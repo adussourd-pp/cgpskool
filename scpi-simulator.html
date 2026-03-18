@@ -28,7 +28,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-html,body{height:100%}body{font-family:'Outfit',sans-serif;color:var(--noir);background:var(--blanc);-webkit-font-smoothing:antialiased;margin:0}
+body{font-family:'Outfit',sans-serif;color:var(--noir);background:var(--blanc);-webkit-font-smoothing:antialiased}
 
 /* ── NAV ── */
 nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
@@ -46,10 +46,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-fi
 .nav-btn.outline:hover{border-color:var(--ambre);color:var(--ambre);background:transparent}
 
 /* ── LAYOUT ── */
-.app-shell{display:flex;flex-direction:row;min-height:calc(100vh - 64px);width:100%}
+.app-shell{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 64px);width:100%}
 
 /* ── SIDEBAR ── */
-.sidebar{background:var(--gris-l);border-right:1px solid var(--bord);padding:24px 20px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:360px;min-width:360px;max-width:360px;flex-shrink:0;box-sizing:border-box;overflow-x:hidden}
+.sidebar{background:var(--gris-l);border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:360px;min-width:360px;max-width:360px;box-sizing:border-box}
 .sidebar-section{margin-bottom:28px}
 .sidebar-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .sidebar-label::after{content:'';flex:1;height:1px;background:var(--bord)}
@@ -94,12 +94,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .slider-labs{display:flex;justify-content:space-between;font-size:10px;color:var(--gris);margin-top:2px}
 
 /* CTA */
-.sim-btn{width:100%;padding:13px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:auto;flex-shrink:0;box-sizing:border-box;display:block}
+.sim-btn{width:100%;padding:14px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:4px}
 .sim-btn:hover{background:var(--ambre-d);color:var(--blanc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,131,42,0.25)}
 .divider{height:1px;background:var(--bord);margin:20px 0}
 
 /* ── MAIN CONTENT ── */
-.main-content{padding:32px 40px;background:var(--blanc);flex:1;min-width:0;overflow-y:auto}
+.main-content{padding:32px 40px;background:var(--blanc);min-height:calc(100vh - 64px);min-width:0}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:16px}
 .empty-icon{font-size:52px;opacity:0.15}
 .empty-title{font-family:'Space Grotesk',sans-serif;font-size:26px;color:var(--gris);font-weight:600}
@@ -258,7 +258,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 
 @media print{
   .sidebar,nav,.sim-btn,.nav-right{display:none!important}
-  .app-shell{display:block}
+  .app-shell{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -300,7 +300,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     <div class="sidebar-label">Source du rendement</div>
     <div class="source-toggle">
       <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
-      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux personnalisé</button>
+      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux manuel</button>
     </div>
     <div id="scpiPickerPanel">
       <input class="scpi-search" type="text" placeholder="Rechercher par nom, société…" oninput="filterSCPI(this.value)">
@@ -353,14 +353,13 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         <input type="range" id="ret-horizon" min="3" max="40" value="20" step="1" oninput="document.getElementById('ret-horizon-val').textContent=this.value+' ans'">
         <div class="slider-labs"><span>3 ans</span><span>20 ans</span><span>40 ans</span></div>
       </div>
-    </div>
-
       <div class="input-group">
         <span class="input-label">Votre TMI (calcul rente nette)</span>
         <div class="slider-val" id="ret-tmi-val">30 %</div>
         <input type="range" id="ret-tmi" min="0" max="45" value="30" step="1" oninput="document.getElementById('ret-tmi-val').textContent=this.value+' %'">
         <div class="slider-labs"><span>0 %</span><span>30 %</span><span>45 %</span></div>
       </div>
+    </div>
     </div>
 
     <!-- NP -->
@@ -399,12 +398,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
       </div>
     </div>
 
-  </div>
-
   <button class="sim-btn" onclick="runSimulation()">Lancer la simulation →</button>
 </aside>
-
-<!-- MAIN CONTENT -->
 <div class="main-content" id="mainContent">
   <div class="empty-state" id="emptyState">
     <div class="empty-icon" style="font-size:56px;opacity:0.5">🧑‍🚀</div>
@@ -428,74 +423,30 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 </div>
 
 <script>
-
-// ─── SCPI DATA (Source: Panorama SCPI 2025) ────────────────────────
-// ═══════════════════════════════════════════════════════════
-// SCPI DATA — Source : Panorama SCPI 2025 (Stellium Invest)
-// Barèmes de démembrement extraits du fichier Excel officiel
-// ═══════════════════════════════════════════════════════════
-
-// Barème NP par SCPI : { duree: np_pct }
-// np_pct = % que vous payez en nue-propriété
-// us_pct = 1 - np_pct = % usufruit
-
-const SCPI_DEMEM = {
-  eurovalys: {5:0.81, 7:0.76, 10:0.69, 15:0.6},
-  activimmo: {3:0.865, 4:0.82, 5:0.78, 6:0.75, 7:0.72, 8:0.7, 9:0.67, 10:0.65, 11:0.635, 12:0.625, 13:0.605, 14:0.59, 15:0.58, 16:0.57, 17:0.56, 18:0.55, 19:0.54, 20:0.53},
-  comete: {3:0.875, 4:0.84, 5:0.8, 6:0.77, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.61, 16:0.6, 17:0.59, 18:0.58, 19:0.57, 20:0.56},
-  altaconv: {3:0.855, 4:0.815, 5:0.775, 6:0.745, 7:0.715, 8:0.69, 9:0.665, 10:0.64, 11:0.625, 12:0.61, 13:0.595, 14:0.585, 15:0.575, 16:0.56, 17:0.55, 18:0.54, 19:0.53, 20:0.52},
-  epe: {3:0.875, 4:0.84, 5:0.8, 6:0.765, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.585, 16:0.575, 17:0.565, 18:0.555, 19:0.55, 20:0.545},
-  ep: {3:0.87, 4:0.83, 5:0.79, 6:0.76, 7:0.73, 8:0.71, 9:0.68, 10:0.66, 11:0.65, 12:0.64, 13:0.63, 14:0.62, 15:0.6, 16:0.59, 17:0.58, 18:0.57, 19:0.56, 20:0.55},
-  atream: {5:0.815, 6:0.785, 7:0.755, 8:0.735, 9:0.71, 10:0.69, 12:0.66, 15:0.63, 20:0.59},
-  te: {5:0.8, 6:0.77, 7:0.74, 8:0.71, 9:0.69, 10:0.67, 11:0.65, 12:0.63, 13:0.61, 14:0.6, 15:0.58, 16:0.57, 17:0.56, 18:0.55, 19:0.54, 20:0.53},
-  corigin: {3:0.85, 4:0.81, 5:0.78, 6:0.75, 7:0.72, 8:0.69, 9:0.67, 10:0.65, 11:0.64, 12:0.63, 13:0.62, 14:0.61, 15:0.6, 16:0.59, 17:0.58, 18:0.57, 19:0.56, 20:0.55},
-  ceurion: {3:0.87, 4:0.83, 5:0.79, 6:0.76, 7:0.74, 8:0.73, 9:0.71, 10:0.69, 11:0.68, 12:0.67, 13:0.66, 14:0.65, 15:0.64, 16:0.63, 17:0.62, 18:0.61, 19:0.6, 20:0.59},
-  lfsante: {3:0.875, 4:0.84, 5:0.8, 6:0.765, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.61, 16:0.6, 17:0.59, 18:0.58, 19:0.57, 20:0.56},
-  osmo: {3:0.875, 4:0.84, 5:0.8, 6:0.765, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.61, 16:0.6, 17:0.59, 18:0.58, 19:0.57, 20:0.56},
-  ncap: {3:0.84, 4:0.81, 5:0.77, 6:0.74, 7:0.71, 8:0.68, 9:0.66, 10:0.64, 11:0.63, 12:0.61, 13:0.6, 14:0.59, 15:0.58},
-  perial: {5:0.77, 6:0.735, 7:0.705, 8:0.675, 9:0.65, 10:0.62, 11:0.605, 12:0.585, 13:0.565, 14:0.55, 15:0.53},
-  immorente: {5:0.7975, 6:0.765, 7:0.7375, 8:0.71, 9:0.6875, 10:0.665, 11:0.645, 12:0.6275, 13:0.61, 14:0.595, 15:0.5825, 16:0.57, 17:0.56, 18:0.55, 19:0.54, 20:0.5325},
-  sofidy: {5:0.81, 6:0.78, 7:0.7525, 8:0.725, 9:0.6975, 10:0.675, 11:0.655, 12:0.635, 13:0.6175, 14:0.6, 15:0.585, 16:0.57, 17:0.5575, 18:0.545, 19:0.535, 20:0.5275},
-};
-
-function getNP(scpiId, duree) {
-  const table = SCPI_DEMEM[scpiId];
-  if (!table || Object.keys(table).length === 0) return null;
-  if (table[duree] !== undefined) return table[duree];
-  const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
-  const lower = keys.filter(k=>k<=duree).pop();
-  const upper = keys.filter(k=>k>=duree).shift();
-  if (lower === undefined) return table[upper];
-  if (upper === undefined) return table[lower];
-  const t = (duree-lower)/(upper-lower);
-  return table[lower] + t*(table[upper]-table[lower]);
-}
-
-const SCPI_DATA = [
-  {id:'eurovalys',name:'Eurovalys',manager:'ADVENIS',theme:'Bureaux',geo:'Allemagne',yieldGross:0.055,capi:950.97,collecteNet2025:0,retraits2025:16.78,partsAttente:6.14,tof:0.901,leverage:0.3592,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:749.03,valeurReconstitution:961.23,assets:36,tenants:195,sqm:454450,geography:{"Allemagne":1.0},assetTypes:{"Bureaux":0.84, "Commerces":0.02, "Production":0.09, "Autres":0.03},price:960},
-  {id:'activimmo',name:'Activimmo',manager:'ALDÉRAN',theme:'Logistique',geo:'International',yieldGross:0.0552,capi:1400,collecteNet2025:95.1,retraits2025:21.79,partsAttente:0,tof:0.781,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:508.08,valeurReconstitution:610.67,assets:179,tenants:372,sqm:1392833,geography:{"France":0.78, "Espagne":0.14, "Italie":0.04, "Pays-Bas":0.02, "Portugal":0.01, "Autres":0.01},assetTypes:{"Loc. d'activités":0.32, "Entrepôts":0.51, "Logistique":0.09, "Transports":0.07},price:610},
-  {id:'comete',name:'Comète',manager:'ALDÉRAN',theme:'Diversifié',geo:'International',yieldGross:0.1118,capi:519.6,collecteNet2025:398.9,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:219.03,valeurReconstitution:253.53,assets:27,tenants:72,sqm:232858,geography:{"Espagne":0.154, "Italie":0.124, "Pays-Bas":0.103, "Royaume-Uni":0.465, "Autres":0.154},assetTypes:{"Bureaux":0.14, "Loisirs":0.06, "Hôtellerie":0.16, "Logistique":0.24, "Commerce":0.28, "Éducation":0.12},price:250},
-  {id:'altaconv',name:'Alta Convictions',manager:'ALTAREA IM',theme:'Diversifié',geo:'France',yieldGross:0.065,capi:105.9,collecteNet2025:42.3,retraits2025:0,partsAttente:0,tof:0.96,leverage:0.14,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:281.63,valeurReconstitution:333.68,assets:16,tenants:29,sqm:58773,geography:{"France":0.8, "International":0.1, "Espagne":0.1},assetTypes:{"Commerces":0.68, "Logistique":0.23, "Locaux d'activité":0.09},price:308},
-  {id:'epe',name:'Epargne Pierre Europe',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'Europe',yieldGross:0.0675,capi:559,collecteNet2025:291.6,retraits2025:0.96,partsAttente:0,tof:1.0,leverage:0,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:172.14,valeurReconstitution:205.4,assets:27,tenants:54,sqm:null,geography:{"Espagne":0.34, "Pays-Bas":0.1, "Irlande":0.29, "Allemagne":0.27},assetTypes:{"Bureaux":0.23, "Commerces":0.2, "Hôtels":0.32, "Locaux activité":0.19, "Santé":0.05},price:200},
-  {id:'ep',name:'Epargne Pierre',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'France',yieldGross:0.0528,capi:2803,collecteNet2025:69.99,retraits2025:43.81,partsAttente:0,tof:0.9445,leverage:0.112,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:168.1,valeurReconstitution:207.22,assets:414,tenants:1020,sqm:1151069,geography:{"Rég. parisienne":0.27, "Province":0.73},assetTypes:{"Bureaux":0.47, "Commerces":0.29, "Loc. d'activités":0.08, "Hôtels":0.1, "Santé":0.06},price:208},
-  {id:'atream',name:'Atream Hôtels',manager:'ATREAM',theme:'Hôtellerie',geo:'Europe',yieldGross:0.065,capi:320.3,collecteNet2025:21.04,retraits2025:5.9,partsAttente:0,tof:1.0,leverage:0.2487,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:874.7,valeurReconstitution:1064.31,assets:22,tenants:null,sqm:null,geography:{"France":0.33, "Pays-Bas":0.14, "Allemagne":0.3, "Belgique":0.23},assetTypes:{"Hôtels":0.71, "Hébergements":0.29},price:1000},
-  {id:'te',name:'Transitions Europe',manager:'ARKEA REIM',theme:'Diversifié',geo:'Europe',yieldGross:0.0825,capi:1100,collecteNet2025:557.96,retraits2025:1.38,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:177.87,valeurReconstitution:207.49,assets:54,tenants:313,sqm:null,geography:{"Espagne":0.36, "Pays-Bas":0.15, "Allemagne":0.21, "Irlande":0.09, "Italie":0.13, "Autres":0.06},assetTypes:{"Bureaux":0.31, "Commerces":0.27, "Logistique":0.16, "Life Science":0.12, "Autres":0.14},price:202},
-  {id:'corigin',name:'Corum Origin',manager:'CORUM',theme:'Diversifié',geo:'Europe',yieldGross:0.073,capi:3794,collecteNet2025:530.43,retraits2025:51.97,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,assets:164,tenants:401,sqm:1638679,geography:{"Pays-Bas":0.27, "Italie":0.15, "Finlande":0.09, "Irlande":0.13, "Espagne":0.09, "Autres":0.27},assetTypes:{"Bureaux":0.58, "Commerces":0.26, "Hôtels":0.08, "Activité":0.06, "Santé":0.02},price:1135},
-  {id:'ceurion',name:'Corum Eurion',manager:'CORUM',theme:'Diversifié',geo:'Europe',yieldGross:0.065,capi:1477,collecteNet2025:149.43,retraits2025:16.27,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:184.76,valeurReconstitution:229.29,assets:49,tenants:107,sqm:486537,geography:{"Pays-Bas":0.23, "Italie":0.14, "Irlande":0.22, "Espagne":0.07, "Portugal":0.09, "Autres":0.25},assetTypes:{"Bureaux":0.74, "Commerces":0.06, "Hôtels":0.1, "Activité":0.08, "Santé":0.02},price:215},
-  {id:'lfsante',name:'LF Avenir Santé',manager:'LA FRANÇAISE',theme:'Santé',geo:'France & Europe',yieldGross:0.0933,capi:259.9,collecteNet2025:36.6,retraits2025:1.9,partsAttente:0,tof:1.0,leverage:0.2621,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:244.18,valeurReconstitution:302.3,assets:32,tenants:null,sqm:56104,geography:{"France":0.52, "Belgique":0.1, "Irlande":0.08, "Autres":0.3},assetTypes:{"Santé":1.0},price:300},
-  {id:'osmo',name:'Osmo Energie',manager:'MATA CAPITAL',theme:'Diversifié',geo:'Europe',yieldGross:0.0933,capi:79,collecteNet2025:47.39,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:246.78,valeurReconstitution:303.67,assets:23,tenants:35,sqm:42790,geography:{"Royaume-Uni":0.42, "France":0.33, "Pays-Bas":0.08, "Irlande":0.11, "Allemagne":0.06},assetTypes:{"Bureaux":0.39, "Commerces":0.43, "Activité & Log.":0.18},price:300},
-  {id:'ncap',name:'NCAP Régions',manager:'NORMA CAPITAL',theme:'Diversifié',geo:'France',yieldGross:0.0601,capi:1084,collecteNet2025:87.2,retraits2025:21,partsAttente:0,tof:0.917,leverage:0.2,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:570.66,valeurReconstitution:698.29,assets:178,tenants:430,sqm:506400,geography:{"Province":0.72, "Rég. parisienne":0.26, "Outre-mer":0.02},assetTypes:{"Bureaux":0.56, "Commerces":0.3, "Locaux activité":0.14},price:682},
-  {id:'perial',name:'Perial Opportunités Europe',manager:'PERIAL',theme:'Diversifié',geo:'France & Europe',yieldGross:0.055,capi:788,collecteNet2025:10.22,retraits2025:26.68,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:33.56,valeurReconstitution:42.93,assets:128,tenants:309,sqm:371968,geography:{"France":0.59, "Pays-Bas":0.14, "Allemagne":0.13, "Espagne":0.13, "Italie":0.02},assetTypes:{"Bureaux":0.48, "Commerces":0.19, "Hôtels":0.27, "Activité":0.02, "Santé":0.05},price:44},
-  {id:'immorente',name:'Immorente',manager:'SOFIDY',theme:'Diversifié',geo:'International',yieldGross:0.0572,capi:4391,collecteNet2025:5.92,retraits2025:60.96,partsAttente:88.6,tof:null,leverage:null,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,assets:994,tenants:3227,sqm:null,geography:{"Paris":0.23, "Rég. parisienne":0.24, "Province":0.32, "International":0.21},assetTypes:{"Bureaux":0.35, "Commerces":0.52, "Hôtels":0.1, "Autres":0.03},price:340},
-  {id:'sofidy',name:'Sofidy Europe Invest',manager:'SOFIDY',theme:'Diversifié',geo:'Europe',yieldGross:0.065,capi:406,collecteNet2025:35.52,retraits2025:2.43,partsAttente:0,tof:null,leverage:0.21,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,assets:36,tenants:null,sqm:null,geography:{"Espagne":0.29, "Pays-Bas":0.35, "Allemagne":0.14, "Irlande":0.1, "Belgique":0.02, "Royaume-Uni":0.1},assetTypes:{"Bureaux":0.36, "Commerces":0.19, "Hôtels":0.2, "MSP":0.21, "Logistique":0.05},price:235},
+// ─── SCPI DATA ────────────────────────────────────────────────────
+const SCPI_DATA=[
+{id:'eurovalys',name:'Eurovalys',manager:'ADVENIS',theme:'Bureaux',geo:'Allemagne',price:960,yieldGross:0.055,yieldNet:0.04125,capi:950.97,collecteNet2025:0,retraits2025:16.78,partsAttente:6.14,tof:0.901,leverage:0.3592,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:749.03,valeurReconstitution:961.23,decote:-0.0013,assets:36,tenants:195,sqm:454450,geography:{'Allemagne':1.0},assetTypes:{'Bureaux':0.84,'Commerces':0.02,'Production':0.09,'Autres':0.03}},
+{id:'activimmo',name:'Activimmo',manager:'ALDÉRAN',theme:'Logistique',geo:'International',price:610,yieldGross:0.0552,yieldNet:0.0414,capi:1400,collecteNet2025:95.1,retraits2025:21.79,partsAttente:0,tof:0.781,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:508.08,valeurReconstitution:610.67,decote:null,assets:179,tenants:372,sqm:1392833,geography:{'France':0.78,'Espagne':0.14,'Italie':0.04,'Pays-Bas':0.02,'Portugal':0.01,'Autres':0.01},assetTypes:{"Loc. d'activités":0.32,'Entrepôts':0.51,'Logistique':0.09,'Transports':0.07}},
+{id:'comete',name:'Comète',manager:'ALDÉRAN',theme:'Diversifié',geo:'International',price:250,yieldGross:0.1118,yieldNet:0.08385,capi:519.6,collecteNet2025:398.9,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:219.03,valeurReconstitution:253.53,decote:null,assets:27,tenants:72,sqm:232858,geography:{'Espagne':0.154,'Italie':0.124,'Pays-Bas':0.103,'Royaume-Uni':0.465,'Autres':0.154},assetTypes:{'Bureaux':0.14,'Loisirs':0.06,'Hôtellerie':0.16,'Logistique':0.24,'Commerce':0.28,'Éducation':0.12}},
+{id:'altaconv',name:'Alta Convictions',manager:'ALTAREA IM',theme:'Diversifié',geo:'France',price:308,yieldGross:0.065,yieldNet:0.03432,capi:105.9,collecteNet2025:42.3,retraits2025:0,partsAttente:0,tof:0.96,leverage:0.14,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:281.63,valeurReconstitution:333.68,decote:-0.077,assets:16,tenants:29,sqm:58773,geography:{'France':0.80,'International':0.10,'Espagne':0.10},assetTypes:{'Commerces':0.68,'Logistique':0.23,"Locaux d'activité":0.09}},
+{id:'epe',name:'Epargne Pierre Europe',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'Europe',price:200,yieldGross:0.0675,yieldNet:0.050625,capi:559,collecteNet2025:291.6,retraits2025:0.96,partsAttente:0,tof:1.0,leverage:0,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:172.14,valeurReconstitution:205.4,decote:-0.026,assets:27,tenants:54,sqm:null,geography:{'Espagne':0.34,'Pays-Bas':0.10,'Irlande':0.29,'Allemagne':0.27},assetTypes:{'Bureaux':0.23,'Commerces':0.20,'Hôtels':0.32,'Locaux activité':0.19,'Santé':0.05}},
+{id:'ep',name:'Epargne Pierre',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'France',price:208,yieldGross:0.0528,yieldNet:0.0278784,capi:2803,collecteNet2025:69.99,retraits2025:43.81,partsAttente:0,tof:0.9445,leverage:0.112,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:168.1,valeurReconstitution:207.22,decote:0.004,assets:414,tenants:1020,sqm:1151069,geography:{'Rég. parisienne':0.27,'Province':0.73},assetTypes:{'Bureaux':0.47,'Commerces':0.29,"Loc. d'activités":0.08,'Hôtels':0.10,'Santé':0.06}},
+{id:'atream',name:'Atream Hôtels',manager:'ATREAM',theme:'Hôtellerie',geo:'Europe',price:1000,yieldGross:0.065,yieldNet:0.04875,capi:320.3,collecteNet2025:21.04,retraits2025:5.9,partsAttente:0,tof:1.0,leverage:0.2487,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:874.7,valeurReconstitution:1064.31,decote:-0.060,assets:22,tenants:null,sqm:null,geography:{'France':0.33,'Pays-Bas':0.14,'Allemagne':0.30,'Belgique':0.23},assetTypes:{'Hôtels':0.71,'Hébergements':0.29}},
+{id:'te',name:'Transitions Europe',manager:'ARKEA REIM',theme:'Diversifié',geo:'Europe',price:202,yieldGross:0.0825,yieldNet:0.061875,capi:1100,collecteNet2025:557.96,retraits2025:1.38,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:177.87,valeurReconstitution:207.49,decote:-0.026,assets:54,tenants:313,sqm:null,geography:{'Espagne':0.36,'Pays-Bas':0.15,'Allemagne':0.21,'Irlande':0.09,'Italie':0.13,'Autres':0.06},assetTypes:{'Bureaux':0.31,'Commerces':0.27,'Logistique':0.16,'Life Science':0.12,'Autres':0.14}},
+{id:'ceurion',name:'Corum Eurion',manager:'CORUM',theme:'Diversifié',geo:'Europe',price:215,yieldGross:0.065,yieldNet:0.04875,capi:1477,collecteNet2025:149.43,retraits2025:16.27,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:184.76,valeurReconstitution:229.29,decote:-0.062,assets:49,tenants:107,sqm:486537,geography:{'Pays-Bas':0.23,'Italie':0.14,'Irlande':0.22,'Espagne':0.07,'Portugal':0.09,'Autres':0.25},assetTypes:{'Bureaux':0.74,'Commerces':0.06,'Hôtels':0.10,'Activité':0.08,'Santé':0.02}},
+{id:'corigin',name:'Corum Origin',manager:'CORUM',theme:'Diversifié',geo:'Europe',price:1135,yieldGross:0.073,yieldNet:0.05475,capi:3794,collecteNet2025:530.43,retraits2025:51.97,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:164,tenants:401,sqm:1638679,geography:{'Pays-Bas':0.27,'Italie':0.15,'Finlande':0.09,'Irlande':0.13,'Espagne':0.09,'Autres':0.27},assetTypes:{'Bureaux':0.58,'Commerces':0.26,'Hôtels':0.08,'Activité':0.06,'Santé':0.02}},
+{id:'lfsante',name:'LF Avenir Santé',manager:'LA FRANÇAISE',theme:'Santé',geo:'France & Europe',price:300,yieldGross:0.0933,yieldNet:0.069975,capi:259.9,collecteNet2025:36.6,retraits2025:1.9,partsAttente:0,tof:1.0,leverage:0.2621,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:244.18,valeurReconstitution:302.3,decote:-0.008,assets:32,tenants:null,sqm:56104,geography:{'France':0.52,'Belgique':0.10,'Irlande':0.08,'Autres':0.30},assetTypes:{'Santé':1.0}},
+{id:'osmo',name:'Osmo Energie',manager:'MATA CAPITAL',theme:'Diversifié',geo:'Europe',price:300,yieldGross:0.0933,yieldNet:0.069975,capi:79,collecteNet2025:47.39,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:246.78,valeurReconstitution:303.67,decote:-0.012,assets:23,tenants:35,sqm:42790,geography:{'Royaume-Uni':0.42,'France':0.33,'Pays-Bas':0.08,'Irlande':0.11,'Allemagne':0.06},assetTypes:{'Bureaux':0.39,'Commerces':0.43,'Activité & Log.':0.18}},
+{id:'ncap',name:'NCAP Régions',manager:'NORMA CAPITAL',theme:'Diversifié',geo:'France',price:682,yieldGross:0.0601,yieldNet:0.0317328,capi:1084,collecteNet2025:87.2,retraits2025:21,partsAttente:0,tof:0.917,leverage:0.20,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:570.66,valeurReconstitution:698.29,decote:-0.023,assets:178,tenants:430,sqm:506400,geography:{'Province':0.72,'Rég. parisienne':0.26,'Outre-mer':0.02},assetTypes:{'Bureaux':0.56,'Commerces':0.30,"Locaux activité":0.14}},
+{id:'perial',name:'Perial Opportunités Europe',manager:'PERIAL',theme:'Diversifié',geo:'France & Europe',price:44,yieldGross:0.055,yieldNet:0.04125,capi:788,collecteNet2025:10.22,retraits2025:26.68,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:33.56,valeurReconstitution:42.93,decote:null,assets:128,tenants:309,sqm:371968,geography:{'France':0.59,'Pays-Bas':0.14,'Allemagne':0.13,'Espagne':0.13,'Italie':0.02},assetTypes:{'Bureaux':0.48,'Commerces':0.19,'Hôtels':0.27,'Activité':0.02,'Santé':0.05}},
+{id:'immorente',name:'Immorente',manager:'SOFIDY',theme:'Diversifié',geo:'International',price:340,yieldGross:0.0572,yieldNet:0.0429,capi:4391,collecteNet2025:5.92,retraits2025:60.96,partsAttente:88.6,tof:null,leverage:null,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:994,tenants:3227,sqm:null,geography:{'Paris':0.23,'Rég. parisienne':0.24,'Province':0.32,'International':0.21},assetTypes:{'Bureaux':0.35,'Commerces':0.52,'Hôtels':0.10,'Autres':0.03}},
+{id:'sofidy',name:'Sofidy Europe Invest',manager:'SOFIDY',theme:'Diversifié',geo:'Europe',price:235,yieldGross:0.065,yieldNet:0.04875,capi:406,collecteNet2025:35.52,retraits2025:2.43,partsAttente:0,tof:null,leverage:0.21,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:36,tenants:null,sqm:null,geography:{'Espagne':0.29,'Pays-Bas':0.35,'Allemagne':0.14,'Irlande':0.10,'Belgique':0.02,'Royaume-Uni':0.10},assetTypes:{'Bureaux':0.36,'Commerces':0.19,'Hôtels':0.20,'MSP':0.21,'Logistique':0.05}}
 ];
 
-// Export pour usage dans les simulateurs
+// NP keys by duration (US% / NP%)
+const US_PCT={3:0.15,4:0.18,5:0.24,6:0.27,7:0.29,8:0.32,9:0.34,10:0.37,11:0.39,12:0.42,13:0.44,14:0.47,15:0.50,16:0.52,17:0.54,18:0.56,19:0.58,20:0.60};
+function getNPpct(dur){return 1-(US_PCT[Math.min(dur,20)]||0.37)}
 
-
-
-// Barème de secours si SCPI non trouvée
-const US_PCT_FALLBACK={3:0.15,4:0.18,5:0.24,6:0.27,7:0.29,8:0.32,9:0.34,10:0.37,11:0.39,12:0.42,13:0.44,14:0.47,15:0.50,16:0.52,17:0.54,18:0.56,19:0.58,20:0.60};
 let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi';
 
 // ─── INIT ─────────────────────────────────────────────────────────
@@ -540,7 +491,7 @@ function getActiveScpi(){
     const label=document.getElementById('custom-name').value.trim()||'Simulation taux personnalisé';
     return{
       id:'custom',name:label,manager:'—',theme:'—',geo:'—',
-      price:null,yieldGross:gross,
+      price:null,yieldGross:gross,yieldNet:net,
       capi:null,collecteNet2025:null,retraits2025:null,partsAttente:0,
       tof:null,leverage:null,isr:false,sri:null,
       durabilite:'—',valeurRealisation:null,valeurReconstitution:null,decote:null,
@@ -583,31 +534,14 @@ function calcRetraite(scpi,init,monthly,reinvestPct,horizon,tmi){
 }
 
 function calcNP(scpi,initValue,duration){
-  // Utilise le barème réel de la SCPI depuis SCPI_DEMEM
-  const npPctRaw = scpi.id ? getNP(scpi.id, duration) : null;
-  const npPct = npPctRaw !== null ? npPctRaw : (1-(US_PCT_FALLBACK[Math.min(duration,20)]||0.37));
-  const usPct = 1 - npPct;
-  if(!scpi.price){
-    // Mode taux personnalisé : pas de prix de part, on travaille en montant investi
-    const actual=initValue;
-    const ppVal=initValue/npPct; // PP reconstituée depuis l'investissement NP
-    const gain=ppVal-actual;
-    const tmi=0.30, ps=0.172;
-    const renteGross=ppVal*scpi.yieldGross/12;
-    const renteNet=renteGross*(1-tmi-ps);
-    return{nbParts:null,actual,usPct,npPct,priceNP:null,ppVal,gain,renteGross,renteNet,duration,isCustom:true};
-  }
+  const usPct=US_PCT[Math.min(duration,20)]||0.37,npPct=1-usPct;
   const priceNP=scpi.price*npPct,nbParts=Math.floor(initValue/priceNP),actual=nbParts*priceNP;
   const ppVal=nbParts*scpi.price,gain=ppVal-actual;
-  const renteGross=ppVal*scpi.yieldGross/12;
-  const renteNet=renteGross*(1-0.30-0.172);
-  return{nbParts,actual,usPct,npPct,priceNP,ppVal,gain,renteGross,renteNet,duration,isCustom:false};
+  return{nbParts,actual,usPct,npPct,priceNP,ppVal,gain,renteGross:ppVal*scpi.yieldGross/12,renteNet:ppVal*scpi.yieldNet/12,duration};
 }
 
 function calcEntreprise(scpi,investUS,duration,isTaxPct,investNPperso){
-  const npPctRaw = scpi.id ? getNP(scpi.id, duration) : null;
-  const npPct = npPctRaw !== null ? npPctRaw : (1-(US_PCT_FALLBACK[Math.min(duration,20)]||0.37));
-  const usPct = 1 - npPct;
+  const usPct=US_PCT[Math.min(duration,20)]||0.37,npPct=1-usPct;
   const ppVal=investUS/usPct;
   const investNPneeded=ppVal*npPct;
   const npCoverage=investNPperso>0?Math.min(investNPperso/investNPneeded,1):null;
@@ -642,11 +576,11 @@ function runSimulation(){
 function renderSCPIHeader(){
   const s=getActiveScpi();
   const decStr='';
-  const tofStr='';
+  const tofStr=s.tof?`<div class="sh-item"><div class="sh-label">TOF</div><div class="sh-val ${s.tof<0.9?'red':'gre'}">${(s.tof*100).toFixed(1)}%</div></div>`:'';
   const attenteStr=s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:'';
   const priceStr=s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:'';
   const capiStr=s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:'';
-  const customBadge=s.isCustom?`<div class="sh-item"><div class="sh-label">Mode</div><div class="sh-val gold">✏️ Taux personnalisé</div></div>`:'';
+  const customBadge=s.isCustom?`<div class="sh-item"><div class="sh-label">Mode</div><div class="sh-val gold">✏️ Taux manuel</div></div>`:'';
   document.getElementById('scpiHeaderBar').innerHTML=`
     <div class="scpi-header fade-in">
       <div class="scpi-header-name">${s.name} <span>— ${s.manager}</span></div>
@@ -705,27 +639,22 @@ function renderNP(){
   const init=+document.getElementById('np-init').value,duration=+document.getElementById('np-duration').value;
   const res=calcNP(s,init,duration);
 
-  const kpi1sub=res.isCustom?'Montant investi en NP':(res.nbParts+' parts × '+fmt(res.priceNP)+' €');
-  const plusPct=res.actual>0?Math.round(res.gain/res.actual*100):0;
-
   document.getElementById('kpiRow').innerHTML=[
-    {label:'Investissement NP',val:fmt(res.actual)+' €',sub:kpi1sub,cls:''},
+    {label:'Investissement NP',val:fmt(res.actual)+' €',sub:res.nbParts+' parts × '+fmt(res.priceNP)+' €',cls:''},
     {label:'Valeur PP au terme',val:fmt(res.ppVal)+' €',sub:'Pleine propriété après '+duration+' ans',cls:'featured'},
-    {label:'Plus-value latente',val:fmt(res.gain)+' €',sub:'+'+plusPct+'% sur le capital investi',cls:'green-card'},
-    {label:'Rente nette / mois',val:fmt(res.renteNet)+' €',sub:'Au terme (après IR 30% + PS 17.2%)',cls:'green-card'}
+    {label:'Plus-value latente',val:fmt(res.gain)+' €',sub:'+'+Math.round(res.gain/res.actual*100)+'% sur le capital investi',cls:'green-card'},
+    {label:'Rente nette / mois',val:fmt(res.renteNet)+' €',sub:'Au terme du démembrement',cls:'green-card'}
   ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   document.getElementById('chartTitle').textContent='Répartition NP / US sur la PP';
   renderBarNP(res);
-
-  const rowPrix=res.isCustom?nprow("Mode","Taux personnalisé — pas de prix de part"):nprow("Prix part en NP",fmt(res.priceNP)+' €');
 
   document.getElementById('extraContent').innerHTML=`
     <div class="np-grid fade-in">
       <div class="np-card you">
         <div class="np-badge you">Nue-propriétaire — Vous</div>
         ${nprow("Clé NP",Math.round(res.npPct*100)+' %')}
-        ${rowPrix}
+        ${nprow("Prix part en NP",fmt(res.priceNP)+' €')}
         ${nprow("Investissement total",fmt(res.actual)+' €')}
         ${nprow("Pendant "+duration+" ans","Aucun revenu ❌",null,'red')}
         ${nprow("Au terme","Pleine propriété ✅",null,'gre')}
@@ -852,22 +781,10 @@ function sr(label,val,col){
 }
 
 function renderStatsGridHTML(s){
-  // Rappel SCPI en haut des stats
-  const scpiRecap = s.isCustom ? '' : `
-    <div style="grid-column:1/-1;background:var(--noir);border-radius:12px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-bottom:4px">
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--blanc);margin-right:auto">${s.name} <span style="color:var(--ambre);font-weight:400">— ${s.manager}</span></div>
-      ${s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:''}
-      <div class="sh-item"><div class="sh-label">Taux de distribution</div><div class="sh-val gold">${(s.yieldGross*100).toFixed(2)}%</div></div>
-      ${s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:''}
-      ${s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:''}
-      ${s.isr?`<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>`:''}
-      <div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>
-    </div>`;
-
-  if(s.isCustom) return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px"><div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode personnalisé. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div></div>`;
+  if(s.isCustom) return `<div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode personnalisé. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div>`;
   const assetBars=Object.entries(s.assetTypes).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--ambre)"></div></div></div>`).join('');
   const geoBars=Object.entries(s.geography).slice(0,6).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--blue)"></div></div></div>`).join('');
-  return`<div class="stats-grid fade-in" style="margin-bottom:24px">${scpiRecap}
+  return`<div class="stats-grid fade-in">
     <div class="stat-block">
       <div class="stat-block-title">Chiffres clés 2025</div>
       ${sr('Capitalisation',s.capi+'M€')}
@@ -897,55 +814,33 @@ function renderStatsGridHTML(s){
 }
 
 function renderBarNP(res){
-  if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  const decotePct=Math.round(res.usPct*100);
-  const plusvalPct=Math.round((res.gain/res.actual)*100);
-  const rendAnnuel=((Math.pow(res.ppVal/res.actual,1/res.duration)-1)*100).toFixed(1);
-  const hNP=130;
-  const hPP=Math.min(Math.round(hNP*(res.ppVal/res.actual)),210);
-  const svgH=260, base=svgH-30;
-  const npX=55, ppX=230, barW=65;
-  const npTop=base-hNP, ppTop=base-hPP;
-  const midX=(npX+barW+ppX)/2, midY=(npTop+ppTop)/2-14;
-  const angle=(Math.atan2(ppTop-npTop, ppX-(npX+barW))*180/Math.PI).toFixed(1);
-
-  const svgHTML=`<svg viewBox="0 0 420 ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:55%;height:${svgH}px;flex-shrink:0">
-    <defs><marker id="arr" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#0D0D0D"/></marker></defs>
-    <line x1="30" y1="${base}" x2="320" y2="${base}" stroke="#0D0D0D" stroke-width="2.5" marker-end="url(#arr)"/>
-    <text x="318" y="${base+18}" font-family="Outfit,sans-serif" font-size="12" font-weight="700" fill="#3A3A3A">${res.duration} ans</text>
-    <rect x="${npX}" y="${npTop}" width="${barW}" height="${hNP}" fill="#C8832A" rx="5"/>
-    <text transform="rotate(-90,${npX+barW/2},${base-(hNP/2)})" x="${npX+barW/2}" y="${base-(hNP/2)+4}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="white">Nue-propriété</text>
-    <text x="${npX+barW/2}" y="${npTop-22}" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#0D0D0D">${fmt(res.actual)} €</text>
-    <rect x="${npX}" y="${npTop-18}" width="${barW}" height="17" fill="#FDEEEC" rx="4"/>
-    <text x="${npX+barW/2}" y="${npTop-5}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#C0392B">−${decotePct}%</text>
-    <rect x="${ppX}" y="${ppTop}" width="${barW}" height="${hPP}" fill="#C8832A" rx="5"/>
-    <text transform="rotate(-90,${ppX+barW/2},${base-(hPP/2)})" x="${ppX+barW/2}" y="${base-(hPP/2)+4}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="white">Pleine-propriété</text>
-    <text x="${ppX+barW/2}" y="${ppTop-10}" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#0D0D0D">${fmt(res.ppVal)} €</text>
-    <line x1="${npX+barW}" y1="${npTop}" x2="${ppX}" y2="${ppTop}" stroke="#C8832A" stroke-width="2" stroke-dasharray="6,4"/>
-    <text x="${midX}" y="${midY}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#C8832A" transform="rotate(${angle},${midX},${midY+8})">${rendAnnuel}% / an</text>
-    <text x="${(npX+barW+ppX)/2}" y="${base-4}" text-anchor="middle" font-size="20">💰</text>
-  </svg>`;
-
-  const atoutsHTML=`<div style="padding:0 16px;flex:1">
-    <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--noir);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--bord)">Atouts :</div>
-    <div style="display:flex;flex-direction:column;gap:13px">
-      <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-size:20px">👍</span><div><div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--ambre-d)">Décote à l'achat : −${decotePct}%</div><div style="font-size:12px;color:var(--gris);margin-top:2px">Acquisition de la simple nue-propriété</div></div></div>
-      <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-size:20px">👍</span><div><div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--ambre-d)">Fiscalité : 0%</div><div style="font-size:12px;color:var(--gris);margin-top:2px">Absence de revenus pendant le démembrement</div></div></div>
-      <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-size:20px">👍</span><div><div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--ambre-d)">Patrimoine +${plusvalPct}%</div><div style="font-size:12px;color:var(--gris);margin-top:2px">Revalorisation automatique à l'extinction de l'usufruit</div></div></div>
-    </div>
-  </div>`;
-
-  const wrap=document.getElementById('chartBox').querySelector('.chart-wrap');
-  wrap.style.height='auto';
-  wrap.innerHTML=`<div style="display:flex;align-items:flex-start;gap:0;padding:8px 0">${svgHTML}${atoutsHTML}</div>`;
+  if(chartInstance)chartInstance.destroy();
+  const ctx=document.getElementById('mainChart').getContext('2d');
+  chartInstance=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Pleine Propriété — '+fmt(res.ppVal)+' €'],
+      datasets:[
+        {label:'Nue-Propriété '+Math.round(res.npPct*100)+'% — '+fmt(res.actual)+' €',data:[res.actual],backgroundColor:'#F0A738',borderRadius:6,borderSkipped:false},
+        {label:'Usufruit '+Math.round(res.usPct*100)+'% — '+fmt(res.ppVal-res.actual)+' €',data:[res.ppVal-res.actual],backgroundColor:'#EDE8DF',borderRadius:6,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:'Outfit',size:11},padding:14}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label}}
+      },
+      scales:{
+        x:{stacked:true,min:0,ticks:{callback:v=>fmt(v)+' €',font:{family:'Outfit',size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{stacked:true,display:false}
+      }
+    }
+  });
   document.getElementById('chartLegend').innerHTML='';
 }
 
 function renderChart(labels,datasets){
-  // Restaurer le canvas si remplacé par un SVG (mode NP)
-  const wrap=document.getElementById('chartBox').querySelector('.chart-wrap');
-  if(!wrap.querySelector('canvas')){wrap.innerHTML='<canvas id="mainChart"></canvas>';}
-  wrap.style.height='230px';
   if(chartInstance)chartInstance.destroy();
   chartInstance=new Chart(document.getElementById('mainChart').getContext('2d'),{
     type:'line',
