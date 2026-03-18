@@ -1288,14 +1288,35 @@ function rPatrimoine(){
     if(t==='C2')return nomC(2);
     return t;
   }
+  function getAssetType(nom){
+    var n=(nom||'').toLowerCase();
+    if(n.indexOf('scpi')>=0)return{label:'SCPI',bg:'#EDF2FB',color:'#2B5EA7'};
+    if(n.indexOf('assurance')>=0)return{label:'Assurance vie',bg:'#F5EFF8',color:'#534AB7'};
+    if(n.indexOf('per ')>=0||n.indexOf('per g')>=0||n.indexOf('perin')>=0)return{label:'PER',bg:'#EAF5EF',color:'#2D7A5B'};
+    if(n.indexOf('résidence')>=0||n.indexOf('residence')>=0||n.indexOf('chalet')>=0)return{label:'Immobilier',bg:'#EAF5EF',color:'#2D7A5B'};
+    if(n.indexOf('livret')>=0||n.indexOf('ldds')>=0||n.indexOf('lep')>=0)return{label:'Livret',bg:'#FDF3E3',color:'#C8832A'};
+    if(n.indexOf('compte courant')>=0||n.indexOf(' cc')>=0)return{label:'Compte',bg:'#F2F1EE',color:'#6B6B6B'};
+    if(n.indexOf('parts de soci')>=0||n.indexOf('sarl')>=0||n.indexOf('sci ')>=0)return{label:'Société',bg:'#FCEBEB',color:'#A32D2D'};
+    if(n.indexOf('pel')>=0)return{label:'PEL',bg:'#FDF3E3',color:'#C8832A'};
+    if(n.indexOf('pea')>=0)return{label:'PEA',bg:'#EDF2FB',color:'#2B5EA7'};
+    return{label:'Autre',bg:'#F2F1EE',color:'#6B6B6B'};
+  }
   function buildHorizonSection(label, badgeCls, items){
     if(!items.length) return '';
-    var total=items.reduce(function(s,a){return s+(a.montant||0);},0);
-    var rows=items.map(function(a){
-      return '<tr><td class="bold">'+a.nom+'</td><td>'+titLabel(a.titulaire)+'</td><td class="right gold">'+fmt(a.montant)+' €</td></tr>';
+    var sorted=items.slice().sort(function(a,b){return (b.montant||0)-(a.montant||0);});
+    var total=sorted.reduce(function(s,a){return s+(a.montant||0);},0);
+    var rows=sorted.map(function(a){
+      var t=getAssetType(a.nom);
+      var tag='<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:'+t.bg+';color:'+t.color+'">'+t.label+'</span>';
+      return '<tr>'
+        +'<td>'+titLabel(a.titulaire)+'</td>'
+        +'<td class="bold">'+a.nom+'</td>'
+        +'<td>'+tag+'</td>'
+        +'<td class="right gold">'+fmt(a.montant)+' €</td>'
+        +'</tr>';
     }).join('');
     return '<tr class="section-header-row" style="background:var(--gris-l)">'
-      +'<td colspan="3" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
+      +'<td colspan="4" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
       +'<span class="badge '+badgeCls+'" style="margin-right:6px">'+label+'</span></td>'
       +'<td class="right" style="font-size:12px;font-weight:700;color:var(--gris-f)">'+fmt(total)+' €</td>'
       +'</tr>'+rows;
@@ -1303,10 +1324,10 @@ function rPatrimoine(){
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
   var mtItems=ED.actifs.filter(function(a){return a.horizon==='mt';});
   var ltItems=ED.actifs.filter(function(a){return a.horizon==='lt';});
-  var allRows=buildHorizonSection('Court terme','badge-blue',ctItems)
+  var allRows=buildHorizonSection('Long terme','badge-amber',ltItems)
              +buildHorizonSection('Moyen terme','badge-green',mtItems)
-             +buildHorizonSection('Long terme','badge-amber',ltItems);
-  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="2">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
+             +buildHorizonSection('Court terme','badge-blue',ctItems);
+  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th>Type</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr>
     <td class="bold">${p.nom}</td><td>${p.titulaire}</td>
