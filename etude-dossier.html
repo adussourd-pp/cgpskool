@@ -1023,10 +1023,15 @@ function parseTextRI(txt){
   // ── 4. ACTIFS ─────────────────────────────────────────────────
   var SKIP_A=['d\u00e9signation','total','immobilier & foncier','immobilier de jouissance','\u00e9pargne','court terme','moyen terme','long terme','retraite et salariale','biens professionnels'];
   var getH=function(n){
+    // Nomenclature Excel V12 exacte
     var nl=(n||'').toLowerCase();
-    if(nl.indexOf('livret')>=0||nl.indexOf('compte courant')>=0||nl.indexOf('ldd')>=0||nl.indexOf('lep')>=0||nl.indexOf('cc')>=0)return'ct';
-    if(nl.indexOf('pel')>=0||nl.indexOf('moyen')>=0)return'mt';
-    return'lt';
+    // Court terme : Livret A, CC, Livret Classique, LDD, Livret Jeune, LEP, CEL
+    if(/livret a|livret bleu|livret classique|livret jeune|compte courant|cc|ldds?|lep|livret d.[ée]pargne pop|cel|compte [ée]pargne logement/.test(nl)) return 'ct';
+    if(/livret/.test(nl) && !/pel/.test(nl)) return 'ct';
+    // Moyen terme : PEL, CAT uniquement (AV, PEA, PEE etc. = long terme selon Excel)
+    if(/pel|plan d.[ée]pargne logement|cat|compte [àa] terme/.test(nl)) return 'mt';
+    // Long terme : tout le reste (AV, Capi, PEA, PEP, CTO, PER, PEE, PERCO, immo, SCPI...)
+    return 'lt';
   };
   ED.actifs=[];
   var actifSection=full.match(/ACTIFS([\s\S]{0,3000}?)(?:PASSIFS|$)/i);
@@ -1071,23 +1076,46 @@ function parseTextRI(txt){
     });
   }
 
-  // ── 6. REVENUS ────────────────────────────────────────────────
-  ED.revenus={c1:0,c2:0,compl:0};
+  // ── 6. REVENUS ─────────────────────────────────────────────────
+  // Stockage séparé : salaires (100%) et revenus fonciers (70%)
+  // Tous les montants sont ANNUELS dans le RI
+  ED.revenus={c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0};
   var revSection=full.match(/REVENUS([\s\S]{0,2000}?)(?:CHARGES|$)/i);
   if(revSection){
     var revLines=revSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
     revLines.forEach(function(line){
       if(line.indexOf('\t')<0)return;
       var parts=line.split('\t');
-      if(/^total$/i.test(parts[0])){
-        ED.revenus.c1=pEur(parts[1]||'0');
-        if(isCouple)ED.revenus.c2=pEur(parts[2]||'0');
+      var label=parts[0].toLowerCase();
+      // Revenus d'activité (salaires, BIC, BNC, BA, auto-entrepreneur)
+      if(/salaire|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label)){
+        var v1=pEur(parts[1]||'0'),v2=pEur(parts[2]||'0');
+        ED.revenus.sal1+=v1; ED.revenus.sal2+=v2;
       }
-      if(/foncier/i.test(parts[0])){
+      // Revenus fonciers et locations meublées (pondérés 70%)
+      if(/foncier|location.meuble|revenus immobilier/i.test(label)){
         var lv=parts.slice(1).filter(function(p){return /[\d\s]+€/.test(p);});
-        if(lv.length)ED.revenus.compl=pEur(lv[lv.length-1]);
+        if(lv.length)ED.revenus.fonc+=pEur(lv[lv.length-1]);
+      }
+      // Total ligne (fallback si salaires non détectés individuellement)
+      if(/^total$/i.test(parts[0])){
+        if(!ED.revenus.sal1&&!ED.revenus.sal2){
+          // Total = salaires + fonciers → on soustrait le foncier après
+          ED.revenus.c1=pEur(parts[1]||'0');
+          if(isCouple)ED.revenus.c2=pEur(parts[2]||'0');
+        }
       }
     });
+    // Calcul final : si on a les salaires détaillés, les utiliser
+    if(ED.revenus.sal1||ED.revenus.sal2){
+      ED.revenus.c1=ED.revenus.sal1;
+      ED.revenus.c2=ED.revenus.sal2;
+    } else if(ED.revenus.fonc>0){
+      // Déduire le foncier du total pour isoler les salaires
+      ED.revenus.c1=Math.max(0,ED.revenus.c1-ED.revenus.fonc/2);
+      ED.revenus.c2=Math.max(0,ED.revenus.c2-ED.revenus.fonc/2);
+    }
+    ED.revenus.compl=ED.revenus.fonc; // compat
   }
 
   // ── 7. CHARGES ────────────────────────────────────────────────
@@ -1123,10 +1151,21 @@ function parseTextRI(txt){
     var psM=fisText.match(/pr.l.vements sociaux nets\s*[:\*]+\s*([\d\s]+)\s*€/i);
     if(psM)ED.fiscal.ps=pEur(psM[1]);
   }
-  if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
+  // Calcul IR progressif si non fourni par le RI
+  if(ED.fiscal.rbg&&(!ED.fiscal.irnet||ED.fiscal.irnet===0)){
+    var calc=calcIR(ED.fiscal.rbg,ED.fiscal.parts||1);
+    if(!ED.fiscal.tmi)ED.fiscal.tmi=calc.tmi;
+    if(!ED.fiscal.irnet)ED.fiscal.irnet=calc.ir;
+  } else if(!ED.fiscal.tmi&&ED.fiscal.rbg){
+    ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts||1);
+  }
 
   var revT=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
-  ED.epMens=Math.max(0,Math.round((revT/12*0.75-ED.charges)*0.3));
+  // Capacité épargne : (revenus nets mensuels - charges) * 30%
+  var _sal=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0);
+  var _fonc=ED.revenus.fonc||ED.revenus.compl||0;
+  var _revNetM=(_sal+_fonc*0.70)/12;
+  ED.epMens=Math.max(0,Math.round((_revNetM-ED.charges)*0.30));
 
   launch();
 }
@@ -1172,7 +1211,14 @@ function generateFromManual(){try{
   ED.fiscal={annee:document.getElementById('fIrAn').value||'—',rbg:parseFloat(document.getElementById('fRbg').value)||0,
     parts:parseFloat(document.getElementById('fParts').value)||1,irnet:parseFloat(document.getElementById('fIrNet').value)||0,
     tmi:parseFloat(document.getElementById('fTMI').value)||0,ps:parseFloat(document.getElementById('fPS').value)||0};
-  if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
+  // Calcul IR progressif si non fourni par le RI
+  if(ED.fiscal.rbg&&(!ED.fiscal.irnet||ED.fiscal.irnet===0)){
+    var calc=calcIR(ED.fiscal.rbg,ED.fiscal.parts||1);
+    if(!ED.fiscal.tmi)ED.fiscal.tmi=calc.tmi;
+    if(!ED.fiscal.irnet)ED.fiscal.irnet=calc.ir;
+  } else if(!ED.fiscal.tmi&&ED.fiscal.rbg){
+    ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts||1);
+  }
   ED.retraite={age1:parseInt(document.getElementById('fRetAge1').value)||64,age2:parseInt(document.getElementById('fRetAge2').value)||64,
     pension1:parseFloat(document.getElementById('fPension1').value)||2500,pension2:parseFloat(document.getElementById('fPension2').value)||2000};
   launch();
@@ -1289,18 +1335,64 @@ function rPatrimoine(){
     return t;
   }
   function getAssetType(nom){
+    // Nomenclature exacte Excel V12 — tags par mots-clés de désignation
     var n=(nom||'').toLowerCase();
-    if(n.indexOf('scpi')>=0)return{label:'SCPI',bg:'#EDF2FB',color:'#2B5EA7'};
-    if(n.indexOf('assurance')>=0)return{label:'Assurance vie',bg:'#F5EFF8',color:'#534AB7'};
-    if(n.indexOf('per ')>=0||n.indexOf('per g')>=0||n.indexOf('perin')>=0)return{label:'PER',bg:'#EAF5EF',color:'#2D7A5B'};
-    if(n.indexOf('résidence')>=0||n.indexOf('residence')>=0||n.indexOf('chalet')>=0)return{label:'Immobilier',bg:'#EAF5EF',color:'#2D7A5B'};
-    if(n.indexOf('livret')>=0||n.indexOf('ldds')>=0||n.indexOf('lep')>=0)return{label:'Livret',bg:'#FDF3E3',color:'#C8832A'};
-    if(n.indexOf('compte courant')>=0||n.indexOf(' cc')>=0)return{label:'Compte',bg:'#F2F1EE',color:'#6B6B6B'};
-    if(n.indexOf('parts de soci')>=0||n.indexOf('sarl')>=0||n.indexOf('sci ')>=0)return{label:'Société',bg:'#FCEBEB',color:'#A32D2D'};
-    if(n.indexOf('pel')>=0)return{label:'PEL',bg:'#FDF3E3',color:'#C8832A'};
-    if(n.indexOf('pea')>=0)return{label:'PEA',bg:'#EDF2FB',color:'#2B5EA7'};
+    // Immobilier jouissance
+    if(/r[ée]sidence principale/.test(n))           return{label:'R\u00e9s. principale',  bg:'#EAF5EF',color:'#1a5e3a'};
+    if(/r[ée]sidence secondaire/.test(n))            return{label:'R\u00e9s. secondaire',  bg:'#EAF5EF',color:'#1a5e3a'};
+    // Immobilier locatif
+    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#EAF5EF',color:'#2D7A5B'};
+    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#EAF5EF',color:'#2D7A5B'};
+    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'#FDF3E3',color:'#8B4A00'};
+    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'#FDF3E3',color:'#8B4A00'};
+    if(/pinel|duflot|robien|jean brun/.test(n))      return{label:'Loi fiscale',            bg:'#FDF3E3',color:'#8B4A00'};
+    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCEBEB',color:'#A32D2D'};
+    if(/foncier/.test(n))                            return{label:'Foncier',               bg:'#EAF5EF',color:'#2D7A5B'};
+    // Court terme (A19-A25)
+    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A/Bleu',          bg:'#FEF9EC',color:'#C8832A'};
+    if(/livret jeune/.test(n))                       return{label:'Livret Jeune',           bg:'#FEF9EC',color:'#C8832A'};
+    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FEF9EC',color:'#C8832A'};
+    if(/\blep\b|livret d.[\u00e9e]pargne populaire/.test(n)) return{label:'LEP',           bg:'#FEF9EC',color:'#C8832A'};
+    if(/\bcel\b|compte [\u00e9e]pargne logement/.test(n))    return{label:'CEL',           bg:'#FEF9EC',color:'#C8832A'};
+    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F2F1EE',color:'#6B6B6B'};
+    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FEF9EC',color:'#C8832A'};
+    // Moyen terme (A27-A29) — PEL + Autre liquidité
+    if(/\bpel\b|plan d.[\u00e9e]pargne logement/.test(n))   return{label:'PEL',            bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'CAT',                   bg:'#EDF2FB',color:'#2B5EA7'};
+    // Long terme (A31-A37) — AV, Capi, PEP, CTO, PEA, Autre
+    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F5EFF8',color:'#534AB7'};
+    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F5EFF8',color:'#534AB7'};
+    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#EDF2FB',color:'#2B5EA7'};
+    // Retraite et Salariale (A39-A44)
+    if(/\bper\b|\bperin\b/.test(n))                  return{label:'PER',                   bg:'#EAF5EF',color:'#2D7A5B'};
+    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#EAF5EF',color:'#2D7A5B'};
+    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/article 83/.test(n))                         return{label:'Art. 83',               bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#EDF2FB',color:'#2B5EA7'};
+    // Biens professionnels
+    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#EDF2FB',color:'#2B5EA7'};
+    if(/parts de soci|sarl|sas |holding/.test(n))    return{label:'Soci\u00e9t\u00e9',    bg:'#FCEBEB',color:'#A32D2D'};
+    if(/chalet|immo/.test(n))                        return{label:'Immobilier',            bg:'#EAF5EF',color:'#2D7A5B'};
     return{label:'Autre',bg:'#F2F1EE',color:'#6B6B6B'};
   }
+
+  // ── Horizon selon nomenclature Excel V12 exacte ────────────────────
+  function getHorizonFromNom(nom){
+    var n=(nom||'').toLowerCase();
+    // Court terme : A19-A25
+    if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|livret d.[\u00e9e]pargne pop|\bcel\b|compte [\u00e9e]pargne logement/.test(n)) return 'ct';
+    if(/\blivret\b/.test(n) && !/pel/.test(n)) return 'ct';
+    // Moyen terme : A27-A29 (PEL, CAT, Autre liquidité)
+    // Long terme  : A31-A37 (AV, Capi, PEP, CTO, PEA) ← Excel dit Long terme
+    // Retraite    : A39-A44 (PER, PERP, PEE, PERCO...) ← mappé lt
+    if(/\bpel\b|plan d.[\u00e9e]pargne logement|\bcat\b|compte [\u00e0a] terme|assurance[- ]vie|capitalisation|\bcto\b|compte[- ]titre|\bpea\b|\bpee\b/.test(n)) return 'mt';
+    // Tout le reste = long terme (immo, AV, Capi, PEA, CTO, PER, sociétés…)
+    return 'lt';
+  }
+  
   function buildHorizonSection(label, badgeCls, items){
     if(!items.length) return '';
     var sorted=items.slice().sort(function(a,b){return (b.montant||0)-(a.montant||0);});
@@ -1348,7 +1440,14 @@ function rFiscal(){
   const f=ED.fiscal;
   setEd('fiAnnee',f.annee||'—');setEd('fiRbg',f.rbg?fmt(f.rbg)+' €':'—');setEd('fiParts',f.parts||1);
   const tmiEl=document.getElementById('fiTMI');
-  tmiEl.textContent=f.tmi+'%';tmiEl.className='tmi-pill tmi-'+f.tmi;
+  var irCalc=calcIR(f.rbg||0,f.parts||1);
+  var tmiDisplay=f.tmi||irCalc.tmi||0;
+  var irDisplay=f.irnet||irCalc.ir||0;
+  tmiEl.textContent=tmiDisplay+'%';tmiEl.className='tmi-pill tmi-'+tmiDisplay;
+  if(!f.irnet&&irCalc.ir>0){
+    var irEstEl=document.getElementById('fiIrNet');
+    if(irEstEl){irEstEl.textContent=fmt(irCalc.ir)+' € (estimé)';irEstEl.style.color='var(--ambre-d)';}
+  }
   setEd('fiIrNet',f.irnet?fmt(f.irnet)+' €':'0 €');setEd('fiPS',f.ps?fmt(f.ps)+' €':'0 €');
   const tot=(f.irnet||0)+(f.ps||0);
   set('fiTotal',tot?fmt(tot)+' €':'0 €');
@@ -1373,7 +1472,8 @@ function rFiscal(){
 }
 
 function rFinancement(){
-  const revB=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
+  // Revenus bruts annuels : salaires 100% + fonciers bruts
+  const revB=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.fonc||ED.revenus.compl||0);
   const revM=revMens();
   const chr=ED.charges||0;
   const rav=revM-chr;
@@ -2092,9 +2192,12 @@ function addStep(){
 
 // ── HELPERS ───────────────────────────────────────────────────────
 function revMens(){
-  // Revenus stockes en annuel, diviser par 12 pour mensuel
-  const b=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
-  return Math.round(b*0.75/12);
+  // Revenus annuels → mensuel net
+  // Salaires/activité : 100% (nets de charges sociales déjà)
+  // Revenus fonciers  : 70% (abattement bancaire standard)
+  var sal=(ED.revenus.c1||0)+(ED.revenus.c2||0);   // salaires annuels
+  var fonc=ED.revenus.fonc||ED.revenus.compl||0;     // fonciers annuels
+  return Math.round((sal + fonc*0.70)/12);
 }
 function nomC(n){
   // Retourne le prenom+initiale NOM pour C1 ou C2
@@ -2121,9 +2224,35 @@ function ageFrom(dob){
   const n=new Date();
   return n.getFullYear()-d.getFullYear()-(n<new Date(n.getFullYear(),d.getMonth(),d.getDate())?1:0);
 }
+// ── Barème IR 2025 progressif complet ────────────────────────────
+// Tranches par quotient familial (RBI / nb parts)
+// Source : barème taux marginal d'imposition 2025 sur revenus 2024
+var TRANCHES_IR=[
+  {min:0,      max:11497,  taux:0},
+  {min:11497,  max:29315,  taux:0.11},
+  {min:29315,  max:83823,  taux:0.30},
+  {min:83823,  max:180294, taux:0.41},
+  {min:180294, max:Infinity,taux:0.45}
+];
+function calcIR(rbg, parts){
+  // Calcul progressif par tranches * nb parts
+  if(!rbg||rbg<=0)return{ir:0,tmi:0};
+  var nbP=parts||1;
+  var qf=rbg/nbP;
+  var ir=0;
+  var tmi=0;
+  for(var i=0;i<TRANCHES_IR.length;i++){
+    var t=TRANCHES_IR[i];
+    if(qf>t.min){
+      var taxable=Math.min(qf,t.max)-t.min;
+      ir+=taxable*t.taux*nbP;
+      if(t.taux>0)tmi=Math.round(t.taux*100);
+    }
+  }
+  return{ir:Math.round(ir),tmi:tmi};
+}
 function tmiFromRBG(rbg,parts){
-  const q=rbg/parts;
-  if(q<=11497)return 0;if(q<=29315)return 11;if(q<=83823)return 30;if(q<=180294)return 41;return 45;
+  return calcIR(rbg,parts).tmi;
 }
 function autoTMI(){
   var eRbg=document.getElementById('fRbg');
