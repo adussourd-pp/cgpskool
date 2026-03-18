@@ -1282,12 +1282,31 @@ function rPatrimoine(){
   });
 
   // Actifs table
-  const rows=ED.actifs.map(a=>`<tr>
-    <td class="bold">${a.nom}</td>
-    <td><span class="badge ${a.horizon==='lt'?'badge-amber':a.horizon==='mt'?'badge-green':'badge-blue'}">${a.horizon==='lt'?'Long terme':a.horizon==='mt'?'Moyen terme':'Court terme'}</span></td>
-    <td>${a.titulaire}</td>
-    <td class="right gold">${fmt(a.montant)} €</td></tr>`).join('');
-  var at=document.getElementById('actifsTbl');if(at)at.innerHTML=`<thead><tr><th>Désignation</th><th>Horizon</th><th>Titulaire</th><th>Montant</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">${fmt(aSum)} €</td></tr></tbody>`;
+  // Actifs groupés par horizon, titulaire avec vrai prénom
+  function titLabel(t){
+    if(t==='C1')return nomC(1);
+    if(t==='C2')return nomC(2);
+    return t;
+  }
+  function buildHorizonSection(label, badgeCls, items){
+    if(!items.length) return '';
+    var total=items.reduce(function(s,a){return s+(a.montant||0);},0);
+    var rows=items.map(function(a){
+      return '<tr><td class="bold">'+a.nom+'</td><td>'+titLabel(a.titulaire)+'</td><td class="right gold">'+fmt(a.montant)+' €</td></tr>';
+    }).join('');
+    return '<tr class="section-header-row" style="background:var(--gris-l)">'
+      +'<td colspan="3" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
+      +'<span class="badge '+badgeCls+'" style="margin-right:6px">'+label+'</span></td>'
+      +'<td class="right" style="font-size:12px;font-weight:700;color:var(--gris-f)">'+fmt(total)+' €</td>'
+      +'</tr>'+rows;
+  }
+  var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
+  var mtItems=ED.actifs.filter(function(a){return a.horizon==='mt';});
+  var ltItems=ED.actifs.filter(function(a){return a.horizon==='lt';});
+  var allRows=buildHorizonSection('Court terme','badge-blue',ctItems)
+             +buildHorizonSection('Moyen terme','badge-green',mtItems)
+             +buildHorizonSection('Long terme','badge-amber',ltItems);
+  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Désignation</th><th>Titulaire</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="2">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr>
     <td class="bold">${p.nom}</td><td>${p.titulaire}</td>
@@ -1390,7 +1409,7 @@ function rRetraite(){
       parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" oninput="ED.retraite.pension'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
       parHtml+='</div>';
       // Age actuel info
-      parHtml+='<div style="font-size:11px;color:var(--gris);margin-top:8px">Âge actuel : <strong>'+cl.age+' ans</strong> — horizon retraite : <strong>'+Math.max(0,(ED.retraite['age'+cl.key]||64)-cl.age)+' ans</strong></div>';
+      parHtml+='<div style="font-size:11px;color:var(--gris);margin-top:8px">Âge actuel : <strong>'+cl.age+' ans</strong> — horizon retraite : <strong>'+Math.max(0,(ED.retraite['age'+cl.key]||64)-cl.age)+' ans</strong></div>';
       parHtml+='</div>';
     });
     retParamsEl.innerHTML=parHtml;
@@ -1417,7 +1436,7 @@ function rRetraite(){
   var pensionBrute=(ED.revenus.c1||0)/12;
   var pensionEst=Math.round(pensionBrute*tauxClient/100);
   var kpiEl=document.getElementById('retKpis');
-  if(kpiEl)kpiEl.innerHTML='<div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Age actuel C1</div><div class="kpi-val">'+age1+' ans</div></div><div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Taux remplacement</div><div class="kpi-val">'+tauxClient+' %</div></div><div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Pension estimee</div><div class="kpi-val">'+fmt(pensionEst)+' €/mois</div></div><div class="kpi featured"><div class="kpi-label">Categorie</div><div class="kpi-val" style="font-size:14px">'+cspKey+'</div></div>';
+  if(kpiEl)kpiEl.innerHTML='<div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Âge actuel '+nomCFull(1)+'</div><div class="kpi-val">'+age1+' ans</div></div><div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Taux remplacement</div><div class="kpi-val">'+tauxClient+' %</div></div><div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Pension estimee</div><div class="kpi-val">'+fmt(pensionEst)+' €/mois</div></div><div class="kpi featured"><div class="kpi-label">Categorie</div><div class="kpi-val" style="font-size:14px">'+cspKey+'</div></div>';
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
   var clients=[{c:ED.c1,retAge:ED.retraite.age1||64,pension:ED.retraite.pension1||2500,rev:ED.revenus.c1,csp:cspKey}];
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:ED.revenus.c2,csp:cspKey2});}
@@ -1425,10 +1444,10 @@ function rRetraite(){
   clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,j){return Math.abs(a-age)<Math.abs(AGES[bi]-age)?j:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.round(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div></div>';});
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,j){return Math.abs(a-age0)<Math.abs(AGES[bi]-age0)?j:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.round(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
-  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euros assurance vie (2,5 %)',rate:0.025,color:'var(--blue)'},{label:'SCPI de rendement (4,5 %)',rate:0.045,color:'var(--green)'},{label:'PER allocation diversifiée (5 %)',rate:0.05,color:'#7B4FA6'}];
+  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euros assurance vie (2,5 %)',rate:0.025,color:'var(--blue)'},{label:'SCPI de rendement (4,5 %)',rate:0.045,color:'var(--green)'},{label:'PER allocation diversifiée (5 %)',rate:0.05,color:'#7B4FA6'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
-  tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C1 à combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr>';
+  tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C1 à combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr>';
   // Manque C2 et couple si applicable
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){
     var age2=ageFrom(ED.c2.dob)||40;
@@ -1437,10 +1456,10 @@ function rRetraite(){
     var tx2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageI2];
     var pensM2=Math.round((ED.revenus.c2||0)/12*tx2/100);
     var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
-    if(gap2>0)tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C2 à combler</td><td class="right">'+fmt(gap2)+' €/mois</td></tr>';
+    if(gap2>0)tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C2 à combler</td><td class="right">'+fmt(gap2)+' €/mois</td></tr>';
     if(gap0>0&&gap2>0){
       var gapTotal=gap0+gap2;
-      tblHtml+='<tr class="total-row" style="background:var(--ambre-l);font-size:13px"><td colspan="3"><strong>Manque couple total</strong></td><td class="right" style="color:var(--ambre-d)"><strong>'+fmt(gapTotal)+' €/mois</strong></td></tr>';
+      tblHtml+='<tr class="total-row" style="background:var(--ambre-l);font-size:13px"><td colspan="3"><strong>Manque couple total</strong></td><td class="right" style="color:var(--ambre-d)"><strong>'+fmt(gapTotal)+' €/mois</strong></td></tr>';
     }
   }
   tblHtml+='</tbody>';
@@ -1466,57 +1485,57 @@ var COPERNIC = {
 
   // ─── ÉPARGNE FINANCIÈRE ────────────────────────────────────────
   'Assurance vie':          {cat:'epargne-fin',  levier:'epargne',     icon:'&#127962;',
-    desc:'Capitalisation à long terme, transmission hors succession (152 k€/bénéf.), sortie libre et fiscalité allégée après 8 ans',
-    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+    desc:'Capitalisation à long terme, transmission hors succession (152 k€/bénéf.), sortie libre et fiscalité allégée après 8 ans',
+    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
   'PER':                    {cat:'epargne-ret',  levier:'fiscal',      icon:'&#127969;',
     desc:'Versements déductibles du RBG dans la limite du plafond retraite. Sortie en rente ou capital à la retraite',
     fiscal:'Déductible à l’entrée — IR à la sortie',sri:'1-7',horizon:'Retraite',horizonAns:20},
   'Contrat de capitalisation':{cat:'epargne-fin',levier:'transmission',icon:'&#128196;',
     desc:'Même fiscalité que l’AV, transmissible par cession ou donation, sans dénouement au décès',
-    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
   'PEA Assurance':          {cat:'epargne-fin',  levier:'epargne',     icon:'&#128200;',
-    desc:'Enveloppe actions européennes, exonération des plus-values après 5 ans, plafond 150 k€',
-    fiscal:'Exonération IR après 5 ans (PS 17,2 % restants)',sri:'4-7',horizon:'5 ans+',horizonAns:8},
+    desc:'Enveloppe actions européennes, exonération des plus-values après 5 ans, plafond 150 k€',
+    fiscal:'Exonération IR après 5 ans (PS 17,2 % restants)',sri:'4-7',horizon:'5 ans+',horizonAns:8},
 
   // ─── ÉPARGNE IMMOBILIÈRE ───────────────────────────────────────
   'SCPI de rendement':      {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
-    desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
-    fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'10 ans+',horizonAns:15},
+    desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
+    fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'10 ans+',horizonAns:15},
   'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'epargne',    icon:'&#127959;',
     desc:'Acquisition de SCPI via une SCI soumise à l’IS : revenus peu imposés grâce à l’amortissement, sortie optimisée',
-    fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
+    fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
   'SCPI de capitalisation': {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
     desc:'Pas de distribution de revenus, valorisation du capital, idéale pour capitaliser sans pression fiscale annuelle',
-    fiscal:'Plus-value immobilière à la cession',sri:'3-4',horizon:'10 ans+',horizonAns:15},
+    fiscal:'Plus-value immobilière à la cession',sri:'3-4',horizon:'10 ans+',horizonAns:15},
   'SCPI fiscale':           {cat:'immo-fisc',    levier:'fiscal',      icon:'&#127959;',
     desc:'SCPI investissant dans des dispositifs fiscaux (Malraux, Déficit Foncier, Denormandie) — réduction ou déduction d’IR',
-    fiscal:'Réduction ou déduction IR selon le dispositif',sri:'4-6',horizon:'10-16 ans',horizonAns:12},
+    fiscal:'Réduction ou déduction IR selon le dispositif',sri:'4-6',horizon:'10-16 ans',horizonAns:12},
   'SCPI en nue-propriété':  {cat:'epargne-immo', levier:'transmission',icon:'&#127959;',
     desc:'Achat à prix décoté, aucun revenu ni IFI pendant le démembrement, revalorisation structurelle à terme',
-    fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+',horizonAns:15},
+    fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+',horizonAns:15},
   'SCPI en usufruit':       {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
     desc:'Acquisition de l’usufruit temporaire : rendement boosté pendant la durée, capital non récupéré en fin de démembrement',
-    fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
+    fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
   'SCPI financée':          {cat:'epargne-immo', levier:'financement', icon:'&#127959;',
     desc:'Acquisition à crédit : les loyers couvrent partiellement les mensualités, effet de levier bancaire sur le patrimoine',
-    fiscal:'Intérêts d’emprunt déductibles des revenus fonciers',sri:'3-4',horizon:'15 ans+',horizonAns:15},
+    fiscal:'Intérêts d’emprunt déductibles des revenus fonciers',sri:'3-4',horizon:'15 ans+',horizonAns:15},
 
   // ─── IMMOBILIER ────────────────────────────────────────────────
   'LMNP':                   {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
-    desc:'Location meublée non professionnelle : amortissement du bien sur 20-30 ans, revenus BIC quasi non imposés',
-    fiscal:'BIC avec amortissement — revenus très peu imposés',sri:'5',horizon:'20 ans+',horizonAns:20},
+    desc:'Location meublée non professionnelle : amortissement du bien sur 20-30 ans, revenus BIC quasi non imposés',
+    fiscal:'BIC avec amortissement — revenus très peu imposés',sri:'5',horizon:'20 ans+',horizonAns:20},
   'Denormandie':            {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
-    desc:'Réduction IR 12-18-21 % sur 6, 9 ou 12 ans, ancien rénové centre-ville, loyers plafonnés',
-    fiscal:'Réduction IR plafonnée niches fiscales',sri:'6',horizon:'6-12 ans',horizonAns:9},
+    desc:'Réduction IR 12-18-21 % sur 6, 9 ou 12 ans, ancien rénové centre-ville, loyers plafonnés',
+    fiscal:'Réduction IR plafonnée niches fiscales',sri:'6',horizon:'6-12 ans',horizonAns:9},
   'Nue-propriété immo':     {cat:'immobilier',   levier:'transmission',icon:'&#127968;',
     desc:'Achat en nue-propriété d’un bien, décote à l’achat, aucun revenu ni IFI, revalorisation à terme',
-    fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+',horizonAns:15},
+    fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+',horizonAns:15},
   'LLI':                    {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
-    desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
-    fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
+    desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
+    fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
   'Loi fiscale (Pinel, Jean Brun…)': {cat:'immobilier',levier:'fiscal',icon:'&#127968;',
     desc:'Dispositifs de défiscalisation immobilière (Pinel+, Jean Brun…) : réduction IR en contrepartie d’un engagement de location',
-    fiscal:'Réduction IR plafonnée niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
+    fiscal:'Réduction IR plafonnée niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
 
   // ─── ÉPARGNE RETRAITE ──────────────────────────────────────────
   'PERIN':                  {cat:'epargne-ret',  levier:'fiscal',      icon:'&#127969;',
@@ -1533,16 +1552,16 @@ var COPERNIC = {
 
   // ─── SOLUTIONS FISCALES ────────────────────────────────────────
   'Capital Investissement (FPCI/FCPR)': {cat:'solutions-fisc',levier:'fiscal',icon:'&#128200;',
-    desc:'Fonds de capital-investissement : réduction IR 25-30 %, capital bloqué 7-10 ans, investissement dans des PME/ETI',
-    fiscal:'Réduction IR dans la limite du plafond des niches',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+    desc:'Fonds de capital-investissement : réduction IR 25-30 %, capital bloqué 7-10 ans, investissement dans des PME/ETI',
+    fiscal:'Réduction IR dans la limite du plafond des niches',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
   'Girardin industriel':    {cat:'solutions-fisc',levier:'fiscal',     icon:'&#127981;',
-    desc:'Réduction IR supérieure au montant investi (110-114 %), remboursement en 1-2 ans, risque de reprise fiscale',
-    fiscal:'Hors plafond des niches — spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans',horizonAns:1},
+    desc:'Réduction IR supérieure au montant investi (110-114 %), remboursement en 1-2 ans, risque de reprise fiscale',
+    fiscal:'Hors plafond des niches — spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans',horizonAns:1},
 
   // ─── ÉPARGNE SALARIALE ─────────────────────────────────────────
   'Plan Épargne Entreprise': {cat:'epargne-sal', levier:'epargne',    icon:'&#127968;',
-    desc:'Épargne salariale avec abondement employeur, blocage 5 ans, sortie exonérée d’IR',
-    fiscal:'Exonération IR (PS 17,2 % restants)',sri:'2-5',horizon:'5 ans',horizonAns:5},
+    desc:'Épargne salariale avec abondement employeur, blocage 5 ans, sortie exonérée d’IR',
+    fiscal:'Exonération IR (PS 17,2 % restants)',sri:'2-5',horizon:'5 ans',horizonAns:5},
   'PERECO/PERECOI':         {cat:'epargne-sal',  levier:'fiscal',      icon:'&#127969;',
     desc:'PER collectif avec abondement employeur et versements déductibles, sortie retraite en capital ou rente',
     fiscal:'Déductible + abondement exonéré',sri:'2-6',horizon:'Retraite',horizonAns:20},
@@ -1550,15 +1569,15 @@ var COPERNIC = {
   // ─── DIVERSIFICATION ───────────────────────────────────────────
   'Fonds Usufruit (NOVAXIA…)':{cat:'diversification',levier:'epargne',icon:'&#128200;',
     desc:'Acquisition d’usufruit temporaire de parts de fonds immobiliers — rendement boosté, capital non récupéré',
-    fiscal:'Revenus fonciers ou financiers selon structure',sri:'4-5',horizon:'5-10 ans',horizonAns:7},
+    fiscal:'Revenus fonciers ou financiers selon structure',sri:'4-5',horizon:'5-10 ans',horizonAns:7},
   'FCPR / FPCI':            {cat:'diversification',levier:'epargne',   icon:'&#128200;',
     desc:'Fonds commun de placement à risque ou professionnel : capital-investissement non coté, rendement potentiellement élevé',
-    fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+    fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
 
   // ─── TRANSMISSION ──────────────────────────────────────────────
   'Donation + AV':          {cat:'transmission', levier:'transmission',icon:'&#128141;',
-    desc:'Donation aux héritiers combinée à une AV avec clause nominative, abattement 100 000 €/enf.',
-    fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
+    desc:'Donation aux héritiers combinée à une AV avec clause nominative, abattement 100 000 €/enf.',
+    fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
   'Donation au dernier vivant':{cat:'transmission',levier:'transmission',icon:'&#128141;',
     desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',
     fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'}
@@ -1625,7 +1644,7 @@ function buildMatriceObjSol(impot,capa,aSum){
   // Objectifs detected banner
   var hasFinancement=activeObjs.indexOf('Investir via le financement')>=0;
   html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
-  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs détectés :</span>';
+  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs détectés :</span>';
   activeObjs.forEach(function(obj){
     html+='<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">'+obj+'</span>';
   });
@@ -1736,8 +1755,8 @@ function renderSolsRetenues(){
     html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif">';
     var titOptions=['C1','C2','Commun'];
     var titLabels={};
-    titLabels['C1']=(ED.c1&&ED.c1.prenom?ED.c1.prenom+(ED.c1.nom?' '+ED.c1.nom[0]+'.':''):'C1');
-    titLabels['C2']=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom+(ED.c2.nom?' '+ED.c2.nom[0]+'.':'')):'C2';
+    titLabels['C1']=nomC(1);
+    titLabels['C2']=ED.type!=='seul'?nomC(2):'C2';
     titLabels['Commun']='Commun';
     titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
     html+='</select></div>';
@@ -1848,7 +1867,7 @@ function renderFichesClient(){
       html+='<div style="padding:10px 14px 8px;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
       html+='<div style="display:inline-flex;align-items:center;gap:5px;background:'+meta.titleBg+';color:#fff;padding:3px 10px 3px 5px;border-radius:20px;font-size:11px;font-weight:700;flex-shrink:0">';
       html+='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.25);font-size:10px;font-weight:700">'+etapeNum+'</span>';
-      html+='Étape '+etapeNum+'</div>';
+      html+='Étape '+etapeNum+'</div>';
       if(objsV.length){
         objsV.forEach(function(o){
           html+='<span style="font-size:11px;font-weight:600;color:#3A3A3A;padding:3px 10px;border-radius:20px;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08)">'+o+'</span>';
@@ -2052,8 +2071,22 @@ function addStep(){
 
 // ── HELPERS ───────────────────────────────────────────────────────
 function revMens(){
+  // Revenus stockes en annuel, diviser par 12 pour mensuel
   const b=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
   return Math.round(b*0.75/12);
+}
+function nomC(n){
+  // Retourne le prenom+initiale NOM pour C1 ou C2
+  var c=n===1?ED.c1:ED.c2;
+  if(!c||(!c.prenom&&!c.nom))return'C'+n;
+  var p=c.prenom||'';
+  var nom=c.nom?c.nom[0]+'.':'';
+  return (p+' '+nom).trim();
+}
+function nomCFull(n){
+  var c=n===1?ED.c1:ED.c2;
+  if(!c||(!c.prenom&&!c.nom))return'C'+n;
+  return ((c.prenom||'')+' '+(c.nom||'')).trim();
 }
 function sum(h){return ED.actifs.filter(a=>a.horizon===h).reduce((s,a)=>s+(a.montant||0),0)}
 function ageFrom(dob){
