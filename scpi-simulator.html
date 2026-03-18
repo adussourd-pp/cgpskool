@@ -28,7 +28,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;color:var(--noir);background:var(--blanc);-webkit-font-smoothing:antialiased}
+html,body{height:100%}body{font-family:'Outfit',sans-serif;color:var(--noir);background:var(--blanc);-webkit-font-smoothing:antialiased;margin:0}
 
 /* ── NAV ── */
 nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
@@ -540,9 +540,21 @@ function calcRetraite(scpi,init,monthly,reinvestPct,horizon,tmi){
 
 function calcNP(scpi,initValue,duration){
   const usPct=US_PCT[Math.min(duration,20)]||0.37,npPct=1-usPct;
+  if(!scpi.price){
+    // Mode taux personnalisé : pas de prix de part, on travaille en montant investi
+    const actual=initValue;
+    const ppVal=initValue/npPct; // PP reconstituée depuis l'investissement NP
+    const gain=ppVal-actual;
+    const tmi=0.30, ps=0.172;
+    const renteGross=ppVal*scpi.yieldGross/12;
+    const renteNet=renteGross*(1-tmi-ps);
+    return{nbParts:null,actual,usPct,npPct,priceNP:null,ppVal,gain,renteGross,renteNet,duration,isCustom:true};
+  }
   const priceNP=scpi.price*npPct,nbParts=Math.floor(initValue/priceNP),actual=nbParts*priceNP;
   const ppVal=nbParts*scpi.price,gain=ppVal-actual;
-  return{nbParts,actual,usPct,npPct,priceNP,ppVal,gain,renteGross:ppVal*scpi.yieldGross/12,renteNet:ppVal*scpi.yieldNet/12,duration};
+  const renteGross=ppVal*scpi.yieldGross/12;
+  const renteNet=renteGross*(1-0.30-0.172);
+  return{nbParts,actual,usPct,npPct,priceNP,ppVal,gain,renteGross,renteNet,duration,isCustom:false};
 }
 
 function calcEntreprise(scpi,investUS,duration,isTaxPct,investNPperso){
@@ -581,7 +593,7 @@ function runSimulation(){
 function renderSCPIHeader(){
   const s=getActiveScpi();
   const decStr='';
-  const tofStr=s.tof?`<div class="sh-item"><div class="sh-label">TOF</div><div class="sh-val ${s.tof<0.9?'red':'gre'}">${(s.tof*100).toFixed(1)}%</div></div>`:'';
+  const tofStr='';
   const attenteStr=s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:'';
   const priceStr=s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:'';
   const capiStr=s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:'';
@@ -644,22 +656,27 @@ function renderNP(){
   const init=+document.getElementById('np-init').value,duration=+document.getElementById('np-duration').value;
   const res=calcNP(s,init,duration);
 
+  const kpi1sub=res.isCustom?'Montant investi en NP':(res.nbParts+' parts × '+fmt(res.priceNP)+' €');
+  const plusPct=res.actual>0?Math.round(res.gain/res.actual*100):0;
+
   document.getElementById('kpiRow').innerHTML=[
-    {label:'Investissement NP',val:fmt(res.actual)+' €',sub:res.nbParts+' parts × '+fmt(res.priceNP)+' €',cls:''},
+    {label:'Investissement NP',val:fmt(res.actual)+' €',sub:kpi1sub,cls:''},
     {label:'Valeur PP au terme',val:fmt(res.ppVal)+' €',sub:'Pleine propriété après '+duration+' ans',cls:'featured'},
-    {label:'Plus-value latente',val:fmt(res.gain)+' €',sub:'+'+Math.round(res.gain/res.actual*100)+'% sur le capital investi',cls:'green-card'},
-    {label:'Rente nette / mois',val:fmt(res.renteNet)+' €',sub:'Au terme du démembrement',cls:'green-card'}
+    {label:'Plus-value latente',val:fmt(res.gain)+' €',sub:'+'+plusPct+'% sur le capital investi',cls:'green-card'},
+    {label:'Rente nette / mois',val:fmt(res.renteNet)+' €',sub:'Au terme (après IR 30% + PS 17.2%)',cls:'green-card'}
   ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   document.getElementById('chartTitle').textContent='Répartition NP / US sur la PP';
   renderBarNP(res);
+
+  const rowPrix=res.isCustom?nprow("Mode","Taux personnalisé — pas de prix de part"):nprow("Prix part en NP",fmt(res.priceNP)+' €');
 
   document.getElementById('extraContent').innerHTML=`
     <div class="np-grid fade-in">
       <div class="np-card you">
         <div class="np-badge you">Nue-propriétaire — Vous</div>
         ${nprow("Clé NP",Math.round(res.npPct*100)+' %')}
-        ${nprow("Prix part en NP",fmt(res.priceNP)+' €')}
+        ${rowPrix}
         ${nprow("Investissement total",fmt(res.actual)+' €')}
         ${nprow("Pendant "+duration+" ans","Aucun revenu ❌",null,'red')}
         ${nprow("Au terme","Pleine propriété ✅",null,'gre')}
@@ -786,10 +803,22 @@ function sr(label,val,col){
 }
 
 function renderStatsGridHTML(s){
-  if(s.isCustom) return `<div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode personnalisé. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div>`;
+  // Rappel SCPI en haut des stats
+  const scpiRecap = s.isCustom ? '' : `
+    <div style="grid-column:1/-1;background:var(--noir);border-radius:12px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-bottom:4px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--blanc);margin-right:auto">${s.name} <span style="color:var(--ambre);font-weight:400">— ${s.manager}</span></div>
+      ${s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:''}
+      <div class="sh-item"><div class="sh-label">Taux de distribution</div><div class="sh-val gold">${(s.yieldGross*100).toFixed(2)}%</div></div>
+      ${s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:''}
+      ${s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:''}
+      ${s.isr?`<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>`:''}
+      <div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>
+    </div>`;
+
+  if(s.isCustom) return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px"><div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode personnalisé. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div></div>`;
   const assetBars=Object.entries(s.assetTypes).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--ambre)"></div></div></div>`).join('');
   const geoBars=Object.entries(s.geography).slice(0,6).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--blue)"></div></div></div>`).join('');
-  return`<div class="stats-grid fade-in">
+  return`<div class="stats-grid fade-in" style="margin-bottom:24px">${scpiRecap}
     <div class="stat-block">
       <div class="stat-block-title">Chiffres clés 2025</div>
       ${sr('Capitalisation',s.capi+'M€')}
