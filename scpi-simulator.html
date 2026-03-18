@@ -288,7 +288,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <aside class="sidebar">
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Type de simulation</div>
+    <div class="sidebar-label">Type de projection</div>
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">📈</span>Plan Retraite SCPI</div>
       <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">🔀</span>Nue-propriété</div>
@@ -300,7 +300,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     <div class="sidebar-label">Source du rendement</div>
     <div class="source-toggle">
       <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
-      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux manuel</button>
+      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux personnalisé</button>
     </div>
     <div id="scpiPickerPanel">
       <input class="scpi-search" type="text" placeholder="Rechercher par nom, société…" oninput="filterSCPI(this.value)">
@@ -398,13 +398,13 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
       </div>
     </div>
 
-  <button class="sim-btn" onclick="runSimulation()">Lancer la simulation →</button>
+  <button class="sim-btn" onclick="runSimulation()">Lancer la projection →</button>
 </aside>
 <div class="main-content" id="mainContent">
   <div class="empty-state" id="emptyState">
     <div class="empty-icon" style="font-size:56px;opacity:0.5">🧑‍🚀</div>
     <div class="empty-title">Prêt pour le décollage ?</div>
-    <div class="empty-sub">Sélectionnez une SCPI de la gamme ou saisissez un taux, configurez les paramètres et lancez la simulation.</div>
+    <div class="empty-sub">Sélectionnez une SCPI de la gamme ou saisissez un taux, configurez les paramètres et lancez la projection.</div>
   </div>
 
   <div id="results" style="display:none">
@@ -488,7 +488,7 @@ function getActiveScpi(){
   if(sourceMode==='custom'){
     const gross=+document.getElementById('custom-gross').value/100;
     const net=gross*0.75;
-    const label=document.getElementById('custom-name').value.trim()||'Simulation taux personnalisé';
+    const label=document.getElementById('custom-name').value.trim()||'Projection financière';
     return{
       id:'custom',name:label,manager:'—',theme:'—',geo:'—',
       price:null,yieldGross:gross,yieldNet:net,
@@ -562,7 +562,7 @@ function calcEntreprise(scpi,investUS,duration,isTaxPct,investNPperso){
 
 function runSimulation(){
   const active=getActiveScpi();
-  if(!active){alert('Veuillez sélectionner une SCPI ou saisir un taux personnalisé');return}
+  if(!active){alert('Veuillez sélectionner une SCPI ou saisir un taux');return}
   if(sourceMode==='scpi'&&!selectedSCPI){alert('Veuillez sélectionner une SCPI dans la liste');return}
   document.getElementById('emptyState').style.display='none';
   document.getElementById('results').style.display='block';
@@ -580,16 +580,14 @@ function renderSCPIHeader(){
   const attenteStr=s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:'';
   const priceStr=s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:'';
   const capiStr=s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:'';
-  const customBadge=s.isCustom?`<div class="sh-item"><div class="sh-label">Mode</div><div class="sh-val gold">✏️ Taux manuel</div></div>`:'';
   document.getElementById('scpiHeaderBar').innerHTML=`
     <div class="scpi-header fade-in">
-      <div class="scpi-header-name">${s.name} <span>— ${s.manager}</span></div>
-      ${priceStr}
+      <div class="scpi-header-name">${s.name}${s.isCustom?'':` <span>— ${s.manager}</span>`}</div>
+      ${s.isCustom?'':`${priceStr}`}
       <div class="sh-item"><div class="sh-label">Taux de distribution</div><div class="sh-val gold">${(s.yieldGross*100).toFixed(2)}%</div></div>
-      ${capiStr}
-      ${decStr}${tofStr}${attenteStr}${customBadge}
-      ${s.isr?'<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>':''}
-      <div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>
+      ${s.isCustom?'':`${capiStr}${decStr}${tofStr}${attenteStr}`}
+      ${s.isCustom?'':s.isr?'<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>':''}
+      ${s.isCustom?'':`<div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>`}
     </div>`;
 }
 
@@ -781,7 +779,7 @@ function sr(label,val,col){
 }
 
 function renderStatsGridHTML(s){
-  if(s.isCustom) return `<div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode personnalisé. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div>`;
+  if(s.isCustom) return `<div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode taux manuel. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div>`;
   const assetBars=Object.entries(s.assetTypes).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--ambre)"></div></div></div>`).join('');
   const geoBars=Object.entries(s.geography).slice(0,6).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--blue)"></div></div></div>`).join('');
   return`<div class="stats-grid fade-in">
