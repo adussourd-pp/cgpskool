@@ -588,7 +588,7 @@ function runSimulation(){
   if(sourceMode==='scpi'&&!selectedSCPI){alert('Veuillez sélectionner une SCPI dans la liste');return}
   document.getElementById('emptyState').style.display='none';
   document.getElementById('results').style.display='block';
-  const btn=document.getElementById('exportBtn');btn.style.opacity='1';btn.style.pointerEvents='auto';
+  const btn=document.getElementById('exportBtn');if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
   renderSCPIHeader();
   if(currentMode==='retraite')renderRetraite();
   else if(currentMode==='np')renderNP();
