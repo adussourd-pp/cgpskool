@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool — Financement SCPI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --ambre:#F0A738;--ambre-d:#C8832A;--ambre-l:#FDF3E3;--ambre-m:#F5D9A8;
+  --noir:#0D0D0D;--gris-f:#3A3A3A;--gris:#6B6B6B;--gris-l:#F7F5F1;--blanc:#FFF;--bord:#EDE8DF;
+  --green:#2D7A5B;--green-l:#EAF5EF;--red:#C0392B;--red-l:#FDEEEC;--blue:#2B5EA7;
+  --sofiap:#1B4F8A;--cfcal:#2E7D32;--cacf:#7B1FA2;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;margin:0}
+body{font-family:'Outfit',sans-serif;color:var(--noir);background:#F4F2EE;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.15)}
+.nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:2px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;text-decoration:none}
+.logo .cgp{color:#fff}.logo .sep{color:#333;margin:0 3px}
+.logo .s{color:#E03535}.logo .k{color:#2B65C0}.logo .o1{color:#E8C547}.logo .o2{color:#4C9BE8}.logo .l{color:#E03535}
+.nav-links{display:flex;gap:4px}
+.nav-link{font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.2s}
+.nav-link:hover{color:rgba(255,255,255,0.8)}.nav-link.active{color:var(--ambre)}
+.nav-btn-pdf{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);background:transparent;cursor:pointer;transition:all 0.2s}
+.nav-btn-pdf:hover{border-color:var(--ambre);color:var(--ambre)}
+.app{display:flex;flex-direction:row;min-height:calc(100vh - 106px)}
+.sidebar{width:340px;min-width:340px;max-width:340px;flex-shrink:0;background:var(--gris-l);border-right:1.5px solid var(--bord);padding:16px 14px 14px;overflow-y:auto;display:flex;flex-direction:column;position:sticky;top:106px;height:calc(100vh - 106px);box-sizing:border-box;overflow-x:hidden}
+.main{flex:1;min-width:0;padding:24px 28px;overflow-y:auto;background:#fff}
+.sb-sep{height:1px;background:var(--bord);margin:10px 0}
+.sb-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.sb-lbl::after{content:'';flex:1;height:1px;background:var(--bord)}
+.fg{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.fg label{font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:7px 9px;border:1.5px solid var(--bord);border-radius:7px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);background:#fff;outline:none;transition:border-color 0.2s;width:100%}
+.fi:focus{border-color:var(--ambre)}
+select.fi{cursor:pointer}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;overflow:hidden;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--ambre)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:7px 9px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:6px 8px;font-size:10px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--ambre-m);border-radius:2px;outline:none;margin:5px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--ambre);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.12)}
+.sl-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--ambre-d);text-align:center;margin-bottom:2px}
+.sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
+.hint{font-size:10px;color:var(--green);margin-top:2px}
+.scpi-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;background:var(--gris-l);border-radius:7px;padding:6px 7px}
+.scpi-num{font-size:10px;font-weight:700;color:var(--gris);width:12px;flex-shrink:0}
+.scpi-row select{flex:1;min-width:0;font-size:11px;border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;color:var(--noir)}
+.scpi-row input[type=number]{width:65px;flex-shrink:0;font-size:11px;border:1px solid var(--bord);border-radius:5px;padding:3px 5px;text-align:right;background:#fff}
+.scpi-del{background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:15px;flex-shrink:0;padding:0 1px;line-height:1}
+.scpi-del:hover{color:var(--red)}
+.scpi-add{font-size:11px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;width:100%;margin-top:2px}
+.scpi-add:hover{background:var(--ambre-l);border-color:var(--ambre)}
+.sim-btn{width:100%;padding:12px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:12px;flex-shrink:0}
+.sim-btn:hover{background:var(--ambre-d);color:#fff}
+.barem-btn{font-size:11px;color:var(--ambre-d);background:transparent;border:none;font-family:'Outfit',sans-serif;cursor:pointer;text-decoration:underline;padding:0}
+.barem-panel{background:var(--gris-l);border-radius:8px;padding:10px;margin-top:6px;display:none}
+.barem-panel.open{display:block}
+.bt{width:100%;font-size:11px;border-collapse:collapse}
+.bt th{font-size:9px;font-weight:700;color:var(--gris);padding:3px 5px;border-bottom:1px solid var(--bord);text-align:left}
+.bt td{padding:3px 5px;border-bottom:1px solid rgba(0,0,0,0.04)}
+.bt input{width:52px;border:1px solid var(--bord);border-radius:4px;padding:2px 4px;font-size:10px;font-family:'Outfit',sans-serif}
+.endett-live{background:var(--gris-l);border-radius:8px;padding:10px;margin-bottom:8px}
+.prog-track{height:8px;background:var(--bord);border-radius:4px;margin:4px 0 2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:65vh;gap:14px;text-align:center}
+.empty-icon{font-size:48px;opacity:0.12}
+.empty-title{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--gris);font-weight:600}
+.empty-sub{font-size:13px;color:var(--gris);max-width:320px;line-height:1.7;font-weight:300}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.kpi{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:12px 14px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--kc,var(--ambre))}
+.kpi.featured{background:var(--ambre);border-color:var(--ambre)}.kpi.featured::after{display:none}
+.kpi.green{background:var(--green-l);border-color:rgba(45,122,91,0.2)}.kpi.red{background:var(--red-l);border-color:rgba(192,57,43,0.15)}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:4px}
+.kpi.featured .kpi-label{color:rgba(13,13,13,0.5)}
+.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--noir);line-height:1}
+.kpi.featured .kpi-val{color:#111}.kpi.green .kpi-val{color:var(--green)}.kpi.red .kpi-val{color:var(--red)}
+.kpi-sub{font-size:10px;color:var(--gris);margin-top:2px}
+.bank-hdr{border-radius:12px;padding:15px 20px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.bank-hdr[data-bank="sofiap"]{background:var(--sofiap)}.bank-hdr[data-bank="cfcal"]{background:var(--cfcal)}.bank-hdr[data-bank="cacf"]{background:var(--cacf)}
+.bh-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-right:auto}
+.bh-it{text-align:center}.bh-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px}
+.bh-v{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--noir);margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--ambre);flex-shrink:0}
+.eq{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.eq-b{flex:1;min-width:110px;border-radius:10px;padding:13px 14px;text-align:center;border:1.5px solid}
+.eq-b.mens{background:#FFF8F0;border-color:var(--ambre-m)}
+.eq-b.divs{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
+.eq-b.pos{background:var(--green-l);border-color:rgba(45,122,91,0.3)}
+.eq-b.neg{background:var(--red-l);border-color:rgba(192,57,43,0.2)}
+.eq-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:4px}
+.eq-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--noir);line-height:1}
+.eq-sub{font-size:10px;color:var(--gris);margin-top:2px}
+.eq-op{font-size:24px;font-weight:300;color:var(--gris);flex-shrink:0}
+.bilan-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.bl{border-radius:10px;padding:13px 15px;border:1.5px solid var(--bord)}
+.bl.hi{background:var(--ambre-l);border-color:var(--ambre-m)}
+.bl-title{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.bl.hi .bl-title{color:var(--ambre-d)}.bl .bl-title{color:var(--gris-f)}
+.bl-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bord);font-size:12px}
+.bl-row:last-child{border-bottom:none}
+.bl-k{color:var(--gris-f)}.bl-v{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--noir)}
+.bl-v.gold{color:var(--ambre-d)}.bl-v.green{color:var(--green)}.bl-v.red{color:var(--red)}
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.chart-h{height:190px}
+.eligib-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.ec{border-radius:10px;padding:12px 14px;border:2px solid;position:relative}
+.ec.ok{border-color:var(--green);background:var(--green-l)}.ec.warn{border-color:var(--ambre);background:var(--ambre-l)}.ec.ko{border-color:var(--bord);background:var(--gris-l);opacity:0.55}
+.ec-ico{position:absolute;top:9px;right:10px;font-size:15px}
+.ec-name{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.ec.ok .ec-name{color:var(--green)}.ec.warn .ec-name{color:var(--ambre-d)}.ec.ko .ec-name{color:var(--gris)}
+.ec-txt{font-size:11px;line-height:1.5;color:var(--gris-f)}
+.endett-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.eb-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;font-weight:500}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl thead th{padding:6px 10px;text-align:right;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
+.tbl thead th:first-child{text-align:left}
+.tbl tbody tr{border-bottom:1px solid var(--bord);transition:background 0.1s}
+.tbl tbody tr:hover{background:var(--ambre-l)}
+.tbl td{padding:6px 10px;text-align:right;color:var(--gris-f)}.tbl td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+.tbl .tot{background:var(--noir)}.tbl .tot td{color:#fff;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.tbl td.gold{color:var(--ambre-d);font-weight:600}.tbl td.green{color:var(--green);font-weight:600}.tbl td.red{color:var(--red)}
+@media print{nav,.sidebar,.sim-btn,.barem-btn,.barem-panel{display:none!important}.app{display:block}.main{padding:0}}
+details summary{user-select:none}
+.fi-fmt{position:relative}
+.fi-fmt input[type=text]{padding-right:8px}
+input.fmt-input{font-variant-numeric:tabular-nums;letter-spacing:0.01em}
+details summary span.arr{display:inline-block;transition:transform 0.2s;font-style:normal}
+details[open] summary span.arr{transform:rotate(90deg)}
+
+/* ── NAV UNIVERSELLE ── */
+.nav-univ{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
+.nav-univ-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;gap:8px}
+.nav-logo{display:flex;align-items:center;gap:2px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;text-decoration:none;margin-right:16px;flex-shrink:0}
+.nav-logo .cgp{color:#fff}.nav-logo .sep{color:#333;margin:0 3px}
+.nav-logo .s{color:#E03535}.nav-logo .k{color:#2B65C0}.nav-logo .o1{color:#E8C547}.nav-logo .o2{color:#4C9BE8}.nav-logo .l{color:#E03535}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-a{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 13px;border-radius:6px;transition:all 0.18s;white-space:nowrap;border:none;background:transparent;cursor:pointer}
+.nav-a:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06)}
+.nav-a.active{color:#F0A738;font-weight:600}
+/* Dropdown SCPI */
+.nav-dropdown{position:relative}
+.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
+.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
+.nav-dropdown:hover .arr{transform:rotate(180deg)}
+.nav-dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;background:rgba(18,18,18,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px;min-width:180px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.18s;backdrop-filter:blur(20px);z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-dropdown-item{display:block;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);text-decoration:none;padding:8px 12px;border-radius:7px;transition:all 0.15s;white-space:nowrap}
+.nav-dropdown-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-dropdown-item.active{color:#F0A738;background:rgba(240,167,56,0.08)}
+.nav-dropdown-sep{height:1px;background:rgba(255,255,255,0.07);margin:4px 0}
+.nav-spacer{flex:1}
+.nav-pdf{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);background:transparent;cursor:pointer;transition:all 0.18s;text-decoration:none;flex-shrink:0}
+.nav-pdf:hover{border-color:#F0A738;color:#F0A738}
+
+</style>
+</head>
+<body>
+<nav class="nav-univ">
+  <div class="nav-univ-inner">
+    <a class="nav-logo" href="index.html">
+      <span class="cgp">CGP</span><span class="sep">|</span>
+      <span class="s">s</span><span class="k">k</span><span class="o1">o</span><span class="o2">o</span><span class="l">l</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-a" href="etude-dossier.html">Étude de Dossier</a>
+      <div class="nav-dropdown">
+        <button class="nav-a nav-dropdown-btn active">SCPI <span class="arr">▾</span></button>
+        <div class="nav-dropdown-menu">
+          <a class="nav-dropdown-item " href="scpi-simulator.html">📈 SCPI Cash</a>
+          <div class="nav-dropdown-sep"></div>
+          <a class="nav-dropdown-item active" href="scpi-financement.html">🏦 Financement SCPI</a>
+        </div>
+      </div>
+      <a class="nav-a" href="immo-simulator.html">Immobilier</a>
+    </div>
+    <span class="nav-spacer"></span>
+    <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
+  </div>
+</nav>
+
+<div class="bank-tabs-wrap">
+  <div class="bank-tab active" data-bank="sofiap" onclick="setBank('sofiap',this)"><span class="bank-dot"></span>SOFIAP · min 80K€ · différé 6 mois</div>
+  <div class="bank-tab" data-bank="cfcal" onclick="setBank('cfcal',this)"><span class="bank-dot"></span>CFCAL · min 40K€ · différé 9 mois</div>
+  <div class="bank-tab" data-bank="cacf" onclick="setBank('cacf',this)"><span class="bank-dot"></span>CACF · min 10K€ · différé total 6 mois</div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:12px">
+    <div id="bankBtn_sofiap" onclick="setBank('sofiap')" style="padding:8px 4px;border:2px solid var(--sofiap);border-radius:8px;text-align:center;cursor:pointer;background:var(--sofiap);font-size:10px;font-weight:700;color:#fff;line-height:1.3">SOFIAP<br><span style="font-weight:400;opacity:0.8">80K€ min</span></div>
+    <div id="bankBtn_cfcal" onclick="setBank('cfcal')" style="padding:8px 4px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:10px;font-weight:700;color:var(--gris);line-height:1.3">CFCAL<br><span style="font-weight:400;opacity:0.8">40K€ min</span></div>
+    <div id="bankBtn_cacf" onclick="setBank('cacf')" style="padding:8px 4px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:10px;font-weight:700;color:var(--gris);line-height:1.3">CACF<br><span style="font-weight:400;opacity:0.8">10K€ min</span></div>
+  </div>
+
+  <details open>
+  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> SITUATION DE L'INVESTISSEUR</summary>
+  <!-- Investissement solo ou couple -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+    <div id="btnSolo" onclick="setInvMode('solo')" style="padding:9px 6px;border:2px solid var(--ambre);border-radius:8px;text-align:center;cursor:pointer;background:var(--ambre-l);font-size:12px;font-weight:600;color:var(--ambre-d)">👤 Solo</div>
+    <div id="btnCouple" onclick="setInvMode('couple')" style="padding:9px 6px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:12px;font-weight:600;color:var(--gris)">👫 Couple</div>
+  </div>
+  <div class="fg"><label>Profil emprunteur</label>
+    <select class="fi" id="fProfil" onchange="onProfil()">
+      <option value="salarie">Salarié</option>
+      <option value="liberal">Profession libérale</option>
+      <option value="retraite">Retraité / Rentier</option>
+      <option value="dirigeant">Chef d'entreprise / TNS</option>
+      <option value="fonctionnaire">Fonctionnaire</option>
+      <option value="expatrie">Expatrié</option>
+    </select>
+  </div>
+  <div id="profilMsg"></div>
+  <div id="bankReco" style="margin-bottom:6px"></div>
+  
+  <div class="sb-sep" style="margin:10px 0"></div>
+
+  <div class="fg"><label>Revenus annuels nets imposables</label>
+    <div class="fi-row"><input type="number" id="fRev" value="60000" step="1000" oninput="calcEndett();showFmt(this,'fRevFmt')"><span class="fi-unit">€/an</span></div>
+    <div id="fRevFmt" style="font-size:10px;color:var(--gris);margin-top:1px;text-align:right">60 000 €/an</div>
+  </div>
+  <div class="grid2">
+    <div class="fg"><label>Loyers immo /mois</label>
+      <div class="fi-row"><input type="number" id="fLImmo" value="0" step="50" oninput="calcEndett();showFmt(this)"><span class="fi-unit">€</span></div>
+    </div>
+    <div class="fg"><label>Loyers SCPI /mois</label>
+      <div class="fi-row"><input type="number" id="fLScpi" value="0" step="50" oninput="calcEndett();showFmt(this)"><span class="fi-unit">€</span></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="fg"><label>Crédits existants /mois</label>
+      <div class="fi-row"><input type="number" id="fCrd" value="0" step="50" oninput="calcEndett();showFmt(this)"><span class="fi-unit">€</span></div>
+    </div>
+    <div class="fg"><label>Loyer RP /mois</label>
+      <div class="fi-row"><input type="number" id="fLRP" value="0" step="50" oninput="calcEndett()"><span class="fi-unit">€</span></div>
+    </div>
+  </div>
+
+  <div class="endett-live" id="endettLive">
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px">
+      <span style="font-weight:600;color:var(--gris-f)">Taux d'endettement actuel</span>
+      <span id="endettVal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px">—</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="endettBar" style="width:0;background:var(--green)"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:2px"><span>0%</span><span>20%</span><span style="color:var(--red);font-weight:700">35% max</span></div>
+  </div>
+
+  <div style="margin-top:8px;margin-bottom:8px">
+    <div style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gris);margin-bottom:6px">TMI — Tranche Marginale d'Imposition</div>
+    <div style="display:flex;gap:4px">
+      <div class="tmi-btn" data-val="0" onclick="setTMI(0)" style="flex:1;padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid var(--bord);background:var(--green-l);font-size:11px;font-weight:700;color:var(--green);transition:all 0.15s">0%</div>
+      <div class="tmi-btn" data-val="11" onclick="setTMI(11)" style="flex:1;padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid var(--bord);background:#fff;font-size:11px;font-weight:700;color:var(--gris);transition:all 0.15s">11%</div>
+      <div class="tmi-btn" data-val="30" onclick="setTMI(30)" style="flex:1;padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid var(--ambre);background:var(--ambre-l);font-size:11px;font-weight:700;color:var(--ambre-d);transition:all 0.15s">30%</div>
+      <div class="tmi-btn" data-val="41" onclick="setTMI(41)" style="flex:1;padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid var(--bord);background:#fff;font-size:11px;font-weight:700;color:var(--gris);transition:all 0.15s">41%</div>
+      <div class="tmi-btn" data-val="45" onclick="setTMI(45)" style="flex:1;padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid var(--bord);background:#fff;font-size:11px;font-weight:700;color:var(--gris);transition:all 0.15s">45%</div>
+    </div>
+    <input type="hidden" id="fTMI" value="30">
+  </div>
+
+  </details>
+
+  <div class="sb-sep"></div>
+  <details open>
+    <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px">
+      <span class="arr" style="font-size:11px">▸</span> SCPI À FINANCER
+    </summary>
+    <div id="scpiList"></div>
+    <button class="scpi-add" onclick="addSCPI()">+ Ajouter une SCPI</button>
+    <div id="scpiTotal" style="display:none;background:var(--noir);border-radius:7px;padding:7px 10px;margin-top:6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Total investi</span>
+      <span id="scpiTotalVal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ambre)">0 €</span>
+    </div>
+  </details>
+
+  <div class="sb-sep"></div>
+  <details open>
+  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> FINANCEMENT</summary>
+  <div class="fg"><label>Durée</label>
+    <div class="sl-val" id="slDurVal">240 mois (20 ans)</div>
+    <input type="range" id="sDur" min="120" max="300" value="240" step="12" oninput="onDur(this.value)">
+    <div class="sl-labs"><span id="slMin">120m</span><span id="slMax">300m</span></div>
+  </div>
+  <div class="grid2">
+    <div class="fg"><label>Différé (mois)</label><input class="fi" id="fDif" type="number" value="6" min="0" max="9"></div>
+    <div class="fg"><label>Type</label>
+      <select class="fi" id="fTDif"><option value="partiel">Partiel</option></select>
+    </div>
+  </div>
+  <div class="fg"><label>Taux nominal (%)</label>
+    <div class="fi-row"><input type="number" id="fTaux" value="4.10" min="0.5" max="15" step="0.05"><span class="fi-unit">%</span></div>
+    <div class="hint" id="tauxHint"></div>
+  </div>
+
+  </details>
+  <div class="sb-sep"></div>
+  <details open>
+  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> ÂGES & ASSURANCE (ADI)</summary>
+  <div class="grid2">
+    <div class="fg"><label>Âge emprunteur 1</label><input class="fi" id="fA1" type="number" value="40" min="18" max="70" oninput="autoADI();calcEndett()"></div>
+    <div class="fg"><label>Quotité 1 (%)</label><input class="fi" id="fQ1" type="number" value="100" min="0" max="100" step="10" oninput="autoADI()"></div>
+  </div>
+  <div id="adi2row" class="grid2" style="display:none">
+    <div class="fg"><label>Âge emprunteur 2</label><input class="fi" id="fA2" type="number" min="18" max="70" placeholder="—" oninput="autoADI()"></div>
+    <div class="fg"><label>Quotité 2 (%)</label><input class="fi" id="fQ2" type="number" value="50" min="0" max="100" step="10" oninput="autoADI()"></div>
+  </div>
+  <div class="fg"><label>Taux ADI global (%/an)</label>
+    <div class="fi-row"><input type="number" id="fADI" value="0.210" min="0" max="2" step="0.001"><span class="fi-unit">%</span></div>
+    <div class="hint" id="adiHint"></div>
+  </div>
+  <div class="fg"><label>Base calcul ADI</label>
+    <select class="fi" id="fBADI"><option value="ce">Capital emprunté (CE)</option><option value="crd">Capital restant dû (CRD)</option></select>
+  </div>
+
+  </details>
+  <div class="sb-sep"></div>
+  <details>
+  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> HYPOTHÈSES</summary>
+  <div class="fg"><label>Revalorisation des parts /an (%)</label>
+    <div class="fi-row"><input type="number" id="fReval" value="0" min="-5" max="10" step="0.5"><span class="fi-unit">%</span></div>
+  </div>
+
+  </details>
+  <div class="sb-sep"></div>
+  <button class="barem-btn" onclick="toggleBarem()">⚙️ Conditions banque</button>
+  <div class="barem-panel" id="baremPanel"></div>
+
+  <button class="sim-btn" onclick="runSim()">Lancer la projection →</button>
+</aside>
+
+<main class="main">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🏦</div>
+    <div class="empty-title">Projection Financière SCPI</div>
+    <div class="empty-sub">Renseignez le profil client, les SCPI et les paramètres, puis lancez.</div>
+  </div>
+  <div id="results" style="display:none"></div>
+</main>
+</div>
+
+<script>
+const BANKS={
+  sofiap:{name:'SOFIAP',color:'#1B4F8A',min:80000,minD:120,maxD:240,difMax:6,difTypes:['partiel'],
+    garantie:'Caution Crédit Logement (~1.73%)',assureur:'SURAVENIR',ageFin:75,
+    fraisDoss:{type:'pct',val:0.01,max:1200},fraisNant:0,endMax:35,
+    profiles:['salarie','liberal','fonctionnaire','expatrie'],
+    taux:{120:{ai:0.0395,as:0.0390},180:{ai:0.0400,as:0.0395},240:{ai:0.0410,as:0.0400}},
+    adi:[{l:'< 30',max:29,t:0.0012},{l:'31–35',max:35,t:0.0013},{l:'36–40',max:40,t:0.0015},{l:'41–45',max:45,t:0.0021},{l:'> 45',max:99,t:0.0031}],
+    coefScpi:1,coefScpiMax:0.04,
+    note:'Patrimoine net immo ≥ montant financé. Pas de max lignes. SCPI éligibles : EP, EPE, TE, Activimmo, Comète…'},
+  cfcal:{name:'CFCAL',color:'#2E7D32',min:40000,minD:120,maxD:300,difMax:9,difTypes:['partiel'],
+    garantie:'Nantissement (135,84 €/SCPI)',assureur:'SURAVENIR',ageFin:85,
+    fraisDoss:{type:'pct',val:0.01,max:null},fraisNant:135.84,endMax:40,maxLignes:6,minLigne:10000,
+    profiles:['salarie','liberal','retraite'],
+    taux:{120:{p:0.0463,l:0.0515},180:{p:0.0489,l:0.0515},240:{p:0.0499,l:0.0535},300:{p:0.0515,l:0.0535}},
+    adi:[{l:'< 30',max:29,t:0.002},{l:'30–50',max:50,t:0.003},{l:'> 50',max:99,t:0.004}],
+    coefScpi:0,
+    note:'6 lignes max, min 10 000 € par ligne. SCPI fiscales : 15 ans min.'},
+  cacf:{name:'CACF – Crédit Agricole',color:'#7B1FA2',min:10000,minD:144,maxD:240,difMax:6,difTypes:['partiel','total'],
+    garantie:'Nantissement (gratuit)',assureur:'CACI',ageFin:81,
+    fraisDoss:{type:'fixed',val:0},fraisNant:0,endMax:45,
+    profiles:['salarie','liberal','retraite','dirigeant','fonctionnaire','expatrie'],
+    taux:{144:{t:0.051},180:{t:0.051},240:{t:0.051}},
+    adi:[{l:'< 30',max:29,t:0.002},{l:'30–50',max:50,t:0.003},{l:'> 50',max:99,t:0.004}],
+    coefScpi:0,
+    note:'Financement 90% (apport 10% + honoraires). Montant max = 30× revenus. Pas de prise en compte des revenus SCPI.'}
+};
+
+const SCPI=[
+  {id:'activimmo',n:'Activimmo',r:5.52,p:610},{id:'comete',n:'Comète',r:11.18,p:250},
+  {id:'altaconv',n:'Alta Convictions',r:6.50,p:308},{id:'epe',n:'Epargne Pierre Europe',r:6.75,p:200},
+  {id:'ep',n:'Epargne Pierre',r:5.28,p:208},{id:'atream',n:'Atream Hôtels',r:6.50,p:1000},
+  {id:'te',n:'Transitions Europe',r:8.25,p:202},{id:'corigin',n:'Corum Origin',r:7.30,p:1135},
+  {id:'ceurion',n:'Corum Eurion',r:6.50,p:215},{id:'lfsante',n:'LF Avenir Santé',r:9.33,p:300},
+  {id:'osmo',n:'Osmo Energie',r:9.33,p:300},{id:'ncap',n:'NCAP Régions',r:6.01,p:682},
+  {id:'perial',n:'Perial Opportunités Europe',r:5.50,p:44},{id:'immorente',n:'Immorente',r:5.72,p:340},
+  {id:'sofidy',n:'Sofidy Europe Invest',r:6.50,p:235},{id:'eurovalys',n:'Eurovalys',r:5.50,p:960},
+];
+
+let bank='sofiap', sc=0, cBar=null, cPie=null, invMode='solo';
+
+window.onload=()=>{addSCPI();setBank('sofiap');calcEndett();autoADI();renderBarem();onProfil();updateBankReco();};
+
+function setInvMode(mode){
+  invMode=mode;
+  const bs=document.getElementById('btnSolo');
+  const bc=document.getElementById('btnCouple');
+  const adi2=document.getElementById('adi2row');
+  if(mode==='solo'){
+    bs.style.border='2px solid var(--ambre)';bs.style.background='var(--ambre-l)';bs.style.color='var(--ambre-d)';
+    bc.style.border='2px solid var(--bord)';bc.style.background='#fff';bc.style.color='var(--gris)';
+    adi2.style.display='none';
+    document.getElementById('fQ1').value=100; autoADI();
+  }else{
+    bc.style.border='2px solid var(--ambre)';bc.style.background='var(--ambre-l)';bc.style.color='var(--ambre-d)';
+    bs.style.border='2px solid var(--bord)';bs.style.background='#fff';bs.style.color='var(--gris)';
+    adi2.style.display='grid';
+    document.getElementById('fQ1').value=50;document.getElementById('fQ2').value=50; autoADI();
+  }
+  calcEndett();
+}
+
+function setBank(b, el){
+  bank=b;
+  // Active tab dans le header
+  document.querySelectorAll('.bank-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else { const t=document.querySelector(`.bank-tab[data-bank="${b}"]`); if(t) t.classList.add('active'); }
+  // Highlight bouton banque dans sidebar
+  ['sofiap','cfcal','cacf'].forEach(id=>{
+    const btn=document.getElementById('bankBtn_'+id);
+    if(!btn)return;
+    const bk=BANKS[id];
+    if(id===b){
+      btn.style.background=bk.color;btn.style.borderColor=bk.color;btn.style.color='#fff';
+    } else {
+      btn.style.background='#fff';btn.style.borderColor='var(--bord)';btn.style.color='var(--gris)';
+    }
+  });
+  updateBank();renderBarem();autoADI();onDur(document.getElementById('sDur').value);
+  document.getElementById('results').style.display='none';
+  document.getElementById('emptyState').style.display='flex';
+}
+
+function updateBank(){
+  const b=BANKS[bank];
+  const sl=document.getElementById('sDur');
+  sl.min=b.minD;sl.max=b.maxD;
+  document.getElementById('slMin').textContent=b.minD+'m';
+  document.getElementById('slMax').textContent=b.maxD+'m';
+  if(+sl.value<b.minD){sl.value=b.minD;onDur(b.minD);}
+  if(+sl.value>b.maxD){sl.value=b.maxD;onDur(b.maxD);}
+  document.getElementById('fDif').max=b.difMax;
+  const td=document.getElementById('fTDif');
+  td.innerHTML=b.difTypes.map(t=>`<option value="${t}">${t==='partiel'?'Partiel':'Total'}</option>`).join('');
+  calcEndett();
+}
+
+function onDur(v){
+  document.getElementById('slDurVal').textContent=v+' mois ('+Math.round(v/12)+' ans)';
+  setTauxAuto();
+}
+
+function setTauxAuto(){
+  const b=BANKS[bank]; const d=+document.getElementById('sDur').value;
+  const keys=Object.keys(b.taux).map(Number).sort((a,c)=>a-c);
+  const k=keys.reduce((p,c)=>Math.abs(c-d)<Math.abs(p-d)?c:p);
+  const e=b.taux[k]; let t,h;
+  if(e.t!==undefined){t=e.t;h=`Barème ${b.name} ${d}m : ${(t*100).toFixed(2)}%`;}
+  else if(e.ai!==undefined){t=e.ai;h=`SOFIAP ${d}m (apport <20%) : ${(t*100).toFixed(2)}%`;}
+  else{t=e.p;h=`CFCAL ${d}m propriétaire : ${(t*100).toFixed(2)}%`;}
+  document.getElementById('fTaux').value=(t*100).toFixed(2);
+  document.getElementById('tauxHint').textContent='✓ '+h;
+}
+
+function onProfil(){
+  const p=document.getElementById('fProfil').value;
+  const msg={
+    dirigeant:'⚠️ SOFIAP non accessible aux TNS. CFCAL et CACF uniquement.',
+    expatrie:'⚠️ SOFIAP : OK si patrimoine net immo France. CACF : OK si contrat droit français.',
+    salarie:'',liberal:'',retraite:'',fonctionnaire:''
+  }[p]||'';
+  document.getElementById('profilMsg').innerHTML=msg?`<div style="font-size:11px;background:#FFF8E1;border:1.5px solid #FFE082;color:#795548;border-radius:7px;padding:7px 9px;margin-bottom:6px">${msg}</div>`:'';
+  updateBankReco();
+}
+
+function updateBankReco(){
+  const p=document.getElementById('fProfil').value;
+  const mont=getScpis().reduce((s,r)=>s+r.montant,0)||0;
+  const reco=[];
+  Object.entries(BANKS).forEach(([id,bk])=>{
+    if(!bk.profiles.includes(p))return;
+    if(mont>0&&mont<bk.min)return;
+    reco.push({id,bk});
+  });
+  const el=document.getElementById('bankReco');
+  if(!el)return;
+  if(reco.length===0){el.innerHTML='<div style="font-size:11px;background:var(--red-l);border:1.5px solid rgba(192,57,43,0.2);color:var(--red);border-radius:7px;padding:7px 9px">❌ Aucun partenaire compatible avec ce profil</div>';return;}
+  const labels={sofiap:'SOFIAP',cfcal:'CFCAL',cacf:'CACF'};
+  const colors={sofiap:'var(--sofiap)',cfcal:'var(--cfcal)',cacf:'var(--cacf)'};
+  el.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--gris);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">Partenaires compatibles</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">${reco.map(r=>`<div onclick="switchToBank('${r.id}')" style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid ${colors[r.id]};color:${r.id===bank?'#fff':colors[r.id]};background:${r.id===bank?colors[r.id]:'transparent'};transition:all 0.2s">${labels[r.id]}</div>`).join('')}</div>`;
+}
+
+function switchToBank(b){
+  const tabs=document.querySelectorAll('.bank-tab');
+  tabs.forEach(t=>{if(t.dataset.bank===b){setBank(b);}});
+}
+
+function calcEndett(){
+  const b=BANKS[bank];
+  const revM=(+document.getElementById('fRev').value||0)/12;
+  const li=(+document.getElementById('fLImmo').value||0)*0.8;
+  const ls=(+document.getElementById('fLScpi').value||0)*(b.coefScpi||0);
+  const charges=(+document.getElementById('fCrd').value||0)+(+document.getElementById('fLRP').value||0);
+  const revCorr=revM+li+ls;
+  const pct=revCorr>0?charges/revCorr*100:0;
+  // Seuil rouge toujours à 35% (norme HCSF)
+  const col=pct>=35?'var(--red)':pct>28?'var(--ambre)':'var(--green)';
+  document.getElementById('endettVal').textContent=pct.toFixed(1)+'%';
+  document.getElementById('endettVal').style.color=col;
+  // Barre plafonnée à 35% = 100%
+  document.getElementById('endettBar').style.width=Math.min(pct,35)/35*100+'%';
+  document.getElementById('endettBar').style.background=col;
+}
+
+function autoADI(){
+  const b=BANKS[bank];
+  const a1=+document.getElementById('fA1').value||40;
+  const q1=(+document.getElementById('fQ1').value||100)/100;
+  const a2=+document.getElementById('fA2').value||0;
+  const q2=(+document.getElementById('fQ2').value||0)/100;
+  const gr=a=>{ const r=b.adi.find(x=>a<=x.max); return r?r.t:b.adi.at(-1).t; };
+  const r1=gr(a1),r2=a2>0?gr(a2):0;
+  const g=r1*q1+r2*q2;
+  document.getElementById('fADI').value=(g*100).toFixed(3);
+  document.getElementById('adiHint').textContent=`✓ ${b.assureur} (fin: ${b.ageFin}a) — E1: ${(r1*100).toFixed(2)}%×${Math.round(q1*100)}%${a2>0?' E2: '+(r2*100).toFixed(2)+'%×'+Math.round(q2*100)+'%':''}`;
+}
+
+function addSCPI(){
+  const b=BANKS[bank];
+  if(b.maxLignes&&document.querySelectorAll('.scpi-row').length>=b.maxLignes){alert('Max '+b.maxLignes+' lignes pour '+b.name);return;}
+  sc++;const id='s'+sc; const n=document.querySelectorAll('.scpi-row').length+1;
+  const d=document.createElement('div');d.className='scpi-row';d.id=id;
+  d.innerHTML=`<span class="scpi-num">${n}</span>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+      <select class="fi scpi-sel" style="font-size:11px;padding:4px 5px;border:none;background:transparent;width:100%" onchange="updateScpiMontant('${id}')">
+        ${SCPI.map(s=>`<option value="${s.id}" data-p="${s.p}" data-r="${s.r}">${s.n} — ${s.r.toFixed(2)}%</option>`).join('')}
+        <option value="custom" data-p="0" data-r="0">✏️ Taux personnalisé</option>
+      </select>
+      <div id="custom_${id}" style="display:none;gap:4px;margin-top:2px">
+        <div class="fi-row" style="height:26px">
+          <input type="number" class="scpi-custom-prix" placeholder="Prix/part" style="width:60px;font-size:11px" oninput="updateScpiMontant('${id}')">
+          <span class="fi-unit" style="font-size:9px">€/pt</span>
+        </div>
+        <div class="fi-row" style="height:26px;margin-top:2px">
+          <input type="number" class="scpi-custom-rdt" placeholder="Rdt %" value="6" style="width:50px;font-size:11px">
+          <span class="fi-unit" style="font-size:9px">%</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <div class="fi-row" style="width:72px;height:28px">
+        <input type="number" class="sp" value="100" min="1" step="1" style="width:45px;font-size:11px;text-align:right" oninput="updateScpiMontant('${id}')">
+        <span class="fi-unit" style="font-size:9px">pts</span>
+      </div>
+      <span class="scpi-montant" id="mont_${id}" style="font-size:10px;font-weight:700;color:var(--ambre-d);white-space:nowrap">—</span>
+    </div>
+    <button class="scpi-del" onclick="document.getElementById('${id}').remove();updateScpiTotal()">×</button>`;
+  document.getElementById('scpiList').appendChild(d);
+  updateScpiMontant(id);
+  setTimeout(updateBankReco, 50);
+}
+
+function updateScpiMontant(id){
+  const row=document.getElementById(id);
+  if(!row)return;
+  const sel=row.querySelector('.scpi-sel');
+  const parts=+row.querySelector('.sp').value||0;
+  const o=sel.options[sel.selectedIndex];
+  const isCustom=sel.value==='custom';
+  const custPanel=document.getElementById('custom_'+id);
+  if(custPanel)custPanel.style.display=isCustom?'flex':'none';
+  let prix=isCustom?(+row.querySelector('.scpi-custom-prix')?.value||0):(+o.dataset.p||0);
+  const montant=parts*prix;
+  const el=document.getElementById('mont_'+id);
+  if(el)el.textContent=montant>0?fmt(montant)+' €':'—';
+  // Validation minimum banque
+  const b=BANKS[bank];
+  if(el&&montant>0&&b.minLigne&&montant<b.minLigne){
+    el.style.color='var(--red)';el.title='Min '+fmt(b.minLigne)+' € par ligne pour '+b.name;
+  } else if(el){el.style.color='var(--ambre-d)';el.title='';}
+  updateScpiTotal();
+}
+
+function updateScpiTotal(){
+  const rows=document.querySelectorAll('.scpi-row');
+  if(rows.length<2){document.getElementById('scpiTotal').style.display='none';return;}
+  let total=0;
+  rows.forEach(r=>{
+    const sel=r.querySelector('.scpi-sel');
+    const parts=+r.querySelector('.sp').value||0;
+    if(!sel)return;
+    const o=sel.options[sel.selectedIndex];
+    const isCustom=sel.value==='custom';
+    const prix=isCustom?(+r.querySelector('.scpi-custom-prix')?.value||0):(+o.dataset.p||0);
+    total+=parts*prix;
+  });
+  document.getElementById('scpiTotal').style.display='flex';
+  document.getElementById('scpiTotalVal').textContent=fmt(total)+' €';
+}
+
+function getScpis(){
+  return [...document.querySelectorAll('.scpi-row')].map(r=>{
+    const sel=r.querySelector('.scpi-sel');
+    if(!sel)return null;
+    const parts=+r.querySelector('.sp').value||0;
+    const o=sel.options[sel.selectedIndex];
+    const isCustom=sel.value==='custom';
+    let prix,rdt,name;
+    if(isCustom){
+      prix=+r.querySelector('.scpi-custom-prix')?.value||0;
+      rdt=+r.querySelector('.scpi-custom-rdt')?.value/100||0.06;
+      name='SCPI personnalisée';
+    } else {
+      prix=+o.dataset.p||0;
+      rdt=+o.dataset.r/100||0;
+      name=SCPI.find(s=>s.id===sel.value)?.n||'SCPI';
+    }
+    return{name,parts,prix,rdt,montant:parts*prix,isCustom};
+  }).filter(r=>r&&r.montant>0);
+}
+
+function calcFrais(m,nb){
+  const b=BANKS[bank];
+  const co=Math.min(Math.max(m*0.01,750),2250);
+  let doss=b.fraisDoss.type==='pct'?m*b.fraisDoss.val:b.fraisDoss.val;
+  if(b.fraisDoss.max)doss=Math.min(doss,b.fraisDoss.max);
+  const nant=(b.fraisNant||0)*nb;
+  const gar=bank==='sofiap'?m*0.0173:0;
+  return{co,doss,nant,gar,tot:co+doss+nant+gar};
+}
+
+function mensAmort(cap,tx,n){const tm=tx/12;return cap*tm/(1-Math.pow(1+tm,-n));}
+
+function buildTab(cap,tx,dur,dif,typD,div0,rev){
+  const tm=tx/12,adiM=+document.getElementById('fADI').value/100/12;
+  const baseADI=document.getElementById('fBADI').value;
+  const durA=dur-dif; const mA=mensAmort(cap,tx,durA);
+  let crd=cap,divM=div0,rows=[];
+  for(let an=1;an<=Math.ceil(dur/12);an++){
+    const m0=(an-1)*12+1,m1=Math.min(an*12,dur),nm=m1-m0+1;
+    let tM=0,tI=0,tA=0,tADI=0;
+    for(let m=m0;m<=m1;m++){
+      const inD=m<=dif;
+      const adi=baseADI==='ce'?cap*adiM:crd*adiM;
+      const int=crd*tm; let am=0,men;
+      if(inD){men=int+adi;am=0;}
+      else{am=mA-int;men=mA+adi;crd=Math.max(0,crd-am);}
+      tM+=men;tI+=int;tA+=am;tADI+=adi;
+    }
+    rows.push({an,mM:tM/nm,iM:tI/nm,aM:tA/nm,adM:tADI/nm,crd:Math.max(0,crd),divM,pM:divM-tM/nm});
+    divM*=(1+rev);
+  }
+  return rows;
+}
+
+function toggleBarem(){document.getElementById('baremPanel').classList.toggle('open');}
+function renderBarem(){
+  const b=BANKS[bank];
+  const fe=Object.values(b.taux)[0];
+  const cols=fe.t!==undefined?['Taux']:fe.ai!==undefined?['<20% apport','≥20% apport']:['Proprio','Locataire'];
+  let h=`<div style="font-size:10px;font-weight:700;color:${b.color};margin-bottom:5px;text-transform:uppercase">${b.name}</div>`;
+  h+=`<div style="font-size:9px;font-weight:600;color:var(--gris);margin:4px 0">TAUX NOMINAUX</div>`;
+  h+=`<table class="bt"><thead><tr><th>Dur.</th>${cols.map(c=>'<th>'+c+'</th>').join('')}</tr></thead><tbody>`;
+  Object.entries(b.taux).forEach(([dur,e])=>{
+    h+=`<tr><td>${dur}m</td>`;
+    if(e.t!==undefined)h+=`<td><input value="${(e.t*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].t=this.value/100;setTauxAuto()"> %</td>`;
+    else if(e.ai!==undefined){h+=`<td><input value="${(e.ai*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].ai=this.value/100;setTauxAuto()"> %</td><td><input value="${(e.as*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].as=this.value/100;setTauxAuto()"> %</td>`;}
+    else{h+=`<td><input value="${(e.p*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].p=this.value/100;setTauxAuto()"> %</td><td><input value="${(e.l*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].l=this.value/100;setTauxAuto()"> %</td>`;}
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table><div style="font-size:9px;font-weight:600;color:var(--gris);margin:6px 0 3px">ADI — ${b.assureur}</div>`;
+  h+=`<table class="bt"><thead><tr><th>Âge</th><th>Taux/an</th></tr></thead><tbody>`;
+  b.adi.forEach((r,i)=>{h+=`<tr><td>${r.l}</td><td><input value="${(r.t*100).toFixed(3)}" onchange="BANKS['${bank}'].adi[${i}].t=this.value/100;autoADI()"> %</td></tr>`;});
+  h+=`</tbody></table><div style="font-size:10px;color:var(--gris-f);margin-top:7px;line-height:1.6">${b.note}</div>`;
+  document.getElementById('baremPanel').innerHTML=h;
+}
+
+function runSim(){
+  const b=BANKS[bank];
+  const scpis=getScpis();
+  if(!scpis.length){alert('Ajoutez au moins une SCPI avec un nombre de parts valide.');return;}
+  const mont=scpis.reduce((s,r)=>s+r.montant,0);
+  const b2=BANKS[bank];
+  if(mont<b2.min){
+    if(!confirm(`⚠️ Montant total (${fmt(mont)} €) inférieur au minimum ${b2.name} (${fmt(b2.min)} €).\nContinuer quand même pour voir la simulation ?`)) return;
+  }
+  if(b2.minLigne){
+    const underMin=scpis.filter(s=>s.montant<b2.minLigne);
+    if(underMin.length){
+      if(!confirm(`⚠️ Lignes sous le minimum ${b2.name} (${fmt(b2.minLigne)} €/ligne) :\n${underMin.map(s=>s.name+' : '+fmt(s.montant)+' €').join('\n')}\nContinuer quand même ?`)) return;
+    }
+  }
+  const dur=+document.getElementById('sDur').value;
+  const dif=Math.min(+document.getElementById('fDif').value,b.difMax);
+  const typD=document.getElementById('fTDif').value;
+  const tx=+document.getElementById('fTaux').value/100;
+  const rev=+document.getElementById('fReval').value/100;
+  const tmi=+document.getElementById('fTMI').value/100;
+  const revenus=+document.getElementById('fRev').value||0;
+  const frais=calcFrais(mont,scpis.length);
+  const apport=frais.co+frais.gar;
+  const emp=mont+frais.doss+frais.nant;
+  const rdtMoy=scpis.reduce((s,r)=>s+r.rdt*r.montant,0)/mont;
+  const divM=mont*rdtMoy/12;
+  const divNet=divM*(1-tmi-0.172);
+  const adiM=+document.getElementById('fADI').value/100/12;
+  const mA=mensAmort(emp,tx,dur-dif)+emp*adiM;
+  const mD=emp*tx/12+emp*adiM;
+  const part=divM-mA;
+  const tab=buildTab(emp,tx,dur,dif,typD,divM,rev);
+  const tL=tab.reduce((s,r)=>s+r.divM*12,0);
+  const tP=tab.reduce((s,r)=>s+r.pM*12,0);
+  const tI=tab.reduce((s,r)=>s+r.iM*12,0);
+  const tADI=tab.reduce((s,r)=>s+r.adM*12,0);
+  const effort=Math.max(0,-tP)+apport;
+
+  // Endettement
+  const revM=revenus/12;
+  const li=(+document.getElementById('fLImmo').value||0)*0.8;
+  const ls=(+document.getElementById('fLScpi').value||0)*(b.coefScpi||0);
+  const charges=(+document.getElementById('fCrd').value||0)+(+document.getElementById('fLRP').value||0);
+  const revC=revM+li+ls;
+  const eAvt=revC>0?charges/revC*100:0;
+  const eApr=revC>0?(charges+mA)/revC*100:0;
+
+  // Éligibilité toutes banques
+  const profil=document.getElementById('fProfil').value;
+  const eligib=Object.entries(BANKS).map(([id,bk])=>{
+    const iss=[];
+    if(!bk.profiles.includes(profil))iss.push('Profil non éligible ('+profil+')');
+    if(mont<bk.min)iss.push('Min: '+fmt(bk.min)+' €');
+    if(bk.maxLignes&&scpis.length>bk.maxLignes)iss.push('Max '+bk.maxLignes+' lignes');
+    if(bk.minLigne){const minL=scpis.find(s=>s.montant<bk.minLigne);if(minL)iss.push('Min/ligne: '+fmt(bk.minLigne)+' €');}
+    const ke=Object.keys(bk.taux).map(Number).sort((a,c)=>a-c);
+    const kk=ke.reduce((p,c)=>Math.abs(c-dur)<Math.abs(p-dur)?c:p);
+    const ee=bk.taux[kk]; const txBk=ee.t||ee.ai||ee.p||tx;
+    const mBk=mensAmort(emp,txBk,dur-dif)+emp*adiM;
+    const eBk=revC>0?(charges+mBk)/revC*100:0;
+    if(eBk>bk.endMax)iss.push(`Endettement: ${eBk.toFixed(0)}% > ${bk.endMax}%`);
+    return{id,bk,iss,ok:iss.length===0};
+  });
+  const curEligib=eligib.find(e=>e.id===bank)||eligib[0];
+
+  render({b,scpis,mont,emp,frais,apport,dur,dif,typD,tx,rdtMoy,divM,divNet,mA,mD,part,tab,tL,tP,tI,tADI,effort,rev,tmi,eAvt,eApr,eligib,curEligib});
+}
+
+function render(d){
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('results').style.display='block';
+  const pos=d.part>=0;
+  let h='';
+
+  // Header
+  h+=`<div class="bank-hdr" data-bank="${bank}">
+    <div class="bh-name">${d.b.name}</div>
+    <div class="bh-it"><div class="bh-lbl">Investi</div><div class="bh-v">${fmt(d.mont)} €</div></div>
+    <div class="bh-it"><div class="bh-lbl">Emprunté</div><div class="bh-v">${fmt(d.emp)} €</div></div>
+    <div class="bh-it"><div class="bh-lbl">Durée</div><div class="bh-v">${d.dur}m</div></div>
+    <div class="bh-it"><div class="bh-lbl">Taux</div><div class="bh-v">${(d.tx*100).toFixed(2)}%</div></div>
+    <div class="bh-it"><div class="bh-lbl">Rdt moy.</div><div class="bh-v">${(d.rdtMoy*100).toFixed(2)}%</div></div>
+  </div>`;
+
+  // Éligibilité banque courante
+  const ce=d.curEligib;
+  const ceCol=ce.ok?'var(--green)':ce.iss.length<=1?'var(--ambre-d)':'var(--red)';
+  const ceBg=ce.ok?'var(--green-l)':ce.iss.length<=1?'var(--ambre-l)':'var(--red-l)';
+  h+=`<div class="card" style="background:${ceBg};border-color:${ceCol}20;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:28px">${ce.ok?'✅':ce.iss.length<=1?'⚠️':'❌'}</div>
+      <div style="flex:1">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:${ceCol}">${ce.ok?d.b.name+' — Dossier éligible':d.b.name+' — Vérification requise'}</div>
+        <div style="font-size:12px;color:var(--gris-f);margin-top:3px">${ce.ok?`Profil validé · Endettement: ${d.eApr.toFixed(1)}% ≤ ${d.b.endMax}% · Montant: ${fmt(d.mont)} € ≥ min ${fmt(d.b.min)} €`:ce.iss.map(i=>'• '+i).join(' &nbsp;|&nbsp; ')}</div>
+      </div>
+    </div>
+  </div>`;
+
+  // Endettement
+  const cA=d.eAvt>d.b.endMax?'var(--red)':d.eAvt>d.b.endMax-5?'var(--ambre)':'var(--green)';
+  const cAp=d.eApr>d.b.endMax?'var(--red)':d.eApr>d.b.endMax-5?'var(--ambre)':'var(--green)';
+  h+=`<div class="card"><div class="card-title"><span class="dot"></span>Taux d'endettement</div>
+  <div class="endett-bars">
+    <div>
+      <div class="eb-label"><span>Avant investissement</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
+    </div>
+    <div>
+      <div class="eb-label"><span>Après investissement</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--gris);margin-top:8px">Seuil ${d.b.name}: <strong>${d.b.endMax}%</strong>${bank==='sofiap'?' — Rendements SCPI pris en compte plafonnés à 4%':' — Rendements SCPI non pris en compte'}</div>
+  </div>`;
+
+  // Équation
+  h+=`<div class="eq">
+    <div class="eq-b mens"><div class="eq-lbl">Mensualité emprunt</div><div class="eq-val">${fmt(d.mA)} €</div><div class="eq-sub">/mois amort.${d.dif>0?' | différé: '+fmt(d.mD)+' €':''}</div></div>
+    <div class="eq-op">−</div>
+    <div class="eq-b divs"><div class="eq-lbl">Dividendes bruts</div><div class="eq-val">${fmt(d.divM)} €</div><div class="eq-sub">/mois | net: ${fmt(d.divNet)} €</div></div>
+    <div class="eq-op">=</div>
+    <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel net':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmt(d.part)} €</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'Votre participation /mois'}</div></div>
+  </div>`;
+
+  // KPIs
+  h+=`<div class="kpi-row">
+    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Mensualité</div><div class="kpi-val">${fmt(d.mA)} €</div><div class="kpi-sub">/mois amortissement</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Dividendes bruts</div><div class="kpi-val">${fmt(d.divM)} €</div><div class="kpi-sub">/mois — rdt ${(d.rdtMoy*100).toFixed(2)}%</div></div>
+    <div class="kpi ${pos?'green':'red'}"><div class="kpi-label">${pos?'Gain mensuel':'Effort mensuel'}</div><div class="kpi-val">${pos?'+':''}${fmt(d.part)} €</div><div class="kpi-sub">${pos?'Dividendes > mensualité':'Votre participation'}</div></div>
+    <div class="kpi featured"><div class="kpi-label">Patrimoine terme</div><div class="kpi-val">${fmt(d.mont)} €</div><div class="kpi-sub">au terme</div></div>
+  </div>`;
+
+  // BILAN EN HAUT
+  h+=`<div class="bilan-2">
+    <div class="bl">
+      <div class="bl-title">Pendant le financement</div>
+      <div class="bl-row"><span class="bl-k">Total loyers perçus</span><span class="bl-v green">${fmt(d.tL)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Total intérêts payés</span><span class="bl-v red">− ${fmt(d.tI)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Total ADI payée</span><span class="bl-v red">− ${fmt(d.tADI)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Participation cumulée</span><span class="bl-v ${d.tP>=0?'green':'red'}">${d.tP>=0?'+':''}${fmt(d.tP)} €</span></div>
+    </div>
+    <div class="bl hi">
+      <div class="bl-title">Au terme</div>
+      <div class="bl-row"><span class="bl-k">Patrimoine constitué</span><span class="bl-v gold">${fmt(d.mont)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Revenus /mois</span><span class="bl-v green">${fmt(d.divM*Math.pow(1+d.rev,d.dur/12))} €</span></div>
+      <div class="bl-row"><span class="bl-k">Effort total client</span><span class="bl-v">${fmt(d.effort)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Loyers couvrent</span><span class="bl-v gold">${Math.round(d.tL/(d.tL+Math.max(0,d.effort))*100)}% du coût total</span></div>
+    </div>
+  </div>`;
+
+  // Charts
+  h+=`<div class="charts-2">
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Mensualités vs Dividendes</div><div class="chart-h"><canvas id="cBar"></canvas></div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement par les loyers</div><div class="chart-h"><canvas id="cPie"></canvas></div></div>
+  </div>`;
+
+  // SCPI + frais
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>SCPI financées</div>
+    <table class="tbl"><thead><tr><th>SCPI</th><th>Parts</th><th>Montant</th><th>Rdt</th><th>Div/mois</th></tr></thead><tbody>`;
+  d.scpis.forEach(r=>{h+=`<tr><td>${r.name}</td><td>${r.parts}</td><td class="gold">${fmt(r.montant)} €</td><td>${(r.rdt*100).toFixed(2)}%</td><td class="green">${fmt(r.montant*r.rdt/12)} €</td></tr>`;});
+  h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${fmt(d.mont)} €</td><td>${(d.rdtMoy*100).toFixed(2)}%</td><td>${fmt(d.divM)} €</td></tr></tbody></table></div>
+
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Frais & financement</div>
+    <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} €</span></div>
+    <div class="bl-row"><span class="bl-k">Courtage (1%)</span><span class="bl-v red">+${fmt(d.frais.co)} €</span></div>
+    <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} €</span></div>
+    ${d.frais.nant>0?`<div class="bl-row"><span class="bl-k">Nantissement</span><span class="bl-v red">+${fmt(d.frais.nant)} €</span></div>`:''}
+    ${d.frais.gar>0?`<div class="bl-row"><span class="bl-k">Caution CL</span><span class="bl-v red">+${fmt(d.frais.gar)} €</span></div>`:''}
+    <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:7px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunté</span><span class="bl-v gold">${fmt(d.emp)} €</span></div>
+    <div class="bl-row"><span class="bl-k">Apport client</span><span class="bl-v">${fmt(d.apport)} €</span></div>
+    </div>
+  </div>`;
+
+  // Tableau annuel
+  h+=`<div class="card"><div class="card-title"><span class="dot"></span>Tableau de financement annuel</div>
+  <div style="overflow-x:auto"><table class="tbl">
+  <thead><tr><th>Année</th><th>Mensualité</th><th>Intérêts</th><th>Amort.</th><th>ADI</th><th>CRD</th><th>Dividendes</th><th>Participation</th></tr></thead><tbody>`;
+  d.tab.forEach(r=>{
+    const p=r.pM>=0;
+    h+=`<tr><td>An ${r.an}</td><td>${fmt(r.mM)} €</td><td class="red">${fmt(r.iM)} €</td><td>${fmt(r.aM)} €</td><td>${fmt(r.adM)} €</td><td>${fmt(r.crd)} €</td><td class="green">${fmt(r.divM)} €</td><td class="${p?'green':'red'}">${p?'+':''}${fmt(r.pM)} €</td></tr>`;
+  });
+  h+=`<tr class="tot"><td>BILAN</td><td></td><td>${fmt(d.tI)} €</td><td></td><td>${fmt(d.tADI)} €</td><td></td><td>${fmt(d.tL)} €</td><td class="${d.tP>=0?'green':''}">${d.tP>=0?'+':''}${fmt(d.tP)} €</td></tr>
+  </tbody></table></div></div>`;
+
+  document.getElementById('results').innerHTML=h;
+
+  // Charts
+  if(cBar)cBar.destroy();
+  cBar=new Chart(document.getElementById('cBar').getContext('2d'),{type:'bar',
+    data:{labels:d.tab.map(r=>'An '+r.an),datasets:[
+      {label:'Mensualité',data:d.tab.map(r=>r.mM),backgroundColor:'#F5D9A8',borderColor:'#F0A738',borderWidth:1.5,borderRadius:3},
+      {label:'Dividendes',data:d.tab.map(r=>r.divM),backgroundColor:'rgba(45,122,91,0.25)',borderColor:'#2D7A5B',borderWidth:1.5,borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Outfit',size:10},padding:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+' €'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Outfit',size:9}}},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Outfit',size:9},callback:v=>fmt(v)+' €'}}}}
+  });
+
+  if(cPie)cPie.destroy();
+  const loyers=Math.max(0,d.tL);
+  const eff=Math.max(0,d.effort);
+  cPie=new Chart(document.getElementById('cPie').getContext('2d'),{type:'doughnut',
+    data:{labels:['Financé par les dividendes','Effort client'],
+      datasets:[{data:[loyers,eff],backgroundColor:['rgba(45,122,91,0.65)','rgba(240,167,56,0.65)'],borderColor:['#2D7A5B','#F0A738'],borderWidth:2,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Outfit',size:10},padding:8}},
+        tooltip:{callbacks:{label:c=>{const t=loyers+eff;return c.label+': '+fmt(c.raw)+' € ('+Math.round(c.raw/t*100)+'%)';}}}}
+    }
+  });
+}
+
+function fmt(n){return Math.round(n||0).toLocaleString('fr-FR');}
+
+function setTMI(val){
+  document.getElementById('fTMI').value=val;
+  const colors={0:'var(--green)',11:'var(--blue,#2B5EA7)',30:'var(--ambre-d)',41:'var(--red)',45:'var(--red)'};
+  const bgs={0:'var(--green-l)',11:'var(--blue-l,#EDF2FB)',30:'var(--ambre-l)',41:'var(--red-l)',45:'var(--red-l)'};
+  document.querySelectorAll('.tmi-btn').forEach(btn=>{
+    const v=+btn.dataset.val;
+    if(v===val){
+      btn.style.border='1.5px solid '+colors[val];
+      btn.style.background=bgs[val];
+      btn.style.color=colors[val];
+    } else {
+      btn.style.border='1.5px solid var(--bord)';
+      btn.style.background='#fff';
+      btn.style.color='var(--gris)';
+    }
+  });
+}
+
+function showFmt(input, targetId){
+  const v=+input.value||0;
+  if(!v)return;
+  const formatted=fmt(v)+' €';
+  if(targetId){
+    const el=document.getElementById(targetId);
+    if(el)el.textContent=formatted+(input.id==='fRev'?'/an':'');
+  } else {
+    // Tooltip temporaire
+    input.title=formatted;
+  }
+}
+</script>
+</body>
+</html>

@@ -50,9 +50,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-fi
 
 /* ── SIDEBAR ── */
 .sidebar{background:var(--gris-l);border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:360px;min-width:360px;max-width:360px;box-sizing:border-box}
-.sidebar-section{margin-bottom:28px}
-.sidebar-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.sidebar-label::after{content:'';flex:1;height:1px;background:var(--bord)}
+.sidebar-section{margin-bottom:2px;border-radius:8px;overflow:hidden}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:7px;cursor:pointer;padding:10px 12px;user-select:none;transition:background 0.15s,color 0.15s;border-radius:8px}
+.sidebar-label:hover{background:var(--bord);color:var(--gris-f)}
+.sidebar-label::after{display:none}
+.sidebar-label .acc-arrow{font-size:8px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
+.sidebar-label.open .acc-arrow{transform:rotate(90deg)}
+.sidebar-body{overflow:hidden;transition:max-height 0.3s ease,opacity 0.25s ease;max-height:0;opacity:0;padding:0 4px}
+.sidebar-body.open{max-height:700px;opacity:1;padding:4px 4px 12px}
 
 /* MODE TABS */
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
@@ -260,26 +265,57 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
   .sidebar,nav,.sim-btn,.nav-right{display:none!important}
   .app-shell{grid-template-columns:1fr}
 }
+
+/* ── NAV UNIVERSELLE ── */
+.nav-univ{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
+.nav-univ-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;gap:8px}
+.nav-logo{display:flex;align-items:center;gap:2px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;text-decoration:none;margin-right:16px;flex-shrink:0}
+.nav-logo .cgp{color:#fff}.nav-logo .sep{color:#333;margin:0 3px}
+.nav-logo .s{color:#E03535}.nav-logo .k{color:#2B65C0}.nav-logo .o1{color:#E8C547}.nav-logo .o2{color:#4C9BE8}.nav-logo .l{color:#E03535}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-a{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 13px;border-radius:6px;transition:all 0.18s;white-space:nowrap;border:none;background:transparent;cursor:pointer}
+.nav-a:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06)}
+.nav-a.active{color:#F0A738;font-weight:600}
+/* Dropdown SCPI */
+.nav-dropdown{position:relative}
+.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
+.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
+.nav-dropdown:hover .arr{transform:rotate(180deg)}
+.nav-dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;background:rgba(18,18,18,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px;min-width:180px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.18s;backdrop-filter:blur(20px);z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-dropdown-item{display:block;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);text-decoration:none;padding:8px 12px;border-radius:7px;transition:all 0.15s;white-space:nowrap}
+.nav-dropdown-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-dropdown-item.active{color:#F0A738;background:rgba(240,167,56,0.08)}
+.nav-dropdown-sep{height:1px;background:rgba(255,255,255,0.07);margin:4px 0}
+.nav-spacer{flex:1}
+.nav-pdf{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);background:transparent;cursor:pointer;transition:all 0.18s;text-decoration:none;flex-shrink:0}
+.nav-pdf:hover{border-color:#F0A738;color:#F0A738}
+
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a class="nav-logo" href="#" style="display:flex;align-items:center;gap:2px">
-      <span style="color:#fff;font-weight:700">CGP</span>
-      <span style="color:#2A2A2A;margin:0 3px">|</span>
-      <span style="color:#E03535">s</span><span style="color:#2B65C0">k</span><span style="color:#E8C547">o</span><span style="color:#4C9BE8">o</span><span style="color:#E03535">l</span>
+<nav class="nav-univ">
+  <div class="nav-univ-inner">
+    <a class="nav-logo" href="index.html">
+      <span class="cgp">CGP</span><span class="sep">|</span>
+      <span class="s">s</span><span class="k">k</span><span class="o1">o</span><span class="o2">o</span><span class="l">l</span>
     </a>
-    <div class="nav-center">
-      <button class="nav-tab active" onclick="switchModule('scpi',this)">SCPI</button>
-      <button class="nav-tab" onclick="alert('Immobilier — bientôt disponible')">Immobilier</button>
-      <button class="nav-tab" onclick="alert('AV / PER — bientôt disponible')">AV / PER</button>
+    <div class="nav-links">
+      <a class="nav-a" href="etude-dossier.html">Étude de Dossier</a>
+      <div class="nav-dropdown">
+        <button class="nav-a nav-dropdown-btn active">SCPI <span class="arr">▾</span></button>
+        <div class="nav-dropdown-menu">
+          <a class="nav-dropdown-item active" href="scpi-simulator.html">📈 SCPI Cash</a>
+          <div class="nav-dropdown-sep"></div>
+          <a class="nav-dropdown-item " href="scpi-financement.html">🏦 Financement SCPI</a>
+        </div>
+      </div>
+      <a class="nav-a" href="immo-simulator.html">Immobilier</a>
     </div>
-    <div class="nav-right">
-      <button class="nav-btn outline" onclick="window.print()" id="exportBtn" style="opacity:0.35;pointer-events:none">⬇ Exporter</button>
-    </div>
+    <span class="nav-spacer"></span>
+    <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
   </div>
 </nav>
 
@@ -288,16 +324,19 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <aside class="sidebar">
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Type de projection</div>
+    <div class="sidebar-label open" onclick="toggleAcc(this)">Type de projection<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">📈</span>Plan Retraite SCPI</div>
       <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">🔀</span>Nue-propriété</div>
       <div class="mode-tab" onclick="setMode('entreprise',this)"><span class="mode-icon">🏢</span>Montage Entreprise</div>
     </div>
+    </div>
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Source du rendement</div>
+    <div class="sidebar-label open" onclick="toggleAcc(this)">SCPI<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
     <div class="source-toggle">
       <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
       <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux personnalisé</button>
@@ -324,12 +363,12 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         </div>
       </div>
     </div>
+    </div>
   </div>
 
-  <div class="divider"></div>
-
   <div class="sidebar-section">
-    <div class="sidebar-label">Paramètres</div>
+    <div class="sidebar-label open" onclick="toggleAcc(this)">Plan d'investissement<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
 
     <!-- RETRAITE -->
     <div id="inputs-retraite">
@@ -359,7 +398,6 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         <input type="range" id="ret-tmi" min="0" max="45" value="30" step="1" oninput="document.getElementById('ret-tmi-val').textContent=this.value+' %'">
         <div class="slider-labs"><span>0 %</span><span>30 %</span><span>45 %</span></div>
       </div>
-    </div>
     </div>
 
     <!-- NP -->
@@ -397,6 +435,9 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         <div class="input-row"><input type="number" id="ent-is" value="25" min="15" max="33" step="1"><span class="input-unit">%</span></div>
       </div>
     </div>
+
+    </div>
+  </div>
 
   <button class="sim-btn" onclick="runSimulation()">Lancer la projection →</button>
 </aside>
@@ -450,6 +491,13 @@ function getNPpct(dur){return 1-(US_PCT[Math.min(dur,20)]||0.37)}
 let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi';
 
 // ─── INIT ─────────────────────────────────────────────────────────
+
+function toggleAcc(label){
+  label.classList.toggle('open');
+  const body=label.nextElementSibling;
+  body.classList.toggle('open');
+}
+
 function init(){renderSCPIList(SCPI_DATA)}
 
 function renderSCPIList(list){
