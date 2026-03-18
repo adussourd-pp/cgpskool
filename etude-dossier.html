@@ -1189,7 +1189,7 @@ function launch(){
   const pasBr=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   const typeL=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple Comm.':'Couple Sep.';
   const banner=document.getElementById('importBanner');
-  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — RI importe</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
+  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:Space Grotesk,sans-serif;font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — RI importe</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
   goTo('situation');
   showNotif('Étude ouverte !');
 }
@@ -1382,7 +1382,7 @@ function rRetraite(){
     clients.forEach(function(cl,i){
       if(i===1&&ED.type==='seul')return;
       parHtml+='<div style="background:var(--gris-l);border-radius:10px;padding:14px 16px">';
-      parHtml+='<div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
+      parHtml+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
       parHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Âge de départ souhaité</label>';
       parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
@@ -1701,7 +1701,7 @@ function renderSolsRetenues(){
     html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Étape</span>';
     html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
     html+='</div>';
-    html+='<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
+    html+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
     html+='</div>';
     html+='<button onclick="toggleSolution(\''+sol.produit+'\')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px">&times;</button></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
@@ -1793,7 +1793,7 @@ function renderFichesClient(){
     var sols=levierMap[lev];if(!sols.length)return;
     var meta=LEVIER_META[lev]||LEVIER_META['epargne'];
     html+='<div style="background:'+meta.bg+';border:1px solid '+meta.border+';border-radius:12px;overflow:hidden;margin-bottom:16px">';
-    html+='<div style="background:'+meta.titleBg+';padding:10px 18px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px;color:#fff">'+meta.label+'</div></div>';
+    html+='<div style="background:'+meta.titleBg+';padding:10px 18px"><div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:#fff">'+meta.label+'</div></div>';
     html+='<div style="padding:16px 18px">';
     // Match objectifs to this levier's solutions
     var levierObjs=[];
