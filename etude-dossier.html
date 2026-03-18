@@ -605,12 +605,18 @@ select.fi{cursor:pointer}
   <div class="sec-header">
     <div><div class="sec-tag">Section 05</div><div class="sec-h1">Bilan Retraite</div><div class="sec-sub">Taux de remplacement &amp; effort d'épargne</div></div>
   </div>
+  <!-- Paramètres manuels retraite -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title"><span class="dot"></span>Paramètres retraite</div>
+    <div id="retParams" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+  </div>
+
   <div class="kpi-row" id="retKpis" style="margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; age
+    <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
       <span style="font-size:11px;font-weight:400;color:var(--gris);margin-left:8px">&#8212; Le point <span style="color:var(--ambre);font-weight:700">&#9679;</span> positionne votre client</span>
     </div>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : etudes actuarielles. Pension = X% du dernier salaire net selon la categorie et l'age.</p>
+    <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
   </div>
@@ -890,258 +896,241 @@ function parseFromPaste(){
 
 // ── TEXT RI PARSER ────────────────────────────────────────────
 function parseTextRI(txt){
-  // Normalize: trim lines, remove excess spaces
-  var lines = txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
-  var full = lines.join('\n');
-
-  // ── helpers ────────────────────────────────────────────────
-  function findVal(keyword, src){
-    src = src || full;
-    // Look for "keyword : value" or "keyword\nvalue"
-    var patterns = [
-      new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:\\*]+\\s*([^\\n\\r]+)','i'),
-      new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*\\n([^\\n\\r]+)','i')
-    ];
-    for(var i=0;i<patterns.length;i++){
-      var m = src.match(patterns[i]);
-      if(m && m[1] && m[1].trim()) return m[1].trim();
-    }
-    return '';
-  }
+  // Normalize lines
+  var lines=txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  var full=lines.join('\n');
 
   function pEur(s){
-    if(!s) return 0;
-    var m = s.replace(/\s/g,'').replace(',','.').match(/[\d]+\.?\d*/);
-    return m ? parseFloat(m[0]) : 0;
+    if(!s)return 0;
+    var m=s.replace(/\s/g,'').replace(',','.').match(/[\d]+\.?\d*/);
+    return m?parseFloat(m[0]):0;
   }
-
   function parseDob(s){
-    var m = (s||'').match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-    return m ? m[1] : '';
+    var m=(s||'').match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+    return m?m[1]:'';
   }
-
   function parseNom(s){
-    if(!s) return {prenom:'',nom:''};
-    s = s.replace(/\(.*?\)/g,'').trim();
-    var p = s.split(/\s+/).filter(function(x){return x;});
-    if(!p.length) return {prenom:'',nom:''};
-    if(p[0] === p[0].toUpperCase() && p[0].length>1) return {nom:p[0], prenom:p.slice(1).join(' ')};
-    return {prenom:p[0], nom:p.slice(1).join(' ')};
+    if(!s)return{prenom:'',nom:''};
+    s=s.replace(/\(.*?\)/g,'').trim();
+    var p=s.split(/\s+/).filter(function(x){return x;});
+    if(!p.length)return{prenom:'',nom:''};
+    if(p[0]===p[0].toUpperCase()&&p[0].length>1)return{nom:p[0],prenom:p.slice(1).join(' ')};
+    return{prenom:p[0],nom:p.slice(1).join(' ')};
   }
 
-  // ── 1. TYPE ─────────────────────────────────────────────────
-  var isCouple = /couple/i.test(full) || /Alexia|Fran.ois|C2\./i.test(full) || full.indexOf('Client 2') > -1;
-  var isSep = /s.paration de biens/i.test(full) || /s.paratiste/i.test(full);
-  ED.type = isCouple ? (isSep ? 'sep' : 'comm') : 'seul';
-
-  // ── 2. IDENTITE ─────────────────────────────────────────────
-  // Try to find the identity table rows
-  // Pattern: "Nom / prénom : * LAFOSSE Alexia" or in a table cell
-  var nomLine = findVal('Nom / pr.nom');
-  var nomLine2 = '';
-  // For couple, there might be two names on the same line or sequential lines
-  var nomMatch = full.match(/Nom\s*\/\s*pr.nom\s*[:\*]+\s*([A-Z][A-Za-z\s\-]+?)(?:\s{2,}|\n)([A-Z][A-Za-z\s\-]+?)(?:\s{2,}|\n|$)/);
-  if(nomMatch){
-    var p1 = parseNom(nomMatch[1]);
-    ED.c1.prenom = p1.prenom; ED.c1.nom = p1.nom;
-    if(isCouple){
-      var p2 = parseNom(nomMatch[2]);
-      ED.c2.prenom = p2.prenom; ED.c2.nom = p2.nom;
+  // ── Parse tab-separated table rows (Word copy-paste format) ──
+  // Each row: "Label\tVal_C1\tVal_C2"
+  var tabRows={};
+  lines.forEach(function(line){
+    if(line.indexOf('\t')<0)return;
+    var parts=line.split('\t').map(function(p){return p.trim();});
+    if(parts.length>=2){
+      // Normalize label: remove * : etc
+      var label=parts[0].replace(/\s*[\*:]+\s*$/,'').toLowerCase().trim();
+      tabRows[label]={v1:parts[1]||'',v2:parts[2]||''};
     }
-  } else if(nomLine){
-    var p1 = parseNom(nomLine);
-    ED.c1.prenom = p1.prenom; ED.c1.nom = p1.nom;
-  }
+  });
 
-  // DOB
-  var dobLine = findVal('N.\\(e\\) le');
-  if(dobLine) ED.c1.dob = parseDob(dobLine);
-  // For couple, look for second dob
-  if(isCouple){
-    var dobAll = full.match(/N.\(e\) le\s*[:\*]+\s*(.+?)(?:\n|$)/gi);
-    if(dobAll && dobAll.length >= 2){
-      ED.c2.dob = parseDob(dobAll[1]);
+  function tabVal(keyword){
+    var kl=keyword.toLowerCase();
+    for(var k in tabRows){
+      if(k.indexOf(kl)>=0)return tabRows[k];
     }
+    return null;
   }
 
-  // Civilite
-  var civLine = findVal('Civilit.');
-  if(civLine) ED.c1.civ = /madame|mme/i.test(civLine) ? 'Mme' : 'M.';
+  // ── 1. TYPE ───────────────────────────────────────────────────
+  var isCouple=Object.keys(tabRows).some(function(k){return tabRows[k].v2&&tabRows[k].v2.length>1;});
+  var regRow=tabVal('gime');
+  var regVal=regRow?(regRow.v1||''):'';
+  var isSep=/paration/i.test(regVal)||/paratiste/i.test(full);
+  ED.type=isCouple?(isSep?'sep':'comm'):'seul';
 
-  // Situation, logement, regime
-  var sitLine = findVal('Situation\\s*\\*?\\s*:');
-  if(sitLine) ED.sitmat = sitLine.split(/\s{2,}/)[0] || sitLine;
-  var logLine = findVal('Logement');
-  if(logLine) ED.logement = logLine.split(/\s{2,}/)[0] || logLine;
-  var regLine = findVal('R.gime');
-  if(regLine){
-    var rl = regLine.toLowerCase();
-    if(rl.includes('paration')) ED.convention = 'Separation de biens';
-    else if(rl.includes('pacs')) ED.convention = 'PACS';
-    else ED.convention = 'Communaute';
+  // ── 2. IDENTITÉ ───────────────────────────────────────────────
+  var nomRow=tabVal('nom / pr');
+  if(nomRow){
+    var p1=parseNom(nomRow.v1);ED.c1.prenom=p1.prenom;ED.c1.nom=p1.nom;
+    if(isCouple){var p2=parseNom(nomRow.v2);ED.c2.prenom=p2.prenom;ED.c2.nom=p2.nom;}
   }
-
-  // Profession
-  var profLine = findVal('Profession\\s*:?\\s*\\*?');
-  if(profLine) ED.c1.profession = profLine.split(/\s{2,}/)[0] || profLine;
-
-  var catLine = findVal('Cat.gorie socio');
-  var mapCSP = function(s){
-    s = (s||'').toLowerCase();
-    if(s.includes('cadre') && s.includes('sup')) return 'Salarie cadre';
-    if(s.includes('cadre')) return 'Salarie cadre';
-    if(s.includes('salari')) return 'Salarie non-cadre';
-    if(s.includes('fonct')) return 'Fonctionnaire';
-    if(s.includes('ind') || s.includes('presta') || s.includes('227')) return 'Independant / TNS';
-    if(s.includes('chef') || s.includes('entreprise')) return "Chef d'entreprise";
-    if(s.includes('retraite')) return 'Retraite';
-    return 'Salarie cadre';
+  var civRow=tabVal('civilit');
+  if(civRow){
+    ED.c1.civ=/madame|mme/i.test(civRow.v1)?'Mme':'M.';
+    if(isCouple)ED.c2.civ=/madame|mme/i.test(civRow.v2)?'Mme':'M.';
+  }
+  var dobRow=tabVal('(e) le');
+  if(dobRow){
+    ED.c1.dob=parseDob(dobRow.v1);
+    if(isCouple)ED.c2.dob=parseDob(dobRow.v2);
+  }
+  var sitRow=tabVal('situation');
+  if(sitRow)ED.sitmat=sitRow.v1||'';
+  var logRow=tabVal('logement');
+  if(logRow)ED.logement=logRow.v1||'';
+  if(regVal){
+    var rl=regVal.toLowerCase();
+    if(rl.indexOf('paration')>=0)ED.convention='Separation de biens';
+    else if(rl.indexOf('pacs')>=0)ED.convention='PACS';
+    else if(rl.indexOf('commun')>=0)ED.convention='Communaute reduite aux acquets';
+    else ED.convention=regVal;
+  }
+  var profRow=tabVal('rofession');
+  if(profRow){
+    ED.c1.profession=profRow.v1||'';
+    if(isCouple)ED.c2.profession=profRow.v2||'';
+  }
+  var catRow=tabVal('at\u00e9gorie socio');
+  if(!catRow)catRow=tabVal('atgorie socio');
+  if(!catRow)catRow=tabVal('cat');
+  var mapCSP=function(s){
+    s=(s||'').toLowerCase();
+    if(s.indexOf('227')>=0||s.indexOf('presta')>=0||s.indexOf('ind\u00e9p')>=0||s.indexOf('indep')>=0)return"Chef d'entreprise";
+    if(s.indexOf('cadre sup')>=0)return'Salarie cadre';
+    if(s.indexOf('cadre')>=0)return'Salarie cadre';
+    if(s.indexOf('salari')>=0)return'Salarie non-cadre';
+    if(s.indexOf('fonct')>=0)return'Fonctionnaire';
+    if(s.indexOf('chef')>=0||s.indexOf('entreprise')>=0)return"Chef d'entreprise";
+    if(s.indexOf('retraite')>=0)return'Retraite';
+    return'Salarie cadre';
   };
-  if(catLine) ED.c1.sitpro = mapCSP(catLine);
-  ED.nbEnfants = 0;
+  if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple)ED.c2.sitpro=mapCSP(catRow.v2);}
+  ED.nbEnfants=0;
 
-  // ── 3. OBJECTIFS & EPARGNE PRECAUTION ───────────────────────
-  var epLine = findVal('.pargne de pr.caution');
-  if(epLine){
-    var epVals = epLine.match(/([\d\s]+)\s*./g);
-    if(epVals) ED.epPrec = pEur(epVals[0]);
-  }
+  // ── 3. OBJECTIFS & ÉPARGNE DE PRÉCAUTION ─────────────────────
+  var epRow=tabVal('pargne de pr');
+  if(epRow)ED.epPrec=pEur(epRow.v1)||pEur(epRow.v2)||0;
 
-  // Objectifs: find the objectifs table section
-  ED.objectifs = [];
-  var objSection = full.match(/02\s*\|?\s*Objectifs([\s\S]{0,2000}?)(?:03\s*\|?\s*Patrimoine|$)/i);
+  ED.objectifs=[];
+  var objSection=full.match(/02\s*\|?\s*Objectifs([\s\S]{0,2000}?)(?:03\s*\|?\s*Patrimoine|$)/i);
   if(objSection){
-    var objText = objSection[1];
-    // Lines that look like objectives (not "Client C1", not empty, not "Personnes", not "Horizon")
-    var objLines = objText.split('\n').map(function(l){return l.trim();}).filter(function(l){
-      return l.length > 5 && l.length < 200
-        && !/^(Personnes|Objectif|Horizon|Moyen|Client C|Martin|Alexia|Fran)/i.test(l)
-        && !/^\d+$/.test(l)
-        && !/^0[2-9]/.test(l)
-        && !/^Epargne/i.test(l);
-    });
-    // Deduplicate and take first 6
-    ED.objectifs = objLines.filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,6);
-  }
-  if(!ED.objectifs.length) ED.objectifs = ['Objectifs a completer'];
-
-  // ── 4. ACTIFS ────────────────────────────────────────────────
-  // Find the actifs section between "03 | Patrimoine" and "Passifs"
-  ED.actifs = [];
-  var patSection = full.match(/(?:03\s*\|?\s*Patrimoine|Actifs)([\s\S]{0,4000}?)(?:Passifs|TOTAL DES ACTIFS)/i);
-  if(patSection){
-    var patText = patSection[1];
-    var SKIP = ['designation','total','immobilier & foncier','immobilier de jouissance','epargne','court terme','moyen terme','long terme','retraite et salariale','biens professionnels','actifs','passifs'];
-    var getH = function(n){
-      var nl = (n||'').toLowerCase();
-      if(nl.includes('livret')||nl.includes('compte courant')||nl.includes('ldd')||nl.includes('lep')) return 'ct';
-      if(nl.includes('pel')||nl.includes('moyen')) return 'mt';
-      return 'lt';
-    };
-    // Each line: look for lines with a money amount
-    var patLines = patText.split('\n');
-    for(var i=0;i<patLines.length;i++){
-      var line = patLines[i].trim();
-      if(!line) continue;
-      if(SKIP.some(function(s){return line.toLowerCase().startsWith(s)||line.toLowerCase()===s;})) continue;
-      // Does it contain an amount?
-      var moneyMatch = line.match(/([\d\s]+[\d])\s*[€\u20ac]/);
-      if(!moneyMatch) continue;
-      var mont = pEur(moneyMatch[1]);
-      if(mont <= 0) continue;
-      // The designation is the part before the first amount
-      var nom = line.replace(/([\d\s]+[\d]\s*[€\u20ac].*)/,'').trim();
-      if(!nom || nom.length < 2) continue;
-      // Titulaire: check for Mme/Mr/C1/C2 patterns in line
-      var tit = 'Commun';
-      if(!isCouple) tit = 'C1';
-      else if(/\bMme\b|Alexia|C1\./i.test(line) && !/\bMr\b|Fran.ois|C2\./i.test(line)) tit = 'C1';
-      else if(/\bMr\b|Fran.ois|C2\./i.test(line) && !/\bMme\b|Alexia|C1\./i.test(line)) tit = 'C2';
-      ED.actifs.push({nom:nom, horizon:getH(nom), titulaire:tit, montant:mont});
-    }
-  }
-
-  // ── 5. PASSIFS ───────────────────────────────────────────────
-  ED.passifs = [];
-  var passSection = full.match(/Passifs([\s\S]{0,3000}?)(?:04\s*\|?\s*Revenus|TOTAL DES PASSIFS)/i);
-  if(passSection){
-    var passText = passSection[1];
-    var passLines = passText.split('\n');
-    for(var i=0;i<passLines.length;i++){
-      var line = passLines[i].trim();
-      if(!line) continue;
-      var nom = '';
-      if(/cr.dit immobilier/i.test(line) && line.length > 20) nom = line.split(/\s{2,}/)[0];
-      else if(/cr.dit/i.test(line) && line.length > 10) nom = line.split(/\s{2,}/)[0];
-      if(!nom) continue;
-      if(/^cr.dit immobilier$|^cr.dit personnel/i.test(nom.trim())) continue;
-      // Find CRD: look ahead for numbers
-      var crd = 0; var ech = 0;
-      for(var j=i;j<Math.min(i+3,passLines.length);j++){
-        var amounts = passLines[j].match(/([\d\s]+[\d])\s*[€\u20ac]/g);
-        if(amounts && amounts.length >= 2){ ech = pEur(amounts[0]); crd = pEur(amounts[1]); break; }
-        if(amounts && amounts.length === 1 && crd===0) crd = pEur(amounts[0]);
+    var objText=objSection[1];
+    var objLines=objText.split('\n').map(function(l){return l.trim();});
+    objLines.forEach(function(line){
+      if(!line||line.length<5||line.length>300)return;
+      if(/^(Personnes|Objectif|Horizon|Moyen|Épargne|Epargne|Client|\d+\s*€|Date)/i.test(line))return;
+      if(/^\d+\s*\|/.test(line))return;
+      // Tabulated objective lines: "C1\tObjectif text\t..."
+      var parts=line.split('\t');
+      var obj=parts.length>=2?parts[1]:parts[0];
+      obj=obj.replace(/\t.*/,'').trim();
+      if(obj.length>5&&obj.length<200&&!/^(personnes|objectif|horizon|moyen)/i.test(obj)){
+        ED.objectifs.push(obj);
       }
-      if(crd<=0 && ech<=0) continue;
-      ED.passifs.push({nom:nom.trim(), titulaire:'Commun', echeance:ech, crd:crd});
-    }
+    });
+  }
+  ED.objectifs=[...new Set(ED.objectifs)].filter(function(o){return o&&o.length>5;}).slice(0,8);
+  if(!ED.objectifs.length)ED.objectifs=['Objectifs \u00e0 compl\u00e9ter'];
+
+  // ── 4. ACTIFS ─────────────────────────────────────────────────
+  var SKIP_A=['d\u00e9signation','total','immobilier & foncier','immobilier de jouissance','\u00e9pargne','court terme','moyen terme','long terme','retraite et salariale','biens professionnels'];
+  var getH=function(n){
+    var nl=(n||'').toLowerCase();
+    if(nl.indexOf('livret')>=0||nl.indexOf('compte courant')>=0||nl.indexOf('ldd')>=0||nl.indexOf('lep')>=0||nl.indexOf('cc')>=0)return'ct';
+    if(nl.indexOf('pel')>=0||nl.indexOf('moyen')>=0)return'mt';
+    return'lt';
+  };
+  ED.actifs=[];
+  var actifSection=full.match(/ACTIFS([\s\S]{0,3000}?)(?:PASSIFS|$)/i);
+  if(actifSection){
+    var actifLines=actifSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+    actifLines.forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var parts=line.split('\t');
+      var nom=parts[0];
+      if(!nom||nom.length<2)return;
+      if(SKIP_A.some(function(s){return nom.toLowerCase()===s||nom.toLowerCase().startsWith(s);}))return;
+      if(/^(d\u00e9signation|total)/i.test(nom))return;
+      // Find euro values
+      var vals=parts.slice(1).filter(function(p){return /[\d\s]+\s*€/.test(p);});
+      if(!vals.length)return;
+      var mont=pEur(vals[vals.length-1]);
+      if(mont<=0)return;
+      var v1=pEur(parts[1]||'');var v2=pEur(parts[2]||'');
+      var tit='Commun';
+      if(!isCouple)tit='C1';
+      else if(v1>0&&v2>0)tit='Commun';
+      else if(v1>0)tit='C1';
+      else if(v2>0)tit='C2';
+      ED.actifs.push({nom:nom,horizon:getH(nom),titulaire:tit,montant:mont});
+    });
   }
 
-  // ── 6. REVENUS ───────────────────────────────────────────────
-  ED.revenus = {c1:0, c2:0, compl:0};
-  // Look for TOTAL DES REVENUS
-  var totalRevMatch = full.match(/TOTAL DES REVENUS\s*[:\s]+([\d\s,]+)\s*[€\u20ac]/i);
-  if(totalRevMatch){
-    var totalRev = pEur(totalRevMatch[1]);
-    if(isCouple){ ED.revenus.c1 = Math.round(totalRev/2); ED.revenus.c2 = Math.round(totalRev/2); }
-    else ED.revenus.c1 = totalRev;
+  // ── 5. PASSIFS ────────────────────────────────────────────────
+  ED.passifs=[];
+  var passifSection=full.match(/PASSIFS([\s\S]{0,2000}?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|REVENUS|$)/i);
+  if(passifSection){
+    var passifLines=passifSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+    passifLines.forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var parts=line.split('\t');
+      var nom=parts[0];
+      if(!nom||nom.length<2)return;
+      if(/^(d\u00e9signation|total|cr\u00e9dit immobilier$|cr\u00e9dit personnel)/i.test(nom))return;
+      var ech=pEur(parts[2]||'');var crd=pEur(parts[3]||'');
+      if(crd<=0&&ech<=0)return;
+      ED.passifs.push({nom:nom,titulaire:'Commun',echeance:ech,crd:crd});
+    });
   }
-  // Also try individual totals in the revenus table
-  var revSection = full.match(/(?:04\s*\|?\s*Revenus|Revenus\s*Charges|Revenus)([\s\S]{0,2000}?)(?:Charges|TOTAL DES REVENUS)/i);
+
+  // ── 6. REVENUS ────────────────────────────────────────────────
+  ED.revenus={c1:0,c2:0,compl:0};
+  var revSection=full.match(/REVENUS([\s\S]{0,2000}?)(?:CHARGES|$)/i);
   if(revSection){
-    var revText = revSection[1];
-    var totalLine = revText.match(/^Total\s+([\d\s]+[€\u20ac])\s+([\d\s]+[€\u20ac])/im);
-    if(totalLine && isCouple){
-      ED.revenus.c1 = pEur(totalLine[1]);
-      ED.revenus.c2 = pEur(totalLine[2]);
-    } else if(totalLine){
-      ED.revenus.c1 = pEur(totalLine[1]);
-    }
-    // Complementary revenues (immobilier/foncier)
-    var immMatch = revText.match(/(?:foncier|immobili)([\s\S]{0,200}?)([\d\s]+[€\u20ac])/i);
-    if(immMatch) ED.revenus.compl = pEur(immMatch[2]);
+    var revLines=revSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+    revLines.forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var parts=line.split('\t');
+      if(/^total$/i.test(parts[0])){
+        ED.revenus.c1=pEur(parts[1]||'0');
+        if(isCouple)ED.revenus.c2=pEur(parts[2]||'0');
+      }
+      if(/foncier/i.test(parts[0])){
+        var lv=parts.slice(1).filter(function(p){return /[\d\s]+€/.test(p);});
+        if(lv.length)ED.revenus.compl=pEur(lv[lv.length-1]);
+      }
+    });
   }
 
-  // ── 7. CHARGES ───────────────────────────────────────────────
-  ED.charges = 0;
-  var totalCharMatch = full.match(/TOTAL DES CHARGES\s*[:\s]+([\d\s,]+)\s*[€\u20ac]/i);
-  if(totalCharMatch) ED.charges = pEur(totalCharMatch[1]) / 12;
+  // ── 7. CHARGES ────────────────────────────────────────────────
+  ED.charges=0;
+  var chSection=full.match(/CHARGES([\s\S]{0,1000}?)(?:TOTAL DES REVENUS|TOTAL DES CHARGES|FISCALIT|$)/i);
+  if(chSection){
+    var chLines=chSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+    chLines.forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var parts=line.split('\t');
+      if(/^total$/i.test(parts[0])){
+        var lv=parts.slice(1).filter(function(p){return /[\d\s]+€/.test(p);});
+        if(lv.length)ED.charges=pEur(lv[lv.length-1])/12;
+      }
+    });
+  }
 
-  // ── 8. FISCAL ────────────────────────────────────────────────
-  ED.fiscal = {annee:'', rbg:0, parts:1, irnet:0, tmi:0, ps:0};
-  var yearM = full.match(/IR acquitt.\s*en\s*[:\*\s]*(\d{4})/i);
-  if(yearM) ED.fiscal.annee = yearM[1];
-  var rbgM = full.match(/revenu brut global\s*[:\*\s]+([\d\s]+)\s*[€\u20ac]/i);
-  if(rbgM) ED.fiscal.rbg = pEur(rbgM[1]);
-  var irnetM = full.match(/total de l.imp.t sur le revenu net\s*[:\*\s]+([\d\s,]+)\s*[€\u20ac]/i);
-  if(irnetM) ED.fiscal.irnet = pEur(irnetM[1]);
-  var tmiM = full.match(/TMI IR\s*[:\s]+(\d+)\s*%/i);
-  if(tmiM) ED.fiscal.tmi = parseInt(tmiM[1]);
-  var partsM = full.match(/nombre de parts\s*[:\s]+([\d,.]+)/i);
-  if(partsM) ED.fiscal.parts = parseFloat(partsM[1].replace(',','.'))||1;
-  var psM = full.match(/pr.l.vements sociaux nets\s*[:\s]+([\d\s,]+)\s*[€\u20ac]/i);
-  if(psM) ED.fiscal.ps = pEur(psM[1]);
-  if(!ED.fiscal.tmi && ED.fiscal.rbg) ED.fiscal.tmi = tmiFromRBG(ED.fiscal.rbg, ED.fiscal.parts);
+  // ── 8. FISCAL ─────────────────────────────────────────────────
+  ED.fiscal={annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0};
+  var fisSection=full.match(/FISCALIT.E?\s+IR([\s\S]{0,2000}?)(?:FISCALIT.E?\s+IFI|$)/i);
+  if(fisSection){
+    var fisText=fisSection[1];
+    var irAn=fisText.match(/IR acquitt.\s+en\s*[:\*]*\s*(\d{4})/i);
+    if(irAn)ED.fiscal.annee=irAn[1];
+    var rbgM=fisText.match(/Revenu brut global\s*[:\*]+\s*([\d\s]+)\s*€/i);
+    if(rbgM)ED.fiscal.rbg=pEur(rbgM[1]);
+    var irM=fisText.match(/Total de l.imp.t sur le revenu net\s*[:\*]+\s*([\d\s]+)\s*€/i);
+    if(irM)ED.fiscal.irnet=pEur(irM[1]);
+    var partsM=fisText.match(/Nombre de parts fiscales\s*[:\*]+\s*([\d,.]+)/i);
+    if(partsM)ED.fiscal.parts=parseFloat(partsM[1].replace(',','.'))||1;
+    var tmiM=fisText.match(/TMI IR\s*[:\*]+\s*(\d+)\s*%/i);
+    if(tmiM)ED.fiscal.tmi=parseInt(tmiM[1]);
+    var psM=fisText.match(/pr.l.vements sociaux nets\s*[:\*]+\s*([\d\s]+)\s*€/i);
+    if(psM)ED.fiscal.ps=pEur(psM[1]);
+  }
+  if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
 
-  // ── 9. EPARGNE MENSUELLE ─────────────────────────────────────
-  var revT = ED.revenus.c1 + ED.revenus.c2 + ED.revenus.compl;
-  ED.epMens = Math.max(0, Math.round((revT/12*0.75 - ED.charges)*0.3));
+  var revT=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
+  ED.epMens=Math.max(0,Math.round((revT/12*0.75-ED.charges)*0.3));
 
   launch();
 }
 
-
-// ── GENERATE FROM MANUAL ─────────────────────────────────────────
 function generateFromManual(){try{
   ED.type=document.getElementById('dType').value;
   ED.consultant=document.getElementById('fConsultant').value;
@@ -1378,8 +1367,36 @@ function rFinancement(){
 }
 
 function rRetraite(){
-  var AGES=[65,60,55,50,45,40,35,30];
-  var TAUX={'Fonctionnaire':[84,75,70,65,65,60,60,60],'Sal. non cadre':[76,70,67,64,60,57,56,54],'Sal. cadre':[60,58,57,55,54,52,50,48],'TNS lib.':[60,51,45,44,43,42,41,40],'Sal. cadre sup.':[54,50,50,49,46,44,43,43],'TNS artisan':[54,50,48,45,43,43,42,41]};
+  if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
+
+  // ── Panneau paramètres manuels ──────────────────────────────
+  var retParamsEl=document.getElementById('retParams');
+  if(retParamsEl){
+    var n1lbl=(ED.c1&&ED.c1.prenom?ED.c1.prenom+' '+(ED.c1.nom||''):'Client 1').trim();
+    var n2lbl=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom+' '+(ED.c2.nom||'')).trim():'Client 2';
+    var clients=[
+      {key:'1',lbl:n1lbl,age:ageFrom(ED.c1&&ED.c1.dob)||40},
+      {key:'2',lbl:n2lbl,age:ageFrom(ED.c2&&ED.c2.dob)||40}
+    ];
+    var parHtml='';
+    clients.forEach(function(cl,i){
+      if(i===1&&ED.type==='seul')return;
+      parHtml+='<div style="background:var(--gris-l);border-radius:10px;padding:14px 16px">';
+      parHtml+='<div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
+      parHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Âge de départ souhaité</label>';
+      parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
+      parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pension souhaitée (€/mois)</label>';
+      parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" oninput="ED.retraite.pension'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
+      parHtml+='</div>';
+      // Age actuel info
+      parHtml+='<div style="font-size:11px;color:var(--gris);margin-top:8px">Âge actuel : <strong>'+cl.age+' ans</strong> — horizon retraite : <strong>'+Math.max(0,(ED.retraite['age'+cl.key]||64)-cl.age)+' ans</strong></div>';
+      parHtml+='</div>';
+    });
+    retParamsEl.innerHTML=parHtml;
+  }
+
+    var AGES=[65,60,55,50,45,40,35,30]; var TAUX={'Fonctionnaire':[84,75,70,65,65,60,60,60],'Sal. non cadre':[76,70,67,64,60,57,56,54],'Sal. cadre':[60,58,57,55,54,52,50,48],'TNS lib.':[60,51,45,44,43,42,41,40],'Sal. cadre sup.':[54,50,50,49,46,44,43,43],'TNS artisan':[54,50,48,45,43,43,42,41]};
   var COLORS=['#2B5EA7','#C0392B','#5D9E4B','#7B4FA6','#1A9E8F','#E8842A'];
   var CSP_MAP={'Fonctionnaire':'Fonctionnaire','Salarie non-cadre':'Sal. non cadre','Salarie cadre':'Sal. cadre','Independant / TNS':'TNS lib.','Retraite':'Sal. non cadre'};
   CSP_MAP["Chef d'entreprise"]='TNS artisan';
@@ -1411,7 +1428,22 @@ function rRetraite(){
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euros assurance vie (2,5 %)',rate:0.025,color:'var(--blue)'},{label:'SCPI de rendement (4,5 %)',rate:0.045,color:'var(--green)'},{label:'PER allocation diversifiée (5 %)',rate:0.05,color:'#7B4FA6'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
-  tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel a combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr></tbody>';
+  tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C1 à combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr>';
+  // Manque C2 et couple si applicable
+  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){
+    var age2=ageFrom(ED.c2.dob)||40;
+    var ageI2=AGES.reduce(function(bi,a,j){return Math.abs(a-age2)<Math.abs(AGES[bi]-age2)?j:bi;},0);
+    var cspKey2=CSP_MAP[ED.c2.sitpro||'']||'Sal. cadre';
+    var tx2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageI2];
+    var pensM2=Math.round((ED.revenus.c2||0)/12*tx2/100);
+    var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
+    if(gap2>0)tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C2 à combler</td><td class="right">'+fmt(gap2)+' €/mois</td></tr>';
+    if(gap0>0&&gap2>0){
+      var gapTotal=gap0+gap2;
+      tblHtml+='<tr class="total-row" style="background:var(--ambre-l);font-size:13px"><td colspan="3"><strong>Manque couple total</strong></td><td class="right" style="color:var(--ambre-d)"><strong>'+fmt(gapTotal)+' €/mois</strong></td></tr>';
+    }
+  }
+  tblHtml+='</tbody>';
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
 }
 
@@ -1431,37 +1463,118 @@ function rTransmission(){
 
 // ── MATRICE COPERNIC ─────────────────────────────────────────
 var COPERNIC = {
-  'Assurance-vie':         {levier:'epargne',     icon:'&#127962;',desc:'Capitalisation, transmission hors succession (152 k€/bénéf.), sortie libre',fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+'},
-  'PER':                   {levier:'fiscal',      icon:'&#127969;',desc:'Déduction des versements du RBG dans la limite du plafond retraite',fiscal:'Déductible à l’entrée, IR à la sortie (rente ou capital)',sri:'1-7',horizon:'Retraite (long terme)',horizonAns:20},
-  'SCPI de rendement':     {levier:'epargne',     icon:'&#127959;',desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, financement possible',fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'Long terme (10 ans+)',horizonAns:15},
-  'SCPI Nue-propriete':    {levier:'transmission',icon:'&#127959;',desc:'Achat sans revenus, revalorisation structurelle, aucun IR pendant le démembrement',fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+'},
-  'Contrat de Capi':       {levier:'transmission',icon:'&#128196;',desc:'Capitalisation transmissible par cession ou donation, soumis au droit commun successoral',fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+'},
-  'Nue-propriete immo':    {levier:'transmission',icon:'&#127968;',desc:'Achat en nue-propriété, aucun revenu ni IFI pendant la période, revalorisation structurelle',fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+'},
-  'Denormandie':           {levier:'fiscal',      icon:'&#127968;',desc:'Réduction IR 12–18–21 % sur 6, 9 ou 12 ans, loyers versés, engagement de location',fiscal:'Réduction IR + revenus fonciers',sri:'6',horizon:'6-12 ans'},
-  'SCPI Denormandie':      {levier:'fiscal',      icon:'&#127959;',desc:'SCPI investissant en Denormandie, réduction IR 21 % max sur 12 ans',fiscal:'Réduction IR plafonnée (niches fiscales)',sri:'3',horizon:'16 ans min'},
-  'LMNP Amortissement':    {levier:'fiscal',      icon:'&#127968;',desc:'Amortissement du bien sur 20–30 ans, BIC non-professionnel, revenus peu imposés',fiscal:'BIC avec amortissement, revenus peu imposés',sri:'5',horizon:'20 ans+'},
-  'LLI':                   {levier:'fiscal',      icon:'&#127968;',desc:'TVA réduite à 10 % + remboursement taxe foncière, loyers versés, engagement 20 ans',fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans'},
-  'Malraux':               {levier:'fiscal',      icon:'&#127963;',desc:'Réduction IR 22–30 % sur travaux, hors plafond des niches, immobilier classé',fiscal:'Réduction IR hors plafond des niches fiscales',sri:'6',horizon:'9 ans min'},
-  'SCPI Malraux':          {levier:'fiscal',      icon:'&#127959;',desc:'SCPI investissant en Malraux, réduction IR immédiate 22–30 % des travaux éligibles',fiscal:'Réduction IR hors plafond des niches fiscales',sri:'6',horizon:'16 ans min'},
-  'Monuments Historiques': {levier:'fiscal',      icon:'&#127963;',desc:'Déduction TOTALE des travaux du RBG sans plafond, loyers après phase de travaux',fiscal:'Déduction totale hors plafond des niches',sri:'5',horizon:'15 ans min'},
-  'Deficit Foncier':       {levier:'fiscal',      icon:'&#127968;',desc:'Imputation 10 700 €/an sur RBG, report sur revenus fonciers, engagement de location 3 ans',fiscal:'Déduction RBG limitée à 10 700 €/an',sri:'5',horizon:'3 ans min'},
-  'SCPI Deficit Foncier':  {levier:'fiscal',      icon:'&#127959;',desc:'SCPI déficit foncier, déduction revenus fonciers + RBG, dividendes trimestriels',fiscal:'Déduction des revenus fonciers',sri:'6',horizon:'16 ans min'},
-  'Capital Investissement':{levier:'fiscal',      icon:'&#128200;',desc:'FIP / FCPI, réduction IR 25–30 %, plafond niches fiscales, PME/ETI, capital bloqué',fiscal:'Réduction IR dans la limite du plafond des niches',sri:'6-7',horizon:'7-10 ans'},
-  'G3F Industriel':        {levier:'fiscal',      icon:'&#127981;',desc:'Girardin Outre-Mer, réduction égale à 110–114 % du montant investi, durée 1–2 ans',fiscal:'Hors plafond des niches, spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans'},
-  'Donation + AV':         {levier:'transmission',icon:'&#128141;',desc:'Donation aux héritiers combinée à une AV avec clause nominative, abattement 100 000 €/enf.',fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
-  'Donation au dernier vivant':{levier:'transmission',icon:'&#128141;',desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'},
-  'SCPI rendement viager':  {levier:'transmission',icon:'&#127959;',desc:'Transmission de l’usufruit avec maintien des revenus, optimisation des droits de succession',fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'Viager'}
+
+  // ─── ÉPARGNE FINANCIÈRE ────────────────────────────────────────
+  'Assurance vie':          {cat:'epargne-fin',  levier:'epargne',     icon:'&#127962;',
+    desc:'Capitalisation à long terme, transmission hors succession (152 k€/bénéf.), sortie libre et fiscalité allégée après 8 ans',
+    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+  'PER':                    {cat:'epargne-ret',  levier:'fiscal',      icon:'&#127969;',
+    desc:'Versements déductibles du RBG dans la limite du plafond retraite. Sortie en rente ou capital à la retraite',
+    fiscal:'Déductible à l’entrée — IR à la sortie',sri:'1-7',horizon:'Retraite',horizonAns:20},
+  'Contrat de capitalisation':{cat:'epargne-fin',levier:'transmission',icon:'&#128196;',
+    desc:'Même fiscalité que l’AV, transmissible par cession ou donation, sans dénouement au décès',
+    fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+  'PEA Assurance':          {cat:'epargne-fin',  levier:'epargne',     icon:'&#128200;',
+    desc:'Enveloppe actions européennes, exonération des plus-values après 5 ans, plafond 150 k€',
+    fiscal:'Exonération IR après 5 ans (PS 17,2 % restants)',sri:'4-7',horizon:'5 ans+',horizonAns:8},
+
+  // ─── ÉPARGNE IMMOBILIÈRE ───────────────────────────────────────
+  'SCPI de rendement':      {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
+    desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
+    fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'10 ans+',horizonAns:15},
+  'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'epargne',    icon:'&#127959;',
+    desc:'Acquisition de SCPI via une SCI soumise à l’IS : revenus peu imposés grâce à l’amortissement, sortie optimisée',
+    fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
+  'SCPI de capitalisation': {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
+    desc:'Pas de distribution de revenus, valorisation du capital, idéale pour capitaliser sans pression fiscale annuelle',
+    fiscal:'Plus-value immobilière à la cession',sri:'3-4',horizon:'10 ans+',horizonAns:15},
+  'SCPI fiscale':           {cat:'immo-fisc',    levier:'fiscal',      icon:'&#127959;',
+    desc:'SCPI investissant dans des dispositifs fiscaux (Malraux, Déficit Foncier, Denormandie) — réduction ou déduction d’IR',
+    fiscal:'Réduction ou déduction IR selon le dispositif',sri:'4-6',horizon:'10-16 ans',horizonAns:12},
+  'SCPI en nue-propriété':  {cat:'epargne-immo', levier:'transmission',icon:'&#127959;',
+    desc:'Achat à prix décoté, aucun revenu ni IFI pendant le démembrement, revalorisation structurelle à terme',
+    fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+',horizonAns:15},
+  'SCPI en usufruit':       {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
+    desc:'Acquisition de l’usufruit temporaire : rendement boosté pendant la durée, capital non récupéré en fin de démembrement',
+    fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
+  'SCPI financée':          {cat:'epargne-immo', levier:'financement', icon:'&#127959;',
+    desc:'Acquisition à crédit : les loyers couvrent partiellement les mensualités, effet de levier bancaire sur le patrimoine',
+    fiscal:'Intérêts d’emprunt déductibles des revenus fonciers',sri:'3-4',horizon:'15 ans+',horizonAns:15},
+
+  // ─── IMMOBILIER ────────────────────────────────────────────────
+  'LMNP':                   {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+    desc:'Location meublée non professionnelle : amortissement du bien sur 20-30 ans, revenus BIC quasi non imposés',
+    fiscal:'BIC avec amortissement — revenus très peu imposés',sri:'5',horizon:'20 ans+',horizonAns:20},
+  'Denormandie':            {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+    desc:'Réduction IR 12-18-21 % sur 6, 9 ou 12 ans, ancien rénové centre-ville, loyers plafonnés',
+    fiscal:'Réduction IR plafonnée niches fiscales',sri:'6',horizon:'6-12 ans',horizonAns:9},
+  'Nue-propriété immo':     {cat:'immobilier',   levier:'transmission',icon:'&#127968;',
+    desc:'Achat en nue-propriété d’un bien, décote à l’achat, aucun revenu ni IFI, revalorisation à terme',
+    fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+',horizonAns:15},
+  'LLI':                    {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+    desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
+    fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
+  'Loi fiscale (Pinel, Jean Brun…)': {cat:'immobilier',levier:'fiscal',icon:'&#127968;',
+    desc:'Dispositifs de défiscalisation immobilière (Pinel+, Jean Brun…) : réduction IR en contrepartie d’un engagement de location',
+    fiscal:'Réduction IR plafonnée niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
+
+  // ─── ÉPARGNE RETRAITE ──────────────────────────────────────────
+  'PERIN':                  {cat:'epargne-ret',  levier:'fiscal',      icon:'&#127969;',
+    desc:'PER individuel : déduction des versements, sortie en capital ou rente à la retraite, blocage sauf cas de déblocage anticipé',
+    fiscal:'Déductible à l’entrée — IR à la sortie',sri:'1-7',horizon:'Retraite',horizonAns:20},
+
+  // ─── PRÉVOYANCE ────────────────────────────────────────────────
+  'Prévoyance individuelle':{cat:'prevoyance',   levier:'protection',  icon:'&#128737;',
+    desc:'Garantie arrêt de travail, invalidité, décès pour les TNS et indépendants — revenus de remplacement en cas d’incapacité',
+    fiscal:'Cotisations déductibles (TNS)',sri:'N/A',horizon:'Annuel'},
+  'Prévoyance pro':         {cat:'prevoyance',   levier:'protection',  icon:'&#128737;',
+    desc:'Protection de l’associé gérant, garantie homme-clé, assurance croisée entre associés',
+    fiscal:'Cotisations déductibles entreprise',sri:'N/A',horizon:'Annuel'},
+
+  // ─── SOLUTIONS FISCALES ────────────────────────────────────────
+  'Capital Investissement (FPCI/FCPR)': {cat:'solutions-fisc',levier:'fiscal',icon:'&#128200;',
+    desc:'Fonds de capital-investissement : réduction IR 25-30 %, capital bloqué 7-10 ans, investissement dans des PME/ETI',
+    fiscal:'Réduction IR dans la limite du plafond des niches',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+  'Girardin industriel':    {cat:'solutions-fisc',levier:'fiscal',     icon:'&#127981;',
+    desc:'Réduction IR supérieure au montant investi (110-114 %), remboursement en 1-2 ans, risque de reprise fiscale',
+    fiscal:'Hors plafond des niches — spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans',horizonAns:1},
+
+  // ─── ÉPARGNE SALARIALE ─────────────────────────────────────────
+  'Plan Épargne Entreprise': {cat:'epargne-sal', levier:'epargne',    icon:'&#127968;',
+    desc:'Épargne salariale avec abondement employeur, blocage 5 ans, sortie exonérée d’IR',
+    fiscal:'Exonération IR (PS 17,2 % restants)',sri:'2-5',horizon:'5 ans',horizonAns:5},
+  'PERECO/PERECOI':         {cat:'epargne-sal',  levier:'fiscal',      icon:'&#127969;',
+    desc:'PER collectif avec abondement employeur et versements déductibles, sortie retraite en capital ou rente',
+    fiscal:'Déductible + abondement exonéré',sri:'2-6',horizon:'Retraite',horizonAns:20},
+
+  // ─── DIVERSIFICATION ───────────────────────────────────────────
+  'Fonds Usufruit (NOVAXIA…)':{cat:'diversification',levier:'epargne',icon:'&#128200;',
+    desc:'Acquisition d’usufruit temporaire de parts de fonds immobiliers — rendement boosté, capital non récupéré',
+    fiscal:'Revenus fonciers ou financiers selon structure',sri:'4-5',horizon:'5-10 ans',horizonAns:7},
+  'FCPR / FPCI':            {cat:'diversification',levier:'epargne',   icon:'&#128200;',
+    desc:'Fonds commun de placement à risque ou professionnel : capital-investissement non coté, rendement potentiellement élevé',
+    fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+
+  // ─── TRANSMISSION ──────────────────────────────────────────────
+  'Donation + AV':          {cat:'transmission', levier:'transmission',icon:'&#128141;',
+    desc:'Donation aux héritiers combinée à une AV avec clause nominative, abattement 100 000 €/enf.',
+    fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
+  'Donation au dernier vivant':{cat:'transmission',levier:'transmission',icon:'&#128141;',
+    desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',
+    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'}
 };
 var OBJ_SOLUTIONS = {
-  'Faire fructifier un capital':       ['Assurance-vie','SCPI de rendement','Contrat de Capi','PER','Capital Investissement'],
-  'Préparer sa retraite':              ['PER','Assurance-vie','SCPI de rendement','LMNP Amortissement','LLI'],
-  'Optimiser son IR':                  ['PER','Malraux','SCPI Malraux','Deficit Foncier','SCPI Deficit Foncier','Monuments Historiques','Denormandie','SCPI Denormandie','LMNP Amortissement','G3F Industriel','Capital Investissement'],
-  'Optimiser son IFI':                 ['SCPI Nue-propriete','Contrat de Capi','Nue-propriete immo'],
-  'Optimiser la transmission':         ['Assurance-vie','Contrat de Capi','SCPI rendement viager','Donation + AV','Donation au dernier vivant','SCPI Nue-propriete'],
-  'Se créer un complément de revenus': ['SCPI de rendement','Assurance-vie','Contrat de Capi','LLI','Denormandie','LMNP Amortissement'],
-  'Protéger son conjoint':             ['Assurance-vie','PER','Donation au dernier vivant'],
-  'Réorganiser son patrimoine':        ['Assurance-vie','Contrat de Capi','SCPI de rendement'],
-  'Épargne / capitalisation':          ['Assurance-vie','Contrat de Capi','SCPI de rendement','PER']
+  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI'],
+  'Préparer sa retraite':               ['PER','PERIN','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
+  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP'],
+  'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
+  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété'],
+  'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l’IS','LLI','Denormandie','LMNP'],
+  'Protéger son conjoint':              ['Assurance vie','PER','Prévoyance individuelle','Prévoyance pro','Donation au dernier vivant'],
+  'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de capitalisation'],
+  'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de capitalisation'],
+  'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
+  'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement']
 };
 var solsSelectionnees=[];
 
@@ -1492,6 +1605,7 @@ function buildMatriceObjSol(impot,capa,aSum){
   if(impot>=2000)activeObjs.push('Optimiser son IR');
   if(ED.fiscal.rbg>1300000)activeObjs.push('Optimiser son IFI');
   if(capa>200)activeObjs.push('Se créer un complément de revenus');
+  if(capa>300)activeObjs.push('Investir via le financement');
   if(aSum>300000)activeObjs.push('Optimiser la transmission');
   if(ED.objectifs&&ED.objectifs.length){ED.objectifs.forEach(function(o){var ol=o.toLowerCase();if(ol.includes('retraite'))activeObjs.push('Préparer sa retraite');if(ol.includes('transm'))activeObjs.push('Optimiser la transmission');if(ol.includes('revenu'))activeObjs.push('Se créer un complément de revenus');if(ol.includes('capital')||ol.includes('epargne')||ol.includes('fructif'))activeObjs.push('Faire fructifier un capital');if(ol.includes('reorgan'))activeObjs.push('Réorganiser son patrimoine');if(ol.includes('conjoint')||ol.includes('protect'))activeObjs.push('Protéger son conjoint');if(ol.includes('fisc')||ol.includes('impot'))activeObjs.push('Optimiser son IR');});}
   activeObjs=activeObjs.filter(function(v,i,a){return a.indexOf(v)===i;});
@@ -1509,12 +1623,18 @@ function buildMatriceObjSol(impot,capa,aSum){
   var html='';
 
   // Objectifs detected banner
-  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
-  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs detectes :</span>';
+  var hasFinancement=activeObjs.indexOf('Investir via le financement')>=0;
+  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
+  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs détectés :</span>';
   activeObjs.forEach(function(obj){
     html+='<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">'+obj+'</span>';
   });
   html+='</div>';
+  if(hasFinancement){
+    html+='<div style="margin-bottom:14px;padding:10px 14px;background:var(--green-l);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--gris-f)">';
+    html+='<strong style="color:var(--green)">&#10003; Levier financement activé</strong> — La capacité d’emprunt permet d’acquérir un actif immobilier dont les loyers couvrent partiellement les mensualités. Sélectionnez une solution ci-dessous.';
+    html+='</div>';
+  }
 
   // Solutions grid: each card shows name + tags + checkbox
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">';
@@ -1664,7 +1784,7 @@ function renderFichesClient(){
   if(!solsSelectionnees.length){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Selectionnez des solutions dans le panneau conseiller pour générer les fiches client</div>';return;}
   var levierMap={};
   solsSelectionnees.forEach(function(s){var lev=s.levier||'epargne';if(!levierMap[lev])levierMap[lev]=[];levierMap[lev].push(s);});
-  var LEVIER_META={'epargne':{label:'Levier des placements',bg:'#FDF3E3',border:'#F5D9A8',titleBg:'#C8832A',rate:0.025},'fiscal':{label:'Levier de l\'impot',bg:'#EDF2FB',border:'#B5D4F4',titleBg:'#185FA5',rate:0.025},'financement':{label:'Levier du financement',bg:'#EAF5EF',border:'#9FE1CB',titleBg:'#0F6E56',rate:0.025},'transmission':{label:'Levier de la transmission',bg:'#F5EFF8',border:'#CECBF6',titleBg:'#534AB7',rate:0.04},'retraite':{label:'Levier de la retraite',bg:'#FFF8F0',border:'#FAC775',titleBg:'#854F0B',rate:0.055}};
+  var LEVIER_META={'epargne':{label:'Levier des placements',bg:'#FDF3E3',border:'#F5D9A8',titleBg:'#C8832A',rate:0.025},'fiscal':{label:'Levier de l\'impot',bg:'#EDF2FB',border:'#B5D4F4',titleBg:'#185FA5',rate:0.025},'financement':{label:'Levier du financement',bg:'#EAF5EF',border:'#9FE1CB',titleBg:'#0F6E56',rate:0.03},'transmission':{label:'Levier de la transmission',bg:'#F5EFF8',border:'#CECBF6',titleBg:'#534AB7',rate:0.04},'retraite':{label:'Levier de la retraite',bg:'#FFF8F0',border:'#FAC775',titleBg:'#854F0B',rate:0.055}};
   var n1=(ED.c1.prenom||'C1')+(ED.c1.nom?' '+ED.c1.nom[0]+'.':'');
   var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom||'C2')+(ED.c2.nom?' '+ED.c2.nom[0]+'.':''):'';
   var objsClient=ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!='Objectifs a completer'?ED.objectifs.filter(function(o){return o&&o.length>3;}).slice(0,4):[];
