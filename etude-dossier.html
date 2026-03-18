@@ -4,18 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGP Skool — Étude de Dossier</title>
+<link rel="stylesheet" href="cgp-skool.css">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --ambre:#F0A738;--ambre-d:#C8832A;--ambre-l:#FDF3E3;--ambre-m:#F5D9A8;
-  --noir:#0D0D0D;--gris-f:#3A3A3A;--gris:#6B6B6B;--gris-l:#F7F5F1;
-  --blanc:#FFFFFF;--bord:#EDE8DF;
-  --green:#2D7A5B;--green-l:#EAF5EF;--red:#C0392B;--red-l:#FDEEEC;
-  --blue:#2B5EA7;--blue-l:#EDF2FB;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;color:var(--noir);background:#F4F2EE;-webkit-font-smoothing:antialiased}
 
 /* ── NAV ── */
@@ -59,7 +51,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-fi
 .main{padding:28px 32px;overflow-y:auto;max-width:1160px}
 .section-page{display:none}
 .section-page.active{display:block;animation:fadeUp 0.25s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SECTION HEADER ── */
 .sec-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
@@ -243,25 +234,33 @@ select.fi{cursor:pointer}
   .section-page:not(.active){page-break-before:always}
   .card,.kpi,.preco-panel,.sol-card{break-inside:avoid}
 }
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
+
+
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a class="logo" href="index.html">
+<nav class="nav-univ">
+  <div class="nav-univ-inner">
+    <a class="nav-logo" href="index.html">
       <span class="cgp">CGP</span><span class="sep">|</span>
       <span class="s">s</span><span class="k">k</span><span class="o1">o</span><span class="o2">o</span><span class="l">l</span>
     </a>
-    <div class="nav-client" id="navClient">📋 Étude de Dossier</div>
-    <div class="nav-actions">
-      <button class="nav-btn ghost" onclick="resetAll()">↺ Nouveau</button>
-      <button class="nav-btn ghost" id="btnPDF" disabled onclick="exportPDF()">⬇ PDF</button>
-      <a class="nav-btn ghost" href="scpi-simulator.html" style="text-decoration:none">🏢 SCPI</a>
+    <div class="nav-links">
+      <a class="nav-a active" href="etude-dossier.html">Étude de Dossier</a>
+      <div class="nav-dropdown">
+        <button class="nav-a nav-dropdown-btn ">SCPI <span class="arr">▾</span></button>
+        <div class="nav-dropdown-menu">
+          <a class="nav-dropdown-item " href="scpi-simulator.html">📈 SCPI Cash</a>
+          <div class="nav-dropdown-sep"></div>
+          <a class="nav-dropdown-item " href="scpi-financement.html">🏦 Financement SCPI</a>
+        </div>
+      </div>
+      <a class="nav-a" href="immo-simulator.html">Immobilier</a>
     </div>
+    <span class="nav-spacer"></span>
+    <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
   </div>
 </nav>
 
