@@ -258,7 +258,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 
 @media print{
   .sidebar,nav,.sim-btn,.nav-right{display:none!important}
-  .app-shell{grid-template-columns:1fr}
+  .app-shell{display:block}
 }
 </style>
 </head>
@@ -450,7 +450,7 @@ const SCPI_DEMEM = {
   te: {5:0.8, 6:0.77, 7:0.74, 8:0.71, 9:0.69, 10:0.67, 11:0.65, 12:0.63, 13:0.61, 14:0.6, 15:0.58, 16:0.57, 17:0.56, 18:0.55, 19:0.54, 20:0.53},
   corigin: {3:0.85, 4:0.81, 5:0.78, 6:0.75, 7:0.72, 8:0.69, 9:0.67, 10:0.65, 11:0.64, 12:0.63, 13:0.62, 14:0.61, 15:0.6, 16:0.59, 17:0.58, 18:0.57, 19:0.56, 20:0.55},
   ceurion: {3:0.87, 4:0.83, 5:0.79, 6:0.76, 7:0.74, 8:0.73, 9:0.71, 10:0.69, 11:0.68, 12:0.67, 13:0.66, 14:0.65, 15:0.64, 16:0.63, 17:0.62, 18:0.61, 19:0.6, 20:0.59},
-  lfsante: {},
+  lfsante: {3:0.875, 4:0.84, 5:0.8, 6:0.765, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.61, 16:0.6, 17:0.59, 18:0.58, 19:0.57, 20:0.56},
   osmo: {3:0.875, 4:0.84, 5:0.8, 6:0.765, 7:0.74, 8:0.715, 9:0.7, 10:0.67, 11:0.655, 12:0.64, 13:0.63, 14:0.62, 15:0.61, 16:0.6, 17:0.59, 18:0.58, 19:0.57, 20:0.56},
   ncap: {3:0.84, 4:0.81, 5:0.77, 6:0.74, 7:0.71, 8:0.68, 9:0.66, 10:0.64, 11:0.63, 12:0.61, 13:0.6, 14:0.59, 15:0.58},
   perial: {5:0.77, 6:0.735, 7:0.705, 8:0.675, 9:0.65, 10:0.62, 11:0.605, 12:0.585, 13:0.565, 14:0.55, 15:0.53},
@@ -458,17 +458,15 @@ const SCPI_DEMEM = {
   sofidy: {5:0.81, 6:0.78, 7:0.7525, 8:0.725, 9:0.6975, 10:0.675, 11:0.655, 12:0.635, 13:0.6175, 14:0.6, 15:0.585, 16:0.57, 17:0.5575, 18:0.545, 19:0.535, 20:0.5275},
 };
 
-// Retourne le % NP pour une SCPI et une durée données
 function getNP(scpiId, duree) {
   const table = SCPI_DEMEM[scpiId];
-  if (!table) return null;
-  // Interpolation : chercher la durée exacte ou la plus proche
+  if (!table || Object.keys(table).length === 0) return null;
   if (table[duree] !== undefined) return table[duree];
   const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
   const lower = keys.filter(k=>k<=duree).pop();
   const upper = keys.filter(k=>k>=duree).shift();
-  if (!lower) return table[upper];
-  if (!upper) return table[lower];
+  if (lower === undefined) return table[upper];
+  if (upper === undefined) return table[lower];
   const t = (duree-lower)/(upper-lower);
   return table[lower] + t*(table[upper]-table[lower]);
 }
@@ -493,7 +491,6 @@ const SCPI_DATA = [
 ];
 
 // Export pour usage dans les simulateurs
-if (typeof module !== "undefined") module.exports = { SCPI_DATA, SCPI_DEMEM, getNP };
 
 
 
@@ -543,7 +540,7 @@ function getActiveScpi(){
     const label=document.getElementById('custom-name').value.trim()||'Simulation taux personnalisé';
     return{
       id:'custom',name:label,manager:'—',theme:'—',geo:'—',
-      price:null,yieldGross:gross,yieldNet:net,
+      price:null,yieldGross:gross,
       capi:null,collecteNet2025:null,retraits2025:null,partsAttente:0,
       tof:null,leverage:null,isr:false,sri:null,
       durabilite:'—',valeurRealisation:null,valeurReconstitution:null,decote:null,
@@ -944,16 +941,11 @@ function renderBarNP(res){
   document.getElementById('chartLegend').innerHTML='';
 }
 
-function resetCanvas(){
-  // Réinitialise le chart-wrap avec un canvas propre
-  const wrap=document.getElementById('chartBox').querySelector('.chart-wrap');
-  if(!wrap.querySelector('canvas')){
-    wrap.innerHTML='<canvas id="mainChart"></canvas>';
-  }
-}
-
 function renderChart(labels,datasets){
-  resetCanvas();
+  // Restaurer le canvas si remplacé par un SVG (mode NP)
+  const wrap=document.getElementById('chartBox').querySelector('.chart-wrap');
+  if(!wrap.querySelector('canvas')){wrap.innerHTML='<canvas id="mainChart"></canvas>';}
+  wrap.style.height='230px';
   if(chartInstance)chartInstance.destroy();
   chartInstance=new Chart(document.getElementById('mainChart').getContext('2d'),{
     type:'line',
