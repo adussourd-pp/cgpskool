@@ -1577,6 +1577,25 @@ function rFinancement(){
 }
 
 
+// ── Données de référence retraite (globales) ──────────────────────
+var TAUX={'Fonctionnaire':[85,75,70,65,60,60,60,60],'Sal. non cadre':[75,70,67,64,60,57,56,54],'Sal. cadre':[60,57,56,55,54,53,50,48],'TNS lib.':[60,54,45,44,43,42,41,40],'Sal. cadre sup.':[54,52,50,49,47,45,43,42],'TNS artisan':[54,50,48,45,44,43,42,41]};
+var ESP_VIE={
+  'Madame':  {55:377,57:355,60:323,62:302,64:273,65:261,67:240},
+  'Monsieur':{55:313,57:294,60:265,62:247,64:229,65:217,67:193}
+};
+function getEspVie(civ,ageDepart){
+  var genre=/madame|mme/i.test(civ||'')?'Madame':'Monsieur';
+  var t=ESP_VIE[genre];
+  var ages=[55,57,60,62,64,65,67];
+  if(t[ageDepart])return t[ageDepart];
+  for(var i=0;i<ages.length-1;i++){
+    if(ageDepart>ages[i]&&ageDepart<ages[i+1]){
+      return Math.round(t[ages[i]]+(t[ages[i+1]]-t[ages[i]])*(ageDepart-ages[i])/(ages[i+1]-ages[i]));
+    }
+  }
+  return ageDepart<=55?t[55]:t[67];
+}
+
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  SECTION — RETRAITE                                            ║
 // ╚══════════════════════════════════════════════════════════════════╝
@@ -1610,27 +1629,7 @@ function rRetraite(){
     retParamsEl.innerHTML=parHtml;
   }
 
-    var AGES=[65,60,55,50,45,40,35,30]; var TAUX={'Fonctionnaire':[85,75,70,65,60,60,60,60],'Sal. non cadre':[75,70,67,64,60,57,56,54],'Sal. cadre':[60,57,56,55,54,53,50,48],'TNS lib.':[60,54,45,44,43,42,41,40],'Sal. cadre sup.':[54,52,50,49,47,45,43,42],'TNS artisan':[54,50,48,45,44,43,42,41]};
-  // Table espérance de vie (mois) selon âge de départ — source config Excel
-  var ESP_VIE={
-    'Madame':  {55:377, 57:355, 60:323, 62:302, 64:273, 65:261, 67:240},
-    'Monsieur':{55:313, 57:294, 60:265, 62:247, 64:229, 65:217, 67:193}
-  };
-  function getEspVie(civ, ageDepart){
-    var genre=/madame|mme|f/i.test(civ||'')?'Madame':'Monsieur';
-    var t=ESP_VIE[genre];
-    var ages=[55,57,60,62,64,65,67];
-    if(t[ageDepart]) return t[ageDepart];
-    // Interpolation linéaire
-    for(var i=0;i<ages.length-1;i++){
-      if(ageDepart>ages[i]&&ageDepart<ages[i+1]){
-        var ratio=(ageDepart-ages[i])/(ages[i+1]-ages[i]);
-        return Math.round(t[ages[i]]+(t[ages[i+1]]-t[ages[i]])*ratio);
-      }
-    }
-    return ageDepart<=55?t[55]:t[67];
-  }
-
+    var AGES=[65,60,55,50,45,40,35,30];
   var COLORS=['#2B5EA7','#C0392B','#5D9E4B','#7B4FA6','#1A9E8F','#E8842A'];
   var CSP_MAP={'Fonctionnaire':'Fonctionnaire','Salarie non-cadre':'Sal. non cadre','Salarie cadre':'Sal. cadre','Independant / TNS':'TNS lib.','Retraite':'Sal. non cadre'};
   CSP_MAP["Chef d'entreprise"]='TNS artisan';
@@ -1653,7 +1652,7 @@ function rRetraite(){
   var kpiEl=document.getElementById('retKpis');
   if(kpiEl)kpiEl.innerHTML='<div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Âge actuel '+nomCFull(1)+'</div><div class="kpi-val">'+age1+' ans</div></div><div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Taux remplacement</div><div class="kpi-val">'+tauxClient+' %</div></div><div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Pension estimee</div><div class="kpi-val">'+fmt(pensionEst)+' €/mois</div></div><div class="kpi featured"><div class="kpi-label">Categorie</div><div class="kpi-val" style="font-size:14px">'+cspKey+'</div></div>';
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
-  var // Pension base = revenus BRUTS totaux (salaires + fonciers sans pondération)
+  // Pension base = revenus BRUTS totaux (salaires + fonciers sans pondération)
   var fonc=ED.revenus.fonc||0;
   var foncC1=isCouple?Math.round(fonc/2):fonc; // fonciers répartis 50/50 si couple
   var foncC2=isCouple?Math.round(fonc/2):0;
