@@ -1226,8 +1226,27 @@ function parseTextRI(txt){
       }
     });
   }
-  // chargesCredit = somme des échéances passifs / 12 (crédits uniquement)
-  ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+  // ── Totaux globaux extraits directement des lignes TOTAL DU RI ──────
+  // Plus fiable que le parsing ligne par ligne
+  var totalRevMatch=full.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
+  var totalChgMatch=full.match(/TOTAL DES CHARGES\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
+  var totalPassifMatch=full.match(/TOTAL DES PASSIFS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
+
+  var totalRevAn  = totalRevMatch  ? pEur(totalRevMatch[1])  : 0;
+  var totalChgAn  = totalChgMatch  ? pEur(totalChgMatch[1])  : 0;
+  var totalPassif = totalPassifMatch? pEur(totalPassifMatch[1]): 0;
+
+  ED.chargesCredit=Math.round(totalEch/12);
+
+  // Pour les revenus : utiliser le TOTAL DES REVENUS si salaires mal parsés
+  if(totalRevAn>0&&(!ED.revenus.sal1||Math.abs(ED.revenus.sal1-totalRevAn)>1000)){
+    // Si pas de revenus fonciers, le total revenus = salaires
+    if(!ED.revenus.fonc){
+      ED.revenus.sal1=isCouple?totalRevAn/2:totalRevAn;
+      ED.revenus.sal2=isCouple?totalRevAn/2:0;
+      ED.revenus.c1=ED.revenus.sal1; ED.revenus.c2=ED.revenus.sal2;
+    }
+  }
 
   // ══════════════════════════════════════════════════════════════════
   // SECTION 05 — FISCALITÉ
