@@ -1,81 +1,81 @@
-# CGP Skool — Étude de Dossier
+# CGP Skool -- Étude de Dossier
 ## Règles absolues & Tests de non-régression
 
 ---
 
-## RÈGLES DE CODE — À VÉRIFIER AVANT CHAQUE LIVRAISON
+## RÈGLES DE CODE -- À VÉRIFIER AVANT CHAQUE LIVRAISON
 
-### R1 — font-family dans les strings JS
+### R1 -- font-family dans les strings JS
 ```js
-// INTERDIT — casse la string JS
+// INTERDIT -- casse la string JS
 html += '<div style="font-family:\'Space Grotesk\',sans-serif">';
 
 // CORRECT
 html += '<div style="font-family:Space Grotesk,sans-serif">';
 ```
 
-### R2 — Caractère \xa0 dans le code JS
+### R2 -- Caractère \xa0 dans le code JS
 Provoque "Invalid or unexpected token". Utiliser des espaces normaux dans le code.
 
-### R3 — Pas de doublon de variable
+### R3 -- Pas de doublon de variable
 Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y compris dans les déclarations groupées `let a, b, c`).
 
-### R4 — Revenus ANNUELS dans le RI
+### R4 -- Revenus ANNUELS dans le RI
 - `ED.revenus.c1` / `sal1` = salaires annuels
 - `ED.revenus.fonc` = fonciers annuels
 - `revMens()` = (sal + fonc×0.70) / 12
 
-### R5 — Taux endettement = crédits SEULEMENT
+### R5 -- Taux endettement = crédits SEULEMENT
 `chrCredit` = échéances passifs /mois. PAS les charges totales (PER, leasing, éducation exclus).
 
-### R6 — Pension retraite = salaires SEULS
+### R6 -- Pension retraite = salaires SEULS
 `pensM = Math.floor(ED.revenus.c1 / 12 * taux / 100)`. Fonciers exclus.
 
-### R7 — Clés internes sans accent
+### R7 -- Clés internes sans accent
 `goTo('synthese')` pas `goTo('synthèse')`. Texte affiché peut avoir des accents, pas les clés.
 
 ---
 
 ## TESTS DE NON-RÉGRESSION
 
-### Cas 1 — Alexia LAFOSSE & François LIEVRE (couple, séparation de biens)
+### Cas 1 -- Alexia LAFOSSE & François LIEVRE (couple, séparation de biens)
 | Indicateur | Attendu |
 |---|---|
-| Revenus nets /mois | 4 326 € |
-| Charges crédit /mois | 3 654 € |
+| Revenus nets /mois | 4 326 EUR |
+| Charges crédit /mois | 3 654 EUR |
 | Taux endettement | 84,5 % |
-| Reste à vivre | 672 € |
-| IR net | 0 € |
-| Pension Alexia (55 ans, Sal. cadre) | 576 €/mois |
-| Manque Alexia (souh. 3 000 €) | 2 424 €/mois |
+| Reste à vivre | 672 EUR |
+| IR net | 0 EUR |
+| Pension Alexia (55 ans, Sal. cadre) | 576 EUR/mois |
+| Manque Alexia (souh. 3 000 EUR) | 2 424 EUR/mois |
 
 
-### Cas 3 — Eric & Marie Aude KEMPF (couple, séparation de biens, 3 parts)
+### Cas 3 -- Eric & Marie Aude KEMPF (couple, séparation de biens, 3 parts)
 | Indicateur | Attendu |
 |---|---|
-| Revenus nets /mois (couple) | (104 000+9 000+3 600×0,70)/12 = **9 627 €** |
-| Charges crédit /mois | 12 000/12 = **1 000 €** |
+| Revenus nets /mois (couple) | (104 000+9 000+3 600×0,70)/12 = **9 627 EUR** |
+| Charges crédit /mois | 12 000/12 = **1 000 EUR** |
 | Taux endettement (couple) | 1 000/9 627 = **10,4 %** |
-| Reste à vivre | 9 627−1 000 = **8 627 €** |
-| IR net | **15 638 €** |
+| Reste à vivre | 9 627-1 000 = **8 627 EUR** |
+| IR net | **15 638 EUR** |
 | TMI | **30 %** |
-| Pension Eric (50 ans, Sal. cadre, départ 60) | (104 000+3 600)/12×55% = **4 931 €/mois** |
-| Pension Marie Aude (48 ans, Sal. non cadre) | 9 000/12×62% = **465 €/mois** |
+| Pension Eric (50 ans, Sal. cadre, départ 60) | (104 000+3 600)/12×55% = **4 931 EUR/mois** |
+| Pension Marie Aude (48 ans, Sal. non cadre) | 9 000/12×62% = **465 EUR/mois** |
 
 **Règle confirmée :** pension = (salaires + fonciers BRUTS) / 12 × taux (sans pondération 70%)
 **Règle confirmée :** endettement = couple complet
 
-### Cas 2 — Mathieu THOMAS (seul, séparé, 2 enfants)
+### Cas 2 -- Mathieu THOMAS (seul, séparé, 2 enfants)
 | Indicateur | Attendu |
 |---|---|
-| Revenus nets /mois | 8 713 € |
-| Charges crédit /mois | 2 879 € |
+| Revenus nets /mois | 8 713 EUR |
+| Charges crédit /mois | 2 879 EUR |
 | Taux endettement | 33,0 % |
-| Reste à vivre | 5 834 € |
-| IR net | 13 670 € |
+| Reste à vivre | 5 834 EUR |
+| IR net | 13 670 EUR |
 | TMI | 41 % |
-| Pension (67 ans, Sal. cadre) | 4 791 €/mois |
-| Impact mensuel (souh. 3 500 €) | +1 291 € (surplus) |
+| Pension (67 ans, Sal. cadre) | 4 791 EUR/mois |
+| Impact mensuel (souh. 3 500 EUR) | +1 291 EUR (surplus) |
 
 ---
 
@@ -85,9 +85,9 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 - [ ] 0 caractère `\xa0` dans le script
 - [ ] `steps` déclaré 1 seule fois
 - [ ] Structure HTML : script avant /script avant /body
-- [ ] Test Alexia : revMens() = 4 326 €
+- [ ] Test Alexia : revMens() = 4 326 EUR
 - [ ] Test Mathieu : endett = 33,0 %
-- [ ] Test Mathieu : pension = 4 791 €
+- [ ] Test Mathieu : pension = 4 791 EUR
 
 ---
 
@@ -109,16 +109,16 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 
 ---
 
-## RÈGLE R8 — Base de calcul pension retraite
+## RÈGLE R8 -- Base de calcul pension retraite
 
 La pension est calculée sur les **revenus BRUTS totaux** (salaires + fonciers), sans appliquer le 70%.
 
 ```js
-// CORRECT — revenus bruts pour la retraite
+// CORRECT -- revenus bruts pour la retraite
 var revBrutMensuel = (sal + foncBrut) / 12;
 var pension = Math.floor(revBrutMensuel * tauxRemplacement / 100);
 
-// INTERDIT — pondération 70% sur les fonciers pour la retraite
+// INTERDIT -- pondération 70% sur les fonciers pour la retraite
 var pension = Math.floor(revMens() * tauxRemplacement / 100); // revMens() applique 70%
 ```
 
@@ -126,7 +126,7 @@ Pour un couple, les fonciers sont répartis 50/50 entre C1 et C2.
 
 ---
 
-## RÈGLE R9 — Endettement calculé sur le couple complet
+## RÈGLE R9 -- Endettement calculé sur le couple complet
 
 Le taux d'endettement et le reste à vivre utilisent **les revenus nets du couple** (`revMens()` = salaires couple + fonciers×70% / 12), pas C1 seul.
 
@@ -140,7 +140,7 @@ const endett = chrCredit / (ED.revenus.c1 / 12) * 100;  // C1 seul
 
 ---
 
-## TEST — Calcul bilan retraite (validation complète)
+## TEST -- Calcul bilan retraite (validation complète)
 
 ### Formule générale
 ```
@@ -151,70 +151,70 @@ capitalCible     = manque × 12 / 0.04               (rendement 4% pour la rente
 effortMensuel(r) = capitalCible / ((1+r)^h - 1) * r / 12
 ```
 
-### Cas Eric KEMPF — Salarié cadre, 50 ans, départ 60 ans
+### Cas Eric KEMPF -- Salarié cadre, 50 ans, départ 60 ans
 
 | Données | Valeur |
 |---|---|
-| Salaires Eric | 104 000 €/an |
-| Revenus fonciers Ostheim (bruts) | 3 600 €/an |
+| Salaires Eric | 104 000 EUR/an |
+| Revenus fonciers Ostheim (bruts) | 3 600 EUR/an |
 | CSP | Salarié cadre |
 | Taux remplacement à 60 ans (Sal. cadre) | **55 %** |
 
 **Calcul :**
 ```
-revBrutMensuel = (104 000 + 3 600) / 12 = 8 967 €/mois
-pension        = floor(8 967 × 55 / 100) = 4 931 €/mois
-manque         = 5 000 − 4 931 = 69 €/mois  ← surplus (impact = −69 €)
-capitalCible   = 69 × 12 / 0.04 = 20 700 €
+revBrutMensuel = (104 000 + 3 600) / 12 = 8 967 EUR/mois
+pension        = floor(8 967 × 55 / 100) = 4 931 EUR/mois
+manque         = 5 000 - 4 931 = 69 EUR/mois  <- surplus (impact = -69 EUR)
+capitalCible   = 69 × 12 / 0.04 = 20 700 EUR
 ```
-PDF attendu : pension **4 931 €**, impact foyer **−69 €** ✓
+PDF attendu : pension **4 931 EUR**, impact foyer **-69 EUR** ok
 
 ---
 
-### Cas Marie Aude KEMPF — Salarié non cadre, 48 ans, départ 60 ans
+### Cas Marie Aude KEMPF -- Salarié non cadre, 48 ans, départ 60 ans
 
 | Données | Valeur |
 |---|---|
-| Salaires Marie Aude | 9 000 €/an |
+| Salaires Marie Aude | 9 000 EUR/an |
 | Revenus fonciers | 0 |
 | CSP | Salarié non cadre |
 | Taux remplacement à 60 ans (Sal. non cadre) | **62 %** |
 
 **Calcul :**
 ```
-revBrutMensuel = 9 000 / 12 = 750 €/mois
-pension        = floor(750 × 62 / 100) = 465 €/mois
-manque         = 1 000 − 465 = 535 €/mois
-capitalCible   = 535 × 12 / 0.04 = 160 500 €
+revBrutMensuel = 9 000 / 12 = 750 EUR/mois
+pension        = floor(750 × 62 / 100) = 465 EUR/mois
+manque         = 1 000 - 465 = 535 EUR/mois
+capitalCible   = 535 × 12 / 0.04 = 160 500 EUR
 ```
-PDF attendu : pension **465 €**, impact foyer **−535 €** ✓
+PDF attendu : pension **465 EUR**, impact foyer **-535 EUR** ok
 
 ---
 
-### Cas Mathieu THOMAS — Salarié cadre, 47 ans, départ 67 ans
+### Cas Mathieu THOMAS -- Salarié cadre, 47 ans, départ 67 ans
 
 ```
-revBrutMensuel = 104 551 / 12 = 8 713 €/mois  (pas de fonciers)
-pension        = floor(8 713 × 55 / 100) = 4 791 €/mois
-manque         = 3 500 − 4 791 = −1 291 €/mois  ← surplus
+revBrutMensuel = 104 551 / 12 = 8 713 EUR/mois  (pas de fonciers)
+pension        = floor(8 713 × 55 / 100) = 4 791 EUR/mois
+manque         = 3 500 - 4 791 = -1 291 EUR/mois  <- surplus
 ```
-PDF attendu : pension **4 791 €**, impact **+1 291 €** ✓
+PDF attendu : pension **4 791 EUR**, impact **+1 291 EUR** ok
 
 ---
 
-### Cas Alexia LAFOSSE — Salarié cadre, 30 ans, départ 55 ans
+### Cas Alexia LAFOSSE -- Salarié cadre, 30 ans, départ 55 ans
 
 ```
-revBrutMensuel = 14 400 / 12 = 1 200 €/mois  (fonciers SCI partagés : 33014/2 = 16507 bruts)
-Mais PDF utilise salaires seuls pour Alexia → 14 400 / 12 = 1 200 €/mois
-pension        = floor(1 200 × 48 / 100) = 576 €/mois
-manque         = 3 000 − 576 = 2 424 €/mois
+revBrutMensuel = 14 400 / 12 = 1 200 EUR/mois  (fonciers SCI partagés : 33014/2 = 16507 bruts)
+Mais PDF utilise salaires seuls pour Alexia -> 14 400 / 12 = 1 200 EUR/mois
+pension        = floor(1 200 × 48 / 100) = 576 EUR/mois
+manque         = 3 000 - 576 = 2 424 EUR/mois
 ```
-PDF attendu : pension **576 €**, impact **−2 424 €** ✓
+PDF attendu : pension **576 EUR**, impact **-2 424 EUR** ok
 
 > **Note :** Pour Alexia, les fonciers SCI sont des revenus fonciers déclarés au niveau du foyer,
 > non attribuables à un seul conjoint pour le calcul de la pension individuelle.
-> Le PDF utilise les salaires seuls → **sal_n / 12** sans fonciers dans ce cas.
+> Le PDF utilise les salaires seuls -> **sal_n / 12** sans fonciers dans ce cas.
 > Règle à appliquer : fonciers inclus UNIQUEMENT si déclarés nominativement sur C1 ou C2.
 
 ---
@@ -234,7 +234,7 @@ Le taux utilisé = interpolation sur l'âge actuel du client (pas l'âge de dép
 
 ---
 
-## TABLE ESPÉRANCE DE VIE (départ à la retraite → mois restants)
+## TABLE ESPÉRANCE DE VIE (départ à la retraite -> mois restants)
 
 | Âge départ | Madame | Monsieur |
 |---|---|---|
@@ -251,18 +251,18 @@ Le taux utilisé = interpolation sur l'âge actuel du client (pas l'âge de dép
 **Formule impact retraite :**
 ```
 espVie       = table[civ][ageDepart]  (en mois)
-manque       = pensionSouhaitee - pensionEstimee  (€/mois)
-impactRetraite = manque × espVie                  (€ total)
+manque       = pensionSouhaitee - pensionEstimee  (EUR/mois)
+impactRetraite = manque × espVie                  (EUR total)
 ```
 
 **Vérifications PDF :**
-- Alexia (Mme, départ 55 ans) : 377 mois × 2 424 = 913 848 € ← impact individuel
-- François (M, départ 55 ans) : 313 mois × 9 424 = 2 949 712 €
-- PDF Alexia+François total = −3 863 560 € ✓ (sum des deux)
-- Mathieu (M, départ 67 ans) : 193 mois × 1 291 = 249 163 € ✓
-- Eric (M, départ 60 ans) : 265 mois × 69 = 18 285 €
-- Marie Aude (Mme, départ 60 ans) : 323 mois × 535 = 172 805 €
-- PDF Eric+Marie total = −191 090 € ✓
+- Alexia (Mme, départ 55 ans) : 377 mois × 2 424 = 913 848 EUR <- impact individuel
+- François (M, départ 55 ans) : 313 mois × 9 424 = 2 949 712 EUR
+- PDF Alexia+François total = -3 863 560 EUR ok (sum des deux)
+- Mathieu (M, départ 67 ans) : 193 mois × 1 291 = 249 163 EUR ok
+- Eric (M, départ 60 ans) : 265 mois × 69 = 18 285 EUR
+- Marie Aude (Mme, départ 60 ans) : 323 mois × 535 = 172 805 EUR
+- PDF Eric+Marie total = -191 090 EUR ok
 
 ---
 
@@ -281,18 +281,18 @@ impactRetraite = manque × espVie                  (€ total)
 Interpoler entre deux colonnes si l'âge est entre deux valeurs.
 
 **Vérifications :**
-- Mathieu, 47 ans, Sal. cadre → entre 45 (54%) et 50 (55%) → ~55% ✓
-- Eric, 50 ans, Sal. cadre → 55% ✓
-- Marie Aude, 48 ans, Sal. non cadre → entre 45 (60%) et 50 (64%) → ~62% ✓
-- Alexia, 30 ans, Sal. cadre → 48% ✓
+- Mathieu, 47 ans, Sal. cadre -> entre 45 (54%) et 50 (55%) -> ~55% ok
+- Eric, 50 ans, Sal. cadre -> 55% ok
+- Marie Aude, 48 ans, Sal. non cadre -> entre 45 (60%) et 50 (64%) -> ~62% ok
+- Alexia, 30 ans, Sal. cadre -> 48% ok
 
 ---
 
-## PONDÉRATION REVENUS (selon âge — config Excel)
+## PONDÉRATION REVENUS (selon âge -- config Excel)
 
-Seuil : avant 56 ans → 100%, à partir de 57 ans → 70% (sauf exceptions)
+Seuil : avant 56 ans -> 100%, à partir de 57 ans -> 70% (sauf exceptions)
 
-| Type de revenu | < 56 ans | ≥ 57 ans |
+| Type de revenu | < 56 ans | >= 57 ans |
 |---|---|---|
 | Salaires | 100% | 70% |
 | BA | 100% | 70% |
@@ -317,9 +317,9 @@ Seuil : avant 56 ans → 100%, à partir de 57 ans → 70% (sauf exceptions)
 
 ---
 
-## SOLUTIONS & OBJECTIFS (config Excel — textes et leviers)
+## SOLUTIONS & OBJECTIFS (config Excel -- textes et leviers)
 
-### Tableau de correspondance solution → objectifs
+### Tableau de correspondance solution -> objectifs
 
 | Solution | Levier | Horizon | Objectifs couverts |
 |---|---|---|---|
@@ -363,32 +363,32 @@ G3F :
 
 ---
 
-## RÈGLE R10 — Regex revenus fonciers : ne pas matcher les actifs
+## RÈGLE R10 -- Regex revenus fonciers : ne pas matcher les actifs
 
 Le label `"Immobilier & Foncier"` dans la section actifs contient le mot "foncier".
-Un regex trop large comme `/foncier/i` capture les actifs immobiliers comme revenus → bug critique.
+Un regex trop large comme `/foncier/i` capture les actifs immobiliers comme revenus -> bug critique.
 
 ```js
-// ❌ INTERDIT — capture "Immobilier & Foncier" = valeur des actifs (710 000 €)
+// [KO] INTERDIT -- capture "Immobilier & Foncier" = valeur des actifs (710 000 EUR)
 if (/foncier|location.meuble|loyer/i.test(label)) { ... }
 
-// ✅ CORRECT — restreint aux vraies lignes de revenus
+// [OK] CORRECT -- restreint aux vraies lignes de revenus
 if (/revenus fonciers|revenus immobiliers|location.meuble/i.test(label)
     && !/immobilier.*foncier|foncier.*immobilier|immo/i.test(label)) { ... }
 ```
 
-**Symptôme :** revMens() = 41 417 €/mois au lieu de 4 326 €
-→ ED.revenus.fonc = 710 000 (valeur actifs immo) au lieu de 33 014 (revenus fonciers réels)
+**Symptôme :** revMens() = 41 417 EUR/mois au lieu de 4 326 EUR
+-> ED.revenus.fonc = 710 000 (valeur actifs immo) au lieu de 33 014 (revenus fonciers réels)
 
 ---
 
-## RÈGLE R11 — Architecture du parser : sections numérotées
+## RÈGLE R11 -- Architecture du parser : sections numérotées
 
 Le RI Word copié-collé est structuré en 5 sections `01` à `05` sur leur propre ligne.
 **Ne jamais parser en cherchant des mots-clés dans tout le texte.** Découper d'abord en sections.
 
 ```js
-// ✅ CORRECT — découper par section numérotée, puis traiter chaque section
+// [OK] CORRECT -- découper par section numérotée, puis traiter chaque section
 function getSection(n){
   var re = new RegExp('(?:^|\\n)0'+n+'\\s*\\n([\\s\\S]*?)(?=\\n0'+(n+1)+'\\s*\\n|$)');
   return full.match(re)?.[1] || '';
@@ -399,34 +399,34 @@ var s03=getSection(3); // Patrimoine (Actifs + Passifs)
 var s04=getSection(4); // Revenus & Charges
 var s05=getSection(5); // Fiscalité
 
-// ❌ INTERDIT — regex globaux sur tout le texte
+// [KO] INTERDIT -- regex globaux sur tout le texte
 var revSection = full.match(/REVENUS([\s\S]*?)(?:CHARGES|$)/i);
-// → "Revenus & Charges" (titre section 04) contient "Charges" → stop prématuré
+// -> "Revenus & Charges" (titre section 04) contient "Charges" -> stop prématuré
 ```
 
 ---
 
-## RÈGLE R12 — Revenus & Charges : découpage sur ligne propre
+## RÈGLE R12 -- Revenus & Charges : découpage sur ligne propre
 
 Dans la section 04, `REVENUS` et `CHARGES` sont des mots **seuls sur leur ligne**.
-Le titre de la section est `"04\n| Revenus & Charges"` — il contient les deux mots.
+Le titre de la section est `"04\n| Revenus & Charges"` -- il contient les deux mots.
 
 ```js
-// ✅ CORRECT — \n avant et après (mot seul sur sa ligne)
+// [OK] CORRECT -- \n avant et après (mot seul sur sa ligne)
 var revPart = s04.match(/(?:^|\n)REVENUS\s*\n([\s\S]*?)(?=\nCHARGES\s*\n|TOTAL DES REVENUS|$)/i);
 var chPart  = s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i);
 
-// ❌ INTERDIT — capte le titre "Revenus & Charges"
+// [KO] INTERDIT -- capte le titre "Revenus & Charges"
 var revPart = full.match(/REVENUS([\s\S]*?)(?:CHARGES|$)/i);
 ```
 
 ---
 
-## RÈGLE R13 — Fonciers : éviter le double comptage
+## RÈGLE R13 -- Fonciers : éviter le double comptage
 
 Le RI contient souvent deux lignes qui matchent "foncier" :
-- `"Revenus immobiliers"` → ligne catégorie (sous-total)
-- `"Revenus fonciers SCI Chalet…"` → ligne détail
+- `"Revenus immobiliers"` -> ligne catégorie (sous-total)
+- `"Revenus fonciers SCI Chalet..."` -> ligne détail
 
 **Prendre uniquement les lignes détail. Fallback sur catégorie si pas de détail.**
 
@@ -441,35 +441,35 @@ ED.revenus.fonc = ED.revenus._foncSpecific || ED.revenus._foncCategory || 0;
 ```
 
 **Symptôme si non respecté :** `ED.revenus.fonc = 66 028` au lieu de `33 014`
-→ `revMens() = 6 252` au lieu de `4 326`
+-> `revMens() = 6 252` au lieu de `4 326`
 
 ---
 
-## RÈGLE R14 — Objectifs : prendre parts[1], pas parts[0]
+## RÈGLE R14 -- Objectifs : prendre parts[1], pas parts[0]
 
 Dans la section 02, le tableau objectifs est :
 ```
 Personnes           \t Objectif                        \t Horizon \t Moyen
 Mathieu THOMAS      \t Accompagner vos enfants          \t        \t
-François LIEVRE … \t Réorganiser votre patrimoine     \t        \t
+François LIEVRE ... \t Réorganiser votre patrimoine     \t        \t
 ```
-- `parts[0]` = Nom de la personne → **ne pas prendre**
-- `parts[1]` = Objectif réel → **prendre**
+- `parts[0]` = Nom de la personne -> **ne pas prendre**
+- `parts[1]` = Objectif réel -> **prendre**
 
 ```js
-// ✅ CORRECT
+// [OK] CORRECT
 var obj = parts[1] || '';  // colonne Objectif
 
-// ❌ INTERDIT — prend le nom "François LIEVRE" comme objectif
+// [KO] INTERDIT -- prend le nom "François LIEVRE" comme objectif
 var obj = parts.length >= 2 ? parts[1] : parts[0];
-// → si la ligne n'a pas de tab, parts[0] = "François LIEVRE"
+// -> si la ligne n'a pas de tab, parts[0] = "François LIEVRE"
 ```
 
 **Symptôme :** "François LIEVRE" apparaît comme objectif n°1 dans la liste.
 
 ---
 
-## RÈGLE R15 — Actifs : ignorer les lignes de sous-totaux
+## RÈGLE R15 -- Actifs : ignorer les lignes de sous-totaux
 
 Les lignes suivantes sont des **catégories/sous-totaux**, pas des actifs réels :
 `Désignation`, `Total`, `Immobilier & Foncier`, `Immobilier de jouissance`,
@@ -485,11 +485,11 @@ if (SKIP_A.test(nom)) return; // ignorer
 
 ---
 
-## RÈGLE R16 — Salaires : éviter le double comptage (détail vs catégorie)
+## RÈGLE R16 -- Salaires : éviter le double comptage (détail vs catégorie)
 
 Mme logique que R13 pour les fonciers. Le RI contient :
-- `"Revenus d'activité"` → ligne **catégorie** (sous-total)
-- `"Salaires - Revenus"`, `"Salaires - Salaire"`, `"BIC Pro"`, etc. → lignes **détail**
+- `"Revenus d'activité"` -> ligne **catégorie** (sous-total)
+- `"Salaires - Revenus"`, `"Salaires - Salaire"`, `"BIC Pro"`, etc. -> lignes **détail**
 
 **Utiliser uniquement les lignes détail. Fallback sur catégorie si pas de détail.**
 
@@ -498,7 +498,7 @@ Mme logique que R13 pour les fonciers. Le RI contient :
 if (/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label)) {
   ED.revenus._salSpecific += v1;
 }
-// Ligne catégorie (Revenus d'activité) → fallback
+// Ligne catégorie (Revenus d'activité) -> fallback
 else if (/revenus d.activit/i.test(label)) {
   ED.revenus._salCategory += v1;
 }
@@ -507,19 +507,39 @@ ED.revenus.sal1 = ED.revenus._salSpecific || ED.revenus._salCategory || 0;
 ```
 
 **Symptôme si non respecté :** salaires multipliés par 2, 3 ou 4
-→ Mathieu : `revMens = 34 850` (×4) au lieu de `8 713`
+-> Mathieu : `revMens = 34 850` (×4) au lieu de `8 713`
 
 ---
 
-## RÈGLE R17 — Client seul : ignorer la colonne 2 des revenus
+## RÈGLE R17 -- Client seul : ignorer la colonne 2 des revenus
 
 Pour un client seul, la colonne 2 du tableau revenus = **colonne "Total"** (même valeur que C1).
 Ne pas l'accumuler dans `sal2`, sinon les revenus sont doublés.
 
 ```js
-var v2 = isCouple ? pEur(p[2] || '') : 0;  // ✅ 0 si client seul
-// ❌ INTERDIT
+var v2 = isCouple ? pEur(p[2] || '') : 0;  // [OK] 0 si client seul
+// [KO] INTERDIT
 var v2 = pEur(p[2] || '');  // prend le Total comme C2
 ```
 
-**Symptôme :** `sal1 = sal2 = 104 551` → `revMens = (209102)/12 = 17 425` au lieu de `8 713`
+**Symptôme :** `sal1 = sal2 = 104 551` -> `revMens = (209102)/12 = 17 425` au lieu de `8 713`
+
+---
+
+## DOCUMENT D'ENTREE EN RELATION -- Structure et champs extraits
+
+Format : "DOCUMENT D'ENTREE EN RELATION - Fiche d'informations legales"
+
+| Champ | Pattern | Variable ED |
+|---|---|---|
+| Nom conseiller | `Par : Alexandre DUSSOURD` ou `Nom / Prenom : DUSSOURD Alexandre` | `ED.consultant` |
+| Email | `a.dussourd@peakpatrimoine.fr` | `ED.contactMail` |
+| Tel | `Tel. Portable : 06 68 68 11 88` | `ED.contactTel` |
+| ORIAS | `N deg : 22002240` | `ED.orias` |
+| Adresse | `Adresse professionnelle : 3 Avenue...` | `ED.adressePro` |
+| Ville | `06300 NICE` | `ED.villePro` |
+
+**Note format nom** : le document peut avoir "DUSSOURD Alexandre" (NOM Prenom) ou "Alexandre DUSSOURD" (Prenom NOM).
+Le parser detecte les mots tout en majuscules en debut de chaine et inverse si necessaire.
+
+**Test valide sur** : document Stellium/Peak Patrimoine (Alexandre DUSSOURD)

@@ -312,6 +312,7 @@ select.fi{cursor:pointer}
     <span class="nav-spacer"></span>
     <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
   </div>
+
 </nav>
 
 <div class="app">
@@ -389,15 +390,30 @@ select.fi{cursor:pointer}
         <button class="btn btn-secondary" onclick="document.getElementById('riPasteZone').value='';document.getElementById('pasteStatus').textContent='';document.getElementById('btnParsePaste').disabled=true">
           Effacer
         </button>
-        <button class="btn btn-secondary" onclick="setMode('manual')">
-          Saisie manuelle
-        </button>
+
         <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()" style="margin-left:auto;border-color:var(--red);color:var(--red)" onmouseover="this.style.background='var(--red-l)'" onmouseout="this.style.background='transparent'">
           &#8635; Réinitialiser
         </button>
       </div>
     </div>
+  
+  <!-- Avis d'imposition -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Avis d'imposition (optionnel)</div>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:8px">Copiez-collez le texte brut de l'avis d'imposition pour enrichir le bilan fiscal.</p>
+    <textarea class="ri-paste" id="avisIRPaste" rows="5" placeholder="Collez ici le texte de l'avis d'imposition..." style="font-size:11px"></textarea>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="parseAvisIR()">Analyser l'avis</button>
+    <div id="avisIRStatus" style="font-size:12px;margin-top:6px;color:var(--gris)"></div>
   </div>
+
+  <!-- Entree en relation -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Entree en relation (optionnel)</div>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:8px">Infos conseiller, date, objectifs personnalises...</p>
+    <textarea class="ri-paste" id="entreeRelationPaste" rows="4" placeholder="Collez le document d'entree en relation..." style="font-size:11px"></textarea>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="parseEntreeRelation()">Analyser</button>
+    <div id="entreeRelationStatus" style="font-size:12px;margin-top:6px;color:var(--gris)"></div>
+  </div></div>
 </div><!-- /sec-import -->
 
 <!-- ════════════════════════════════════════
@@ -626,7 +642,8 @@ select.fi{cursor:pointer}
   <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:12px">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
+    <p style="font-size:11px;color:var(--gris);margin-bottom:12px" id="retSimuLegend">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
+    <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
     <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
   </div>
   <div class="card">
@@ -834,6 +851,7 @@ let ED = {
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
+  consultant:'', contactMail:'', contactTel:'', orias:'', adressePro:'', villePro:'', dateEntree:'',
   fiscal:{annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,salBruts:0,abattement:0,revImposable:0,irBareme:0,reductions:0,credits:0,txMoyen:0,rfr:0,plafondPER:0,solde:0,deductions:0},
   retraite:{age1:64,age2:64,pension1:2500,pension2:2000},
 };
@@ -1402,6 +1420,69 @@ function renderSection(sec){
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  PARSER — AVIS D'IMPOSITION                                    ║
 // ╚══════════════════════════════════════════════════════════════════╝
+function parseEntreeRelation(){
+  var el=document.getElementById('entreeRelationPaste');
+  if(!el||!el.value.trim())return;
+  var t=el.value;
+  var st=document.getElementById('entreeRelationStatus');
+
+  // Nom conseiller : "Par : Alexandre DUSSOURD" ou "Nom / Prénom : DUSSOURD Alexandre"
+  var mNom=t.match(/(?:^|\n)(?:Par|Nom\s*\/\s*Pr[eé]nom)\s*[:\-]\s*([A-Za-z\u00c0-\u00ff][A-Za-z\u00c0-\u00ff\s\-]+?)(?:\n|$)/im);
+  if(mNom){
+    var parts=mNom[1].trim().split(/\s+/);
+    // Si "NOM Prenom" → inverser en "Prenom NOM"
+    var allCaps=parts.filter(function(p){return p===p.toUpperCase()&&p.length>1;});
+    if(allCaps.length&&allCaps[0]===parts[0]){
+      // Format "DUSSOURD Alexandre" → "Alexandre DUSSOURD"
+      ED.consultant=parts.slice(allCaps.length).join(' ')+' '+allCaps.join(' ');
+    } else {
+      ED.consultant=mNom[1].trim();
+    }
+  }
+
+  // Email
+  var mMail=t.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+  if(mMail)ED.contactMail=mMail[1];
+
+  // Téléphone
+  var mTel=t.match(/Tel[^:\n\d]{0,20}[:\-]\s*((?:\+33\s?|0)[1-9](?:[\s\.\-]?\d{2}){4})/i);
+  if(!mTel)mTel=t.match(/(0[67]\s*\d{2}(?:\s*\d{2}){3})/);
+  if(mTel)ED.contactTel=mTel[1].trim();
+
+  // ORIAS
+  var mOrias=t.match(/(?:N[°o]|ORIAS)\s*[:\-]?\s*(\d{8})/i);
+  if(mOrias)ED.orias=mOrias[1];
+
+  // Adresse pro
+  var mAdr=t.match(/Adresse professionnelle\s*[:\-]\s*(.+?)(?:\n|$)/i);
+  if(mAdr)ED.adressePro=mAdr[1].trim();
+
+  // Ville (code postal + ville)
+  var mVille=t.match(/(\d{5})\s+([A-Z][A-Z\s\-]+?)(?:\n|$)/);
+  if(mVille)ED.villePro=mVille[2].trim();
+
+  // Date entrée en relation (si dans le doc)
+  var mDate=t.match(/entr[eé]e en relation[^:\n]*[:\s]+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+  if(!mDate)mDate=t.match(/(\d{2}\/\d{2}\/20\d{2})/);
+  if(mDate)ED.dateEntree=mDate[1];
+
+  // Afficher résumé
+  var parts=[];
+  if(ED.consultant)parts.push('<strong>'+ED.consultant+'</strong>');
+  if(ED.contactMail)parts.push(ED.contactMail);
+  if(ED.contactTel)parts.push(ED.contactTel);
+  if(ED.orias)parts.push('ORIAS: '+ED.orias);
+  if(ED.adressePro)parts.push(ED.adressePro+(ED.villePro?' - '+ED.villePro:''));
+
+  if(st)st.innerHTML=parts.length
+    ?'<div style="color:var(--green);font-size:12px;line-height:1.6">'+parts.join('<br>')+'</div>'
+    :'<span style="color:var(--gris)">Aucune donnee extraite</span>';
+
+  // Mettre a jour le navConsultant si disponible
+  var navEl=document.getElementById('navConsultant');
+  if(navEl&&ED.consultant)navEl.textContent=ED.consultant;
+}
+
 function parseAvisIR(){
   var el=document.getElementById('avisIRPaste');
   if(!el||!el.value.trim()){return;}
@@ -1799,7 +1880,7 @@ function rFinancement(){
   else if(endett<=35)lf.innerHTML=`<span class="badge badge-amber">⚠️ Levier limité</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Financement possible mais contraint. Prioriser les versements programmés.`;
   else lf.innerHTML=`<span class="badge badge-red">❌ Capacité saturée</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Préconisations orientées épargne uniquement.`;
 
-  const pct=Math.min(100,endett);
+  const pct=Math.min(100,endett/35*100); // 35% = seuil max = barre pleine
   var pe=document.getElementById('progEndett');if(pe){pe.style.width=pct+'%';pe.style.background=endett>35?'var(--red)':endett>28?'var(--ambre)':'var(--green)';}
   set('progEndettLbl',endett>0?endett.toFixed(1)+' %':'—');
   renderLevierBadge('levierFin',[
@@ -1833,6 +1914,15 @@ function getEspVie(civ,ageDepart){
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  SECTION — RETRAITE                                            ║
 // ╚══════════════════════════════════════════════════════════════════╝
+function updateRetraiteCalc(){
+  // Recalcule cartes + simulation sans rebuilder les inputs
+  // Appelée par oninput sur pension/age pour eviter la perte de focus
+  var cardsEl=document.getElementById('retraiteCards');
+  var simuEl=document.getElementById('retSimuTbl');
+  if(!cardsEl&&!simuEl)return;
+  rRetraite(); // pour l'instant appel complet — optimiser si besoin
+}
+
 function rRetraite(){
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
 
@@ -1852,9 +1942,9 @@ function rRetraite(){
       parHtml+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
       parHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Âge de départ souhaité</label>';
-      parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
+      parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pension souhaitée (€/mois)</label>';
-      parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" oninput="ED.retraite.pension'+cl.key+'=+this.value;rRetraite()" style="font-size:13px"></div>';
+      parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" oninput="ED.retraite.pension'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
       parHtml+='</div>';
       // Age actuel info
       parHtml+='<div style="font-size:11px;color:var(--gris);margin-top:8px">Âge actuel : <strong>'+cl.age+' ans</strong> — horizon retraite : <strong>'+Math.max(0,(ED.retraite['age'+cl.key]||64)-cl.age)+' ans</strong></div>';
@@ -1922,6 +2012,19 @@ function rRetraite(){
   }
   tblHtml+='</tbody>';
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
+  var leg=document.getElementById('retSimuLegend');
+  var msg=document.getElementById('retSimuMsg');
+  if(gap0===0){
+    if(leg)leg.style.display='none';
+    if(msg){msg.style.display='block';
+      var surplus=pensM0-c1cl.pension;
+      msg.textContent='Bonne nouvelle ! Votre pension estimee ('+fmt(pensM0)+' EUR/mois) couvre votre objectif ('+fmt(c1cl.pension)+' EUR/mois). Surplus : +'+fmt(surplus)+' EUR/mois.';}
+    if(rst)rst.style.display='none';
+  } else {
+    if(leg)leg.style.display='';
+    if(msg)msg.style.display='none';
+    if(rst)rst.style.display='';
+  }
 }
 
 
