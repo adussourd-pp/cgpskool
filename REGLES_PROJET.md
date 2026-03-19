@@ -482,3 +482,44 @@ var SKIP_A = /^(désignation|total|immobilier & foncier|immobilier de jouissance
                retraite et salariale|biens professionnels|foncier)$/i;
 if (SKIP_A.test(nom)) return; // ignorer
 ```
+
+---
+
+## RÈGLE R16 — Salaires : éviter le double comptage (détail vs catégorie)
+
+M�me logique que R13 pour les fonciers. Le RI contient :
+- `"Revenus d'activité"` → ligne **catégorie** (sous-total)
+- `"Salaires - Revenus"`, `"Salaires - Salaire"`, `"BIC Pro"`, etc. → lignes **détail**
+
+**Utiliser uniquement les lignes détail. Fallback sur catégorie si pas de détail.**
+
+```js
+// Ligne détail (Salaires, BA, BIC, BNC, AE...)
+if (/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label)) {
+  ED.revenus._salSpecific += v1;
+}
+// Ligne catégorie (Revenus d'activité) → fallback
+else if (/revenus d.activit/i.test(label)) {
+  ED.revenus._salCategory += v1;
+}
+// Finalisation
+ED.revenus.sal1 = ED.revenus._salSpecific || ED.revenus._salCategory || 0;
+```
+
+**Symptôme si non respecté :** salaires multipliés par 2, 3 ou 4
+→ Mathieu : `revMens = 34 850` (×4) au lieu de `8 713`
+
+---
+
+## RÈGLE R17 — Client seul : ignorer la colonne 2 des revenus
+
+Pour un client seul, la colonne 2 du tableau revenus = **colonne "Total"** (même valeur que C1).
+Ne pas l'accumuler dans `sal2`, sinon les revenus sont doublés.
+
+```js
+var v2 = isCouple ? pEur(p[2] || '') : 0;  // ✅ 0 si client seul
+// ❌ INTERDIT
+var v2 = pEur(p[2] || '');  // prend le Total comme C2
+```
+
+**Symptôme :** `sal1 = sal2 = 104 551` → `revMens = (209102)/12 = 17 425` au lieu de `8 713`

@@ -1173,9 +1173,23 @@ function parseTextRI(txt){
       var p=line.split('\t').map(function(x){return x.trim();});
       var label=p[0].toLowerCase().trim();
       // Salaires et revenus d'activité (100%)
-      if(/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur|revenus d.activit/i.test(label)){
-        var v1=pEur(p[1]||''),v2=pEur(p[2]||'');
-        ED.revenus.sal1+=v1; ED.revenus.sal2+=v2;
+      // Distinguer lignes-détail (Salaires, BA, BIC...) et ligne-catégorie (Revenus d'activité)
+      var isSalDetail=/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label);
+      var isSalCat=/revenus d.activit/i.test(label);
+      if(isSalDetail||isSalCat){
+        var v1=pEur(p[1]||'');
+        // v2 seulement si couple ET colonne 2 existe ET différente de colonne 1
+        var v2=isCouple?pEur(p[2]||''):0;
+        // Pour client seul : colonne 2 = "Total" (même valeur) → ignorer
+        if(!isCouple)v2=0;
+        if(isSalDetail){
+          ED.revenus._salSpecific=(ED.revenus._salSpecific||0)+v1;
+          ED.revenus._sal2Specific=(ED.revenus._sal2Specific||0)+v2;
+        } else {
+          // ligne catégorie : stocker séparément, n'utiliser que si pas de détail
+          ED.revenus._salCategory=(ED.revenus._salCategory||0)+v1;
+          ED.revenus._sal2Category=(ED.revenus._sal2Category||0)+v2;
+        }
       }
       // Revenus fonciers / locations meublées (70%) — distinguer détail vs catégorie
       if(/revenus fonciers|location.meuble/i.test(label)){
@@ -1190,12 +1204,12 @@ function parseTextRI(txt){
         ED.revenus.c1=pEur(p[1]||''); ED.revenus.c2=pEur(p[2]||'');
       }
     });
-    // Priorité : lignes spécifiques > catégorie
+    // Priorité : lignes détail > catégorie pour salaires ET fonciers
+    ED.revenus.sal1=ED.revenus._salSpecific||ED.revenus._salCategory||0;
+    ED.revenus.sal2=ED.revenus._sal2Specific||ED.revenus._sal2Category||0;
     ED.revenus.fonc=ED.revenus._foncSpecific||ED.revenus._foncCategory||0;
-    // Si salaires détectés, les utiliser
-    if(ED.revenus.sal1||ED.revenus.sal2){
-      ED.revenus.c1=ED.revenus.sal1; ED.revenus.c2=ED.revenus.sal2;
-    }
+    // Affecter c1/c2
+    ED.revenus.c1=ED.revenus.sal1; ED.revenus.c2=ED.revenus.sal2;
     ED.revenus.compl=ED.revenus.fonc;
   }
 
