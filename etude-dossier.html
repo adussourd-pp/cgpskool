@@ -509,6 +509,9 @@ select.fi{cursor:pointer}
       <div class="fiscal-row"><span class="fr-l">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill" id="fiTMI">—</span></span></div>
+        <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fTxMoyen">—</span></div>
+        <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fRfr">—</span></div>
+        <div class="fiscal-row"><span class="fr-l">Plafond PER dispo</span><span class="fr-v" id="fPlafondPER">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Impôt net</span><span class="fr-v ed" id="fiIrNet" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Prélèvements sociaux</span><span class="fr-v ed" id="fiPS" contenteditable="true">—</span></div>
       <div class="fiscal-row" style="border-top:2px solid var(--ambre-m);padding-top:10px;margin-top:4px">
@@ -831,7 +834,7 @@ let ED = {
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
-  fiscal:{annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0},
+  fiscal:{annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,salBruts:0,abattement:0,revImposable:0,irBareme:0,reductions:0,credits:0,txMoyen:0,rfr:0,plafondPER:0,solde:0,deductions:0},
   retraite:{age1:64,age2:64,pension1:2500,pension2:2000},
 };
 
@@ -1397,6 +1400,167 @@ function renderSection(sec){
 
 
 // ╔══════════════════════════════════════════════════════════════════╗
+// ║  PARSER — AVIS D'IMPOSITION                                    ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function parseAvisIR(){
+  var el=document.getElementById('avisIRPaste');
+  if(!el||!el.value.trim()){return;}
+  var t=el.value;
+  var st=document.getElementById('avisIRStatus');
+
+  function pN(s){
+    if(!s)return 0;
+    var m=String(s).replace(/[\s\u20ac*+]/g,'').replace(',','.').match(/-?[\d]+\.?\d*/);
+    return m?parseFloat(m[0]):0;
+  }
+  function parseNumBlock(block){
+    // Extraire toutes les valeurs (positives et negatives) dans l'ordre
+    var entries=[];
+    block.split('\n').forEach(function(line){
+      var l=line.trim();
+      var m=l.match(/^(-\s*)?(\d[\d ]*)\s*$/);
+      if(m){var v=parseInt(m[2].replace(/\s/g,''));entries.push(m[1]?-v:v);}
+    });
+    return entries;
+  }
+
+  // Annee
+  var mAn=t.match(/revenus de (\d{4})/i);
+  if(mAn)ED.fiscal.annee=mAn[1];
+
+  // Couple ?
+  var isCouple=/D.clarant 2/i.test(t);
+
+  // Parts : "X X,XX" (ex: "2 2,00" ou "2 3,00")
+  var mP=t.match(/\b\d\s+([23456789][,\.](?:00|50|25|75))\b/);
+  if(mP)ED.fiscal.parts=parseFloat(mP[1].replace(',','.'));
+
+  // Noms declarants
+  var mN1=t.match(/D.clarant 1[^:\n]*:\s*([A-Z][A-Z\s-]+?)(?:\n|$)/i);
+  var mN2=t.match(/D.clarant 2[^:\n]*:\s*([A-Z][A-Z\s-]+?)(?:\n|$)/i);
+  if(mN1&&!ED.c1.nom)ED.c1.nom=mN1[1].trim();
+  if(mN2&&!ED.c2.nom)ED.c2.nom=mN2[1].trim();
+
+  // Isoler le bloc de valeurs (avant CALCUL DU SOLDE)
+  var calcIdx=t.indexOf('CALCUL DU SOLDE');
+  var valBlock=calcIdx>0?t.slice(0,calcIdx):t;
+
+  if(!isCouple){
+    // CLIENT SEUL : colonne unique
+    // Ordre: salBruts, abattement(-), rbg, [deductions(-)], revImposable, *irBareme, irBareme, reductions(-)*n, irnet, irnet
+    var entries=parseNumBlock(valBlock);
+    var pos=entries.filter(function(v){return v>0;});
+    // valeurs positives dans l'ordre
+    if(pos[0])ED.fiscal.salBruts=pos[0];     // salaires bruts
+    if(pos[1])ED.fiscal.rbg=pos[1];           // RBG
+    // ir bareme : precedé de * dans le texte brut
+    var starM=valBlock.match(/[*]\s*(\d{4,6})/);
+    if(starM)ED.fiscal.irBareme=pN(starM[1]);
+    // irnet : valeur qui apparait 2x consécutifs
+    for(var i=0;i<entries.length-1;i++){
+      if(entries[i]===entries[i+1]&&entries[i]>500&&entries[i]<50000){
+        ED.fiscal.irnet=entries[i]; break;
+      }
+    }
+    // revenu imposable : grande valeur < rbg
+    for(var j=0;j<pos.length;j++){
+      if(pos[j]<ED.fiscal.rbg&&pos[j]>ED.fiscal.rbg*0.8){
+        ED.fiscal.revImposable=pos[j]; break;
+      }
+    }
+    // abattement
+    var negVals=entries.filter(function(v){return v<0;});
+    if(negVals[0])ED.fiscal.abattement=Math.abs(negVals[0]);
+
+  } else {
+    // COUPLE : 3 colonnes D1 / D2 / Total
+    // Chercher le bloc Total
+    var totIdx=valBlock.lastIndexOf('\nTotal\n');
+    if(totIdx<0)totIdx=valBlock.indexOf('\nTotal\n');
+    if(totIdx>0){
+      var totBlock=valBlock.slice(totIdx);
+      var ents=parseNumBlock(totBlock);
+      // Mapping positionnel (voir documentation REGLES_PROJET):
+      // [0]=salBruts, [1]=HS(opt), [2]=salTotal, [3]=CSGded(-), [4]=RBG,
+      // [5]=irBareme, [6]=decote(-), [7]=irAvantRed, [8..n-2]=reductions/credits(-), [n-1]=irnet, [n]=irnet
+      // Positifs dans l'ordre
+      var posT=ents.filter(function(v){return v>0;});
+      if(posT.length>=1)ED.fiscal.salBruts=posT[0];
+      // salTotal = 1er nombre > salBruts ou 3e positif
+      for(var k=1;k<posT.length;k++){
+        if(posT[k]>posT[0]){ED.fiscal.salTotal=posT[k];break;}
+      }
+      // RBG = grand nombre apres salTotal
+      for(var l2=0;l2<posT.length;l2++){
+        if(ED.fiscal.salTotal&&posT[l2]<ED.fiscal.salTotal&&posT[l2]>posT[l2+1]){
+          if(!ED.fiscal.rbg)ED.fiscal.rbg=posT[l2];
+        }
+      }
+      // irBareme = 1er nombre 4 chiffres apres rbg
+      for(var m2=0;m2<posT.length;m2++){
+        if(posT[m2]<10000&&posT[m2]>100){ED.fiscal.irBareme=posT[m2];break;}
+      }
+      // irnet = valeur qui apparait 2x
+      for(var n2=0;n2<ents.length-1;n2++){
+        if(ents[n2]===ents[n2+1]&&ents[n2]>100&&ents[n2]<20000){
+          ED.fiscal.irnet=ents[n2]; break;
+        }
+      }
+      // Decote
+      var negT=ents.filter(function(v){return v<0;});
+      if(negT[0])ED.fiscal.decote=Math.abs(negT[0]);
+    }
+    // Salaires D1 et D2
+    var d1M=valBlock.match(/D.clar[^\d\n]{0,10}1\s*\n(\d{5,6})/i);
+    var d2M=valBlock.match(/D.clar[^\d\n]{0,10}2\s*\n(\d{5,6})/i);
+    if(d1M)ED.fiscal.salD1=pN(d1M[1]);
+    if(d2M)ED.fiscal.salD2=pN(d2M[1]);
+  }
+
+  // Taux % (valables seul et couple)
+  var pcts=[]; var reP=/(\d{1,2})[,.](\d{2})\s*%/g; var mm;
+  while((mm=reP.exec(t))!==null){
+    var v2=parseFloat(mm[1]+'.'+mm[2]);
+    if(v2>=1&&v2<=50)pcts.push(v2);
+  }
+  pcts.sort(function(a,b){return a-b;});
+  if(pcts.length>=2){ED.fiscal.txMoyen=pcts[0];ED.fiscal.tmi=Math.round(pcts[pcts.length-1]);}
+  else if(pcts.length===1){if(pcts[0]>20)ED.fiscal.tmi=Math.round(pcts[0]);else ED.fiscal.txMoyen=pcts[0];}
+
+  // Si TMI absent, calculer depuis RBG et parts
+  if(!ED.fiscal.tmi&&ED.fiscal.rbg&&ED.fiscal.parts){
+    var qf=ED.fiscal.rbg/ED.fiscal.parts;
+    var tr=[[11600,0],[29579,11],[84577,30],[181917,41],[Infinity,45]];
+    for(var ti=0;ti<tr.length;ti++){if(qf<=tr[ti][0]){ED.fiscal.tmi=ti>0?tr[ti-1][1]:0;break;}}
+  }
+
+  // RFR : apres "reference"
+  var mRfr=t.match(/f.rence[^\d]{0,100}(\d{5,6})/i);
+  if(mRfr)ED.fiscal.rfr=pN(mRfr[1]);
+  else ED.fiscal.rfr=ED.fiscal.rbg||0;
+
+  // Plafond PER : apres "= "
+  var mPer=t.match(/=\s*(\d{5,6})/);
+  if(mPer)ED.fiscal.plafondPER=pN(mPer[1]);
+
+  // Deductions PER
+  var mDed=t.match(/retraite[^\d]{0,30}(\d{4,5})/i);
+  if(mDed)ED.fiscal.deductions=pN(mDed[1]);
+
+  // Abattement (si pas encore trouve)
+  if(!ED.fiscal.abattement){
+    var mAb=t.match(/frais r.els[^\d]{0,30}(\d{3,5})/i)||t.match(/D.duction 10%[^\d]{0,30}(\d{3,5})/i);
+    if(mAb)ED.fiscal.abattement=pN(mAb[1]);
+  }
+
+  var msg='Analyse OK -- '+ED.fiscal.annee+' | '+(isCouple?'Couple':'Seul')+' '+ED.fiscal.parts+' parts'+
+    ' | RBG: '+(ED.fiscal.rbg||'?')+' EUR | IR net: '+(ED.fiscal.irnet||'?')+' EUR | TMI: '+(ED.fiscal.tmi||'?')+'%';
+  if(st)st.innerHTML='<span style="color:var(--green)">'+msg+'</span>';
+  if(document.getElementById('sec-fiscal')&&document.getElementById('sec-fiscal').style.display!=='none'){rFiscal();}
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
 // ║  SECTION — SITUATION                                           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function rSituation(){
@@ -1560,9 +1724,9 @@ function rPatrimoine(){
         +'</tr>';
     }).join('');
     return '<tr class="section-header-row" style="background:var(--gris-l)">'
-      +'<td colspan="4" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
+      +'<td colspan="3" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
       +'<span class="badge '+badgeCls+'" style="margin-right:6px">'+label+'</span></td>'
-      +'<td class="right" style="font-size:12px;font-weight:700;color:var(--gris-f)">'+fmt(total)+' €</td>'
+      +'<td class="right" style="font-size:12px;font-weight:700;color:var(--gris-f);padding-right:12px">'+fmt(total)+' €</td>'
       +'</tr>'+rows;
   }
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
