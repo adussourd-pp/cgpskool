@@ -1226,16 +1226,24 @@ function parseTextRI(txt){
       }
     });
   }
-  // ── Totaux globaux extraits directement des lignes TOTAL DU RI ──────
-  // Plus fiable que le parsing ligne par ligne
-  var totalRevMatch=full.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
-  var totalChgMatch=full.match(/TOTAL DES CHARGES\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
-  var totalPassifMatch=full.match(/TOTAL DES PASSIFS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
+  // ── Totaux globaux depuis les lignes TOTAL DU RI (source fiable) ───
+  var totalRevMatch=full.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[\u20ac$]/i);
+  var totalRevAn=totalRevMatch?pEur(totalRevMatch[1]):0;
 
-  var totalRevAn  = totalRevMatch  ? pEur(totalRevMatch[1])  : 0;
-  var totalChgAn  = totalChgMatch  ? pEur(totalChgMatch[1])  : 0;
-  var totalPassif = totalPassifMatch? pEur(totalPassifMatch[1]): 0;
-
+  // chargesCredit = ligne Total du tableau PASSIFS, colonne Echéance par an
+  var totalEch=0;
+  var passifLines=s03.split('\n');
+  var inPassif=false;
+  passifLines.forEach(function(line){
+    if(/^PASSIFS$/i.test(line.trim()))inPassif=true;
+    if(!inPassif||line.indexOf('\t')<0)return;
+    var p=line.split('\t').map(function(x){return x.trim();});
+    if(/^total$/i.test(p[0])){
+      var nums=p.slice(1).map(pEur).filter(function(v){return v>0;});
+      if(nums.length)totalEch=nums[0];
+    }
+  });
+  if(!totalEch)totalEch=ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0);
   ED.chargesCredit=Math.round(totalEch/12);
 
   // Pour les revenus : utiliser le TOTAL DES REVENUS si salaires mal parsés
