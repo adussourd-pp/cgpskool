@@ -791,6 +791,37 @@ select.fi{cursor:pointer}
 <div class="notif" id="notif"></div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════
+//  CGP SKOOL — ÉTUDE DE DOSSIER
+//  Version : 2.0  |  Dernière modification : Mars 2026
+//
+//  ARCHITECTURE :
+//  ├── GLOBALS & ÉTAT          Variables globales, ED (état client)
+//  ├── DONNÉES RÉFÉRENCE       Tranches IR, COPERNIC, OBJ_SOLUTIONS
+//  ├── NAVIGATION              goTo, setMode, renderSection
+//  ├── PARSER — IMPORT         onRiPaste, parseFromPaste
+//  ├── PARSER — TEXTE RI       parseTextRI (parsing Word RI)
+//  ├── SAISIE MANUELLE         generateFromManual
+//  ├── HELPERS CALCUL          revMens, calcIR, ageFrom, fmt...
+//  ├── SECTIONS (7)            rSituation → rSynthese
+//  ├── MATRICE COPERNIC        buildMatriceObjSol
+//  ├── SOLUTIONS               toggleSolution, renderSolsRetenues
+//  ├── FICHES CLIENT           renderFichesClient
+//  └── UTILITAIRES             exportPDF, resetAll, showNotif
+//
+//  RÈGLES ABSOLUES :
+//  1. JAMAIS font-family avec guillemets simples autour du nom de police
+//     → Toujours : font-family:Space Grotesk,sans-serif
+//  2. JAMAIS de caractere U+00A0 (espace insecable) dans le code JS
+//     → Utiliser des espaces normaux dans le code
+//  3. Revenus stockés en ANNUEL, revMens() divise par 12
+//  4. Taux endettement = chrCredit (passifs) / revMens()
+//     PAS les charges totales
+//  5. Pension retraite = salaires seuls / 12 × taux
+//     PAS les revenus fonciers
+//  6. Vérifier 0 doublon de variable avant livraison
+// ═══════════════════════════════════════════════════════════════════
+
 // ── STATE ─────────────────────────────────────────────────────────
 let ED = {
   type:'seul', consultant:'',
@@ -803,9 +834,17 @@ let ED = {
   fiscal:{annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0},
   retraite:{age1:64,age2:64,pension1:2500,pension2:2000},
 };
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  GLOBALS & ÉTAT                                                ║
+// ╚══════════════════════════════════════════════════════════════════╝
 let pieInst=null, solCount=0, steps=[];
 
 // ── NAVIGATION ────────────────────────────────────────────────────
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  NAVIGATION                                                    ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function goTo(sec){
   document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
@@ -840,6 +879,10 @@ function toggleC2(){
 // ── PASTE IMPORT ─────────────────────────────────────────────
 var riPasteBuffer = '';
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  PARSER — IMPORT                                               ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function onRiPaste(txt){
   riPasteBuffer = txt;
   var status = document.getElementById('pasteStatus');
@@ -895,6 +938,10 @@ function parseFromPaste(){
 }
 
 // ── TEXT RI PARSER ────────────────────────────────────────────
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  PARSER — TEXTE RI                                             ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function parseTextRI(txt){
   // Normalize lines
   var lines=txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
@@ -1171,6 +1218,10 @@ function parseTextRI(txt){
   launch();
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SAISIE MANUELLE                                               ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function generateFromManual(){try{
   ED.type=document.getElementById('dType').value;
   ED.consultant=document.getElementById('fConsultant').value;
@@ -1253,6 +1304,10 @@ function renderSection(sec){
   else if(sec==='synthese')rSynthese();
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — SITUATION                                           ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rSituation(){
   const n1=`${ED.c1.civ} ${ED.c1.prenom} ${ED.c1.nom}`.trim();
   const a1=ageFrom(ED.c1.dob);
@@ -1284,6 +1339,10 @@ function rSituation(){
   krav.style.color=rav<500?'var(--red)':rav<1500?'var(--ambre-d)':'inherit';
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — PATRIMOINE                                          ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function renderLevierBadge(containerId, items){
   var el=document.getElementById(containerId);
   if(!el)return;
@@ -1437,6 +1496,10 @@ function rPatrimoine(){
   ]);
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — FISCAL                                              ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rFiscal(){
   const f=ED.fiscal;
   setEd('fiAnnee',f.annee||'—');setEd('fiRbg',f.rbg?fmt(f.rbg)+' €':'—');setEd('fiParts',f.parts||1);
@@ -1472,6 +1535,10 @@ function rFiscal(){
   ]);
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — FINANCEMENT                                         ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rFinancement(){
   // Revenus bruts annuels (affichage) : salaires + fonciers bruts
   const revB=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0)+(ED.revenus.fonc||0);
@@ -1509,6 +1576,10 @@ function rFinancement(){
   ]);
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — RETRAITE                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rRetraite(){
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
 
@@ -1539,7 +1610,27 @@ function rRetraite(){
     retParamsEl.innerHTML=parHtml;
   }
 
-    var AGES=[65,60,55,50,45,40,35,30]; var TAUX={'Fonctionnaire':[84,75,70,65,65,60,60,60],'Sal. non cadre':[76,70,67,64,60,57,56,54],'Sal. cadre':[60,58,57,55,54,52,50,48],'TNS lib.':[60,51,45,44,43,42,41,40],'Sal. cadre sup.':[54,50,50,49,46,44,43,43],'TNS artisan':[54,50,48,45,43,43,42,41]};
+    var AGES=[65,60,55,50,45,40,35,30]; var TAUX={'Fonctionnaire':[85,75,70,65,60,60,60,60],'Sal. non cadre':[75,70,67,64,60,57,56,54],'Sal. cadre':[60,57,56,55,54,53,50,48],'TNS lib.':[60,54,45,44,43,42,41,40],'Sal. cadre sup.':[54,52,50,49,47,45,43,42],'TNS artisan':[54,50,48,45,44,43,42,41]};
+  // Table espérance de vie (mois) selon âge de départ — source config Excel
+  var ESP_VIE={
+    'Madame':  {55:377, 57:355, 60:323, 62:302, 64:273, 65:261, 67:240},
+    'Monsieur':{55:313, 57:294, 60:265, 62:247, 64:229, 65:217, 67:193}
+  };
+  function getEspVie(civ, ageDepart){
+    var genre=/madame|mme|f/i.test(civ||'')?'Madame':'Monsieur';
+    var t=ESP_VIE[genre];
+    var ages=[55,57,60,62,64,65,67];
+    if(t[ageDepart]) return t[ageDepart];
+    // Interpolation linéaire
+    for(var i=0;i<ages.length-1;i++){
+      if(ageDepart>ages[i]&&ageDepart<ages[i+1]){
+        var ratio=(ageDepart-ages[i])/(ages[i+1]-ages[i]);
+        return Math.round(t[ages[i]]+(t[ages[i+1]]-t[ages[i]])*ratio);
+      }
+    }
+    return ageDepart<=55?t[55]:t[67];
+  }
+
   var COLORS=['#2B5EA7','#C0392B','#5D9E4B','#7B4FA6','#1A9E8F','#E8842A'];
   var CSP_MAP={'Fonctionnaire':'Fonctionnaire','Salarie non-cadre':'Sal. non cadre','Salarie cadre':'Sal. cadre','Independant / TNS':'TNS lib.','Retraite':'Sal. non cadre'};
   CSP_MAP["Chef d'entreprise"]='TNS artisan';
@@ -1557,15 +1648,25 @@ function rRetraite(){
   window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+' : '+ctx.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Outfit',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Outfit',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Outfit',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Outfit',size:11},color:'#6B6B6B'}}}}});
   var legEl=document.getElementById('retLegend');
   if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC=k===cspKey;return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+(isC?'700':'400')+';background:'+(isC?'rgba(240,167,56,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+(isC?'#F0A738':'transparent')+';color:'+(isC?'#C8832A':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC?' ← '+tauxClient+'%':'')+' </span>';}).join('');
-  var pensionBrute=(ED.revenus.c1||0)/12;
+  var pensionBrute=((ED.revenus.c1||0)+(ED.revenus.fonc&&!isCouple?ED.revenus.fonc:Math.round((ED.revenus.fonc||0)/2)))/12;
   var pensionEst=Math.round(pensionBrute*tauxClient/100);
   var kpiEl=document.getElementById('retKpis');
   if(kpiEl)kpiEl.innerHTML='<div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Âge actuel '+nomCFull(1)+'</div><div class="kpi-val">'+age1+' ans</div></div><div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Taux remplacement</div><div class="kpi-val">'+tauxClient+' %</div></div><div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Pension estimee</div><div class="kpi-val">'+fmt(pensionEst)+' €/mois</div></div><div class="kpi featured"><div class="kpi-label">Categorie</div><div class="kpi-val" style="font-size:14px">'+cspKey+'</div></div>';
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
-  var clients=[{c:ED.c1,retAge:ED.retraite.age1||64,pension:ED.retraite.pension1||2500,rev:ED.revenus.c1,csp:cspKey}];
-  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:ED.revenus.c2,csp:cspKey2});}
+  var // Pension base = revenus BRUTS totaux (salaires + fonciers sans pondération)
+  var fonc=ED.revenus.fonc||0;
+  var foncC1=isCouple?Math.round(fonc/2):fonc; // fonciers répartis 50/50 si couple
+  var foncC2=isCouple?Math.round(fonc/2):0;
+  clients=[{c:ED.c1,retAge:ED.retraite.age1||64,pension:ED.retraite.pension1||2500,rev:(ED.revenus.c1||0)+foncC1,csp:cspKey}];
+  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:(ED.revenus.c2||0)+foncC2,csp:cspKey2});}
   var cardsHtml='';
-  clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,j){return Math.abs(a-age)<Math.abs(AGES[bi]-age)?j:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div></div>';});
+  clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,j){return Math.abs(a-age)<Math.abs(AGES[bi]-age)?j:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);
+        var espVie=getEspVie(c.civ,cl.retAge||64);
+        var impactTotal=Math.round((cl.pension-pensM)*espVie);
+        var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
+        +'<div class="fiscal-row"><span class="fr-l">Espérance de vie</span><span class="fr-v">'+espVie+' mois</span></div>'
+        +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact retraite total</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
+        +'</div>';});
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,j){return Math.abs(a-age0)<Math.abs(AGES[bi]-age0)?j:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euros assurance vie (2,5 %)',rate:0.025,color:'var(--blue)'},{label:'SCPI de rendement (4,5 %)',rate:0.045,color:'var(--green)'},{label:'PER allocation diversifiée (5 %)',rate:0.05,color:'#7B4FA6'}];
@@ -1578,7 +1679,7 @@ function rRetraite(){
     var ageI2=AGES.reduce(function(bi,a,j){return Math.abs(a-age2)<Math.abs(AGES[bi]-age2)?j:bi;},0);
     var cspKey2=CSP_MAP[ED.c2.sitpro||'']||'Sal. cadre';
     var tx2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageI2];
-    var pensM2=Math.floor((ED.revenus.c2||0)/12*tx2/100);
+    var pensM2=Math.floor(((ED.revenus.c2||0)+foncC2)/12*tx2/100);
     var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
     if(gap2>0)tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C2 à combler</td><td class="right">'+fmt(gap2)+' €/mois</td></tr>';
     if(gap0>0&&gap2>0){
@@ -1590,6 +1691,10 @@ function rRetraite(){
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — TRANSMISSION                                        ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rTransmission(){
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
@@ -1721,6 +1826,10 @@ var OBJ_SOLUTIONS = {
 };
 var solsSelectionnees=[];
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — PRÉCONISATIONS                                      ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function togglePanneauConseiller(){
   var el=document.getElementById('panneauConseiller');
   var chev=document.getElementById('panneauChevron');
@@ -1742,6 +1851,10 @@ function rPreconisations(){
   renderFichesClient();
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  MATRICE COPERNIC                                              ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function buildMatriceObjSol(impot,capa,aSum){
   var activeObjs=[];
   if(ED.epMens>100||aSum>5000)activeObjs.push('Épargne / capitalisation');
@@ -1808,6 +1921,10 @@ function buildMatriceObjSol(impot,capa,aSum){
   var el=document.getElementById('matriceObjSol');if(el)el.innerHTML=html;
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SOLUTIONS                                                     ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function toggleSolution(produit){
   var idx=solsSelectionnees.findIndex(function(s){return s.produit===produit;});
   if(idx>=0){solsSelectionnees.splice(idx,1);}
@@ -1912,6 +2029,10 @@ function ajouterSolutionManuelle(){
   renderSolsRetenues();renderFichesClient();
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  FICHES CLIENT                                                 ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function renderFichesClient(){
   var el=document.getElementById('fichesClientContainer');if(!el)return;
   // Build map of produit -> {objectifs} from current selection
@@ -2039,6 +2160,10 @@ function renderFichesClient(){
 }
 
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SECTION — SYNTHÈSE                                            ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function rSynthese(){
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
@@ -2158,6 +2283,10 @@ function rSynthese(){
 }
 
 // ── PRECO SOLUTIONS ───────────────────────────────────────────────
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  ÉTAPES & UI                                                   ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function addSol(type){
   solCount++;
   const id='sol'+solCount;
@@ -2205,13 +2334,21 @@ function addStep(){
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  HELPERS CALCUL                                                ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function revMens(){
-  // Revenus annuels → mensuel
-  // Salaires 100% + Fonciers 70% (abattement bancaire standard)
-  // sal1+sal2 = salaires détectés ; c1+c2 = fallback si parsing par total
+  // Revenus annuels → mensuel net (pondération selon âge — config Excel)
+  // < 56 ans : salaires 100% | >= 57 ans : salaires 70%
+  // Fonciers et locations meublées : toujours 70%
+  var age1=ageFrom(ED.c1&&ED.c1.dob)||40;
+  var age2=ED.type!=='seul'?(ageFrom(ED.c2&&ED.c2.dob)||40):0;
+  var ageMoy=ED.type!=='seul'?Math.round((age1+age2)/2):age1;
+  var txSal=ageMoy>=57?0.70:1.00;
   var sal=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0);
   var fonc=ED.revenus.fonc||0;
-  return Math.round((sal + fonc*0.70)/12);
+  return Math.round((sal*txSal + fonc*0.70)/12);
 }
 function nomC(n){
   // Retourne le prenom+initiale NOM pour C1 ou C2
@@ -2241,6 +2378,10 @@ function ageFrom(dob){
 // ── Barème IR 2025 progressif complet ────────────────────────────
 // Tranches par quotient familial (RBI / nb parts)
 // Source : barème taux marginal d'imposition 2025 sur revenus 2024
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  DONNÉES RÉFÉRENCE                                             ║
+// ╚══════════════════════════════════════════════════════════════════╝
 var TRANCHES_IR=[
   {min:0,      max:11497,  taux:0},
   {min:11497,  max:29315,  taux:0.11},
@@ -2346,6 +2487,10 @@ function addPassif(){
   tb.appendChild(tr);
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  UTILITAIRES                                                   ║
+// ╚══════════════════════════════════════════════════════════════════╝
 function exportPDF(){
   showNotif('⏳ Export en cours…');
   setTimeout(()=>{window.print();showNotif('✅ Export lancé !')},300);
