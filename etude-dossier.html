@@ -1628,13 +1628,13 @@ function rFinancement(){
   const chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12)||chr;
   const rav=revM-chrCredit;
   const endett=revM>0?chrCredit/revM*100:0;
-  const capa=revM*0.33-chrCredit;
+  const capa=revM*0.35-chrCredit; // 35% = seuil bancaire max
   const col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
 
   set('kFin1',fmt(revB)+' €');set('kFin2',fmt(revM)+' €');set('kFin3',fmt(chrCredit)+' €');
   const ke=document.getElementById('kFin4');ke.textContent=endett>0?endett.toFixed(1)+' %':'—';ke.style.color=col;
 
-  setEd('ffRevMens',fmt(revM)+' €/mois');setEd('ffCharges',fmt(chr)+' €/mois');setEd('ffRAV',fmt(rav)+' €/mois');
+  setEd('ffRevMens',fmt(revM)+' €/mois');setEd('ffCharges',fmt(chrCredit)+' €/mois');setEd('ffRAV',fmt(rav)+' €/mois');
   document.getElementById('ffEndett').innerHTML=`<span style="color:${col};font-weight:700">${endett>0?endett.toFixed(1)+' %':'—'}</span>`;
   const capEl=document.getElementById('ffCapa');
   capEl.textContent=capa>0?fmt(capa)+' €/mois':'Capacité saturée';capEl.style.color=capa>0?'var(--green)':'var(--red)';
