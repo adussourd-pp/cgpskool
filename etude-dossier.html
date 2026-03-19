@@ -943,13 +943,19 @@ function parseFromPaste(){
 // ║  PARSER — TEXTE RI                                             ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function parseTextRI(txt){
-  // Normalize lines
-  var lines=txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
-  var full=lines.join('\n');
+  // ════════════════════════════════════════════════════════════════
+  // PARSER RI — structure Word copié-collé (tabulations \t)
+  // Sections repérées par "01\n", "02\n", ... "05\n"
+  // Colonnes : seul → [label, C1, Total] | couple → [label, C1, C2, Commun, Total]
+  // ════════════════════════════════════════════════════════════════
 
+  var lines = txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  var full  = lines.join('\n');
+
+  // ── Helpers ──────────────────────────────────────────────────────
   function pEur(s){
     if(!s)return 0;
-    var m=s.replace(/\s/g,'').replace(',','.').match(/[\d]+\.?\d*/);
+    var m=String(s).replace(/\s/g,'').replace(',','.').match(/[\d]+\.?\d*/);
     return m?parseFloat(m[0]):0;
   }
   function parseDob(s){
@@ -959,269 +965,302 @@ function parseTextRI(txt){
   function parseNom(s){
     if(!s)return{prenom:'',nom:''};
     s=s.replace(/\(.*?\)/g,'').trim();
-    var p=s.split(/\s+/).filter(function(x){return x;});
+    var p=s.split(/\s+/).filter(Boolean);
     if(!p.length)return{prenom:'',nom:''};
-    if(p[0]===p[0].toUpperCase()&&p[0].length>1)return{nom:p[0],prenom:p.slice(1).join(' ')};
+    // "NOM Prenom" ou "Prenom NOM"
+    if(p[0]===p[0].toUpperCase()&&p[0].length>1&&p.length>1)
+      return{nom:p[0],prenom:p.slice(1).join(' ')};
     return{prenom:p[0],nom:p.slice(1).join(' ')};
   }
 
-  // ── Parse tab-separated table rows (Word copy-paste format) ──
-  // Each row: "Label\tVal_C1\tVal_C2"
-  var tabRows={};
-  lines.forEach(function(line){
-    if(line.indexOf('\t')<0)return;
-    var parts=line.split('\t').map(function(p){return p.trim();});
-    if(parts.length>=2){
-      // Normalize label: remove * : etc
-      var label=parts[0].replace(/\s*[\*:]+\s*$/,'').toLowerCase().trim();
-      tabRows[label]={v1:parts[1]||'',v2:parts[2]||''};
-    }
+  // ── Découper en sections numérotées ──────────────────────────────
+  function getSection(n){
+    var re=new RegExp('(?:^|\\n)0'+n+'\\s*\\n([\\s\\S]*?)(?=\\n0'+(n+1)+'\\s*\\n|$)');
+    var m=full.match(re);
+    return m?m[1]:'';
+  }
+  var s01=getSection(1), s02=getSection(2), s03=getSection(3),
+      s04=getSection(4), s05=getSection(5);
+
+  // ── Lignes tabulées d'une section → objet label→{v1,v2,v3,v4} ───
+  function tabMap(section){
+    var map={};
+    section.split('\n').forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var p=line.split('\t').map(function(x){return x.trim();});
+      var key=p[0].replace(/\s*[\*:]+\s*$/,'').toLowerCase().trim();
+      if(key)map[key]={v1:p[1]||'',v2:p[2]||'',v3:p[3]||'',v4:p[4]||'',raw:p};
+    });
+    return map;
+  }
+  var t01=tabMap(s01);
+
+  // ── Déterminer si couple ──────────────────────────────────────────
+  // Couple = section 01 contient deux colonnes de valeurs
+  var isCouple=false;
+  var s01lines=s01.split('\n').filter(function(l){return l.indexOf('\t')>=0;});
+  s01lines.forEach(function(l){
+    var p=l.split('\t');
+    if(p.length>=3&&p[1].trim()&&p[2].trim()&&p[2].trim()!==p[1].trim())isCouple=true;
   });
+  // Couple forced if "Madame" appears (C2 civ)
+  if(/madame|monsieur/i.test(s01)&&s01lines.some(function(l){
+    var p=l.split('\t'); return p.length>=3&&/madame|monsieur/i.test(p[2]||'');
+  })) isCouple=true;
+  ED.type=isCouple?'sep':'seul'; // régime sera affiné ci-dessous
 
-  function tabVal(keyword){
-    var kl=keyword.toLowerCase();
-    for(var k in tabRows){
-      if(k.indexOf(kl)>=0)return tabRows[k];
-    }
-    return null;
-  }
-
-  // ── 1. TYPE ───────────────────────────────────────────────────
-  var isCouple=Object.keys(tabRows).some(function(k){return tabRows[k].v2&&tabRows[k].v2.length>1;});
-  var regRow=tabVal('gime');
-  var regVal=regRow?(regRow.v1||''):'';
-  var isSep=/paration/i.test(regVal)||/paratiste/i.test(full);
-  ED.type=isCouple?(isSep?'sep':'comm'):'seul';
-
-  // ── 2. IDENTITÉ ───────────────────────────────────────────────
-  var nomRow=tabVal('nom / pr');
+  // ══════════════════════════════════════════════════════════════════
+  // SECTION 01 — IDENTITÉ
+  // ══════════════════════════════════════════════════════════════════
+  // Noms
+  var nomRow=t01['nom / pr\u00e9nom']||t01['nom / prenom'];
   if(nomRow){
-    var p1=parseNom(nomRow.v1);ED.c1.prenom=p1.prenom;ED.c1.nom=p1.nom;
-    if(isCouple){var p2=parseNom(nomRow.v2);ED.c2.prenom=p2.prenom;ED.c2.nom=p2.nom;}
+    var n1=parseNom(nomRow.v1); ED.c1.prenom=n1.prenom; ED.c1.nom=n1.nom;
+    if(isCouple){var n2=parseNom(nomRow.v2); ED.c2.prenom=n2.prenom; ED.c2.nom=n2.nom;}
   }
-  var civRow=tabVal('civilit');
+  // Civilité
+  var civRow=t01['civilit\u00e9']||t01['civilite'];
   if(civRow){
     ED.c1.civ=/madame|mme/i.test(civRow.v1)?'Mme':'M.';
     if(isCouple)ED.c2.civ=/madame|mme/i.test(civRow.v2)?'Mme':'M.';
   }
-  var dobRow=tabVal('(e) le');
+  // Date de naissance
+  var dobRow=t01['n\u00e9(e) le']||t01['ne(e) le'];
   if(dobRow){
     ED.c1.dob=parseDob(dobRow.v1);
     if(isCouple)ED.c2.dob=parseDob(dobRow.v2);
   }
-  var sitRow=tabVal('situation');
-  if(sitRow)ED.sitmat=sitRow.v1||'';
-  var logRow=tabVal('logement');
-  if(logRow)ED.logement=logRow.v1||'';
-  if(regVal){
-    var rl=regVal.toLowerCase();
-    if(rl.indexOf('paration')>=0)ED.convention='Separation de biens';
-    else if(rl.indexOf('pacs')>=0)ED.convention='PACS';
-    else if(rl.indexOf('commun')>=0)ED.convention='Communaute reduite aux acquets';
-    else ED.convention=regVal;
+  // Situation matrimoniale
+  var sitRow=t01['situation']||t01['situation\u00a0'];
+  if(sitRow)ED.sitmat=sitRow.v1;
+  // Logement
+  var logRow=t01['logement'];
+  if(logRow)ED.logement=logRow.v1;
+  // Régime matrimonial
+  var regRow=t01['r\u00e9gime/ convention']||t01['regime/ convention']||t01['r\u00e9gime']||t01['regime'];
+  if(regRow&&regRow.v1){
+    var rv=regRow.v1.toLowerCase();
+    if(rv.indexOf('paration')>=0){ED.convention='Separation de biens';ED.type='sep';}
+    else if(rv.indexOf('pacs')>=0){ED.convention='PACS';ED.type='sep';}
+    else if(rv.indexOf('commun')>=0){ED.convention='Communaute';ED.type='comm';}
   }
-  var profRow=tabVal('rofession');
-  if(profRow){
-    ED.c1.profession=profRow.v1||'';
-    if(isCouple)ED.c2.profession=profRow.v2||'';
-  }
-  var catRow=tabVal('at\u00e9gorie socio');
-  if(!catRow)catRow=tabVal('atgorie socio');
-  if(!catRow)catRow=tabVal('cat');
+  // Profession + CSP
+  var catRow=t01['cat\u00e9gorie socio-professionnelle']||t01['categorie socio-professionnelle']||t01['cat\u00e9gorie socio'];
+  var profRow=null;
+  Object.keys(t01).forEach(function(k){
+    if(k.indexOf('profession')>=0&&k.indexOf('socio')<0&&k.indexOf('cat\u00e9')<0&&k.indexOf('cate')<0)
+      profRow=t01[k];
+  });
   var mapCSP=function(s){
     s=(s||'').toLowerCase();
-    if(s.indexOf('227')>=0||s.indexOf('presta')>=0||s.indexOf('ind\u00e9p')>=0||s.indexOf('indep')>=0)return"Chef d'entreprise";
-    if(s.indexOf('cadre sup')>=0)return'Salarie cadre';
-    if(s.indexOf('cadre')>=0)return'Salarie cadre';
-    if(s.indexOf('salari')>=0)return'Salarie non-cadre';
-    if(s.indexOf('fonct')>=0)return'Fonctionnaire';
-    if(s.indexOf('chef')>=0||s.indexOf('entreprise')>=0)return"Chef d'entreprise";
-    if(s.indexOf('retraite')>=0)return'Retraite';
-    return'Salarie cadre';
+    if(s.indexOf('227')>=0||s.indexOf('ind\u00e9p')>=0||s.indexOf('indep')>=0||s.indexOf('presta')>=0)return "Chef d'entreprise";
+    if(s.indexOf('38')>=0||s.indexOf('ing\u00e9nieur')>=0||s.indexOf('cadre')>=0&&s.indexOf('sup')<0)return 'Salarie cadre';
+    if(s.indexOf('cadre sup')>=0)return 'Salarie cadre';
+    if(s.indexOf('salari')>=0)return 'Salarie non-cadre';
+    if(s.indexOf('employ')>=0)return 'Salarie non-cadre';
+    if(s.indexOf('fonct')>=0)return 'Fonctionnaire';
+    if(s.indexOf('chef')>=0||s.indexOf('entreprise')>=0)return "Chef d'entreprise";
+    if(s.indexOf('retraite')>=0)return 'Retraite';
+    return 'Salarie cadre';
   };
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple)ED.c2.sitpro=mapCSP(catRow.v2);}
+  if(profRow){ED.c1.profession=profRow.v1;if(isCouple)ED.c2.profession=profRow.v2;}
   ED.nbEnfants=0;
 
-  // ── 3. OBJECTIFS & ÉPARGNE DE PRÉCAUTION ─────────────────────
-  var epRow=tabVal('pargne de pr');
+  // ══════════════════════════════════════════════════════════════════
+  // SECTION 02 — OBJECTIFS & ÉPARGNE DE PRÉCAUTION
+  // ══════════════════════════════════════════════════════════════════
+  var t02=tabMap(s02);
+  var epRow=t02['epargne de pr\u00e9caution souhait\u00e9e']||t02['epargne de precaution souhaitee']
+          ||t02['\u00e9pargne de pr\u00e9caution souhait\u00e9e'];
   if(epRow)ED.epPrec=pEur(epRow.v1)||pEur(epRow.v2)||0;
 
   ED.objectifs=[];
-  var objSection=full.match(/02\s*\|?\s*Objectifs([\s\S]{0,2000}?)(?:03\s*\|?\s*Patrimoine|$)/i);
-  if(objSection){
-    var objText=objSection[1];
-    var objLines=objText.split('\n').map(function(l){return l.trim();});
-    objLines.forEach(function(line){
-      if(!line||line.length<5||line.length>300)return;
-      if(/^(Personnes|Objectif|Horizon|Moyen|Épargne|Epargne|Client|\d+\s*€|Date)/i.test(line))return;
-      if(/^\d+\s*\|/.test(line))return;
-      // Tabulated objective lines: "C1\tObjectif text\t..."
-      var parts=line.split('\t');
-      var obj=parts.length>=2?parts[1]:parts[0];
-      obj=obj.replace(/\t.*/,'').trim();
-      if(obj.length>5&&obj.length<200&&!/^(personnes|objectif|horizon|moyen)/i.test(obj)){
-        ED.objectifs.push(obj);
-      }
-    });
-  }
-  ED.objectifs=[...new Set(ED.objectifs)].filter(function(o){return o&&o.length>5;}).slice(0,8);
+  var objSeen={};
+  s02.split('\n').forEach(function(line){
+    if(line.indexOf('\t')<0)return;
+    var p=line.split('\t').map(function(x){return x.trim();});
+    if(p.length<2)return;
+    // Ligne objectif = "Nom Prenom\tObjectif texte\t..." ou "Client C1\tObjectif\t..."
+    // On prend p[1] si p[0] ressemble à un nom/client et p[1] est un vrai objectif
+    if(/^(personnes|objectif|horizon|moyen|epargne|\u00e9pargne|d\u00e9signation)/i.test(p[0]))return;
+    var obj=p[1]||'';
+    if(obj.length<5||obj.length>200)return;
+    if(/^(personnes|objectif|horizon|moyen|\d)/i.test(obj))return;
+    if(!objSeen[obj]){objSeen[obj]=true;ED.objectifs.push(obj);}
+  });
   if(!ED.objectifs.length)ED.objectifs=['Objectifs \u00e0 compl\u00e9ter'];
 
-  // ── 4. ACTIFS ─────────────────────────────────────────────────
-  var SKIP_A=['d\u00e9signation','total','immobilier & foncier','immobilier de jouissance','\u00e9pargne','court terme','moyen terme','long terme','retraite et salariale','biens professionnels'];
-  var getH=function(n){
-    // Nomenclature Excel V12 exacte
-    var nl=(n||'').toLowerCase();
-    // Court terme : Livret A, CC, Livret Classique, LDD, Livret Jeune, LEP, CEL
-    if(/livret a|livret bleu|livret classique|livret jeune|compte courant|cc|ldds?|lep|livret d.[ée]pargne pop|cel|compte [ée]pargne logement/.test(nl)) return 'ct';
-    if(/livret/.test(nl) && !/pel/.test(nl)) return 'ct';
-    // Moyen terme : PEL, CAT uniquement (AV, PEA, PEE etc. = long terme selon Excel)
-    if(/pel|plan d.[ée]pargne logement|cat|compte [àa] terme/.test(nl)) return 'mt';
-    // Long terme : tout le reste (AV, Capi, PEA, PEP, CTO, PER, PEE, PERCO, immo, SCPI...)
-    return 'lt';
-  };
+  // ══════════════════════════════════════════════════════════════════
+  // SECTION 03 — PATRIMOINE (ACTIFS + PASSIFS)
+  // ══════════════════════════════════════════════════════════════════
+  // Découper 03 en actifs et passifs
+  var actifPart=s03.match(/ACTIFS([\s\S]*?)(?:PASSIFS|TOTAL DES ACTIFS|$)/i);
+  var passifPart=s03.match(/PASSIFS([\s\S]*?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|$)/i);
+
+  // CATÉGORIES à ignorer (sous-totaux, en-têtes)
+  var SKIP_A=/^(d\u00e9signation|designation|total|immobilier & foncier|immobilier de jouissance|immobilier locatif|imm.*foncier|\u00e9pargne|epargne|court terme|moyen terme|long terme|retraite et salariale|biens professionnels|foncier)$/i;
+
   ED.actifs=[];
-  var actifSection=full.match(/ACTIFS([\s\S]{0,3000}?)(?:PASSIFS|$)/i);
-  if(actifSection){
-    var actifLines=actifSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
-    actifLines.forEach(function(line){
+  if(actifPart){
+    var aLines=actifPart[1].split('\n');
+    // Détecter si couple via en-tête colonnes
+    var aHeader=aLines.find(function(l){return /d\u00e9signation|designation/i.test(l);});
+    var aCols=aHeader?aHeader.split('\t').length:2;
+    aLines.forEach(function(line){
       if(line.indexOf('\t')<0)return;
-      var parts=line.split('\t');
-      var nom=parts[0];
-      if(!nom||nom.length<2)return;
-      if(SKIP_A.some(function(s){return nom.toLowerCase()===s||nom.toLowerCase().startsWith(s);}))return;
-      if(/^(d\u00e9signation|total)/i.test(nom))return;
-      // Find euro values
-      var vals=parts.slice(1).filter(function(p){return /[\d\s]+\s*€/.test(p);});
+      var p=line.split('\t').map(function(x){return x.trim();});
+      var nom=p[0];
+      if(!nom||nom.length<2||SKIP_A.test(nom))return;
+      if(/^\d+\s*[€%]/.test(nom))return;
+      // Trouver les valeurs €
+      var vals=p.slice(1).map(pEur).filter(function(v){return v>0;});
       if(!vals.length)return;
-      var mont=pEur(vals[vals.length-1]);
+      var mont=vals[vals.length-1]; // dernière valeur = total ligne
       if(mont<=0)return;
-      var v1=pEur(parts[1]||'');var v2=pEur(parts[2]||'');
+      // Titulaire
+      var v1=pEur(p[1]||''),v2=pEur(p[2]||'');
       var tit='Commun';
       if(!isCouple)tit='C1';
       else if(v1>0&&v2>0)tit='Commun';
       else if(v1>0)tit='C1';
       else if(v2>0)tit='C2';
-      ED.actifs.push({nom:nom,horizon:getH(nom),titulaire:tit,montant:mont});
+      // Horizon
+      var nl=nom.toLowerCase();
+      var horizon='lt';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|livret d.[\u00e9e]pargne pop|\bcel\b/.test(nl))horizon='ct';
+      else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizon='ct';
+      else if(/\bpel\b|\bcat\b|assurance[- ]vie|capitalisation|\bpea\b|\bpee\b/.test(nl))horizon='mt';
+      ED.actifs.push({nom:nom,horizon:horizon,titulaire:tit,montant:mont});
     });
   }
 
-  // ── 5. PASSIFS ────────────────────────────────────────────────
+  // PASSIFS
   ED.passifs=[];
-  var passifSection=full.match(/PASSIFS([\s\S]{0,2000}?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|REVENUS|$)/i);
-  if(passifSection){
-    var passifLines=passifSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
-    passifLines.forEach(function(line){
+  if(passifPart){
+    passifPart[1].split('\n').forEach(function(line){
       if(line.indexOf('\t')<0)return;
-      var parts=line.split('\t');
-      var nom=parts[0];
+      var p=line.split('\t').map(function(x){return x.trim();});
+      var nom=p[0];
       if(!nom||nom.length<2)return;
-      if(/^(d\u00e9signation|total|cr\u00e9dit immobilier$|cr\u00e9dit personnel)/i.test(nom))return;
-      var ech=pEur(parts[2]||'');var crd=pEur(parts[3]||'');
+      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier$|cr\u00e9dit personnel|credit)$/i.test(nom.trim()))return;
+      // Format : [Nom, Titulaire, Echéance/an, CRD, Date]
+      // ou     : [Nom, Echéance, CRD, Date] (lignes catégorie sans titulaire)
+      var ech=0,crd=0;
+      if(p.length>=4){
+        // Chercher colonnes numériques
+        var nums=p.slice(1).map(function(x,i){return{i:i+1,v:pEur(x)};}).filter(function(x){return x.v>0;});
+        if(nums.length>=2){ech=nums[0].v;crd=nums[1].v;}
+        else if(nums.length===1){crd=nums[0].v;}
+      }
       if(crd<=0&&ech<=0)return;
       ED.passifs.push({nom:nom,titulaire:'Commun',echeance:ech,crd:crd});
     });
   }
 
-  // ── 6. REVENUS ──────────────────────────────────────────────────
-  // Stockage séparé : salaires annuels (100%) + fonciers annuels (70% bancaire)
-  // TOUS les montants dans le RI sont ANNUELS
-  ED.revenus={c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0};
-  var revSection=full.match(/REVENUS([\s\S]{0,2000}?)(?:CHARGES|$)/i);
-  if(revSection){
-    var revLines=revSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
-    revLines.forEach(function(line){
+  // ══════════════════════════════════════════════════════════════════
+  // SECTION 04 — REVENUS & CHARGES
+  // ══════════════════════════════════════════════════════════════════
+  // Découper proprement en REVENUS et CHARGES (mots sur leur propre ligne)
+  var revPart=s04.match(/(?:^|\n)REVENUS\s*\n([\s\S]*?)(?=\nCHARGES\s*\n|TOTAL DES REVENUS|$)/i);
+  var chPart =s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i);
+
+  ED.revenus={c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_foncSpecific:0,_foncCategory:0};
+
+  if(revPart){
+    revPart[1].split('\n').forEach(function(line){
       if(line.indexOf('\t')<0)return;
-      var parts=line.split('\t');
-      var label=parts[0].toLowerCase().trim();
-      // Revenus d'activité : salaires (toutes formes), BIC, BNC, BA, AE
+      var p=line.split('\t').map(function(x){return x.trim();});
+      var label=p[0].toLowerCase().trim();
+      // Salaires et revenus d'activité (100%)
       if(/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur|revenus d.activit/i.test(label)){
-        var v1=pEur(parts[1]||''),v2=pEur(parts[2]||'');
+        var v1=pEur(p[1]||''),v2=pEur(p[2]||'');
         ED.revenus.sal1+=v1; ED.revenus.sal2+=v2;
       }
-      // Revenus fonciers + locations meublées → pondérés 70%
-      if(/revenus fonciers|revenus immobiliers|location.meuble/i.test(label)&&!/immobilier.*foncier|foncier.*immobilier|immo/i.test(label)){
-        // Prendre la valeur max (total couple) parmi les colonnes
-        var fvals=parts.slice(1).map(function(p){return pEur(p);}).filter(function(v){return v>0;});
-        if(fvals.length)ED.revenus.fonc+=Math.max.apply(null,fvals);
+      // Revenus fonciers / locations meublées (70%) — distinguer détail vs catégorie
+      if(/revenus fonciers|location.meuble/i.test(label)){
+        var fvals=p.slice(1).map(pEur).filter(function(v){return v>0;});
+        if(fvals.length)ED.revenus._foncSpecific+=Math.max.apply(null,fvals);
+      } else if(/revenus immobiliers/i.test(label)){
+        var fvals2=p.slice(1).map(pEur).filter(function(v){return v>0;});
+        if(fvals2.length)ED.revenus._foncCategory+=Math.max.apply(null,fvals2);
       }
-      // Ligne Total (fallback)
+      // Ligne Total (fallback si salaires non détectés)
       if(/^total$/i.test(label)&&!ED.revenus.sal1&&!ED.revenus.sal2){
-        ED.revenus.c1=pEur(parts[1]||''); ED.revenus.c2=pEur(parts[2]||'');
+        ED.revenus.c1=pEur(p[1]||''); ED.revenus.c2=pEur(p[2]||'');
       }
     });
-    // Finaliser : priorité aux salaires détectés ligne par ligne
+    // Priorité : lignes spécifiques > catégorie
+    ED.revenus.fonc=ED.revenus._foncSpecific||ED.revenus._foncCategory||0;
+    // Si salaires détectés, les utiliser
     if(ED.revenus.sal1||ED.revenus.sal2){
-      ED.revenus.c1=ED.revenus.sal1;
-      ED.revenus.c2=ED.revenus.sal2;
-    } else if(ED.revenus.fonc>0&&(ED.revenus.c1||ED.revenus.c2)){
-      // Fallback : déduire les fonciers du total pour isoler les salaires
-      var halfFonc=ED.revenus.fonc/(isCouple?2:1);
-      ED.revenus.c1=Math.max(0,ED.revenus.c1-halfFonc);
-      ED.revenus.c2=Math.max(0,ED.revenus.c2-halfFonc);
+      ED.revenus.c1=ED.revenus.sal1; ED.revenus.c2=ED.revenus.sal2;
     }
-    ED.revenus.compl=ED.revenus.fonc; // compatibilité
+    ED.revenus.compl=ED.revenus.fonc;
   }
-  // Charges crédit = somme des échéances annuelles des passifs / 12
-  // Utilisées pour le taux d'endettement bancaire (PER, leasing, éducation exclus)
+
+  // Charges — CRÉDITS SEULEMENT pour le taux d'endettement
+  // Les charges du bilan sont dans les PASSIFS (echéances)
+  ED.charges=0;
+  if(chPart){
+    chPart[1].split('\n').forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var p=line.split('\t').map(function(x){return x.trim();});
+      if(/^total$/i.test(p[0].trim())){
+        var vals=p.slice(1).map(pEur).filter(function(v){return v>0;});
+        if(vals.length)ED.charges=Math.max.apply(null,vals)/12;
+      }
+    });
+  }
+  // chargesCredit = somme des échéances passifs / 12 (crédits uniquement)
   ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
 
-  // ── 7. CHARGES ────────────────────────────────────────────────
-  ED.charges=0;
-  var chSection=full.match(/CHARGES([\s\S]{0,1000}?)(?:TOTAL DES REVENUS|TOTAL DES CHARGES|FISCALIT|$)/i);
-  if(chSection){
-    var chLines=chSection[1].split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
-    chLines.forEach(function(line){
-      if(line.indexOf('\t')<0)return;
-      var parts=line.split('\t');
-      if(/^total$/i.test(parts[0])){
-        var lv=parts.slice(1).filter(function(p){return /[\d\s]+€/.test(p);});
-        if(lv.length)ED.charges=pEur(lv[lv.length-1])/12;
-      }
-    });
-  }
-
-  // ── 8. FISCAL ─────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════
+  // SECTION 05 — FISCALITÉ
+  // ══════════════════════════════════════════════════════════════════
   ED.fiscal={annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0};
-  var fisSection=full.match(/FISCALIT.E?\s+IR([\s\S]{0,2000}?)(?:FISCALIT.E?\s+IFI|$)/i);
-  if(fisSection){
-    var fisText=fisSection[1];
-    var irAn=fisText.match(/IR acquitt.\s+en\s*[:\*]*\s*(\d{4})/i);
-    if(irAn)ED.fiscal.annee=irAn[1];
-    var rbgM=fisText.match(/Revenu brut global\s*[:\*]+\s*([\d\s]+)\s*€/i);
-    if(rbgM)ED.fiscal.rbg=pEur(rbgM[1]);
-    var irM=fisText.match(/Total de l.imp.t sur le revenu net\s*[:\*]+\s*([\d\s]+)\s*€/i);
-    if(irM)ED.fiscal.irnet=pEur(irM[1]);
-    var partsM=fisText.match(/Nombre de parts fiscales\s*[:\*]+\s*([\d,.]+)/i);
-    if(partsM)ED.fiscal.parts=parseFloat(partsM[1].replace(',','.'))||1;
-    var tmiM=fisText.match(/TMI IR\s*[:\*]+\s*(\d+)\s*%/i);
-    if(tmiM)ED.fiscal.tmi=parseInt(tmiM[1]);
-    var psM=fisText.match(/pr.l.vements sociaux nets\s*[:\*]+\s*([\d\s]+)\s*€/i);
-    if(psM)ED.fiscal.ps=pEur(psM[1]);
-  }
-  // Calcul IR progressif si non fourni par le RI
-  if(ED.fiscal.rbg&&(!ED.fiscal.irnet||ED.fiscal.irnet===0)){
-    var calc=calcIR(ED.fiscal.rbg,ED.fiscal.parts||1);
-    if(!ED.fiscal.tmi)ED.fiscal.tmi=calc.tmi;
-    if(!ED.fiscal.irnet)ED.fiscal.irnet=calc.ir;
-  } else if(!ED.fiscal.tmi&&ED.fiscal.rbg){
-    ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts||1);
+
+  // IR acquitté en
+  var irAn=s05.match(/IR acquitt[eé] en\s*[:\*]+\s*(\d{4})/i);
+  if(irAn)ED.fiscal.annee=irAn[1];
+
+  // Chercher dans les lignes tabulées de la section 05
+  var t05=tabMap(s05);
+
+  // RBG — peut être "revenu brut global : * 89 492 €" sur une ligne avec valeur dans la ligne elle-même
+  var rbgMatch=s05.match(/Revenu brut global\s*[:\*\s]+([0-9\s]+)\s*[€$]/i);
+  if(rbgMatch)ED.fiscal.rbg=pEur(rbgMatch[1]);
+
+  // IR net
+  var irMatch=s05.match(/Total de l.imp[oô]t sur le revenu net\s*[:\*\s]+([0-9\s]+)\s*[€$]/i);
+  if(irMatch)ED.fiscal.irnet=pEur(irMatch[1]);
+
+  // TMI — "TMI IR : 41,00 %" (peut être dans une colonne de droite)
+  var tmiMatch=s05.match(/TMI IR\s*[:\*\s]+([0-9,\.]+)\s*%/i);
+  if(tmiMatch)ED.fiscal.tmi=Math.round(parseFloat(tmiMatch[1].replace(',','.')));
+
+  // Parts
+  var partsMatch=s05.match(/Nombre de parts fiscales\s*[:\*\s]+([0-9,\.]+)/i);
+  if(partsMatch)ED.fiscal.parts=parseFloat(partsMatch[1].replace(',','.'))||1;
+
+  // PS
+  var psMatch=s05.match(/pr[eé]l[eè]vements sociaux nets\s*[:\*\s]+([0-9\s]+)\s*[€$]/i);
+  if(psMatch)ED.fiscal.ps=pEur(psMatch[1]);
+
+  // Si IR non trouvé, estimer via barème
+  if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
+  if(!ED.fiscal.irnet&&ED.fiscal.rbg){
+    var calc=calcIR(ED.fiscal.rbg,ED.fiscal.parts);
+    ED.fiscal.irnet=calc.ir; if(!ED.fiscal.tmi)ED.fiscal.tmi=calc.tmi;
   }
 
-  var revT=(ED.revenus.c1||0)+(ED.revenus.c2||0)+(ED.revenus.compl||0);
-  // Capacité épargne : (revenus nets mensuels - charges) * 30%
-  var _sal=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0);
-  var _fonc=ED.revenus.fonc||ED.revenus.compl||0;
-  var _revNetM=(_sal+_fonc*0.70)/12;
-  ED.epMens=Math.max(0,Math.round((_revNetM-ED.charges)*0.30));
+  // Épargne mensuelle estimée
+  var revM=revMens();
+  ED.epMens=Math.max(0,Math.round((revM-ED.chargesCredit)*0.30));
 
   launch();
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  SAISIE MANUELLE                                               ║
-// ╚══════════════════════════════════════════════════════════════════╝
 function generateFromManual(){try{
   ED.type=document.getElementById('dType').value;
   ED.consultant=document.getElementById('fConsultant').value;
