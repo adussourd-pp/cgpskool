@@ -360,3 +360,22 @@ de {revenus}/mois en optimisant la fiscalité sur les revenus locatifs."
 G3F :
 "Réduction d'impôt de {impots}. Investissement oneshot, rentabilité de 10% sur 1 an."
 ```
+
+---
+
+## RÈGLE R10 — Regex revenus fonciers : ne pas matcher les actifs
+
+Le label `"Immobilier & Foncier"` dans la section actifs contient le mot "foncier".
+Un regex trop large comme `/foncier/i` capture les actifs immobiliers comme revenus → bug critique.
+
+```js
+// ❌ INTERDIT — capture "Immobilier & Foncier" = valeur des actifs (710 000 €)
+if (/foncier|location.meuble|loyer/i.test(label)) { ... }
+
+// ✅ CORRECT — restreint aux vraies lignes de revenus
+if (/revenus fonciers|revenus immobiliers|location.meuble/i.test(label)
+    && !/immobilier.*foncier|foncier.*immobilier|immo/i.test(label)) { ... }
+```
+
+**Symptôme :** revMens() = 41 417 €/mois au lieu de 4 326 €
+→ ED.revenus.fonc = 710 000 (valeur actifs immo) au lieu de 33 014 (revenus fonciers réels)

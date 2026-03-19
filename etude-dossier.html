@@ -1140,7 +1140,7 @@ function parseTextRI(txt){
         ED.revenus.sal1+=v1; ED.revenus.sal2+=v2;
       }
       // Revenus fonciers + locations meublées → pondérés 70%
-      if(/foncier|location.meuble|loyer/i.test(label)){
+      if(/revenus fonciers|revenus immobiliers|location.meuble/i.test(label)&&!/immobilier.*foncier|foncier.*immobilier|immo/i.test(label)){
         // Prendre la valeur max (total couple) parmi les colonnes
         var fvals=parts.slice(1).map(function(p){return pEur(p);}).filter(function(v){return v>0;});
         if(fvals.length)ED.revenus.fonc+=Math.max.apply(null,fvals);
