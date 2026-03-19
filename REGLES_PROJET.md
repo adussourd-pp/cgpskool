@@ -379,3 +379,106 @@ if (/revenus fonciers|revenus immobiliers|location.meuble/i.test(label)
 
 **Symptôme :** revMens() = 41 417 €/mois au lieu de 4 326 €
 → ED.revenus.fonc = 710 000 (valeur actifs immo) au lieu de 33 014 (revenus fonciers réels)
+
+---
+
+## RÈGLE R11 — Architecture du parser : sections numérotées
+
+Le RI Word copié-collé est structuré en 5 sections `01` à `05` sur leur propre ligne.
+**Ne jamais parser en cherchant des mots-clés dans tout le texte.** Découper d'abord en sections.
+
+```js
+// ✅ CORRECT — découper par section numérotée, puis traiter chaque section
+function getSection(n){
+  var re = new RegExp('(?:^|\\n)0'+n+'\\s*\\n([\\s\\S]*?)(?=\\n0'+(n+1)+'\\s*\\n|$)');
+  return full.match(re)?.[1] || '';
+}
+var s01=getSection(1); // Identité
+var s02=getSection(2); // Objectifs
+var s03=getSection(3); // Patrimoine (Actifs + Passifs)
+var s04=getSection(4); // Revenus & Charges
+var s05=getSection(5); // Fiscalité
+
+// ❌ INTERDIT — regex globaux sur tout le texte
+var revSection = full.match(/REVENUS([\s\S]*?)(?:CHARGES|$)/i);
+// → "Revenus & Charges" (titre section 04) contient "Charges" → stop prématuré
+```
+
+---
+
+## RÈGLE R12 — Revenus & Charges : découpage sur ligne propre
+
+Dans la section 04, `REVENUS` et `CHARGES` sont des mots **seuls sur leur ligne**.
+Le titre de la section est `"04\n| Revenus & Charges"` — il contient les deux mots.
+
+```js
+// ✅ CORRECT — \n avant et après (mot seul sur sa ligne)
+var revPart = s04.match(/(?:^|\n)REVENUS\s*\n([\s\S]*?)(?=\nCHARGES\s*\n|TOTAL DES REVENUS|$)/i);
+var chPart  = s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i);
+
+// ❌ INTERDIT — capte le titre "Revenus & Charges"
+var revPart = full.match(/REVENUS([\s\S]*?)(?:CHARGES|$)/i);
+```
+
+---
+
+## RÈGLE R13 — Fonciers : éviter le double comptage
+
+Le RI contient souvent deux lignes qui matchent "foncier" :
+- `"Revenus immobiliers"` → ligne catégorie (sous-total)
+- `"Revenus fonciers SCI Chalet…"` → ligne détail
+
+**Prendre uniquement les lignes détail. Fallback sur catégorie si pas de détail.**
+
+```js
+if (/revenus fonciers|location.meuble/i.test(label)) {
+  ED.revenus._foncSpecific += max(vals);   // ligne détail
+} else if (/revenus immobiliers/i.test(label)) {
+  ED.revenus._foncCategory += max(vals);   // ligne catégorie
+}
+// Finalisation : préférer spécifique
+ED.revenus.fonc = ED.revenus._foncSpecific || ED.revenus._foncCategory || 0;
+```
+
+**Symptôme si non respecté :** `ED.revenus.fonc = 66 028` au lieu de `33 014`
+→ `revMens() = 6 252` au lieu de `4 326`
+
+---
+
+## RÈGLE R14 — Objectifs : prendre parts[1], pas parts[0]
+
+Dans la section 02, le tableau objectifs est :
+```
+Personnes           \t Objectif                        \t Horizon \t Moyen
+Mathieu THOMAS      \t Accompagner vos enfants          \t        \t
+François LIEVRE … \t Réorganiser votre patrimoine     \t        \t
+```
+- `parts[0]` = Nom de la personne → **ne pas prendre**
+- `parts[1]` = Objectif réel → **prendre**
+
+```js
+// ✅ CORRECT
+var obj = parts[1] || '';  // colonne Objectif
+
+// ❌ INTERDIT — prend le nom "François LIEVRE" comme objectif
+var obj = parts.length >= 2 ? parts[1] : parts[0];
+// → si la ligne n'a pas de tab, parts[0] = "François LIEVRE"
+```
+
+**Symptôme :** "François LIEVRE" apparaît comme objectif n°1 dans la liste.
+
+---
+
+## RÈGLE R15 — Actifs : ignorer les lignes de sous-totaux
+
+Les lignes suivantes sont des **catégories/sous-totaux**, pas des actifs réels :
+`Désignation`, `Total`, `Immobilier & Foncier`, `Immobilier de jouissance`,
+`Immobilier locatif`, `Épargne`, `Court terme`, `Moyen terme`, `Long terme`,
+`Retraite et Salariale`, `Biens professionnels`, `Foncier`
+
+```js
+var SKIP_A = /^(désignation|total|immobilier & foncier|immobilier de jouissance|
+               immobilier locatif|épargne|court terme|moyen terme|long terme|
+               retraite et salariale|biens professionnels|foncier)$/i;
+if (SKIP_A.test(nom)) return; // ignorer
+```
