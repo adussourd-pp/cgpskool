@@ -587,95 +587,84 @@ select.span2{grid-column:span 2}
   <div class="sec-header">
     <div>
       <div class="sec-tag">Étape 0</div>
-      <div class="sec-h1">Import du Recueil d'Informations</div>
-      <div class="sec-sub">Importez votre Word RI en PDF ou par copier-coller</div>
+      <div class="sec-h1">Import</div>
+      <div class="sec-sub">Recueil d'informations et avis d'imposition</div>
     </div>
   </div>
 
-  <div style="margin-bottom:20px">
+  <div style="margin-bottom:20px;display:flex;flex-direction:column;gap:16px">
+
+    <!-- ── BLOC RI ── -->
     <div style="background:#fff;border:1.5px solid var(--bord);border-radius:14px;padding:24px">
 
-      <!-- Upload PDF RI -->
-      <div style="margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <span style="font-size:24px">📄</span>
-          <div>
-            <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:var(--noir)">Importer le RI en PDF</div>
-            <div style="font-size:12px;color:var(--gris);margin-top:1px">Sauvegardez votre Word RI en PDF puis déposez-le ici</div>
-          </div>
-        </div>
-        <label id="riDropzone" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:28px;border:2px dashed var(--bord);border-radius:12px;cursor:pointer;background:#fafaf9;transition:all 0.2s" ondragover="event.preventDefault();this.style.borderColor='var(--ambre)';this.style.background='var(--ambre-l)'" ondragleave="this.style.borderColor='var(--bord)';this.style.background='#fafaf9'" ondrop="handleRiDrop(event)">
-          <span style="font-size:36px">📥</span>
-          <span style="font-size:13px;font-weight:600;color:var(--noir)">Déposer le PDF ici</span>
-          <span style="font-size:12px;color:var(--gris)">ou cliquer pour sélectionner</span>
-          <input type="file" id="riFileInput" accept=".pdf,.docx" style="display:none" onchange="handleRiFile(this.files[0])">
-        </label>
-        <div id="riFileStatus" style="margin-top:8px;font-size:12px;color:var(--gris);min-height:16px"></div>
-      </div>
-
-      <!-- Séparateur -->
-      <div style="display:flex;align-items:center;gap:12px;margin:18px 0">
-        <div style="flex:1;height:1px;background:var(--bord)"></div>
-        <span style="font-size:11px;font-weight:700;color:var(--gris);letter-spacing:0.1em">OU</span>
-        <div style="flex:1;height:1px;background:var(--bord)"></div>
-      </div>
-
-      <!-- Copier-coller texte brut -->
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <span style="font-size:24px">📋</span>
-          <div>
-            <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:var(--noir)">Coller le contenu du Word RI</div>
-            <div style="font-size:12px;color:var(--gris);margin-top:1px">Dans Word : <strong>Ctrl+A</strong> → <strong>Ctrl+C</strong> → coller ici</div>
-          </div>
-        </div>
-        <textarea id="riPasteZone"
-          placeholder="Collez ici le contenu copié depuis votre Word RI..."
-          style="width:100%;height:180px;padding:14px;border:1.5px solid var(--bord);border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);resize:vertical;outline:none;transition:border-color 0.2s;line-height:1.6;background:#fafaf9"
-          oninput="onRiPaste(this.value)"
-          onfocus="this.style.borderColor='var(--ambre)'"
-          onblur="this.style.borderColor='var(--bord)'"></textarea>
-        <div id="pasteStatus" style="margin-top:8px;font-size:12px;color:var(--gris);min-height:16px"></div>
-      </div>
-
-      <!-- Loader + actions -->
-      <div id="parseLoader" style="display:none;margin-top:14px;padding:14px 18px;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:10px;align-items:center;gap:12px">
-        <div style="width:20px;height:20px;border:2.5px solid var(--ambre-m);border-top-color:var(--ambre-d);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0"></div>
+      <!-- Ligne principale : titre + bouton Importer -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-weight:600;font-size:13px;color:var(--ambre-d)">Analyse du RI en cours…</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:1px" id="loaderDetail">Lecture des données patrimoniales</div>
+          <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:16px;color:var(--noir)">📋 Recueil d'informations</div>
+          <div style="font-size:12px;color:var(--gris);margin-top:3px">Cliquer pour choisir votre fichier Word (.docx) — s'ouvre directement</div>
         </div>
+        <label style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:var(--ambre);color:#fff;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:background 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--ambre-d)'" onmouseout="this.style.background='var(--ambre)'">
+          &#8599; Importer
+          <input type="file" id="riFileInput" accept=".docx" style="display:none" onchange="handleRiFile(this.files[0])">
+        </label>
       </div>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button class="btn btn-primary" onclick="parseFromPaste()" id="btnParsePaste" disabled>
-          &#9654; Analyser et ouvrir l'étude
-        </button>
-        <button class="btn btn-secondary" onclick="document.getElementById('riPasteZone').value='';document.getElementById('pasteStatus').textContent='';document.getElementById('btnParsePaste').disabled=true;document.getElementById('riFileStatus').textContent=''">
-          Effacer
-        </button>
-        <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()" style="margin-left:auto;border-color:var(--red);color:var(--red)" onmouseover="this.style.background='var(--red-l)'" onmouseout="this.style.background='transparent'">
-          &#8635; Réinitialiser
-        </button>
+
+      <!-- Feedback import -->
+      <div id="riFileStatus" style="font-size:12px;color:var(--gris);min-height:16px"></div>
+
+      <!-- Séparateur OU -->
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 12px">
+        <div style="flex:1;height:1px;background:var(--bord)"></div>
+        <span style="font-size:10px;font-weight:700;color:var(--gris);letter-spacing:0.1em">OU COLLER DEPUIS WORD</span>
+        <div style="flex:1;height:1px;background:var(--bord)"></div>
+      </div>
+
+      <!-- Zone copier-coller -->
+      <textarea id="riPasteZone"
+        placeholder="Dans Word : Ctrl+A → Ctrl+C → coller ici…"
+        style="width:100%;height:110px;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);resize:vertical;outline:none;transition:border-color 0.2s;line-height:1.6;background:#fafaf9"
+        oninput="onRiPaste(this.value)"
+        onfocus="this.style.borderColor='var(--ambre)'"
+        onblur="this.style.borderColor='var(--bord)'"></textarea>
+      <div id="pasteStatus" style="margin-top:6px;font-size:12px;color:var(--gris);min-height:14px"></div>
+
+      <!-- Loader -->
+      <div id="parseLoader" style="display:none;margin-top:10px;padding:10px 14px;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:10px;align-items:center;gap:10px">
+        <div style="width:16px;height:16px;border:2px solid var(--ambre-m);border-top-color:var(--ambre-d);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0"></div>
+        <div style="font-size:12px;color:var(--ambre-d);font-weight:600" id="loaderDetail">Analyse en cours…</div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-primary" onclick="parseFromPaste()" id="btnParsePaste" disabled>&#9654; Ouvrir l'étude</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('riPasteZone').value='';document.getElementById('pasteStatus').textContent='';document.getElementById('btnParsePaste').disabled=true">Effacer</button>
+      </div>
+
+
+      <!-- Réinitialiser -->
+      <div style="margin-top:14px;text-align:right">
+        <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()" style="font-size:11px;border-color:var(--red);color:var(--red)" onmouseover="this.style.background='var(--red-l)'" onmouseout="this.style.background='transparent'">&#8635; Réinitialiser l'étude</button>
       </div>
     </div>
 
-    <!-- Avis d'imposition — upload PDF uniquement -->
-    <div class="card" style="margin-bottom:16px;margin-top:16px">
-      <div class="card-title"><span class="dot"></span>Avis d'imposition (optionnel)</div>
-      <p style="font-size:12px;color:var(--gris);margin-bottom:10px">Importez le PDF de votre avis d'imposition pour enrichir automatiquement le bilan fiscal.</p>
-      <label id="avisDropzone" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px dashed var(--bord);border-radius:10px;cursor:pointer;background:#fafaf9;transition:all 0.2s" ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='rgba(43,94,167,0.05)'" ondragleave="this.style.borderColor='var(--bord)';this.style.background='#fafaf9'" ondrop="handleAvisDrop(event)">
-        <span style="font-size:28px">📊</span>
+    <!-- ── BLOC AVIS D'IMPOSITION ── -->
+    <div style="background:#fff;border:1.5px solid var(--bord);border-radius:14px;padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-size:13px;font-weight:600;color:var(--noir)">Déposer le PDF de l'avis d'imposition</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:2px">ou cliquer pour sélectionner</div>
+          <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
+          <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
         </div>
-        <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
-      </label>
-      <div id="avisIRStatus" style="font-size:12px;margin-top:8px;color:var(--gris);min-height:16px"></div>
+        <label id="avisDropzone" style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#fff;color:var(--blue);border:1.5px solid var(--blue);font-family:Space Grotesk,sans-serif;font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--blue-l)'" onmouseout="this.style.background='#fff'" ondragover="event.preventDefault();this.style.background='var(--blue-l)'" ondragleave="this.style.background='#fff'" ondrop="handleAvisDrop(event)">
+          &#8599; Importer
+          <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
+        </label>
+      </div>
+      <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
     </div>
 
   </div>
 </div><!-- /sec-import -->
+
 
 <!-- ════════════════════════════════════════
      1 — SITUATION & OBJECTIFS
@@ -2137,7 +2126,7 @@ function parseFromPaste(){
   var loaderSteps=['Lecture des données patrimoniales','Identification des actifs et passifs','Calcul des indicateurs fiscaux','Détection des objectifs','Finalisation de l\'étude…'];
   var si=0;
   var stepInt=setInterval(function(){
-    si=(si+1)%steps.length;
+    si=(si+1)%loaderSteps.length;
     var d=document.getElementById('loaderDetail');
     if(d)d.textContent=loaderSteps[si];
   },400);
@@ -4530,22 +4519,30 @@ function handleRiDrop(e) {
 function handleRiFile(file) {
   if (!file) return;
   var status = document.getElementById('riFileStatus');
-  var btn    = document.getElementById('btnParsePaste');
   var ext    = file.name.split('.').pop().toLowerCase();
 
   if (status) status.textContent = 'Lecture de ' + file.name + '…';
 
   if (ext === 'docx') {
-    // Extraction directe avec mammoth
     var reader = new FileReader();
     reader.onload = function(e) {
       mammoth.extractRawText({arrayBuffer: e.target.result}).then(function(result) {
         var txt = result.value;
-        document.getElementById('riPasteZone').value = txt;
+        if (!txt || txt.trim().length < 50) {
+          if (status) status.innerHTML = '<span style="color:var(--red)">❌ Fichier vide ou illisible</span>';
+          return;
+        }
         riPasteBuffer = txt;
-        if (btn) btn.disabled = txt.trim().length < 50;
-        if (status) status.innerHTML = '<span style="color:var(--green)">✅ ' + file.name + ' — ' + txt.split('\n').length + ' lignes extraites</span>';
-        onRiPaste(txt);
+        // Feedback visuel
+        if (status) status.innerHTML = '<span style="color:var(--green)">✅ ' + file.name + ' importé — analyse en cours…</span>';
+        // Lancer directement le parse et naviguer
+        setTimeout(function() {
+          try {
+            parseTextRI(txt);
+          } catch(e) {
+            if (status) status.innerHTML = '<span style="color:var(--red)">❌ Erreur d\'analyse : ' + e.message + '</span>';
+          }
+        }, 80);
       }).catch(function(err) {
         if (status) status.innerHTML = '<span style="color:var(--red)">❌ Erreur lecture DOCX : ' + err.message + '</span>';
       });
