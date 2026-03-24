@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intérêts Composés — CGP Skool</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── Layout ── */
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+
+.page-hero {
+  background: var(--bg);
+  padding: 40px 52px 44px;
+  position: relative; overflow: hidden;
+}
+.page-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--rule-d) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule-d) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+}
+.page-hero-inner { max-width: 1140px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* ── Grille principale ── */
+.sim-layout {
+  max-width: 1140px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 0;
+  min-height: calc(100vh - 200px);
+}
+
+/* ── Panneau gauche ── */
+.panel-left {
+  background: var(--paper-2);
+  border-right: 1px solid var(--rule-l);
+  padding: 28px 24px 40px;
+  overflow-y: auto;
+}
+
+/* Groupes de paramètres */
+.param-section {
+  margin-bottom: 28px;
+}
+.param-section-title {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-30); margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule-l);
+  display: flex; align-items: center; gap: 8px;
+}
+.param-section-title span {
+  width: 3px; height: 12px;
+  background: var(--orange); display: inline-block; flex-shrink: 0;
+}
+
+.param-row {
+  margin-bottom: 14px;
+}
+.param-label {
+  font-size: 11px; font-weight: 500; color: var(--ink-60);
+  margin-bottom: 5px; display: flex; align-items: center;
+  justify-content: space-between;
+}
+.param-label small {
+  font-size: 9px; color: var(--ink-30); font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+/* Input avec unité */
+.input-with-unit {
+  display: flex; align-items: stretch;
+  border: 1px solid var(--rule-l);
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.input-with-unit:focus-within { border-color: var(--orange); }
+.input-with-unit input {
+  flex: 1; padding: 9px 12px;
+  border: none; background: transparent;
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  color: var(--ink); outline: none;
+  min-width: 0;
+}
+.input-unit {
+  padding: 0 12px;
+  display: flex; align-items: center;
+  font-size: 12px; font-weight: 600; color: var(--ink-30);
+  background: var(--paper);
+  border-left: 1px solid var(--rule-l);
+  flex-shrink: 0;
+}
+
+/* Toggle fréquence */
+.freq-row { display: flex; gap: 4px; }
+.freq-btn {
+  flex: 1; padding: 7px 2px;
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  border: 1px solid var(--rule-l); background: #fff;
+  color: var(--ink-60); cursor: pointer; transition: all 0.15s;
+  text-align: center;
+}
+.freq-btn:hover { border-color: var(--orange); color: var(--orange); }
+.freq-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+/* Toggle reinvestissement */
+.toggle-row { display: flex; gap: 4px; }
+.toggle-opt {
+  flex: 1; padding: 8px 4px;
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  border: 1px solid var(--rule-l); background: #fff;
+  color: var(--ink-60); cursor: pointer; transition: all 0.15s;
+  text-align: center;
+}
+.toggle-opt:hover { border-color: var(--orange); color: var(--orange); }
+.toggle-opt.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* Section frais — accordéon */
+.frais-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+  font-size: 11px; font-weight: 600; color: var(--ink-60);
+  padding: 8px 0;
+}
+.frais-toggle .arr { font-size: 9px; transition: transform 0.2s; }
+.frais-toggle.open .arr { transform: rotate(180deg); }
+.frais-body { display: none; padding-top: 6px; }
+.frais-body.open { display: block; }
+
+/* Bouton calcul */
+.btn-calc {
+  width: 100%;
+  padding: 14px;
+  background: var(--orange); color: #fff;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  letter-spacing: 0.04em;
+  border: none; cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 6px 18px rgba(212,98,42,0.25);
+  margin-top: 8px;
+}
+.btn-calc:hover { background: var(--orange-hover); }
+
+/* ── Zone résultats ── */
+.panel-right {
+  background: var(--paper);
+  padding: 28px 32px 40px;
+  overflow-y: auto;
+}
+
+/* KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: #fff;
+  border: 1px solid var(--rule-l);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--kpi-color, var(--rule-l));
+}
+.kpi-label {
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-30); margin-bottom: 8px;
+}
+.kpi-value {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink); line-height: 1;
+}
+.kpi-sub {
+  font-size: 10px; color: var(--ink-30); margin-top: 4px;
+}
+.kpi-card.featured {
+  background: var(--ink); border-color: var(--ink);
+}
+.kpi-card.featured .kpi-label { color: var(--fog-2); }
+.kpi-card.featured .kpi-value { color: var(--white); }
+.kpi-card.featured .kpi-sub { color: var(--fog-2); }
+
+/* Tableau de synthèse */
+.summary-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--rule-l);
+  font-size: 13px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row .lbl { color: var(--ink-60); }
+.summary-row .val { font-weight: 600; color: var(--ink); }
+.summary-row .val.accent { color: var(--orange); }
+.summary-row .val.neg { color: #c0392b; }
+.summary-row.total {
+  font-size: 14px; font-weight: 700;
+  border-top: 2px solid var(--rule-l); border-bottom: none;
+  padding-top: 12px; margin-top: 4px;
+}
+
+/* Chart */
+.chart-wrap {
+  background: #fff; border: 1px solid var(--rule-l);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.chart-title {
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-30);
+}
+.chart-canvas-wrap { position: relative; height: 260px; }
+
+/* Tableau annuel */
+.table-section {
+  background: #fff; border: 1px solid var(--rule-l);
+  overflow: hidden;
+}
+.table-section-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--rule-l);
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-30);
+}
+.tbl {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+.tbl th {
+  background: var(--ink); color: #fff;
+  padding: 10px 14px; text-align: right;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.tbl th:first-child { text-align: center; }
+.tbl td {
+  padding: 9px 14px; text-align: right;
+  border-bottom: 1px solid var(--rule-l);
+  color: var(--ink-60);
+}
+.tbl td:first-child { text-align: center; font-weight: 600; color: var(--ink); }
+.tbl td.pos { color: #1a7a4a; font-weight: 600; }
+.tbl td.neg { color: #c0392b; }
+.tbl tr:hover td { background: var(--paper); }
+.tbl tr.milestone td { background: var(--o-dim); }
+.tbl tr.milestone td:first-child { color: var(--orange); }
+
+/* État vide */
+.empty-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 400px; text-align: center; gap: 12px;
+}
+.empty-panel svg { opacity: 0.14; }
+.empty-panel-title {
+  font-family: var(--serif); font-size: 22px; font-weight: 400;
+  letter-spacing: -0.01em; color: var(--ink); margin-top: 4px;
+}
+.empty-panel-sub { font-size: 13px; color: var(--ink-60); font-weight: 300; max-width: 280px; line-height: 1.8; }
+
+/* Note de bas de page */
+.sim-note {
+  font-size: 10.5px; color: var(--ink-30);
+  border-top: 1px solid var(--rule-l);
+  padding-top: 14px; margin-top: 24px;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .sim-layout { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .panel-left { border-right: none; border-bottom: 1px solid var(--rule-l); }
+  .page-hero { padding: 32px 20px; }
+  .panel-left, .panel-right { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="cs-kicker">
+      <span class="cs-kicker-line"></span>
+      <span class="cs-kicker-text">Simulateur patrimonial</span>
+    </div>
+    <h1 class="cs-h1 light" style="font-size:clamp(24px,2.8vw,38px);margin-bottom:6px">
+      Calculatrice <em>intérêts composés</em>
+    </h1>
+    <p style="font-size:13px;font-weight:300;color:var(--fog);max-width:480px;line-height:1.7">
+      Projection de capitalisation avec versements périodiques, frais et imposition — tous paramètres configurables.
+    </p>
+  </div>
+</div>
+
+<!-- SIMULATEUR -->
+<div class="sim-layout">
+
+  <!-- ── PANNEAU GAUCHE ── -->
+  <div class="panel-left">
+
+    <!-- Capital & versements -->
+    <div class="param-section">
+      <div class="param-section-title"><span></span>Capital & versements</div>
+
+      <div class="param-row">
+        <div class="param-label">Capital initial</div>
+        <div class="input-with-unit">
+          <input type="number" id="capital" value="10000" min="0" step="1000" oninput="recalc()">
+          <div class="input-unit">€</div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">
+          Versement périodique
+          <small>fréquence →</small>
+        </div>
+        <div class="input-with-unit" style="margin-bottom:6px">
+          <input type="number" id="versement" value="200" min="0" step="50" oninput="recalc()">
+          <div class="input-unit">€</div>
+        </div>
+        <div class="freq-row" id="freqRow">
+          <button class="freq-btn active" onclick="setFreq('mensuel',this)">Mensuel</button>
+          <button class="freq-btn" onclick="setFreq('trimestriel',this)">Trim.</button>
+          <button class="freq-btn" onclick="setFreq('annuel',this)">Annuel</button>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Durée</div>
+        <div class="input-with-unit">
+          <input type="number" id="duree" value="20" min="1" max="50" step="1" oninput="recalc()">
+          <div class="input-unit">ans</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rendement -->
+    <div class="param-section">
+      <div class="param-section-title"><span></span>Rendement</div>
+
+      <div class="param-row">
+        <div class="param-label">Taux annuel brut</div>
+        <div class="input-with-unit">
+          <input type="number" id="taux" value="5" min="0" max="20" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Capitalisation</div>
+        <div class="toggle-row" id="capitRow">
+          <button class="toggle-opt active" onclick="setCapit('annuelle',this)">Annuelle</button>
+          <button class="toggle-opt" onclick="setCapit('mensuelle',this)">Mensuelle</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frais -->
+    <div class="param-section">
+      <div class="param-section-title"><span></span>Frais</div>
+
+      <div class="param-row">
+        <div class="frais-toggle" id="fraisToggle" onclick="toggleFrais()">
+          <span>Taux de revalorisation nets de frais</span>
+          <span class="arr">▾</span>
+        </div>
+        <div class="frais-body" id="fraisBody">
+          <div class="param-row">
+            <div class="param-label">Taux fonds euros (net frais)</div>
+            <div class="input-with-unit">
+              <input type="number" id="tauxFE" value="1.1" min="0" max="10" step="0.1" oninput="recalc()">
+              <div class="input-unit">%</div>
+            </div>
+          </div>
+          <div class="param-row">
+            <div class="param-label">Taux unités de compte (net frais)</div>
+            <div class="input-with-unit">
+              <input type="number" id="tauxUC" value="3.5" min="0" max="15" step="0.1" oninput="recalc()">
+              <div class="input-unit">%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Frais de gestion annuels</div>
+        <div class="input-with-unit">
+          <input type="number" id="fraisGestion" value="0" min="0" max="5" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Frais sur versement initial <small>★ obligatoires</small></div>
+        <div class="input-with-unit">
+          <input type="number" id="fraisVersInit" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Frais sur versements périodiques <small>★ obligatoires</small></div>
+        <div class="input-with-unit">
+          <input type="number" id="fraisVersPer" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Frais sur versements exceptionnels <small>★ obligatoires</small></div>
+        <div class="input-with-unit">
+          <input type="number" id="fraisVersExc" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fiscalité -->
+    <div class="param-section">
+      <div class="param-section-title"><span></span>Fiscalité à la sortie</div>
+
+      <div class="param-row">
+        <div class="param-label">Mode d'imposition</div>
+        <div class="toggle-row" id="fiscRow">
+          <button class="toggle-opt active" onclick="setFisc('pfu',this)">Flat tax 30%</button>
+          <button class="toggle-opt" onclick="setFisc('bareme',this)">Barème IR</button>
+          <button class="toggle-opt" onclick="setFisc('exonere',this)">Exonéré</button>
+        </div>
+      </div>
+
+      <div class="param-row" id="tmiRow" style="display:none">
+        <div class="param-label">TMI applicable</div>
+        <div class="toggle-row" id="tmiToggle">
+          <button class="freq-btn active" onclick="setTMI(0.11,this)">11%</button>
+          <button class="freq-btn" onclick="setTMI(0.30,this)">30%</button>
+          <button class="freq-btn" onclick="setTMI(0.41,this)">41%</button>
+          <button class="freq-btn" onclick="setTMI(0.45,this)">45%</button>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-label">Prélèvements sociaux (PS)</div>
+        <div class="input-with-unit">
+          <input type="number" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+          <div class="input-unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="recalc()">Calculer →</button>
+  </div>
+
+  <!-- ── PANNEAU DROIT ── -->
+  <div class="panel-right" id="panelRight">
+    <div class="empty-panel" id="emptyPanel">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="4" y="28" width="8" height="20" rx="0" fill="#181614"/>
+        <rect x="16" y="20" width="8" height="28" rx="0" fill="#181614"/>
+        <rect x="28" y="12" width="8" height="36" rx="0" fill="#181614"/>
+        <rect x="40" y="4" width="8" height="44" rx="0" fill="#D4622A"/>
+        <line x1="2" y1="48" x2="50" y2="48" stroke="#181614" stroke-width="1.5"/>
+      </svg>
+      <div class="empty-panel-title">Projection capitalisation</div>
+      <div class="empty-panel-sub">Renseignez les paramètres et lancez la simulation.</div>
+    </div>
+
+    <div id="results" style="display:none">
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- Graphique -->
+      <div class="chart-wrap">
+        <div class="chart-header">
+          <span class="chart-title">Évolution du capital dans le temps</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Synthèse -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-30);margin-bottom:12px">Décomposition du capital final</div>
+          <div id="decomposition"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-30);margin-bottom:12px">Indicateurs clés</div>
+          <div id="indicateurs"></div>
+        </div>
+      </div>
+
+      <!-- Tableau annuel -->
+      <div class="table-section">
+        <div class="table-section-header">Évolution annuelle</div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="text-align:center">Année</th>
+                <th>Capital début</th>
+                <th>Versements</th>
+                <th>Intérêts</th>
+                <th>Frais</th>
+                <th>Capital fin</th>
+                <th>Capital net (après fisc.)</th>
+              </tr>
+            </thead>
+            <tbody id="tablBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sim-note" id="simNote"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);padding:28px 52px;display:flex;align-items:center;justify-content:space-between">
+  <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div style="width:26px;height:26px;border:1px solid rgba(212,98,42,0.38);display:flex;align-items:center;justify-content:center">
+      <span style="font-family:var(--serif);font-size:12px;color:var(--orange);line-height:1">C</span>
+    </div>
+    <span style="font-size:10.5px;color:rgba(255,255,255,0.25);letter-spacing:0.2em;text-transform:uppercase">CGP Skool</span>
+  </a>
+  <span style="font-size:11px;color:rgba(255,255,255,0.16)">© 2025 — Outil interne réservé aux consultants du réseau</span>
+</footer>
+
+<script>
+// ── État ──
+var freq = 'mensuel';       // mensuel | trimestriel | annuel
+var capit = 'annuelle';     // annuelle | mensuelle
+var fiscMode = 'pfu';       // pfu | bareme | exonere
+var tmiBareme = 0.11;
+var chartInst = null;
+
+// ── Helpers ──
+function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n, decimals) {
+  return new Intl.NumberFormat('fr-FR', {
+    maximumFractionDigits: decimals !== undefined ? decimals : 0,
+    minimumFractionDigits: 0
+  }).format(Math.round(n * Math.pow(10, decimals || 0)) / Math.pow(10, decimals || 0));
+}
+function fmtE(n) { return fmt(n) + ' €'; }
+function fmtPct(n) { return fmt(n, 2) + ' %'; }
+
+function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+// ── Actions UI ──
+function setFreq(f, btn) {
+  freq = f;
+  document.querySelectorAll('#freqRow .freq-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalc();
+}
+function setCapit(c, btn) {
+  capit = c;
+  document.querySelectorAll('#capitRow .toggle-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalc();
+}
+function setFisc(f, btn) {
+  fiscMode = f;
+  document.querySelectorAll('#fiscRow .toggle-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tmiRow').style.display = f === 'bareme' ? 'block' : 'none';
+  recalc();
+}
+function setTMI(v, btn) {
+  tmiBareme = v;
+  document.querySelectorAll('#tmiToggle .freq-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recalc();
+}
+function toggleFrais() {
+  var t = document.getElementById('fraisToggle');
+  var b = document.getElementById('fraisBody');
+  t.classList.toggle('open');
+  b.classList.toggle('open');
+}
+
+// ── Calcul core ──
+function recalc() {
+  var capital      = gv('capital');
+  var versement    = gv('versement');
+  var duree        = Math.max(1, Math.min(50, Math.round(gv('duree'))));
+  var tauxAnnuel   = gv('taux') / 100;
+  var fraisGestion = gv('fraisGestion') / 100;
+  var fraisVI      = gv('fraisVersInit') / 100;
+  var fraisVP      = gv('fraisVersPer') / 100;
+  var ps           = gv('ps') / 100;
+  var irFlat       = fiscMode === 'pfu' ? 0.128 : fiscMode === 'bareme' ? tmiBareme : 0;
+  var fiscTotal    = fiscMode === 'exonere' ? 0 : irFlat + ps;
+
+  // Nombre de versements périodiques par an
+  var versParAn = freq === 'mensuel' ? 12 : freq === 'trimestriel' ? 4 : 1;
+  var versementAnnuel = versement * versParAn; // versement brut annuel
+
+  // Capital de départ après frais sur versement initial
+  var capitalNet = capital * (1 - fraisVI);
+
+  // Taux net de frais de gestion
+  var tauxNet = tauxAnnuel - fraisGestion;
+
+  // Capitalisation : taux périodique
+  var periodesParAn = capit === 'mensuelle' ? 12 : 1;
+  var tauxPeriodique = Math.pow(1 + tauxNet, 1 / periodesParAn) - 1;
+
+  // Simulation année par année
+  var rows = [];
+  var cap = capitalNet;
+  var totalVersements = capital; // capital initial compris
+  var totalInterets = 0;
+  var totalFraisVers = capital * fraisVI; // frais init
+  var totalFraisGestion = 0;
+
+  for (var an = 1; an <= duree; an++) {
+    var capDebut = cap;
+    // Versements de l'année (nets de frais)
+    var versAnnuelNet = versementAnnuel * (1 - fraisVP);
+    var fraisVersAnnee = versementAnnuel * fraisVP;
+
+    // Calcul des intérêts selon capitalisation
+    var capAvecVers = cap;
+    var interetsAn = 0;
+
+    if (capit === 'annuelle') {
+      // Versements en milieu d'année (approx : 1/2 an d'intérêts)
+      var interetsCap = cap * tauxNet;
+      var interetsVers = versAnnuelNet * (tauxNet / 2);
+      interetsAn = interetsCap + interetsVers;
+      cap = cap + versAnnuelNet + interetsAn;
+    } else {
+      // Mensuelle : on simule mois par mois
+      var versParMois = versementAnnuel / 12 * (1 - fraisVP);
+      for (var m = 0; m < 12; m++) {
+        cap += versParMois;
+        cap *= (1 + tauxPeriodique);
+      }
+      interetsAn = cap - capDebut - versAnnuelNet;
+    }
+
+    var fraisGestionAnnee = capDebut * fraisGestion;
+    totalVersements += versementAnnuel;
+    totalInterets += interetsAn;
+    totalFraisVers += fraisVersAnnee;
+    totalFraisGestion += fraisGestionAnnee;
+
+    rows.push({
+      an,
+      capDebut: Math.round(capDebut),
+      versAnnuel: Math.round(versementAnnuel),
+      versAnnuelNet: Math.round(versAnnuelNet),
+      interets: Math.round(interetsAn),
+      frais: Math.round(fraisVersAnnee + fraisGestionAnnee),
+      capFin: Math.round(cap),
+    });
+  }
+
+  var capitalFinal = cap;
+  var capitalInvesti = capital + versementAnnuel * duree; // brut versé
+  var capitalInvesti_net = capitalNet + versementAnnuel * (1 - fraisVP) * duree; // net frais vers
+  var plusValues = capitalFinal - capitalInvesti_net;
+  var fiscalite = plusValues > 0 ? plusValues * fiscTotal : 0;
+  var capitalNetFisc = capitalFinal - fiscalite;
+  var totalFrais = totalFraisVers + totalFraisGestion;
+
+  // Performance
+  var rendTotal = capitalInvesti_net > 0 ? (capitalFinal - capitalInvesti_net) / capitalInvesti_net * 100 : 0;
+  var tauxReel = capitalInvesti_net > 0 ? (Math.pow(capitalFinal / capitalInvesti_net, 1 / duree) - 1) * 100 : 0;
+
+  // ── Affichage ──
+  document.getElementById('emptyPanel').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  // KPIs
+  var kpis = [
+    { label: 'Capital final brut', val: fmtE(capitalFinal), sub: 'Avant fiscalité', color: 'var(--orange)', featured: false },
+    { label: 'Capital net', val: fmtE(capitalNetFisc), sub: 'Après fiscalité', color: 'var(--orange)', featured: true },
+    { label: 'Plus-values', val: fmtE(Math.max(0, plusValues)), sub: fmtPct(rendTotal) + ' de gain total', color: '#1a7a4a', featured: false },
+    { label: 'Total versé', val: fmtE(capitalInvesti), sub: 'Capital + versements bruts', color: 'var(--rule-l)', featured: false },
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k =>
+    `<div class="kpi-card${k.featured?' featured':''}" style="--kpi-color:${k.color}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`
+  ).join('');
+
+  // Décomposition
+  var dec = [
+    { lbl: 'Capital initial', val: fmtE(capital), cls: '' },
+    { lbl: 'Versements périodiques', val: fmtE(versementAnnuel * duree), cls: '' },
+    { lbl: 'Intérêts générés', val: fmtE(totalInterets), cls: 'accent' },
+    { lbl: '− Frais totaux', val: '− ' + fmtE(totalFrais), cls: 'neg' },
+    { lbl: '− Fiscalité', val: '− ' + fmtE(fiscalite), cls: 'neg' },
+  ];
+  document.getElementById('decomposition').innerHTML = dec.map(d =>
+    `<div class="summary-row"><span class="lbl">${d.lbl}</span><span class="val ${d.cls}">${d.val}</span></div>`
+  ).join('') +
+  `<div class="summary-row total"><span class="lbl">Capital net final</span><span class="val accent">${fmtE(capitalNetFisc)}</span></div>`;
+
+  // Indicateurs
+  var ind = [
+    { lbl: 'Taux annuel appliqué', val: fmtPct(tauxAnnuel * 100) },
+    { lbl: 'Frais de gestion / an', val: fmtPct(fraisGestion * 100) },
+    { lbl: 'Taux net (après frais)', val: fmtPct(tauxNet * 100) },
+    { lbl: 'Rendement total', val: fmtPct(rendTotal) },
+    { lbl: 'TCAM (taux composé annuel)', val: fmtPct(tauxReel) },
+    { lbl: 'Fiscalité appliquée', val: fiscMode === 'exonere' ? 'Exonéré' : fmtPct(fiscTotal * 100) },
+  ];
+  document.getElementById('indicateurs').innerHTML = ind.map(i =>
+    `<div class="summary-row"><span class="lbl">${i.lbl}</span><span class="val">${i.val}</span></div>`
+  ).join('');
+
+  // Graphique
+  var labels = rows.map(r => 'An ' + r.an);
+  var dataCapFin = rows.map(r => r.capFin);
+  var dataInvesti = rows.map(r => {
+    return Math.round(capitalNet + versementAnnuel * (1 - fraisVP) * r.an);
+  });
+  var dataNet = rows.map(r => {
+    var pv = Math.max(0, r.capFin - (capitalNet + versementAnnuel * (1 - fraisVP) * r.an));
+    var fisc = pv * fiscTotal;
+    return Math.round(r.capFin - fisc);
+  });
+
+  if (chartInst) chartInst.destroy();
+  var ctx = document.getElementById('mainChart');
+  chartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Capital brut',
+          data: dataCapFin,
+          borderColor: 'var(--orange)',
+          backgroundColor: 'rgba(212,98,42,0.08)',
+          fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.4,
+        },
+        {
+          label: 'Capital net (après fisc.)',
+          data: dataNet,
+          borderColor: '#1a7a4a',
+          backgroundColor: 'rgba(26,122,74,0.05)',
+          fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4,
+        },
+        {
+          label: 'Total versé (net frais)',
+          data: dataInvesti,
+          borderColor: 'rgba(24,22,20,0.25)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5, pointRadius: 0, tension: 0, borderDash: [4, 4],
+        },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, padding: 14 } },
+        tooltip: { callbacks: {
+          label: function(ctx) {
+            return ' ' + ctx.dataset.label + ' : ' + new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' €';
+          }
+        }}
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 10 }, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 10 }, callback: v => new Intl.NumberFormat('fr-FR', {notation:'compact'}).format(v) + '€' } }
+      }
+    }
+  });
+
+  // Tableau annuel
+  var tbody = '';
+  rows.forEach(r => {
+    var milestone = r.an % 5 === 0;
+    var pvAn = Math.max(0, r.capFin - (capitalNet + versementAnnuel * (1 - fraisVP) * r.an));
+    var fiscAn = pvAn * fiscTotal;
+    var netAn = r.capFin - fiscAn;
+    tbody += `<tr class="${milestone?'milestone':''}">
+      <td>${r.an}</td>
+      <td>${fmtE(r.capDebut)}</td>
+      <td>${fmtE(r.versAnnuel)}</td>
+      <td class="pos">+ ${fmtE(r.interets)}</td>
+      <td class="neg">${r.frais > 0 ? '− ' + fmtE(r.frais) : '—'}</td>
+      <td><strong>${fmtE(r.capFin)}</strong></td>
+      <td style="color:var(--orange);font-weight:600">${fmtE(netAn)}</td>
+    </tr>`;
+  });
+  document.getElementById('tablBody').innerHTML = tbody;
+
+  // Note
+  document.getElementById('simNote').innerHTML =
+    `Simulation à titre indicatif — non contractuelle. Hypothèses : taux annuel brut ${fmtPct(tauxAnnuel*100)}, ` +
+    `frais de gestion ${fmtPct(fraisGestion*100)}/an, frais sur versements ${fmtPct(gv('fraisVersPer'))}%, ` +
+    `capitalisation ${capit}, versements ${freq}. ` +
+    (fiscMode === 'exonere' ? 'Fiscalité : exonéré.' :
+     fiscMode === 'pfu' ? `Fiscalité : flat tax 30% (IR 12,8% + PS ${fmtPct(ps*100)}) sur les plus-values.` :
+     `Fiscalité : barème IR ${fmtPct(tmiBareme*100)} + PS ${fmtPct(ps*100)} sur les plus-values.`);
+}
+
+// Init auto
+document.addEventListener('DOMContentLoaded', function() { recalc(); });
+</script>
+</body>
+</html>
