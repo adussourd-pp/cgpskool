@@ -393,11 +393,11 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-section-title"><span></span>Frais</div>
 
       <div class="param-row">
-        <div class="frais-toggle" id="fraisToggle" onclick="toggleFrais()">
+        <div class="frais-toggle open" id="fraisToggle" onclick="toggleFrais()">
           <span>Taux de revalorisation nets de frais</span>
           <span class="arr">▾</span>
         </div>
-        <div class="frais-body" id="fraisBody">
+        <div class="frais-body open" id="fraisBody">
           <div class="param-row">
             <div class="param-label">Taux fonds euros (net frais)</div>
             <div class="input-with-unit">
@@ -418,7 +418,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-row">
         <div class="param-label">Frais de gestion annuels</div>
         <div class="input-with-unit">
-          <input type="number" id="fraisGestion" value="0" min="0" max="5" step="0.1" oninput="recalc()">
+          <input type="number" id="fraisGestion" value="1" min="0" max="5" step="0.1" oninput="recalc()">
           <div class="input-unit">%</div>
         </div>
       </div>
@@ -426,7 +426,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-row">
         <div class="param-label">Frais sur versement initial <small>★ obligatoires</small></div>
         <div class="input-with-unit">
-          <input type="number" id="fraisVersInit" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <input type="number" id="fraisVersInit" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
           <div class="input-unit">%</div>
         </div>
       </div>
@@ -434,7 +434,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-row">
         <div class="param-label">Frais sur versements périodiques <small>★ obligatoires</small></div>
         <div class="input-with-unit">
-          <input type="number" id="fraisVersPer" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <input type="number" id="fraisVersPer" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
           <div class="input-unit">%</div>
         </div>
       </div>
@@ -442,7 +442,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-row">
         <div class="param-label">Frais sur versements exceptionnels <small>★ obligatoires</small></div>
         <div class="input-with-unit">
-          <input type="number" id="fraisVersExc" value="0" min="0" max="10" step="0.1" oninput="recalc()">
+          <input type="number" id="fraisVersExc" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
           <div class="input-unit">%</div>
         </div>
       </div>
@@ -455,12 +455,36 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <div class="param-row">
         <div class="param-label">Mode d'imposition</div>
         <div class="toggle-row" id="fiscRow">
-          <button class="toggle-opt active" onclick="setFisc('pfu',this)">Flat tax 30%</button>
+          <button class="toggle-opt active" onclick="setFisc('pfu',this)">Flat tax</button>
           <button class="toggle-opt" onclick="setFisc('bareme',this)">Barème IR</button>
           <button class="toggle-opt" onclick="setFisc('exonere',this)">Exonéré</button>
         </div>
       </div>
 
+      <!-- Flat tax scindée IR + PS -->
+      <div id="pfuRow">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="param-row" style="margin-bottom:0">
+            <div class="param-label">IR sur plus-values</div>
+            <div class="input-with-unit">
+              <input type="number" id="irPfu" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
+              <div class="input-unit">%</div>
+            </div>
+          </div>
+          <div class="param-row" style="margin-bottom:0">
+            <div class="param-label">Prélèvements sociaux</div>
+            <div class="input-with-unit">
+              <input type="number" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+              <div class="input-unit">%</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:7px;padding:7px 10px;background:rgba(43,94,167,0.07);font-size:11px;color:#185FA5">
+          Flat tax totale = IR + PS = <strong id="flatTaxTotal">30,0 %</strong> sur les plus-values
+        </div>
+      </div>
+
+      <!-- Barème IR -->
       <div class="param-row" id="tmiRow" style="display:none">
         <div class="param-label">TMI applicable</div>
         <div class="toggle-row" id="tmiToggle">
@@ -469,13 +493,12 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
           <button class="freq-btn" onclick="setTMI(0.41,this)">41%</button>
           <button class="freq-btn" onclick="setTMI(0.45,this)">45%</button>
         </div>
-      </div>
-
-      <div class="param-row">
-        <div class="param-label">Prélèvements sociaux (PS)</div>
-        <div class="input-with-unit">
-          <input type="number" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
+        <div class="param-row" style="margin-top:10px;margin-bottom:0">
+          <div class="param-label">Prélèvements sociaux (barème)</div>
+          <div class="input-with-unit">
+            <input type="number" id="psBareme" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+            <div class="input-unit">%</div>
+          </div>
         </div>
       </div>
     </div>
@@ -599,7 +622,8 @@ function setFisc(f, btn) {
   fiscMode = f;
   document.querySelectorAll('#fiscRow .toggle-opt').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tmiRow').style.display = f === 'bareme' ? 'block' : 'none';
+  document.getElementById('pfuRow').style.display  = f === 'pfu'    ? 'block' : 'none';
+  document.getElementById('tmiRow').style.display  = f === 'bareme' ? 'block' : 'none';
   recalc();
 }
 function setTMI(v, btn) {
@@ -625,8 +649,14 @@ function recalc() {
   var fraisVI      = gv('fraisVersInit') / 100;
   var fraisVP      = gv('fraisVersPer') / 100;
   var ps           = gv('ps') / 100;
-  var irFlat       = fiscMode === 'pfu' ? 0.128 : fiscMode === 'bareme' ? tmiBareme : 0;
-  var fiscTotal    = fiscMode === 'exonere' ? 0 : irFlat + ps;
+  var irPfu = (parseFloat((document.getElementById('irPfu')||{}).value) || 12.8) / 100;
+  var psBareme = (parseFloat((document.getElementById('psBareme')||{}).value) || 17.2) / 100;
+  var irFlat    = fiscMode === 'pfu' ? irPfu : fiscMode === 'bareme' ? tmiBareme : 0;
+  var psFisc    = fiscMode === 'bareme' ? psBareme : ps;
+  var fiscTotal = fiscMode === 'exonere' ? 0 : irFlat + psFisc;
+  // Mise à jour affichage flat tax total
+  var ftEl = document.getElementById('flatTaxTotal');
+  if (ftEl) ftEl.textContent = ((irPfu + ps) * 100).toFixed(1).replace('.', ',') + ' %';
 
   // Nombre de versements périodiques par an
   var versParAn = freq === 'mensuel' ? 12 : freq === 'trimestriel' ? 4 : 1;
@@ -762,33 +792,32 @@ function recalc() {
     return Math.round(r.capFin - fisc);
   });
 
+  // Données graphique bâtons empilés : capital versé + intérêts cumulés
+  var dataCapVerse = rows.map(r => Math.round(capitalNet + versementAnnuel * (1 - fraisVP) * r.an));
+  var dataInterets = rows.map(r => Math.max(0, r.capFin - Math.round(capitalNet + versementAnnuel * (1 - fraisVP) * r.an)));
+
   if (chartInst) chartInst.destroy();
   var ctx = document.getElementById('mainChart');
   chartInst = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
       labels,
       datasets: [
         {
-          label: 'Capital brut',
-          data: dataCapFin,
+          label: 'Capital versé (net frais)',
+          data: dataCapVerse,
+          backgroundColor: 'rgba(24,22,20,0.18)',
+          borderColor: 'rgba(24,22,20,0.3)',
+          borderWidth: 0,
+          stack: 'capital',
+        },
+        {
+          label: 'Intérêts composés',
+          data: dataInterets,
+          backgroundColor: 'rgba(212,98,42,0.82)',
           borderColor: 'var(--orange)',
-          backgroundColor: 'rgba(212,98,42,0.08)',
-          fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.4,
-        },
-        {
-          label: 'Capital net (après fisc.)',
-          data: dataNet,
-          borderColor: '#1a7a4a',
-          backgroundColor: 'rgba(26,122,74,0.05)',
-          fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4,
-        },
-        {
-          label: 'Total versé (net frais)',
-          data: dataInvesti,
-          borderColor: 'rgba(24,22,20,0.25)',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5, pointRadius: 0, tension: 0, borderDash: [4, 4],
+          borderWidth: 0,
+          stack: 'capital',
         },
       ]
     },
@@ -796,15 +825,29 @@ function recalc() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, padding: 14 } },
-        tooltip: { callbacks: {
-          label: function(ctx) {
-            return ' ' + ctx.dataset.label + ' : ' + new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' €';
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ' ' + ctx.dataset.label + ' : ' + new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' €';
+            },
+            footer: function(items) {
+              var total = items.reduce((s, i) => s + i.parsed.y, 0);
+              return 'Total : ' + new Intl.NumberFormat('fr-FR').format(Math.round(total)) + ' €';
+            }
           }
-        }}
+        }
       },
       scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 10 }, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 10 }, callback: v => new Intl.NumberFormat('fr-FR', {notation:'compact'}).format(v) + '€' } }
+        x: {
+          stacked: true,
+          grid: { display: false },
+          ticks: { font: { family: 'Inter', size: 10 }, maxTicksLimit: 12 }
+        },
+        y: {
+          stacked: true,
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { family: 'Inter', size: 10 }, callback: v => new Intl.NumberFormat('fr-FR', {notation:'compact'}).format(v) + '€' }
+        }
       }
     }
   });
@@ -839,7 +882,12 @@ function recalc() {
 }
 
 // Init auto
-document.addEventListener('DOMContentLoaded', function() { recalc(); });
+document.addEventListener('DOMContentLoaded', function() {
+  // Ouvrir l'accordéon frais par défaut
+  document.getElementById('fraisToggle').classList.add('open');
+  document.getElementById('fraisBody').classList.add('open');
+  recalc();
+});
 </script>
 </body>
 </html>
