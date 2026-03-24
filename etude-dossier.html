@@ -34,6 +34,30 @@ body{font-family:var(--sans);-webkit-font-smoothing:antialiased}
 /* ── NAV UNIVERSELLE ──────────────────────────────────────────────── */
 /* Fonts et nav via cgp-skool-theme.css */
 
+/* ── Dropdown SCPI (spécifique ED — classes nav-dropdown) ── */
+.nav-dropdown{position:relative}
+.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
+.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
+.nav-dropdown:hover .arr{transform:rotate(180deg)}
+.nav-dropdown-menu{
+  position:absolute;top:calc(100% + 4px);left:0;
+  background:rgba(15,14,13,0.97);
+  border:1px solid var(--rule-d);
+  padding:6px;min-width:190px;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:all 0.18s;backdrop-filter:blur(20px);
+  z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-dropdown-item{
+  display:block;font-family:var(--sans);font-size:13px;font-weight:400;
+  color:rgba(255,255,255,0.55);text-decoration:none;
+  padding:8px 12px;transition:color 0.15s;white-space:nowrap;
+}
+.nav-dropdown-item:hover{color:#fff}
+.nav-dropdown-item.active{color:var(--orange)}
+.nav-dropdown-sep{height:1px;background:var(--rule-d);margin:4px 0}
+
 /* ── TYPOGRAPHIE ──────────────────────────────────────────────────── */
 /* Fonts chargées par cgp-skool-theme.css */
 

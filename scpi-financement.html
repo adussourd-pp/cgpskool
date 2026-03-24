@@ -4,21 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGP Skool — Financement SCPI</title>
-<link rel="stylesheet" href="cgp-skool.css">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cgp-skool-theme.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 html,body{color:var(--noir);background:var(--blanc)}
-body{font-family:'Outfit',sans-serif;color:var(--noir);background:#F4F2EE;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);color:var(--noir);background:#F4F2EE;-webkit-font-smoothing:antialiased}
 nav{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.15)}
 .nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{display:flex;align-items:center;gap:2px;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;text-decoration:none}
+.logo{display:flex;align-items:center;gap:2px;font-family:var(--sans);font-size:17px;font-weight:700;text-decoration:none}
 .logo .cgp{color:#fff}.logo .sep{color:#333;margin:0 3px}
 .logo .s{color:#E03535}.logo .k{color:#2B65C0}.logo .o1{color:#E8C547}.logo .o2{color:#4C9BE8}.logo .l{color:#E03535}
 .nav-links{display:flex;gap:4px}
 .nav-link{font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.2s}
 .nav-link:hover{color:rgba(255,255,255,0.8)}.nav-link.active{color:var(--ambre)}
-.nav-btn-pdf{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);background:transparent;cursor:pointer;transition:all 0.2s}
+.nav-btn-pdf{font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);background:transparent;cursor:pointer;transition:all 0.2s}
 .nav-btn-pdf:hover{border-color:var(--ambre);color:var(--ambre)}
 .app{display:flex;flex-direction:row;min-height:calc(100vh - 106px)}
 .sidebar{width:340px;min-width:340px;max-width:340px;flex-shrink:0;background:var(--gris-l);border-right:1.5px solid var(--bord);padding:28px 20px;overflow-y:auto;display:flex;flex-direction:column;position:sticky;top:106px;height:calc(100vh - 106px);box-sizing:border-box;overflow-x:hidden}
@@ -28,42 +27,42 @@ nav{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-fi
 .sb-lbl::after{content:'';flex:1;height:1px;background:var(--bord)}
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .fg label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris)}
-.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);background:#fff;outline:none;transition:border-color 0.2s;width:100%}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;transition:border-color 0.2s;width:100%}
 .fi:focus{border-color:var(--ambre)}
 select.fi{cursor:pointer}
 .fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;overflow:hidden;transition:border-color 0.2s}
 .fi-row:focus-within{border-color:var(--ambre)}
-.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);min-width:0}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
 .fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--ambre-m);border-radius:2px;outline:none;margin:5px 0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--ambre);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.12)}
-.sl-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--ambre-d);text-align:center;margin-bottom:2px}
+.sl-val{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ambre-d);text-align:center;margin-bottom:2px}
 .sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
 .hint{font-size:10px;color:var(--green);margin-top:2px}
 .scpi-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;background:var(--gris-l);border-radius:7px;padding:6px 7px}
 .scpi-num{font-size:10px;font-weight:700;color:var(--gris);width:12px;flex-shrink:0}
-.scpi-row select{flex:1;min-width:0;font-size:11px;border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;color:var(--noir)}
+.scpi-row select{flex:1;min-width:0;font-size:11px;border:none;background:transparent;outline:none;font-family:var(--sans);color:var(--noir)}
 .scpi-row input[type=number]{width:65px;flex-shrink:0;font-size:11px;border:1px solid var(--bord);border-radius:5px;padding:3px 5px;text-align:right;background:#fff}
 .scpi-del{background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:15px;flex-shrink:0;padding:0 1px;line-height:1}
 .scpi-del:hover{color:var(--red)}
-.scpi-add{font-size:11px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;width:100%;margin-top:2px}
+.scpi-add{font-size:11px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:var(--sans);transition:all 0.2s;width:100%;margin-top:2px}
 .scpi-add:hover{background:var(--ambre-l);border-color:var(--ambre)}
-.sim-btn{width:100%;padding:12px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:12px;flex-shrink:0}
+.sim-btn{width:100%;padding:12px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:12px;flex-shrink:0}
 .sim-btn:hover{background:var(--ambre-d);color:#fff}
-.barem-btn{font-size:11px;color:var(--ambre-d);background:transparent;border:none;font-family:'Outfit',sans-serif;cursor:pointer;text-decoration:underline;padding:0}
+.barem-btn{font-size:11px;color:var(--ambre-d);background:transparent;border:none;font-family:var(--sans);cursor:pointer;text-decoration:underline;padding:0}
 .barem-panel{background:var(--gris-l);border-radius:8px;padding:10px;margin-top:6px;display:none}
 .barem-panel.open{display:block}
 .bt{width:100%;font-size:11px;border-collapse:collapse}
 .bt th{font-size:9px;font-weight:700;color:var(--gris);padding:3px 5px;border-bottom:1px solid var(--bord);text-align:left}
 .bt td{padding:3px 5px;border-bottom:1px solid rgba(0,0,0,0.04)}
-.bt input{width:52px;border:1px solid var(--bord);border-radius:4px;padding:2px 4px;font-size:10px;font-family:'Outfit',sans-serif}
+.bt input{width:52px;border:1px solid var(--bord);border-radius:4px;padding:2px 4px;font-size:10px;font-family:var(--sans)}
 .endett-live{background:var(--gris-l);border-radius:8px;padding:10px;margin-bottom:8px}
 .prog-track{height:8px;background:var(--bord);border-radius:4px;margin:4px 0 2px;overflow:hidden}
 .prog-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:65vh;gap:14px;text-align:center}
 .empty-icon{font-size:48px;opacity:0.12}
-.empty-title{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--gris);font-weight:600}
+.empty-title{font-family:var(--sans);font-size:22px;color:var(--gris);font-weight:600}
 .empty-sub{font-size:13px;color:var(--gris);max-width:320px;line-height:1.7;font-weight:300}
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
 .kpi{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:12px 14px;position:relative;overflow:hidden}
@@ -72,16 +71,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .kpi.green{background:var(--green-l);border-color:rgba(45,122,91,0.2)}.kpi.red{background:var(--red-l);border-color:rgba(192,57,43,0.15)}
 .kpi-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
 .kpi.featured .kpi-label{color:rgba(13,13,13,0.5)}
-.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--noir);line-height:1;margin-bottom:4px}
+.kpi-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--noir);line-height:1;margin-bottom:4px}
 .kpi.featured .kpi-val{color:var(--noir)}.kpi.green .kpi-val{color:var(--green)}.kpi.red .kpi-val{color:var(--red)}
 .kpi-sub{font-size:11px;color:var(--gris);font-weight:300;margin-top:3px}
 .bank-hdr{border-radius:12px;padding:15px 20px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .bank-hdr[data-bank="sofiap"]{background:var(--sofiap)}.bank-hdr[data-bank="cfcal"]{background:var(--cfcal)}.bank-hdr[data-bank="cacf"]{background:var(--cacf)}
-.bh-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-right:auto}
+.bh-name{font-family:var(--sans);font-size:16px;font-weight:700;color:#fff;margin-right:auto}
 .bh-it{text-align:center}.bh-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px}
-.bh-v{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.bh-v{font-family:var(--sans);font-size:13px;font-weight:700;color:#fff}
 .card{background:#fff;border:1px solid var(--bord);border-radius:12px;padding:20px 22px;margin-bottom:16px}
-.card-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--noir);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.card-title{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);margin-bottom:12px;display:flex;align-items:center;gap:7px}
 .card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--ambre);flex-shrink:0}
 .eq{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .eq-b{flex:1;min-width:110px;border-radius:10px;padding:13px 14px;text-align:center;border:1.5px solid}
@@ -90,7 +89,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .eq-b.pos{background:var(--green-l);border-color:rgba(45,122,91,0.3)}
 .eq-b.neg{background:var(--red-l);border-color:rgba(192,57,43,0.2)}
 .eq-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:4px}
-.eq-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--noir);line-height:1}
+.eq-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--noir);line-height:1}
 .eq-sub{font-size:11px;color:var(--gris);font-weight:300;margin-top:3px}
 .eq-op{font-size:24px;font-weight:300;color:var(--gris);flex-shrink:0}
 .bilan-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -100,7 +99,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .bl.hi .bl-title{color:var(--ambre-d)}.bl .bl-title{color:var(--gris-f)}
 .bl-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bord);font-size:12px}
 .bl-row:last-child{border-bottom:none}
-.bl-k{color:var(--gris-f)}.bl-v{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--noir)}
+.bl-k{color:var(--gris-f)}.bl-v{font-family:var(--sans);font-weight:700;color:var(--noir)}
 .bl-v.gold{color:var(--ambre-d)}.bl-v.green{color:var(--green)}.bl-v.red{color:var(--red)}
 .charts-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .chart-h{height:190px}
@@ -108,7 +107,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .ec{border-radius:10px;padding:12px 14px;border:2px solid;position:relative}
 .ec.ok{border-color:var(--green);background:var(--green-l)}.ec.warn{border-color:var(--ambre);background:var(--ambre-l)}.ec.ko{border-color:var(--bord);background:var(--gris-l);opacity:0.55}
 .ec-ico{position:absolute;top:9px;right:10px;font-size:15px}
-.ec-name{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.ec-name{font-family:var(--sans);font-size:13px;font-weight:700;margin-bottom:3px}
 .ec.ok .ec-name{color:var(--green)}.ec.warn .ec-name{color:var(--ambre-d)}.ec.ko .ec-name{color:var(--gris)}
 .ec-txt{font-size:11px;line-height:1.5;color:var(--gris-f)}
 .endett-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -119,7 +118,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .tbl tbody tr{border-bottom:1px solid var(--bord);transition:background 0.1s}
 .tbl tbody tr:hover{background:var(--ambre-l)}
 .tbl td{padding:8px 12px;text-align:right;color:var(--gris-f)}.tbl td:first-child{text-align:left;font-weight:600;color:var(--noir)}
-.tbl .tot{background:var(--noir)}.tbl .tot td{color:#fff;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.tbl .tot{background:var(--noir)}.tbl .tot td{color:#fff;font-weight:700;font-family:var(--sans)}
 .tbl td.gold{color:var(--ambre-d);font-weight:600}.tbl td.green{color:var(--green);font-weight:600}.tbl td.red{color:var(--red)}
 @media print{nav,.sidebar,.sim-btn,.barem-btn,.barem-panel{display:none!important}.app{display:block}.main{padding:0}}
 details summary{user-select:none}
@@ -131,7 +130,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
 
 
 .bank-tabs-wrap{background:#fff;border-bottom:1.5px solid var(--bord);padding:0 24px;display:flex;position:sticky;top:58px;z-index:100;box-shadow:0 1px 0 var(--bord)}
-.bank-tab{padding:10px 20px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.bank-tab{padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
 .bank-tab:hover{color:var(--gris-f);background:var(--gris-l)}
 .bank-tab.active[data-bank="sofiap"]{color:var(--sofiap);border-bottom-color:var(--sofiap);background:rgba(27,79,138,0.05)}
 .bank-tab.active[data-bank="cfcal"]{color:var(--cfcal);border-bottom-color:var(--cfcal);background:rgba(46,125,50,0.05)}
@@ -143,28 +142,55 @@ details[open] summary span.arr{transform:rotate(90deg)}
 </style>
 </head>
 <body>
-<nav class="nav-univ">
-  <div class="nav-univ-inner">
-    <a class="nav-logo" href="index.html">
-      <span class="cgp">CGP</span><span class="sep">|</span>
-      <span class="s">s</span><span class="k">k</span><span class="o1">o</span><span class="o2">o</span><span class="l">l</span>
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
     </a>
-    <div class="nav-links">
-      <a class="nav-a" href="etude-dossier.html">Étude de Dossier</a>
+    <div class="cs-nav-links">
+      <a class="cs-nav-a" href="etude-dossier.html">Étude de Dossier</a>
       <div class="nav-dropdown">
-        <button class="nav-a nav-dropdown-btn active">SCPI <span class="arr">▾</span></button>
+        <button class="cs-nav-a nav-dropdown-btn active">SCPI <span class="arr">▾</span></button>
         <div class="nav-dropdown-menu">
-          <a class="nav-dropdown-item " href="scpi-simulator.html">📈 SCPI Cash</a>
+          <a class="nav-dropdown-item" href="scpi-simulator.html">📈 SCPI Cash</a>
           <div class="nav-dropdown-sep"></div>
-          <a class="nav-dropdown-item active" href="scpi-financement.html">🏦 Financement SCPI</a>
+          <a class="nav-dropdown-item  active" href="scpi-financement.html">🏦 Financement SCPI</a>
         </div>
       </div>
-      <a class="nav-a" href="immo-simulator.html">Immobilier</a>
+      <a class="cs-nav-a" href="immo-simulator.html">Immobilier</a>
     </div>
-    <span class="nav-spacer"></span>
-    <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-primary" href="etude-dossier.html" style="text-decoration:none">Étude de Dossier →</a>
+    </div>
   </div>
 </nav>
+
+<!-- CSS dropdown pour nav-dropdown dans cs-nav -->
+<style>
+.nav-dropdown{position:relative}
+.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
+.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
+.nav-dropdown:hover .arr{transform:rotate(180deg)}
+.nav-dropdown-menu{
+  position:absolute;top:calc(100% + 4px);left:0;
+  background:rgba(15,14,13,0.97);
+  border:1px solid var(--rule-d);
+  padding:6px;min-width:190px;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:all 0.18s;backdrop-filter:blur(20px);
+  z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-dropdown-item{
+  display:block;font-family:var(--sans);font-size:13px;font-weight:400;
+  color:rgba(255,255,255,0.55);text-decoration:none;
+  padding:8px 12px;transition:color 0.15s;white-space:nowrap;
+}
+.nav-dropdown-item:hover{color:#fff}
+.nav-dropdown-item.active{color:var(--orange)}
+.nav-dropdown-sep{height:1px;background:var(--rule-d);margin:4px 0}
+</style>
 
 <div class="bank-tabs-wrap">
   <div class="bank-tab active" data-bank="sofiap" onclick="setBank('sofiap',this)"><span class="bank-dot"></span>SOFIAP · min 80K€ · différé 6 mois</div>
@@ -227,7 +253,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
   <div class="endett-live" id="endettLive">
     <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px">
       <span style="font-weight:600;color:var(--gris-f)">Taux d'endettement actuel</span>
-      <span id="endettVal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px">—</span>
+      <span id="endettVal" style="font-family:var(--sans);font-weight:700;font-size:14px">—</span>
     </div>
     <div class="prog-track"><div class="prog-fill" id="endettBar" style="width:0;background:var(--green)"></div></div>
     <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:2px"><span>0%</span><span>20%</span><span style="color:var(--red);font-weight:700">35% max</span></div>
@@ -256,7 +282,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <button class="scpi-add" onclick="addSCPI()">+ Ajouter une SCPI</button>
     <div id="scpiTotal" style="display:none;background:var(--noir);border-radius:7px;padding:7px 10px;margin-top:6px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Total investi</span>
-      <span id="scpiTotalVal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ambre)">0 €</span>
+      <span id="scpiTotalVal" style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--ambre)">0 €</span>
     </div>
   </details>
 
@@ -747,7 +773,7 @@ function render(d){
     <div style="display:flex;align-items:center;gap:12px">
       <div style="font-size:28px">${ce.ok?'✅':ce.iss.length<=1?'⚠️':'❌'}</div>
       <div style="flex:1">
-        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:${ceCol}">${ce.ok?d.b.name+' — Dossier éligible':d.b.name+' — Vérification requise'}</div>
+        <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:${ceCol}">${ce.ok?d.b.name+' — Dossier éligible':d.b.name+' — Vérification requise'}</div>
         <div style="font-size:12px;color:var(--gris-f);margin-top:3px">${ce.ok?`Profil validé · Endettement: ${d.eApr.toFixed(1)}% ≤ ${d.b.endMax}% · Montant: ${fmt(d.mont)} € ≥ min ${fmt(d.b.min)} €`:ce.iss.map(i=>'• '+i).join(' &nbsp;|&nbsp; ')}</div>
       </div>
     </div>
@@ -759,11 +785,11 @@ function render(d){
   h+=`<div class="card"><div class="card-title"><span class="dot"></span>Taux d'endettement</div>
   <div class="endett-bars">
     <div>
-      <div class="eb-label"><span>Avant investissement</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
+      <div class="eb-label"><span>Avant investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
       <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
     </div>
     <div>
-      <div class="eb-label"><span>Après investissement</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
+      <div class="eb-label"><span>Après investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
       <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
     </div>
   </div>
