@@ -1,0 +1,258 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  CGP SKOOL — DESIGN SYSTEM                                  ║
+ * ║  Source : landing page officielle cgpskool.com              ║
+ * ║  Usage  : <link rel="stylesheet" href="cgp-skool-theme.css">║
+ * ║           Placé AVANT tout autre <style> de la page         ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
+
+/* ── FONTS ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── VARIABLES (tokens officiels landing) ──────────────────────── */
+:root {
+  /* Couleurs de fond */
+  --bg:          #0f0e0d;
+  --bg-2:        #161412;
+  --paper:       #F6F3EE;
+  --paper-2:     #EDEAE3;
+
+  /* Orange — couleur de marque */
+  --orange:      #D4622A;
+  --orange-lt:   #E8855A;
+  --o-dim:       rgba(212,98,42,0.13);
+  --o-glow:      rgba(212,98,42,0.07);
+  --orange-hover:#b8501f;
+
+  /* Blanc / brouillard (sur fond sombre) */
+  --white:       #FFFFFF;
+  --fog:         rgba(255,255,255,0.58);
+  --fog-2:       rgba(255,255,255,0.3);
+  --fog-3:       rgba(255,255,255,0.08);
+
+  /* Séparateurs */
+  --rule-d:      rgba(255,255,255,0.07);   /* sur fond sombre */
+  --rule-l:      rgba(24,22,20,0.08);      /* sur fond clair  */
+
+  /* Encre (sur fond clair) */
+  --ink:         #181614;
+  --ink-60:      rgba(24,22,20,0.6);
+  --ink-30:      rgba(24,22,20,0.3);
+
+  /* Typographie */
+  --serif:       'Playfair Display', Georgia, serif;
+  --sans:        'Inter', system-ui, sans-serif;
+
+  /* Alias de compatibilité (ancienne palette ED) */
+  --ambre:       #D4622A;
+  --ambre-d:     #b8501f;
+  --ambre-l:     rgba(212,98,42,0.10);
+  --ambre-m:     rgba(212,98,42,0.30);
+  --noir:        #181614;
+  --gris:        rgba(24,22,20,0.55);
+  --gris-f:      rgba(24,22,20,0.75);
+  --gris-l:      #F6F3EE;
+  --bord:        rgba(24,22,20,0.09);
+}
+
+/* ── RESET DE BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { font-family: var(--sans); }
+
+/* ── NAV UNIVERSELLE ───────────────────────────────────────────── */
+/*
+ * Usage HTML :
+ * <nav class="cs-nav">
+ *   <div class="cs-nav-inner">
+ *     <a class="cs-logo" href="index.html">
+ *       <div class="cs-logo-mark"><span>C</span></div>
+ *       <span class="cs-logo-name">CGP Skool</span>
+ *     </a>
+ *     <div class="cs-nav-links"> ... </div>
+ *     <div class="cs-nav-actions"> boutons droite </div>
+ *   </div>
+ * </nav>
+ */
+.cs-nav {
+  position: sticky; top: 0; z-index: 200;
+  height: 64px;
+  background: rgba(15,14,13,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--rule-d);
+  display: flex; align-items: center;
+}
+.cs-nav-inner {
+  width: 100%; max-width: 1400px; margin: 0 auto;
+  padding: 0 52px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Logo */
+.cs-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; margin-right: 20px; flex-shrink: 0;
+}
+.cs-logo-mark {
+  width: 30px; height: 30px;
+  border: 1.5px solid var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cs-logo-mark span {
+  font-family: var(--serif);
+  font-size: 14px; font-weight: 500;
+  color: var(--orange); line-height: 1;
+}
+.cs-logo-name {
+  font-family: var(--sans);
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.60);
+  letter-spacing: 0.22em; text-transform: uppercase;
+}
+
+/* Liens */
+.cs-nav-links { display: flex; align-items: center; gap: 2px; flex: 1; }
+.cs-nav-a {
+  font-family: var(--sans); font-size: 13px; font-weight: 400;
+  color: rgba(255,255,255,0.45); text-decoration: none;
+  padding: 6px 13px;
+  transition: color 0.18s; white-space: nowrap;
+  border: none; background: transparent; cursor: pointer;
+}
+.cs-nav-a:hover  { color: rgba(255,255,255,0.85); }
+.cs-nav-a.active { color: var(--orange); font-weight: 500; }
+
+/* Actions (boutons droite) */
+.cs-nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+/* Bouton discret (Mon profil) */
+.cs-btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--sans); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent; color: rgba(255,255,255,0.55);
+  cursor: pointer; transition: all 0.2s;
+}
+.cs-btn-ghost:hover           { border-color: var(--orange); color: var(--orange); }
+.cs-btn-ghost.ok              { border-color: rgba(45,160,100,0.35); color: rgba(45,160,100,0.85); }
+.cs-btn-ghost.missing         { border-color: rgba(212,98,42,0.4); color: var(--orange); }
+
+/* Bouton primaire (PDF, CTA) */
+.cs-btn-primary {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 15px 34px;
+  background: var(--orange); color: var(--white);
+  border: none; cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 8px 28px rgba(212,98,42,0.3);
+  text-decoration: none; width: fit-content;
+}
+.cs-btn-primary:hover { background: var(--orange-hover); color: var(--white); gap: 16px; }
+
+/* ── KICKER (étiquette de section) ────────────────────────────── */
+/*
+ * <div class="cs-kicker">
+ *   <span class="cs-kicker-line"></span>
+ *   <span class="cs-kicker-text">MON LABEL</span>
+ * </div>
+ */
+.cs-kicker       { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.cs-kicker-line  { width: 28px; height: 1px; background: var(--orange); flex-shrink: 0; }
+.cs-kicker-text  {
+  font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--orange);
+}
+
+/* ── TITRES ────────────────────────────────────────────────────── */
+.cs-h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 3.5vw, 52px);
+  font-weight: 400; line-height: 1.08; letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cs-h1.light { color: var(--white); }
+.cs-h1 em    { font-style: italic; color: var(--orange); }
+
+.cs-h2 {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.5vw, 36px);
+  font-weight: 400; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.cs-h2.light { color: var(--white); }
+.cs-h2 em    { font-style: italic; color: var(--orange); }
+
+/* ── CARD (carte sur fond sombre) ─────────────────────────────── */
+.cs-card {
+  border: 1px solid var(--rule-d);
+  padding: 22px 26px;
+  background: rgba(255,255,255,0.025);
+  transition: border-color 0.2s;
+}
+.cs-card:hover { border-color: rgba(212,98,42,0.30); }
+
+/* Card sur fond clair */
+.cs-card-light {
+  border: 1px solid var(--rule-l);
+  padding: 22px 26px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cs-card-light:hover {
+  border-color: rgba(212,98,42,0.25);
+  box-shadow: 0 4px 20px rgba(212,98,42,0.06);
+}
+
+/* ── BADGE / TAG ───────────────────────────────────────────────── */
+.cs-badge {
+  display: inline-flex; align-items: center;
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 9px;
+  background: var(--o-dim); color: var(--orange);
+}
+.cs-badge.neutral {
+  background: rgba(24,22,20,0.06); color: var(--ink-60);
+}
+
+/* ── SÉPARATEUR SECTION ────────────────────────────────────────── */
+.cs-rule { width: 100%; height: 1px; background: var(--rule-l); }
+.cs-rule.dark { background: var(--rule-d); }
+
+/* ── TEXTE COURANT ─────────────────────────────────────────────── */
+.cs-body {
+  font-size: 15px; font-weight: 300; line-height: 1.8;
+  color: var(--fog);
+}
+.cs-body.ink { color: var(--ink-60); }
+.cs-body.sm  { font-size: 13px; line-height: 1.7; }
+
+.cs-label {
+  font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-60);
+}
+.cs-label.light { color: var(--fog-2); }
+
+/* ── UTILITAIRES ───────────────────────────────────────────────── */
+.cs-orange  { color: var(--orange); }
+.cs-white   { color: var(--white); }
+.cs-fog     { color: var(--fog); }
+.cs-fog-2   { color: var(--fog-2); }
+.cs-ink     { color: var(--ink); }
+.cs-ink-60  { color: var(--ink-60); }
+
+.cs-bg-dark   { background: var(--bg); }
+.cs-bg-paper  { background: var(--paper); }
+.cs-bg-paper2 { background: var(--paper-2); }
+
+.cs-italic { font-style: italic; }
+.cs-serif  { font-family: var(--serif); }
+.cs-sans   { font-family: var(--sans); }

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGP Skool — Étude de Dossier</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
 <style id="cgp-skool-inline">
 /* ═══════════════════════════════════════════════════════════════════
    CGP SKOOL — Feuille de style commune
@@ -14,108 +15,33 @@
 /* ── RESET & BASE ─────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased}
 
 /* ── VARIABLES ────────────────────────────────────────────────────── */
 :root{
-  --ambre:#F0A738;
-  --ambre-d:#C8832A;
-  --ambre-l:#FDF3E3;
-  --ambre-m:#F5D9A8;
-  --noir:#0D0D0D;
-  --gris-f:#3A3A3A;
-  --gris:#6B6B6B;
-  --gris-l:#F7F5F1;
-  --blanc:#FFFFFF;
-  --bord:#EDE8DF;
-  --green:#2D7A5B;
-  --green-l:#EAF5EF;
-  --red:#C0392B;
-  --red-l:#FDEEEC;
-  --blue:#2B5EA7;
-  --blue-l:#EDF2FB;
+  /* Variables spécifiques Étude de Dossier (overrides du theme) */
+  --green:#2D7A5B; --green-l:#EAF5EF;
+  --blue:#185FA5;  --blue-l:#EDF2FB;
+  --red:#C0392B;   --red-l:#FCEBEB;
+  /* Alias rétrocompat */
+  --ambre:var(--orange); --ambre-d:var(--orange-hover);
+  --ambre-l:var(--o-dim); --ambre-m:rgba(212,98,42,0.30);
+  --noir:var(--ink); --gris:var(--ink-60); --gris-f:var(--ink-60);
+  --gris-l:var(--paper); --bord:var(--rule-l);
+  --blanc:var(--white);
 }
 
 /* ── NAV UNIVERSELLE ──────────────────────────────────────────────── */
-.nav-univ{
-  position:sticky;top:0;z-index:200;
-  background:rgba(13,13,13,0.97);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(240,167,56,0.12);
-}
-.nav-univ-inner{
-  max-width:1400px;margin:0 auto;
-  padding:0 24px;height:58px;
-  display:flex;align-items:center;gap:8px;
-}
-/* Logo */
-.nav-logo{
-  display:flex;align-items:center;gap:2px;
-  font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;
-  text-decoration:none;margin-right:16px;flex-shrink:0;
-}
-.nav-logo .cgp{color:#fff}
-.nav-logo .sep{color:#333;margin:0 3px}
-.nav-logo .s{color:#E03535}
-.nav-logo .k{color:#2B65C0}
-.nav-logo .o1{color:#E8C547}
-.nav-logo .o2{color:#4C9BE8}
-.nav-logo .l{color:#E03535}
-/* Liens */
-.nav-links{display:flex;align-items:center;gap:2px;flex:1}
-.nav-a{
-  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
-  color:rgba(255,255,255,0.45);text-decoration:none;
-  padding:6px 13px;border-radius:6px;
-  transition:all 0.18s;white-space:nowrap;
-  border:none;background:transparent;cursor:pointer;
-}
-.nav-a:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06)}
-.nav-a.active{color:#F0A738;font-weight:600}
-/* Dropdown SCPI */
-.nav-dropdown{position:relative}
-.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
-.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
-.nav-dropdown:hover .arr{transform:rotate(180deg)}
-.nav-dropdown-menu{
-  position:absolute;top:calc(100% + 6px);left:0;
-  background:rgba(18,18,18,0.98);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:10px;padding:6px;min-width:180px;
-  opacity:0;visibility:hidden;transform:translateY(-6px);
-  transition:all 0.18s;backdrop-filter:blur(20px);
-  z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.4);
-}
-.nav-dropdown:hover .nav-dropdown-menu{
-  opacity:1;visibility:visible;transform:translateY(0);
-}
-.nav-dropdown-item{
-  display:block;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
-  color:rgba(255,255,255,0.6);text-decoration:none;
-  padding:8px 12px;border-radius:7px;transition:all 0.15s;white-space:nowrap;
-}
-.nav-dropdown-item:hover{background:rgba(255,255,255,0.07);color:#fff}
-.nav-dropdown-item.active{color:#F0A738;background:rgba(240,167,56,0.08)}
-.nav-dropdown-sep{height:1px;background:rgba(255,255,255,0.07);margin:4px 0}
-.nav-spacer{flex:1}
-.nav-pdf{
-  font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;
-  padding:6px 14px;border-radius:7px;
-  border:1px solid rgba(255,255,255,0.15);
-  color:rgba(255,255,255,0.45);background:transparent;
-  cursor:pointer;transition:all 0.18s;
-  text-decoration:none;flex-shrink:0;
-}
-.nav-pdf:hover{border-color:#F0A738;color:#F0A738}
+/* Fonts et nav via cgp-skool-theme.css */
 
 /* ── TYPOGRAPHIE ──────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+/* Fonts chargées par cgp-skool-theme.css */
 
 /* ── COMPOSANTS COMMUNS ───────────────────────────────────────────── */
 
 /* Badges */
 .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;gap:3px}
-.badge-amber{background:var(--ambre-l);color:var(--ambre-d)}
+.badge-amber{background:var(--o-dim);color:var(--orange)}
 .badge-green{background:var(--green-l);color:var(--green)}
 .badge-red{background:var(--red-l);color:var(--red)}
 .badge-blue{background:var(--blue-l);color:var(--blue)}
@@ -123,14 +49,15 @@ body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
 
 /* Boutons */
 .btn{
-  font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
-  padding:9px 20px;border-radius:8px;border:none;cursor:pointer;
-  transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:10px 20px;cursor:pointer;border:none;
+  transition:all 0.22s;white-space:nowrap;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
 }
-.btn-primary{background:var(--ambre);color:#111}
-.btn-primary:hover{background:var(--ambre-d);color:#fff}
-.btn-secondary{background:var(--gris-l);color:var(--gris-f)}
-.btn-secondary:hover{background:var(--bord)}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:0 6px 18px rgba(212,98,42,0.25)}
+.btn-primary:hover{background:var(--orange-hover);color:#fff}
+.btn-secondary{background:transparent;border:1px solid var(--rule-l);color:var(--ink-60)}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 .btn-success{background:var(--green);color:#fff}
 .btn-success:hover{opacity:0.85}
 
@@ -140,11 +67,11 @@ body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
   border-radius:12px;padding:18px 20px;margin-bottom:16px;
 }
 .card-title{
-  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;
+  font-family:var(--sans);font-size:14px;font-weight:700;
   color:var(--noir);margin-bottom:12px;
   display:flex;align-items:center;gap:7px;
 }
-.card-title .dot{width:7px;height:7px;border-radius:50%;background:var(--ambre);flex-shrink:0}
+.card-title .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
 
 /* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
@@ -155,15 +82,15 @@ body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
 }
 .kpi::after{
   content:'';position:absolute;bottom:0;left:0;right:0;
-  height:3px;background:var(--kc,var(--ambre));
+  height:3px;background:var(--kc,var(--orange));
 }
-.kpi.featured{background:var(--ambre);border-color:var(--ambre)}
+.kpi.featured{background:var(--orange);border-color:var(--orange)}
 .kpi.featured::after{display:none}
 .kpi.green{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
 .kpi.red{background:var(--red-l);border-color:rgba(192,57,43,0.15)}
 .kpi-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
 .kpi.featured .kpi-label{color:rgba(13,13,13,0.5)}
-.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;color:var(--noir);line-height:1}
+.kpi-val{font-family:var(--sans);font-size:19px;font-weight:700;color:var(--noir);line-height:1}
 .kpi.featured .kpi-val{color:#111}
 .kpi.green .kpi-val{color:var(--green)}
 .kpi.red .kpi-val{color:var(--red)}
@@ -177,12 +104,12 @@ body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
   color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord);
 }
 .tbl tbody tr{border-bottom:1px solid var(--bord);transition:background 0.1s}
-.tbl tbody tr:hover{background:var(--ambre-l)}
+.tbl tbody tr:hover{background:var(--o-dim)}
 .tbl td{padding:7px 12px;color:var(--gris-f)}
 .tbl .total-row{background:var(--noir)}
-.tbl .total-row td{color:#fff;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.tbl .total-row td{color:#fff;font-weight:700;font-family:var(--sans)}
 .tbl td.right{text-align:right}
-.tbl td.gold{color:var(--ambre-d);font-weight:600}
+.tbl td.gold{color:var(--orange);font-weight:600}
 .tbl td.green{color:var(--green);font-weight:600}
 .tbl td.red{color:var(--red)}
 
@@ -199,20 +126,20 @@ body{font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
 /* Inputs communs */
 .fi{
   padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;
-  font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);
+  font-family:var(--sans);font-size:13px;color:var(--noir);
   background:#fff;outline:none;transition:border-color 0.2s;width:100%;
 }
-.fi:focus{border-color:var(--ambre)}
+.fi:focus{border-color:var(--orange)}
 select.fi{cursor:pointer}
 .fi-row{
   display:flex;align-items:center;background:#fff;
   border:1.5px solid var(--bord);border-radius:7px;
   overflow:hidden;transition:border-color 0.2s;
 }
-.fi-row:focus-within{border-color:var(--ambre)}
+.fi-row:focus-within{border-color:var(--orange)}
 .fi-row input{
   flex:1;background:transparent;border:none;outline:none;
-  padding:8px 10px;font-family:'Outfit',sans-serif;font-size:13px;
+  padding:8px 10px;font-family:var(--sans);font-size:13px;
   color:var(--noir);min-width:0;
 }
 .fi-unit{
@@ -236,7 +163,7 @@ select.fi{cursor:pointer}
 
 /* Scrollbar */
 ::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
+::-webkit-scrollbar-thumb{background:rgba(212,98,42,0.3);border-radius:3px}
 
 /* Animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -253,12 +180,12 @@ details[open] summary span.arr{transform:rotate(90deg)}
 }
 
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Fonts chargées par cgp-skool-theme.css -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --ambre:#F0A738;--ambre-d:#C8832A;--ambre-l:#FDF3E3;--ambre-m:#F5D9A8;
+  --ambre:var(--orange);--ambre-d:var(--orange-hover);--ambre-l:var(--o-dim);--ambre-m:rgba(212,98,42,0.25);
   --noir:#0D0D0D;--gris-f:#3A3A3A;--gris:#6B6B6B;--gris-l:#F7F5F1;
   --blanc:#FFFFFF;--bord:#EDE8DF;
   --green:#2D7A5B;--green-l:#EAF5EF;--red:#C0392B;--red-l:#FDEEEC;
@@ -266,7 +193,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
 
 .nav-dropdown:hover .nav-btn:disabled{opacity:0.3;cursor:not-allowed}
 
@@ -277,16 +204,16 @@ body{font-family:'Outfit',sans-serif;color:var(--noir);background:#ECEAE6;-webki
 .sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 12px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 10px 6px;margin-top:6px}
 .sidebar-lbl:first-child{margin-top:0}
-.step-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;font-family:'Outfit',sans-serif;font-size:13px;color:var(--gris-f);transition:all 0.15s}
+.step-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;font-family:var(--sans);font-size:13px;color:var(--gris-f);transition:all 0.15s}
 .step-btn:hover{background:rgba(0,0,0,0.06)}
-.step-btn.active{background:var(--ambre-l);color:var(--ambre-d);font-weight:600}
+.step-btn.active{background:var(--o-dim);color:var(--orange);font-weight:600}
 .step-btn.done{color:var(--green)}
 .step-dot{width:7px;height:7px;border-radius:50%;background:var(--bord);flex-shrink:0;transition:all 0.2s}
-.step-btn.active .step-dot{background:var(--ambre)}
+.step-btn.active .step-dot{background:var(--orange)}
 .step-btn.done .step-dot{background:var(--green)}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
 .client-mini{background:rgba(0,0,0,0.07);border-radius:8px;padding:12px;margin-top:auto}
-.client-mini-name{font-family:Space Grotesk,sans-serif;font-size:14px;font-weight:700;color:var(--noir);margin-bottom:2px}
+.client-mini-name{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:2px}
 .client-mini-detail{font-size:11px;color:var(--gris);line-height:1.5}
 
 /* ── MAIN ── */
@@ -298,19 +225,19 @@ to{opacity:1;transform:translateY(0)}}
 
 /* ── SECTION HEADER ── */
 .sec-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.sec-tag{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ambre);margin-bottom:4px}
-.sec-h1{font-family:Space Grotesk,sans-serif;font-size:24px;font-weight:700;color:var(--noir)}
+.sec-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.sec-h1{font-family:var(--sans);font-size:24px;font-weight:700;color:var(--noir)}
 .sec-sub{font-size:13px;color:var(--gris);margin-top:3px;font-weight:300}
 
 /* ── EDITABLE FIELD ── */
 /* Toutes les zones editables ont ce style */
 .ed{outline:none;border-bottom:1.5px solid transparent;transition:border-color 0.15s,background 0.15s;border-radius:4px 4px 0 0;padding:2px 4px;cursor:text;min-width:40px;display:inline-block}
-.ed:hover{border-bottom-color:var(--ambre-m);background:var(--ambre-l)}
-.ed:focus{border-bottom-color:var(--ambre);background:var(--ambre-l)}
+.ed:hover{border-bottom-color:rgba(212,98,42,0.3);background:var(--o-dim)}
+.ed:focus{border-bottom-color:var(--orange);background:var(--o-dim)}
 .ed-block{outline:none;border:1.5px solid transparent;border-radius:8px;padding:10px 12px;cursor:text;transition:all 0.15s;min-height:40px;line-height:1.7;background:#fff}
-.ed-block:hover{border-color:var(--ambre-m);background:var(--ambre-l)}
-.ed-block:focus{border-color:var(--ambre);background:var(--ambre-l)}
-.ed-hint{font-size:11px;color:rgba(240,167,56,0.5);font-style:italic;pointer-events:none}
+.ed-block:hover{border-color:rgba(212,98,42,0.3);background:var(--o-dim)}
+.ed-block:focus{border-color:var(--orange);background:var(--o-dim)}
+.ed-hint{font-size:11px;color:rgba(212,98,42,0.5);font-style:italic;pointer-events:none}
 
 /* ── CARDS ── */
 /* ── KPI ROW ── */
@@ -321,14 +248,14 @@ to{opacity:1;transform:translateY(0)}}
 /* ── TAGS / BADGES ── */
 /* ── IMPORT ZONE ── */
 .import-zone{border:2px dashed var(--bord);border-radius:16px;padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff;margin-bottom:18px}
-.import-zone:hover,.import-zone.over{border-color:var(--ambre);background:var(--ambre-l)}
+.import-zone:hover,.import-zone.over{border-color:var(--orange);background:var(--o-dim)}
 .import-icon{font-size:44px;margin-bottom:12px;display:block}
-.import-title{font-family:Space Grotesk,sans-serif;font-size:17px;font-weight:700;color:var(--noir);margin-bottom:6px}
+.import-title{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir);margin-bottom:6px}
 .import-sub{font-size:13px;color:var(--gris);line-height:1.6}
 
 /* ── MODE TOGGLE ── */
 .mode-toggle{display:grid;grid-template-columns:1fr 1fr;background:var(--gris-l);border-radius:10px;padding:4px;margin-bottom:18px}
-.mode-btn{padding:9px;border-radius:7px;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--gris);cursor:pointer;transition:all 0.2s}
+.mode-btn{padding:9px;border-radius:7px;border:none;background:transparent;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--gris);cursor:pointer;transition:all 0.2s}
 .mode-btn.active{background:#fff;color:var(--noir);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
 
 /* ── FORM ── */
@@ -337,13 +264,13 @@ select.span2{grid-column:span 2}
 /* ── PYRAMID ── */
 .pyramid{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-radius:10px;border:1.5px solid}
-.pyr-lv.lt{background:#FDF3E3;border-color:var(--ambre-m)}
+.pyr-lv.lt{background:var(--o-dim);border-color:var(--ambre-m)}
 .pyr-lv.mt{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
 .pyr-lv.ct{background:var(--blue-l);border-color:rgba(43,94,167,0.2)}
 .pyr-lv.ep{background:var(--gris-l);border-color:var(--bord)}
 .pyr-name{font-size:13px;font-weight:600;color:var(--noir)}
 .pyr-desc{font-size:11px;color:var(--gris)}
-.pyr-amt{font-family:Space Grotesk,sans-serif;font-size:16px;font-weight:700;color:var(--noir);text-align:right}
+.pyr-amt{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir);text-align:right}
 .pyr-pct{font-size:11px;color:var(--gris);text-align:right;margin-top:1px}
 
 /* ── FISCAL ── */
@@ -354,7 +281,7 @@ select.span2{grid-column:span 2}
 .tmi-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700}
 .tmi-0{background:var(--green-l);color:var(--green)}
 .tmi-11{background:var(--blue-l);color:var(--blue)}
-.tmi-30{background:var(--ambre-l);color:var(--ambre-d)}
+.tmi-30{background:var(--o-dim);color:var(--orange)}
 .tmi-41,.tmi-45{background:var(--red-l);color:var(--red)}
 
 /* ── PROGRESS ── */
@@ -365,15 +292,15 @@ select.span2{grid-column:span 2}
 .preco-panel{border-radius:14px;padding:20px;border:1.5px solid}
 .preco-panel.avant{border-color:rgba(192,57,43,0.2);background:#FFFCFC}
 .preco-panel.apres{border-color:rgba(45,122,91,0.2);background:#FAFFFE}
-.preco-panel-title{font-family:Space Grotesk,sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.preco-panel-title{font-family:var(--sans);font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .preco-panel.avant .preco-panel-title{color:var(--red)}
 .preco-panel.apres .preco-panel-title{color:var(--green)}
 
 /* Carte solution */
 .sol-card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:16px;margin-bottom:10px;position:relative}
-.sol-card:hover{border-color:var(--ambre-m)}
+.sol-card:hover{border-color:rgba(212,98,42,0.3)}
 .sol-top{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.sol-type-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--ambre-l);color:var(--ambre-d)}
+.sol-type-tag{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--o-dim);color:var(--orange)}
 .sol-del{position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--gris);font-size:18px;cursor:pointer;line-height:1;transition:color 0.2s}
 .sol-del:hover{color:var(--red)}
 .sol-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
@@ -383,7 +310,7 @@ select.span2{grid-column:span 2}
 
 /* Boutons ajout solution */
 .add-sol-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-.add-sol-btn{padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.add-sol-btn{padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .add-sol-btn:hover{border-color:var(--ambre);color:var(--ambre-d);background:var(--ambre-l)}
 
 /* ── SYNTHÈSE ── */
@@ -401,7 +328,7 @@ select.span2{grid-column:span 2}
 
 /* ── BUTTONS ── */
 .row-btns{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:10px;flex-wrap:wrap}
-.add-row-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s}
+.add-row-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:var(--sans);transition:all 0.2s}
 .add-row-btn:hover{background:var(--ambre-l);border-color:var(--ambre)}
 
 /* ── NOTIF ── */
@@ -414,7 +341,7 @@ select.span2{grid-column:span 2}
 
 /* ── IMPORT RESULT ── */
 .import-ok{background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:18px 20px;margin-bottom:16px}
-.import-ok-title{font-weight:700;color:var(--green);margin-bottom:8px;font-family:Space Grotesk,sans-serif;font-size:15px}
+.import-ok-title{font-weight:700;color:var(--green);margin-bottom:8px;font-family:var(--sans);font-size:15px}
 .import-ok-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;font-size:13px;color:var(--gris-f)}
 .import-ok-item strong{color:var(--noir)}
 
@@ -464,31 +391,28 @@ select.span2{grid-column:span 2}
   @page{size:A4 portrait;margin:1.5cm 1.5cm 2.5cm 1.5cm}
 }
 /* Dropdown SCPI */
-.nav-dropdown:hover .nav-dropdown-item.active{color:#F0A738;background:rgba(240,167,56,0.08)}
+.nav-dropdown:hover .nav-dropdown-item.active{color:#D4622A;background:rgba(212,98,42,0.08)}
 
 /* ── PROFIL CONSEILLER ─────────────────────────────────────── */
 .profil-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
 .profil-modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18)}
-.profil-modal h2{font-family:Space Grotesk,sans-serif;font-size:18px;font-weight:700;color:var(--noir);margin-bottom:6px}
+.profil-modal h2{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir);margin-bottom:6px}
 .profil-modal .sub{font-size:12px;color:var(--gris);margin-bottom:20px}
 .profil-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .profil-row.full{grid-template-columns:1fr}
 .profil-fg{display:flex;flex-direction:column;gap:4px}
 .profil-fg label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gris)}
-.profil-fg input,.profil-fg textarea{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:Outfit,sans-serif;font-size:13px;color:var(--noir);background:#fff;outline:none;transition:border-color 0.2s;width:100%}
+.profil-fg input,.profil-fg textarea{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;transition:border-color 0.2s;width:100%}
 .profil-fg input:focus,.profil-fg textarea:focus{border-color:var(--ambre)}
 .profil-fg textarea{resize:vertical;min-height:64px}
-.profil-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;cursor:pointer;border:none;transition:all 0.2s}
-.profil-badge.ok{background:rgba(45,122,91,0.12);color:var(--green)}
-.profil-badge.missing{background:rgba(240,167,56,0.12);color:var(--ambre-d)}
-.profil-badge:hover{opacity:0.8}
+/* profil-badge → cs-btn-ghost dans cgp-skool-theme.css */
 .pdf-conseiller-footer{display:none;margin-top:32px;padding-top:14px;border-top:1px solid var(--bord);font-size:10px;color:var(--gris);line-height:1.6}
 @media print{.profil-overlay,.profil-modal{display:none!important}.pdf-conseiller-footer{display:block!important}}
 
 /* -- ZONES COMMENTAIRES LIBRES ---------------------------------------- */
 .comment-zone{margin-top:14px}
 .comment-zone-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
-.comment-zone textarea{width:100%;min-height:60px;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none;background:#fafaf9;transition:border-color 0.2s}
+.comment-zone textarea{width:100%;min-height:60px;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none;background:#fafaf9;transition:border-color 0.2s}
 .comment-zone textarea:focus{border-color:var(--ambre);background:#fff}
 .comment-zone textarea::placeholder{color:var(--gris);opacity:0.7}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}}
@@ -496,7 +420,7 @@ select.span2{grid-column:span 2}
 /* ── EN-TÊTE PDF (caché à l'écran) ── */
 .pdf-page-header{display:none;padding:8pt 0 10pt;border-bottom:1pt solid #ddd;margin-bottom:14pt;
   display:flex;justify-content:space-between;align-items:center}
-.pdf-page-header-left{font-family:Space Grotesk,sans-serif}
+.pdf-page-header-left{font-family:var(--sans)}
 .pdf-page-header-nom{font-weight:700;font-size:13pt;color:#111}
 .pdf-page-header-date{font-size:9pt;color:#888;margin-top:2pt}
 .pdf-page-header-right{text-align:right;font-size:9pt;color:#666}
@@ -504,32 +428,32 @@ select.span2{grid-column:span 2}
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav-univ">
-  <div class="nav-univ-inner">
-    <a class="nav-logo" href="index.html">
-      <span class="cgp">CGP</span><span class="sep">|</span>
-      <span class="s">s</span><span class="k">k</span><span class="o1">o</span><span class="o2">o</span><span class="l">l</span>
+<!-- NAV — structure cs- du theme CGP Skool -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
     </a>
-    <div class="nav-links">
-      <a class="nav-a active" href="etude-dossier.html">Étude de Dossier</a>
+    <div class="cs-nav-links">
+      <a class="cs-nav-a active" href="etude-dossier.html">Étude de Dossier</a>
       <div class="nav-dropdown">
-        <button class="nav-a nav-dropdown-btn ">SCPI <span class="arr">▾</span></button>
+        <button class="cs-nav-a nav-dropdown-btn">SCPI <span class="arr">▾</span></button>
         <div class="nav-dropdown-menu">
-          <a class="nav-dropdown-item " href="scpi-simulator.html">📈 SCPI Cash</a>
+          <a class="nav-dropdown-item" href="scpi-simulator.html">📈 SCPI Cash</a>
           <div class="nav-dropdown-sep"></div>
-          <a class="nav-dropdown-item " href="scpi-financement.html">🏦 Financement SCPI</a>
+          <a class="nav-dropdown-item" href="scpi-financement.html">🏦 Financement SCPI</a>
         </div>
       </div>
-      <a class="nav-a" href="immo-simulator.html">Immobilier</a>
+      <a class="cs-nav-a" href="immo-simulator.html">Immobilier</a>
     </div>
-    <span class="nav-spacer"></span>
-    <button id="btnProfil" class="profil-badge missing" onclick="openProfil()" title="Mon profil conseiller">
-      ⚙️ <span id="profilBadgeLabel">Mon profil</span>
-    </button>
-    <button class="nav-pdf" onclick="window.print()">⬇ PDF</button>
+    <div class="cs-nav-actions">
+      <button id="btnProfil" class="cs-btn-ghost missing" onclick="openProfil()">
+        ⚙ <span id="profilBadgeLabel">Mon profil</span>
+      </button>
+      <button class="cs-btn-primary" onclick="window.print()">⬇ PDF</button>
+    </div>
   </div>
-
 </nav>
 
 <div class="app">
@@ -560,9 +484,9 @@ select.span2{grid-column:span 2}
     <div class="client-mini-name" id="cmName">&#8212;</div>
     <div class="client-mini-detail" id="cmDetail">&#8212;</div>
   </div>
-  <div id="sidebarProfilBlock" style="margin-top:8px;padding:10px 12px;background:rgba(240,167,56,0.08);border-radius:8px;border:1.5px solid rgba(240,167,56,0.2);cursor:pointer;transition:all 0.2s" onclick="openProfil()">
+  <div id="sidebarProfilBlock" style="margin-top:8px;padding:10px 12px;background:rgba(212,98,42,0.08);border-radius:8px;border:1.5px solid rgba(212,98,42,0.2);cursor:pointer;transition:all 0.2s" onclick="openProfil()">
     <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ambre-d);margin-bottom:4px">Conseiller</div>
-    <div id="sidebarProfilNom" style="font-family:Space Grotesk,sans-serif;font-size:12px;font-weight:700;color:var(--noir)">⚙️ Configurer mon profil</div>
+    <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">⚙️ Configurer mon profil</div>
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
   </div>
 </aside>
@@ -600,10 +524,10 @@ select.span2{grid-column:span 2}
       <!-- Ligne principale : titre + bouton Importer -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:16px;color:var(--noir)">📋 Recueil d'informations</div>
+          <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">📋 Recueil d'informations</div>
           <div style="font-size:12px;color:var(--gris);margin-top:3px">Cliquer pour choisir votre fichier Word (.docx) — s'ouvre directement</div>
         </div>
-        <label style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:var(--ambre);color:#fff;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:background 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--ambre-d)'" onmouseout="this.style.background='var(--ambre)'">
+        <label style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:var(--ambre);color:#fff;font-family:var(--sans);font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:background 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--ambre-d)'" onmouseout="this.style.background='var(--ambre)'">
           &#8599; Importer
           <input type="file" id="riFileInput" accept=".docx" style="display:none" onchange="handleRiFile(this.files[0])">
         </label>
@@ -622,7 +546,7 @@ select.span2{grid-column:span 2}
       <!-- Zone copier-coller -->
       <textarea id="riPasteZone"
         placeholder="Dans Word : Ctrl+A → Ctrl+C → coller ici…"
-        style="width:100%;height:110px;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--noir);resize:vertical;outline:none;transition:border-color 0.2s;line-height:1.6;background:#fafaf9"
+        style="width:100%;height:110px;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;transition:border-color 0.2s;line-height:1.6;background:#fafaf9"
         oninput="onRiPaste(this.value)"
         onfocus="this.style.borderColor='var(--ambre)'"
         onblur="this.style.borderColor='var(--bord)'"></textarea>
@@ -651,10 +575,10 @@ select.span2{grid-column:span 2}
     <div style="background:#fff;border:1.5px solid var(--bord);border-radius:14px;padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
+          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
           <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
         </div>
-        <label id="avisDropzone" style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#fff;color:var(--blue);border:1.5px solid var(--blue);font-family:Space Grotesk,sans-serif;font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--blue-l)'" onmouseout="this.style.background='#fff'" ondragover="event.preventDefault();this.style.background='var(--blue-l)'" ondragleave="this.style.background='#fff'" ondrop="handleAvisDrop(event)">
+        <label id="avisDropzone" style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#fff;color:var(--blue);border:1.5px solid var(--blue);font-family:var(--sans);font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--blue-l)'" onmouseout="this.style.background='#fff'" ondragover="event.preventDefault();this.style.background='var(--blue-l)'" ondragleave="this.style.background='#fff'" ondrop="handleAvisDrop(event)">
           &#8599; Importer
           <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
         </label>
@@ -990,29 +914,43 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- Solutions recommandées -->
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Solutions recommandées</div>
-    <div id="solContainer"></div>
-    <div class="add-sol-bar" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
-      <button class="add-sol-btn" onclick="addSol('Placement')">＋ Placement</button>
-      <button class="add-sol-btn" onclick="addSol('Optimisation fiscale')">＋ Fiscal</button>
-      <button class="add-sol-btn" onclick="addSol('Immobilier')">＋ Immobilier</button>
-      <button class="add-sol-btn" onclick="addSol('Retraite')">＋ Retraite</button>
-      <button class="add-sol-btn" onclick="addSol('Financement')">＋ Financement</button>
-      <button class="add-sol-btn" onclick="addSol('Transmission')">＋ Transmission</button>
-      <button class="add-sol-btn" onclick="addSol('Protection')">＋ Protection</button>
+  <!-- ── PANNEAU CONSEILLER (fond sombre, jamais visible client) ── -->
+  <div style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
+    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:12px 12px 0 0" onclick="togglePanneauConseiller()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">🔒</span>
+        <div>
+          <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--orange)">Panneau conseiller</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px">Objectifs détectés · Solutions Copernic — jamais visible par le client</div>
+        </div>
+      </div>
+      <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
+    </div>
+    <div id="panneauConseiller" style="background:#fefcf8;padding:20px">
+      <!-- Matrice objectifs → solutions Copernic (cliquables) -->
+      <div style="margin-bottom:20px">
+        <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:12px">Objectifs identifiés — solutions Copernic compatibles</div>
+        <div id="matriceObjSol" style="font-size:13px;color:var(--gris-f)">—</div>
+      </div>
+      <!-- Solutions retenues + paramétrage des projections -->
+      <div style="border-top:1px solid var(--bord);padding-top:18px">
+        <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:14px">Solutions retenues — paramétrage</div>
+        <div id="solsRetenues"><div style="font-size:12px;color:var(--gris);font-style:italic">Aucune solution — cochez dans la matrice ci-dessus</div></div>
+        <button onclick="ajouterSolutionManuelle()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter manuellement</button>
+      </div>
     </div>
   </div>
 
-  <!-- Épargne à conserver / réorienter -->
+  <!-- ── FICHES CLIENT (générées depuis Copernic) ── -->
+  <div id="fichesClientContainer" style="margin-bottom:18px">
+    <div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Sélectionnez des solutions dans le panneau conseiller pour générer les fiches</div>
+  </div>
+
+  <!-- Note conseiller -->
+  <div id="solContainer" style="display:none"></div>
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Épargne à conserver &amp; réorienter</div>
-    <div class="grid3">
-      <div class="fg"><label>Long terme — À conserver</label><div class="ed-block" id="conserLT" contenteditable="true" data-placeholder="Ex : AV Linxea — 45 000 €"></div></div>
-      <div class="fg"><label>Moyen terme — À conserver</label><div class="ed-block" id="conserMT" contenteditable="true" data-placeholder="Ex : PEL — 18 000 €"></div></div>
-      <div class="fg"><label>À réorienter</label><div class="ed-block" id="reorienter" contenteditable="true" data-placeholder="Ex : CC excédentaire — 5 000 €"></div></div>
-    </div>
+    <div class="card-title"><span class="dot"></span>Note du consultant</div>
+    <div class="ed-block" id="notePreco" contenteditable="true" data-placeholder="Vos observations…"></div>
   </div>
 
   <div class="row-btns">
@@ -2001,7 +1939,7 @@ function calcSynthese(ED, solsSelectionnees) {
 //
 //  RÈGLES ABSOLUES :
 //  1. JAMAIS font-family avec guillemets simples autour du nom de police
-//     → Toujours : font-family:Space Grotesk,sans-serif
+//     → Toujours : font-family:var(--sans)
 //  2. JAMAIS de caractere U+00A0 (espace insecable) dans le code JS
 //     → Utiliser des espaces normaux dans le code
 //  3. Revenus stockés en ANNUEL, revMens() divise par 12
@@ -2691,7 +2629,7 @@ function launch(){
   const pasBr=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   const typeL=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple Comm.':'Couple Sep.';
   const banner=document.getElementById('importBanner');
-  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:Space Grotesk,sans-serif;font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — RI importe</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
+  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — RI importe</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
   goTo('situation');
   showNotif('Étude ouverte !');
 }
@@ -3109,8 +3047,8 @@ function rPatrimoine(){
   pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
     type:'doughnut',
     data:{labels:['Long terme','Moyen terme','Court terme'],
-      datasets:[{data:[lt,mt,ct],backgroundColor:['#F5D9A8','#C8EDD9','#C5D8F5'],borderColor:['#F0A738','#2D7A5B','#2B5EA7'],borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Outfit',size:11},padding:12}}}}
+      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(212,98,42,0.25)','#C8EDD9','#C5D8F5'],borderColor:['var(--orange)','#2D7A5B','#2B5EA7'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:12}}}}
   });
 
   // Actifs table
@@ -3129,19 +3067,19 @@ function rPatrimoine(){
     // Immobilier locatif
     if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#EAF5EF',color:'#2D7A5B'};
     if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'#FDF3E3',color:'#8B4A00'};
-    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'#FDF3E3',color:'#8B4A00'};
-    if(/pinel|duflot|robien|jean brun/.test(n))      return{label:'Loi fiscale',            bg:'#FDF3E3',color:'#8B4A00'};
+    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'var(--o-dim)',color:'#8B4A00'};
+    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'var(--o-dim)',color:'#8B4A00'};
+    if(/pinel|duflot|robien|jean brun/.test(n))      return{label:'Loi fiscale',            bg:'var(--o-dim)',color:'#8B4A00'};
     if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCEBEB',color:'#A32D2D'};
     if(/^foncier$|terrain|bois|\bfoncier\b.*non b[aâ]ti|bien rural|\bgfa\b|\bgfv\b|\bgff\b/i.test(n)&&!/immobilier|immo|foncier.*SCI|SCI.*foncier/i.test(n)) return{label:'Foncier',bg:'#EAF5EF',color:'#2D7A5B'};
     // Court terme (A19-A25)
-    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A/Bleu',          bg:'#FEF9EC',color:'#C8832A'};
-    if(/livret jeune/.test(n))                       return{label:'Livret Jeune',           bg:'#FEF9EC',color:'#C8832A'};
-    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FEF9EC',color:'#C8832A'};
-    if(/\blep\b|livret d.[\u00e9e]pargne populaire/.test(n)) return{label:'LEP',           bg:'#FEF9EC',color:'#C8832A'};
-    if(/\bcel\b|compte [\u00e9e]pargne logement/.test(n))    return{label:'CEL',           bg:'#FEF9EC',color:'#C8832A'};
+    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A/Bleu',          bg:'#FEF9EC',color:'var(--orange-hover)'};
+    if(/livret jeune/.test(n))                       return{label:'Livret Jeune',           bg:'#FEF9EC',color:'var(--orange-hover)'};
+    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FEF9EC',color:'var(--orange-hover)'};
+    if(/\blep\b|livret d.[\u00e9e]pargne populaire/.test(n)) return{label:'LEP',           bg:'#FEF9EC',color:'var(--orange-hover)'};
+    if(/\bcel\b|compte [\u00e9e]pargne logement/.test(n))    return{label:'CEL',           bg:'#FEF9EC',color:'var(--orange-hover)'};
     if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F2F1EE',color:'#6B6B6B'};
-    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FEF9EC',color:'#C8832A'};
+    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FEF9EC',color:'var(--orange-hover)'};
     // Moyen terme (A27-A29) — PEL + Autre liquidité
     if(/\bpel\b|plan d.[\u00e9e]pargne logement/.test(n))   return{label:'PEL',            bg:'#EDF2FB',color:'#2B5EA7'};
     if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'CAT',                   bg:'#EDF2FB',color:'#2B5EA7'};
@@ -3305,10 +3243,6 @@ function rFinancement(){
 
 // ── Données de référence retraite (globales) ──────────────────────
 var TAUX=RET_TAUX; // alias vers RET_TAUX de data.js
-var ESP_VIE={
-  'Madame':  {55:377,57:355,60:323,62:302,64:273,65:261,67:240},
-  'Monsieur':{55:313,57:294,60:265,62:247,64:229,65:217,67:193}
-};
 // getEspVie définie dans data.js (injecté ci-dessus)
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -3339,7 +3273,7 @@ function rRetraite(){
     clients.forEach(function(cl,i){
       if(i===1&&ED.type==='seul')return;
       parHtml+='<div style="background:var(--gris-l);border-radius:10px;padding:14px 16px">';
-      parHtml+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
+      parHtml+='<div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
       parHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Âge de départ souhaité</label>';
       parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
@@ -3364,13 +3298,13 @@ function rRetraite(){
   var tauxClient=TAUX[cspKey][ageIdx];
   var keys=Object.keys(TAUX);
   var datasets=keys.map(function(k,i){var isC=k===cspKey;return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
-  datasets.push({label:'Votre client',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#F0A738',backgroundColor:'#F0A738',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  datasets.push({label:'Votre client',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'var(--orange)',backgroundColor:'var(--orange)',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
   var ctx=document.getElementById('retChart');
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
-  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+' : '+ctx.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Outfit',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Outfit',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Outfit',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Outfit',size:11},color:'#6B6B6B'}}}}});
+  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+' : '+ctx.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}}});
   var legEl=document.getElementById('retLegend');
-  if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC=k===cspKey;return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+(isC?'700':'400')+';background:'+(isC?'rgba(240,167,56,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+(isC?'#F0A738':'transparent')+';color:'+(isC?'#C8832A':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC?' ← '+tauxClient+'%':'')+' </span>';}).join('');
+  if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC=k===cspKey;return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+(isC?'700':'400')+';background:'+(isC?'rgba(212,98,42,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+(isC?'var(--orange)':'transparent')+';color:'+(isC?'var(--orange-hover)':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC?' ← '+tauxClient+'%':'')+' </span>';}).join('');
   // R8 : pension KPI = salaires seuls (fonciers SCI exclus pour couple, nominatifs seuls si seul)
 var isCouple=ED.type!=='seul';
 var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus._foncNomC1||0))/12;
@@ -3591,6 +3525,7 @@ function rPreconisations(){
   var endett=revM>0?(chrCredit/revM*100).toFixed(1):'—';
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
+  var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
   var av=document.getElementById('precoAvant');
   if(av){
     var rows=[
@@ -3602,7 +3537,7 @@ function rPreconisations(){
       ['Impôt annuel',       fmt(impot)+' € — TMI '+(ED.fiscal.tmi||'—')+'%', false],
       ['Épargne mensuelle',  fmt(ED.epMens||0)+' €', false],
     ];
-    if(plafondPER>0) rows.push(['Plafond PER', fmt(plafondPER)+' € → économie '+fmt(economiePER)+' €', false]);
+    if(plafondPER>0) rows.push(['Plafond PER', fmt(plafondPER)+' € → éco. '+fmt(economiePER)+' €', false]);
     av.innerHTML=rows.map(function(r){
       return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bord)">'
         +'<span style="font-size:12px;color:var(--gris)">'+r[0]+'</span>'
@@ -3610,6 +3545,9 @@ function rPreconisations(){
         +'</div>';
     }).join('');
   }
+  buildMatriceObjSol(impot,capa,aSum);
+  renderSolsRetenues();
+  renderFichesClient();
 }
 
 
@@ -3661,7 +3599,7 @@ function buildMatriceObjSol(impot,capa,aSum){
     var bid='btn_sol_'+s.replace(/[^a-zA-Z0-9]/g,'_');
     var objPills=allSols[s].objectifs.map(function(o){
       var short={'Épargne / capitalisation':'Capitalisation','Optimiser son IR':'Fiscal IR','Se créer un complément de revenus':'Revenus','Optimiser la transmission':'Transmission','Préparer sa retraite':'Retraite','Optimiser son IFI':'Fiscal IFI','Faire fructifier un capital':'Capital','Réorganiser son patrimoine':'Reorganisation','Protéger son conjoint':'Protection'};
-      return '<span style="background:rgba(240,167,56,0.12);color:#C8832A;font-size:9px;padding:1px 6px;border-radius:10px">'+( short[o]||o)+'</span>';
+      return '<span style="background:rgba(212,98,42,0.12);color:var(--orange-hover);font-size:9px;padding:1px 6px;border-radius:10px">'+( short[o]||o)+'</span>';
     }).join('');
 
     html+='<div id="'+bid+'" onclick="toggleSolution(\''+s+'\')" style="cursor:pointer;border-radius:10px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'rgba(45,122,91,0.06)':'#fff')+';padding:10px 12px;transition:all 0.15s;user-select:none" onmouseover="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--ambre)\'" onmouseout="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--bord)\'">';
@@ -3715,14 +3653,14 @@ function renderSolsRetenues(){
   var html='';
   solsSelectionnees.forEach(function(sol,i){
     var cp=COPERNIC[sol.produit]||{};
-    html+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid #F0A738">';
+    html+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--orange)">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
     html+='<div style="display:flex;align-items:center;gap:8px">';
     html+='<div style="display:flex;align-items:center;gap:4px">';
     html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Étape</span>';
-    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
+    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
     html+='</div>';
-    html+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
+    html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
     html+='</div>';
     html+='<button onclick="toggleSolution(\''+sol.produit+'\')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px">&times;</button></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
@@ -3754,7 +3692,7 @@ function renderSolsRetenues(){
       html+='</label></div>';
     }
     html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:2px">';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif">';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif">';
     var titOptions=['C1','C2','Commun'];
     var titLabels={};
     titLabels['C1']=nomC(1);
@@ -3762,9 +3700,9 @@ function renderSolsRetenues(){
     titLabels['Commun']='Commun';
     titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
     html+='</select></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">VP mensuel</label><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+i+',\'vp\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Horizon (ans)</label><input type="number" value="'+(parseInt(sol.horizon)||10)+'" title="'+(sol.horizonLabel||'')+'" min="1" max="40" oninput="updateSol('+i+',\'horizon\',this.value+\' ans\')" onchange="updateSol('+i+',\'horizon\',this.value+\' ans\')" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Outfit\',sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">VP mensuel</label><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+i+',\'vp\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Horizon (ans)</label><input type="number" value="'+(parseInt(sol.horizon)||10)+'" title="'+(sol.horizonLabel||'')+'" min="1" max="40" oninput="updateSol('+i+',\'horizon\',this.value+\' ans\')" onchange="updateSol('+i+',\'horizon\',this.value+\' ans\')" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
     html+='</div></div>';
   });
   el.innerHTML=html;
@@ -3821,7 +3759,7 @@ function renderFichesClient(){
   });
 
   var LEVIER_META={
-    'epargne':     {label:'Faire fructifier votre épargne',      bg:'#FDF3E3',border:'#F5D9A8',titleBg:'#C8832A',rate:0.025},
+    'epargne':     {label:'Faire fructifier votre épargne',      bg:'var(--o-dim)',border:'rgba(212,98,42,0.25)',titleBg:'var(--orange-hover)',rate:0.025},
     'fiscal':      {label:'Optimiser votre fiscalité',           bg:'#EDF2FB',border:'#B5D4F4',titleBg:'#185FA5',rate:0.025},
     'financement': {label:'Investir par le financement',         bg:'#EAF5EF',border:'#9FE1CB',titleBg:'#0F6E56',rate:0.03},
     'transmission':{label:'Organiser votre transmission',        bg:'#F5EFF8',border:'#CECBF6',titleBg:'#534AB7',rate:0.04},
@@ -3847,7 +3785,7 @@ function renderFichesClient(){
     // ── En-tête levier ──
     html+='<div style="background:'+meta.bg+';border:1.5px solid '+meta.border+';border-radius:14px;overflow:hidden;margin-bottom:20px">';
     html+='<div style="background:'+meta.titleBg+';padding:12px 20px;display:flex;align-items:center;gap:10px">';
-    html+='<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:15px;color:#fff">'+meta.label+'</div>';
+    html+='<div style="font-family:var(--sans);font-weight:700;font-size:15px;color:#fff">'+meta.label+'</div>';
     html+='</div>';
     html+='<div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">';
 
@@ -4089,7 +4027,7 @@ function rSynthese(){
       });
       var ctAp=ctAct+ctAdd, mtAp=mtAct+mtAdd, ltAp=ltAct+ltAdd;
       var totAp=ctAp+mtAp+ltAp||1;
-      [{label:'Court terme',act:ctAct,ap:ctAp,color:'#F0A738'},
+      [{label:'Court terme',act:ctAct,ap:ctAp,color:'var(--orange)'},
        {label:'Moyen terme',act:mtAct,ap:mtAp,color:'#185FA5'},
        {label:'Long terme', act:ltAct,ap:ltAp,color:'#0F6E56'}].forEach(function(h){
         if(h.act===0&&h.ap===0)return;
@@ -4129,7 +4067,7 @@ function rSynthese(){
         labels:['Court terme','Moyen terme','Long terme'],
         datasets:[{
           data:[ct,mt,lt],
-          backgroundColor:['#F0A738','#185FA5','#0F6E56'],
+          backgroundColor:['var(--orange)','#185FA5','#0F6E56'],
           borderWidth:2,borderColor:'#fff'
         }]
       },
@@ -4148,7 +4086,7 @@ function rSynthese(){
     var leg=document.getElementById('pyramideLegend');
     if(leg){
       var total=ct+mt+lt;
-      leg.innerHTML=[{l:'Court terme',v:ct,c:'#F0A738'},{l:'Moyen terme',v:mt,c:'#185FA5'},{l:'Long terme',v:lt,c:'#0F6E56'}].map(function(i){
+      leg.innerHTML=[{l:'Court terme',v:ct,c:'var(--orange)'},{l:'Moyen terme',v:mt,c:'#185FA5'},{l:'Long terme',v:lt,c:'#0F6E56'}].map(function(i){
         return '<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:'+i.c+';flex-shrink:0"></span>'
           +'<span style="color:var(--gris)">'+i.l+'</span> <strong>'+fmt(i.v)+' €</strong>'
           +(total>0?' <span style="color:var(--gris)">('+Math.round(i.v/total*100)+'%)</span>':'')
@@ -4553,7 +4491,7 @@ function updateProfilBadge(p) {
   var label = document.getElementById('profilBadgeLabel');
   if (!badge) return;
   var complet = p && p.nom && p.cabinet && p.orias;
-  badge.className = 'profil-badge ' + (complet ? 'ok' : 'missing');
+  badge.className = 'cs-btn-ghost ' + (complet ? 'ok' : 'missing');
   var nomAff = complet ? (p.prenom ? p.prenom + ' ' + p.nom : p.nom) : 'Mon profil';
   if (label) label.textContent = nomAff;
   // Sidebar
@@ -4564,8 +4502,8 @@ function updateProfilBadge(p) {
     ? (p.cabinet || '') + (p.orias ? ' · ORIAS ' + p.orias : '')
     : 'Affiché sur le PDF';
   var sBlock = document.getElementById('sidebarProfilBlock');
-  if (sBlock) sBlock.style.borderColor = complet ? 'rgba(45,122,91,0.3)' : 'rgba(240,167,56,0.2)';
-  if (sBlock) sBlock.style.background  = complet ? 'rgba(45,122,91,0.06)' : 'rgba(240,167,56,0.08)';
+  if (sBlock) sBlock.style.borderColor = complet ? 'rgba(45,122,91,0.3)' : 'rgba(212,98,42,0.2)';
+  if (sBlock) sBlock.style.background  = complet ? 'rgba(45,122,91,0.06)' : 'rgba(212,98,42,0.08)';
 }
 
 function injectProfilIntoED(p) {
