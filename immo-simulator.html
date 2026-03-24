@@ -373,10 +373,13 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       <!-- Bilan final -->
       <div class="bilan-block" id="bilanBlock"></div>
 
-      <!-- Graphique participation -->
+      <!-- Camembert -->
       <div class="chart-block">
-        <div class="chart-title">Participation cumulée vs loyers nets cumulés</div>
-        <div style="height:220px;position:relative"><canvas id="mainChart"></canvas></div>
+        <div class="chart-title">Répartition du financement — participation vs loyers nets</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center">
+          <div style="position:relative;height:220px"><canvas id="mainChart"></canvas></div>
+          <div id="pieLegende" style="font-size:12px"></div>
+        </div>
       </div>
 
       <!-- Détail -->
@@ -779,24 +782,37 @@ function recalc() {
     ['Participation totale', fmtE(last.partCumul),'o'],
   ].map(r=>dRow(r[0],r[1],r[2])).join(''));
 
-  // Graphique
+  // Camembert : participation cumulée vs loyers nets cumulés vs réserve amort
   if(chartInst) chartInst.destroy();
+  var pieData = [Math.round(last.partCumul), Math.round(loyerNetCumul), Math.round(reserveFinale)];
+  var pieLabels = ['Votre participation', 'Loyers nets', 'Réserve amortissement'];
+  var pieColors = ['rgba(212,98,42,0.85)', 'rgba(26,122,74,0.8)', 'rgba(24,22,20,0.2)'];
   chartInst = new Chart(document.getElementById('mainChart'), {
-    type: 'line',
+    type: 'doughnut',
     data: {
-      labels: rows.map(r=>'An '+r.an),
-      datasets: [
-        { label: 'Participation cumulée', data: chartPartCumul, borderColor:'var(--orange)', backgroundColor:'rgba(212,98,42,0.07)', fill:true, borderWidth:2.5, pointRadius:0, tension:0.4 },
-        { label: 'Loyers nets cumulés',  data: chartLoyerCumul, borderColor:'#1a7a4a', backgroundColor:'rgba(26,122,74,0.06)', fill:true, borderWidth:2, pointRadius:0, tension:0.4 },
-      ]
+      labels: pieLabels,
+      datasets: [{ data: pieData, backgroundColor: pieColors, borderWidth: 0, hoverOffset: 6 }]
     },
-    options: { responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'top',labels:{font:{family:'Inter',size:11},padding:14}},
-        tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}} },
-      scales:{ x:{grid:{display:false},ticks:{font:{family:'Inter',size:9},maxTicksLimit:12}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:10},callback:v=>fmt(v)+'€'}} }
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' '+ctx.label+' : '+fmt(ctx.parsed)+' €' } }
+      }
     }
   });
+  // Légende custom
+  var total = pieData.reduce((a,b)=>a+b,0);
+  setHTML('pieLegende', pieLabels.map((lbl,i) => {
+    var pct = total > 0 ? (pieData[i]/total*100).toFixed(1) : 0;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule-l)">'
+      +'<span style="width:12px;height:12px;border-radius:2px;background:'+pieColors[i]+';flex-shrink:0"></span>'
+      +'<span style="color:var(--ink-60);flex:1">'+lbl+'</span>'
+      +'<span style="font-weight:700;color:var(--ink)">'+fmtE(pieData[i])+'</span>'
+      +'<span style="color:var(--ink-30);font-size:10px;min-width:36px;text-align:right">'+pct+' %</span>'
+      +'</div>';
+  }).join(''));
 
   // Tableau
   var tbody = '';
