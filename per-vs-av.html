@@ -239,13 +239,55 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
       <span class="hyp-label">Rendement annuel net (%)</span>
       <input type="number" class="hyp-input" id="rendement" value="4" min="0.5" max="10" step="0.5" oninput="recalc()">
     </div>
-    <div class="hyp-field">
-      <span class="hyp-label">PFU / Flat tax AV (%)</span>
-      <input type="number" class="hyp-input" id="pfu" value="30" min="0" max="50" step="1" oninput="recalc()">
+  </div>
+
+  <!-- Taux fiscaux en 2 colonnes AV / PER -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:24px">
+
+    <!-- AV -->
+    <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 22px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#2B5EA7;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <span style="width:8px;height:8px;background:#2B5EA7;display:inline-block"></span>
+        Assurance Vie — fiscalité sortie
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="hyp-field">
+          <span class="hyp-label">IR sur plus-values (%)</span>
+          <input type="number" class="hyp-input" id="irAv" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
+          <span class="hyp-hint">Taux IR flat sur les PV</span>
+        </div>
+        <div class="hyp-field">
+          <span class="hyp-label">PS sur plus-values (%)</span>
+          <input type="number" class="hyp-input" id="psAv" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+          <span class="hyp-hint">Prélèvements sociaux AV</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:rgba(43,94,167,0.06);font-size:11px;color:#2B5EA7">
+        Flat tax totale = IR + PS = <strong id="avFlatTaxTotal">30,0 %</strong> sur les plus-values
+      </div>
     </div>
-    <div class="hyp-field">
-      <span class="hyp-label">Prélèvements sociaux (%)</span>
-      <input type="number" class="hyp-input" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+
+    <!-- PER -->
+    <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 22px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <span style="width:8px;height:8px;background:var(--orange);display:inline-block"></span>
+        PER Individuel — fiscalité sortie
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="hyp-field">
+          <span class="hyp-label">IR sur plus-values (%)</span>
+          <input type="number" class="hyp-input" id="irPer" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
+          <span class="hyp-hint">IR PV (même taux que l'AV)</span>
+        </div>
+        <div class="hyp-field">
+          <span class="hyp-label">PS sur plus-values (%)</span>
+          <input type="number" class="hyp-input" id="psPer" value="18.4" min="0" max="25" step="0.1" oninput="recalc()">
+          <span class="hyp-hint">Prélèvements sociaux PER</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:var(--o-dim);font-size:11px;color:var(--orange)">
+        IR barème (TMI sortie) sur capital + PS <strong id="perPsDisplay">18,4 %</strong> sur les plus-values
+      </div>
     </div>
   </div>
 
@@ -389,7 +431,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
               <span class="val" id="perFiscIr">—</span>
             </div>
             <div class="detail-row sub">
-              <span class="label">dont PS (18,4%) sur plus-values</span>
+              <span class="label">dont IR+PS sur plus-values</span>
               <span class="val" id="perFiscPs">—</span>
             </div>
             <div class="detail-row total-row">
@@ -423,7 +465,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
   </div>
 
   <div class="sim-footer">
-    Simulation à titre indicatif — non contractuelle. AV : flat tax 30% (IR 12,8% + PS 17,2%) sur les plus-values. PER : IR barème (TMI sortie) sur le capital + PS <span id="footerPsPer">18,4</span>% sur les plus-values. Rendement annuel net = <span id="footerRdt">4</span>%.
+    Simulation à titre indicatif — non contractuelle. AV : IR <span id="fIrAv">12,8</span>% + PS <span id="fPsAv">17,2</span>% = flat tax <span id="fFlatTax">30,0</span>% sur les PV. PER : IR barème (TMI sortie) sur le capital + PS <span id="footerPsPer">18,4</span>% sur les PV. Rendement = <span id="footerRdt">4</span>%.
   </div>
 </div>
 
@@ -459,38 +501,47 @@ function fmtGain(n) {
   return (n > 0 ? '+' : '') + (n * 100).toFixed(1).replace('.', ',') + ' %';
 }
 function getParams() {
+  var irAv  = parseFloat(document.getElementById('irAv').value)  || 12.8;
+  var psAv  = parseFloat(document.getElementById('psAv').value)  || 17.2;
+  var irPer = parseFloat(document.getElementById('irPer').value) || 12.8;
+  var psPer = parseFloat(document.getElementById('psPer').value) || 18.4;
+  // Mettre à jour les affichages récapitulatifs
+  setText('avFlatTaxTotal', (irAv + psAv).toFixed(1).replace('.', ',') + ' %');
+  setText('perPsDisplay',   (irPer + psPer).toFixed(1).replace('.', ',') + ' % (IR ' + irPer.toFixed(1) + '% + PS ' + psPer.toFixed(1) + '%)');
   return {
     montant: parseFloat(document.getElementById('montantBrut').value) || 10000,
     rdt:     parseFloat(document.getElementById('rendement').value) / 100 || 0.04,
-    pfu:     parseFloat(document.getElementById('pfu').value) / 100 || 0.30,    // AV flat tax
-    psPer:   parseFloat(document.getElementById('psPer').value) / 100 || 0.184, // PER PS sur PV
+    psAv:   psAv / 100,    // AV : PS sur les PV (hypothèse simplificatrice)
+    irPer:  irPer / 100,   // PER : IR sur les PV
+    psPer:  psPer / 100,   // PER : PS sur les PV
   };
 }
 
 // ── Calcul core ──
-function calcScenario(montant, rdt, pfu, psPer, tmiE, tmiS, duree) {
-  // AV : investit montant * (1 - tmiE)
-  // Fiscalité sortie : flat tax = IR 12,8% + PS 17,2% = 30% sur les plus-values
-  var avCapital = montant * (1 - tmiE);
+function calcScenario(montant, rdt, psAv, irPer, psPer, tmiE, tmiS, duree) {
+  // ─── AV ───────────────────────────────────────────────────────────
+  // Hypothèse simplificatrice : seuls les PS (17,2%) s'appliquent sur les PV
+  // (l'IR AV 12,8% est ignoré pour garder la comparaison conservative)
+  var avCapital = montant * (1 - tmiE);          // capital investi net d'IR
   var avBrut    = avCapital * Math.pow(1 + rdt, duree);
   var avPv      = avBrut - avCapital;
-  var avFiscPs  = avPv * pfu;   // flat tax AV (IR 12,8% + PS 17,2%) sur les PV
+  var avFiscPs  = avPv * psAv;                   // PS uniquement sur les PV
   var avFisc    = avFiscPs;
   var avNet     = avBrut - avFisc;
   var avEffort  = avCapital;
   var avGain    = (avNet - avEffort) / avEffort;
 
-  // PER : investit montant entier (déduction IR)
-  // Fiscalité sortie : IR barème (TMI sortie) sur le capital + PS 18,4% sur les plus-values
-  // Note : le PFU ne s'applique PAS au PER — l'IR est calculé au barème progressif
+  // ─── PER ──────────────────────────────────────────────────────────
+  // Fiscalité sortie = IR barème (TMI sortie) sur CAPITAL
+  //                  + (IR 12,8% + PS 18,4%) sur les PLUS-VALUES
   var perCapital = montant;
   var perBrut    = perCapital * Math.pow(1 + rdt, duree);
   var perPv      = perBrut - perCapital;
-  var perFiscIr  = perCapital * tmiS;   // IR barème (TMI sortie) sur le capital initial
-  var perFiscPs  = perPv * psPer;       // PS 18,4% sur les plus-values uniquement
+  var perFiscIr  = perCapital * tmiS;            // IR barème (TMI sortie) sur le capital
+  var perFiscPs  = perPv * (irPer + psPer);      // IR 12,8% + PS 18,4% sur les PV
   var perFisc    = perFiscIr + perFiscPs;
   var perNet     = perBrut - perFisc;
-  var perEffort  = avCapital; // effort réel = même que AV (économie d'IR reversée)
+  var perEffort  = avCapital;                    // effort réel identique à AV
   var perGain    = (perNet - perEffort) / perEffort;
 
   var diff = perGain - avGain;
@@ -506,6 +557,11 @@ function setText(id, val) { var el = document.getElementById(id); if (el) el.tex
 function recalc() {
   var p = getParams();
   // Mettre à jour footer
+  var irAvVal = parseFloat(document.getElementById('irAv').value)||12.8;
+  var psAvVal = parseFloat(document.getElementById('psAv').value)||17.2;
+  setText('fIrAv', irAvVal.toFixed(1).replace('.',','));
+  setText('fPsAv', psAvVal.toFixed(1).replace('.',','));
+  setText('fFlatTax', (irAvVal+psAvVal).toFixed(1).replace('.',','));
   setText('footerPsPer', (p.psPer * 100).toFixed(1).replace('.', ','));
   setText('footerRdt', (p.rdt * 100).toFixed(1).replace('.', ','));
 
@@ -527,7 +583,7 @@ function renderMatrix(p) {
         html += '<td style="background:var(--paper-2);color:var(--ink-30);font-size:11px">—</td>';
         return;
       }
-      var r = calcScenario(p.montant, p.rdt, p.pfu, p.psPer, tE, tS, duree);
+      var r = calcScenario(p.montant, p.rdt, p.psAv, p.irPer, p.psPer, tE, tS, duree);
       var d = r.diff;
       var cls = d > 0 ? 'val-pos' : d < 0 ? 'val-neg' : 'val-neutral';
       var prefix = d > 0 ? '+' : '';
@@ -548,7 +604,7 @@ function renderRecapChart(p) {
       label: 'Sortie ' + (tS * 100).toFixed(0) + '%',
       data: TMI_ENTREE.map(function(tE) {
         if (tS > tE) return null;
-        return calcScenario(p.montant, p.rdt, p.pfu, p.psPer, tE, tS, duree).diff * 100;
+        return calcScenario(p.montant, p.rdt, p.psAv, p.irPer, p.psPer, tE, tS, duree).diff * 100;
       }),
       borderColor: colors[si],
       backgroundColor: colors[si],
@@ -585,7 +641,7 @@ function renderRecapChart(p) {
 
 // ── Détail ──
 function renderDetail(p) {
-  var r = calcScenario(p.montant, p.rdt, p.pfu, p.psPer, tmiEntree, tmiSortie, duree);
+  var r = calcScenario(p.montant, p.rdt, p.psAv, p.irPer, p.psPer, tmiEntree, tmiSortie, duree);
 
   // Différentiel
 
@@ -621,7 +677,7 @@ function renderEvolutionChart(p) {
   var avData = [], perData = [];
   for (var y = 0; y <= Math.max(duree, 30); y++) {
     annees.push(y);
-    var rA = calcScenario(p.montant, p.rdt, p.pfu, p.psPer, tmiEntree, tmiSortie, y);
+    var rA = calcScenario(p.montant, p.rdt, p.psAv, p.irPer, p.psPer, tmiEntree, tmiSortie, y);
     avData.push(Math.round(rA.avNet));
     perData.push(Math.round(rA.perNet));
   }
