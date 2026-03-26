@@ -378,36 +378,39 @@ select.span2{grid-column:span 2}
 
 /* ── PRINT ── */
 @media print{
-  /* ── MASQUER : navigation, sidebar, boutons, formulaires, zones import ── */
+  /* ── MASQUER : navigation, sidebar, boutons, zones conseiller ── */
   nav,.sidebar,.nav-actions,.row-btns,.add-row-btn,.add-sol-btn,.add-sol-bar,
   .sol-del,.mode-toggle,.import-zone,.btn,.ed:hover,.ed-block:hover,
   #panneauConseiller,button,input[type="file"],.import-zone label,
-  .comment-zone textarea,.riDropzone,.avisDropzone,
+  .riDropzone,.avisDropzone,
   #riDropzone,#avisDropzone,#riFileStatus,#avisIRStatus,
   #newStepInput,.profil-overlay,.panneau-interne,
-  #syntheseConseillerBadge{display:none!important}
+  .comment-zone,.pdf-page-header,
+  .page-break-marker,.page-break-spacer,
+  #syntheseConseillerBadge,#sec-import{display:none!important}
   /* ── LAYOUT : pleine largeur ── */
-  .app{grid-template-columns:1fr!important}
+  .app{display:block!important}
   .main{padding:0!important;max-width:100%!important}
   body{background:#fff!important;font-size:11pt}
-  /* ── SECTIONS : toutes visibles avec saut de page ── */
-  .section-page{display:block!important}
-  .section-page:not(.active){page-break-before:always}
+  /* ── SECTIONS : seules les pages cochées sont visibles ── */
+  .section-page{display:none!important}
+  .section-page.print-visible{display:block!important;page-break-before:always;
+    border:none!important;box-shadow:none!important;border-radius:0!important;
+    padding:40px!important;max-width:100%!important;min-height:auto!important;margin:0!important}
+  .section-page.print-visible:first-of-type{page-break-before:auto}
   .sec-header{margin-bottom:16pt}
   .sec-tag{font-size:8pt;letter-spacing:0.12em;opacity:0.6}
   .sec-h1{font-size:18pt;margin-bottom:4pt}
   .sec-sub{font-size:10pt;opacity:0.7}
   /* ── CARDS : pas de coupure au milieu ── */
-  .card,.kpi,.preco-panel,.sol-card,.comment-zone,
+  .card,.kpi,.preco-panel,.sol-card,
   .preco-avant-apres>div,#fichesClientContainer>div{break-inside:avoid}
   /* ── COULEURS : fond blanc, textes lisibles ── */
   .card{background:#fff!important;border:1px solid #ccc!important;box-shadow:none!important}
-  /* ── COMMENTAIRES : afficher comme texte propre ── */
-  .comment-zone{display:block!important;margin-top:8pt;padding-top:8pt;border-top:0.5pt solid #ddd}
-  .comment-zone-label{font-size:7pt;color:#888;text-transform:uppercase;letter-spacing:0.1em}
-  .comment-zone textarea{display:block!important;border:none!important;background:transparent!important;
-    resize:none!important;padding:0!important;min-height:0!important;font-size:10pt;color:#333;
-    width:100%!important;overflow:visible!important;height:auto!important}
+  /* ── NOTE PRINT : visible si activée ── */
+  .note-print{break-inside:avoid}
+  /* ── PIED DE PAGE : position statique pour l'impression ── */
+  .page-number{position:static!important;padding:14px 0 0!important}
   /* ── GRAPHIQUES : éviter la coupure ── */
   canvas{max-width:100%!important}
   .synthese-step{break-inside:avoid}
@@ -415,8 +418,6 @@ select.span2{grid-column:span 2}
   .pdf-cover-page{display:block!important;page-break-after:always}
   /* ── PAGE MENTIONS LÉGALES ── */
   .pdf-mentions-page{display:block!important;page-break-before:always}
-  /* ── EN-TÊTE DE PAGE : conseiller ── */
-  .pdf-page-header{display:block!important}
   /* ── PIED DE PAGE : coordonnées conseiller ── */
   .pdf-conseiller-footer{display:block!important;
     position:fixed;bottom:0;left:0;right:0;
@@ -6277,11 +6278,26 @@ function renderAvisPreview(){
 function exportPDF() {
   // Mettre à jour l'en-tête PDF avant impression
   updatePdfHeader();
+  // Déterminer les sections à imprimer (ordre PDF)
+  var printOrder=['pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite',
+    'transmission','entreprise','preconisations','synthese','avis','mentions'];
+  var checkMap={transmission:'checkTransmission',entreprise:'checkEntreprise',avis:'checkAvis'};
+  // Marquer les sections visibles pour l'impression
+  document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+  printOrder.forEach(function(id){
+    var checkId=checkMap[id];
+    if(checkId){var cb=document.getElementById(checkId);if(!cb||!cb.checked)return;}
+    var sec=document.getElementById('sec-'+id);
+    if(sec&&sec.id!=='sec-import')sec.classList.add('print-visible');
+  });
   // Convertir tous les canvas Chart.js en img PNG
   convertChartsToImg(function() {
     window.print();
-    // Remettre les canvas après impression
-    setTimeout(restoreCharts, 2000);
+    // Remettre les canvas et nettoyer les classes après impression
+    setTimeout(function(){
+      restoreCharts();
+      document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+    }, 2000);
   });
 }
 
