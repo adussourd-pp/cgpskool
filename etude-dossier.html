@@ -2398,6 +2398,14 @@ function parseTextRI(txt){
     var sitVal = (sitPt ? sitPt.v1 : '') || kv01['situation'] || '';
     if(sitVal) ED.sitmat = sitVal;
 
+    // Regime matrimonial / Convention
+    var convPt = pt01['regime/ convention'] || pt01['regime / convention'] || pt01['regime'] || pt01['convention'];
+    var convVal = (convPt ? convPt.v1 : '') || kv01['regime/ convention'] || kv01['regime'] || '';
+    if(convVal){
+      convVal = convVal.replace(/R.gime matrimonial\s*:\s*/i,'').replace(/R.gime\s*:\s*/i,'').trim();
+      if(convVal) ED.convention = convVal;
+    }
+
     // Logement
     var logPt = pt01['logement'];
     var logVal = (logPt ? logPt.v1 : '') || kv01['logement'] || '';
@@ -2707,6 +2715,9 @@ function parseTextRI(txt){
   if(dobRow){ED.c1.dob=parseDob(dobRow.v1);if(isCouple2)ED.c2.dob=parseDob(dobRow.v2);}
   // Sit mat
   var sitRow=t01['situation']||t01['situation\u00a0'];if(sitRow)ED.sitmat=sitRow.v1;
+  // Regime / Convention
+  var convRow=t01['r\u00e9gime/ convention']||t01['regime/ convention']||t01['r\u00e9gime']||t01['regime'];
+  if(convRow){var cv=(convRow.v1||'').replace(/R.gime matrimonial\s*:\s*/i,'').replace(/R.gime\s*:\s*/i,'').trim();if(cv)ED.convention=cv;}
   // Logement
   var logRow=t01['logement'];if(logRow)ED.logement=logRow.v1;
   // Adresse
@@ -3301,11 +3312,13 @@ function rSituation(){
   if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
 
   function personCard(label,name,age,profession,revenus){
+    var mens=Math.round(revenus/12);
     var c='<div class="card" style="margin-bottom:0">';
     c+='<div class="card-title"><span class="dot"></span>'+label+'</div>';
     c+='<div class="fiscal-row"><span class="fr-l">Nom</span><span class="fr-v" style="font-weight:700">'+name+(age?' \u2014 '+age+' ans':'')+'</span></div>';
     c+='<div class="fiscal-row"><span class="fr-l">Profession</span><span class="fr-v">'+profession+'</span></div>';
-    c+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v" style="font-weight:700">'+fmt(revenus)+' \u20ac</span></div>';
+    c+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v" style="font-weight:700;font-size:15px">'+fmt(mens)+' \u20ac/mois</span></div>';
+    c+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v" style="color:var(--gris)">'+fmt(revenus)+' \u20ac/an</span></div>';
     if(ED.logement)c+='<div class="fiscal-row"><span class="fr-l">Logement</span><span class="fr-v">'+ED.logement+'</span></div>';
     if(ED.adresse)c+='<div class="fiscal-row"><span class="fr-l">Adresse</span><span class="fr-v">'+ED.adresse+'</span></div>';
     c+='</div>';
