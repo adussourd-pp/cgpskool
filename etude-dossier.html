@@ -649,6 +649,9 @@ select.span2{grid-column:span 2}
   <!-- Situation personnelle : 2 colonnes couple ou 1 colonne seul -->
   <div id="sitDisplay" style="margin-bottom:16px">—</div>
 
+  <!-- Revenus par personne (style Financement) -->
+  <div id="revenuCards" style="margin-bottom:16px"></div>
+
   <!-- Chiffres clés du foyer (commun) -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Chiffres clés du foyer</div>
@@ -1114,9 +1117,9 @@ select.span2{grid-column:span 2}
 
   <!-- Apercu (visible dans le PDF) -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Aperçu mentions légales</div>
+    <div class="card-title"><span class="dot"></span>Aperçu — inclus dans le PDF</div>
     <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucune mention saisie.</em>
+      <em style="color:var(--gris)">Saisissez vos mentions légales ci-dessus.</em>
     </div>
   </div>
 
@@ -1152,6 +1155,10 @@ select.span2{grid-column:span 2}
     <div style="padding:16px;background:#fefcf8">
       <div id="avisManualList"></div>
       <button onclick="addAvisManuel()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter un avis</button>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)">
+        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:6px">Lien pour laisser un avis (inclus dans le PDF)</label>
+        <input type="url" id="avisLienUrl" placeholder="https://g.page/r/votre-lien/review" style="width:100%;padding:8px 12px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;outline:none" oninput="saveAvisLien()">
+      </div>
     </div>
   </div>
 
@@ -3327,7 +3334,36 @@ function rSituation(){
     sit+='</div>';
   }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
-  document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
+  document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple \u2014 Communaut\u00e9':'Couple \u2014 S\u00e9paration de biens';
+
+  // Revenus par personne (style Financement)
+  var rcEl=document.getElementById('revenuCards');
+  if(rcEl){
+    var p1=ED.c1.prenom||'C1';
+    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
+    var mens1=Math.round(sal1/12);
+    var ep1=ED.epMens||0;
+    var rcH='<div style="display:grid;grid-template-columns:'+(isCoupleSit?'1fr 1fr':'1fr')+';gap:16px">';
+    function revCard(prenom,salAn,salMois,epMens){
+      var c='<div class="card" style="margin-bottom:0;padding:16px">';
+      c+='<div class="card-title" style="margin-bottom:10px"><span class="dot"></span>'+prenom+'</div>';
+      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--blue)">Revenus annuels</span><span class="fr-v" style="font-weight:700">'+fmt(salAn)+' \u20ac</span></div>';
+      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--blue)">Revenus mensuels</span><span class="fr-v" style="font-weight:700">'+fmt(salMois)+' \u20ac/mois</span></div>';
+      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--orange)">\u00c9pargne mensuelle</span><span class="fr-v" style="font-weight:700;color:var(--orange)">'+fmt(epMens)+' \u20ac/mois</span></div>';
+      c+='</div>';
+      return c;
+    }
+    rcH+=revCard(p1,sal1,mens1,ep1);
+    if(isCoupleSit){
+      var p2=ED.c2.prenom||'C2';
+      var sal2=ED.revenus.sal2||ED.revenus.c2||0;
+      var mens2=Math.round(sal2/12);
+      var ep2=ED.epMens2||0;
+      rcH+=revCard(p2,sal2,mens2,ep2);
+    }
+    rcH+='</div>';
+    rcEl.innerHTML=rcH;
+  }
 
   const objH=ED.objectifs.length
     ? ED.objectifs.map((o,i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span></div>`).join('')
@@ -5453,8 +5489,6 @@ var PROFIL_FIELDS = [
   {id:'pAdresse',  key:'adresse',  label:'Adresse'},
   {id:'pCP',       key:'cp',       label:'CP'},
   {id:'pVille',    key:'ville',    label:'Ville'},
-  {id:'pMentions', key:'mentions', label:'Mentions'},
-  {id:'pTrustpilot', key:'trustpilot', label:'Trustpilot'},
   {id:'pColor1',   key:'color1',   label:'Couleur 1'},
   {id:'pColor2',   key:'color2',   label:'Couleur 2'},
 ];
@@ -5648,12 +5682,8 @@ function handleRiFile(file) {
   }
 }
 
-// Clic sur la zone → déclencher l'input file
+// Clic sur les dropzones
 document.addEventListener('DOMContentLoaded', function() {
-  var dz = document.getElementById('riDropzone');
-  if (dz) dz.addEventListener('click', function() {
-    document.getElementById('riFileInput').click();
-  });
   var adz = document.getElementById('avisDropzone');
   if (adz) adz.addEventListener('click', function() {
     document.getElementById('avisFileInput').click();
@@ -5850,6 +5880,11 @@ function rAvis(){
       }
     }catch(e){}
   }
+  // Charger le lien
+  var lienEl=document.getElementById('avisLienUrl');
+  if(lienEl&&!lienEl.value){
+    try{var l=localStorage.getItem('cgpskool_avis_lien');if(l)lienEl.value=l;}catch(e){}
+  }
   renderAvisPreview();
 }
 
@@ -5887,28 +5922,45 @@ function saveAvis(){
   renderAvisPreview();
 }
 
+function saveAvisLien(){
+  var el=document.getElementById('avisLienUrl');
+  if(el)try{localStorage.setItem('cgpskool_avis_lien',el.value);}catch(e){}
+  renderAvisPreview();
+}
+
 function renderAvisPreview(){
   var el=document.getElementById('avisPreview');
   if(!el)return;
   try{
     var raw=localStorage.getItem('cgpskool_avis');
-    if(!raw||!JSON.parse(raw).length){
+    var avis=raw?JSON.parse(raw):[];
+    var lien='';try{lien=localStorage.getItem('cgpskool_avis_lien')||'';}catch(e){}
+
+    if(!avis.length&&!lien){
       el.innerHTML='<em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>';
       return;
     }
-    var avis=JSON.parse(raw);
-    var h='<div style="margin-bottom:8px;font-weight:700;color:var(--noir)">'+avis.length+' avis client'+(avis.length>1?'s':'')+'</div>';
-    avis.forEach(function(a){
-      var starsHtml='';
-      for(var i=0;i<5;i++)starsHtml+='<span style="color:'+(i<a.stars?'#D4622A':'#ddd')+';font-size:14px">&#9733;</span>';
-      h+='<div style="padding:10px 0;border-bottom:1px solid var(--bord)">';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center">';
-      h+='<strong style="font-size:13px">'+a.name+'</strong>';
-      h+='<span>'+starsHtml+'</span>';
+    var h='';
+    if(avis.length){
+      h+='<div style="margin-bottom:8px;font-weight:700;color:var(--noir)">'+avis.length+' avis client'+(avis.length>1?'s':'')+'</div>';
+      avis.forEach(function(a){
+        var starsHtml='';
+        for(var i=0;i<5;i++)starsHtml+='<span style="color:'+(i<a.stars?'#D4622A':'#ddd')+';font-size:14px">&#9733;</span>';
+        h+='<div style="padding:10px 0;border-bottom:1px solid var(--bord)">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+        h+='<strong style="font-size:13px">'+a.name+'</strong>';
+        h+='<span>'+starsHtml+'</span>';
+        h+='</div>';
+        if(a.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+a.text+'</div>';
+        h+='</div>';
+      });
+    }
+    if(lien){
+      h+='<div style="margin-top:16px;padding:14px;background:var(--gris-l);border-radius:10px;text-align:center">';
+      h+='<div style="font-size:11px;color:var(--gris);margin-bottom:6px">Votre avis compte pour nous</div>';
+      h+='<a href="'+lien+'" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border-radius:8px;text-decoration:none">Laisser un avis</a>';
       h+='</div>';
-      if(a.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+a.text+'</div>';
-      h+='</div>';
-    });
+    }
     el.innerHTML=h;
   }catch(e){
     el.innerHTML='<em style="color:var(--gris)">Aucun avis.</em>';
@@ -6100,25 +6152,8 @@ window.addEventListener('afterprint', function() {
         <input type="text" id="pVille" placeholder="Nice" oninput="saveProfil()">
       </div>
     </div>
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Mentions légales (texte libre — incluses en fin de PDF)</label>
-        <textarea id="pMentions" rows="4" placeholder="Inscrit à l'ORIAS sous le n°..." oninput="saveProfil()"></textarea>
-      </div>
-    </div>
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Avis clients Trustpilot (inclus dans le PDF)</label>
-        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
-          <input type="url" id="pTrustpilot" placeholder="https://fr.trustpilot.com/review/monsite.fr" oninput="saveProfil()" style="flex:1">
-          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger auto</button>
-        </div>
-        <div style="font-size:10px;color:var(--gris);margin-bottom:6px">Ou ajoutez manuellement :</div>
-        <div id="trustpilotManualList"></div>
-        <button onclick="addManualReview()" style="padding:5px 12px;border:1.5px dashed var(--bord);border-radius:7px;background:transparent;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris);margin-top:4px">+ Ajouter un avis</button>
-        <div id="trustpilotPreview" style="margin-top:6px;font-size:11px;color:var(--gris)"></div>
-      </div>
-    </div>
+    <!-- Mentions legales deplacees dans la page Mentions -->
+    <!-- Avis clients deplaces dans la page Avis -->
     <div class="profil-row">
       <div class="profil-fg">
         <label>Couleur principale</label>
