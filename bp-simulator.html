@@ -156,6 +156,11 @@ table tr:hover td { background: var(--paper); }
         <div style="font-size:10px;color:var(--fog-2)">~27 clients en moyenne</div>
       </div>
       <div style="text-align:right">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Projection</div>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:400;color:var(--orange-lt)">7 ans</div>
+        <div style="font-size:10px;color:var(--fog-2)">Galaxie en 3 ans chez les meilleurs</div>
+      </div>
+      <div style="text-align:right">
         <div style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">TPC cible</div>
         <div style="font-family:var(--serif);font-size:22px;font-weight:400;color:var(--orange-lt)">5% → 8%</div>
         <div style="font-size:10px;color:var(--fog-2)">Consultant → Galaxie</div>
@@ -186,7 +191,9 @@ table tr:hover td { background: var(--paper); }
     <div class="ps">
       <div class="ps-title"><span></span>Organisation — Niveau 1</div>
       <div class="pr"><div class="pl">Consultants inscrits/an <small>(moyenne)</small></div>
-        <div class="iu"><input type="number" id="inscNiv1" value="2" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
+        <div class="iu"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
+      <div class="pr"><div class="pl">Taux de parrainage <small>(filleuls/consultant actif)</small></div>
+        <div class="iu"><input type="number" id="tauxParrainage" value="1.5" step="0.5" min="0" oninput="recalc()"><div class="iu-u">/ actif</div></div></div>
       <div class="pr"><div class="pl">Taux d'actifs</div>
         <div class="iu"><input type="number" id="tauxActifs" value="62" step="5" oninput="recalc()"><div class="iu-u">%</div></div></div>
       <div class="pr"><div class="pl">VA moyenne / actif niv.1</div>
@@ -197,8 +204,6 @@ table tr:hover td { background: var(--paper); }
 
     <div class="ps">
       <div class="ps-title"><span></span>Organisation — Niveaux 2+</div>
-      <div class="pr"><div class="pl">Consultants inscrits niv.2+ / an</div>
-        <div class="iu"><input type="number" id="inscNiv2" value="1" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
       <div class="pr"><div class="pl">VA moyenne / actif niv.2+</div>
         <div class="iu"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
       <div class="pr"><div class="pl">PV moyen équipe niv.2+</div>
@@ -207,8 +212,12 @@ table tr:hover td { background: var(--paper); }
 
     <div class="ps">
       <div class="ps-title"><span></span>Hypothèses PMR</div>
+      <div class="pr"><div class="pl">Durée du business plan</div>
+        <div class="iu"><input type="number" id="duréePlan" value="7" min="3" max="10" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
       <div class="pr"><div class="pl">Mois passage Manager <small>(depuis signature)</small></div>
         <div class="iu"><input type="number" id="moisManager" value="18" step="3" oninput="recalc()"><div class="iu-u">mois</div></div></div>
+      <div class="pr"><div class="pl">Mois passage Galaxie <small>(meilleurs : 36 mois)</small></div>
+        <div class="iu"><input type="number" id="moisGalaxie" value="36" step="6" oninput="recalc()"><div class="iu-u">mois</div></div></div>
       <div class="pr"><div class="pl">Commission récurrente (encours UC)</div>
         <div class="iu"><input type="number" id="tauxRec" value="0.4" step="0.1" oninput="recalc()"><div class="iu-u">%</div></div></div>
       <div class="pr"><div class="pl">Encours moyen / client</div>
@@ -307,7 +316,6 @@ function getTPC(vaOrga, branchesActives) {
 
 // Estimation branches actives (branche = filleul Manager avec >500k VA)
 function getBranchesActives(consultantsNiv1Actifs, vaNiv1) {
-  // On estime qu'une branche sur 3 actifs atteint le seuil Manager
   var managersEstimes = Math.floor(consultantsNiv1Actifs / 3);
   return Math.min(managersEstimes, 4);
 }
@@ -321,110 +329,175 @@ function getQualif(tpc, branchesActives) {
   return 'Consultant';
 }
 
+// ── Titres PMR (Volume Global Personnel annuel) ──
+// Senior > 0.5M€, Major > 1M€, Expert > 1.5M€ (+ enquête satisfaction positive supposée)
+function getTitre(vgpAnnuel) {
+  if(vgpAnnuel > 1500000) return 'Expert';
+  if(vgpAnnuel > 1000000) return 'Major';
+  if(vgpAnnuel > 500000)  return 'Senior';
+  return null;
+}
+
+// Prime Qualité (uniquement Managers) — taux selon Volume Global Personnel
+// Senior/Major : +1%, Expert : +2%, plafonnée à TPC + prime ≤ 7% ou 8%
+function getPrimeQualite(titre, tpc, isManager) {
+  if(!isManager || !titre) return 0;
+  var tauxPrime = (titre === 'Expert') ? 0.02 : 0.01;
+  var plafondTotal = (titre === 'Expert' || titre === 'Major') ? 0.08 : 0.07;
+  // Plafonner pour ne pas dépasser le max
+  var primeEffective = Math.min(tauxPrime, plafondTotal - tpc);
+  return Math.max(0, primeEffective);
+}
+
 function recalc() {
   var va0         = gv('va0', 500000);
   var croissVA    = gv('croissVA', 25) / 100;
   var pvPerso     = gv('pvPerso', 0.4);
-  var inscNiv1    = gv('inscNiv1', 2);
+  var inscNiv1    = gv('inscNiv1', 3);
+  var tauxParrainage = gv('tauxParrainage', 1.5); // filleuls générés par consultant actif
   var tauxActifs  = gv('tauxActifs', 62) / 100;
   var vaNiv1      = gv('vaNiv1', 250000);
   var pvNiv1      = gv('pvNiv1', 0.4);
-  var inscNiv2    = gv('inscNiv2', 1);
   var vaNiv2      = gv('vaNiv2', 100000);
   var pvNiv2      = gv('pvNiv2', 0.4);
   var moisManager = gv('moisManager', 18);
+  var moisGalaxie = gv('moisGalaxie', 36);
   var tauxRec     = gv('tauxRec', 0.4) / 100;
   var encoursClient = gv('encoursClient', 50000);
+  var dureePlan   = Math.max(3, Math.min(10, Math.round(gv('duréePlan', 7))));
 
-  // Année Manager (an 0 = inscription)
-  var anManager = moisManager <= 12 ? 0 : moisManager <= 24 ? 1 : moisManager <= 36 ? 2 : 3;
+  // Année Manager et Galaxie
+  var anManager = moisManager <= 12 ? 0 : moisManager <= 24 ? 1 : moisManager <= 36 ? 2 : moisManager <= 48 ? 3 : 4;
+  var anGalaxie = moisGalaxie <= 12 ? 0 : moisGalaxie <= 24 ? 1 : moisGalaxie <= 36 ? 2 : moisGalaxie <= 48 ? 3 : moisGalaxie <= 60 ? 4 : 5;
 
   var rows = [];
-  var totalInscNiv1 = 0, totalInscNiv2 = 0;
-  var totalActifsNiv1 = 0, totalActifsNiv2 = 0;
+  var totalInscNiv1 = 0, totalActifsNiv1 = 0;
+  var totalInscNiv2 = 0, totalActifsNiv2 = 0;
   var encoursCumule = 0;
 
-  for(var an = 0; an <= 5; an++) {
+  for(var an = 0; an <= dureePlan; an++) {
     var vaPerso = va0 * Math.pow(1 + croissVA, an);
 
-    // Equipe niv 1
-    totalInscNiv1 += (an === 0 ? 1 : inscNiv1);
+    // ── Niveau 1 : consultant inscrit + parrainage de ses actifs (1,5/actif/an) ──
+    if(an === 0) {
+      totalInscNiv1 += 1; // le consultant lui-même au démarrage
+    } else {
+      // Nouvelles inscriptions directes + 20% du flux parrainage part vers niv.1
+      var newNiv1 = inscNiv1 + Math.round(totalActifsNiv1 * tauxParrainage * 0.2);
+      totalInscNiv1 += newNiv1;
+    }
     totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
     var vaEquipeNiv1 = totalActifsNiv1 * vaNiv1;
 
-    // Equipe niv 2+
-    totalInscNiv2 += (an === 0 ? 0 : inscNiv2);
+    // ── Niveau 2+ : 80% du flux parrainage (chaque actif niv.1 génère 1,5 filleuls/an) ──
+    if(an > 0) {
+      var newNiv2 = Math.round(totalActifsNiv1 * tauxParrainage * 0.8);
+      totalInscNiv2 += newNiv2;
+    }
     totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
     var vaEquipeNiv2 = totalActifsNiv2 * vaNiv2;
 
     var vaOrga = vaPerso + vaEquipeNiv1 + vaEquipeNiv2;
 
-    // Qualification
-    var branchesActives = an >= anManager ? getBranchesActives(totalActifsNiv1, vaNiv1) : 0;
+    // ── Branches actives : interpolation progressive vers Galaxie ──
+    var branchesActives = 0;
+    if(an >= anManager) {
+      if(an >= anGalaxie) {
+        branchesActives = 4;
+      } else {
+        // Progression linéaire entre Manager (0 branche) et Galaxie (4 branches)
+        var prog = (an - anManager) / Math.max(1, anGalaxie - anManager);
+        branchesActives = Math.min(4, Math.floor(prog * 4));
+      }
+    }
+
     var tpc = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
     var qualif = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
+    var isManager = an >= anManager;
 
-    // CA perso : VA × TPC × PV
+    var vgpAnnuel = vaPerso;
+    var titre = isManager ? getTitre(vgpAnnuel) : null;
+    var primeQualite = getPrimeQualite(titre, tpc, isManager);
+    var tpcEffectif = tpc + primeQualite;
+
     var caPerso = vaPerso * tpc * pvPerso;
-
-    // Commission démarrage niv1 (Manager) = 2% × VA équipe niv1 × PV
-    var comDemarrage = (an >= anManager) ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
-
-    // Commission expansion niv1 (si branche active) = 1% × VA filleuls managers
+    var caPrimeQualite = vaPerso * primeQualite * pvPerso;
+    var comDemarrage = isManager ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
     var comExpansion = branchesActives > 0 ? vaEquipeNiv1 * 0.5 * 0.01 * pvNiv1 : 0;
-
-    // Commission développement niv2+ = 0.5% × VA équipe niv2
     var comDevelop = branchesActives > 0 ? vaEquipeNiv2 * 0.005 * pvNiv2 : 0;
+    var caTotal = caPerso + caPrimeQualite + comDemarrage + comExpansion + comDevelop;
 
-    var caTotal = caPerso + comDemarrage + comExpansion + comDevelop;
-
-    // Encours et commission récurrente (AV/PER)
-    var nbClientsAn = Math.round(vaPerso / 200000 * 5); // ~5 nouveaux clients par 200k VA
+    var nbClientsAn = Math.round(vaPerso / 200000 * 5);
     encoursCumule += nbClientsAn * encoursClient;
     var comRec = encoursCumule > 50000 ? encoursCumule * tauxRec : 0;
 
     rows.push({ an, vaPerso, vaEquipeNiv1, vaEquipeNiv2, vaOrga,
       totalInscNiv1, totalActifsNiv1, totalInscNiv2, totalActifsNiv2,
-      caPerso, comDemarrage, comExpansion, comDevelop, caTotal,
-      tpc, qualif, branchesActives, encoursCumule, comRec });
+      caPerso, caPrimeQualite, comDemarrage, comExpansion, comDevelop, caTotal,
+      tpc, tpcEffectif, qualif, titre, branchesActives, encoursCumule, comRec });
   }
 
   // ── Affichage ──
   hide('emptyPanel'); show('results');
 
-  // Qualifications
+  // Qualifications & Titres
   var qualifs = [
-    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:-1, c:'var(--rule-l)' },
+    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:0, c:'var(--rule-l)' },
     { lbl:'Manager', tpc:'6%', seuil:'VA orga 50k€', annee:-1, c:'#181614' },
     { lbl:'Manager Planète', tpc:'6,5%', seuil:'1 branche active', annee:-1, c:'#6366f1' },
     { lbl:'Manager Étoile', tpc:'7%', seuil:'2 branches actives', annee:-1, c:'#2563eb' },
     { lbl:'Manager Galaxie', tpc:'8%', seuil:'4 branches actives', annee:-1, c:'var(--orange)' },
   ];
-  // Chercher l'année où chaque qualification est atteinte
-  var qualifOrder = ['Consultant','Manager','Manager Planète','Manager Étoile','Manager Constellation','Manager Galaxie'];
   rows.forEach(function(r) {
     if(r.qualif === 'Manager' && qualifs[1].annee < 0) qualifs[1].annee = r.an;
     if(r.qualif === 'Manager Planète' && qualifs[2].annee < 0) qualifs[2].annee = r.an;
     if(r.qualif === 'Manager Étoile' && qualifs[3].annee < 0) qualifs[3].annee = r.an;
     if(r.qualif === 'Manager Galaxie' && qualifs[4].annee < 0) qualifs[4].annee = r.an;
   });
-  // Consultant toujours an 0
-  qualifs[0].annee = 0;
 
-  setHTML('qualRow', qualifs.map(q => {
-    var reached = q.annee >= 0;
-    return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
-      +'<div class="qual-lbl">'+q.lbl+'</div>'
-      +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'">'+q.tpc+'</div>'
-      +'<div class="qual-sub">'+q.seuil+'</div>'
-      +(reached?'<span class="qual-badge oui">An '+q.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
-      +'</div>';
-  }).join(''));
+  // Titres (Senior / Major / Expert)
+  var titresData = [
+    { lbl:'Senior', seuil:'> 0,5 M€ VGP/an', prime:'+1%', desc:'Éligible Prime Qualité', annee:-1, c:'#d97706' },
+    { lbl:'Major',  seuil:'> 1 M€ VGP/an',   prime:'+1%', desc:'Éligible Prime Qualité', annee:-1, c:'#7c3aed' },
+    { lbl:'Expert', seuil:'> 1,5 M€ VGP/an', prime:'+2%', desc:'Prime Qualité max', annee:-1, c:'#dc2626' },
+  ];
+  rows.forEach(function(r) {
+    if(r.titre === 'Senior' && titresData[0].annee < 0) titresData[0].annee = r.an;
+    if(r.titre === 'Major'  && titresData[1].annee < 0) titresData[1].annee = r.an;
+    if(r.titre === 'Expert' && titresData[2].annee < 0) titresData[2].annee = r.an;
+  });
 
-  // Tableau
+  setHTML('qualRow',
+    '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule-l)">Qualifications PMR</div>'
+    + qualifs.map(q => {
+      var reached = q.annee >= 0;
+      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
+        +'<div class="qual-lbl">'+q.lbl+'</div>'
+        +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'">'+q.tpc+'</div>'
+        +'<div class="qual-sub">'+q.seuil+'</div>'
+        +(reached?'<span class="qual-badge oui">An '+q.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
+        +'</div>';
+    }).join('')
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité (enquête satisfaction positive requise)</div>'
+    + titresData.map(t => {
+      var reached = t.annee >= 0;
+      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?t.c:'var(--rule-l)')+';min-width:140px">'
+        +'<div class="qual-lbl">'+t.lbl+'</div>'
+        +'<div class="qual-val" style="color:'+(reached?t.c:'var(--ink-30)')+'">'+t.prime+'</div>'
+        +'<div class="qual-sub">'+t.seuil+'</div>'
+        +'<div class="qual-sub" style="font-size:9px;color:var(--ink-30);margin-top:1px">'+t.desc+'</div>'
+        +(reached?'<span class="qual-badge oui">An '+t.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
+        +'</div>';
+    }).join('')
+  );
+
+  // Tableau — en-têtes avec titre + qualification
   var headers = '<th>Indicateur</th>' + rows.map(function(r) {
-    var isManager = r.qualif !== 'Consultant';
-    return '<th style="'+(isManager?'background:var(--orange)':'')+'">An '+r.an+(isManager?'<br><span style="font-size:8px;opacity:0.8">'+r.qualif+'</span>':'')+'</th>';
+    var isM = r.qualif !== 'Consultant';
+    var titreBadge = r.titre ? ' <span style="background:rgba(255,255,255,0.15);font-size:7px;padding:1px 4px;border-radius:2px">'+r.titre+'</span>' : '';
+    return '<th style="'+(isM?'background:var(--orange)':'')+'">An '+r.an
+      +(isM?'<br><span style="font-size:8px;opacity:0.85">'+r.qualif+titreBadge+'</span>':'')
+      +'</th>';
   }).join('');
   setHTML('tblHead', headers);
 
@@ -433,8 +506,12 @@ function recalc() {
   }
   var tbody = '';
   tbody += tblRow('VA personnelle', rows.map(r=>fmtE(r.vaPerso)));
-  tbody += tblRow('TPC', rows.map(r=>(r.tpc*100).toFixed(1)+'%'), 'o');
-  tbody += tblRow('CA personnel', rows.map(r=>fmtE(r.caPerso)), 'g');
+  tbody += tblRow('TPC (à l\'acte)', rows.map(r=>(r.tpc*100).toFixed(1)+'%'), 'o');
+  tbody += tblRow('Titre annuel', rows.map(r=>r.titre||'—'));
+  tbody += tblRow('Prime Qualité (fin exercice)', rows.map(r=>r.tpcEffectif>r.tpc?fmtPct((r.tpcEffectif-r.tpc)*100,1):'—'), 'g');
+  tbody += tblRow('Taux effectif total', rows.map(r=>fmtPct(r.tpcEffectif*100,1)), 'o');
+  tbody += tblRow('CA personnel (à l\'acte)', rows.map(r=>fmtE(r.caPerso)));
+  tbody += tblRow('Prime Qualité (montant)', rows.map(r=>r.caPrimeQualite>0?fmtE(r.caPrimeQualite):'—'), 'g');
   tbody += tblRow('── Consultants inscrits niv.1', rows.map(r=>r.totalInscNiv1), '', true);
   tbody += tblRow('── Consultants actifs niv.1', rows.map(r=>r.totalActifsNiv1), '', true);
   tbody += tblRow('VA équipe niv.1', rows.map(r=>fmtE(r.vaEquipeNiv1)));
@@ -457,6 +534,7 @@ function recalc() {
       labels: rows.map(r=>'An '+r.an),
       datasets: [
         { label: 'CA Personnel', data: rows.map(r=>Math.round(r.caPerso)), backgroundColor:'rgba(212,98,42,0.8)', stack:'a' },
+        { label: 'Prime Qualité', data: rows.map(r=>Math.round(r.caPrimeQualite)), backgroundColor:'rgba(212,98,42,0.35)', stack:'a' },
         { label: 'Com. Démarrage', data: rows.map(r=>Math.round(r.comDemarrage)), backgroundColor:'rgba(24,22,20,0.5)', stack:'a' },
         { label: 'Com. Expansion', data: rows.map(r=>Math.round(r.comExpansion)), backgroundColor:'rgba(24,22,20,0.3)', stack:'a' },
         { label: 'Com. Développement', data: rows.map(r=>Math.round(r.comDevelop)), backgroundColor:'rgba(24,22,20,0.15)', stack:'a' },
