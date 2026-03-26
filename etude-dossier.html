@@ -6025,37 +6025,23 @@ function saveMentionsDirect(){
 
   // Sections connues du RI legal
   var SECTIONS=[
-    {id:'immo',re:/(?:^|\n)(IMMOBILIER|SES HABILITATIONS)\s*\n/i,title:'Activit\u00e9 immobili\u00e8re',badge:'Transaction'},
+    {id:'immo',re:/(?:^|\n)(IMMOBILIER|SES HABILITATIONS)\s*\n/i,title:'Activit\u00e9 immobili\u00e8re',badge:'TRANSACTION'},
     {id:'orias',re:/IMMATRICULATION.*ORIAS/i,title:'Immatriculation ORIAS',badge:'ORIAS'},
     {id:'fin',re:/(?:^|\n)FINANCEMENT\s*\n/i,title:'Financement',badge:'IOBSP'},
     {id:'ass',re:/(?:^|\n)ASSURANCE\s*\n/i,title:'Assurance',badge:'IAS'},
-    {id:'inst',re:/INSTRUMENTS FINANCIERS/i,title:'Instruments financiers',badge:'CIF / Agent li\u00e9'},
+    {id:'inst',re:/INSTRUMENTS FINANCIERS/i,title:'Instruments financiers',badge:'CIF'},
     {id:'rcp',re:/ASSURANCES?\s*RCP/i,title:'Assurance RCP',badge:''},
-    {id:'recl',re:/TRAITEMENT DES RECLAMATIONS/i,title:'Traitement des r\u00e9clamations',badge:''},
-    {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs comp\u00e9tents',badge:''}
+    {id:'recl',re:/TRAITEMENT DES RECLAMATIONS/i,title:'R\u00e9clamations',badge:''},
+    {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs',badge:''}
   ];
 
-  var h='<div style="font-family:var(--sans)">';
-
-  // Carte contact avec photo de profil
-  var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
-  h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15);border-radius:12px;padding:16px 20px;margin-bottom:28px">';
-  if(photoUrl)h+='<img src="'+photoUrl+'" style="width:72px;height:72px;border-radius:12px;object-fit:cover;flex-shrink:0">';
-  h+='<div style="flex:1;min-width:0">';
-  if(mNom)h+='<div style="font-weight:600;font-size:15px;color:var(--noir);margin-bottom:4px">'+mNom[1].trim()+'</div>';
-  if(mAdr)h+='<div style="font-size:12px;color:var(--gris-f)">'+mAdr[1].trim()+(mVille?', '+mVille[1].trim():'')+'</div>';
-  if(mMail)h+='<div style="margin-top:3px"><a style="font-size:12px;color:var(--orange);text-decoration:none">'+mMail[1]+'</a></div>';
-  if(mTel)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:2px">'+mTel[1].trim()+'</div>';
-  if(mOrias)h+='<div style="margin-top:6px"><span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:3px 10px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
-  h+='</div></div>';
-
-  // Decouper le texte en sections
+  // Detect which sections exist for the sidebar sommaire
+  var foundSections=[];
   var secNum=0;
   SECTIONS.forEach(function(sec){
     var m=raw.match(sec.re);
     if(!m)return;
     var start=m.index+m[0].length;
-    // Trouver la fin = debut de la section suivante ou fin du texte
     var end=raw.length;
     for(var si=SECTIONS.indexOf(sec)+1;si<SECTIONS.length;si++){
       var nm=raw.match(SECTIONS[si].re);
@@ -6063,19 +6049,74 @@ function saveMentionsDirect(){
     }
     var content=raw.substring(start,end).trim();
     if(!content)return;
-
     secNum++;
-    var num=secNum<10?'0'+secNum:''+secNum;
-    // Header
-    h+='<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:2px solid rgba(212,98,42,0.2)">';
-    h+='<span style="font-family:var(--serif);font-size:28px;font-weight:600;color:rgba(212,98,42,0.3);line-height:1;min-width:36px">'+num+'</span>';
-    h+='<span style="font-family:var(--serif);font-size:20px;font-weight:600;color:var(--noir);flex:1">'+sec.title+'</span>';
-    if(sec.badge)h+='<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:3px 10px;border-radius:20px">'+sec.badge+'</span>';
+    foundSections.push({sec:sec,num:secNum<10?'0'+secNum:''+secNum,content:content});
+  });
+
+  // ── Build 2-column layout ──
+  var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
+
+  var h='<div style="display:flex;gap:40px;font-family:var(--sans);align-items:flex-start">';
+
+  // ── COLONNE GAUCHE : sidebar sticky ──
+  h+='<div style="width:220px;flex-shrink:0;position:sticky;top:24px">';
+  h+='<div style="background:rgba(212,98,42,0.04);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:24px 20px">';
+
+  // Photo
+  if(photoUrl)h+='<div style="margin-bottom:16px"><img src="'+photoUrl+'" style="width:56px;height:56px;border-radius:12px;object-fit:cover;display:block"></div>';
+
+  // Nom
+  if(mNom)h+='<div style="font-weight:700;font-size:15px;color:var(--noir);line-height:1.3;margin-bottom:4px">'+mNom[1].trim()+'</div>';
+
+  // Adresse + ville
+  if(mAdr){
+    var adrText=mAdr[1].trim();
+    if(mVille)adrText+=', '+mVille[1].trim();
+    h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5;margin-bottom:2px">'+adrText+'</div>';
+  } else if(mVille){
+    h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5;margin-bottom:2px">'+mVille[1].trim()+'</div>';
+  }
+
+  // Email
+  if(mMail)h+='<div style="margin-top:8px"><span style="font-size:12px;color:var(--orange);cursor:pointer">\u25CF '+mMail[1]+'</span></div>';
+
+  // ORIAS badge
+  if(mOrias)h+='<div style="margin-top:10px"><span style="display:inline-block;font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
+
+  h+='</div>'; // fin carte contact
+
+  // Sommaire
+  if(foundSections.length){
+    h+='<div style="margin-top:24px;padding:0 4px">';
+    h+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">SOMMAIRE</div>';
+    foundSections.forEach(function(fs){
+      h+='<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="var t=document.getElementById(\'ml-sec-'+fs.sec.id+'\');if(t)t.scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
+      h+='<span style="width:6px;height:6px;border-radius:50%;background:rgba(212,98,42,0.3);flex-shrink:0"></span>';
+      h+='<span style="font-size:13px;color:var(--noir);font-weight:400">'+fs.sec.title+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+
+  h+='</div>'; // fin sidebar
+
+  // ── COLONNE DROITE : contenu ──
+  h+='<div style="flex:1;min-width:0">';
+
+  foundSections.forEach(function(fs){
+    var sec=fs.sec;
+    var num=fs.num;
+    var content=fs.content;
+
+    // Section header
+    h+='<div id="ml-sec-'+sec.id+'" style="margin-top:'+(num==='01'?'0':'48')+'px;margin-bottom:24px;display:flex;align-items:baseline;gap:14px">';
+    h+='<span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span>';
+    h+='<span style="font-family:var(--serif);font-size:24px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
+    if(sec.badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+sec.badge+'</span>';
     h+='</div>';
 
-    // Contenu : lignes
+    // Parse content lines
     var cLines=content.split('\n').map(function(l){return l.replace(/\t/g,'  ').trim();}).filter(Boolean);
-    // Filtrer caractere  et lignes vides
     cLines=cLines.filter(function(l){return l.replace(/\s/g,'').length>0;});
 
     var cardBuf=[];
@@ -6083,32 +6124,29 @@ function saveMentionsDirect(){
     while(ci2<cLines.length){
       var cl=cLines[ci2];
 
-      // Detecter RCP : ligne header (IMMO IOBSP...) suivie de montants
+      // RCP table
       if(/^IMMO\s/.test(cl)||/Activit.*Montant/i.test(cl)){
         if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
         var headers=cl.split(/\s{2,}/).filter(Boolean);
         var amounts=[];
         while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;var amtLine=cLines[ci2].trim();var amtParts=amtLine.split(/\s{2,}/).filter(Boolean);if(amtParts.length>=headers.length){amounts=amtParts;}else if(amtParts.length>1){amounts=amounts.concat(amtParts);}else{amounts.push(amtLine);}}
-        // Render as table
-        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
-        h+='<tr><th style="background:var(--gris-l);padding:10px 14px;text-align:left;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Activit\u00e9</th><th style="background:var(--gris-l);padding:10px 14px;text-align:right;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Montant garanti / an</th></tr>';
+        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;border-radius:10px;overflow:hidden">';
+        h+='<tr><th style="background:var(--gris-l);padding:12px 16px;text-align:left;font-weight:600;color:var(--gris);border-bottom:1px solid var(--bord);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Activit\u00e9</th><th style="background:var(--gris-l);padding:12px 16px;text-align:right;font-weight:600;color:var(--gris);border-bottom:1px solid var(--bord);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Montant garanti</th></tr>';
         var rcpMap={'IMMO':'Transactions immobili\u00e8res (IMMO)','IOBSP':'Op\u00e9rations de banque (IOBSP)','IAS':'Interm\u00e9diaire d\'assurance (IAS)','CIF':'Conseil en investissement (CIF)'};
         headers.forEach(function(hd,hi){
           var amt=amounts[hi]||'';
           var isZero=/^0[\s€]*$|^0\.0/.test(amt);
           var label=rcpMap[hd]||hd;
-          h+='<tr><td style="padding:10px 14px;border-bottom:1px solid var(--bord);color:var(--noir);font-weight:300">'+label+'</td>';
-          h+='<td style="padding:10px 14px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:600;color:var(--orange)')+'">'+( isZero?'Non applicable':amt)+'</td></tr>';
+          h+='<tr><td style="padding:12px 16px;border-bottom:1px solid var(--bord);color:var(--noir);font-weight:400">'+label+'</td>';
+          h+='<td style="padding:12px 16px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:700;color:var(--orange)')+'">'+( isZero?'Non applicable':amt)+'</td></tr>';
         });
         h+='</table>';
         ci2++;continue;
       }
 
-      // Detecter tags : ligne commencant par espace ou avec 2+ items courts separes par espaces
+      // Tags
       var tagItems=[];
       if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
-        // Accumuler les lignes adjacentes commencant par espace
-        var tagLines=[];
         while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
           var parts=cLines[ci2].split(/\s{2,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
           if(parts.length>=2&&parts.every(function(p){return p.length<60;})){tagItems=tagItems.concat(parts);}
@@ -6117,42 +6155,51 @@ function saveMentionsDirect(){
         }
       }
       if(tagItems.length>=2){
-        // Injecter les tags dans le cardBuf pour qu'ils restent dans la card
-        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0">';
-        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
+        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">';
+        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
         tagHtml+='</div>';
         cardBuf.push(tagHtml);
         continue;
       }
 
-      // Ligne vide = flush card
+      // Blank line = flush card
       if(!cl){
         if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
         ci2++;continue;
       }
 
-      // Accumuler dans card
       cardBuf.push(cl);
       ci2++;
     }
     if(cardBuf.length)h+=renderMlCard2(cardBuf);
   });
 
-  h+='</div>';
+  h+='</div>'; // fin colonne droite
+  h+='</div>'; // fin layout 2 colonnes
   mel.innerHTML=h;
+}
+
+function mlHighlight(text){
+  // Bold key terms: societe names, ORIAS numbers, CPI numbers, uppercase acronyms
+  text=text.replace(/\b(ORIAS\s*n[°o\u00b0]?\s*\d[\d\s]*\d)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(CPI\s+[\d\s]+\d)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/(Stellium\s+\w+|ANACOFI\s*\w*)/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(agent commercial|mandataire\s+\w+|courtier)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(\d{2}\s*\d{3}\s*\d{3})\b/g,'<strong>$1</strong>');
+  return text;
 }
 
 function renderMlCard2(lines){
   if(!lines.length)return '';
-  // First line as subtitle if short and caps
   var sub='';var content=lines;
-  if(lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1){
+  if(typeof lines[0]==='string'&&lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1&&!/</.test(lines[0])){
     sub=lines[0];content=lines.slice(1);
   }
-  var c='<div style="background:#fff;border:1px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:12px'+(sub?';border-left:3px solid var(--orange)':'')+'">';
-  if(sub)c+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:10px">'+sub+'</div>';
+  var c='<div style="background:#fff;border:1.5px solid rgba(212,98,42,0.12);border-left:3.5px solid var(--orange);border-radius:12px;padding:20px 24px;margin-bottom:14px">';
+  if(sub)c+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">'+sub+'</div>';
   content.forEach(function(l){
-    c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.75;margin:0 0 6px">'+l+'</p>';
+    if(/</.test(l)){c+=l;return;} // already HTML (tags)
+    c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">'+mlHighlight(l)+'</p>';
   });
   c+='</div>';
   return c;
