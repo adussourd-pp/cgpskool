@@ -4733,6 +4733,53 @@ function renderSolsRetenues(){
       html+='</div>';
     }
 
+    // ── Formulaire FIP/FCPI custom ──
+    var isFIPFCPI=grp.produit==='FIP / FCPI';
+    if(isFIPFCPI){
+      var ff=firstSol._fip||{montantAn:0,types:[],tauxReduc:25,duree:7,points:[]};
+      if(!firstSol._fip)firstSol._fip=ff;
+      var reducAn1=Math.round((ff.montantAn||0)*(ff.tauxReduc||25)/100);
+      var engTotal=(ff.montantAn||0)*(ff.duree||7);
+      var reducCumul=reducAn1*(ff.duree||7);
+      var ffs='width:100%;padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none';
+      html+='<div style="margin-top:10px;padding:14px;background:rgba(43,94,167,0.04);border:1.5px solid rgba(43,94,167,0.15);border-radius:10px">';
+      // Ligne 1 : montant + types
+      html+='<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Montant investi / an</label><input type="number" value="'+(ff.montantAn||0)+'" min="0" onchange="updFip(\'montantAn\',+this.value)" style="'+ffs+'"></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Type</label><div style="display:flex;gap:8px;margin-top:4px">';
+      ['FIP','FCPI','FIP Corse','FIP Outre-mer'].forEach(function(tp){
+        var ck=ff.types&&ff.types.indexOf(tp)>=0;
+        html+='<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--noir);cursor:pointer"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleFipType(\''+tp+'\',this.checked)" style="accent-color:#2B5EA7">'+tp+'</label>';
+      });
+      html+='</div></div></div>';
+      // Ligne 2 : taux réduction + durée
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Taux de r\u00e9duction IR (%)</label><input type="number" value="'+(ff.tauxReduc||25)+'" min="0" max="50" onchange="updFip(\'tauxReduc\',+this.value)" style="'+ffs+'"><div style="font-size:10px;color:var(--gris);margin-top:2px;font-style:italic">\u00c0 v\u00e9rifier \u2014 taux variable selon mill\u00e9sime</div></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dur\u00e9e de la strat\u00e9gie</label><select onchange="updFip(\'duree\',+this.value)" style="'+ffs+'">';
+      [7,8,9,10].forEach(function(y){html+='<option value="'+y+'"'+(ff.duree===y?' selected':'')+'>'+y+' ans'+(y===10?'+':'')+'</option>';});
+      html+='</select></div></div>';
+      // Calculs auto
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px">';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">R\u00e9duction IR ann\u00e9e 1</div><div style="font-weight:700;color:var(--green)">'+fmt(reducAn1)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Engagement total</div><div style="font-weight:700;color:var(--noir)">'+fmt(engTotal)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">R\u00e9duction IR cumul\u00e9e</div><div style="font-weight:700;color:var(--green)">'+fmt(reducCumul)+' \u20ac</div></div>';
+      html+='</div>';
+      // Bloc pédagogique boucle
+      html+='<div style="padding:10px 12px;background:rgba(43,94,167,0.06);border-radius:8px;margin-bottom:10px;font-size:11px;color:var(--gris-f);line-height:1.6">';
+      html+='\ud83d\udca1 <strong>Strat\u00e9gie recommand\u00e9e :</strong> r\u00e9it\u00e9rer l\'investissement chaque ann\u00e9e sur 7 \u00e0 10 ans minimum. Chaque mill\u00e9sime est un fonds distinct \u2014 la diversification r\u00e9duit le risque de concentration et lisse les performances. R\u00e9duction IR r\u00e9currente + portefeuille diversifi\u00e9.</div>';
+      // Points à aborder
+      html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Points \u00e0 aborder</div>';
+      var fipPts=[{k:'risque',l:'Risque de perte en capital (fonds non garantis)'},{k:'blocage',l:'Blocage des fonds 7 \u00e0 10 ans minimum'},{k:'plafond',l:'Plafond annuel (12 000 \u20ac c\u00e9lib. / 24 000 \u20ac couple)'},{k:'cumul',l:'Cumul possible FIP + FCPI + Corse + Outre-mer'}];
+      fipPts.forEach(function(pt){
+        var ck=ff.points&&ff.points.indexOf(pt.k)>=0;
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleFipPoint(\''+pt.k+'\',this.checked)" style="accent-color:#2B5EA7">'+pt.l+'</label>';
+      });
+      html+='</div>';
+      // Note fixe
+      html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">\u26a0\ufe0f Le taux de r\u00e9duction IR \u00e9volue chaque ann\u00e9e selon la loi de finances. V\u00e9rifier au moment de la souscription. Capital non garanti.</div>';
+      html+='</div>';
+    }
+
     html+='</div>'; // fin header padding
 
     // ── Contrats (sub-rows) ──
@@ -4854,6 +4901,30 @@ function toggleDonStrat(key,checked){
   var sol=solsSelectionnees.find(function(s){return s.produit==='Donation';});
   if(!sol)return;if(!sol._don)sol._don={};if(!sol._don.strategies)sol._don.strategies=[];
   var arr=sol._don.strategies;
+  if(checked&&arr.indexOf(key)<0)arr.push(key);
+  else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
+}
+// ── FIP/FCPI helpers ──
+function updFip(field,val){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='FIP / FCPI';});
+  if(!sol)return;if(!sol._fip)sol._fip={};
+  sol._fip[field]=val;
+  solsSelectionnees.forEach(function(s){if(s.produit==='FIP / FCPI')s._fip=sol._fip;});
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleFipType(type,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='FIP / FCPI';});
+  if(!sol)return;if(!sol._fip)sol._fip={};if(!sol._fip.types)sol._fip.types=[];
+  var arr=sol._fip.types;
+  if(checked&&arr.indexOf(type)<0)arr.push(type);
+  else if(!checked){var i=arr.indexOf(type);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleFipPoint(key,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='FIP / FCPI';});
+  if(!sol)return;if(!sol._fip)sol._fip={};if(!sol._fip.points)sol._fip.points=[];
+  var arr=sol._fip.points;
   if(checked&&arr.indexOf(key)<0)arr.push(key);
   else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
   renderSolsRetenues();renderFichesClient();
@@ -5138,6 +5209,32 @@ function renderFichesClient(){
         }
         html+='</div>';
       });
+
+      // Rendu FIP/FCPI spécifique
+      if(pg.produit==='FIP / FCPI'&&firstSol._fip){
+        var fp=firstSol._fip;
+        var reducFP=Math.round((fp.montantAn||0)*(fp.tauxReduc||25)/100);
+        var engFP=(fp.montantAn||0)*(fp.duree||7);
+        var reducCumFP=reducFP*(fp.duree||7);
+        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">';
+        if(fp.types&&fp.types.length)html+=fp.types.join(' + ')+' \u2014 ';
+        html+='<strong>'+fmt(fp.montantAn||0)+' \u20ac/an</strong> sur <strong>'+(fp.duree||7)+' ans</strong>';
+        html+=' (taux r\u00e9duction : '+(fp.tauxReduc||25)+' %).';
+        html+='<br>R\u00e9duction IR ann\u00e9e 1 : <strong>'+fmt(reducFP)+' \u20ac</strong>';
+        html+=' \u2014 Engagement total : <strong>'+fmt(engFP)+' \u20ac</strong>';
+        html+=' \u2014 R\u00e9duction cumul\u00e9e : <strong>'+fmt(reducCumFP)+' \u20ac</strong>.';
+        html+='<br><span style="font-size:11px;color:var(--gris)">Strat\u00e9gie boucle : r\u00e9it\u00e9rer chaque ann\u00e9e pour diversifier les mill\u00e9simes et lisser le risque.</span>';
+        html+='</div>';
+        if(fp.points&&fp.points.length){
+          var ptLabels={risque:'Risque de perte en capital',blocage:'Blocage 7-10 ans',plafond:'Plafond 12k\u20ac/24k\u20ac',cumul:'Cumul FIP+FCPI possible'};
+          html+='<div style="margin-top:6px;font-size:11px;color:var(--gris)">';
+          html+=fp.points.map(function(k){return '\u2022 '+(ptLabels[k]||k);}).join('<br>');
+          html+='</div>';
+        }
+        html+='<div style="margin-top:6px;font-size:11px;color:var(--orange);font-weight:600">\u26a0\ufe0f Taux variable selon loi de finances. Capital non garanti.</div>';
+        html+='</div>';
+      }
 
       // Rendu Donation spécifique
       if(pg.produit==='Donation'&&firstSol._don){
