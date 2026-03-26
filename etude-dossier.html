@@ -409,8 +409,8 @@ select.span2{grid-column:span 2}
   .card{background:#fff!important;border:1px solid #ccc!important;box-shadow:none!important}
   /* ── NOTE PRINT : visible si activée ── */
   .note-print{break-inside:avoid}
-  /* ── PIED DE PAGE : position statique pour l'impression ── */
-  .page-number{position:static!important;padding:14px 0 0!important}
+  /* ── PIED DE PAGE : masquer les .page-number inline ── */
+  .page-number{display:none!important}
   /* ── GRAPHIQUES : éviter la coupure ── */
   canvas{max-width:100%!important}
   .synthese-step{break-inside:avoid}
@@ -418,13 +418,15 @@ select.span2{grid-column:span 2}
   .pdf-cover-page{display:block!important;page-break-after:always}
   /* ── PAGE MENTIONS LÉGALES ── */
   .pdf-mentions-page{display:block!important;page-break-before:always}
-  /* ── PIED DE PAGE : coordonnées conseiller ── */
-  .pdf-conseiller-footer{display:block!important;
+  /* ── FOOTER PDF FIXE : répété sur chaque page imprimée ── */
+  .pdf-print-footer{display:flex!important;justify-content:space-between;align-items:center;
     position:fixed;bottom:0;left:0;right:0;
-    border-top:0.5pt solid #ddd;padding:6pt 12pt;
-    font-size:8pt;color:#666;background:#fff}
+    border-top:0.5pt solid #ddd;padding:6pt 0;
+    font-family:var(--sans);font-size:8pt;color:#888;background:#fff}
+  .pdf-print-footer .pf-center{font-style:italic}
+  .pdf-conseiller-footer{display:none!important}
   /* ── FORMAT A4 ── */
-  @page{size:A4 portrait;margin:1.5cm 1.5cm 2.5cm 1.5cm}
+  @page{size:A4 portrait;margin:1.5cm 1.5cm 2cm 1.5cm}
 }
 /* Dropdown SCPI */
 .nav-dropdown:hover .nav-dropdown-item.active{color:#D4622A;background:rgba(212,98,42,0.08)}
@@ -468,8 +470,10 @@ select.span2{grid-column:span 2}
 .note-print{margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;white-space:pre-wrap}
 .note-print::before{content:'Note conseiller';display:block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
 
-/* ── PIED DE PAGE ── */
-.page-number{display:flex;justify-content:space-between;align-items:center;font-family:var(--sans);font-size:10px;color:var(--gris);padding:14px 0 0;border-top:1px solid var(--bord);position:absolute;bottom:40px;left:40px;right:40px}
+/* ── PIED DE PAGE (masqué à l'écran, visible uniquement en PDF) ── */
+.page-number{display:none}
+/* ── FOOTER PDF FIXE (répété sur chaque page imprimée) ── */
+.pdf-print-footer{display:none}
 
 /* ── PAGE DE GARDE PDF ── */
 .pdf-cover-page{display:none}
@@ -1224,6 +1228,13 @@ select.span2{grid-column:span 2}
 
   <div class="page-number"></div>
 </div><!-- /sec-avis -->
+
+<!-- ── FOOTER PDF (fixe, répété sur chaque page imprimée) ── -->
+<div class="pdf-print-footer" id="pdfPrintFooter">
+  <span class="pf-left" id="pdfFootCabinet"></span>
+  <span class="pf-center">Document confidentiel</span>
+  <span class="pf-right" id="pdfFootPage"></span>
+</div>
 
 </main>
 </div><!-- /app -->
@@ -6289,6 +6300,10 @@ function exportPDF() {
     var sec=document.getElementById('sec-'+id);
     if(sec&&sec.id!=='sec-import')sec.classList.add('print-visible');
   });
+  // Remplir le footer PDF
+  var profil=loadProfil();
+  var footCab=document.getElementById('pdfFootCabinet');
+  if(footCab)footCab.textContent=profil.cabinet||'';
   // Convertir tous les canvas Chart.js en img PNG
   convertChartsToImg(function() {
     window.print();
