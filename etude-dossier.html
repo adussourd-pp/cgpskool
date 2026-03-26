@@ -4486,6 +4486,13 @@ function buildMatriceObjSol(impot,capa,aSum){
     var cat=getLevierCategory(cp.levier||'epargne');
     groups[cat].push(s);
   });
+  // Ordre fiscal : PER, FIP/FCPI, Girardin, SCPI fiscale, puis le reste
+  var fiscOrd=['PER','FIP / FCPI','Girardin industriel','SCPI fiscale'];
+  groups.fiscal.sort(function(a,b){
+    var ia=fiscOrd.indexOf(a),ib=fiscOrd.indexOf(b);
+    if(ia<0)ia=99;if(ib<0)ib=99;
+    return ia-ib;
+  });
 
   // Render each levier category
   var entOn=isEntrepriseActive();
