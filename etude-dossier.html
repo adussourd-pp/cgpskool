@@ -288,10 +288,10 @@ select.span2{grid-column:span 2}
 /* ── PYRAMID ── */
 .pyramid{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-radius:10px;border:1.5px solid}
-.pyr-lv.lt{background:var(--o-dim);border-color:var(--ambre-m)}
-.pyr-lv.mt{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
-.pyr-lv.ct{background:var(--blue-l);border-color:rgba(43,94,167,0.2)}
-.pyr-lv.ep{background:var(--gris-l);border-color:var(--bord)}
+.pyr-lv.lt{background:var(--red-l);border-color:rgba(192,57,43,0.25)}
+.pyr-lv.mt{background:var(--o-dim);border-color:var(--ambre-m)}
+.pyr-lv.ct{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
+.pyr-lv.ep{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
 .pyr-name{font-size:13px;font-weight:600;color:var(--noir)}
 .pyr-desc{font-size:11px;color:var(--gris)}
 .pyr-amt{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir);text-align:right}
@@ -2727,7 +2727,7 @@ function launch(){
   const pasBr=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   const typeL=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple Comm.':'Couple Sep.';
   const banner=document.getElementById('importBanner');
-  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — RI importe</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
+  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — Étude en cours</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
   goTo('situation');
   showNotif('Étude ouverte !');
 }
@@ -3108,20 +3108,21 @@ function rSituation(){
 function renderLevierBadge(containerId, items){
   var el=document.getElementById(containerId);
   if(!el)return;
-  var h='<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:0">';
-  h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);flex-shrink:0">Levier</span>';
+  var h='<div class="card" style="padding:16px 18px;margin-bottom:10px;border-left:3px solid var(--orange)">';
+  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:10px">Leviers identifiés</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
   items.forEach(function(item){
     var color=item.ok?'var(--green)':'var(--gris)';
     var bg=item.ok?'var(--green-l)':'rgba(0,0,0,0.04)';
     var border=item.ok?'rgba(45,122,91,0.3)':'var(--bord)';
     var icon=item.ok?'&#10003;':'&#8212;';
-    h+='<div style="display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;border:1.5px solid '+border+';background:'+bg+'">';
-    h+='<span style="font-size:11px;color:'+color+'">'+icon+'</span>';
-    h+='<span style="font-size:11px;font-weight:600;color:'+(item.ok?'var(--green)':'var(--gris-f)')+'">'+item.label+'</span>';
-    if(item.detail&&item.ok)h+='<span style="font-size:10px;color:var(--gris);margin-left:2px">'+item.detail+'</span>';
-    h+='</div>';
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid '+border+';background:'+bg+'">';
+    h+='<span style="font-size:12px;color:'+color+';font-weight:700">'+icon+'</span>';
+    h+='<div><span style="font-size:12px;font-weight:600;color:'+(item.ok?'var(--green)':'var(--gris-f)')+'">'+item.label+'</span>';
+    if(item.detail&&item.ok)h+='<br><span style="font-size:10px;color:var(--gris)">'+item.detail+'</span>';
+    h+='</div></div>';
   });
-  h+='</div>';
+  h+='</div></div>';
   el.innerHTML=h;
 }
 function rPatrimoine(){
@@ -3137,15 +3138,17 @@ function rPatrimoine(){
   set('pyrLT',fmt(lt)+' €');set('pyrLTp',pct(lt,aSum));
   set('pyrMT',fmt(mt)+' €');set('pyrMTp',pct(mt,aSum));
   set('pyrCT',fmt(ct)+' €');set('pyrCTp',pct(ct,aSum));
-  set('pyrEP',fmt(ct)+' €');set('pyrEpCible',fmt(ED.epPrec)+' €');
-  const epok=ct>=ED.epPrec;
+  // Épargne de précaution cible = 3 mois de revenus nets (ou valeur saisie si renseignée)
+  var epCible = ED.epPrec || Math.round(revMens() * 3);
+  set('pyrEP',fmt(ct)+' €');set('pyrEpCible',fmt(epCible)+' € (3 mois)');
+  const epok=ct>=epCible;
   document.getElementById('pyrEPst').innerHTML=`<span class="badge ${epok?'badge-green':'badge-red'}">${epok?'✓ Atteint':'⚠ À renforcer'}</span>`;
 
   if(pieInst)pieInst.destroy();
   pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
     type:'doughnut',
     data:{labels:['Long terme','Moyen terme','Court terme'],
-      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(212,98,42,0.25)','#C8EDD9','#C5D8F5'],borderColor:['var(--orange)','#2D7A5B','#2B5EA7'],borderWidth:2}]},
+      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(192,57,43,0.2)','rgba(212,98,42,0.25)','rgba(45,122,91,0.2)'],borderColor:['#C0392B','#D4622A','#2D7A5B'],borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:12}}}}
   });
 
@@ -3238,9 +3241,9 @@ function rPatrimoine(){
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
   var mtItems=ED.actifs.filter(function(a){return a.horizon==='mt';});
   var ltItems=ED.actifs.filter(function(a){return a.horizon==='lt';});
-  var allRows=buildHorizonSection('Long terme','badge-amber',ltItems)
-             +buildHorizonSection('Moyen terme','badge-green',mtItems)
-             +buildHorizonSection('Court terme','badge-blue',ctItems);
+  var allRows=buildHorizonSection('Long terme','badge-red',ltItems)
+             +buildHorizonSection('Moyen terme','badge-amber',mtItems)
+             +buildHorizonSection('Court terme','badge-green',ctItems);
   var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th>Type</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr>
@@ -3250,11 +3253,12 @@ function rPatrimoine(){
   var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr><th>Désignation</th><th>Titulaire</th><th>Échéance /an</th><th>CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="4" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="3">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} €</td></tr></tbody>`;
   // Levier placement badge
   var epMens=ED.epMens||0;
+  var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
   renderLevierBadge('levierPat',[
-    {label:'Placement disponible', ok:epMens>100||ct>0, detail:epMens>100?fmt(epMens)+' €/mois dispo':''},
-    {label:'Epargne CT a optimiser', ok:ct>0&&ct<(ED.epPrec||5000)*2, detail:ct>0?fmt(ct)+' €':''},
-    {label:'Immobilier LT', ok:lt>0, detail:lt>0?fmt(lt)+' €':''},
-    {label:'Transmission', ok:aSum>300000, detail:aSum>300000?'Patrimoine >300k':''}
+    {label:'Capacité d\'épargne', ok:capEpargne>0, detail:capEpargne>0?fmt(capEpargne)+' €/mois disponible':'Aucune marge'},
+    {label:'Réorientation CT', ok:ct>epCible, detail:ct>epCible?fmt(ct-epCible)+' € réorientable (excédent précaution)':''},
+    {label:'Patrimoine immobilier', ok:lt>0, detail:lt>0?fmt(lt)+' € long terme':''},
+    {label:'Transmission', ok:aSum>300000, detail:aSum>300000?'Patrimoine > 300k€':''}
   ]);
 }
 
