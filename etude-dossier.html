@@ -945,35 +945,57 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-transmission">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b</div><div class="sec-h1">Transmission</div><div class="sec-sub">Protection, succession &amp; donations</div></div>
+    <div><div class="sec-tag">Section 05b</div><div class="sec-h1">Transmission</div></div>
   </div>
-  <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Patrimoine net</div><div class="kpi-val" id="kTrans1">0 €</div></div>
-    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Abattement enfant</div><div class="kpi-val" id="kTrans2">100 000 €</div></div>
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">AV exoneration</div><div class="kpi-val" id="kTrans3">152 500 €</div></div>
-    <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Droits estimes</div><div class="kpi-val" id="kTrans4">—</div></div>
-  </div>
-  <div class="grid2" style="margin-bottom:18px">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Situation successorale</div>
-      <div class="fiscal-row"><span class="fr-l">Regime matrimonial</span><span class="fr-v ed" id="tRegime" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Donation au dernier vivant</span><span class="fr-v ed" id="tDDV" contenteditable="true">Non</span></div>
-      <div class="fiscal-row"><span class="fr-l">Testament</span><span class="fr-v ed" id="tTestament" contenteditable="true">Non</span></div>
-      <div class="fiscal-row"><span class="fr-l">Nb heritiers directs</span><span class="fr-v ed" id="tHeritiers" contenteditable="true">—</span></div>
-      <div class="fiscal-row" style="border-top:2px solid var(--ambre-m);padding-top:10px;margin-top:6px">
-        <span class="fr-l" style="font-weight:600">Actifs hors succession (AV)</span>
-        <span class="fr-v" id="tAV" style="color:var(--green);font-weight:700">—</span>
-      </div>
+
+  <!-- Saisie situation successorale -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Situation successorale</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Patrimoine net</label><input class="fi" type="number" id="trPatNet" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont AV hors succession</label><input class="fi" type="number" id="trAV" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont PER hors succession</label><input class="fi" type="number" id="trPER" oninput="calcTransmission()"></div>
     </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Levier transmission</div>
-      <div id="transLevierText" style="font-size:13px;line-height:1.7;color:var(--gris-f)">—</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;gime matrimonial</label><select class="fi" id="trRegime" onchange="calcTransmission()"><option>Communaut&#233; r&#233;duite aux acqu&#234;ts</option><option>S&#233;paration de biens</option><option>Communaut&#233; universelle</option><option>Participation aux acqu&#234;ts</option></select></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Nb enfants</label><input class="fi" type="number" id="trEnfants" min="0" value="0" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Donations ant&#233;rieures</label><input class="fi" type="number" id="trDonAnt" oninput="calcTransmission()"><div style="font-size:9px;color:var(--gris);font-style:italic">Moins de 15 ans</div></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:10px">
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trDDV" onchange="calcTransmission()" style="accent-color:var(--orange)">Donation au dernier vivant</label>
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trTestament" onchange="calcTransmission()" style="accent-color:var(--orange)">Testament</label>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C1</label><input class="fi" type="number" id="trPropC1" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C2</label><input class="fi" type="number" id="trPropC2" oninput="calcTransmission()"></div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note transmission</div>
-    <div class="ed-block" id="noteTrans" contenteditable="true" data-placeholder="Analyse successorale : AV, donations, clause beneficiaire, SCI..."></div>
+
+  <!-- Résultats Avant / Après -->
+  <div id="transResultats" style="margin-bottom:16px"></div>
+
+  <!-- Optimisations -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Optimisations</div>
+    <div id="transOptimisations" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDonation" onchange="calcTransmission()" style="accent-color:var(--green)">Donation aux enfants</label>
+      <div id="trOptDonMontantWrap" style="display:none"><input class="fi" type="number" id="trOptDonMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptAV" onchange="calcTransmission()" style="accent-color:var(--green)">Abondement AV hors succession</label>
+      <div id="trOptAVMontantWrap" style="display:none"><input class="fi" type="number" id="trOptAVMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDDV" onchange="calcTransmission()" style="accent-color:var(--green)">Donation au dernier vivant</label>
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDemembrement" onchange="calcTransmission()" style="accent-color:var(--green)">D&#233;membrement</label>
+      <div id="trOptDemMontantWrap" style="display:none"><input class="fi" type="number" id="trOptDemMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
+    </div>
   </div>
+
+  <!-- Note -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="noteTrans" contenteditable="true" data-placeholder="Analyse successorale, strat&#233;gie de transmission..."></div>
+  </div>
+
+  <div style="font-size:11px;color:var(--orange);font-weight:600;padding:10px 14px;background:rgba(212,98,42,0.06);border-radius:8px;margin-bottom:10px">&#9888;&#65039; Simulations simplifi&#233;es et non contractuelles. &#192; affiner et valider aupr&#232;s d'un notaire. Hors frais de notaire.</div>
+
   <div class="page-number"></div>
 </div><!-- /sec-transmission -->
 
@@ -4116,17 +4138,129 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
 // ║  SECTION — TRANSMISSION                                        ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function rTransmission(){
+  // Pré-remplir depuis ED si disponible
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   var patNet=aSum-pSum;
-  var avSum=ED.actifs.filter(function(a){return a.nom.toLowerCase().includes('assurance')||a.nom.toLowerCase().includes(' av ');}).reduce(function(s,a){return s+(a.montant||0);},0);
-  set('kTrans1',fmt(patNet)+' €');
-  set('kTrans4',patNet>500000?fmt(Math.round((patNet-100000)*0.2))+' € est.':'< seuil');
-  set('tAV',avSum>0?fmt(avSum)+' €':'Non renseigne');
-  var el=document.getElementById('tRegime');if(el&&!el.matches(':focus'))el.textContent=ED.convention||'Non renseigne';
-  var h2=document.getElementById('tHeritiers');if(h2&&!h2.matches(':focus'))h2.textContent=ED.nbEnfants>0?ED.nbEnfants+' enfant(s)':'A preciser';
-  var lt=document.getElementById('transLevierText');
-  if(lt){if(avSum>0)lt.innerHTML='<span class="badge badge-green">AV en place</span><br><br>Capital de <strong>'+fmt(avSum)+' €</strong> potentiellement hors succession (art. L132-12). Verifier les clauses beneficiaires — limite 152 500 €/beneficiaire avant 70 ans.';else lt.innerHTML='<span class="badge badge-amber">Levier AV a mobiliser</span><br><br>Aucune assurance vie identifiee. L\'AV permet de transmettre jusqu\'a <strong>152 500 €</strong> par beneficiaire hors droits de succession.';}
+  var avSum=ED.actifs.filter(function(a){return(a.nom||'').toLowerCase().indexOf('assurance')>=0||(a.nom||'').toLowerCase().indexOf(' av ')>=0;}).reduce(function(s,a){return s+(a.montant||0);},0);
+  var perSum=ED.actifs.filter(function(a){return(a.nom||'').toLowerCase().indexOf('per')>=0;}).reduce(function(s,a){return s+(a.montant||0);},0);
+  var el1=document.getElementById('trPatNet');if(el1&&!el1.value)el1.value=patNet||'';
+  var el2=document.getElementById('trAV');if(el2&&!el2.value)el2.value=avSum||'';
+  var el3=document.getElementById('trPER');if(el3&&!el3.value)el3.value=perSum||'';
+  var el4=document.getElementById('trEnfants');if(el4&&!+el4.value)el4.value=ED.nbEnfants||0;
+  calcTransmission();
+}
+
+// Barème droits de succession en ligne directe
+var TRANCHES_SUCC=[
+  {max:8072,taux:0.05},{max:12109,taux:0.10},{max:15932,taux:0.15},
+  {max:552324,taux:0.20},{max:902838,taux:0.30},{max:1805677,taux:0.40},
+  {max:Infinity,taux:0.45}
+];
+function calcDroitsSucc(baseTaxable){
+  if(baseTaxable<=0)return{total:0,tranches:[]};
+  var rest=baseTaxable,total=0,det=[];
+  var prev=0;
+  TRANCHES_SUCC.forEach(function(tr){
+    if(rest<=0)return;
+    var tranche=Math.min(rest,tr.max-prev);
+    var droits=Math.round(tranche*tr.taux);
+    if(tranche>0)det.push({de:prev,a:Math.min(prev+tranche,tr.max),taux:Math.round(tr.taux*100),montant:tranche,droits:droits});
+    total+=droits;rest-=tranche;prev=tr.max;
+  });
+  return{total:total,tranches:det};
+}
+
+function calcTransmission(){
+  try{
+  var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+  var cb=function(id){var e=document.getElementById(id);return e&&e.checked;};
+  // Toggle montants optim
+  var dw=document.getElementById('trOptDonMontantWrap');if(dw)dw.style.display=cb('trOptDonation')?'':'none';
+  var aw=document.getElementById('trOptAVMontantWrap');if(aw)aw.style.display=cb('trOptAV')?'':'none';
+  var mw=document.getElementById('trOptDemMontantWrap');if(mw)mw.style.display=cb('trOptDemembrement')?'':'none';
+
+  var patNet=n('trPatNet'),avHS=n('trAV'),perHS=n('trPER');
+  var nbEnf=Math.max(1,n('trEnfants'));
+  var donAnt=n('trDonAnt');
+  var ddv=cb('trDDV');
+  var regime=(document.getElementById('trRegime')?document.getElementById('trRegime').value:'')||'';
+  var isSep=regime.indexOf('paration')>=0;
+  var propC1=n('trPropC1'),propC2=n('trPropC2');
+
+  // AVANT — Succession C1
+  var succC1=isSep?propC1:Math.round((patNet-avHS-perHS)/2);
+  var partEnfC1=ddv?Math.round(succC1*0.75):Math.round(succC1*0.75);
+  var baseParEnfC1=Math.max(0,Math.round(partEnfC1/nbEnf)-100000+Math.round(donAnt/nbEnf));
+  var droitsC1=calcDroitsSucc(baseParEnfC1);
+  var totalDroitsC1=droitsC1.total*nbEnf;
+
+  // Succession C2
+  var succC2=isSep?propC2:Math.round((patNet-avHS-perHS)/2);
+  var partEnfC2=succC2;
+  var baseParEnfC2=Math.max(0,Math.round(partEnfC2/nbEnf)-100000);
+  var droitsC2=calcDroitsSucc(baseParEnfC2);
+  var totalDroitsC2=droitsC2.total*nbEnf;
+  var totalAvant=totalDroitsC1+totalDroitsC2;
+
+  // APRÈS — avec optimisations
+  var optDon=cb('trOptDonation')?n('trOptDonMontant'):0;
+  var optAV=cb('trOptAV')?n('trOptAVMontant'):0;
+  var optDem=cb('trOptDemembrement')?n('trOptDemMontant'):0;
+  var patNetApres=patNet-optDon-optAV-Math.round(optDem*0.5);
+  var avHSApres=avHS+optAV;
+  var succC1Ap=isSep?Math.max(0,propC1-Math.round(optDon/2)):Math.round((patNetApres-avHSApres-perHS)/2);
+  var partEnfC1Ap=Math.round(succC1Ap*0.75);
+  var baseC1Ap=Math.max(0,Math.round(partEnfC1Ap/nbEnf)-100000);
+  var droitsC1Ap=calcDroitsSucc(baseC1Ap);
+  var totalC1Ap=droitsC1Ap.total*nbEnf;
+  var succC2Ap=isSep?propC2:Math.round((patNetApres-avHSApres-perHS)/2);
+  var baseC2Ap=Math.max(0,Math.round(succC2Ap/nbEnf)-100000);
+  var droitsC2Ap=calcDroitsSucc(baseC2Ap);
+  var totalC2Ap=droitsC2Ap.total*nbEnf;
+  var totalApres=totalC1Ap+totalC2Ap;
+  var economie=totalAvant-totalApres;
+  var hasOptim=optDon>0||optAV>0||optDem>0;
+
+  // Render
+  var el=document.getElementById('transResultats');
+  if(!el)return;
+  var kpiRow=function(l,v,opts){opts=opts||{};return '<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="font-size:12px;color:var(--gris)">'+l+'</span><span style="font-size:12px;font-weight:'+(opts.bold?'700':'600')+';color:'+(opts.color||'var(--gris-f)')+'">'+v+'</span></div>';};
+  var sep='<div style="border-top:1px solid var(--bord);margin:5px 0"></div>';
+
+  var h='<div style="display:grid;grid-template-columns:1fr'+(hasOptim?' 1fr':'')+';gap:16px">';
+  // Colonne AVANT
+  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Avant</div>';
+  h+=kpiRow('Patrimoine successoral',fmt(patNet-avHS-perHS)+' \u20ac');
+  h+=kpiRow('AV hors succession',fmt(avHS)+' \u20ac',{color:'var(--green)'});
+  h+=sep;
+  h+=kpiRow('Succession C1 \u2192 enfants',fmt(partEnfC1)+' \u20ac');
+  h+=kpiRow('Base taxable / enfant',fmt(baseParEnfC1)+' \u20ac');
+  h+=kpiRow('Droits C1 ('+nbEnf+' enf.)',fmt(totalDroitsC1)+' \u20ac',{color:totalDroitsC1>0?'var(--red)':'var(--green)'});
+  h+=sep;
+  h+=kpiRow('Succession C2 \u2192 enfants',fmt(partEnfC2)+' \u20ac');
+  h+=kpiRow('Base taxable / enfant',fmt(baseParEnfC2)+' \u20ac');
+  h+=kpiRow('Droits C2 ('+nbEnf+' enf.)',fmt(totalDroitsC2)+' \u20ac',{color:totalDroitsC2>0?'var(--red)':'var(--green)'});
+  h+=sep;
+  h+=kpiRow('TOTAL DROITS',fmt(totalAvant)+' \u20ac',{bold:true,color:totalAvant>0?'var(--red)':'var(--green)'});
+  h+='</div>';
+
+  // Colonne APRÈS (si optimisations)
+  if(hasOptim){
+    h+='<div class="card" style="margin-bottom:0;background:#FAFFFE"><div class="card-title"><span class="dot"></span>Apr\u00e8s optimisation</div>';
+    h+=kpiRow('Patrimoine successoral',fmt(patNetApres-avHSApres-perHS)+' \u20ac');
+    h+=kpiRow('AV hors succession',fmt(avHSApres)+' \u20ac',{color:'var(--green)'});
+    h+=sep;
+    h+=kpiRow('Droits C1',fmt(totalC1Ap)+' \u20ac',{color:totalC1Ap>0?'var(--red)':'var(--green)'});
+    h+=kpiRow('Droits C2',fmt(totalC2Ap)+' \u20ac',{color:totalC2Ap>0?'var(--red)':'var(--green)'});
+    h+=sep;
+    h+=kpiRow('TOTAL DROITS',fmt(totalApres)+' \u20ac',{bold:true,color:totalApres>0?'var(--red)':'var(--green)'});
+    h+=kpiRow('\u00c9conomie r\u00e9alis\u00e9e',fmt(economie)+' \u20ac',{bold:true,color:'var(--green)'});
+    h+='</div>';
+  }
+  h+='</div>';
+  el.innerHTML=h;
+  }catch(e){console.warn('calcTransmission error:',e);}
 }
 
 // ── MATRICE COPERNIC ─────────────────────────────────────────

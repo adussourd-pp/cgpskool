@@ -155,12 +155,19 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 ---
 
+## Règles de travail
+
+- **AVANT toute modification** : analyser l'impact potentiel et prévenir l'utilisateur si risque de casser quelque chose. Ne jamais exécuter une commande complexe sans analyse préalable.
+- **Fonctions critiques** : NE JAMAIS modifier la structure interne de `renderSolsRetenues`, `renderFichesClient`, `rSituation`, `rPatrimoine`, `rFiscal`, `rRetraite`. Ajouter du code AUTOUR avec des try/catch.
+- **Commits atomiques** : une feature = un commit. Tester R2b + R2c avant chaque commit.
+- **Si ça casse** : `git checkout <dernier-bon-commit> -- etude-dossier.html` pour revenir en arrière.
+
 ## Règles de code critiques (résumé de REGLES_PROJET.md)
 
 - **R1** : Pas de quotes autour de font-family dans les strings JS
 - **R2** : Pas de `\xa0` (espace insécable) dans le code
 - **R2b** : **JAMAIS de curly/smart quotes** (`'` `'` `"` `"`) dans le code. Toujours utiliser les apostrophes droites (`'` `"`). Après chaque Edit, vérifier avec : `grep -Pn $'\xe2\x80\x99|\xe2\x80\x98' etude-dossier.html`
-- **R2c** : **Vérifier la syntaxe JS** après chaque modification : extraire le bloc `<script>` et lancer `node --check`. Commande : `sed -n '2124,6790p' etude-dossier.html > /tmp/check.js && node --check /tmp/check.js`
+- **R2c** : **Vérifier la syntaxe JS** après chaque modification. Trouver le bon `<script>` avec `grep -n '^<script>' etude-dossier.html` puis `sed -n 'START,ENDp' etude-dossier.html > /tmp/check.js && node --check /tmp/check.js`
 - **R3** : Pas de doublon de variable
 - **R4** : Revenus stockés ANNUELS, `revMens()` divise par 12
 - **R7** : Clés internes sans accent (`synthese` pas `synthèse`)
