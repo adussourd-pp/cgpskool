@@ -1691,9 +1691,7 @@ function calcPension(salAnnuel, foncNominatif, csp, age) {
 function calcRetraiteForage(clients) {
   var EFFORTS = [
     { label:'Livret / epargne reglementee (1,5 %)', rate:0.015 },
-    { label:'Fonds euros assurance vie (2,5 %)',     rate:0.025 },
-    { label:'SCPI de rendement (4,5 %)',             rate:0.045 },
-    { label:'PER allocation diversifiee (5 %)',      rate:0.05  },
+    { label:'Fonds euro (2,5 %)',                    rate:0.025 },
   ];
 
   return (clients||[]).map(function(cl) {
@@ -3434,7 +3432,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         +'</div>';});
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
-  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euros assurance vie (2,5 %)',rate:0.025,color:'var(--blue)'},{label:'SCPI de rendement (4,5 %)',rate:0.045,color:'var(--green)'},{label:'PER allocation diversifiée (5 %)',rate:0.05,color:'#7B4FA6'}];
+  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
   tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C1 à combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr>';
