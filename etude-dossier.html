@@ -6220,7 +6220,7 @@ function saveMentionsDirect(){
     {id:'orias',re:/IMMATRICULATION.*ORIAS/i,title:'Immatriculation ORIAS',badge:'ORIAS'},
     {id:'fin',re:/(?:^|\n)FINANCEMENT\s*\n/i,title:'Financement',badge:'IOBSP'},
     {id:'ass',re:/(?:^|\n)ASSURANCE\s*\n/i,title:'Assurance',badge:'IAS'},
-    {id:'inst',re:/INSTRUMENTS FINANCIERS/i,title:'Instruments financiers',badge:'CIF'},
+    {id:'inst',re:/INSTRUMENTS FINANCIERS/i,title:'Instruments financiers',badge:'_auto_inst'},
     {id:'rcp',re:/ASSURANCES?\s*RCP/i,title:'Assurance RCP',badge:''},
     {id:'recl',re:/TRAITEMENT DES RECLAMATIONS/i,title:'R\u00e9clamations',badge:''},
     {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs',badge:''}
@@ -6267,11 +6267,18 @@ function saveMentionsDirect(){
     var num=fs.num;
     var content=fs.content;
 
+    // Badge dynamique pour instruments financiers : détecter Agent lié vs CIF
+    var badge=sec.badge;
+    if(badge==='_auto_inst'){
+      if(/agent\s+li[ée]/i.test(content))badge='AGENT LI\u00c9';
+      else badge='CIF';
+    }
+
     // Section header
     h+='<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:baseline;gap:14px">';
     h+='<span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span>';
     h+='<span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
-    if(sec.badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+sec.badge+'</span>';
+    if(badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+badge+'</span>';
     h+='</div>';
 
     // Parse content lines
