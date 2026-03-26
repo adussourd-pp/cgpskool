@@ -4148,10 +4148,6 @@ var COPERNIC = {
   'Contrat de capitalisation':{cat:'epargne-fin',levier:'transmission',icon:'&#128196;',
     desc:'Même fiscalité que l’AV, transmissible par cession ou donation, sans dénouement au décès',
     fiscal:'PFU 12,8 % / abattement après 8 ans',sri:'1-7',horizon:'8 ans+',horizonAns:10},
-  'PEA Assurance':          {cat:'epargne-fin',  levier:'epargne',     icon:'&#128200;',
-    desc:'Enveloppe actions européennes, exonération des plus-values après 5 ans, plafond 150 k€',
-    fiscal:'Exonération IR après 5 ans (PS 17,2 % restants)',sri:'4-7',horizon:'5 ans+',horizonAns:8},
-
   // ─── ÉPARGNE IMMOBILIÈRE ───────────────────────────────────────
   'SCPI de rendement':      {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
     desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
@@ -4159,9 +4155,6 @@ var COPERNIC = {
   'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'entreprise', icon:'&#127959;',
     desc:'Acquisition de SCPI via une SCI soumise à l’IS : revenus peu imposés grâce à l’amortissement, sortie optimisée',
     fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
-  'SCPI de capitalisation': {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
-    desc:'Pas de distribution de revenus, valorisation du capital, idéale pour capitaliser sans pression fiscale annuelle',
-    fiscal:'Plus-value immobilière à la cession',sri:'3-4',horizon:'10 ans+',horizonAns:15},
   'SCPI fiscale':           {cat:'immo-fisc',    levier:'fiscal',      icon:'&#127959;',
     desc:'SCPI investissant dans des dispositifs fiscaux (Malraux, Déficit Foncier, Denormandie) — réduction ou déduction d’IR',
     fiscal:'Réduction ou déduction IR selon le dispositif',sri:'4-6',horizon:'10-16 ans',horizonAns:12},
@@ -4249,15 +4242,15 @@ var COPERNIC = {
     fiscal:'IS 15-25% + flat tax sur dividendes, amortissement deductible',sri:'5',horizon:'15 ans+',horizonAns:15}
 };
 var OBJ_SOLUTIONS = {
-  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
+  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','PERIN','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
   'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l’IS','LLI','Denormandie','LMNP'],
   'Protéger son conjoint':              ['Assurance vie','PER','Prévoyance individuelle','Prévoyance pro','Donation au dernier vivant'],
-  'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de capitalisation'],
-  'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de capitalisation'],
+  'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
+  'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
   'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
   'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement','SCI a l\'IS']
 };
@@ -4967,22 +4960,51 @@ function renderFichesClient(){
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
               html+='le capital estim\u00e9 serait de <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong>';
               html+=loyer2>0?' avec des loyers potentiels de <strong>~'+fmt(loyer2)+'\u00a0\u20ac/mois</strong>.':'.';
+            } else if(isSCPI2){
+              // SCPI de rendement : modèle distribution + réinvestissement
+              var yieldSCPI=0.05; // taux distribution 5%
+              var revaloSCPI=0.01; // revalorisation part 1%/an
+              var patSCPI=(sol.vi||0);
+              var totalDiv=0;
+              for(var ySCPI=0;ySCPI<h2;ySCPI++){
+                var divAn=Math.round(patSCPI*yieldSCPI);
+                if(sol.reinvest)patSCPI+=divAn;
+                else totalDiv+=divAn;
+                patSCPI+=((sol.vp||0)*12);
+                patSCPI=Math.round(patSCPI*(1+revaloSCPI));
+              }
+              var loyerMens=Math.round(patSCPI*yieldSCPI/12);
+              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
+              html+='patrimoine SCPI estim\u00e9 \u00e0 <strong>'+fmt(patSCPI)+'\u00a0\u20ac</strong>';
+              if(sol.reinvest)html+=' (dividendes r\u00e9investis).';
+              else html+=totalDiv>0?'. Dividendes per\u00e7us sur la p\u00e9riode : <strong>'+fmt(totalDiv)+'\u00a0\u20ac</strong>.':'.';
+              html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution 5\u00a0%).';
             } else if(/per\b/i.test(sol.produit||'')){
+              // PER : rendement 3% fixe + économie fiscale
               var tmiPer=ED.fiscal.tmi||0;
               var ecoAn1=Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmiPer/100);
               var ecoSuiv=sol.vp>0?Math.round(sol.vp*12*tmiPer/100):0;
+              var capPer3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
               html+='Ann\u00e9e 1 : \u00e9conomie fiscale de <strong>'+fmt(ecoAn1)+'\u00a0\u20ac</strong>';
               html+=' (versement initial'+(sol.vp>0?' + mensualit\u00e9s':'')+' \u00d7 TMI '+tmiPer+'\u00a0%).';
-              if(ecoSuiv>0&&h2>1)html+='<br>Ann\u00e9es suivantes : <strong>'+fmt(ecoSuiv)+'\u00a0\u20ac/an</strong> d\'\u00e9conomie d\'imp\u00f4t ('+fmt(sol.vp)+' \u00d7 12 \u00d7 '+tmiPer+'\u00a0%).';
-              html+='<br>Dans '+h2+' ans, capital estim\u00e9 entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> (rendement 3 \u00e0 5\u00a0%).';
+              if(ecoSuiv>0&&h2>1)html+='<br>Ann\u00e9es suivantes : <strong>'+fmt(ecoSuiv)+'\u00a0\u20ac/an</strong> d\'\u00e9conomie d\'imp\u00f4t.';
+              html+='<br>Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(capPer3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%).';
+            } else if(/assurance.vie|contrat de capitalisation/i.test(sol.produit||'')){
+              // AV / Capi : rendement 3% fixe
+              var capAV3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+              var renteAV3=Math.round(capAV3*0.04/12);
+              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%), ';
+              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteAV3)+'\u00a0\u20ac/mois</strong>.';
             } else if(economieFisc2>0){
               html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
-              html+='Dans '+h2+' ans, capital estim\u00e9 entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> (rendement 3 \u00e0 5\u00a0%).';
+              html+='Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0)))+'\u00a0\u20ac</strong> (rendement 3\u00a0%).';
             } else {
+              var capDef3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+              var renteDef3=Math.round(capDef3*0.04/12);
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='le capital estim\u00e9 serait entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> ';
-              html+='(rendement 3 \u00e0 5\u00a0%), ';
-              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>'+fmt(renteBas)+' \u00e0 '+fmt(renteHaut)+'\u00a0\u20ac/mois</strong>.';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capDef3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%), ';
+              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteDef3)+'\u00a0\u20ac/mois</strong>.';
             }
             html+='</div>';
           }
