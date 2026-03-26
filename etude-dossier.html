@@ -901,7 +901,7 @@ select.span2{grid-column:span 2}
   <div id="retKpis" style="display:none"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
-      <span style="font-size:11px;font-weight:400;color:var(--gris);margin-left:8px">&#8212; Le point <span style="color:var(--ambre);font-weight:700">&#9679;</span> positionne votre client</span>
+      <span id="retClientTags" style="margin-left:8px"></span>
     </div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
     <div style="position:relative;height:360px;overflow:hidden"><canvas id="retChart"></canvas></div>
@@ -3904,14 +3904,39 @@ function rRetraite(){
   var ageIdx=AGES.reduce(function(bi,a,i){return a>=age1?i:bi;},0);
   var tauxClient=TAUX[cspKey][ageIdx];
   var keys=Object.keys(TAUX);
-  var datasets=keys.map(function(k,i){var isC=k===cspKey;return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
-  datasets.push({label:'Votre client',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  // Highlight C1 CSP line
+  var datasets=keys.map(function(k,i){var isC=(k===cspKey);return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
+  // C1 point
+  var prenom1=(ED.c1.prenom||'Client 1').trim();
+  datasets.push({label:prenom1+' ('+age1+' ans)',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  // C2 point si couple
+  var hasC2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
+  var age2=0,ageIdx2=0,tauxC2=0,cspKey2='',prenom2='';
+  if(hasC2){
+    prenom2=(ED.c2.prenom||'Client 2').trim();
+    age2=ageFrom(ED.c2.dob)||40;
+    var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';
+    cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';
+    ageIdx2=AGES.reduce(function(bi,a,i){return a>=age2?i:bi;},0);
+    tauxC2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageIdx2];
+    // Highlight C2 CSP line too
+    var c2LineIdx=keys.indexOf(cspKey2);
+    if(c2LineIdx>=0&&cspKey2!==cspKey){datasets[c2LineIdx].borderWidth=3;}
+    datasets.push({label:prenom2+' ('+age2+' ans)',data:AGES.map(function(a,i){return i===ageIdx2?tauxC2:null;}),borderColor:'#2D7A5B',backgroundColor:'#2D7A5B',pointRadius:AGES.map(function(a,i){return i===ageIdx2?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  }
   var ctx=document.getElementById('retChart');
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
-  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+' : '+ctx.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}}});
+  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}}});
+  // Client tags in header
+  var tagsEl=document.getElementById('retClientTags');
+  if(tagsEl){
+    var th='<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(212,98,42,0.12);color:#D4622A;border:1.5px solid rgba(212,98,42,0.2)"><span style="width:8px;height:8px;border-radius:50%;background:#D4622A"></span>'+prenom1+' \u2014 '+age1+' ans</span>';
+    if(hasC2)th+=' <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(45,122,91,0.1);color:#2D7A5B;border:1.5px solid rgba(45,122,91,0.2)"><span style="width:8px;height:8px;border-radius:50%;background:#2D7A5B"></span>'+prenom2+' \u2014 '+age2+' ans</span>';
+    tagsEl.innerHTML=th;
+  }
   var legEl=document.getElementById('retLegend');
-  if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC=k===cspKey;return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+(isC?'700':'400')+';background:'+(isC?'rgba(212,98,42,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+(isC?'var(--orange)':'transparent')+';color:'+(isC?'var(--orange-hover)':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC?' ← '+tauxClient+'%':'')+' </span>';}).join('');
+  if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC1=(k===cspKey);var isC2=(hasC2&&k===cspKey2);return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+((isC1||isC2)?'700':'400')+';background:'+((isC1||isC2)?'rgba(212,98,42,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+((isC1||isC2)?'var(--orange)':'transparent')+';color:'+((isC1||isC2)?'var(--orange-hover)':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC1?' \u2190 '+tauxClient+'%':'')+(isC2&&!isC1?' \u2190 '+tauxC2+'%':'')+' </span>';}).join('');
   // R8 : pension KPI = salaires seuls (fonciers SCI exclus pour couple, nominatifs seuls si seul)
 var isCouple=ED.type!=='seul';
 var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus._foncNomC1||0))/12;
