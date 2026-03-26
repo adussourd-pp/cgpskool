@@ -3252,11 +3252,12 @@ function rPatrimoine(){
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
+  var levierPlacement = capEpargne>0 || ct>epCible;
+  var detailPlacement = [];
+  if(capEpargne>0) detailPlacement.push(fmt(capEpargne)+' €/mois d\'épargne disponible');
+  if(ct>epCible) detailPlacement.push(fmt(ct-epCible)+' € réorientable (excédent précaution)');
   renderLevierBadge('levierPat',[
-    {label:'Capacité d\'épargne', ok:capEpargne>0, detail:capEpargne>0?fmt(capEpargne)+' €/mois disponible':'Aucune marge'},
-    {label:'Réorientation CT', ok:ct>epCible, detail:ct>epCible?fmt(ct-epCible)+' € réorientable (excédent précaution)':''},
-    {label:'Patrimoine immobilier', ok:lt>0, detail:lt>0?fmt(lt)+' € long terme':''},
-    {label:'Transmission', ok:aSum>300000, detail:aSum>300000?'Patrimoine > 300k€':''}
+    {label:'Placement', ok:levierPlacement, detail:levierPlacement?detailPlacement.join(' + '):'Pas de marge'}
   ]);
 }
 
@@ -3291,11 +3292,9 @@ function rFiscal(){
   }
   // Levier impot badge
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
+  var levierFiscal = tot>=3000;
   renderLevierBadge('levierFis',[
-    {label:'Reduction IR', ok:tot>=2000, detail:tot>=2000?fmt(tot)+' €/an':''},
-    {label:'Plafond PER', ok:(ED.fiscal.rbg||0)>0, detail:plafRet?fmt(plafRet)+' € dispo':''},
-    {label:'Niches fiscales', ok:f.tmi>=30, detail:f.tmi>=30?'TMI '+f.tmi+'%':''},
-    {label:'IFI', ok:(ED.fiscal.rbg||0)>1300000, detail:''}
+    {label:'Bilan fiscal', ok:levierFiscal, detail:levierFiscal?fmt(tot)+' €/an d\'impôts — solutions de réduction mobilisables':'Impôts < 3 000 € — levier fiscal limité'}
   ]);
 }
 
@@ -3332,11 +3331,9 @@ function rFinancement(){
   const pct=Math.min(100,endett/35*100); // 35% = seuil max = barre pleine
   var pe=document.getElementById('progEndett');if(pe){pe.style.width=pct+'%';pe.style.background=endett>35?'var(--red)':endett>28?'var(--ambre)':'var(--green)';}
   set('progEndettLbl',endett>0?endett.toFixed(1)+' %':'—');
+  var levierFinancement = endett<33;
   renderLevierBadge('levierFin',[
-    {label:'Taux endettement', ok:endett<33, detail:endett>0?endett.toFixed(1)+' %':''},
-    {label:'Capacité emprunt', ok:endett<33&&capa>200, detail:capa>200?'+'+fmt(Math.max(0,capa))+' €/mois':''},
-    {label:'Reste à vivre', ok:rav>1000, detail:rav>0?fmt(rav)+' €/mois':''},
-    {label:'Financement immo', ok:endett<30&&revM>2000, detail:''}
+    {label:'Financement', ok:levierFinancement, detail:levierFinancement?'Endettement '+endett.toFixed(1)+' % — capacité d\'emprunt disponible':'Endettement '+endett.toFixed(1)+' % — capacité saturée'}
   ]);
 }
 
