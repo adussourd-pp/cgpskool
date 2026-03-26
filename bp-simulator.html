@@ -175,12 +175,43 @@ table tr:hover td { background: var(--paper); }
   <div class="panel-left">
 
     <div class="pmr-note">
-      Basé sur le <strong>Plan Marketing de Rémunération (PMR) Prodémial</strong>. Commission de vente = VA × TPC × PV. Passage Manager moyen en 18 mois avec ~27 clients.
+      Basé sur le <strong>Plan Marketing de Rémunération (PMR) Prodémial</strong>. Commission de vente = VA × TPC × PV. Passage Manager moyen en 18 mois avec ~27 clients.<br>
+      <strong style="color:var(--orange)">Nouveau :</strong> Si vous avez déjà une activité, renseignez votre situation actuelle en An 0.
+    </div>
+
+    <!-- ── AN 0 : SITUATION ACTUELLE ── -->
+    <div class="ps" style="background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);padding:12px 14px;margin-bottom:16px">
+      <div class="ps-title" style="color:var(--orange)"><span></span>Situation actuelle — An 0</div>
+      <p style="font-size:10px;color:var(--ink-60);margin-bottom:12px;line-height:1.6">Renseignez vos chiffres réels si vous avez déjà une activité. Laissez à 0 si vous démarrez.</p>
+      <div class="pr"><div class="pl">VA personnelle actuelle <small>(An 0)</small></div>
+        <div class="iu"><input type="number" id="va0actuel" value="0" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="pr"><div class="pl">Consultants niv.1 inscrits actuels</div>
+        <div class="iu"><input type="number" id="niv1Actuel" value="0" step="1" oninput="recalc()"><div class="iu-u">inscrits</div></div></div>
+      <div class="pr"><div class="pl">Consultants niv.1 actifs actuels</div>
+        <div class="iu"><input type="number" id="niv1ActifsActuel" value="0" step="1" oninput="recalc()"><div class="iu-u">actifs</div></div></div>
+      <div class="pr"><div class="pl">Consultants niv.2+ inscrits actuels</div>
+        <div class="iu"><input type="number" id="niv2Actuel" value="0" step="1" oninput="recalc()"><div class="iu-u">inscrits</div></div></div>
+      <div class="pr"><div class="pl">Consultants niv.2+ actifs actuels</div>
+        <div class="iu"><input type="number" id="niv2ActifsActuel" value="0" step="1" oninput="recalc()"><div class="iu-u">actifs</div></div></div>
+      <div class="pr"><div class="pl">Encours gérés actuels <small>(AV / PER)</small></div>
+        <div class="iu"><input type="number" id="encoursCumuleActuel" value="0" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="pr"><div class="pl">Qualification actuelle</div>
+        <div class="iu" style="background:var(--paper)">
+          <select id="qualifActuelle" onchange="recalc()" style="flex:1;padding:7px 10px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink);outline:none">
+            <option value="consultant">Consultant (TPC 5%)</option>
+            <option value="manager">Manager (TPC 6%)</option>
+            <option value="planete">Manager Planète (TPC 6,5%)</option>
+            <option value="etoile">Manager Étoile (TPC 7%)</option>
+            <option value="constellation">Manager Constellation (TPC 7,5%)</option>
+            <option value="galaxie">Manager Galaxie (TPC 8%)</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="ps">
-      <div class="ps-title"><span></span>Votre activité personnelle</div>
-      <div class="pr"><div class="pl">VA perso An 0 <small>(base)</small></div>
+      <div class="ps-title"><span></span>Projection — Activité personnelle</div>
+      <div class="pr"><div class="pl">VA cible An 1 <small>(ou base de croissance)</small></div>
         <div class="iu"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
       <div class="pr"><div class="pl">Croissance VA perso / an</div>
         <div class="iu"><input type="number" id="croissVA" value="25" step="5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
@@ -354,7 +385,7 @@ function recalc() {
   var croissVA    = gv('croissVA', 25) / 100;
   var pvPerso     = gv('pvPerso', 0.4);
   var inscNiv1    = gv('inscNiv1', 3);
-  var tauxParrainage = gv('tauxParrainage', 1.5); // filleuls générés par consultant actif
+  var tauxParrainage = gv('tauxParrainage', 1.5);
   var tauxActifs  = gv('tauxActifs', 62) / 100;
   var vaNiv1      = gv('vaNiv1', 250000);
   var pvNiv1      = gv('pvNiv1', 0.4);
@@ -366,75 +397,119 @@ function recalc() {
   var encoursClient = gv('encoursClient', 50000);
   var dureePlan   = Math.max(3, Math.min(10, Math.round(gv('duréePlan', 7))));
 
-  // Année Manager et Galaxie
+  // ── Situation actuelle (An 0) ──
+  var va0actuel          = gv('va0actuel', 0);
+  var niv1Actuel         = gv('niv1Actuel', 0);
+  var niv1ActifsActuel   = gv('niv1ActifsActuel', 0);
+  var niv2Actuel         = gv('niv2Actuel', 0);
+  var niv2ActifsActuel   = gv('niv2ActifsActuel', 0);
+  var encoursCumuleActuel= gv('encoursCumuleActuel', 0);
+  var qualifActuelleEl   = document.getElementById('qualifActuelle');
+  var qualifActuelle     = qualifActuelleEl ? qualifActuelleEl.value : 'consultant';
+
+  // TPC depuis qualification actuelle saisie
+  var tpcAn0Map = { consultant:0.05, manager:0.06, planete:0.065, etoile:0.07, constellation:0.075, galaxie:0.08 };
+  var qualifLabelMap = { consultant:'Consultant', manager:'Manager', planete:'Manager Planète', etoile:'Manager Étoile', constellation:'Manager Constellation', galaxie:'Manager Galaxie' };
+  var branchesAn0Map = { consultant:0, manager:0, planete:1, etoile:2, constellation:3, galaxie:4 };
+  var hasExistingActivity = va0actuel > 0 || niv1Actuel > 0 || niv2Actuel > 0;
+
+  // Année Manager et Galaxie (ne s'appliquent que si on démarre de zéro)
   var anManager = moisManager <= 12 ? 0 : moisManager <= 24 ? 1 : moisManager <= 36 ? 2 : moisManager <= 48 ? 3 : 4;
   var anGalaxie = moisGalaxie <= 12 ? 0 : moisGalaxie <= 24 ? 1 : moisGalaxie <= 36 ? 2 : moisGalaxie <= 48 ? 3 : moisGalaxie <= 60 ? 4 : 5;
 
   var rows = [];
-  var totalInscNiv1 = 0, totalActifsNiv1 = 0;
-  var totalInscNiv2 = 0, totalActifsNiv2 = 0;
-  var encoursCumule = 0;
+  // Initialisation depuis la situation actuelle saisie
+  var totalInscNiv1   = niv1Actuel;
+  var totalActifsNiv1 = niv1ActifsActuel;
+  var totalInscNiv2   = niv2Actuel;
+  var totalActifsNiv2 = niv2ActifsActuel;
+  var encoursCumule   = encoursCumuleActuel;
 
   for(var an = 0; an <= dureePlan; an++) {
-    var vaPerso = va0 * Math.pow(1 + croissVA, an);
-
-    // ── Niveau 1 : consultant inscrit + parrainage de ses actifs (1,5/actif/an) ──
+    // ── VA perso ──
+    // An 0 : si activité existante → utiliser va0actuel, sinon 0 (démarrage)
+    // An 1+ : croissance depuis va0 (cible an1)
+    var vaPerso;
     if(an === 0) {
-      totalInscNiv1 += 1; // le consultant lui-même au démarrage
+      vaPerso = hasExistingActivity ? va0actuel : 0;
     } else {
-      // Nouvelles inscriptions directes + 20% du flux parrainage part vers niv.1
+      vaPerso = va0 * Math.pow(1 + croissVA, an - 1);
+    }
+
+    // ── Organisation ──
+    if(an === 0) {
+      // An 0 : situation initiale déjà chargée avant la boucle
+      // On ne modifie pas les compteurs pour an=0, on les lit tels quels
+    } else if(an === 1) {
+      // An 1 : premières nouvelles inscriptions directes (+ 1 pour soi si démarrage)
+      if(!hasExistingActivity) totalInscNiv1 += 1; // le consultant lui-même
+      totalInscNiv1 += inscNiv1;
+      totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
+      // Niv2 : parrainage des actifs niv1 existants
+      var newNiv2_1 = Math.round(totalActifsNiv1 * tauxParrainage * 0.8);
+      totalInscNiv2 += newNiv2_1;
+      totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
+    } else {
+      // An 2+ : inscriptions directes + parrainage de l'équipe existante
       var newNiv1 = inscNiv1 + Math.round(totalActifsNiv1 * tauxParrainage * 0.2);
       totalInscNiv1 += newNiv1;
-    }
-    totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
-    var vaEquipeNiv1 = totalActifsNiv1 * vaNiv1;
-
-    // ── Niveau 2+ : 80% du flux parrainage (chaque actif niv.1 génère 1,5 filleuls/an) ──
-    if(an > 0) {
+      totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
       var newNiv2 = Math.round(totalActifsNiv1 * tauxParrainage * 0.8);
       totalInscNiv2 += newNiv2;
+      totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
     }
-    totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
-    var vaEquipeNiv2 = totalActifsNiv2 * vaNiv2;
 
+    var vaEquipeNiv1 = totalActifsNiv1 * vaNiv1;
+    var vaEquipeNiv2 = totalActifsNiv2 * vaNiv2;
     var vaOrga = vaPerso + vaEquipeNiv1 + vaEquipeNiv2;
 
-    // ── Branches actives : interpolation progressive vers Galaxie ──
-    var branchesActives = 0;
-    if(an >= anManager) {
-      if(an >= anGalaxie) {
-        branchesActives = 4;
+    // ── Qualification ──
+    var branchesActives, tpc, qualif, isManager;
+    if(an === 0 && hasExistingActivity) {
+      // Utiliser la qualification saisie manuellement
+      branchesActives = branchesAn0Map[qualifActuelle] || 0;
+      tpc             = tpcAn0Map[qualifActuelle] || 0.05;
+      qualif          = qualifLabelMap[qualifActuelle] || 'Consultant';
+      isManager       = qualifActuelle !== 'consultant';
+    } else {
+      // Progression selon les paramètres
+      if(an >= anManager) {
+        if(an >= anGalaxie) {
+          branchesActives = 4;
+        } else {
+          var prog = (an - anManager) / Math.max(1, anGalaxie - anManager);
+          branchesActives = Math.min(4, Math.floor(prog * 4));
+        }
       } else {
-        // Progression linéaire entre Manager (0 branche) et Galaxie (4 branches)
-        var prog = (an - anManager) / Math.max(1, anGalaxie - anManager);
-        branchesActives = Math.min(4, Math.floor(prog * 4));
+        branchesActives = 0;
       }
+      tpc     = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
+      qualif  = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
+      isManager = an >= anManager;
     }
 
-    var tpc = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
-    var qualif = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
-    var isManager = an >= anManager;
-
-    var vgpAnnuel = vaPerso;
-    var titre = isManager ? getTitre(vgpAnnuel) : null;
+    var vgpAnnuel    = vaPerso;
+    var titre        = isManager ? getTitre(vgpAnnuel) : null;
     var primeQualite = getPrimeQualite(titre, tpc, isManager);
-    var tpcEffectif = tpc + primeQualite;
+    var tpcEffectif  = tpc + primeQualite;
 
-    var caPerso = vaPerso * tpc * pvPerso;
+    var caPerso        = vaPerso * tpc * pvPerso;
     var caPrimeQualite = vaPerso * primeQualite * pvPerso;
-    var comDemarrage = isManager ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
-    var comExpansion = branchesActives > 0 ? vaEquipeNiv1 * 0.5 * 0.01 * pvNiv1 : 0;
-    var comDevelop = branchesActives > 0 ? vaEquipeNiv2 * 0.005 * pvNiv2 : 0;
-    var caTotal = caPerso + caPrimeQualite + comDemarrage + comExpansion + comDevelop;
+    var comDemarrage   = isManager ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
+    var comExpansion   = branchesActives > 0 ? vaEquipeNiv1 * 0.5 * 0.01 * pvNiv1 : 0;
+    var comDevelop     = branchesActives > 0 ? vaEquipeNiv2 * 0.005 * pvNiv2 : 0;
+    var caTotal        = caPerso + caPrimeQualite + comDemarrage + comExpansion + comDevelop;
 
-    var nbClientsAn = Math.round(vaPerso / 200000 * 5);
-    encoursCumule += nbClientsAn * encoursClient;
+    var nbClientsAn = an === 0 ? 0 : Math.round(vaPerso / 200000 * 5);
+    encoursCumule  += nbClientsAn * encoursClient;
     var comRec = encoursCumule > 50000 ? encoursCumule * tauxRec : 0;
 
     rows.push({ an, vaPerso, vaEquipeNiv1, vaEquipeNiv2, vaOrga,
-      totalInscNiv1, totalActifsNiv1, totalInscNiv2, totalActifsNiv2,
+      totalInscNiv1, totalActifsNiv1: an===0 ? totalActifsNiv1 : totalActifsNiv1,
+      totalInscNiv2, totalActifsNiv2,
       caPerso, caPrimeQualite, comDemarrage, comExpansion, comDevelop, caTotal,
-      tpc, tpcEffectif, qualif, titre, branchesActives, encoursCumule, comRec });
+      tpc, tpcEffectif, qualif, titre, branchesActives, encoursCumule, comRec,
+      isAn0: an === 0 && hasExistingActivity });
   }
 
   // ── Affichage ──
@@ -495,9 +570,12 @@ function recalc() {
   var headers = '<th>Indicateur</th>' + rows.map(function(r) {
     var isM = r.qualif !== 'Consultant';
     var titreBadge = r.titre ? ' <span style="background:rgba(255,255,255,0.15);font-size:7px;padding:1px 4px;border-radius:2px">'+r.titre+'</span>' : '';
-    return '<th style="'+(isM?'background:var(--orange)':'')+'">An '+r.an
-      +(isM?'<br><span style="font-size:8px;opacity:0.85">'+r.qualif+titreBadge+'</span>':'')
-      +'</th>';
+    var isRealAn0 = r.an === 0 && r.isAn0;
+    var bg = isRealAn0 ? 'background:#2563eb' : isM ? 'background:var(--orange)' : '';
+    var label = isRealAn0 ? 'Actuel' : 'An '+r.an;
+    var sublabel = isRealAn0 ? '<br><span style="font-size:8px;opacity:0.85">Situation réelle</span>' :
+                  isM ? '<br><span style="font-size:8px;opacity:0.85">'+r.qualif+titreBadge+'</span>' : '';
+    return '<th style="'+bg+'">'+label+sublabel+'</th>';
   }).join('');
   setHTML('tblHead', headers);
 
