@@ -3188,14 +3188,14 @@ function renderLevierBadge(containerId, items){
   h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:10px">Leviers identifiés</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
   items.forEach(function(item){
-    var color=item.ok?'var(--green)':'var(--gris)';
-    var bg=item.ok?'var(--green-l)':'rgba(0,0,0,0.04)';
-    var border=item.ok?'rgba(45,122,91,0.3)':'var(--bord)';
-    var icon=item.ok?'&#10003;':'&#8212;';
+    var color=item.ok?'var(--green)':item.partial?'var(--orange)':'var(--gris)';
+    var bg=item.ok?'var(--green-l)':item.partial?'var(--o-dim)':'rgba(0,0,0,0.04)';
+    var border=item.ok?'rgba(45,122,91,0.3)':item.partial?'rgba(212,98,42,0.3)':'var(--bord)';
+    var icon=item.ok?'&#10003;':item.partial?'~':'&#8212;';
     h+='<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid '+border+';background:'+bg+'">';
     h+='<span style="font-size:12px;color:'+color+';font-weight:700">'+icon+'</span>';
-    h+='<div><span style="font-size:12px;font-weight:600;color:'+(item.ok?'var(--green)':'var(--gris-f)')+'">'+item.label+'</span>';
-    if(item.detail&&item.ok)h+='<br><span style="font-size:10px;color:var(--gris)">'+item.detail+'</span>';
+    h+='<div><span style="font-size:12px;font-weight:600;color:'+(item.ok?'var(--green)':item.partial?'var(--orange)':'var(--gris-f)')+'">'+item.label+'</span>';
+    if(item.detail&&(item.ok||item.partial))h+='<br><span style="font-size:10px;color:var(--gris)">'+item.detail+'</span>';
     h+='</div></div>';
   });
   h+='</div></div>';
@@ -3379,8 +3379,12 @@ function rFiscal(){
   // Levier impot badge
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
   var levierFiscal = tot>=3000;
+  var levierFiscalPeu = tot>=1000 && tot<3000;
+  var levierFisDetail = levierFiscal ? fmt(tot)+' €/an d\'impôts — économies fiscales mobilisables'
+    : levierFiscalPeu ? fmt(tot)+' €/an d\'impôts — levier fiscal limité mais existant'
+    : 'Impôts < 1 000 € — pas de levier fiscal significatif';
   renderLevierBadge('levierFis',[
-    {label:'Bilan fiscal', ok:levierFiscal, detail:levierFiscal?fmt(tot)+' €/an d\'impôts — économies fiscales mobilisables':'Impôts < 3 000 € — levier fiscal limité'}
+    {label:'Levier fiscal', ok:levierFiscal, partial:levierFiscalPeu, detail:levierFisDetail}
   ]);
 }
 
