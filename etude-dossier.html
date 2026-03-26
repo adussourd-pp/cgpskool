@@ -726,9 +726,6 @@ select.span2{grid-column:span 2}
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="card" style="margin-bottom:0" id="levierBox">
-        <div id="levierText" style="font-size:13px;line-height:1.6;color:var(--gris-f)">—</div>
-      </div>
       <div class="card" style="margin-bottom:0">
         <div class="card-title" style="margin-bottom:10px"><span class="dot"></span>Barème 2025</div>
         <table class="tbl">
@@ -1965,7 +1962,7 @@ let ED = {
   type:'seul', consultant:'',
   c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:''},
   c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:''},
-  sitmat:'Célibataire', convention:'', logement:'Propriétaire', nbEnfants:0,
+  sitmat:'Célibataire', convention:'', logement:'Propriétaire', nbEnfants:0, enfants:[],
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
@@ -2255,15 +2252,17 @@ function parseTextRI(txt){
     }
 
     // Enfants
-    ED.nbEnfants = 0;
+    ED.nbEnfants = 0; ED.enfants=[];
     var enfMatch = s01.match(/(?:Enfants?)\s*\n([^\n]+)/i);
     if(enfMatch){
       var enfLine = enfMatch[1].trim();
-      var dates = enfLine.match(/\(\d{2}\/\d{2}\/\d{4}\)/g);
-      ED.nbEnfants = dates ? dates.length : 0;
-      if(!ED.nbEnfants && enfLine.length > 2) {
-        ED.nbEnfants = enfLine.split(',').filter(function(x){return x.trim().length>2;}).length;
-      }
+      var enfParts2=enfLine.split(',');
+      enfParts2.forEach(function(part){
+        var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+        if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
+        else if(part.trim().length>2){ED.enfants.push({nom:part.trim(),dob:''});}
+      });
+      ED.nbEnfants=ED.enfants.length;
     }
 
     // ══ SECTION 02 — OBJECTIFS ══
@@ -2534,13 +2533,21 @@ function parseTextRI(txt){
   ED.nbEnfants=0;
   var enfM=ss01.match(/(?:^|\n)Enfants[^\n]*\n([^\n]+)/i);
   if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants\s*\t([^\n]+)/i);
-  if(enfM&&enfM[1]){var ef=enfM[1].trim();var dates=ef.match(/\(\d{2}\/\d{2}\/\d{4}\)/g);ED.nbEnfants=dates?dates.length:ef.split(',').filter(function(x){return x.trim().length>2;}).length;}
+  ED.enfants=[];
+  if(enfM&&enfM[1]){var ef=enfM[1].trim();var enfParts=ef.split(',');enfParts.forEach(function(part){
+    var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+    if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
+    else if(part.trim().length>2){ED.enfants.push({nom:part.trim(),dob:''});}
+  });ED.nbEnfants=ED.enfants.length;}
 
   // SECTION 02
   var t02=tabMap(ss02);
   var epRow=t02['\u00e9pargne de pr\u00e9caution souhait\u00e9e']||t02['epargne de pr\u00e9caution souhaitee']||t02['epargne de precaution souhaitee'];
   if(epRow)ED.epPrec=pEur2(epRow.v1)||pEur2(epRow.v2)||0;
   ED.objectifs=[];var objSeen2={};
+  // Collecter les noms des clients pour les filtrer des objectifs
+  var clientNames=[(ED.c1.nom||'').toUpperCase(),(ED.c1.prenom||'').toUpperCase(),
+    (ED.c2.nom||'').toUpperCase(),(ED.c2.prenom||'').toUpperCase()].filter(function(n){return n.length>1;});
   ss02.split('\n').forEach(function(line){
     if(line.indexOf('\t')<0)return;
     var p=line.split('\t').map(function(x){return x.trim();});
@@ -2548,6 +2555,10 @@ function parseTextRI(txt){
     var obj=p[1]||'';
     if(obj.length<5||obj.length>200)return;
     if(/^(personnes|objectif|horizon|moyen|\d)/i.test(obj))return;
+    // Filtrer les noms de clients qui se glissent comme objectifs (R14)
+    var objUp=obj.toUpperCase();
+    var isClientName=clientNames.some(function(cn){return cn.length>2&&objUp.indexOf(cn)>=0;});
+    if(isClientName)return;
     if(!objSeen2[obj]){objSeen2[obj]=true;ED.objectifs.push(obj);}
   });
   if(!ED.objectifs.length)ED.objectifs=['Objectifs \u00e0 compl\u00e9ter'];
@@ -3078,7 +3089,18 @@ function rSituation(){
     const a2=ageFrom(ED.c2.dob);
     sit+=`<br><br><strong>${n2}</strong>${a2?' — '+a2+' ans':''}<br>${ED.c2.profession||ED.c2.sitpro||'—'}<br>${ED.convention||''}`;
   }
-  sit+=`<br><br>${ED.nbEnfants} enfant(s) · ${ED.logement}`;
+  // Enfants détaillés (prénoms + âges)
+  var enfDisplay='';
+  if(ED.enfants&&ED.enfants.length){
+    enfDisplay=ED.enfants.map(function(e){
+      var age=e.dob?ageFrom(e.dob):null;
+      return e.nom+(age!==null?' ('+age+' ans)':'');
+    }).join(', ');
+    enfDisplay=ED.enfants.length+' enfant(s) : '+enfDisplay;
+  } else {
+    enfDisplay=ED.nbEnfants+' enfant(s)';
+  }
+  sit+=`<br><br><span style="color:var(--blue);font-weight:600">${enfDisplay}</span> · ${ED.logement}`;
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
 
