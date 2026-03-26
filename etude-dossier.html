@@ -3198,7 +3198,8 @@ function rPatrimoine(){
   set('kPat4',fmt(patFin)+' €');
 
   const pct=(v,t)=>t>0?(v/t*100).toFixed(0)+'%':'0%';
-  set('pyrLT',fmt(lt)+' €');set('pyrLTp',pct(lt,aSum));
+  var ltNet=lt-pSum; // LT net = actifs LT - capital restant dû des passifs
+  set('pyrLT',fmt(ltNet)+' €');set('pyrLTp',pct(ltNet,aSum));
   set('pyrMT',fmt(mt)+' €');set('pyrMTp',pct(mt,aSum));
   set('pyrCT',fmt(ct)+' €');set('pyrCTp',pct(ct,aSum));
   // Épargne de précaution cible = 3 mois de revenus nets (ou valeur saisie si renseignée)
