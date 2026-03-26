@@ -4628,8 +4628,11 @@ function handleRiFile(file) {
           return;
         }
         riPasteBuffer = txt;
+        // DEBUG : afficher le texte brut mammoth dans la zone paste pour inspection
+        var pasteZone = document.getElementById('riPasteZone');
+        if (pasteZone) pasteZone.value = txt;
         // Feedback visuel
-        if (status) status.innerHTML = '<span style="color:var(--green)">✅ ' + file.name + ' importé — analyse en cours…</span>';
+        if (status) status.innerHTML = '<span style="color:var(--green)">✅ ' + file.name + ' importé (' + txt.split('\\n').length + ' lignes) — texte brut affiché ci-dessous pour vérification</span>';
         // Lancer directement le parse et naviguer
         setTimeout(function() {
           try {
