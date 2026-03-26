@@ -5790,6 +5790,34 @@ function rMentions(){
   saveMentionsDirect();
 }
 
+function formatMentionsContent(lines){
+  var out='';
+  lines.forEach(function(line){
+    // Detecter les lignes avec separateurs tab ou || = liste de partenaires -> tags
+    var items=[];
+    if(line.indexOf('\t')>=0){
+      items=line.split('\t').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+    } else if(line.indexOf('||')>=0){
+      items=line.split('||').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+    }
+    // Aussi detecter les lignes qui sont juste des noms separes par des espaces larges (3+ espaces)
+    if(!items.length&&/\s{3,}/.test(line)){
+      items=line.split(/\s{3,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+    }
+    if(items.length>=3){
+      // Afficher en tags
+      out+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
+      items.forEach(function(it){
+        out+='<span style="display:inline-block;padding:4px 12px;border:1px solid var(--bord);border-radius:6px;font-size:11px;font-weight:600;color:var(--noir);background:#fff">'+it+'</span>';
+      });
+      out+='</div>';
+    } else {
+      out+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+line+'</div>';
+    }
+  });
+  return out;
+}
+
 function saveMentionsDirect(){
   var input=document.getElementById('mentionsDirectInput');
   if(!input)return;
@@ -5838,16 +5866,16 @@ function saveMentionsDirect(){
       h+='<span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir)">'+firstLine+'</span>';
       h+='</div>';
       // Reste du bloc = contenu
-      var content=lines.slice(1).join('<br>');
+      var content=formatMentionsContent(lines.slice(1));
       if(content){
         h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
-        h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+content+'</div>';
+        h+=content;
         h+='</div>';
       }
     } else {
       // Bloc sans titre = contenu simple avec bordure
       h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
-      h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+lines.join('<br>')+'</div>';
+      h+=formatMentionsContent(lines);
       h+='</div>';
     }
   });
