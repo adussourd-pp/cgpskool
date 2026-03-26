@@ -4158,9 +4158,6 @@ var COPERNIC = {
   'SCPI fiscale':           {cat:'immo-fisc',    levier:'fiscal',      icon:'&#127959;',
     desc:'SCPI investissant dans des dispositifs fiscaux (Malraux, Déficit Foncier, Denormandie) — réduction ou déduction d’IR',
     fiscal:'Réduction ou déduction IR selon le dispositif',sri:'4-6',horizon:'10-16 ans',horizonAns:12},
-  'SCPI en nue-propriété':  {cat:'epargne-immo', levier:'transmission',icon:'&#127959;',
-    desc:'Achat à prix décoté, aucun revenu ni IFI pendant le démembrement, revalorisation structurelle à terme',
-    fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+',horizonAns:15},
   'SCPI en usufruit':       {cat:'epargne-immo', levier:'entreprise',  icon:'&#127959;',
     desc:'Acquisition de l’usufruit temporaire : rendement boosté pendant la durée, capital non récupéré en fin de démembrement',
     fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
@@ -4186,9 +4183,6 @@ var COPERNIC = {
     fiscal:'Réduction IR plafonnée niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
 
   // ─── ÉPARGNE RETRAITE ──────────────────────────────────────────
-  'PERIN':                  {cat:'epargne-ret',  levier:'fiscal',      icon:'&#127969;',
-    desc:'PER individuel : déduction des versements, sortie en capital ou rente à la retraite, blocage sauf cas de déblocage anticipé',
-    fiscal:'Déductible à l’entrée — IR à la sortie',sri:'1-7',horizon:'Retraite',horizonAns:20},
 
   // ─── PRÉVOYANCE ────────────────────────────────────────────────
   'Prévoyance individuelle':{cat:'prevoyance',   levier:'protection',  icon:'&#128737;',
@@ -4210,11 +4204,14 @@ var COPERNIC = {
   'Plan Épargne Entreprise': {cat:'epargne-sal', levier:'entreprise', icon:'&#127968;',
     desc:'Épargne salariale avec abondement employeur, blocage 5 ans, sortie exonérée d’IR',
     fiscal:'Exonération IR (PS 17,2 % restants)',sri:'2-5',horizon:'5 ans',horizonAns:5},
-  'PERECO/PERECOI':         {cat:'epargne-sal',  levier:'fiscal',      icon:'&#127969;',
+  'PERECO/PERECOI':         {cat:'epargne-sal',  levier:'entreprise',  icon:'&#127969;',
     desc:'PER collectif avec abondement employeur et versements déductibles, sortie retraite en capital ou rente',
     fiscal:'Déductible + abondement exonéré',sri:'2-6',horizon:'Retraite',horizonAns:20},
 
-  // ─── DIVERSIFICATION ───────────────────────────────────────────
+  // ─── CAPITAL INVESTISSEMENT / FISCAL ────────────────────────────
+  'FIP / FCPI':             {cat:'capital-invest', levier:'fiscal',     icon:'&#128200;',
+    desc:'R\u00e9duction IR 18-25 % du montant investi (plafonn\u00e9), capital bloqu\u00e9 5-10 ans, risque de perte en capital',
+    fiscal:'R\u00e9duction IR 18-25 % (niches fiscales)',sri:'6-7',horizon:'5-10 ans',horizonAns:7},
     'FCPR / FPCI':            {cat:'diversification',levier:'epargne',   icon:'&#128200;',
     desc:'Fonds commun de placement à risque ou professionnel : capital-investissement non coté, rendement potentiellement élevé',
     fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
@@ -4243,8 +4240,8 @@ var COPERNIC = {
 };
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
-  'Préparer sa retraite':               ['PER','PERIN','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP','Apport-cession 150-0 B ter'],
+  'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
+  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun\u2026)','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l’IS','LLI','Denormandie','LMNP'],
