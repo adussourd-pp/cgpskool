@@ -733,16 +733,11 @@ select.span2{grid-column:span 2}
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Imposition</div>
       <div class="fiscal-row"><span class="fr-l">Année d'imposition</span><span class="fr-v ed" id="fiAnnee" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true">—</span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true" style="font-size:16px;font-weight:700;color:var(--noir)">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Revenu imposable</span><span class="fr-v" id="fiRevImp">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill" id="fiTMI">—</span></span></div>
-      <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fiTxMoyen">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fiRfr">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fTxMoyen">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fRfr">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Plafond PER dispo</span><span class="fr-v" id="fPlafondPER">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">IR barème</span><span class="fr-v" id="fiIrBareme">—</span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:rgba(192,57,43,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--red)">IR soumis au bareme</span><span class="fr-v" id="fiIrBareme" style="font-size:16px;font-weight:700;color:var(--red)">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Crédits d'impôt</span><span class="fr-v" id="fiCredits">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Impôt net</span><span class="fr-v ed" id="fiIrNet" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Prélèvements sociaux</span><span class="fr-v ed" id="fiPS" contenteditable="true">—</span></div>
@@ -4122,19 +4117,42 @@ function buildMatriceObjSol(impot,capa,aSum){
 
   var html='';
 
-  // Objectifs detected banner
-  var hasFinancement=activeObjs.indexOf('Investir via le financement')>=0;
-  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
-  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs detectes :</span>';
-  activeObjs.forEach(function(obj){
-    html+='<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">'+obj+'</span>';
+  // Visuel 4 leviers + budgets
+  var hasPlacement=ED.epMens>0||aSum>5000;
+  var hasFiscal=impot>=2000;
+  var hasFinancement=capa>200;
+  // Epargne a reorienter
+  var reorInputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
+  var reorConsTot=0;reorInputs.forEach(function(inp){reorConsTot+=+(inp.value||0);});
+  var finActifsTotal=(ED.actifs||[]).reduce(function(s,a){var cfg=getActifConfig(a.label||a.nom||'');return cfg.immo?s:s+(a.montant||0);},0);
+  var reorMontant=Math.max(0,finActifsTotal-reorConsTot);
+  // VP dispo = epargne mensuelle - somme des VP deja affectees
+  var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(sol.vp||0);},0);
+  var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
+
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">';
+  var levierStats=[
+    {label:'Placement',color:'#2B5EA7',active:hasPlacement,val:fmt(reorMontant)+' \u20ac',sub:'A r\u00e9orienter'},
+    {label:'Fiscal',color:'#D4622A',active:hasFiscal,val:'TMI '+(ED.fiscal.tmi||0)+'%',sub:'IR '+fmt(impot)+' \u20ac'},
+    {label:'Financement',color:'#2D7A5B',active:hasFinancement,val:fmt(Math.round(capa))+' \u20ac/m',sub:'Capacit\u00e9'},
+    {label:'Entreprise',color:'#7B5EA7',active:true,val:'SCI / Holding',sub:'150-0 B ter'}
+  ];
+  levierStats.forEach(function(l){
+    var op=l.active?'1':'0.35';
+    var tick=l.active?'&#10003;':'&#9679;';
+    html+='<div style="padding:10px;border-radius:8px;border:1.5px solid '+l.color+'30;background:'+l.color+'08;opacity:'+op+';text-align:center">';
+    html+='<div style="font-size:14px;color:'+l.color+';margin-bottom:2px">'+tick+'</div>';
+    html+='<div style="font-weight:700;font-size:11px;color:'+l.color+'">'+l.label+'</div>';
+    html+='<div style="font-size:13px;font-weight:700;color:var(--noir);margin-top:4px">'+l.val+'</div>';
+    html+='<div style="font-size:10px;color:var(--gris)">'+l.sub+'</div>';
+    html+='</div>';
   });
   html+='</div>';
-  if(hasFinancement){
-    html+='<div style="margin-bottom:14px;padding:10px 14px;background:var(--green-l);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--gris-f)">';
-    html+='<strong style="color:var(--green)">&#10003; Levier financement active</strong> — La capacite d\'emprunt permet d\'acquerir un actif immobilier dont les loyers couvrent partiellement les mensualites. Selectionnez une solution ci-dessous.';
-    html+='</div>';
-  }
+  // VP disponible
+  html+='<div style="display:flex;gap:16px;margin-bottom:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px">';
+  html+='<div><span style="color:var(--gris)">VP disponible (mensuelle) :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
+  html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:var(--orange)">'+fmt(reorMontant)+' \u20ac</strong></div>';
+  html+='</div>';
 
   // Group ALL COPERNIC solutions by levier category
   var groups={placement:[],fiscal:[],financement:[],entreprise:[]};
@@ -5156,6 +5174,55 @@ function loadTrustpilotPreview(){
   }catch(e){}
 }
 
+// ── Trustpilot saisie manuelle ──
+function addManualReview(){
+  var list=document.getElementById('trustpilotManualList');
+  if(!list)return;
+  var idx=list.querySelectorAll('.tp-manual-row').length;
+  var row=document.createElement('div');
+  row.className='tp-manual-row';
+  row.style.cssText='display:grid;grid-template-columns:1fr 50px auto;gap:4px;margin-bottom:4px;align-items:center';
+  row.innerHTML='<input type="text" placeholder="Nom du client" style="padding:5px 8px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:11px" oninput="saveManualReviews()">'
+    +'<input type="number" min="1" max="5" value="5" placeholder="/5" style="padding:5px 4px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:11px;text-align:center;width:50px" oninput="saveManualReviews()">'
+    +'<button onclick="this.parentElement.remove();saveManualReviews()" style="border:none;background:transparent;color:var(--gris);cursor:pointer;font-size:14px">\u00d7</button>';
+  list.appendChild(row);
+}
+
+function saveManualReviews(){
+  var rows=document.querySelectorAll('.tp-manual-row');
+  var reviews=[];
+  rows.forEach(function(r){
+    var inputs=r.querySelectorAll('input');
+    var name=inputs[0]?inputs[0].value.trim():'';
+    var stars=inputs[1]?inputs[1].value:'5';
+    if(name)reviews.push({name:name,stars:stars,text:'',score:''});
+  });
+  if(reviews.length){
+    try{localStorage.setItem('cgpskool_trustpilot',JSON.stringify(reviews));}catch(e){}
+    showTrustpilotPreview(reviews);
+  }
+}
+
+function loadManualReviews(){
+  try{
+    var raw=localStorage.getItem('cgpskool_trustpilot');
+    if(!raw)return;
+    var reviews=JSON.parse(raw);
+    var list=document.getElementById('trustpilotManualList');
+    if(!list)return;
+    reviews.forEach(function(r){
+      addManualReview();
+      var rows=list.querySelectorAll('.tp-manual-row');
+      var last=rows[rows.length-1];
+      if(last){
+        var inputs=last.querySelectorAll('input');
+        if(inputs[0])inputs[0].value=r.name||'';
+        if(inputs[1])inputs[1].value=r.stars||'5';
+      }
+    });
+  }catch(e){}
+}
+
 // ── Logo upload ──
 function handleLogoUpload(input){
   if(!input.files||!input.files[0])return;
@@ -5366,6 +5433,7 @@ function clearProfil() {
   injectProfilIntoED(p);
   updatePdfFooter(p);
   loadTrustpilotPreview();
+  loadManualReviews();
 })();
 
 // Touche Echap ferme la modale
@@ -5819,11 +5887,14 @@ window.addEventListener('afterprint', function() {
     </div>
     <div class="profil-row full">
       <div class="profil-fg">
-        <label>URL Trustpilot (avis clients — inclus dans le PDF)</label>
-        <div style="display:flex;gap:6px;align-items:center">
+        <label>Avis clients Trustpilot (inclus dans le PDF)</label>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
           <input type="url" id="pTrustpilot" placeholder="https://fr.trustpilot.com/review/monsite.fr" oninput="saveProfil()" style="flex:1">
-          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger avis</button>
+          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger auto</button>
         </div>
+        <div style="font-size:10px;color:var(--gris);margin-bottom:6px">Ou ajoutez manuellement :</div>
+        <div id="trustpilotManualList"></div>
+        <button onclick="addManualReview()" style="padding:5px 12px;border:1.5px dashed var(--bord);border-radius:7px;background:transparent;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris);margin-top:4px">+ Ajouter un avis</button>
         <div id="trustpilotPreview" style="margin-top:6px;font-size:11px;color:var(--gris)"></div>
       </div>
     </div>
