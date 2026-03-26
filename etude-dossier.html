@@ -650,7 +650,11 @@ select.span2{grid-column:span 2}
   </div>
 
   <!-- Situation personnelle : 2 colonnes couple ou 1 colonne seul -->
-  <div id="sitDisplay" style="margin-bottom:16px">—</div>
+  <div id="sitDisplay" style="margin-bottom:16px">
+    <div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">
+      Importez un recueil d'informations pour afficher la situation du client
+    </div>
+  </div>
 
   <!-- Chiffres clés du foyer (commun) -->
   <div class="card" style="margin-bottom:16px">
@@ -1103,32 +1107,21 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions légales</div><div class="sec-sub">Incluses en dernière page du PDF</div></div>
   </div>
 
-  <!-- Zone conseiller (pas dans le PDF) -->
-  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
-    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:14px">&#128274;</span>
-      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — saisie des mentions légales</div>
+  <!-- Zone saisie mentions (style copier-coller comme RI) -->
+  <div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
+    <div style="margin-bottom:14px">
+      <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Mentions légales</div>
+      <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez vos mentions légales ou saisissez-les directement</div>
     </div>
-    <div style="padding:16px;background:#fefcf8;display:grid;gap:10px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><label class="ml-label">Raison sociale</label><input class="ml-input" id="mlRaison" placeholder="Peak Patrimoine" oninput="renderMentionsPreview()"></div>
-        <div><label class="ml-label">Forme juridique</label><input class="ml-input" id="mlForme" placeholder="SAS / SARL / EI..." oninput="renderMentionsPreview()"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><label class="ml-label">Siège social</label><input class="ml-input" id="mlSiege" placeholder="3 avenue de la République, 06300 Nice" oninput="renderMentionsPreview()"></div>
-        <div><label class="ml-label">RCS / SIREN</label><input class="ml-input" id="mlRcs" placeholder="RCS Nice 123 456 789" oninput="renderMentionsPreview()"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><label class="ml-label">N° ORIAS</label><input class="ml-input" id="mlOrias" placeholder="22002240" oninput="renderMentionsPreview()"></div>
-        <div><label class="ml-label">Statut / Activité</label><input class="ml-input" id="mlStatut" placeholder="CIF, COA, IOBSP, agent immobilier..." oninput="renderMentionsPreview()"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><label class="ml-label">Association professionnelle</label><input class="ml-input" id="mlAsso" placeholder="CNCGP, ANACOFI, Chambre des CIF..." oninput="renderMentionsPreview()"></div>
-        <div><label class="ml-label">Assurance RCP</label><input class="ml-input" id="mlRcp" placeholder="MMA IARD, contrat n°..." oninput="renderMentionsPreview()"></div>
-      </div>
-      <div><label class="ml-label">Mentions complémentaires (texte libre)</label>
-        <textarea id="mlComplement" rows="3" placeholder="Médiateur : ... / Autres mentions..." style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--gris-f);resize:vertical;outline:none" oninput="renderMentionsPreview()"></textarea>
-      </div>
+    <textarea id="mentionsDirectInput" rows="8"
+      placeholder="Peak Patrimoine — SAS au capital de...&#10;Siège social : 3 avenue de la République, 06300 Nice&#10;RCS Nice 123 456 789&#10;ORIAS n° 22002240 — www.orias.fr&#10;Conseiller en Investissements Financiers&#10;Membre de la CNCGP&#10;Assurance RCP : MMA IARD..."
+      style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
+      oninput="saveMentionsDirect()"
+      onfocus="this.style.borderColor='var(--orange)'"
+      onblur="this.style.borderColor='var(--bord)'"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
     </div>
   </div>
 
@@ -5776,69 +5769,25 @@ function rPageGarde(){
 }
 
 function rMentions(){
-  // Charger depuis localStorage
-  try{
-    var raw=localStorage.getItem('cgpskool_ml');
-    if(raw){
-      var d=JSON.parse(raw);
-      var fields=['mlRaison','mlForme','mlSiege','mlRcs','mlOrias','mlStatut','mlAsso','mlRcp','mlComplement'];
-      fields.forEach(function(id){
-        var el=document.getElementById(id);
-        if(el&&!el.value&&d[id])el.value=d[id];
-      });
-    } else {
-      // Fallback : pre-remplir depuis le profil
-      var p=loadProfil?loadProfil():{};
-      if(p.cabinet){var el=document.getElementById('mlRaison');if(el&&!el.value)el.value=p.cabinet;}
-      if(p.orias){var el2=document.getElementById('mlOrias');if(el2&&!el2.value)el2.value=p.orias;}
-      if(p.adresse){var el3=document.getElementById('mlSiege');if(el3&&!el3.value)el3.value=p.adresse+(p.cp?' '+p.cp:'')+(p.ville?' '+p.ville:'');}
-    }
-  }catch(e){}
-  renderMentionsPreview();
+  var input=document.getElementById('mentionsDirectInput');
+  if(input&&!input.value){
+    try{var txt=localStorage.getItem('cgpskool_mentions')||'';if(txt)input.value=txt;}catch(e){}
+  }
+  saveMentionsDirect();
 }
 
-function renderMentionsPreview(){
-  // Sauvegarder
-  var fields=['mlRaison','mlForme','mlSiege','mlRcs','mlOrias','mlStatut','mlAsso','mlRcp','mlComplement'];
-  var d={};
-  fields.forEach(function(id){var el=document.getElementById(id);if(el)d[id]=el.value.trim();});
-  try{localStorage.setItem('cgpskool_ml',JSON.stringify(d));}catch(e){}
-
-  // Sync vers profil (cabinet, orias, adresse)
-  var p=loadProfil?loadProfil():{};
-  var changed=false;
-  if(d.mlRaison&&d.mlRaison!==p.cabinet){p.cabinet=d.mlRaison;changed=true;}
-  if(d.mlOrias&&d.mlOrias!==p.orias){p.orias=d.mlOrias;changed=true;}
-  if(d.mlSiege&&d.mlSiege!==p.adresse){p.adresse=d.mlSiege;changed=true;}
-  if(changed){try{localStorage.setItem('cgpskool_profil_v1',JSON.stringify(p));}catch(e){}}
-
-  // Rendu apercu
-  var el=document.getElementById('mentionsPreview');
-  if(!el)return;
-  var hasData=Object.values(d).some(function(v){return v;});
-  if(!hasData){el.innerHTML='<em style="color:var(--gris)">Renseignez les champs ci-dessus.</em>';return;}
-
-  var h='<div style="font-family:var(--sans)">';
-  if(d.mlRaison){
-    h+='<div style="font-size:16px;font-weight:700;color:var(--noir);margin-bottom:4px">'+d.mlRaison+'</div>';
-    if(d.mlForme)h+='<div style="font-size:12px;color:var(--gris);margin-bottom:12px">'+d.mlForme+'</div>';
+function saveMentionsDirect(){
+  var input=document.getElementById('mentionsDirectInput');
+  if(!input)return;
+  try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
+  var mel=document.getElementById('mentionsPreview');
+  if(mel){
+    if(input.value.trim()){
+      mel.innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.8;white-space:pre-line">'+input.value.trim()+'</div>';
+    } else {
+      mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions légales ci-dessus.</em>';
+    }
   }
-  var sections=[];
-  if(d.mlSiege)sections.push({t:'Si\u00e8ge social',v:d.mlSiege});
-  if(d.mlRcs)sections.push({t:'RCS / SIREN',v:d.mlRcs});
-  if(d.mlOrias)sections.push({t:'ORIAS',v:'n\u00b0 '+d.mlOrias+' \u2014 <a href="https://www.orias.fr" target="_blank" style="color:var(--orange)">www.orias.fr</a>'});
-  if(d.mlStatut)sections.push({t:'Statut',v:d.mlStatut});
-  if(d.mlAsso)sections.push({t:'Association professionnelle',v:d.mlAsso});
-  if(d.mlRcp)sections.push({t:'Assurance RCP',v:d.mlRcp});
-  sections.forEach(function(s){
-    h+='<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)">';
-    h+='<span style="font-size:11px;color:var(--gris);min-width:160px">'+s.t+'</span>';
-    h+='<span style="font-size:11px;color:var(--noir);font-weight:600">'+s.v+'</span>';
-    h+='</div>';
-  });
-  if(d.mlComplement)h+='<div style="margin-top:10px;font-size:11px;color:var(--gris-f);line-height:1.7">'+d.mlComplement.replace(/\n/g,'<br>')+'</div>';
-  h+='</div>';
-  el.innerHTML=h;
 }
 
 // ══════════════════════════════════════════════════════════════
