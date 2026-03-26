@@ -1077,6 +1077,12 @@ select.span2{grid-column:span 2}
     <div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Sélectionnez des solutions dans le panneau conseiller pour générer les fiches</div>
   </div>
 
+  <!-- Note préconisations (visible en page si switch ON) -->
+  <div id="notePrecoClient" style="display:none;margin-bottom:18px;padding:16px 20px;background:var(--gris-l);border-radius:12px;border:1.5px solid var(--bord)">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Note du conseiller</div>
+    <div id="notePrecoClientText" style="font-size:13px;color:var(--noir);line-height:1.7;white-space:pre-wrap"></div>
+  </div>
+
   <div id="solContainer" style="display:none"></div>
 
   <div class="note-print" id="notePrint-preconisations" style="display:none"></div>
@@ -1085,7 +1091,17 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-preconisations -->
 <div class="comment-zone comment-off panneau-interne" data-sec="preconisations" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
-  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+
+  <!-- Note visible dans la page client (avec switch) -->
+  <div style="margin-bottom:14px;padding:12px 14px;background:#fff;border:1.5px solid var(--bord);border-radius:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Note client (visible dans le PDF)</span>
+      <label class="cz-switch"><input type="checkbox" id="notePrecoSwitch" onchange="syncNotePreco()"><span class="cz-slider"></span></label>
+    </div>
+    <textarea id="notePrecoText" placeholder="Ajoutez une note personnalisée sous vos préconisations..." rows="3" oninput="syncNotePreco()" style="width:100%;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none;background:#fafaf9"></textarea>
+  </div>
+
+  <div class="comment-zone-label"><span>Note conseiller (non imprimée)</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
   <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2" oninput="autoEnableComment(this)"></textarea>
 </div>
 
@@ -2284,6 +2300,22 @@ function syncNotePrint(zone){
   } else {
     np.style.display='none';
     np.textContent='';
+  }
+}
+function syncNotePreco(){
+  var sw=document.getElementById('notePrecoSwitch');
+  var ta=document.getElementById('notePrecoText');
+  var box=document.getElementById('notePrecoClient');
+  var txt=document.getElementById('notePrecoClientText');
+  if(!sw||!ta||!box||!txt)return;
+  // Auto-enable switch when typing
+  if(ta.value.trim().length>0&&!sw.checked)sw.checked=true;
+  if(sw.checked&&ta.value.trim()){
+    box.style.display='';
+    txt.textContent=ta.value.trim();
+  } else {
+    box.style.display='none';
+    txt.textContent='';
   }
 }
 function toggleComment(cb){
