@@ -441,14 +441,22 @@ select.span2{grid-column:span 2}
 
 /* -- ZONES COMMENTAIRES LIBRES ---------------------------------------- */
 .comment-zone{margin-top:14px}
-.comment-zone-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
+.comment-zone-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
 .comment-zone textarea{width:100%;min-height:60px;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none;background:#fafaf9;transition:border-color 0.2s}
 .comment-zone textarea:focus{border-color:var(--ambre);background:#fff}
 .comment-zone textarea::placeholder{color:var(--gris);opacity:0.7}
+.comment-zone.comment-off textarea{opacity:0.4}
+/* Toggle switch */
+.cz-switch{position:relative;display:inline-block;width:32px;height:18px;flex-shrink:0}
+.cz-switch input{opacity:0;width:0;height:0}
+.cz-slider{position:absolute;cursor:pointer;inset:0;background:var(--bord);border-radius:18px;transition:0.2s}
+.cz-slider::before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:0.2s}
+.cz-switch input:checked+.cz-slider{background:var(--orange)}
+.cz-switch input:checked+.cz-slider::before{transform:translateX(14px)}
 .ml-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);display:block;margin-bottom:4px}
 .ml-input{width:100%;padding:7px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);outline:none}
 .ml-input:focus{border-color:var(--orange)}
-@media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}}
+@media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}.comment-zone.comment-off{display:none!important}}
 
 /* ── NUMÉROTATION DE PAGE ── */
 .page-number{text-align:center;font-family:var(--sans);font-size:11px;color:var(--gris);padding:18px 0 4px;margin-top:18px;border-top:1px solid var(--bord)}
@@ -683,9 +691,9 @@ select.span2{grid-column:span 2}
     <div id="objDisplay" style="font-size:13px;color:var(--gris-f)">—</div>
   </div>
 
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -727,9 +735,9 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierPat" style="margin-bottom:10px"></div>
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -769,9 +777,9 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierFis" style="margin-bottom:10px"></div>
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -789,9 +797,9 @@ select.span2{grid-column:span 2}
   <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
 
   <div id="levierFin" style="margin-bottom:10px"></div>
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -830,9 +838,9 @@ select.span2{grid-column:span 2}
     <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
     <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
   </div>
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -991,9 +999,9 @@ select.span2{grid-column:span 2}
 
   <div id="solContainer" style="display:none"></div>
 
-  <div class="comment-zone">
-    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
-    <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2"></textarea>
+  <div class="comment-zone comment-off">
+    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+    <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2" oninput="autoEnableComment(this)"></textarea>
   </div>
 
   <div class="page-number"></div>
@@ -2204,6 +2212,21 @@ function updatePageNumbers(){
     if(idx===-1){pn.textContent='';return;}
     pn.textContent='Page '+(idx+1)+' / '+total;
   });
+}
+
+// ── TOGGLE NOTE CONSEILLER ────────────────────────────────────────
+function toggleComment(cb){
+  var zone=cb.closest('.comment-zone');
+  if(!zone)return;
+  zone.classList.toggle('comment-off',!cb.checked);
+}
+function autoEnableComment(ta){
+  var zone=ta.closest('.comment-zone');
+  if(!zone)return;
+  var cb=zone.querySelector('.cz-switch input');
+  if(!cb)return;
+  if(ta.value.trim().length>0&&!cb.checked){cb.checked=true;zone.classList.remove('comment-off');}
+  if(ta.value.trim().length===0&&cb.checked){cb.checked=false;zone.classList.add('comment-off');}
 }
 
 // ── MODE IMPORT/MANUAL ────────────────────────────────────────────
