@@ -3437,8 +3437,7 @@ function rPatrimoine(){
   // Camembert supprime (canvas pieChart retire du HTML)
 
   // Actifs table
-  // Actifs groupés par horizon, titulaire avec vrai prénom
-  function titLabel(t){
+  var titLabel=function(t){
     if(t==='C1')return nomC(1);
     if(t==='C2')return nomC(2);
     return t;
@@ -4026,7 +4025,7 @@ function rPreconisations(){
   if(objEl){
     if(ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!=='Objectifs \u00e0 compl\u00e9ter'){
       objEl.innerHTML=ED.objectifs.map(function(o,i){
-        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--green);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
+        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--orange);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
       }).join('');
     } else {
       objEl.innerHTML='<em style="color:var(--gris)">Aucun objectif identifi\u00e9</em>';
