@@ -4502,7 +4502,10 @@ function renderSolsRetenues(){
     html+='</div>';
     html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+sol.produit+'</div>';
     html+='</div>';
-    html+='<button onclick="removeSol('+i+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px" title="Supprimer cette instance">&times;</button></div>';
+    html+='<div style="display:flex;align-items:center;gap:2px">';
+    html+='<button onclick="dupliquerSol('+i+')" style="border:none;background:transparent;color:var(--orange);cursor:pointer;font-size:18px;padding:0 4px" title="Dupliquer pour un autre titulaire">&#43;</button>';
+    html+='<button onclick="removeSol('+i+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px" title="Supprimer cette instance">&times;</button>';
+    html+='</div></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
     html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"><span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span><span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">Horizon : '+cp.horizon+'</span><span style="background:var(--gris-l);color:var(--gris-f);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.fiscal+'</span></div>';
     // Objectifs cochables pour cette solution
@@ -4567,8 +4570,19 @@ function ajouterSolutionManuelle(){
   if(!produit||!produit.trim())return;
   var p=produit.trim();
   if(!COPERNIC[p])COPERNIC[p]={levier:'epargne',icon:'&#10133;',desc:'Solution personnalisee',fiscal:'A preciser',sri:'?',horizon:'A preciser'};
-  if(!solsSelectionnees.some(function(s){return s.produit===p;}))solsSelectionnees.push({produit:p,levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:'10 ans',objectifs:[]});
+  var cp=COPERNIC[p];var hAns=cp?(cp.horizonAns||(parseInt(cp.horizon)||10)):10;
+  solsSelectionnees.push({produit:p,levier:cp?cp.levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:hAns+' ans',horizonLabel:cp?cp.horizon:'10 ans',objectifs:[],etape:solsSelectionnees.length+1,objectifsValides:[]});
   renderSolsRetenues();renderFichesClient();
+}
+function dupliquerSol(idx){
+  var src=solsSelectionnees[idx];if(!src)return;
+  var dup=JSON.parse(JSON.stringify(src));
+  dup.etape=solsSelectionnees.length+1;
+  dup.titulaire=src.titulaire==='C1'?(ED.type!=='seul'?'C2':'C1'):'C1';
+  dup.vi=0;dup.vp=0;
+  solsSelectionnees.splice(idx+1,0,dup);
+  solsSelectionnees.forEach(function(s,i){s.etape=i+1;});
+  _refreshSolUI(src.produit);
 }
 
 
