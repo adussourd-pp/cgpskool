@@ -2891,7 +2891,7 @@ function parseTextRI(txt){
       }
     });
 
-    ED.epMens = Math.max(0, Math.round((revM - ED.chargesCredit) * 0.30));
+    ED.epMens = Math.max(0, Math.round(revM * 0.20));
 
     launch();
     return; // ← fin format mammoth
@@ -3117,7 +3117,7 @@ function parseTextRI(txt){
   if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
   if(!ED.fiscal.irnet&&ED.fiscal.rbg){var c2=calcIR(ED.fiscal.rbg,ED.fiscal.parts);ED.fiscal.irnet=c2.ir;if(!ED.fiscal.tmi)ED.fiscal.tmi=c2.tmi;}
   var revM2=revMens();
-  ED.epMens=Math.max(0,Math.round((revM2-ED.chargesCredit)*0.30));
+  ED.epMens=Math.max(0,Math.round(revM2*0.20));
   launch();
 }
 
