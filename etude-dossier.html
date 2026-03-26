@@ -286,13 +286,13 @@ to{opacity:1;transform:translateY(0)}}
 /* ── FORM ── */
 select.span2{grid-column:span 2}
 
-/* ── PYRAMID (forme trapeze bisautee 3D) ── */
-.pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px;padding:0 10px}
-.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:relative;border:none;color:#fff}
-.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c);width:40%;clip-path:polygon(8% 0%,92% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a);width:60%;clip-path:polygon(6% 0%,94% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7);width:80%;clip-path:polygon(5% 0%,95% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74);width:100%;clip-path:polygon(3% 0%,97% 0%,100% 100%,0% 100%)}
+/* ── PYRAMID (rectangles colores) ── */
+.pyramid{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:8px;color:#fff}
+.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c)}
+.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a)}
+.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7)}
+.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74)}
 .pyr-name{font-size:12px;font-weight:700;color:#fff}
 .pyr-desc{font-size:10px;color:rgba(255,255,255,0.7)}
 .pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;color:#fff;text-align:right}
@@ -505,12 +505,30 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
+  <button class="step-btn" id="btnEntreprise" data-sec="entreprise"
+    onclick="if(document.getElementById('checkEntreprise').checked)goTo('entreprise')"
+    style="opacity:0.38;pointer-events:none;display:flex;justify-content:space-between;align-items:center">
+    <span style="display:flex;align-items:center;gap:8px"><span class="step-dot" id="dotEntreprise"></span>Entreprise</span>
+    <input type="checkbox" id="checkEntreprise"
+      onchange="toggleEntreprise(this.checked)"
+      onclick="event.stopPropagation()"
+      style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
+  </button>
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
   <div class="sidebar-lbl" style="margin-top:8px">PDF</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
-  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions &amp; Avis</button>
+  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions l\u00e9gales</button>
+  <button class="step-btn" id="btnAvis" data-sec="avis"
+    onclick="if(document.getElementById('checkAvis').checked)goTo('avis')"
+    style="opacity:0.38;pointer-events:none;display:flex;justify-content:space-between;align-items:center">
+    <span style="display:flex;align-items:center;gap:8px"><span class="step-dot" id="dotAvis"></span>Avis clients</span>
+    <input type="checkbox" id="checkAvis"
+      onchange="toggleAvis(this.checked)"
+      onclick="event.stopPropagation()"
+      style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
+  </button>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
@@ -733,16 +751,11 @@ select.span2{grid-column:span 2}
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Imposition</div>
       <div class="fiscal-row"><span class="fr-l">Année d'imposition</span><span class="fr-v ed" id="fiAnnee" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true">—</span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true" style="font-size:16px;font-weight:700;color:var(--noir)">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Revenu imposable</span><span class="fr-v" id="fiRevImp">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill" id="fiTMI">—</span></span></div>
-      <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fiTxMoyen">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fiRfr">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fTxMoyen">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fRfr">—</span></div>
-        <div class="fiscal-row"><span class="fr-l">Plafond PER dispo</span><span class="fr-v" id="fPlafondPER">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">IR barème</span><span class="fr-v" id="fiIrBareme">—</span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:rgba(192,57,43,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--red)">IR soumis au bareme</span><span class="fr-v" id="fiIrBareme" style="font-size:16px;font-weight:700;color:var(--red)">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Crédits d'impôt</span><span class="fr-v" id="fiCredits">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Impôt net</span><span class="fr-v ed" id="fiIrNet" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Prélèvements sociaux</span><span class="fr-v ed" id="fiPS" contenteditable="true">—</span></div>
@@ -873,6 +886,49 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-transmission -->
 
 <!-- ════════════════════════════════════════
+     5b — ENTREPRISE (optionnel)
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-entreprise">
+  <div class="sec-header">
+    <div><div class="sec-tag">Section 05b — Optionnel</div><div class="sec-h1">Analyse Entreprise</div><div class="sec-sub">SCI, Holding, 150-0 B ter, FCPR remploi</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Solutions Entreprise disponibles</div>
+    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f);line-height:1.8">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Apport-cession 150-0 B ter</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Report d'imposition PV — reinvestissement 60% dans 2 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">FCPR/FPCI remploi</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Eligible remploi 150-0 B ter + exoneration PV apres 5 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Contrat de capitalisation PM</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Tresorerie d'entreprise optimisee, IS forfaitaire</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">SCI a l'IS</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Amortissement, transmission via donation de parts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Note conseiller — Entreprise</div>
+    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('transmission')">&#8592; Transmission</button>
+    <button class="btn btn-secondary" onclick="goTo('preconisations')">Pr\u00e9conisations &#8594;</button>
+  </div>
+</div><!-- /sec-entreprise -->
+
+<!-- ════════════════════════════════════════
      6 — PRÉCONISATIONS
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-preconisations">
@@ -880,34 +936,34 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 06</div><div class="sec-h1">Préconisations Patrimoniales</div></div>
   </div>
 
-  <!-- Leviers disponibles + Situation visee -->
+  <!-- Leviers disponibles + Objectifs client -->
   <div class="preco-avant-apres" style="margin-bottom:18px">
     <div class="preco-panel avant" style="border-color:rgba(43,94,167,0.2);background:#FAFCFF">
       <div class="preco-panel-title" style="color:var(--blue)">Leviers disponibles</div>
       <div id="precoLeviers" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
-    <div class="preco-panel apres">
-      <div class="preco-panel-title">Situation visee apres preconisations</div>
-      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Decrivez la situation patrimoniale cible, les benefices attendus pour le client..."></div>
+    <div class="preco-panel apres" style="border-color:rgba(45,122,91,0.2);background:#FAFFFE">
+      <div class="preco-panel-title" style="color:var(--green)">Objectifs patrimoniaux</div>
+      <div id="precoObjectifs" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
   </div>
 
-  <!-- Epargne financiere — vue conseiller (editable) + vue client -->
+  <!-- Épargne financière — vue conseiller (éditable) + vue client -->
   <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Epargne financiere preconisee</div>
+    <div class="card-title"><span class="dot"></span>Épargne financière préconisée</div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="font-size:12px;color:var(--gris)">Patrimoine financier total (hors immobilier)</div>
-      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 &euro;</div>
+      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 €</div>
     </div>
     <div id="precoEpargneTable" style="margin-bottom:14px"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;background:var(--gris-l);border-radius:10px">
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a conserver</div>
-        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 &euro;</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à conserver</div>
+        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 €</div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a reorienter</div>
-        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 &euro;</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à réorienter</div>
+        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 €</div>
       </div>
     </div>
   </div>
@@ -1029,15 +1085,18 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Page de garde</div><div class="sec-sub">Premiere page du PDF — logo, nom client, coordonnees</div></div>
   </div>
 
-  <div style="border:2px dashed var(--bord);border-radius:16px;padding:40px;background:#fff;min-height:500px;display:flex;align-items:center;justify-content:center">
-    <div style="text-align:center;max-width:500px">
-      <div id="gardeLogoPreview" style="margin-bottom:24px"></div>
-      <div style="font-family:var(--sans);font-size:28px;font-weight:700;color:var(--noir);margin-bottom:8px">Etude de Dossier</div>
-      <div id="gardeClientPreview" style="font-family:var(--sans);font-size:18px;color:var(--gris-f);margin-bottom:20px">Nom du client</div>
-      <div id="gardeDatePreview" style="font-size:13px;color:var(--gris);margin-bottom:28px"></div>
-      <div style="width:60px;height:2px;background:var(--orange);margin:0 auto 28px"></div>
-      <div id="gardeConseillerPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8"></div>
+  <div style="border:2px dashed var(--bord);border-radius:16px;background:#fff;min-height:500px;display:flex;flex-direction:column">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px">
+      <div style="text-align:center;max-width:500px">
+        <div id="gardeLogoPreview" style="margin-bottom:24px"></div>
+        <div style="font-family:var(--sans);font-size:28px;font-weight:700;color:var(--noir);margin-bottom:8px">Etude de Dossier</div>
+        <div id="gardeClientPreview" style="font-family:var(--sans);font-size:18px;color:var(--gris-f);margin-bottom:20px">Nom du client</div>
+        <div id="gardeDatePreview" style="font-size:13px;color:var(--gris);margin-bottom:28px"></div>
+        <div style="width:60px;height:2px;background:var(--orange);margin:0 auto 28px"></div>
+        <div id="gardeConseillerPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8"></div>
+      </div>
     </div>
+    <div id="gardeFooter" style="padding:14px 24px;border-top:1px solid var(--bord);text-align:center;font-size:11px;color:var(--gris);line-height:1.6"></div>
   </div>
 
   <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
@@ -1055,29 +1114,22 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-mentions">
   <div class="sec-header">
-    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions legales &amp; Avis clients</div><div class="sec-sub">Derniere page du PDF</div></div>
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions l\u00e9gales</div><div class="sec-sub">Incluses en derni\u00e8re page du PDF</div></div>
   </div>
 
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Mentions legales</div>
+    <div class="card-title"><span class="dot"></span>Mentions l\u00e9gales</div>
     <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
-    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucun avis charge — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> et entrez votre URL Trustpilot.</em>
+      <em style="color:var(--gris)">Aucune mention configur\u00e9e — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
     </div>
   </div>
 
   <div class="card" style="background:var(--gris-l);border-color:transparent">
     <div style="font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
-      Les simulations presentees dans ce document ne constituent en aucun cas une promesse de rendement.
-      Les performances passees ne prejugent pas des performances futures.
+      Les simulations pr\u00e9sent\u00e9es dans ce document ne constituent en aucun cas une promesse de rendement.
+      Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.
       Tout investissement comporte des risques, y compris de perte en capital.
-      Ce document est strictement confidentiel et destine uniquement a l'usage du client designe.
+      Ce document est strictement confidentiel et destin\u00e9 uniquement \u00e0 l'usage du client d\u00e9sign\u00e9.
     </div>
   </div>
 
@@ -1086,6 +1138,31 @@ select.span2{grid-column:span 2}
     <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
   </div>
 </div><!-- /sec-mentions -->
+
+<!-- ════════════════════════════════════════
+     10 — AVIS CLIENTS (optionnel)
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-avis">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF — Optionnel</div><div class="sec-h1">Avis clients</div><div class="sec-sub">Page Trustpilot incluse dans le PDF si activ\u00e9e</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
+    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucun avis — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour charger ou saisir des avis.</em>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
+    Cette page n'est incluse dans le PDF que si la case "Avis clients" est coch\u00e9e dans la navigation.
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('mentions')">&#8592; Mentions l\u00e9gales</button>
+    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
+  </div>
+</div><!-- /sec-avis -->
 
 </main>
 </div><!-- /app -->
@@ -2015,7 +2092,7 @@ let ED = {
   type:'seul', consultant:'',
   c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:''},
   c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:''},
-  sitmat:'Célibataire', convention:'', logement:'Propriétaire', nbEnfants:0, enfants:[],
+  sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[],
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
@@ -2300,6 +2377,11 @@ function parseTextRI(txt){
     var logVal = (logPt ? logPt.v1 : '') || kv01['logement'] || '';
     if(logVal) ED.logement = logVal;
 
+    // Adresse
+    var adrPt = pt01['adresse'] || pt01['adresse de résidence'] || pt01['adresse residence'];
+    var adrVal = (adrPt ? adrPt.v1 : '') || kv01['adresse'] || kv01['adresse de résidence'] || '';
+    if(adrVal) ED.adresse = adrVal;
+
     // CSP
     var cspPt = pt01['catégorie socio-professionnelle'] || pt01['categorie socio-professionnelle'] || pt01['catégorie socio'];
     if(cspPt && cspPt.v1){
@@ -2317,10 +2399,12 @@ function parseTextRI(txt){
     if(enfMatch){
       var enfLine = enfMatch[1].trim();
       var enfParts2=enfLine.split(',');
+      var enfSeenB={};
       enfParts2.forEach(function(part){
-        var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
-        else if(part.trim().length>2){ED.enfants.push({nom:part.trim(),dob:''});}
+        var clean=part.trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
+        var m=clean.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+        if(m){var nn=m[1].trim();if(!enfSeenB[nn]){enfSeenB[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
+        else if(clean.length>2){if(!enfSeenB[clean]){enfSeenB[clean]=true;ED.enfants.push({nom:clean,dob:''});}}
       });
       ED.nbEnfants=ED.enfants.length;
     }
@@ -2330,12 +2414,13 @@ function parseTextRI(txt){
     var objSeen = {};
     // Try pipe-table extraction first (R14: objective is in column 1, not column 0)
     var objRows02 = parsePipeTable(s02);
-    var SKIP_OBJ_LABEL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d)/i;
+    var SKIP_OBJ_HDR = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d+$)/i;
+    var SKIP_OBJ_VAL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation)$/i;
     objRows02.forEach(function(cols){
-      if(SKIP_OBJ_LABEL.test((cols[0]||'').trim())) return;
+      if(SKIP_OBJ_HDR.test((cols[0]||'').trim())) return;
       var obj = (cols[1] || '').trim();
       if(obj.length < 5 || obj.length > 200) return;
-      if(SKIP_OBJ_LABEL.test(obj)) return;
+      if(SKIP_OBJ_VAL.test(obj)) return;
       if(!objSeen[obj]){ objSeen[obj] = true; ED.objectifs.push(obj); }
     });
     // Fallback: line-by-line heuristic for non-pipe mammoth text
@@ -2344,7 +2429,7 @@ function parseTextRI(txt){
       var isName = false;
       for(var oi=0;oi<objLines.length;oi++){
         var ol = objLines[oi];
-        if(SKIP_OBJ_LABEL.test(ol) || /^\|/.test(ol)) continue;
+        if(SKIP_OBJ_HDR.test(ol) || /^\|/.test(ol)) continue;
         if(/^[A-ZÉÈÊ][a-zéèêàùûî]+\s+[A-ZÉÈÊ]+/.test(ol)){
           isName = true; continue;
         }
@@ -2402,9 +2487,10 @@ function parseTextRI(txt){
     ED.passifs = [];
     var passifSection = (s03.match(/PASSIFS([\s\S]*?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|$)/i)||['',''])[1];
     var passifRows = parsePipeTable(passifSection);
+    var SKIP_P = /^(désignation|designation|total|crédit immobilier|credit immobilier|crédit personnel|credit personnel|crédit|credit|prêt|pret)$/i;
     passifRows.forEach(function(cols){
       var nom = cols[0];
-      if(!nom||nom.length<2||/^(désignation|designation|total)$/i.test(nom.trim())) return;
+      if(!nom||nom.length<2||SKIP_P.test(nom.trim())) return;
       // Format : [Nom, Titulaire, Echéance/an, CRD, Date]
       var ech=0, crd=0;
       var nums=[];
@@ -2597,6 +2683,9 @@ function parseTextRI(txt){
   var sitRow=t01['situation']||t01['situation\u00a0'];if(sitRow)ED.sitmat=sitRow.v1;
   // Logement
   var logRow=t01['logement'];if(logRow)ED.logement=logRow.v1;
+  // Adresse
+  var adrRow=t01['adresse']||t01['adresse de r\u00e9sidence']||t01['adresse residence'];
+  if(adrRow)ED.adresse=adrRow.v1;
   // CSP
   var catRow=t01['cat\u00e9gorie socio-professionnelle']||t01['categorie socio-professionnelle']||t01['cat\u00e9gorie socio'];
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
@@ -2604,6 +2693,7 @@ function parseTextRI(txt){
   ED.nbEnfants=0;
   // Parser enfants : chercher les lignes avec des dates (dd/mm/yyyy) après "Enfants"
   ED.enfants=[];
+  var enfSeenA={};
   var enfLines=ss01.split('\n');
   for(var ei=0;ei<enfLines.length;ei++){
     var el=enfLines[ei];
@@ -2615,7 +2705,7 @@ function parseTextRI(txt){
     if(enfDates){
       enfDates.forEach(function(part){
         var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m)ED.enfants.push({nom:m[1].trim(),dob:m[2]});
+        if(m){var nn=m[1].trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();if(!enfSeenA[nn]){enfSeenA[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
       });
     }
   }
@@ -2635,7 +2725,7 @@ function parseTextRI(txt){
     if(/^(personnes|objectif|horizon|moyen|epargne|\u00e9pargne|d\u00e9signation)/i.test(p[0]))return;
     var obj=p[1]||'';
     if(obj.length<5||obj.length>200)return;
-    if(/^(personnes|objectif|horizon|moyen|\d)/i.test(obj))return;
+    if(/^(personnes|objectif|horizon|moyen)$/i.test(obj))return;
     // Filtrer les noms de clients qui se glissent comme objectifs (R14)
     var objUp=obj.toUpperCase();
     var isClientName=clientNames.some(function(cn){return cn.length>2&&objUp.indexOf(cn)>=0;});
@@ -2676,7 +2766,7 @@ function parseTextRI(txt){
       if(line.indexOf('\t')<0)return;
       var p=line.split('\t').map(function(x){return x.trim();});
       var nom=p[0];if(!nom||nom.length<2)return;
-      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier$|cr\u00e9dit personnel|credit)$/i.test(nom.trim()))return;
+      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier|credit immobilier|cr\u00e9dit personnel|credit personnel|cr\u00e9dit|credit|pr\u00eat|pret)$/i.test(nom.trim()))return;
       var ech=0,crd=0;
       if(p.length>=4){var nums=p.slice(1).map(function(x,i){return{i:i+1,v:pEur2(x)};}).filter(function(x){return x.v>0;});
         if(nums.length>=2){ech=nums[0].v;crd=nums[1].v;}else if(nums.length===1){crd=nums[0].v;}
@@ -2836,6 +2926,7 @@ function renderSection(sec){
   else if(sec==='synthese')rSynthese();
   else if(sec==='pagegarde')rPageGarde();
   else if(sec==='mentions')rMentions();
+  else if(sec==='avis')rMentions();
 }
 
 
@@ -3172,7 +3263,8 @@ function rSituation(){
   if(ED.enfants&&ED.enfants.length){
     enfDisplay=ED.enfants.map(function(e){
       var age=e.dob?ageFrom(e.dob):null;
-      return e.nom+(age!==null?' ('+age+' ans)':'');
+      var nm=e.nom.replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
+      return nm+(age!==null?' ('+age+' ans)':'');
     }).join(', ');
     enfDisplay=ED.enfants.length+' enfant(s) : '+enfDisplay;
   } else if(ED.nbEnfants){
@@ -3190,6 +3282,7 @@ function rSituation(){
     sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' €/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     // Col C2
     sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
@@ -3198,12 +3291,15 @@ function rSituation(){
     sit+=(ED.c2.profession||ED.c2.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal2||ED.revenus.c2||0)+' €/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     sit+='</div>';
     // Commun
     sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
+    var sitLabel=ED.sitmat||'';
+    if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabel+'</strong></div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
@@ -3214,10 +3310,13 @@ function rSituation(){
     sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' &euro;/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong></div>';
+    var sitLabelS=ED.sitmat||'';
+    if(ED.convention&&sitLabelS)sitLabelS+=' \u2014 '+ED.convention;
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabelS+'</strong></div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
@@ -3920,23 +4019,38 @@ function rPreconisations(){
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
   var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
 
-  // ── Leviers disponibles ──
+  // ── Leviers disponibles (tick vert / rond rouge grise) ──
   var levEl=document.getElementById('precoLeviers');
   if(levEl){
     var levH='';
-    var leviers=[];
-    if(ED.epMens>0||aSum>5000)leviers.push({icon:'&#128176;',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' &euro;/mois'});
-    if(impot>=2000)leviers.push({icon:'&#128200;',label:'Fiscal',desc:'IR '+fmt(impot)+' &euro; — TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' — PER dispo '+fmt(plafondPER)+' &euro;':'')});
-    if(capa>200)leviers.push({icon:'&#127968;',label:'Financement',desc:'Capacite emprunt ~'+fmt(Math.round(capa))+' &euro;/mois'});
-    leviers.push({icon:'&#127981;',label:'Entreprise',desc:'SCI, holding, 150-0 B ter'});
-    leviers.forEach(function(l){
-      levH+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bord)">';
-      levH+='<span style="font-size:18px">'+l.icon+'</span>';
+    var allLeviers=[
+      {key:'placement',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' \u20ac/mois',active:ED.epMens>0||aSum>5000,color:'#2B5EA7'},
+      {key:'fiscal',label:'Fiscal',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' \u2014 PER dispo '+fmt(plafondPER)+' \u20ac':''),active:impot>=2000,color:'#D4622A'},
+      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois',active:capa>200,color:'#2D7A5B'},
+      {key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'}
+    ];
+    allLeviers.forEach(function(l){
+      var opacity=l.active?'1':'0.4';
+      var tick=l.active?'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:'+l.color+';color:#fff;font-size:11px;font-weight:700">&#10003;</span>':'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid #ccc;color:#ccc;font-size:9px">&#9679;</span>';
+      levH+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bord);opacity:'+opacity+'">';
+      levH+=tick;
       levH+='<div><div style="font-weight:700;font-size:12px;color:var(--noir)">'+l.label+'</div>';
       levH+='<div style="font-size:11px;color:var(--gris)">'+l.desc+'</div></div>';
       levH+='</div>';
     });
     levEl.innerHTML=levH;
+  }
+
+  // ── Objectifs client ──
+  var objEl=document.getElementById('precoObjectifs');
+  if(objEl){
+    if(ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!=='Objectifs \u00e0 compl\u00e9ter'){
+      objEl.innerHTML=ED.objectifs.map(function(o,i){
+        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--green);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
+      }).join('');
+    } else {
+      objEl.innerHTML='<em style="color:var(--gris)">Aucun objectif identifi\u00e9</em>';
+    }
   }
 
   // ── Epargne financiere (hors immo) — tableau editable ──
@@ -3966,22 +4080,25 @@ function rPreconisations(){
     var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
     h+='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">';
     h+='<th style="text-align:left;padding:6px 8px">Actif</th>';
-    h+='<th style="text-align:right;padding:6px 8px">Actuel</th>';
-    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">Conseille</th>';
+    h+='<th style="text-align:right;padding:6px 8px">\u20ac actuel</th>';
+    h+='<th style="text-align:center;padding:6px 8px">Conserver</th>';
+    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">\u20ac conseill\u00e9</th>';
     h+='</tr></thead><tbody>';
 
     horizons.forEach(function(hz){
       var items=groups[hz.key];
       if(!items.length)return;
       var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
-      h+='<tr style="background:'+hz.bg+'"><td colspan="3" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' &euro;</td></tr>';
+      h+='<tr style="background:'+hz.bg+'"><td colspan="4" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' \u20ac</td></tr>';
       items.forEach(function(a,i){
         var uid=hz.key+'_'+i;
         var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
-        h+='<tr style="border-bottom:1px solid var(--bord)">';
+        var isKept=conseille>0;
+        h+='<tr style="border-bottom:1px solid var(--bord);opacity:'+(isKept?'1':'0.5')+'" id="row_'+uid+'">';
         h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
-        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' &euro;</td>';
-        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:90px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"></td>';
+        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' \u20ac</td>';
+        h+='<td style="padding:5px 8px;text-align:center"><label style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer"><input type="checkbox" '+(isKept?'checked':'')+' onchange="togglePrecoSwitch(\''+uid+'\','+a.montant+',this.checked)" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;border-radius:9px;background:'+(isKept?'#2D7A5B':'#ccc')+';transition:0.2s"></span><span style="position:absolute;top:2px;left:'+(isKept?'18':'2')+'px;width:14px;height:14px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span></label></td>';
+        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:80px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"> \u20ac</td>';
         h+='</tr>';
       });
     });
@@ -4031,6 +4148,12 @@ function updatePrecoTotals(){
   if(rEl)rEl.textContent=fmt(Math.max(0,reorienter))+' \u20ac';
 }
 
+function togglePrecoSwitch(uid,montantActuel,checked){
+  window._precoConseille[uid]=checked?montantActuel:0;
+  // Re-render
+  rPreconisations();
+}
+
 
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  MATRICE COPERNIC                                              ║
@@ -4077,19 +4200,42 @@ function buildMatriceObjSol(impot,capa,aSum){
 
   var html='';
 
-  // Objectifs detected banner
-  var hasFinancement=activeObjs.indexOf('Investir via le financement')>=0;
-  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
-  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs detectes :</span>';
-  activeObjs.forEach(function(obj){
-    html+='<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">'+obj+'</span>';
+  // Visuel 4 leviers + budgets
+  var hasPlacement=ED.epMens>0||aSum>5000;
+  var hasFiscal=impot>=2000;
+  var hasFinancement=capa>200;
+  // Epargne a reorienter
+  var reorInputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
+  var reorConsTot=0;reorInputs.forEach(function(inp){reorConsTot+=+(inp.value||0);});
+  var finActifsTotal=(ED.actifs||[]).reduce(function(s,a){var cfg=getActifConfig(a.label||a.nom||'');return cfg.immo?s:s+(a.montant||0);},0);
+  var reorMontant=Math.max(0,finActifsTotal-reorConsTot);
+  // VP dispo = epargne mensuelle - somme des VP deja affectees
+  var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(sol.vp||0);},0);
+  var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
+
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">';
+  var levierStats=[
+    {label:'Placement',color:'#2B5EA7',active:hasPlacement,val:fmt(reorMontant)+' \u20ac',sub:'A r\u00e9orienter'},
+    {label:'Fiscal',color:'#D4622A',active:hasFiscal,val:'TMI '+(ED.fiscal.tmi||0)+'%',sub:'IR '+fmt(impot)+' \u20ac'},
+    {label:'Financement',color:'#2D7A5B',active:hasFinancement,val:fmt(Math.round(capa))+' \u20ac/m',sub:'Capacit\u00e9'},
+    {label:'Entreprise',color:'#7B5EA7',active:true,val:'SCI / Holding',sub:'150-0 B ter'}
+  ];
+  levierStats.forEach(function(l){
+    var op=l.active?'1':'0.35';
+    var tick=l.active?'&#10003;':'&#9679;';
+    html+='<div style="padding:10px;border-radius:8px;border:1.5px solid '+l.color+'30;background:'+l.color+'08;opacity:'+op+';text-align:center">';
+    html+='<div style="font-size:14px;color:'+l.color+';margin-bottom:2px">'+tick+'</div>';
+    html+='<div style="font-weight:700;font-size:11px;color:'+l.color+'">'+l.label+'</div>';
+    html+='<div style="font-size:13px;font-weight:700;color:var(--noir);margin-top:4px">'+l.val+'</div>';
+    html+='<div style="font-size:10px;color:var(--gris)">'+l.sub+'</div>';
+    html+='</div>';
   });
   html+='</div>';
-  if(hasFinancement){
-    html+='<div style="margin-bottom:14px;padding:10px 14px;background:var(--green-l);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--gris-f)">';
-    html+='<strong style="color:var(--green)">&#10003; Levier financement active</strong> — La capacite d\'emprunt permet d\'acquerir un actif immobilier dont les loyers couvrent partiellement les mensualites. Selectionnez une solution ci-dessous.';
-    html+='</div>';
-  }
+  // VP disponible
+  html+='<div style="display:flex;gap:16px;margin-bottom:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px">';
+  html+='<div><span style="color:var(--gris)">VP disponible (mensuelle) :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
+  html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:var(--orange)">'+fmt(reorMontant)+' \u20ac</strong></div>';
+  html+='</div>';
 
   // Group ALL COPERNIC solutions by levier category
   var groups={placement:[],fiscal:[],financement:[],entreprise:[]};
@@ -4962,7 +5108,41 @@ function toggleTransmission(checked){
     if(secTrans&&secTrans.classList.contains('active'))goTo('retraite');
   }
 }
-// Après import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
+function toggleEntreprise(checked){
+  var btn=document.getElementById('btnEntreprise');
+  var dot=document.getElementById('dotEntreprise');
+  if(!btn)return;
+  if(checked){
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+    if(dot)dot.style.background='var(--ambre)';
+  } else {
+    btn.style.opacity='0.38';
+    btn.style.pointerEvents='none';
+    if(dot)dot.style.background='';
+    var sec=document.getElementById('sec-entreprise');
+    if(sec&&sec.classList.contains('active'))goTo('retraite');
+  }
+}
+
+function toggleAvis(checked){
+  var btn=document.getElementById('btnAvis');
+  var dot=document.getElementById('dotAvis');
+  if(!btn)return;
+  if(checked){
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+    if(dot)dot.style.background='var(--ambre)';
+  } else {
+    btn.style.opacity='0.38';
+    btn.style.pointerEvents='none';
+    if(dot)dot.style.background='';
+    var secAvis=document.getElementById('sec-avis');
+    if(secAvis&&secAvis.classList.contains('active'))goTo('mentions');
+  }
+}
+
+// Apres import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
 var validatedSections={};
 function markDone(){
   // Après import, toutes les sections sont "pending" (orange)
@@ -5108,6 +5288,55 @@ function loadTrustpilotPreview(){
   try{
     var raw=localStorage.getItem('cgpskool_trustpilot');
     if(raw){var reviews=JSON.parse(raw);showTrustpilotPreview(reviews);}
+  }catch(e){}
+}
+
+// ── Trustpilot saisie manuelle ──
+function addManualReview(){
+  var list=document.getElementById('trustpilotManualList');
+  if(!list)return;
+  var idx=list.querySelectorAll('.tp-manual-row').length;
+  var row=document.createElement('div');
+  row.className='tp-manual-row';
+  row.style.cssText='display:grid;grid-template-columns:1fr 50px auto;gap:4px;margin-bottom:4px;align-items:center';
+  row.innerHTML='<input type="text" placeholder="Nom du client" style="padding:5px 8px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:11px" oninput="saveManualReviews()">'
+    +'<input type="number" min="1" max="5" value="5" placeholder="/5" style="padding:5px 4px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:11px;text-align:center;width:50px" oninput="saveManualReviews()">'
+    +'<button onclick="this.parentElement.remove();saveManualReviews()" style="border:none;background:transparent;color:var(--gris);cursor:pointer;font-size:14px">\u00d7</button>';
+  list.appendChild(row);
+}
+
+function saveManualReviews(){
+  var rows=document.querySelectorAll('.tp-manual-row');
+  var reviews=[];
+  rows.forEach(function(r){
+    var inputs=r.querySelectorAll('input');
+    var name=inputs[0]?inputs[0].value.trim():'';
+    var stars=inputs[1]?inputs[1].value:'5';
+    if(name)reviews.push({name:name,stars:stars,text:'',score:''});
+  });
+  if(reviews.length){
+    try{localStorage.setItem('cgpskool_trustpilot',JSON.stringify(reviews));}catch(e){}
+    showTrustpilotPreview(reviews);
+  }
+}
+
+function loadManualReviews(){
+  try{
+    var raw=localStorage.getItem('cgpskool_trustpilot');
+    if(!raw)return;
+    var reviews=JSON.parse(raw);
+    var list=document.getElementById('trustpilotManualList');
+    if(!list)return;
+    reviews.forEach(function(r){
+      addManualReview();
+      var rows=list.querySelectorAll('.tp-manual-row');
+      var last=rows[rows.length-1];
+      if(last){
+        var inputs=last.querySelectorAll('input');
+        if(inputs[0])inputs[0].value=r.name||'';
+        if(inputs[1])inputs[1].value=r.stars||'5';
+      }
+    });
   }catch(e){}
 }
 
@@ -5321,6 +5550,7 @@ function clearProfil() {
   injectProfilIntoED(p);
   updatePdfFooter(p);
   loadTrustpilotPreview();
+  loadManualReviews();
 })();
 
 // Touche Echap ferme la modale
@@ -5536,6 +5766,16 @@ function rPageGarde(){
       if(dataUrl)logo.innerHTML='<img src="'+dataUrl+'" style="max-height:60px;max-width:200px">';
       else logo.innerHTML='<div style="color:var(--gris);font-size:12px">Aucun logo — configurez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil</strong></div>';
     }catch(e){}
+  }
+
+  // Pied de page : cabinet + ORIAS
+  var foot=document.getElementById('gardeFooter');
+  if(foot&&p){
+    var fParts=[];
+    if(p.cabinet)fParts.push('<strong>'+p.cabinet+'</strong>');
+    if(p.orias)fParts.push('ORIAS n\u00b0 '+p.orias+' — <span style="color:var(--blue)">www.orias.fr</span>');
+    if(p.adresse)fParts.push(p.adresse+(p.cp||p.ville?', '+(p.cp||'')+' '+(p.ville||''):''));
+    foot.innerHTML=fParts.length?fParts.join(' &nbsp;|&nbsp; '):'<em style="color:var(--gris)">Configurez votre profil pour afficher cabinet et ORIAS</em>';
   }
 }
 
@@ -5774,11 +6014,14 @@ window.addEventListener('afterprint', function() {
     </div>
     <div class="profil-row full">
       <div class="profil-fg">
-        <label>URL Trustpilot (avis clients — inclus dans le PDF)</label>
-        <div style="display:flex;gap:6px;align-items:center">
+        <label>Avis clients Trustpilot (inclus dans le PDF)</label>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
           <input type="url" id="pTrustpilot" placeholder="https://fr.trustpilot.com/review/monsite.fr" oninput="saveProfil()" style="flex:1">
-          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger avis</button>
+          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger auto</button>
         </div>
+        <div style="font-size:10px;color:var(--gris);margin-bottom:6px">Ou ajoutez manuellement :</div>
+        <div id="trustpilotManualList"></div>
+        <button onclick="addManualReview()" style="padding:5px 12px;border:1.5px dashed var(--bord);border-radius:7px;background:transparent;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris);margin-top:4px">+ Ajouter un avis</button>
         <div id="trustpilotPreview" style="margin-top:6px;font-size:11px;color:var(--gris)"></div>
       </div>
     </div>
