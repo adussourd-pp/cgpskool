@@ -4278,30 +4278,21 @@ function rSynthese(){
 
 function resetSteps(){
   steps=[];
-  // Générer les étapes depuis les sol-cards manuelles
-  var cards=document.querySelectorAll('#solContainer .sol-card');
-  if(cards&&cards.length){
-    cards.forEach(function(card,i){
-      var tag=card.querySelector('.sol-type-tag');
-      var objectifInp=card.querySelectorAll('input[type=text], .fi:not([type=number])');
-      var label=tag?tag.textContent.trim():'Solution '+(i+1);
-      // Chercher le champ objectif visé (dernier input text)
-      var obj='';
-      card.querySelectorAll('input.fi:not([type=number])').forEach(function(inp){
-        if(inp.placeholder&&/objectif/i.test(inp.placeholder)&&inp.value.trim())obj=inp.value.trim();
-      });
-      if(obj) label+=' — '+obj;
+  // Étape 1 toujours : bilan réalisé
+  steps.push({label:'Bilan patrimonial réalisé', done:true});
+  // Générer les étapes depuis les préconisations validées (solsSelectionnees)
+  if(solsSelectionnees&&solsSelectionnees.length){
+    // Trier par numéro d'étape
+    var sorted=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
+    sorted.forEach(function(sol){
+      var cp=COPERNIC&&COPERNIC[sol.produit];
+      var label=cp?cp.label:sol.produit;
+      if(sol.horizonLabel) label+=' ('+sol.horizonLabel+')';
       steps.push({label:label, done:false});
     });
-  } else {
-    // Étapes par défaut
-    steps=[
-      {label:'Bilan patrimonial réalisé', done:true},
-      {label:'Préconisations validées', done:false},
-      {label:'Mise en place des solutions', done:false},
-      {label:'Suivi & révision annuelle', done:false},
-    ];
   }
+  // Étape finale toujours : suivi
+  steps.push({label:'Suivi & révision annuelle', done:false});
   renderSteps();
 }
 
@@ -4350,10 +4341,13 @@ function renderSteps(){
   // Stepper horizontal
   container.innerHTML='<div class="synthese-steps">'
     +steps.map(function(s,i){
-      return '<div class="synthese-step'+(s.done?' done':'')+'" onclick="toggleStep('+i+')">'
+      return '<div class="synthese-step'+(s.done?' done':'')+'" style="position:relative">'
+        +'<div onclick="toggleStep('+i+')" style="cursor:pointer">'
         +'<div class="ss-num">Étape '+(i+1)+'</div>'
         +'<div class="ss-label">'+s.label+'</div>'
         +'<div class="ss-status">'+(s.done?'✅ Fait':'En attente')+'</div>'
+        +'</div>'
+        +'<button onclick="event.stopPropagation();removeStep('+i+')" style="position:absolute;top:4px;right:6px;background:none;border:none;font-size:14px;color:var(--gris);cursor:pointer;padding:2px 5px;line-height:1" title="Supprimer cette étape">×</button>'
         +'</div>';
     }).join('')
     +'</div>';
@@ -4363,6 +4357,10 @@ function addStep(){
   var nsi=document.getElementById('newStepInput');
   var v=nsi?nsi.value.trim():'';
   if(v){steps.push({label:v,done:false});if(nsi)nsi.value='';renderSteps();}
+}
+function removeStep(i){
+  steps.splice(i,1);
+  renderSteps();
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────
