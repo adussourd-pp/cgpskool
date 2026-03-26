@@ -3908,9 +3908,9 @@ function rRetraite(){
   var keys=Object.keys(TAUX);
   // Highlight C1 CSP line
   var datasets=keys.map(function(k,i){var isC=(k===cspKey);return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
-  // C1 point
+  // C1 point (petit point, le label sera dessiné par le plugin)
   var prenom1=(ED.c1.prenom||'Client 1').trim();
-  datasets.push({label:prenom1+' ('+age1+' ans)',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  datasets.push({label:prenom1+' \u2014 '+age1+' ans',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom1,age:age1,taux:tauxClient,color:'#D4622A',idx:ageIdx}});
   // C2 point si couple
   var hasC2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
   var age2=0,ageIdx2=0,tauxC2=0,cspKey2='',prenom2='';
@@ -3921,22 +3921,63 @@ function rRetraite(){
     cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';
     ageIdx2=AGES.reduce(function(bi,a,i){return a>=age2?i:bi;},0);
     tauxC2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageIdx2];
-    // Highlight C2 CSP line too
     var c2LineIdx=keys.indexOf(cspKey2);
     if(c2LineIdx>=0&&cspKey2!==cspKey){datasets[c2LineIdx].borderWidth=3;}
-    datasets.push({label:prenom2+' ('+age2+' ans)',data:AGES.map(function(a,i){return i===ageIdx2?tauxC2:null;}),borderColor:'#2D7A5B',backgroundColor:'#2D7A5B',pointRadius:AGES.map(function(a,i){return i===ageIdx2?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+    datasets.push({label:prenom2+' \u2014 '+age2+' ans',data:AGES.map(function(a,i){return i===ageIdx2?tauxC2:null;}),borderColor:'#2D7A5B',backgroundColor:'#2D7A5B',pointRadius:AGES.map(function(a,i){return i===ageIdx2?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom2,age:age2,taux:tauxC2,color:'#2D7A5B',idx:ageIdx2}});
   }
+  // Plugin custom : dessine un trait vertical + label à côté de chaque point client
+  var clientTagPlugin={id:'clientTagPlugin',afterDraw:function(chart){
+    var ctx3=chart.ctx;
+    chart.data.datasets.forEach(function(ds,dsi){
+      if(!ds._clientTag)return;
+      var tag=ds._clientTag;
+      var meta=chart.getDatasetMeta(dsi);
+      var pt=meta.data[tag.idx];
+      if(!pt)return;
+      var x=pt.x,y=pt.y;
+      var area=chart.chartArea;
+      // Trait vertical pointillé
+      ctx3.save();
+      ctx3.setLineDash([3,3]);
+      ctx3.strokeStyle=tag.color;
+      ctx3.lineWidth=1.5;
+      ctx3.beginPath();
+      ctx3.moveTo(x,y-6);
+      ctx3.lineTo(x,area.top);
+      ctx3.stroke();
+      ctx3.setLineDash([]);
+      // Label tag
+      var txt=tag.name+' \u2014 '+tag.age+' ans ('+tag.taux+'%)';
+      ctx3.font='600 10px Inter,system-ui,sans-serif';
+      var tw=ctx3.measureText(txt).width;
+      var px=8,py=4,br=6;
+      var lx=x-tw/2-px;
+      var ly=area.top-22;
+      if(lx<area.left)lx=area.left+2;
+      if(lx+tw+px*2>area.right)lx=area.right-tw-px*2-2;
+      // Fond arrondi
+      ctx3.fillStyle=tag.color+'18';
+      ctx3.strokeStyle=tag.color+'40';
+      ctx3.lineWidth=1;
+      ctx3.beginPath();
+      ctx3.roundRect(lx,ly,tw+px*2,16+py*2,br);
+      ctx3.fill();
+      ctx3.stroke();
+      // Texte
+      ctx3.fillStyle=tag.color;
+      ctx3.textAlign='left';
+      ctx3.textBaseline='middle';
+      ctx3.fillText(txt,lx+px,ly+8+py);
+      ctx3.restore();
+    });
+  }};
   var ctx=document.getElementById('retChart');
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
-  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}}});
-  // Client tags in header
+  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}},plugins:[clientTagPlugin]});
+  // Remove header tags (now drawn on chart)
   var tagsEl=document.getElementById('retClientTags');
-  if(tagsEl){
-    var th='<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(212,98,42,0.12);color:#D4622A;border:1.5px solid rgba(212,98,42,0.2)"><span style="width:8px;height:8px;border-radius:50%;background:#D4622A"></span>'+prenom1+' \u2014 '+age1+' ans</span>';
-    if(hasC2)th+=' <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(45,122,91,0.1);color:#2D7A5B;border:1.5px solid rgba(45,122,91,0.2)"><span style="width:8px;height:8px;border-radius:50%;background:#2D7A5B"></span>'+prenom2+' \u2014 '+age2+' ans</span>';
-    tagsEl.innerHTML=th;
-  }
+  if(tagsEl)tagsEl.innerHTML='';
   var legEl=document.getElementById('retLegend');
   if(legEl)legEl.innerHTML=keys.map(function(k,i){var isC1=(k===cspKey);var isC2=(hasC2&&k===cspKey2);return'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:'+((isC1||isC2)?'700':'400')+';background:'+((isC1||isC2)?'rgba(212,98,42,0.15)':'rgba(0,0,0,0.04)')+';border:1.5px solid '+((isC1||isC2)?'var(--orange)':'transparent')+';color:'+((isC1||isC2)?'var(--orange-hover)':'#6B6B6B')+'"><span style="width:9px;height:9px;border-radius:50%;background:'+COLORS[i]+';flex-shrink:0"></span>'+k+(isC1?' \u2190 '+tauxClient+'%':'')+(isC2&&!isC1?' \u2190 '+tauxC2+'%':'')+' </span>';}).join('');
   // R8 : pension KPI = salaires seuls (fonciers SCI exclus pour couple, nominatifs seuls si seul)
