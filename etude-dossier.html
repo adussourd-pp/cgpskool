@@ -286,17 +286,17 @@ to{opacity:1;transform:translateY(0)}}
 /* ── FORM ── */
 select.span2{grid-column:span 2}
 
-/* ── PYRAMID ── */
-.pyramid{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-radius:10px;border:1.5px solid}
-.pyr-lv.lt{background:var(--red-l);border-color:rgba(192,57,43,0.25)}
-.pyr-lv.mt{background:var(--o-dim);border-color:var(--ambre-m)}
-.pyr-lv.ct{background:var(--blue-l);border-color:rgba(43,94,167,0.2)}
-.pyr-lv.ep{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
-.pyr-name{font-size:13px;font-weight:600;color:var(--noir)}
-.pyr-desc{font-size:11px;color:var(--gris)}
-.pyr-amt{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir);text-align:right}
-.pyr-pct{font-size:11px;color:var(--gris);text-align:right;margin-top:1px}
+/* ── PYRAMID (forme trapeze empile) ── */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px}
+.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:relative;border:none;border-bottom:2px solid #fff}
+.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c);color:#fff;border-radius:8px 8px 0 0;width:55%}
+.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a);color:#fff;width:72%}
+.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7);color:#fff;width:88%}
+.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74);color:#fff;border-radius:0 0 8px 8px;width:100%}
+.pyr-name{font-size:12px;font-weight:700;color:#fff}
+.pyr-desc{font-size:10px;color:rgba(255,255,255,0.7)}
+.pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;color:#fff;text-align:right}
+.pyr-pct{font-size:10px;color:rgba(255,255,255,0.7);text-align:right;margin-top:1px}
 
 /* ── FISCAL ── */
 .fiscal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bord)}
@@ -405,6 +405,10 @@ select.span2{grid-column:span 2}
   /* ── GRAPHIQUES : éviter la coupure ── */
   canvas{max-width:100%!important}
   .synthese-step{break-inside:avoid}
+  /* ── PAGE DE GARDE ── */
+  .pdf-cover-page{display:block!important;page-break-after:always}
+  /* ── PAGE MENTIONS LÉGALES ── */
+  .pdf-mentions-page{display:block!important;page-break-before:always}
   /* ── EN-TÊTE DE PAGE : conseiller ── */
   .pdf-page-header{display:block!important}
   /* ── PIED DE PAGE : coordonnées conseiller ── */
@@ -441,6 +445,19 @@ select.span2{grid-column:span 2}
 .comment-zone textarea:focus{border-color:var(--ambre);background:#fff}
 .comment-zone textarea::placeholder{color:var(--gris);opacity:0.7}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}}
+
+/* ── PAGE DE GARDE PDF ── */
+.pdf-cover-page{display:none}
+.pdf-cover-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;text-align:center;padding:40px}
+.pdf-cover-logo{margin-bottom:32px}
+.pdf-cover-logo img{max-height:80px;max-width:280px}
+.pdf-cover-title{font-family:var(--sans);font-size:32pt;font-weight:700;color:var(--noir);margin-bottom:12px}
+.pdf-cover-subtitle{font-family:var(--sans);font-size:16pt;color:var(--gris-f);margin-bottom:24px}
+.pdf-cover-date{font-size:12pt;color:var(--gris);margin-bottom:32px}
+.pdf-cover-conseiller{font-size:11pt;color:var(--gris-f);line-height:1.8}
+/* ── PAGE MENTIONS LÉGALES PDF ── */
+.pdf-mentions-page{display:none}
+.pdf-mentions-inner{padding:40px 20px}
 
 /* ── EN-TÊTE PDF (caché à l'écran) ── */
 .pdf-page-header{display:none;padding:8pt 0 10pt;border-bottom:1pt solid #ddd;margin-bottom:14pt;
@@ -512,6 +529,17 @@ select.span2{grid-column:span 2}
 <!-- ════════════════════════════════════════
      0 — IMPORT / SAISIE
 ════════════════════════════════════════ -->
+
+<!-- ── PAGE DE GARDE PDF ── -->
+<div id="pdfCoverPage" class="pdf-cover-page">
+  <div class="pdf-cover-inner">
+    <div id="pdfCoverLogo" class="pdf-cover-logo"></div>
+    <div class="pdf-cover-title">Etude de Dossier</div>
+    <div class="pdf-cover-subtitle" id="pdfCoverClient"></div>
+    <div class="pdf-cover-date" id="pdfCoverDate"></div>
+    <div class="pdf-cover-conseiller" id="pdfCoverConseiller"></div>
+  </div>
+</div>
 
 <!-- ── EN-TÊTE PDF ── -->
 <div class="pdf-page-header" id="pdfPageHeader">
@@ -3074,6 +3102,7 @@ function rSituation(){
     sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
     sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' €/an</span>';
+    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
     sit+='</div>';
     // Col C2
     sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
@@ -3081,13 +3110,13 @@ function rSituation(){
     sit+='<strong>'+n2+'</strong>'+(a2?' — '+a2+' ans':'')+'<br>';
     sit+=(ED.c2.profession||ED.c2.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal2||ED.revenus.c2||0)+' €/an</span>';
+    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
     sit+='</div>';
     sit+='</div>';
     // Commun
     sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
     sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
-    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
@@ -3095,10 +3124,10 @@ function rSituation(){
     sit+='<div class="card" style="margin-bottom:12px;padding:12px">';
     sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
     sit+=(ED.c1.profession||ED.c1.sitpro||'—');
+    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
     sit+='</div>';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
     sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br>'+ED.sitmat+'</div>';
-    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
   }
@@ -3654,7 +3683,7 @@ var COPERNIC = {
   'SCPI de rendement':      {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
     desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
     fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'10 ans+',horizonAns:15},
-  'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'epargne',    icon:'&#127959;',
+  'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'entreprise', icon:'&#127959;',
     desc:'Acquisition de SCPI via une SCI soumise à l’IS : revenus peu imposés grâce à l’amortissement, sortie optimisée',
     fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
   'SCPI de capitalisation': {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
@@ -3666,7 +3695,7 @@ var COPERNIC = {
   'SCPI en nue-propriété':  {cat:'epargne-immo', levier:'transmission',icon:'&#127959;',
     desc:'Achat à prix décoté, aucun revenu ni IFI pendant le démembrement, revalorisation structurelle à terme',
     fiscal:'Pas d’IR ni de revenus pendant la période',sri:'3-4',horizon:'15 ans+',horizonAns:15},
-  'SCPI en usufruit':       {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
+  'SCPI en usufruit':       {cat:'epargne-immo', levier:'entreprise',  icon:'&#127959;',
     desc:'Acquisition de l’usufruit temporaire : rendement boosté pendant la durée, capital non récupéré en fin de démembrement',
     fiscal:'Revenus fonciers taxés à l’IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
   'SCPI financée':          {cat:'epargne-immo', levier:'financement', icon:'&#127959;',
@@ -3674,7 +3703,7 @@ var COPERNIC = {
     fiscal:'Intérêts d’emprunt déductibles des revenus fonciers',sri:'3-4',horizon:'15 ans+',horizonAns:15},
 
   // ─── IMMOBILIER ────────────────────────────────────────────────
-  'LMNP':                   {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+  'LMNP':                   {cat:'immobilier',   levier:'financement', icon:'&#127968;',
     desc:'Location meublée non professionnelle : amortissement du bien sur 20-30 ans, revenus BIC quasi non imposés',
     fiscal:'BIC avec amortissement — revenus très peu imposés',sri:'5',horizon:'20 ans+',horizonAns:20},
   'Denormandie':            {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
@@ -3686,7 +3715,7 @@ var COPERNIC = {
   'LLI':                    {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
     desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
     fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
-  'Loi fiscale (Pinel, Jean Brun…)': {cat:'immobilier',levier:'fiscal',icon:'&#127968;',
+  'Loi fiscale (Pinel, Jean Brun…)': {cat:'immobilier',levier:'financement',icon:'&#127968;',
     desc:'Dispositifs de défiscalisation immobilière (Pinel+, Jean Brun…) : réduction IR en contrepartie d’un engagement de location',
     fiscal:'Réduction IR plafonnée niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
 
@@ -3800,70 +3829,117 @@ function rPreconisations(){
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  MATRICE COPERNIC                                              ║
 // ╚══════════════════════════════════════════════════════════════════╝
+// Mapping levier interne -> catégorie affichée
+var LEVIER_CATEGORIES = [
+  {key:’placement’,   label:’Placement’,   icon:’&#128176;’, color:’#2B5EA7’, bg:’#EDF2FB’,
+   match:[‘epargne’,’transmission’]},
+  {key:’fiscal’,      label:’Fiscal’,      icon:’&#128200;’, color:’#D4622A’, bg:’rgba(212,98,42,0.08)’,
+   match:[‘fiscal’]},
+  {key:’financement’, label:’Financement’, icon:’&#127968;’, color:’#2D7A5B’, bg:’#EAF5EF’,
+   match:[‘financement’]},
+  {key:’entreprise’,  label:’Entreprise’,  icon:’&#127981;’, color:’#7B5EA7’, bg:’#F3EDF9’,
+   match:[‘entreprise’]}
+];
+
+function getLevierCategory(levier){
+  for(var i=0;i<LEVIER_CATEGORIES.length;i++){
+    if(LEVIER_CATEGORIES[i].match.indexOf(levier)>=0) return LEVIER_CATEGORIES[i].key;
+  }
+  return ‘placement’;
+}
+
 function buildMatriceObjSol(impot,capa,aSum){
   var activeObjs=[];
-  if(ED.epMens>100||aSum>5000)activeObjs.push('Épargne / capitalisation');
-  if(impot>=2000)activeObjs.push('Optimiser son IR');
-  if(ED.fiscal.rbg>1300000)activeObjs.push('Optimiser son IFI');
-  if(capa>200)activeObjs.push('Se créer un complément de revenus');
-  if(capa>300)activeObjs.push('Investir via le financement');
-  if(aSum>300000)activeObjs.push('Optimiser la transmission');
-  if(ED.objectifs&&ED.objectifs.length){ED.objectifs.forEach(function(o){var ol=o.toLowerCase();if(ol.includes('retraite'))activeObjs.push('Préparer sa retraite');if(ol.includes('transm'))activeObjs.push('Optimiser la transmission');if(ol.includes('revenu'))activeObjs.push('Se créer un complément de revenus');if(ol.includes('capital')||ol.includes('epargne')||ol.includes('fructif'))activeObjs.push('Faire fructifier un capital');if(ol.includes('reorgan'))activeObjs.push('Réorganiser son patrimoine');if(ol.includes('conjoint')||ol.includes('protect'))activeObjs.push('Protéger son conjoint');if(ol.includes('fisc')||ol.includes('impot'))activeObjs.push('Optimiser son IR');});}
+  if(ED.epMens>100||aSum>5000)activeObjs.push(‘Épargne / capitalisation’);
+  if(impot>=2000)activeObjs.push(‘Optimiser son IR’);
+  if(ED.fiscal.rbg>1300000)activeObjs.push(‘Optimiser son IFI’);
+  if(capa>200)activeObjs.push(‘Se créer un complément de revenus’);
+  if(capa>300)activeObjs.push(‘Investir via le financement’);
+  if(aSum>300000)activeObjs.push(‘Optimiser la transmission’);
+  if(ED.objectifs&&ED.objectifs.length){ED.objectifs.forEach(function(o){var ol=o.toLowerCase();if(ol.includes(‘retraite’))activeObjs.push(‘Préparer sa retraite’);if(ol.includes(‘transm’))activeObjs.push(‘Optimiser la transmission’);if(ol.includes(‘revenu’))activeObjs.push(‘Se créer un complément de revenus’);if(ol.includes(‘capital’)||ol.includes(‘epargne’)||ol.includes(‘fructif’))activeObjs.push(‘Faire fructifier un capital’);if(ol.includes(‘reorgan’))activeObjs.push(‘Réorganiser son patrimoine’);if(ol.includes(‘conjoint’)||ol.includes(‘protect’))activeObjs.push(‘Protéger son conjoint’);if(ol.includes(‘fisc’)||ol.includes(‘impot’))activeObjs.push(‘Optimiser son IR’);});}
   activeObjs=activeObjs.filter(function(v,i,a){return a.indexOf(v)===i;});
-  if(!activeObjs.length)activeObjs=['Épargne / capitalisation'];
+  if(!activeObjs.length)activeObjs=[‘Épargne / capitalisation’];
 
-  // Collect all unique solutions across active objectives
-  var allSols={};
+  // Collect matching solutions (from objectives)
+  var matchedSols={};
   activeObjs.forEach(function(obj){
     (OBJ_SOLUTIONS[obj]||[]).forEach(function(s){
-      if(!allSols[s])allSols[s]={produit:s,objectifs:[]};
-      allSols[s].objectifs.push(obj);
+      if(!matchedSols[s])matchedSols[s]={produit:s,objectifs:[]};
+      matchedSols[s].objectifs.push(obj);
     });
   });
 
-  var html='';
+  var html=’’;
 
   // Objectifs detected banner
-  var hasFinancement=activeObjs.indexOf('Investir via le financement')>=0;
-  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">';
-  html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs détectés :</span>';
+  var hasFinancement=activeObjs.indexOf(‘Investir via le financement’)>=0;
+  html+=’<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--bord)">’;
+  html+=’<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);align-self:center;margin-right:4px">Objectifs detectes :</span>’;
   activeObjs.forEach(function(obj){
-    html+='<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">'+obj+'</span>';
+    html+=’<span style="background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px">’+obj+’</span>’;
   });
-  html+='</div>';
+  html+=’</div>’;
   if(hasFinancement){
-    html+='<div style="margin-bottom:14px;padding:10px 14px;background:var(--green-l);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--gris-f)">';
-    html+='<strong style="color:var(--green)">&#10003; Levier financement activé</strong> — La capacité d’emprunt permet d’acquérir un actif immobilier dont les loyers couvrent partiellement les mensualités. Sélectionnez une solution ci-dessous.';
-    html+='</div>';
+    html+=’<div style="margin-bottom:14px;padding:10px 14px;background:var(--green-l);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--gris-f)">’;
+    html+=’<strong style="color:var(--green)">&#10003; Levier financement active</strong> — La capacite d\’emprunt permet d\’acquerir un actif immobilier dont les loyers couvrent partiellement les mensualites. Selectionnez une solution ci-dessous.’;
+    html+=’</div>’;
   }
 
-  // Solutions grid: each card shows name + tags + checkbox
-  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">';
-  Object.keys(allSols).forEach(function(s){
-    var cp=COPERNIC[s];if(!cp)return;
-    var isSelected=solsSelectionnees.some(function(r){return r.produit===s;});
-    var bid='btn_sol_'+s.replace(/[^a-zA-Z0-9]/g,'_');
-    var objPills=allSols[s].objectifs.map(function(o){
-      var short={'Épargne / capitalisation':'Capitalisation','Optimiser son IR':'Fiscal IR','Se créer un complément de revenus':'Revenus','Optimiser la transmission':'Transmission','Préparer sa retraite':'Retraite','Optimiser son IFI':'Fiscal IFI','Faire fructifier un capital':'Capital','Réorganiser son patrimoine':'Reorganisation','Protéger son conjoint':'Protection'};
-      return '<span style="background:rgba(212,98,42,0.12);color:var(--orange-hover);font-size:9px;padding:1px 6px;border-radius:10px">'+( short[o]||o)+'</span>';
-    }).join('');
-
-    html+='<div id="'+bid+'" onclick="toggleSolution(\''+s+'\')" style="cursor:pointer;border-radius:10px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'rgba(45,122,91,0.06)':'#fff')+';padding:10px 12px;transition:all 0.15s;user-select:none" onmouseover="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--ambre)\'" onmouseout="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--bord)\'">';
-    html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">';
-    html+='<div style="font-size:12px;font-weight:600;color:var(--noir)">'+s+'</div>';
-    html+='<div style="width:16px;height:16px;border-radius:4px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'#2D7A5B':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff">'+(isSelected?'&#10003;':'')+'</div>';
-    html+='</div>';
-    html+='<div style="font-size:10px;color:var(--gris);line-height:1.5;margin-bottom:6px">'+cp.desc.substring(0,60)+(cp.desc.length>60?'...':'')+'</div>';
-    html+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">'+objPills+'</div>';
-    html+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
-    html+='<span style="background:var(--ambre-l);color:var(--ambre-d);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">SRI '+cp.sri+'</span>';
-    html+='<span style="background:var(--blue-l);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:9px">'+cp.horizon+'</span>';
-    html+='</div>';
-    html+='</div>';
+  // Group ALL COPERNIC solutions by levier category
+  var groups={placement:[],fiscal:[],financement:[],entreprise:[]};
+  Object.keys(COPERNIC).forEach(function(s){
+    var cp=COPERNIC[s];
+    var cat=getLevierCategory(cp.levier||’epargne’);
+    groups[cat].push(s);
   });
-  html+='</div>';
 
-  var el=document.getElementById('matriceObjSol');if(el)el.innerHTML=html;
+  // Render each levier category
+  LEVIER_CATEGORIES.forEach(function(lev){
+    var sols=groups[lev.key]||[];
+    if(!sols.length) return;
+    // Section header
+    html+=’<div style="margin-top:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px">’;
+    html+=’<span style="font-size:16px">’+lev.icon+’</span>’;
+    html+=’<span style="font-family:var(--sans);font-weight:700;font-size:13px;color:’+lev.color+’">’+lev.label+’</span>’;
+    html+=’<span style="flex:1;height:1px;background:’+lev.color+’22"></span>’;
+    html+=’<span style="font-size:10px;color:var(--gris)">’+sols.length+’ solution’+(sols.length>1?’s’:’’)+’</span>’;
+    html+=’</div>’;
+    html+=’<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">’;
+    sols.forEach(function(s){
+      var cp=COPERNIC[s];if(!cp)return;
+      var isMatched=!!matchedSols[s];
+      var isSelected=solsSelectionnees.some(function(r){return r.produit===s;});
+      var bid=’btn_sol_’+s.replace(/[^a-zA-Z0-9]/g,’_’);
+      var objPills=’’;
+      if(isMatched){
+        var short={‘Épargne / capitalisation’:’Capitalisation’,’Optimiser son IR’:’Fiscal IR’,’Se créer un complément de revenus’:’Revenus’,’Optimiser la transmission’:’Transmission’,’Préparer sa retraite’:’Retraite’,’Optimiser son IFI’:’Fiscal IFI’,’Faire fructifier un capital’:’Capital’,’Réorganiser son patrimoine’:’Reorganisation’,’Protéger son conjoint’:’Protection’,’Investir via le financement’:’Financement’,’Créer un patrimoine immobilier’:’Immobilier’};
+        objPills=matchedSols[s].objectifs.map(function(o){
+          return ‘<span style="background:rgba(212,98,42,0.12);color:var(--orange-hover);font-size:9px;padding:1px 6px;border-radius:10px">’+(short[o]||o)+’</span>’;
+        }).join(‘’);
+      }
+      var opacity=isMatched||isSelected?’1’:’0.45’;
+      var borderCol=isSelected?’#2D7A5B’:isMatched?’var(--bord)’:’#e0ddd8’;
+      var bgCol=isSelected?’rgba(45,122,91,0.06)’:isMatched?’#fff’:’#fafaf8’;
+
+      html+=’<div id="’+bid+’" onclick="toggleSolution(\’’+s.replace(/’/g,"\\’")+’\’)" style="cursor:pointer;border-radius:10px;border:1.5px solid ‘+borderCol+’;background:’+bgCol+’;padding:10px 12px;transition:all 0.15s;user-select:none;opacity:’+opacity+’" onmouseover="this.style.opacity=1;this.style.borderColor=this.style.borderColor===\’#2D7A5B\’?\’#2D7A5B\’:\’var(--ambre)\’" onmouseout="this.style.opacity=’+(isMatched||isSelected?’1’:’0.45’)+’;if(this.style.borderColor!==\’#2D7A5B\’)this.style.borderColor=\’’+(isMatched?’var(--bord)’:’#e0ddd8’)+’\’">’;
+      html+=’<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">’;
+      html+=’<div style="font-size:12px;font-weight:600;color:var(--noir)">’+s+’</div>’;
+      html+=’<div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ‘+(isSelected?’#2D7A5B’:’var(--bord)’)+’;background:’+(isSelected?’#2D7A5B’:’transparent’)+’;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff">’+(isSelected?’&#10003;’:’’)+’</div>’;
+      html+=’</div>’;
+      html+=’<div style="font-size:10px;color:var(--gris);line-height:1.5;margin-bottom:6px">’+cp.desc.substring(0,60)+(cp.desc.length>60?’...’:’’)+’</div>’;
+      if(objPills) html+=’<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">’+objPills+’</div>’;
+      if(!isMatched&&!isSelected) html+=’<div style="font-size:9px;color:var(--gris);font-style:italic;margin-bottom:4px">Non recommande — activable manuellement</div>’;
+      html+=’<div style="display:flex;gap:4px;flex-wrap:wrap">’;
+      html+=’<span style="background:’+lev.bg+’;color:’+lev.color+’;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">’+lev.label+’</span>’;
+      html+=’<span style="background:var(--ambre-l);color:var(--ambre-d);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">SRI ‘+cp.sri+’</span>’;
+      html+=’<span style="background:var(--blue-l);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:9px">’+cp.horizon+’</span>’;
+      html+=’</div>’;
+      html+=’</div>’;
+    });
+    html+=’</div>’;
+  });
+
+  var el=document.getElementById(‘matriceObjSol’);if(el)el.innerHTML=html;
 }
 
 
@@ -4694,22 +4770,29 @@ function markDone(){
   updateProgress();
 }
 // ── Couleurs personnalisées ──
+// Applique les couleurs perso UNIQUEMENT sur titres, sous-titres et dots
+// Les boutons, badges, cards et nav restent dans le style CGP Skool
 function applyColors(){
   var c1=document.getElementById('pColor1');
   var c2=document.getElementById('pColor2');
   if(!c1||!c2)return;
   var color1=c1.value||'#D4622A';
   var color2=c2.value||'#181614';
-  // Générer les variantes
-  document.documentElement.style.setProperty('--ambre',color1);
-  document.documentElement.style.setProperty('--ambre-d',color1);
-  document.documentElement.style.setProperty('--orange',color1);
-  document.documentElement.style.setProperty('--orange-hover',color2);
-  document.documentElement.style.setProperty('--o-dim',color1+'1a');
-  document.documentElement.style.setProperty('--ambre-l',color1+'18');
-  document.documentElement.style.setProperty('--ambre-m',color1+'4d');
-  document.documentElement.style.setProperty('--noir',color2);
-  document.documentElement.style.setProperty('--ink',color2);
+  // Appliquer via custom properties scopees
+  document.documentElement.style.setProperty('--custom-accent',color1);
+  document.documentElement.style.setProperty('--custom-ink',color2);
+  // Injecter ou mettre a jour le style scope
+  var styleId='customColorStyle';
+  var st=document.getElementById(styleId);
+  if(!st){st=document.createElement('style');st.id=styleId;document.head.appendChild(st);}
+  st.textContent=
+    '.sec-h1{color:'+color2+'!important}'+
+    '.sec-tag{color:'+color1+'!important}'+
+    '.sec-sub{color:'+color2+'88!important}'+
+    '.card-title .dot{background:'+color1+'!important}'+
+    '.step-dot{background:'+color1+'!important}'+
+    '.pdf-page-header-nom{color:'+color2+'!important}'+
+    '.preco-panel.avant .preco-panel-title{color:'+color1+'!important}';
   saveProfil();
 }
 function loadColors(){
@@ -5158,17 +5241,54 @@ function updatePdfHeader() {
   var p = loadProfil ? loadProfil() : {};
   var nom = ED.c1.prenom ? (ED.c1.prenom + ' ' + (ED.c1.nom||'')) : 'Client';
   if (ED.type !== 'seul' && ED.c2 && ED.c2.prenom) nom += ' & ' + ED.c2.prenom + ' ' + (ED.c2.nom||'');
+  var dateStr = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
 
   var headerNom = document.getElementById('pdfHeaderNom');
   var headerDate = document.getElementById('pdfHeaderDate');
   var headerRight = document.getElementById('pdfHeaderRight');
 
-  if (headerNom) headerNom.textContent = 'Étude de Dossier — ' + nom.trim();
-  if (headerDate) headerDate.textContent = 'Réalisée le ' + new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+  if (headerNom) headerNom.textContent = 'Etude de Dossier — ' + nom.trim();
+  if (headerDate) headerDate.textContent = 'Realisee le ' + dateStr;
   if (headerRight && p && p.nom) {
     headerRight.innerHTML = (p.prenom ? p.prenom + ' ' + p.nom : p.nom)
       + (p.cabinet ? '<br>' + p.cabinet : '')
-      + (p.orias ? '<br>ORIAS n° ' + p.orias : '');
+      + (p.orias ? '<br>ORIAS n\u00b0 ' + p.orias : '');
+  }
+
+  // Page de garde
+  var coverClient = document.getElementById('pdfCoverClient');
+  var coverDate = document.getElementById('pdfCoverDate');
+  var coverConseiller = document.getElementById('pdfCoverConseiller');
+  var coverLogo = document.getElementById('pdfCoverLogo');
+  if (coverClient) coverClient.textContent = nom.trim();
+  if (coverDate) coverDate.textContent = dateStr;
+  if (coverConseiller && p && p.nom) {
+    var lines = [];
+    lines.push((p.prenom||'') + ' ' + (p.nom||''));
+    if (p.cabinet) lines.push(p.cabinet);
+    if (p.tel) lines.push(p.tel);
+    if (p.email) lines.push(p.email);
+    coverConseiller.innerHTML = lines.join('<br>');
+  }
+  if (coverLogo) {
+    try {
+      var logo = localStorage.getItem('cgpskool_logo');
+      if (logo) coverLogo.innerHTML = '<img src="' + logo + '" style="max-height:80px;max-width:280px">';
+    } catch(e) {}
+  }
+
+  // Page mentions legales
+  var mentionsContent = document.getElementById('pdfMentionsContent');
+  var mentionsFooter = document.getElementById('pdfMentionsFooter');
+  if (mentionsContent && p && p.mentions) {
+    mentionsContent.innerHTML = p.mentions.replace(/\n/g, '<br>');
+  }
+  if (mentionsFooter && p && p.nom) {
+    var foot = '<strong>' + ((p.prenom||'') + ' ' + (p.nom||'')).trim() + '</strong>';
+    if (p.cabinet) foot += ' — ' + p.cabinet;
+    if (p.orias) foot += '<br>ORIAS n\u00b0 ' + p.orias + ' — www.orias.fr';
+    if (p.adresse) foot += '<br>' + p.adresse + (p.cp || p.ville ? ', ' + (p.cp||'') + ' ' + (p.ville||'') : '');
+    mentionsFooter.innerHTML = foot;
   }
 }
 
@@ -5274,6 +5394,20 @@ window.addEventListener('afterprint', function() {
 <!-- Zone pied de page PDF (cachée en écran, visible à l'impression) -->
 <div id="pdfConseillerFooter" class="pdf-conseiller-footer"></div>
 
+<!-- ── PAGE MENTIONS LÉGALES PDF ── -->
+<div id="pdfMentionsPage" class="pdf-mentions-page">
+  <div class="pdf-mentions-inner">
+    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir);margin-bottom:16px">Mentions legales</div>
+    <div id="pdfMentionsContent" style="font-size:10px;color:var(--gris-f);line-height:1.8"></div>
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid var(--bord);font-size:9px;color:var(--gris);line-height:1.6;font-style:italic">
+      Les simulations presentees dans ce document ne constituent en aucun cas une promesse de rendement.
+      Les performances passees ne prejugent pas des performances futures.
+      Tout investissement comporte des risques, y compris de perte en capital.
+      Ce document est strictement confidentiel et destine uniquement a l'usage du client designe.
+    </div>
+    <div id="pdfMentionsFooter" style="margin-top:24px;text-align:center"></div>
+  </div>
+</div>
 
 </body>
 </html>
