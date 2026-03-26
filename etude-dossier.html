@@ -1204,11 +1204,8 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section</div><div class="sec-h1">Avis clients</div></div>
   </div>
 
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Avis clients</div>
-    <div id="avisPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8;min-height:40px">
-      <em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>
-    </div>
+  <div id="avisPreview">
+    <em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>
   </div>
 
   <div class="page-number"></div>
@@ -6489,23 +6486,35 @@ function renderAvisPreview(){
     }
     var h='';
     if(avis.length){
-      h+='<div style="margin-bottom:8px;font-weight:700;color:var(--noir)">'+avis.length+' avis client'+(avis.length>1?'s':'')+'</div>';
+      // Moyenne des notes
+      var avg=avis.reduce(function(s,a){return s+(a.stars||0);},0)/avis.length;
+      var avgStars='';
+      for(var si=0;si<5;si++)avgStars+='<span style="color:'+(si<Math.round(avg)?'#D4622A':'#ddd')+';font-size:18px">&#9733;</span>';
+      h+='<div style="text-align:center;margin-bottom:24px">';
+      h+='<div style="font-size:32px;font-weight:700;color:var(--noir)">'+avg.toFixed(1)+'<span style="font-size:16px;color:var(--gris);font-weight:400"> / 5</span></div>';
+      h+='<div style="margin:4px 0">'+avgStars+'</div>';
+      h+='<div style="font-size:12px;color:var(--gris)">'+avis.length+' avis client'+(avis.length>1?'s':'')+'</div>';
+      h+='</div>';
+
+      h+='<div style="display:grid;grid-template-columns:'+(avis.length===1?'1fr':'1fr 1fr')+';gap:14px">';
       avis.forEach(function(a){
         var starsHtml='';
-        for(var i=0;i<5;i++)starsHtml+='<span style="color:'+(i<a.stars?'#D4622A':'#ddd')+';font-size:14px">&#9733;</span>';
-        h+='<div style="padding:10px 0;border-bottom:1px solid var(--bord)">';
-        h+='<div style="display:flex;justify-content:space-between;align-items:center">';
-        h+='<strong style="font-size:13px">'+a.name+'</strong>';
-        h+='<span>'+starsHtml+'</span>';
+        for(var i=0;i<5;i++)starsHtml+='<span style="color:'+(i<a.stars?'#D4622A':'#ddd')+';font-size:12px">&#9733;</span>';
+        h+='<div style="background:var(--gris-l);border-radius:12px;padding:16px 18px">';
+        h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+        h+='<div style="width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">\uD83E\uDDD1</div>';
+        h+='<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;color:var(--noir)">'+a.name+'</div>';
+        h+='<div>'+starsHtml+'</div></div>';
         h+='</div>';
-        if(a.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+a.text+'</div>';
+        if(a.text)h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.6;font-style:italic">\u00ab '+a.text+' \u00bb</div>';
         h+='</div>';
       });
+      h+='</div>';
     }
     if(lien){
-      h+='<div style="margin-top:16px;padding:14px;background:var(--gris-l);border-radius:10px;text-align:center">';
-      h+='<div style="font-size:11px;color:var(--gris);margin-bottom:6px">Votre avis compte pour nous</div>';
-      h+='<a href="'+lien+'" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border-radius:8px;text-decoration:none">Laisser un avis</a>';
+      h+='<div style="margin-top:20px;padding:16px;background:var(--gris-l);border-radius:12px;text-align:center">';
+      h+='<div style="font-size:12px;color:var(--gris);margin-bottom:8px">Votre avis compte pour nous</div>';
+      h+='<a href="'+lien+'" target="_blank" style="display:inline-block;padding:10px 24px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;border-radius:8px;text-decoration:none">Laisser un avis</a>';
       h+='</div>';
     }
     el.innerHTML=h;
