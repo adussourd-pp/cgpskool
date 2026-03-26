@@ -824,7 +824,7 @@ function renderEntreprise(){
 
 function er(label,val,col,highlight){
   const colorClass=col?` class="ent-row-val ${col}"`:'class="ent-row-val"';
-  return `<div class="ent-row${highlight?' highlight':''}""><span class="ent-row-label">${label}</span><span ${colorClass}>${val}</span></div>`;
+  return `<div class="ent-row${highlight?' highlight':''}"><span class="ent-row-label">${label}</span><span ${colorClass}>${val}</span></div>`;
 }
 
 function nprow(label,val,extra,col){
@@ -884,11 +884,11 @@ function renderBarNP(res){
     options:{
       responsive:true,maintainAspectRatio:false,indexAxis:'y',
       plugins:{
-        legend:{position:'bottom',labels:{font:{family:'Outfit',size:11},padding:14}},
+        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:14}},
         tooltip:{callbacks:{label:ctx=>ctx.dataset.label}}
       },
       scales:{
-        x:{stacked:true,min:0,ticks:{callback:v=>fmt(v)+' €',font:{family:'Outfit',size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{stacked:true,min:0,ticks:{callback:v=>fmt(v)+' €',font:{family:'Inter',size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
         y:{stacked:true,display:false}
       }
     }
@@ -901,7 +901,7 @@ function renderChart(labels,datasets){
   chartInstance=new Chart(document.getElementById('mainChart').getContext('2d'),{
     type:'line',
     data:{labels,datasets:datasets.map(d=>({label:d.label,data:d.data,borderColor:d.color,backgroundColor:d.color+'18',fill:true,tension:0.4,borderWidth:2.5,pointRadius:3,pointHoverRadius:7,pointBackgroundColor:d.color}))},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:var_='rgba(13,13,13,0.92)',borderColor:'rgba(240,167,56,0.3)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:12,callbacks:{label:ctx=>ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'var(--gris)',font:{family:'Outfit',size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'var(--gris)',font:{family:'Outfit',size:10},callback:v=>fmt(v)+' €'}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:var_='rgba(13,13,13,0.92)',borderColor:'rgba(240,167,56,0.3)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:12,callbacks:{label:ctx=>ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10},callback:v=>fmt(v)+' €'}}}}
   });
   document.getElementById('chartLegend').innerHTML=datasets.map(d=>`<span><span class="leg-dot" style="background:${d.color}"></span>${d.label}</span>`).join('');
 }

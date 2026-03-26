@@ -876,10 +876,10 @@ function render(d){
       {label:'Dividendes',data:d.tab.map(r=>r.divM),backgroundColor:'rgba(45,122,91,0.25)',borderColor:'#2D7A5B',borderWidth:1.5,borderRadius:3}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{family:'Outfit',size:10},padding:8}},
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},padding:8}},
         tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+' €'}}},
-      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Outfit',size:9}}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Outfit',size:9},callback:v=>fmt(v)+' €'}}}}
+      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:9}}},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:9},callback:v=>fmt(v)+' €'}}}}
   });
 
   if(cPie)cPie.destroy();
@@ -889,7 +889,7 @@ function render(d){
     data:{labels:['Financé par les dividendes','Effort client'],
       datasets:[{data:[loyers,eff],backgroundColor:['rgba(45,122,91,0.65)','rgba(240,167,56,0.65)'],borderColor:['#2D7A5B','#F0A738'],borderWidth:2,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
-      plugins:{legend:{position:'bottom',labels:{font:{family:'Outfit',size:10},padding:8}},
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},padding:8}},
         tooltip:{callbacks:{label:c=>{const t=loyers+eff;return c.label+': '+fmt(c.raw)+' € ('+Math.round(c.raw/t*100)+'%)';}}}}
     }
   });

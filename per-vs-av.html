@@ -487,6 +487,7 @@ var TMI_LIST = [0, 0.11, 0.30, 0.41, 0.45];
 
 // Graphiques
 var evolutionChartInst = null;
+var recapChartInst = null;
 
 // ── Helpers ──
 function fmt(n) {
@@ -722,7 +723,7 @@ function setTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'detail') { setTimeout(function() { renderEvolutionChart(getParams()); renderDiffGauge(0); recalc(); }, 50); }
+  if (name === 'detail') { setTimeout(function() { renderEvolutionChart(getParams()); recalc(); }, 50); }
 }
 
 function setTMI(type, val, btn) {

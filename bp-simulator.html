@@ -520,7 +520,7 @@ function recalc() {
     var caPerso        = vaPerso * tpc * pvPerso;
     var caPrimeQualite = vaPerso * primeQualite * pvPerso;
     var comDemarrage   = isManager ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
-    var comExpansion   = branchesActives > 0 ? vaEquipeNiv1 * 0.5 * 0.01 * pvNiv1 : 0;
+    var comExpansion   = branchesActives > 0 ? vaEquipeNiv1 * 0.01 * pvNiv1 : 0;
     var comDevelop     = branchesActives > 0 ? vaEquipeNiv2 * 0.005 * pvNiv2 : 0;
     var caTotal        = caPerso + caPrimeQualite + comDemarrage + comExpansion + comDevelop;
 
@@ -794,7 +794,7 @@ function recalc() {
       labels: rows.map(r=>'An '+r.an),
       datasets: [
         { label: 'Encours cumulé', data: rows.map(r=>Math.round(r.encoursCumule)), borderColor:'#181614', backgroundColor:'rgba(24,22,20,0.05)', fill:true, borderWidth:2, pointRadius:3, tension:0.4, yAxisID:'y' },
-        { label: 'Com. récurrente / an', data: rows.map(r=>Math.round(r.comRec)), borderColor:'var(--orange)', backgroundColor:'rgba(212,98,42,0.08)', fill:false, borderWidth:2.5, pointRadius:4, tension:0.4, yAxisID:'y2' },
+        { label: 'Com. récurrente / an', data: rows.map(r=>Math.round(r.comRec)), borderColor:'#D4622A', backgroundColor:'rgba(212,98,42,0.08)', fill:false, borderWidth:2.5, pointRadius:4, tension:0.4, yAxisID:'y2' },
       ]
     },
     options: { responsive:true, maintainAspectRatio:false,

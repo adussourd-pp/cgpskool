@@ -74,8 +74,8 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 | Reste à vivre | 5 834 EUR |
 | IR net | 13 670 EUR |
 | TMI | 41 % |
-| Pension (67 ans, Sal. cadre) | 4 791 EUR/mois |
-| Impact mensuel (souh. 3 500 EUR) | +1 291 EUR (surplus) |
+| Pension (67 ans, Sal. cadre) | 4 704 EUR/mois (taux interpolé 54%) |
+| Impact mensuel (souh. 3 500 EUR) | +1 204 EUR (surplus) |
 
 ---
 
@@ -87,7 +87,7 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 - [ ] Structure HTML : script avant /script avant /body
 - [ ] Test Alexia : revMens() = 4 326 EUR
 - [ ] Test Mathieu : endett = 33,0 %
-- [ ] Test Mathieu : pension = 4 791 EUR
+- [ ] Test Mathieu : pension = 4 704 EUR (taux interpolé 54%)
 
 ---
 
@@ -195,10 +195,11 @@ PDF attendu : pension **465 EUR**, impact foyer **-535 EUR** ok
 
 ```
 revBrutMensuel = 104 551 / 12 = 8 713 EUR/mois  (pas de fonciers)
-pension        = floor(8 713 × 55 / 100) = 4 791 EUR/mois
-manque         = 3 500 - 4 791 = -1 291 EUR/mois  <- surplus
+taux           = interpolation(47 ans, cadre) = 54 + (47-45)/(50-45)*(55-54) = 54.4 -> arrondi 54%
+pension        = floor(8 713 × 54 / 100) = 4 704 EUR/mois
+manque         = 3 500 - 4 704 = -1 204 EUR/mois  <- surplus
 ```
-PDF attendu : pension **4 791 EUR**, impact **+1 291 EUR** ok
+PDF attendu : pension **4 704 EUR**, impact **+1 204 EUR** ok
 
 ---
 
@@ -281,7 +282,7 @@ impactRetraite = manque × espVie                  (EUR total)
 Interpoler entre deux colonnes si l'âge est entre deux valeurs.
 
 **Vérifications :**
-- Mathieu, 47 ans, Sal. cadre -> entre 45 (54%) et 50 (55%) -> ~55% ok
+- Mathieu, 47 ans, Sal. cadre -> entre 45 (54%) et 50 (55%) -> interpolé 54% (54.4 arrondi)
 - Eric, 50 ans, Sal. cadre -> 55% ok
 - Marie Aude, 48 ans, Sal. non cadre -> entre 45 (60%) et 50 (64%) -> ~62% ok
 - Alexia, 30 ans, Sal. cadre -> 48% ok
@@ -543,3 +544,100 @@ Format : "DOCUMENT D'ENTREE EN RELATION - Fiche d'informations legales"
 Le parser detecte les mots tout en majuscules en debut de chaine et inverse si necessaire.
 
 **Test valide sur** : document Stellium/Peak Patrimoine (Alexandre DUSSOURD)
+
+---
+
+## RÈGLE R18 -- Pondération salaires par âge
+
+Le coefficient de pondération des salaires pour le calcul des revenus mensuels dépend de l'âge moyen du foyer :
+
+```js
+var txSal = ageMoy >= 57 ? 0.70 : 1.00;
+```
+
+| Âge moyen foyer | Salaires | Fonciers | Retraite | Capitaux mobiliers |
+|---|---|---|---|---|
+| < 57 ans | 100% | 70% | 100% | 100% |
+| >= 57 ans | 70% | 70% | 100% | 100% |
+
+**Source :** onglet "Config_Revenus" du fichier Excel ED_RI.
+
+---
+
+## RÈGLE R19 -- Interpolation linéaire (taux retraite et espérance de vie)
+
+`getRetTaux()` et `getEspVie()` doivent **interpoler linéairement** entre deux paliers, pas utiliser le ceiling (arrondi au palier supérieur) ni le floor.
+
+```js
+// CORRECT — interpolation linéaire
+var t = (age - ageBas) / (ageHaut - ageBas);
+return Math.round(tauxBas + t * (tauxHaut - tauxBas));
+
+// INTERDIT — ceiling (ancien comportement)
+for (var i=0; i<AGES.length; i++) { if (AGES[i]>=age) idx=i; }
+return arr[idx];
+```
+
+**Vérification :**
+- Marie Aude, 48 ans, non cadre : entre 45 (60%) et 50 (64%) → 62% (pas 64%)
+- Mathieu, 47 ans, cadre : entre 45 (54%) et 50 (55%) → 54% (pas 55%)
+- Sur un âge exact (50, 60, 65...) : la valeur du palier est retournée telle quelle.
+
+---
+
+## RÈGLE R20 -- Ne jamais redéclarer CSP_MAP localement
+
+Le mapping `CSP_MAP` est défini dans `data.js` et couvre toutes les variantes (avec/sans accents, labels RI, etc.). Ne jamais le redéclarer dans une fonction locale — cela crée un risque de désynchronisation.
+
+```js
+// INTERDIT — CSP_MAP local dans rRetraite()
+var CSP_MAP = {'Fonctionnaire':'Fonctionnaire', ...};
+CSP_MAP["Chef d'entreprise"] = 'TNS artisan';  // 'TNS artisan' n'existe pas !
+
+// CORRECT — utiliser le global de data.js
+var key = CSP_MAP[csp];  // renvoie 'TNS comer.' pour "Chef d'entreprise"
+```
+
+**Symptôme :** pension fausse pour les chefs d'entreprise (fallback silencieux sur 'Sal. cadre').
+
+---
+
+## RÈGLE R21 -- Chart.js : pas de CSS custom properties dans le canvas
+
+Les propriétés CSS custom (`var(--orange)`, `var(--gris)`) ne sont **pas résolues** dans un contexte canvas 2D (Chart.js). Toujours utiliser des couleurs hex ou rgba.
+
+```js
+// INTERDIT — dans un dataset Chart.js
+borderColor: 'var(--orange)'    // → rendu noir
+color: 'var(--gris)'            // → ignoré
+
+// CORRECT
+borderColor: '#D4622A'
+color: 'rgba(24,22,20,0.55)'
+```
+
+**Police :** utiliser `'Inter'` (pas `'Outfit'`) dans toutes les configs Chart.js pour rester cohérent avec le design system.
+
+---
+
+## RÈGLE R22 -- Parser mammoth = mêmes protections que parser Format-A
+
+Le fichier `etude-dossier.html` contient deux chemins de parsing (mammoth pour Word, Format-A pour paste). Les deux doivent implémenter :
+
+- **R10** : regex foncier restrictif (`/revenus fonciers|location.meuble/i` + exclusion `immobilier.*foncier`)
+- **R13** : distinction `_foncSpecific` vs `_foncCategory` (préférer spécifique)
+- **R16** : distinction `_salSpecific` vs `_salCategory` (préférer spécifique)
+
+Toute modification du parsing dans un chemin doit être répliquée dans l'autre.
+
+---
+
+## SOURCES DE DONNÉES VALIDÉES
+
+| Source | Date | Fichiers impactés |
+|---|---|---|
+| Excel ED_RI_62 (Omnium Finance) | 2025 | data.js (barème IR, taux retraite, espérance vie, actifs, solutions) |
+| PMR Prodémial — Convention Cadre Annexe 1 | nov. 2021 | bp-simulator.html (TPC, commissions, qualifications) |
+| Doc Suravenir — Cristalliance Avenir | 01/01/2026 | comparatif-cgp.html (frais Finzzle : 4.8% max, gestion 1%) |
+| Article ADI — Bilan Prosper Conseil 2026 | jan. 2026 | comparatif-cgp.html (honoraires 0.6%-0.2% TTC, 1er RDV 150€) |
+| Webinaire CGPulse — SilmaTec Finance (S. VEAUX) | 30/01/2026 | comparatif-cgp.html (hybride : bilan 900-3000€, CSP 650-1200€) |

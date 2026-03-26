@@ -233,6 +233,13 @@ var ACTIFS_CONFIG = {
   'Vehicules':                          {h:'LT', immo:false},
   "Objet d'art":                        {h:'LT', immo:false},
   'Metaux precieux':                    {h:'LT', immo:false},
+  'Scellier':                           {h:'LT', immo:true},
+  'Duflot':                             {h:'LT', immo:true},
+  'Robien':                             {h:'LT', immo:true},
+  'Borloo':                             {h:'LT', immo:true},
+  'Perisol':                            {h:'LT', immo:true},
+  'Girardin':                           {h:'LT', immo:true},
+  'Sofica':                             {h:'LT', immo:false},
 };
 
 function getActifConfig(label) {
@@ -305,6 +312,12 @@ var SOLUTIONS_CONFIG = {
     texte:"Se constituer un patrimoine dans l'immobilier d'entreprise et generateur de revenus complementaires de {revenus}/mois.",
     objectifs:['Reorganiser votre patrimoine','Optimiser vos placements','Creer patrimoine immobilier','Completer vos revenus','Preparer votre retraite'],
   },
+  'SCPI_CASH_VP': {
+    label:'SCPI Cash (versements programmés)', levier:'Placements',
+    horizon:'15 ans', horizonAns:15, rendement:0.045,
+    texte:"Se constituer un patrimoine dans l'immobilier d'entreprise via des versements reguliers et generateur de revenus complementaires de {revenus}/mois.",
+    objectifs:['Reorganiser votre patrimoine','Optimiser vos placements','Creer patrimoine immobilier','Completer vos revenus','Preparer votre retraite'],
+  },
   'SCPI_DEM': {
     label:'SCPI Demembrement', levier:'Placements',
     horizon:'10 ans', horizonAns:10, rendement:0.04,
@@ -369,9 +382,17 @@ function getBaremeIR(sitmat, nbEnfants, vivantSeul) {
 function getRetTaux(csp, age) {
   var key = CSP_MAP[csp] || CSP_MAP[(csp||'').replace(/\u00e9/g,'e').replace(/\u00e7/g,'c')] || 'Sal. cadre';
   var arr = RET_TAUX[key] || RET_TAUX['Sal. cadre'];
-  var idx = 0;
-  for (var i=0; i<RET_AGES.length; i++) { if (RET_AGES[i]>=age) idx=i; }
-  return arr[idx];
+  // Interpolation lineaire entre deux paliers d'age (R19)
+  // RET_AGES est en ordre decroissant : [65, 60, 55, 50, 45, 40, 35, 30, 0]
+  if (age >= RET_AGES[0]) return arr[0];
+  if (age <= RET_AGES[RET_AGES.length-1]) return arr[arr.length-1];
+  for (var i = 0; i < RET_AGES.length - 1; i++) {
+    if (age <= RET_AGES[i] && age >= RET_AGES[i+1]) {
+      var t = (age - RET_AGES[i+1]) / (RET_AGES[i] - RET_AGES[i+1]);
+      return Math.round(arr[i+1] + t * (arr[i] - arr[i+1]));
+    }
+  }
+  return arr[0];
 }
 
 /**
@@ -381,9 +402,17 @@ function getRetTaux(csp, age) {
  */
 function getEspVie(civ, ageDepart) {
   var arr = (civ==='Mme') ? ESP_VIE['Mme'] : ESP_VIE['M.'];
-  var idx = 0;
-  for (var i=0; i<ESP_AGES.length; i++) { if (ESP_AGES[i]<=ageDepart) idx=i; }
-  return parseInt(arr[idx])||240;
+  // Interpolation lineaire entre deux ages de depart (R19)
+  // ESP_AGES est en ordre croissant : [55, 57, 60, 62, 64, 65, 67]
+  if (ageDepart <= ESP_AGES[0]) return arr[0];
+  if (ageDepart >= ESP_AGES[ESP_AGES.length-1]) return arr[arr.length-1];
+  for (var i = 0; i < ESP_AGES.length - 1; i++) {
+    if (ageDepart >= ESP_AGES[i] && ageDepart <= ESP_AGES[i+1]) {
+      var t = (ageDepart - ESP_AGES[i]) / (ESP_AGES[i+1] - ESP_AGES[i]);
+      return Math.round(arr[i] + t * (arr[i+1] - arr[i]));
+    }
+  }
+  return arr[arr.length-1];
 }
 
 /**
