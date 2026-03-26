@@ -550,11 +550,16 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
-  <div class="sidebar-lbl" style="margin-top:8px">Simulateurs</div>
-  <a href="scpi-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Cash</a>
-  <a href="scpi-financement.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Financement</a>
-  <a href="per-vs-av.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>PER vs AV</a>
-  <a href="immo-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>Immobilier locatif</a>
+  <div class="sidebar-lbl" style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+    <span>Projections financi&#232;res</span>
+    <label class="cz-switch" style="transform:scale(0.85)"><input type="checkbox" id="toggleProjections" onchange="var w=document.getElementById('projLinksWrap');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
+  </div>
+  <div id="projLinksWrap" style="display:none">
+    <a href="scpi-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Cash</a>
+    <a href="scpi-financement.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Financement</a>
+    <a href="per-vs-av.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>PER vs AV</a>
+    <a href="immo-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>Immobilier locatif</a>
+  </div>
   <div class="sidebar-lbl" style="margin-top:8px">Mise en page</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
   <button class="step-btn" data-sec="sommaire" onclick="goTo('sommaire')"><span class="step-dot"></span>Sommaire</button>
@@ -870,6 +875,30 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierFis" style="margin-bottom:10px"></div>
+
+  <!-- Projection fiscale -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span><span class="dot"></span>Projection fiscale</span>
+      <label class="cz-switch"><input type="checkbox" id="projFiscToggle" onchange="var w=document.getElementById('projFiscBody');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
+    </div>
+    <div id="projFiscBody" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Salaires C1</label><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Salaires C2</label><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Autres revenus</label><input class="fi" type="number" id="projAutres" oninput="calcProjectionIR()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">D&#233;ductions</label><input class="fi" type="number" id="projDeduc" oninput="calcProjectionIR()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Situation</label><select class="fi" id="projSitmat" onchange="calcProjectionIR()"><option value="marie">Mari&#233; / PACS</option><option value="celibataire">C&#233;libataire</option><option value="celibataire_seul">C&#233;lib. parent isol&#233;</option><option value="veuf">Veuf</option></select></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Nb enfants</label><input class="fi" type="number" id="projEnfants" min="0" value="0" oninput="calcProjectionIR()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;ductions IR</label><input class="fi" type="number" id="projReduc" oninput="calcProjectionIR()"></div>
+      </div>
+      <div id="projFiscResultat" style="margin-bottom:8px"></div>
+      <div style="font-size:10px;color:var(--gris);font-style:italic">Estimation bar&#232;me 2025. Hors pr&#233;l&#232;vements sociaux. Ne remplace pas une simulation officielle.</div>
+    </div>
+  </div>
+
   <div class="note-print" id="notePrint-fiscal" style="display:none"></div>
 
   <div class="page-number"></div>
@@ -3871,6 +3900,7 @@ function rFiscal(){
     bH+='</tbody></table>';
     bEl.innerHTML=bH;
   }
+  initProjectionIR();
 }
 
 
@@ -7047,6 +7077,52 @@ function rPageGarde(){
   }
 }
 
+function initProjectionIR(){
+  try{
+    var e=function(id,v){var el=document.getElementById(id);if(el&&!el.value)el.value=v||'';};
+    e('projSal1',ED.revenus.sal1||ED.revenus.c1||'');
+    e('projSal2',ED.revenus.sal2||ED.revenus.c2||'');
+    e('projAutres',(ED.revenus.fonc||0)+(ED.revenus.bic||0)||'');
+    e('projDeduc',ED.fiscal.deductions||'');
+    e('projReduc',(ED.fiscal.reductions||0)+(ED.fiscal.credits||0)||'');
+    var sm=document.getElementById('projSitmat');
+    if(sm){
+      var sit=(ED.sitmat||'').toLowerCase();
+      if(sit.indexOf('mari')>=0||sit.indexOf('pacs')>=0)sm.value='marie';
+      else sm.value='celibataire';
+    }
+    var enf=document.getElementById('projEnfants');
+    if(enf&&!+enf.value)enf.value=ED.nbEnfants||0;
+    calcProjectionIR();
+  }catch(e2){}
+}
+function calcProjectionIR(){
+  try{
+    var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+    var sal1=n('projSal1'),sal2=n('projSal2'),autres=n('projAutres'),deduc=n('projDeduc');
+    var reduc=n('projReduc');
+    var sitmat=document.getElementById('projSitmat')?document.getElementById('projSitmat').value:'marie';
+    var nbEnf=n('projEnfants');
+    // Abattement 10% sur salaires (min 495, max 14171 par personne)
+    var abatt1=Math.min(14171,Math.max(495,Math.round(sal1*0.10)));
+    var abatt2=Math.min(14171,Math.max(495,Math.round(sal2*0.10)));
+    if(!sal1)abatt1=0;if(!sal2)abatt2=0;
+    var rbg=sal1-abatt1+sal2-abatt2+autres-deduc;
+    if(rbg<0)rbg=0;
+    var res=calcIR(rbg,sitmat,nbEnf,false,reduc,0);
+    var el=document.getElementById('projFiscResultat');
+    if(!el)return;
+    var irActuel=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
+    var diff=res.irNet-irActuel;
+    var h='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">';
+    h+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Revenu imposable</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+fmt(rbg)+' \u20ac</div></div>';
+    h+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">IR projet\u00e9</div><div style="font-size:14px;font-weight:700;color:'+(res.irNet>irActuel?'var(--red)':'var(--green)')+'">'+fmt(res.irNet)+' \u20ac</div></div>';
+    h+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">TMI</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+res.tmi+' %</div></div>';
+    h+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">vs IR actuel</div><div style="font-size:14px;font-weight:700;color:'+(diff>0?'var(--red)':diff<0?'var(--green)':'var(--gris)')+'">'+( diff>0?'+':'')+fmt(diff)+' \u20ac</div></div>';
+    h+='</div>';
+    el.innerHTML=h;
+  }catch(e){console.warn('calcProjectionIR error:',e);}
+}
 function updEntreprise(){
   var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
   var n=function(id){return +(v(id))||0;};
