@@ -3569,12 +3569,13 @@ function rSituation(){
   var sitLabel=ED.sitmat||'';
   if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
 
-  function personCard(label,name,age,profession,revenus){
+  function personCard(label,name,age,profession,revenus,cspTag){
     var mens=Math.round(revenus/12);
     var c='<div class="card" style="margin-bottom:0">';
     c+='<div class="card-title"><span class="dot"></span>'+label+'</div>';
     c+='<div class="fiscal-row"><span class="fr-l">Nom</span><span class="fr-v" style="font-weight:700">'+name+(age?' \u2014 '+age+' ans':'')+'</span></div>';
     c+='<div class="fiscal-row"><span class="fr-l">Profession</span><span class="fr-v">'+profession+'</span></div>';
+    if(cspTag)c+='<div class="fiscal-row"><span class="fr-l">Cat\u00e9gorie</span><span class="fr-v"><span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(212,98,42,0.1);color:var(--orange);border:1px solid rgba(212,98,42,0.2)">'+cspTag+'</span></span></div>';
     c+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v" style="font-weight:700;font-size:15px">'+fmt(mens)+' \u20ac/mois</span></div>';
     c+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v" style="color:var(--gris)">'+fmt(revenus)+' \u20ac/an</span></div>';
     if(ED.logement)c+='<div class="fiscal-row"><span class="fr-l">Logement</span><span class="fr-v">'+ED.logement+'</span></div>';
@@ -3589,12 +3590,15 @@ function rSituation(){
     sit+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
     var prof1=(ED.c1.profession||ED.c1.sitpro||'\u2014')+(ED.c1.societe?' \u2014 '+ED.c1.societe:'');
     var prof2=(ED.c2.profession||ED.c2.sitpro||'\u2014')+(ED.c2.societe?' \u2014 '+ED.c2.societe:'');
-    sit+=personCard('D\u00e9clarant 1',n1,a1,prof1,ED.revenus.sal1||ED.revenus.c1||0);
-    sit+=personCard('D\u00e9clarant 2',n2,a2,prof2,ED.revenus.sal2||ED.revenus.c2||0);
+    var csp1=CSP_MAP[ED.c1.sitpro||'']||ED.c1.sitpro||'';
+    var csp2=CSP_MAP[ED.c2.sitpro||'']||ED.c2.sitpro||'';
+    sit+=personCard('D\u00e9clarant 1',n1,a1,prof1,ED.revenus.sal1||ED.revenus.c1||0,csp1);
+    sit+=personCard('D\u00e9clarant 2',n2,a2,prof2,ED.revenus.sal2||ED.revenus.c2||0,csp2);
     sit+='</div>';
   } else {
     var prof1s=(ED.c1.profession||ED.c1.sitpro||'\u2014')+(ED.c1.societe?' \u2014 '+ED.c1.societe:'');
-    sit+=personCard('D\u00e9clarant',n1,a1,prof1s,ED.revenus.sal1||ED.revenus.c1||0);
+    var csp1s=CSP_MAP[ED.c1.sitpro||'']||ED.c1.sitpro||'';
+    sit+=personCard('D\u00e9clarant',n1,a1,prof1s,ED.revenus.sal1||ED.revenus.c1||0,csp1s);
     sit+='<div style="height:12px"></div>';
   }
 
@@ -3924,8 +3928,8 @@ function rFinancement(){
     var fonc=ED.revenus.fonc||0;
     var h='';
     if(isCoupleFin){
-      var n1=(ED.c1.prenom||'C1').split(' ')[0];
-      var n2=(ED.c2.prenom||'C2').split(' ')[0];
+      var n1=((ED.c1.prenom||'')+(ED.c1.nom?' '+ED.c1.nom:'')).trim()||'C1';
+      var n2=((ED.c2.prenom||'')+(ED.c2.nom?' '+ED.c2.nom:'')).trim()||'C2';
       h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
       h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>'+n1+'</div>';
       h+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v">'+fmt(sal1)+' €</span></div>';
@@ -4024,7 +4028,8 @@ function rRetraite(){
   var datasets=keys.map(function(k,i){var isC=(k===cspKey);return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
   // C1 point (petit point, le label sera dessiné par le plugin)
   var prenom1=(ED.c1.prenom||'Client 1').trim();
-  datasets.push({label:prenom1+' \u2014 '+age1+' ans',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom1,age:age1,taux:tauxClient,color:'#D4622A',idx:ageIdx}});
+  var colorC1=COLORS[keys.indexOf(cspKey)]||'#D4622A';
+  datasets.push({label:prenom1+' \u2014 '+age1+' ans',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:colorC1,backgroundColor:colorC1,pointRadius:AGES.map(function(a,i){return i===ageIdx?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom1,age:age1,taux:tauxClient,color:colorC1,idx:ageIdx}});
   // C2 point si couple
   var hasC2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
   var age2=0,ageIdx2=0,tauxC2=0,cspKey2='',prenom2='';
@@ -4037,7 +4042,8 @@ function rRetraite(){
     tauxC2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageIdx2];
     var c2LineIdx=keys.indexOf(cspKey2);
     if(c2LineIdx>=0&&cspKey2!==cspKey){datasets[c2LineIdx].borderWidth=3;}
-    datasets.push({label:prenom2+' \u2014 '+age2+' ans',data:AGES.map(function(a,i){return i===ageIdx2?tauxC2:null;}),borderColor:'#2D7A5B',backgroundColor:'#2D7A5B',pointRadius:AGES.map(function(a,i){return i===ageIdx2?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom2,age:age2,taux:tauxC2,color:'#2D7A5B',idx:ageIdx2}});
+    var colorC2=COLORS[keys.indexOf(cspKey2)]||'#2D7A5B';
+    datasets.push({label:prenom2+' \u2014 '+age2+' ans',data:AGES.map(function(a,i){return i===ageIdx2?tauxC2:null;}),borderColor:colorC2,backgroundColor:colorC2,pointRadius:AGES.map(function(a,i){return i===ageIdx2?5:0;}),pointHoverRadius:7,showLine:false,order:0,_clientTag:{name:prenom2,age:age2,taux:tauxC2,color:colorC2,idx:ageIdx2}});
   }
   // Plugin custom : dessine un trait vertical + label à côté de chaque point client
   var clientTagPlugin={id:'clientTagPlugin',afterDraw:function(chart){
