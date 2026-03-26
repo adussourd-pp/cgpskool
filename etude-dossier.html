@@ -414,10 +414,8 @@ select.span2{grid-column:span 2}
   /* ── GRAPHIQUES : éviter la coupure ── */
   canvas{max-width:100%!important}
   .synthese-step{break-inside:avoid}
-  /* ── PAGE DE GARDE ── */
-  .pdf-cover-page{display:block!important;page-break-after:always}
-  /* ── PAGE MENTIONS LÉGALES ── */
-  .pdf-mentions-page{display:block!important;page-break-before:always}
+  /* ── ANCIENNES PAGES PDF : masquer ── */
+  .pdf-cover-page,.pdf-mentions-page{display:none!important}
   /* ── FOOTER PDF FIXE : répété sur chaque page imprimée ── */
   .pdf-print-footer{display:flex!important;justify-content:space-between;align-items:center;
     position:fixed;bottom:0;left:0;right:0;
@@ -584,24 +582,12 @@ select.span2{grid-column:span 2}
      0 — IMPORT / SAISIE
 ════════════════════════════════════════ -->
 
-<!-- ── PAGE DE GARDE PDF ── -->
-<div id="pdfCoverPage" class="pdf-cover-page">
-  <div class="pdf-cover-inner">
-    <div id="pdfCoverLogo" class="pdf-cover-logo"></div>
-    <div class="pdf-cover-title">Etude de Dossier</div>
-    <div class="pdf-cover-subtitle" id="pdfCoverClient"></div>
-    <div class="pdf-cover-date" id="pdfCoverDate"></div>
-    <div class="pdf-cover-conseiller" id="pdfCoverConseiller"></div>
-  </div>
-</div>
-
-<!-- ── EN-TÊTE PDF ── -->
+<!-- ── EN-TÊTE SECTION (au-dessus du cadre A4) ── -->
 <div class="pdf-page-header" id="pdfPageHeader">
   <div class="pdf-page-header-left">
     <div class="pdf-page-header-nom" id="pdfHeaderNom">Étude de Dossier</div>
-    <div class="pdf-page-header-date" id="pdfHeaderDate"></div>
   </div>
-  <div class="pdf-page-header-right" id="pdfHeaderRight">CGP Skool</div>
+  <div class="pdf-page-header-right" id="pdfHeaderRight">Étude de Dossier</div>
 </div>
 
 <div class="section-page active" id="sec-import">
