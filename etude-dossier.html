@@ -4141,7 +4141,7 @@ var COPERNIC = {
   'SCPI en usufruit':       {cat:'epargne-immo', levier:'entreprise',  icon:'&#127959;',
     desc:'Acquisition de l\'usufruit temporaire : rendement boosté pendant la durée, capital non récupéré en fin de démembrement',
     fiscal:'Revenus fonciers taxés à l\'IR',sri:'3-4',horizon:'3-10 ans',horizonAns:7},
-  'SCPI financée':          {cat:'epargne-immo', levier:'financement', icon:'&#127959;',
+  'SCPI financ\u00e9e':          {cat:'immobilier', levier:'financement', icon:'&#127959;',
     desc:'Acquisition à crédit : les loyers couvrent partiellement les mensualités, effet de levier bancaire sur le patrimoine',
     fiscal:'Intérêts d\'emprunt déductibles des revenus fonciers',sri:'3-4',horizon:'15 ans+',horizonAns:15},
 
@@ -4149,10 +4149,10 @@ var COPERNIC = {
   'LMNP':                   {cat:'immobilier',   levier:'financement', icon:'&#127968;',
     desc:'Location meublée non professionnelle : amortissement du bien sur 20-30 ans, revenus BIC quasi non imposés',
     fiscal:'BIC avec amortissement — revenus très peu imposés',sri:'5',horizon:'20 ans+',horizonAns:20},
-  'Denormandie':            {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+  'Denormandie':            {cat:'immobilier',   levier:'financement',      icon:'&#127968;',
     desc:'Réduction IR 12-18-21 % sur 6, 9 ou 12 ans, ancien rénové centre-ville, loyers plafonnés',
     fiscal:'Réduction IR plafonnée niches fiscales',sri:'6',horizon:'6-12 ans',horizonAns:9},
-  'Nue-propriété immo':     {cat:'immobilier',   levier:'transmission',icon:'&#127968;',
+  'Nue-propri\u00e9t\u00e9 immo':     {cat:'immobilier',   levier:'financement',icon:'&#127968;',
     desc:'Achat en nue-propriété d\'un bien, décote à l\'achat, aucun revenu ni IFI, revalorisation à terme',
     fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+',horizonAns:15},
   'LLI':                    {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
@@ -4173,9 +4173,6 @@ var COPERNIC = {
     fiscal:'Cotisations déductibles entreprise',sri:'N/A',horizon:'Annuel'},
 
   // ─── SOLUTIONS FISCALES ────────────────────────────────────────
-  'Capital Investissement (FPCI/FCPR)': {cat:'solutions-fisc',levier:'fiscal',icon:'&#128200;',
-    desc:'Fonds de capital-investissement : réduction IR 25-30 %, capital bloqué 7-10 ans, investissement dans des PME/ETI',
-    fiscal:'Réduction IR dans la limite du plafond des niches',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
   'Girardin industriel':    {cat:'solutions-fisc',levier:'fiscal',     icon:'&#127981;',
     desc:'Réduction IR supérieure au montant investi (110-114 %), remboursement en 1-2 ans, risque de reprise fiscale',
     fiscal:'Hors plafond des niches — spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans',horizonAns:1},
@@ -4221,7 +4218,7 @@ var COPERNIC = {
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Apport-cession 150-0 B ter'],
+  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
@@ -4649,8 +4646,9 @@ function renderSolsRetenues(){
     }
 
     // SCPI reinvest toggle (shown once per group)
-    var isSCPI3=grp.produit&&grp.produit.toLowerCase().indexOf('scpi')>=0;
-    if(isSCPI3){
+    var isSCPIRendement=grp.produit==='SCPI de rendement';
+    var isSCPI3=isSCPIRendement;
+    if(isSCPIRendement){
       var reinvPct=firstSol._reinvestPct!==undefined?firstSol._reinvestPct:(firstSol.reinvest?100:0);
       html+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--blue-l);border-radius:8px;border:1px solid rgba(43,94,167,0.2)">';
       html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
@@ -4676,26 +4674,44 @@ function renderSolsRetenues(){
     // ── Contrats (sub-rows) ──
     // Header row
     html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
-    var isImmoGrp=cp.cat==='immobilier';
-    html+='<div>Titulaire</div><div>'+(isImmoGrp?'Apport':'Versement initial')+'</div><div>'+(isImmoGrp?'\u00c9pargne /mois':'VP mensuel')+'</div><div>Horizon</div><div></div></div>';
+    var isImmoGrp=cp.cat==='immobilier'||cp.levier==='financement';
+    var inSt='padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif';
+    if(isImmoGrp){
+      // Grille financement : 6 colonnes + delete
+      html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.8fr 28px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
+      html+='<div>Titulaire</div><div>Apport</div><div>\u00c9pargne /mois</div><div>Horizon</div><div>Patrimoine final</div><div>Revenus /mois</div><div></div></div>';
+    } else {
+      html+='<div>Titulaire</div><div>Versement initial</div><div>VP mensuel</div><div>Horizon</div><div></div></div>';
+    }
 
     grp.indices.forEach(function(idx){
       var sol=solsSelectionnees[idx];
-      html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
+      if(isImmoGrp){
+        html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.8fr 28px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
+      } else {
+        html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
+      }
 
       // Titulaire select
-      html+='<div><select onchange="updateSol('+idx+',\'titulaire\',this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif">';
+      html+='<div><select onchange="updateSol('+idx+',\'titulaire\',this.value)" style="width:90%;'+inSt+'">';
       titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
       html+='</select></div>';
 
-      // VI
-      html+='<div><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+idx+',\'vi\',+this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+      // VI / Apport
+      html+='<div><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+idx+',\'vi\',+this.value)" style="width:90%;'+inSt+'"></div>';
 
-      // VP
-      html+='<div><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+idx+',\'vp\',+this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+      // VP / Épargne mois
+      html+='<div><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+idx+',\'vp\',+this.value)" style="width:90%;'+inSt+'"></div>';
 
       // Horizon
-      html+='<div><input type="number" value="'+(parseInt(sol.horizon)||10)+'" min="1" max="40" oninput="updateSol('+idx+',\'horizon\',this.value+\' ans\')" style="width:80%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+      html+='<div><input type="number" value="'+(parseInt(sol.horizon)||10)+'" min="1" max="40" oninput="updateSol('+idx+',\'horizon\',this.value+\' ans\')" style="width:80%;'+inSt+'"></div>';
+
+      if(isImmoGrp){
+        // Patrimoine final (saisie libre)
+        html+='<div><input type="number" value="'+(sol._patFinal||0)+'" min="0" onchange="updateSol('+idx+',\'_patFinal\',+this.value)" style="width:90%;'+inSt+'"></div>';
+        // Revenus complémentaires /mois (saisie libre)
+        html+='<div><input type="number" value="'+(sol._revCompl||0)+'" min="0" onchange="updateSol('+idx+',\'_revCompl\',+this.value)" style="width:90%;'+inSt+'"></div>';
+      }
 
       // Delete
       html+='<div><button onclick="removeSol('+idx+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:16px;padding:0;line-height:1" title="Supprimer">&times;</button></div>';
@@ -4918,10 +4934,11 @@ function renderFichesClient(){
         var isImmo2=cp.cat==='immobilier';
         html+='<div style="border-top:1px solid rgba(0,0,0,0.04)">';
 
-        if(isImmo2){
-          // ── Rendu immobilier : apport + épargne mensuelle + patrimoine + revenus ──
-          var patrimoineImmo=sol.vi>0?Math.round((sol.vi||0)*1.5+(sol.vp||0)*12*h2):0; // estimation patrimoine constitué
-          var loyerImmo=patrimoineImmo>0?Math.round(patrimoineImmo*0.04/12):0;
+        var isImmoFin=cp.cat==='immobilier'||cp.levier==='financement';
+        if(isImmoFin){
+          // ── Rendu financement/immobilier : utilise les valeurs saisies ou estimation ──
+          var patrimoineImmo=sol._patFinal||(sol.vi>0?Math.round((sol.vi||0)*1.5+(sol.vp||0)*12*h2):0);
+          var loyerImmo=sol._revCompl||(patrimoineImmo>0?Math.round(patrimoineImmo*0.04/12):0);
           html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
           html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
           html+='<span style="color:var(--bord)">:</span>';
