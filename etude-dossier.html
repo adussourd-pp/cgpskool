@@ -4490,68 +4490,123 @@ function renderSolsRetenues(){
     });
   });
   if(!solsSelectionnees.length){el.innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune solution &#8212; cochez dans la matrice ci-dessus</div>';return;}
-  var html='';
+
+  // Grouper par produit (garder l'ordre de premiere apparition)
+  var groups=[];var groupMap={};
   solsSelectionnees.forEach(function(sol,i){
-    var cp=COPERNIC[sol.produit]||{};
-    html+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--orange)">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-    html+='<div style="display:flex;align-items:center;gap:8px">';
-    html+='<div style="display:flex;align-items:center;gap:4px">';
-    html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Solution</span>';
-    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro de solution dans la stratégie">';
-    html+='</div>';
-    html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+sol.produit+'</div>';
-    html+='</div>';
-    html+='<div style="display:flex;align-items:center;gap:2px">';
-    html+='<button onclick="dupliquerSol('+i+')" style="border:none;background:rgba(212,98,42,0.08);color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans);padding:4px 10px;border-radius:6px;white-space:nowrap" title="Dupliquer pour un autre titulaire">+ Ajouter un contrat</button>';
-    html+='<button onclick="removeSol('+i+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px" title="Supprimer cette instance">&times;</button>';
+    if(!groupMap[sol.produit]){groupMap[sol.produit]={produit:sol.produit,indices:[]};groups.push(groupMap[sol.produit]);}
+    groupMap[sol.produit].indices.push(i);
+  });
+
+  // Titulaire labels (shared)
+  var titOptions=['C1'];var titLabels={};
+  titLabels['C1']=nomC(1);
+  if(ED.type!=='seul'){titOptions.push('C2');titLabels['C2']=nomC(2);}
+  titOptions.push('Commun');titLabels['Commun']='Commun';
+  var nbEnf=ED.nbEnfants||0;
+  for(var ei=1;ei<=nbEnf;ei++){var eKey='E'+ei;titOptions.push(eKey);titLabels[eKey]=(ED.enfants&&ED.enfants[ei-1]&&ED.enfants[ei-1].prenom)?ED.enfants[ei-1].prenom:'Enfant '+ei;}
+
+  var html='';
+  groups.forEach(function(grp){
+    var cp=COPERNIC[grp.produit]||{};
+    var firstIdx=grp.indices[0];
+    var firstSol=solsSelectionnees[firstIdx];
+
+    // ── Card produit ──
+    html+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:12px;margin-bottom:14px;border-left:3.5px solid var(--orange);overflow:hidden">';
+
+    // Header produit
+    html+='<div style="padding:16px 18px 0">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html+='<div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">'+grp.produit+'</div>';
+    html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
+    if(cp.sri)html+='<span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span>';
+    if(cp.horizon)html+='<span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.horizon+'</span>';
+    if(cp.fiscal)html+='<span style="background:var(--gris-l);color:var(--gris-f);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.fiscal+'</span>';
     html+='</div></div>';
-    if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
-    html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"><span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span><span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">Horizon : '+cp.horizon+'</span><span style="background:var(--gris-l);color:var(--gris-f);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.fiscal+'</span></div>';
-    // Objectifs cochables pour cette solution
-    var solObjs=allSolsMap&&allSolsMap[sol.produit]?allSolsMap[sol.produit].objectifs:[];
+    if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);line-height:1.5;margin-bottom:10px">'+cp.desc+'</div>';
+
+    // Objectifs (shared across group, use first sol's objectifsValides)
+    var solObjs=allSolsMap&&allSolsMap[grp.produit]?allSolsMap[grp.produit].objectifs:[];
     if(solObjs.length){
-      html+='<div style="margin-bottom:10px">';
-      html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:5px">Objectifs validés</div>';
-      html+='<div style="display:flex;flex-wrap:wrap;gap:5px">';
+      html+='<div style="margin-bottom:12px"><div style="display:flex;flex-wrap:wrap;gap:5px">';
       solObjs.forEach(function(obj){
-        var isChecked=sol.objectifsValides&&sol.objectifsValides.indexOf(obj)>=0;
-        var oid='obj_'+i+'_'+obj.replace(/[^a-zA-Z0-9]/g,'_');
+        var isChecked=firstSol.objectifsValides&&firstSol.objectifsValides.indexOf(obj)>=0;
         html+='<label style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;cursor:pointer;font-size:11px;border:1.5px solid '+(isChecked?'#2D7A5B':'var(--bord)')+';background:'+(isChecked?'var(--green-l)':'#fff')+';color:'+(isChecked?'var(--green)':'var(--gris-f)')+';transition:all 0.15s">';
-        html+='<input type="checkbox" '+(isChecked?'checked':'')+' onchange="toggleObjValide('+i+',\''+obj.replace(/'/g,"\\'")+'\',this.checked)" style="accent-color:var(--green);width:12px;height:12px;cursor:pointer">';
+        html+='<input type="checkbox" '+(isChecked?'checked':'')+' onchange="toggleObjValideGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\''+obj.replace(/'/g,"\\'")+'\',this.checked)" style="accent-color:var(--green);width:12px;height:12px;cursor:pointer">';
         html+=obj+'</label>';
       });
       html+='</div></div>';
     }
-    // Toggle réinvestissement pour SCPI
-    var isSCPI3=sol.produit&&sol.produit.toLowerCase().indexOf('scpi')>=0;
+
+    // SCPI reinvest toggle (shown once per group)
+    var isSCPI3=grp.produit&&grp.produit.toLowerCase().indexOf('scpi')>=0;
     if(isSCPI3){
-      html+='<div style="margin-bottom:8px;padding:8px 12px;background:var(--blue-l);border-radius:8px;border:1px solid rgba(43,94,167,0.2);display:flex;align-items:center;justify-content:space-between">';
-      html+='<div><div style="font-size:12px;font-weight:600;color:var(--blue)">Réinvestissement des dividendes</div>';
-      html+='<div style="font-size:11px;color:var(--gris);margin-top:1px">Activé : effet boule de neige (capitalisation). Désactivé : distribution cash mensuelle.</div></div>';
+      html+='<div style="margin-bottom:10px;padding:8px 12px;background:var(--blue-l);border-radius:8px;border:1px solid rgba(43,94,167,0.2);display:flex;align-items:center;justify-content:space-between">';
+      html+='<div><div style="font-size:12px;font-weight:600;color:var(--blue)">R\u00e9investissement dividendes</div>';
+      html+='<div style="font-size:11px;color:var(--gris);margin-top:1px">Activ\u00e9 : capitalisation. D\u00e9sactiv\u00e9 : distribution cash.</div></div>';
       html+='<label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;margin-left:12px">';
-      html+='<input type="checkbox" '+(sol.reinvest?'checked':'')+' onchange="updateSol('+i+',\'reinvest\',this.checked);renderFichesClient();" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer">';
-      html+='<span style="font-size:11px;font-weight:600;color:'+(sol.reinvest?'var(--blue)':'var(--gris)')+'">'+( sol.reinvest?'Activé':'Désactivé')+'</span>';
+      html+='<input type="checkbox" '+(firstSol.reinvest?'checked':'')+' onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'reinvest\',this.checked)" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer">';
+      html+='<span style="font-size:11px;font-weight:600;color:'+(firstSol.reinvest?'var(--blue)':'var(--gris)')+'">'+( firstSol.reinvest?'Activ\u00e9':'D\u00e9sactiv\u00e9')+'</span>';
       html+='</label></div>';
     }
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:2px">';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif">';
-    var titOptions=['C1'];
-    var titLabels={};
-    titLabels['C1']=nomC(1);
-    if(ED.type!=='seul'){titOptions.push('C2');titLabels['C2']=nomC(2);}
-    titOptions.push('Commun');titLabels['Commun']='Commun';
-    // Ajouter les enfants comme options
-    var nbEnf=ED.nbEnfants||0;
-    for(var ei=1;ei<=nbEnf;ei++){var eKey='E'+ei;titOptions.push(eKey);titLabels[eKey]=(ED.enfants&&ED.enfants[ei-1]&&ED.enfants[ei-1].prenom)?ED.enfants[ei-1].prenom:'Enfant '+ei;}
-    titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
-    html+='</select></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">VP mensuel</label><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+i+',\'vp\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Horizon (ans)</label><input type="number" value="'+(parseInt(sol.horizon)||10)+'" title="'+(sol.horizonLabel||'')+'" min="1" max="40" oninput="updateSol('+i+',\'horizon\',this.value+\' ans\')" onchange="updateSol('+i+',\'horizon\',this.value+\' ans\')" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
-    html+='</div></div>';
+
+    html+='</div>'; // fin header padding
+
+    // ── Contrats (sub-rows) ──
+    // Header row
+    html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
+    html+='<div>Titulaire</div><div>Versement initial</div><div>VP mensuel</div><div>Horizon</div><div></div></div>';
+
+    grp.indices.forEach(function(idx){
+      var sol=solsSelectionnees[idx];
+      html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
+
+      // Titulaire select
+      html+='<div><select onchange="updateSol('+idx+',\'titulaire\',this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif">';
+      titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
+      html+='</select></div>';
+
+      // VI
+      html+='<div><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+idx+',\'vi\',+this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+
+      // VP
+      html+='<div><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+idx+',\'vp\',+this.value)" style="width:90%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+
+      // Horizon
+      html+='<div><input type="number" value="'+(parseInt(sol.horizon)||10)+'" min="1" max="40" oninput="updateSol('+idx+',\'horizon\',this.value+\' ans\')" style="width:80%;padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+
+      // Delete
+      html+='<div><button onclick="removeSol('+idx+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:16px;padding:0;line-height:1" title="Supprimer">&times;</button></div>';
+
+      html+='</div>';
+    });
+
+    // Bouton ajouter un contrat
+    html+='<div style="padding:8px 18px 12px;border-top:1px solid rgba(0,0,0,0.04)">';
+    html+='<button onclick="dupliquerSol('+grp.indices[grp.indices.length-1]+')" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);padding:4px 0">+ Ajouter un contrat</button>';
+    html+='</div>';
+
+    html+='</div>'; // fin card produit
   });
   el.innerHTML=html;
+}
+
+function toggleObjValideGroup(produit,obj,checked){
+  solsSelectionnees.forEach(function(sol){
+    if(sol.produit!==produit)return;
+    if(!sol.objectifsValides)sol.objectifsValides=[];
+    var pos=sol.objectifsValides.indexOf(obj);
+    if(checked&&pos<0)sol.objectifsValides.push(obj);
+    else if(!checked&&pos>=0)sol.objectifsValides.splice(pos,1);
+  });
+  renderSolsRetenues();renderFichesClient();
+}
+function updateSolGroup(produit,field,val){
+  solsSelectionnees.forEach(function(sol){
+    if(sol.produit===produit)sol[field]=val;
+  });
+  renderSolsRetenues();renderFichesClient();
 }
 
 function updateSol(idx,field,val){if(solsSelectionnees[idx])solsSelectionnees[idx][field]=val;renderFichesClient();}
