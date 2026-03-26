@@ -429,6 +429,8 @@ select.span2{grid-column:span 2}
   /* ── PROJECTION : masquée par défaut en print sauf si switch ON ── */
   #projFiscCard{display:none!important}
   #projFiscCard.proj-print-visible{display:block!important}
+  #projFinCard{display:none!important}
+  .proj-fin-print #projFinCard{display:block!important}
   /* ── FORMAT A4 ── */
   @page{size:A4 portrait;margin:1.5cm 1.5cm 1.5cm 1.5cm}
 }
@@ -917,6 +919,29 @@ select.span2{grid-column:span 2}
 
   <!-- Analyse par personne -->
   <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
+
+  <!-- Projection financement -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span><span class="dot" style="background:var(--green)"></span>Projection financement</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:10px;color:var(--gris)" id="projFinPDFLabel">Masqu&#233; du PDF</span>
+        <label class="cz-switch"><input type="checkbox" id="projFinPrint" onchange="var c=document.getElementById('projFinCard');var l=document.getElementById('projFinPDFLabel');if(c)c.classList.toggle('proj-fin-print',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
+      </div>
+    </div>
+    <div id="projFinCard">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Montant emprunt&#233;</label><input class="fi" type="number" id="projFinMontant" oninput="calcProjectionFin()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Taux nominal (%)</label><input class="fi" type="number" id="projFinTaux" step="0.01" value="3.5" oninput="calcProjectionFin()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dur&#233;e (ans)</label><input class="fi" type="number" id="projFinDuree" value="20" min="1" max="30" oninput="calcProjectionFin()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Assurance (%)</label><input class="fi" type="number" id="projFinAssur" step="0.01" value="0.30" oninput="calcProjectionFin()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Apport</label><input class="fi" type="number" id="projFinApport" oninput="calcProjectionFin()"></div>
+      </div>
+      <div id="projFinResultat"></div>
+    </div>
+  </div>
 
   <div id="levierFin" style="margin-bottom:10px"></div>
   <div class="note-print" id="notePrint-financement" style="display:none"></div>
@@ -7132,6 +7157,34 @@ function calcProjectionIR(){
     h+='<div class="fiscal-row" style="border-top:2px solid rgba(45,122,91,0.3);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">\u00c9cart vs actuel</span><span class="fr-v" style="font-size:16px;font-weight:700;color:'+(diff>0?'var(--red)':diff<0?'var(--green)':'var(--gris)')+'">'+(diff>0?'+':'')+fmt(diff)+' \u20ac</span></div>';
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionIR error:',e);}
+}
+function calcProjectionFin(){
+  try{
+    var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+    var montant=n('projFinMontant'),taux=n('projFinTaux')/100,duree=n('projFinDuree'),assur=n('projFinAssur')/100,apport=n('projFinApport');
+    if(!montant||!duree)return;
+    var nbMois=duree*12;
+    var tauxM=taux/12;
+    var mensualite=tauxM>0?Math.round(montant*tauxM/(1-Math.pow(1+tauxM,-nbMois))):Math.round(montant/nbMois);
+    var mensAssur=Math.round(montant*assur/12);
+    var mensTotale=mensualite+mensAssur;
+    var coutTotal=mensTotale*nbMois-montant;
+    var revM=revMens();
+    var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    var nouvEndett=revM>0?((chrCredit+mensTotale)/revM*100).toFixed(1):'0';
+    var nouvRAV=revM-chrCredit-mensTotale;
+    var el=document.getElementById('projFinResultat');
+    if(!el)return;
+    var endColor=+nouvEndett>35?'var(--red)':+nouvEndett>28?'var(--orange)':'var(--green)';
+    var h='';
+    h+='<div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Mensualit\u00e9 totale</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(mensTotale)+' \u20ac/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Dont cr\u00e9dit</span><span class="fr-v">'+fmt(mensualite)+' \u20ac</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Dont assurance</span><span class="fr-v">'+fmt(mensAssur)+' \u20ac</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Co\u00fbt total cr\u00e9dit</span><span class="fr-v" style="color:var(--red)">'+fmt(coutTotal)+' \u20ac</span></div>';
+    h+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:8px;margin-top:4px"><span class="fr-l" style="font-weight:600">Nouvel endettement</span><span class="fr-v" style="font-weight:700;color:'+endColor+'">'+nouvEndett+' %</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Nouveau reste \u00e0 vivre</span><span class="fr-v" style="font-weight:700;color:'+(nouvRAV<0?'var(--red)':'var(--green)')+'">'+fmt(nouvRAV)+' \u20ac/mois</span></div>';
+    el.innerHTML=h;
+  }catch(e){console.warn('calcProjectionFin error:',e);}
 }
 function updEntreprise(){
   var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
