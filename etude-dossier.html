@@ -301,7 +301,8 @@ select.span2{grid-column:span 2}
 .pyr-name{font-size:12px;font-weight:700}
 .pyr-lv.lt .pyr-name{color:var(--red)}.pyr-lv.mt .pyr-name{color:var(--orange)}.pyr-lv.ct .pyr-name{color:var(--blue)}.pyr-lv.ep .pyr-name{color:var(--green)}
 .pyr-desc{font-size:10px;color:var(--gris)}
-.pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);text-align:right}
+.pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;text-align:right}
+.pyr-lv.lt .pyr-amt{color:var(--red)}.pyr-lv.mt .pyr-amt{color:var(--orange)}.pyr-lv.ct .pyr-amt{color:var(--blue)}.pyr-lv.ep .pyr-amt{color:var(--green)}
 .pyr-pct{font-size:10px;color:var(--gris);text-align:right;margin-top:1px}
 
 /* ── FISCAL ── */
@@ -525,7 +526,7 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Analyse</div>
   <button class="step-btn" data-sec="situation" onclick="goTo('situation')"><span class="step-dot"></span>Situation &amp; Objectifs</button>
   <button class="step-btn" data-sec="patrimoine" onclick="goTo('patrimoine')"><span class="step-dot"></span>Patrimoine</button>
-  <button class="step-btn" data-sec="fiscal" onclick="goTo('fiscal')"><span class="step-dot"></span>Imp\u00f4ts</button>
+  <button class="step-btn" data-sec="fiscal" onclick="goTo('fiscal')"><span class="step-dot"></span>Imp&#244;ts</button>
   <button class="step-btn" data-sec="financement" onclick="goTo('financement')"><span class="step-dot"></span>Financement</button>
   <button class="step-btn" data-sec="retraite" onclick="goTo('retraite')"><span class="step-dot"></span>Retraite</button>
   <button class="step-btn" id="btnTransmission" data-sec="transmission"
@@ -784,10 +785,10 @@ select.span2{grid-column:span 2}
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Répartition par horizon</div>
     <div class="pyramid" id="pyramideEl">
-      <div class="pyr-lv lt"><div><div class="pyr-name">Long terme</div><div class="pyr-desc">+15 ans · Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
-      <div class="pyr-lv mt"><div><div class="pyr-name">Moyen terme</div><div class="pyr-desc">Minimum 5 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
-      <div class="pyr-lv ct"><div><div class="pyr-name">Court terme</div><div class="pyr-desc">Disponible &lt; 5 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
-      <div class="pyr-lv ep"><div><div class="pyr-name">Epargne de precaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
+      <div class="pyr-lv lt"><div><div class="pyr-name">LONG TERME</div><div class="pyr-desc">+15 ans · Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
+      <div class="pyr-lv mt"><div><div class="pyr-name">MOYEN TERME</div><div class="pyr-desc">Minimum 5 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
+      <div class="pyr-lv ct"><div><div class="pyr-name">COURT TERME</div><div class="pyr-desc">Disponible &lt; 5 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
+      <div class="pyr-lv ep"><div><div class="pyr-name">ÉPARGNE DE PRÉCAUTION</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
     </div>
   </div>
 
@@ -824,7 +825,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-fiscal">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 03</div><div class="sec-h1">Imp\u00f4ts</div></div>
+    <div><div class="sec-tag">Section 03</div><div class="sec-h1">Imp&#244;ts</div></div>
   </div>
 
   <div style="margin-bottom:18px">
@@ -3541,7 +3542,7 @@ function rSituation(){
 function renderLevierBadge(containerId, items){
   var el=document.getElementById(containerId);
   if(!el)return;
-  var h='<div class="card" style="padding:20px 22px;margin-bottom:10px">';
+  var h='<div style="padding:20px 0;margin-bottom:10px">';
   h+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:14px">Levier identifi\u00e9</div>';
   h+='<div style="display:flex;flex-direction:column;gap:10px">';
   items.forEach(function(item){
@@ -3680,7 +3681,7 @@ function rPatrimoine(){
     return '<tr class="section-header-row" style="background:var(--gris-l)">'
       +'<td colspan="3" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
       +'<span class="badge '+badgeCls+'" style="margin-right:6px">'+label+'</span></td>'
-      +'<td class="right" style="font-size:12px;font-weight:700;color:var(--gris-f);padding-right:12px">'+fmt(total)+' €</td>'
+      +'<td class="right" style="padding-right:12px"><span class="badge '+badgeCls+'" style="font-size:11px;font-weight:700">'+fmt(total)+' \u20ac</span></td>'
       +'</tr>'+rows;
   }
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
