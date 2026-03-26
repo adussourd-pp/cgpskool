@@ -6116,10 +6116,11 @@ function saveMentionsDirect(){
         }
       }
       if(tagItems.length>=2){
-        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
-        h+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0">';
-        tagItems.forEach(function(t){h+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
-        h+='</div>';
+        // Injecter les tags dans le cardBuf pour qu'ils restent dans la card
+        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0">';
+        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
+        tagHtml+='</div>';
+        cardBuf.push(tagHtml);
         continue;
       }
 
