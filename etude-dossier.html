@@ -4424,13 +4424,13 @@ function togglePrecoSwitch(uid,montantActuel,checked){
 // ╚══════════════════════════════════════════════════════════════════╝
 // Mapping levier interne -> catégorie affichée
 var LEVIER_CATEGORIES = [
-  {key:'placement',   label:'Placement',   icon:'&#128176;', color:'#2B5EA7', bg:'#EDF2FB',
+  {key:'placement',   label:'Placement',   icon:'', color:'#D4622A', bg:'rgba(212,98,42,0.06)',
    match:['epargne','transmission']},
-  {key:'fiscal',      label:'Imp\u00f4ts', icon:'&#128200;', color:'#D4622A', bg:'rgba(212,98,42,0.08)',
+  {key:'fiscal',      label:'Imp\u00f4ts', icon:'', color:'#D4622A', bg:'rgba(212,98,42,0.06)',
    match:['fiscal']},
-  {key:'financement', label:'Financement', icon:'&#127968;', color:'#2D7A5B', bg:'#EAF5EF',
+  {key:'financement', label:'Financement', icon:'', color:'#D4622A', bg:'rgba(212,98,42,0.06)',
    match:['financement']},
-  {key:'entreprise',  label:'Entreprise',  icon:'&#127981;', color:'#7B5EA7', bg:'#F3EDF9',
+  {key:'entreprise',  label:'Entreprise',  icon:'', color:'#D4622A', bg:'rgba(212,98,42,0.06)',
    match:['entreprise','protection']}
 ];
 
@@ -4518,7 +4518,6 @@ function buildMatriceObjSol(impot,capa,aSum){
     if(!sols.length) return;
     // Section header
     html+='<div style="margin-top:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px">';
-    html+='<span style="font-size:16px">'+lev.icon+'</span>';
     html+='<span style="font-family:var(--sans);font-weight:700;font-size:13px;color:'+lev.color+'">'+lev.label+'</span>';
     html+='<span style="flex:1;height:1px;background:'+lev.color+'22"></span>';
     html+='<span style="font-size:10px;color:var(--gris)">'+sols.length+' solution'+(sols.length>1?'s':'')+'</span>';
@@ -4548,10 +4547,11 @@ function buildMatriceObjSol(impot,capa,aSum){
       html+='<div style="font-size:10px;color:var(--gris);line-height:1.5;margin-bottom:6px">'+cp.desc.substring(0,60)+(cp.desc.length>60?'...':'')+'</div>';
       if(objPills) html+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">'+objPills+'</div>';
       if(!isMatched&&!isSelected) html+='<div style="font-size:9px;color:var(--gris);font-style:italic;margin-bottom:4px">Non recommande — activable manuellement</div>';
+      var catLabels={'epargne-fin':'Placement','epargne-immo':'SCPI','epargne-ret':'Retraite','epargne-sal':'Entreprise','immobilier':'Immobilier','immo-fisc':'Immobilier','capital-invest':'Capital invest.','diversification':'Diversification','transmission':'Transmission','prevoyance':'Pr\u00e9voyance','entreprise':'Entreprise','fiscal-outremer':'Fiscal'};
+      var catLabel=catLabels[cp.cat]||cp.cat;
       html+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
+      html+='<span style="background:var(--gris-l);color:var(--gris-f);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">'+catLabel+'</span>';
       html+='<span style="background:'+lev.bg+';color:'+lev.color+';padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">'+lev.label+'</span>';
-      html+='<span style="background:var(--ambre-l);color:var(--ambre-d);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600">SRI '+cp.sri+'</span>';
-      html+='<span style="background:var(--blue-l);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:9px">'+cp.horizon+'</span>';
       html+='</div>';
       html+='</div>';
     });
