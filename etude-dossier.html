@@ -3146,8 +3146,8 @@ function rPatrimoine(){
   // Épargne de précaution cible = 3 mois de revenus nets (ou valeur saisie si renseignée)
   var epCible = ED.epPrec || Math.round(revMens() * 3);
   set('pyrEP',fmt(ct)+' €');set('pyrEpCible',fmt(epCible)+' € (3 mois)');
-  const epok=ct>=epCible;
-  document.getElementById('pyrEPst').innerHTML=`<span class="badge ${epok?'badge-green':'badge-red'}">${epok?'✓ Atteint':'⚠ À renforcer'}</span>`;
+  var epok=ct>=epCible;
+  document.getElementById('pyrEPst').innerHTML=epok?'<span class="badge badge-green">✓ Atteint</span>':'';
 
   if(pieInst)pieInst.destroy();
   pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
