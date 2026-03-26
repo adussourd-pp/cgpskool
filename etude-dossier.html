@@ -3672,14 +3672,13 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
-  // Résumé manque par personne
   tblHtml+='</tbody></table>';
-  var n1Lbl=(ED.c1.prenom||'C1').split(' ')[0];
-  var resumeH='<div style="margin-top:14px;padding:14px;background:var(--gris-l);border-radius:8px">';
-  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:10px">Résumé des manques à combler</div>';
-  resumeH+='<div class="fiscal-row"><span class="fr-l">'+n1Lbl+' — pension estimée</span><span class="fr-v">'+fmt(pensM0)+' €/mois</span></div>';
-  resumeH+='<div class="fiscal-row"><span class="fr-l">'+n1Lbl+' — pension souhaitée</span><span class="fr-v">'+fmt(c1cl.pension)+' €/mois</span></div>';
-  resumeH+='<div class="fiscal-row" style="border-top:1.5px solid var(--bord);padding-top:6px"><span class="fr-l" style="font-weight:700">'+n1Lbl+' — manque mensuel</span><span class="fr-v" style="color:var(--red);font-weight:700">'+(gap0>0?fmt(gap0)+' €/mois':'Couvert')+'</span></div>';
+  // Bloc manque total compact
+  var gapFoyer=gap0;
+  var espVie1=getEspVie(ED.c1.civ||'M.',c1cl.retAge||64);
+  var retAge1=c1cl.retAge||64;
+  var espVieMin=espVie1,espVieMax=espVie1;
+  var retAgeMin=retAge1,retAgeMax=retAge1;
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){
     var n2Lbl=(ED.c2.prenom||'C2').split(' ')[0];
     var age2=ageFrom(ED.c2.dob)||40;
@@ -3688,16 +3687,31 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
     var tx2=(TAUX[cspKey2tab]||TAUX['Sal. cadre'])[ageI2];
     var pensM2=Math.floor(((ED.revenus.sal2||ED.revenus.c2||0)+foncC2)/12*tx2/100);
     var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
-    resumeH+='<div style="margin-top:10px"></div>';
-    resumeH+='<div class="fiscal-row"><span class="fr-l">'+n2Lbl+' — pension estimée</span><span class="fr-v">'+fmt(pensM2)+' €/mois</span></div>';
-    resumeH+='<div class="fiscal-row"><span class="fr-l">'+n2Lbl+' — pension souhaitée</span><span class="fr-v">'+fmt(ED.retraite.pension2||2000)+' €/mois</span></div>';
-    resumeH+='<div class="fiscal-row" style="border-top:1.5px solid var(--bord);padding-top:6px"><span class="fr-l" style="font-weight:700">'+n2Lbl+' — manque mensuel</span><span class="fr-v" style="color:var(--red);font-weight:700">'+(gap2>0?fmt(gap2)+' €/mois':'Couvert')+'</span></div>';
-    if(gap0>0||gap2>0){
-      var gapTotal=gap0+(gap2||0);
-      resumeH+='<div class="fiscal-row" style="margin-top:10px;padding:8px 10px;background:var(--ink);border-radius:6px"><span class="fr-l" style="color:#fff;font-weight:700">Manque total du foyer</span><span class="fr-v" style="color:var(--red);font-weight:700;font-size:15px">'+fmt(gapTotal)+' €/mois</span></div>';
-    }
+    gapFoyer+=gap2;
+    var retAge2=ED.retraite.age2||64;
+    var espVie2=getEspVie(ED.c2.civ||'Mme',retAge2);
+    espVieMin=Math.min(espVie1,espVie2);espVieMax=Math.max(espVie1,espVie2);
+    retAgeMin=Math.min(retAge1,retAge2);retAgeMax=Math.max(retAge1,retAge2);
+  }
+  var impactMin=gapFoyer*espVieMin;
+  var impactMax=gapFoyer*espVieMax;
+  var resumeH='<div style="margin-top:14px;padding:16px;background:var(--ink);border-radius:10px;color:#fff">';
+  resumeH+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">';
+  resumeH+='<div>';
+  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px">Manque total du foyer</div>';
+  resumeH+='<div style="font-size:22px;font-weight:700;color:'+(gapFoyer>0?'#e74c3c':'#2ecc71')+'">'+fmt(gapFoyer)+' &euro;/mois</div>';
+  resumeH+='</div>';
+  resumeH+='<div style="text-align:right">';
+  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px">Impact sur la duree</div>';
+  if(espVieMin===espVieMax){
+    resumeH+='<div style="font-size:18px;font-weight:700;color:#e74c3c">'+fmt(Math.abs(impactMin))+' &euro;</div>';
+    resumeH+='<div style="font-size:11px;color:rgba(255,255,255,0.5)">'+Math.round(espVieMin/12)+' ans (depart '+retAge1+' ans)</div>';
+  } else {
+    resumeH+='<div style="font-size:18px;font-weight:700;color:#e74c3c">'+fmt(Math.abs(impactMin))+' a '+fmt(Math.abs(impactMax))+' &euro;</div>';
+    resumeH+='<div style="font-size:11px;color:rgba(255,255,255,0.5)">'+Math.round(espVieMin/12)+' a '+Math.round(espVieMax/12)+' ans (depart '+retAgeMin+(retAgeMin!==retAgeMax?' a '+retAgeMax:'')+' ans)</div>';
   }
   resumeH+='</div>';
+  resumeH+='</div></div>';
   tblHtml+=resumeH;
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
   var leg=document.getElementById('retSimuLegend');
