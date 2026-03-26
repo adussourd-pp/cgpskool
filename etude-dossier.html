@@ -242,9 +242,12 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .client-mini-detail{font-size:11px;color:var(--gris);line-height:1.5}
 
 /* ── MAIN ── */
-.main{padding:28px 32px;overflow-y:auto;max-width:1160px;background:#fff}
+.main{padding:28px 32px;overflow-y:auto;max-width:1160px;background:#ECEAE6}
 .section-page{display:none}
 .section-page.active{display:block;animation:fadeUp 0.25s ease}
+/* Cadre A4 sur les sections (sauf import) */
+.section-page:not(#sec-import){background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px;max-width:794px;margin:0 auto;min-height:600px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+#sec-import{background:transparent;padding:0}
 to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -533,6 +536,9 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
+  <div style="padding:8px 10px;margin-top:8px">
+    <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:10px;font-size:13px">&#11015; Exporter PDF</button>
+  </div>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
@@ -1050,7 +1056,7 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Page de garde</div><div class="sec-sub">Premiere page du PDF — logo, nom client, coordonnees</div></div>
   </div>
 
-  <div style="border:1.5px solid var(--bord);border-radius:4px;background:#fff;width:100%;max-width:794px;min-height:1123px;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin:0 auto">
+  <div style="display:flex;flex-direction:column;min-height:500px">
 
     <!-- En-tete cabinet -->
     <div style="padding:24px 32px;border-bottom:1px solid var(--bord);display:flex;justify-content:space-between;align-items:flex-start">
@@ -1092,13 +1098,19 @@ select.span2{grid-column:span 2}
 
   </div>
 
-  <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
-    Pour modifier le logo et les coordonnees, ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong>.
+  <!-- Sommaire (page 2) -->
+  <div style="margin-top:32px;padding-top:32px;border-top:1px solid var(--bord)">
+    <div style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);margin-bottom:20px">Sommaire</div>
+    <div id="gardeSommaire" style="font-family:var(--sans)"></div>
+  </div>
+
+  <div class="panneau-interne" style="margin-top:18px;padding:10px 14px;background:rgba(212,98,42,0.06);border:1px dashed var(--orange);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
+    Pour modifier le logo, ouvrez la <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">configuration</strong>.
   </div>
 
   <div class="row-btns" style="margin-top:18px">
     <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
-    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions &amp; Avis &#8594;</button>
+    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions légales &#8594;</button>
   </div>
 </div><!-- /sec-pagegarde -->
 
@@ -5806,6 +5818,38 @@ function rPageGarde(){
   var foot=document.getElementById('gardeFooter');
   if(foot){
     foot.innerHTML=p.cabinet?'<span>'+p.cabinet+'</span>':'';
+  }
+
+  // Sommaire
+  var som=document.getElementById('gardeSommaire');
+  if(som){
+    var items=[
+      {num:'01',label:'Situation personnelle & Objectifs'},
+      {num:'02',label:'Patrimoine'},
+      {num:'03',label:'Bilan Fiscal'},
+      {num:'04',label:'Revenus & Capacit\u00e9 de Financement'},
+      {num:'05',label:'Retraite'}
+    ];
+    // Optionnels
+    var cbTrans=document.getElementById('checkTransmission');
+    if(cbTrans&&cbTrans.checked)items.push({num:'05b',label:'Transmission'});
+    var cbEnt=document.getElementById('checkEntreprise');
+    if(cbEnt&&cbEnt.checked)items.push({num:'05c',label:'Entreprise'});
+    items.push({num:'06',label:'Pr\u00e9conisations Patrimoniales'});
+    items.push({num:'07',label:'Synth\u00e8se & Feuille de route'});
+    items.push({num:'',label:'Mentions l\u00e9gales'});
+    var cbAvis=document.getElementById('checkAvis');
+    if(cbAvis&&cbAvis.checked)items.push({num:'',label:'Avis clients'});
+
+    var sh='';
+    items.forEach(function(it,i){
+      sh+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bord)">';
+      sh+='<span style="font-family:var(--serif);font-size:18px;font-weight:600;color:rgba(212,98,42,0.3);min-width:32px">'+(it.num||'')+'</span>';
+      sh+='<span style="font-size:14px;color:var(--noir);flex:1">'+it.label+'</span>';
+      sh+='<span style="font-size:11px;color:var(--gris)">'+(i+2)+'</span>';
+      sh+='</div>';
+    });
+    som.innerHTML=sh;
   }
 }
 
