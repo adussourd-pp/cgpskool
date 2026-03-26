@@ -1019,11 +1019,9 @@ select.span2{grid-column:span 2}
 
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
 <div id="extPanelPreconisations" class="panneau-interne" style="display:none;border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
-  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
     <div>
       <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">Panneau conseiller</div>
-      <div style="font-size:11px;color:var(--gris);margin-top:1px">Objectifs détectés · Solutions Copernic — pas visible dans le PDF</div>
     </div>
     <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
   </div>
@@ -4646,6 +4644,45 @@ function renderSolsRetenues(){
       html+='</div></div>';
     }
 
+    // ── Recommandations par produit ──
+    if(!window.RECOS)window.RECOS={
+      'Assurance vie':['Privil\u00e9gier une architecture ouverte (multi-supports)','V\u00e9rifier la clause b\u00e9n\u00e9ficiaire','Anticiper la fiscalit\u00e9 apr\u00e8s 8 ans','Envisager des rachats partiels programm\u00e9s'],
+      'Contrat de capitalisation':['Int\u00e9ressant si patrimoine soumis \u00e0 l\'IFI','Peut \u00eatre transmis par donation de son vivant','V\u00e9rifier la compatibilit\u00e9 avec la succession'],
+      'SCPI de rendement':['Diversifier entre plusieurs SCPI et gestionnaires','V\u00e9rifier le taux d\'occupation financier (TOF)','Envisager le r\u00e9investissement des dividendes','Financement \u00e0 cr\u00e9dit possible pour effet levier'],
+      'FCPR / FPCI':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 investisseur qualifi\u00e9 si ticket > 100k\u20ac','Diversifier les mill\u00e9simes','Anticiper le blocage des fonds (5 \u00e0 10 ans)','Adapter la part au profil de risque global'],
+      'Donation':['V\u00e9rifier la date de la derni\u00e8re donation (rechargement 15 ans)','Envisager une donation-partage pour figer les valeurs','Consulter un notaire pour l\'acte','Pr\u00e9voir le rapport \u00e0 succession si in\u00e9galit\u00e9 entre h\u00e9ritiers'],
+      'PER':['V\u00e9rifier le plafond de d\u00e9duction disponible (avis d\'imposition)','Anticiper la fiscalit\u00e9 \u00e0 la sortie (rente vs capital)','Arbitrer entre PER individuel et PER entreprise','Optimiser le timing des versements selon revenus de l\'ann\u00e9e'],
+      'FIP / FCPI':['R\u00e9it\u00e9rer chaque ann\u00e9e pour cr\u00e9er une boucle de mill\u00e9simes','V\u00e9rifier le plafond niches fiscales restant (10 000\u20ac/an)','Cumuler FIP + FCPI + Corse + Outre-mer si possible','S\u00e9lectionner un op\u00e9rateur avec track record solide'],
+      'Girardin industriel':['Privil\u00e9gier un op\u00e9rateur avec garantie de bonne fin fiscale','V\u00e9rifier le plafond niches fiscales d\u00e9rogatoire (18 000\u20ac Outre-mer)','Souscrire en d\u00e9but d\'ann\u00e9e pour les meilleurs taux','Ne pas d\u00e9passer une exposition raisonnable du patrimoine'],
+      'SCPI fiscale':['Identifier le dispositif fiscal applicable (Malraux / D\u00e9ficit / MH)','V\u00e9rifier le plafond niches fiscales restant','Anticiper la fiscalit\u00e9 des revenus fonciers g\u00e9n\u00e9r\u00e9s','Horizon minimum 8-10 ans recommand\u00e9'],
+      'SCPI financ\u00e9e':['Comparer le co\u00fbt du cr\u00e9dit vs rendement SCPI','V\u00e9rifier la capacit\u00e9 d\'endettement restante','Privil\u00e9gier un cr\u00e9dit in fine si TMI \u00e9lev\u00e9','Anticiper l\'effort d\'\u00e9pargne mensuel net'],
+      'LMNP':['V\u00e9rifier le r\u00e9gime fiscal (r\u00e9el obligatoire pour amortissement)','Anticiper la requalification LMP si revenus > 23 000\u20ac','Faire \u00e9tablir un tableau d\'amortissement par un expert-comptable','V\u00e9rifier la qualit\u00e9 du gestionnaire si r\u00e9sidence services'],
+      'Denormandie':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 de la commune (liste officielle)','Confirmer le montant des travaux (min 25% du co\u00fbt total)','V\u00e9rifier les plafonds de loyers et ressources locataire','Contr\u00f4ler l\'impact sur le plafond niches fiscales (10 000\u20ac/an)'],
+      'Nue-propri\u00e9t\u00e9 immo':['V\u00e9rifier la solidit\u00e9 du bailleur social (usufruitier)','Anticiper la r\u00e9cup\u00e9ration de la pleine propri\u00e9t\u00e9','Pas de revenus pendant la dur\u00e9e \u2014 v\u00e9rifier la coh\u00e9rence','Int\u00e9ressant pour r\u00e9duire l\'assiette IFI'],
+      'LLI':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 TVA r\u00e9duite (zone et op\u00e9rateur agr\u00e9\u00e9)','Envisager la SCI \u00e0 l\'IS pour optimiser l\'amortissement','V\u00e9rifier les plafonds de loyers applicables','Anticiper la fiscalit\u00e9 des revenus selon structure'],
+      'Jeanbrun':['V\u00e9rifier que le bien est un immeuble collectif (appartement)','Confirmer le DPE A ou B (neuf RE2020 obligatoire)','V\u00e9rifier les plafonds de loyers par zone','V\u00e9rifier les ressources du locataire','D\u00e9crets d\'application en cours \u2014 confirmer avec conseiller fiscal'],
+      'Immobilier d\u00e9fiscalisant':['Identifier le dispositif applicable','V\u00e9rifier le plafond niches fiscales restant','Anticiper la fiscalit\u00e9 des revenus g\u00e9n\u00e9r\u00e9s','Faire valider le montage par un conseiller fiscal'],
+      'SCPI via SCI \u00e0 l\'IS':['V\u00e9rifier l\'objet social de la SCI','Anticiper la double imposition \u00e0 la sortie (IS + IR dividendes)','Faire \u00e9tablir les statuts par un juriste','Inscrire les parts au bilan de la SCI'],
+      'SCPI en usufruit':['Identifier le nu-propri\u00e9taire en parall\u00e8le','V\u00e9rifier la convention d\'usufruit','Anticiper la fiscalit\u00e9 IS sur les revenus per\u00e7us','Dur\u00e9e \u00e0 adapter aux besoins de tr\u00e9sorerie'],
+      'Pr\u00e9voyance individuelle':['Faire \u00e9tablir plusieurs devis comparatifs','V\u00e9rifier les exclusions de garantie','Adapter le d\u00e9lai de franchise \u00e0 la tr\u00e9sorerie','R\u00e9viser annuellement selon \u00e9volution des revenus'],
+      'Pr\u00e9voyance pro':['Valoriser l\'entreprise avant de fixer le capital homme-cl\u00e9','V\u00e9rifier la r\u00e9daction du pacte d\'associ\u00e9s','Adapter selon la structure juridique (SAS / SARL / EURL)','Faire \u00e9tablir plusieurs devis comparatifs'],
+      'PEE':['V\u00e9rifier les conditions d\'acc\u00e8s pour le dirigeant (min 1 salari\u00e9)','R\u00e9diger l\'accord ou la DUE avec un juriste','Communiquer clairement aux salari\u00e9s','Combiner avec PERECO pour maximiser l\'avantage fiscal'],
+      'PERECO/PERECOI':['V\u00e9rifier le statut du dirigeant (TNS vs assimil\u00e9 salari\u00e9)','Combiner avec PEE pour maximiser l\'abondement','D\u00e9finir l\'allocation selon profil de risque et horizon','Anticiper les modalit\u00e9s de sortie (rente / capital / mixte)'],
+      'Apport-cession 150-0 B ter':['Structurer la holding AVANT la cession \u2014 ordre imp\u00e9ratif','Respecter le d\u00e9lai de r\u00e9investissement (2 ans)','Documenter rigoureusement le r\u00e9investissement','Coordonner avec l\'avocat fiscaliste et l\'expert-comptable','Ne pas confondre avec le 150-0 D ter'],
+      'FCPR/FPCI (remploi 150-0 B ter)':['Confirmer l\'\u00e9ligibilit\u00e9 du fonds au remploi','Ticket min 100 000\u20ac \u2014 investisseur qualifi\u00e9','Coordonner avec l\'avocat en charge du 150-0 B ter','Anticiper le blocage 5 ans minimum','Diversifier entre plusieurs fonds si montant important'],
+      'Contrat de capitalisation PM':['V\u00e9rifier que l\'objet social autorise ce placement','Inscrire au bilan \u2014 traitement comptable \u00e0 valider','Envisager le nantissement pour garantir un pr\u00eat','Anticiper la fiscalit\u00e9 IS \u00e0 la sortie']
+    };
+    var recoList=RECOS[grp.produit];
+    if(recoList){
+      if(!firstSol._recos)firstSol._recos=[];
+      html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:6px">Recommandations</div>';
+      recoList.forEach(function(r,ri){
+        var ck=firstSol._recos.indexOf(ri)>=0;
+        html+='<label style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px;line-height:1.4"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleReco(\''+grp.produit.replace(/\'/g,"\\'")+'\','+ri+',this.checked)" style="accent-color:var(--orange);margin-top:2px;flex-shrink:0">'+r+'</label>';
+      });
+      html+='</div>';
+    }
+
     // SCPI reinvest toggle (shown once per group)
     var isSCPIRendement=grp.produit==='SCPI de rendement';
     var isSCPI3=isSCPIRendement;
@@ -5126,6 +5163,16 @@ function toggleDonStrat(key,checked){
   if(checked&&arr.indexOf(key)<0)arr.push(key);
   else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
   renderSolsRetenues();renderFichesClient();
+}
+// ── Recommandations helpers ──
+function toggleReco(produit,idx,checked){
+  solsSelectionnees.forEach(function(s){
+    if(s.produit!==produit)return;
+    if(!s._recos)s._recos=[];
+    if(checked&&s._recos.indexOf(idx)<0)s._recos.push(idx);
+    else if(!checked){var i=s._recos.indexOf(idx);if(i>=0)s._recos.splice(i,1);}
+  });
+  renderFichesClient();
 }
 // ── Custom Forms generique helpers ──
 function updCF(key,field,val){
@@ -5662,6 +5709,20 @@ function renderFichesClient(){
         }
         html+='<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:600">\u26a0\ufe0f Simulation indicative \u2014 \u00e0 confirmer avec un notaire.</div>';
         html+='</div>';
+      }
+
+      // Recommandations cochées (Points de vigilance) dans le PDF
+      if(firstSol._recos&&firstSol._recos.length){
+        var recoListPDF=window.RECOS?window.RECOS[pg.produit]:null;
+        if(recoListPDF){
+          var checkedRecos=firstSol._recos.map(function(ri){return recoListPDF[ri];}).filter(Boolean);
+          if(checkedRecos.length){
+            html+='<div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
+            html+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:6px">Points de vigilance</div>';
+            html+='<div style="font-size:11px;color:var(--gris-f);line-height:1.7">'+checkedRecos.map(function(r){return '\u2022 '+r;}).join('<br>')+'</div>';
+            html+='</div>';
+          }
+        }
       }
 
       // Note client par produit (si switch ON et texte non vide)
