@@ -450,6 +450,9 @@ select.span2{grid-column:span 2}
 .ml-input:focus{border-color:var(--orange)}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}}
 
+/* ── NUMÉROTATION DE PAGE ── */
+.page-number{text-align:center;font-family:var(--sans);font-size:11px;color:var(--gris);padding:18px 0 4px;margin-top:18px;border-top:1px solid var(--bord)}
+
 /* ── PAGE DE GARDE PDF ── */
 .pdf-cover-page{display:none}
 .pdf-cover-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;text-align:center;padding:40px}
@@ -685,6 +688,7 @@ select.span2{grid-column:span 2}
     <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-situation -->
 
 <!-- ════════════════════════════════════════
@@ -728,6 +732,7 @@ select.span2{grid-column:span 2}
     <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-patrimoine -->
 
 <!-- ════════════════════════════════════════
@@ -769,6 +774,7 @@ select.span2{grid-column:span 2}
     <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-fiscal -->
 
 <!-- ════════════════════════════════════════
@@ -788,6 +794,7 @@ select.span2{grid-column:span 2}
     <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-financement -->
 
 <!-- ════════════════════════════════════════
@@ -828,6 +835,7 @@ select.span2{grid-column:span 2}
     <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-retraite -->
 
 <!-- ════════════════════════════════════════
@@ -864,6 +872,7 @@ select.span2{grid-column:span 2}
     <div class="card-title"><span class="dot"></span>Note transmission</div>
     <div class="ed-block" id="noteTrans" contenteditable="true" data-placeholder="Analyse successorale : AV, donations, clause beneficiaire, SCI..."></div>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-transmission -->
 
 <!-- ════════════════════════════════════════
@@ -907,7 +916,33 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="goTo('transmission')">&#8592; Transmission</button>
     <button class="btn btn-secondary" onclick="goTo('preconisations')">Préconisations &#8594;</button>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-entreprise -->
+
+<!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
+<div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
+    <div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">Panneau conseiller</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:1px">Objectifs détectés · Solutions Copernic — pas visible dans le PDF</div>
+    </div>
+    <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
+  </div>
+  <div id="panneauConseiller" style="background:#fefcf8;padding:20px">
+    <!-- Matrice objectifs → solutions Copernic (cliquables) -->
+    <div style="margin-bottom:20px">
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:12px">Objectifs identifiés — solutions Copernic compatibles</div>
+      <div id="matriceObjSol" style="font-size:13px;color:var(--gris-f)">—</div>
+    </div>
+    <!-- Solutions retenues + paramétrage des projections -->
+    <div style="border-top:1px solid var(--bord);padding-top:18px">
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:14px">Solutions retenues — paramétrage</div>
+      <div id="solsRetenues"><div style="font-size:12px;color:var(--gris);font-style:italic">Aucune solution — cochez dans la matrice ci-dessus</div></div>
+      <button onclick="ajouterSolutionManuelle()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter manuellement</button>
+    </div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════
      6 — PRÉCONISATIONS
@@ -949,30 +984,6 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- ── PANNEAU CONSEILLER ── -->
-  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
-    <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
-      <div>
-        <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">Panneau conseiller</div>
-        <div style="font-size:11px;color:var(--gris);margin-top:1px">Objectifs détectés · Solutions Copernic — pas visible dans le PDF</div>
-      </div>
-      <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
-    </div>
-    <div id="panneauConseiller" style="background:#fefcf8;padding:20px">
-      <!-- Matrice objectifs → solutions Copernic (cliquables) -->
-      <div style="margin-bottom:20px">
-        <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:12px">Objectifs identifiés — solutions Copernic compatibles</div>
-        <div id="matriceObjSol" style="font-size:13px;color:var(--gris-f)">—</div>
-      </div>
-      <!-- Solutions retenues + paramétrage des projections -->
-      <div style="border-top:1px solid var(--bord);padding-top:18px">
-        <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:14px">Solutions retenues — paramétrage</div>
-        <div id="solsRetenues"><div style="font-size:12px;color:var(--gris);font-style:italic">Aucune solution — cochez dans la matrice ci-dessus</div></div>
-        <button onclick="ajouterSolutionManuelle()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter manuellement</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ── FICHES CLIENT (générées depuis Copernic) ── -->
   <div id="fichesClientContainer" style="margin-bottom:18px">
     <div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Sélectionnez des solutions dans le panneau conseiller pour générer les fiches</div>
@@ -985,6 +996,7 @@ select.span2{grid-column:span 2}
     <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2"></textarea>
   </div>
 
+  <div class="page-number"></div>
 </div><!-- /sec-preconisations -->
 
 <!-- ════════════════════════════════════════
@@ -1046,6 +1058,7 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="goTo('preconisations')">← Préconisations</button>
     <button class="btn btn-success" onclick="exportPDF()">↓ Exporter PDF complet</button>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-synthese -->
 
 <!-- ════════════════════════════════════════
@@ -1112,7 +1125,27 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
     <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions légales &#8594;</button>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-pagegarde -->
+
+<!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
+<div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-radius:10px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
+    <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entrée en relation (fiche légale)</div>
+  </div>
+  <textarea id="mentionsDirectInput" rows="6"
+    placeholder="Collez ici le contenu de votre fiche d'informations légales..."
+    style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
+    oninput="saveMentionsDirect()"
+    onfocus="this.style.borderColor='var(--orange)'"
+    onblur="this.style.borderColor='var(--bord)'"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════
      9 — MENTIONS LÉGALES & AVIS
@@ -1120,24 +1153,6 @@ select.span2{grid-column:span 2}
 <div class="section-page" id="sec-mentions">
   <div class="sec-header">
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions légales</div><div class="sec-sub">Incluses en dernière page du PDF</div></div>
-  </div>
-
-  <!-- Zone saisie mentions (copier-coller) -->
-  <div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
-    <div style="margin-bottom:14px">
-      <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
-      <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entrée en relation (fiche légale)</div>
-    </div>
-    <textarea id="mentionsDirectInput" rows="6"
-      placeholder="Collez ici le contenu de votre fiche d'informations légales..."
-      style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
-      oninput="saveMentionsDirect()"
-      onfocus="this.style.borderColor='var(--orange)'"
-      onblur="this.style.borderColor='var(--bord)'"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
-    </div>
   </div>
 
   <!-- Rendu mentions (visible dans le PDF) -->
@@ -1156,7 +1171,25 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
     <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-mentions -->
+
+<!-- ── ZONE CONSEILLER AVIS (hors section-page) ── -->
+<div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
+    <span style="font-size:14px">&#128274;</span>
+    <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — pas visible dans le PDF</div>
+  </div>
+  <div style="padding:16px;background:#fefcf8">
+    <div id="avisManualList"></div>
+    <button onclick="addAvisManuel()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter un avis</button>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)">
+      <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:6px">Lien pour laisser un avis (inclus dans le PDF)</label>
+      <input type="url" id="avisLienUrl" placeholder="https://g.page/r/votre-lien/review" style="width:100%;padding:8px 12px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;outline:none" oninput="saveAvisLien()">
+    </div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════
      10 — AVIS CLIENTS (optionnel)
@@ -1164,22 +1197,6 @@ select.span2{grid-column:span 2}
 <div class="section-page" id="sec-avis">
   <div class="sec-header">
     <div><div class="sec-tag">PDF — Optionnel</div><div class="sec-h1">Avis clients</div><div class="sec-sub">Inclus dans le PDF si la case est cochée</div></div>
-  </div>
-
-  <!-- Zone conseiller (pas dans le PDF) -->
-  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
-    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:14px">&#128274;</span>
-      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — pas visible dans le PDF</div>
-    </div>
-    <div style="padding:16px;background:#fefcf8">
-      <div id="avisManualList"></div>
-      <button onclick="addAvisManuel()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter un avis</button>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)">
-        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:6px">Lien pour laisser un avis (inclus dans le PDF)</label>
-        <input type="url" id="avisLienUrl" placeholder="https://g.page/r/votre-lien/review" style="width:100%;padding:8px 12px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;outline:none" oninput="saveAvisLien()">
-      </div>
-    </div>
   </div>
 
   <!-- Apercu (visible dans le PDF) -->
@@ -1194,6 +1211,7 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="goTo('mentions')">&#8592; Mentions légales</button>
     <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
   </div>
+  <div class="page-number"></div>
 </div><!-- /sec-avis -->
 
 </main>
@@ -2160,6 +2178,32 @@ function goTo(sec){
   if(btn)btn.classList.add('active');
   window.scrollTo(0,0);
   if(sec!=='import') renderSection(sec);
+  updatePageNumbers();
+}
+
+// ── NUMÉROTATION DYNAMIQUE DES PAGES ─────────────────────────────
+function updatePageNumbers(){
+  // Sections éligibles à la numérotation (hors import)
+  var sectionIds=['situation','patrimoine','fiscal','financement','retraite',
+    'transmission','entreprise','preconisations','synthese','pagegarde','mentions','avis'];
+  // Filtrer les sections activées (checkbox cochée ou pas de checkbox = toujours active)
+  var checkMap={transmission:'checkTransmission',entreprise:'checkEntreprise',avis:'checkAvis'};
+  var activeSections=sectionIds.filter(function(id){
+    var checkId=checkMap[id];
+    if(checkId){var cb=document.getElementById(checkId);return cb&&cb.checked;}
+    return true;
+  });
+  var total=activeSections.length;
+  // Mettre à jour chaque .page-number
+  sectionIds.forEach(function(id){
+    var sec=document.getElementById('sec-'+id);
+    if(!sec)return;
+    var pn=sec.querySelector('.page-number');
+    if(!pn)return;
+    var idx=activeSections.indexOf(id);
+    if(idx===-1){pn.textContent='';return;}
+    pn.textContent='Page '+(idx+1)+' / '+total;
+  });
 }
 
 // ── MODE IMPORT/MANUAL ────────────────────────────────────────────
@@ -5084,6 +5128,7 @@ function toggleTransmission(checked){
     var secTrans=document.getElementById('sec-transmission');
     if(secTrans&&secTrans.classList.contains('active'))goTo('retraite');
   }
+  updatePageNumbers();
 }
 function isEntrepriseActive(){
   var cb=document.getElementById('checkEntreprise');
@@ -5105,6 +5150,7 @@ function toggleEntreprise(checked){
     var sec=document.getElementById('sec-entreprise');
     if(sec&&sec.classList.contains('active'))goTo('retraite');
   }
+  updatePageNumbers();
   // Rafraichir preconisations si ouverte
   var secPreco=document.getElementById('sec-preconisations');
   if(secPreco&&secPreco.classList.contains('active'))rPreconisations();
@@ -5125,6 +5171,7 @@ function toggleAvis(checked){
     var secAvis=document.getElementById('sec-avis');
     if(secAvis&&secAvis.classList.contains('active'))goTo('mentions');
   }
+  updatePageNumbers();
 }
 
 // Apres import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
@@ -5645,6 +5692,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Charger couleurs et logo personnalisés
   loadColors();
   loadLogo();
+  updatePageNumbers();
 });
 
 // ── Avis d'imposition — upload PDF ───────────────────────────
