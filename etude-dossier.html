@@ -539,8 +539,8 @@ select.span2{grid-column:span 2}
     <div class="client-mini-detail" id="cmDetail">&#8212;</div>
   </div>
   <div id="sidebarProfilBlock" style="margin-top:8px;padding:10px 12px;background:var(--gris-l);border-radius:8px;border:1.5px solid var(--bord);cursor:pointer;transition:all 0.2s" onclick="openProfil()">
-    <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">Conseiller</div>
-    <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">⚙️ Configurer mon profil</div>
+    <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">Configuration</div>
+    <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">Configuration</div>
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
   </div>
 </aside>
@@ -943,15 +943,12 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- ── PANNEAU CONSEILLER (fond sombre, jamais visible client) ── -->
-  <div style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
-    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:12px 12px 0 0" onclick="togglePanneauConseiller()">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:16px">🔒</span>
-        <div>
-          <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--orange)">Panneau conseiller</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px">Objectifs détectés · Solutions Copernic — jamais visible par le client</div>
-        </div>
+  <!-- ── PANNEAU CONSEILLER ── -->
+  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
+    <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
+      <div>
+        <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">Panneau conseiller</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:1px">Objectifs détectés · Solutions Copernic — pas visible dans le PDF</div>
       </div>
       <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
     </div>
@@ -5322,6 +5319,24 @@ function loadManualReviews(){
 }
 
 // ── Logo upload ──
+function handlePhotoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var dataUrl=e.target.result;
+    try{localStorage.setItem('cgpskool_photo',dataUrl);}catch(err){}
+    showPhotoPreview(dataUrl);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showPhotoPreview(dataUrl){
+  var el=document.getElementById('photoPreview');
+  if(el&&dataUrl)el.innerHTML='<img src="'+dataUrl+'" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--bord)">';
+}
+function loadPhoto(){
+  try{var photo=localStorage.getItem('cgpskool_photo');if(photo)showPhotoPreview(photo);}catch(e){}
+}
+
 function handleLogoUpload(input){
   if(!input.files||!input.files[0])return;
   var reader=new FileReader();
@@ -5454,7 +5469,7 @@ function updateProfilBadge(p) {
   // Sidebar
   var sNom = document.getElementById('sidebarProfilNom');
   var sDet = document.getElementById('sidebarProfilDetail');
-  if (sNom) sNom.textContent = complet ? nomAff : '⚙️ Configurer mon profil';
+  if (sNom) sNom.textContent = complet ? nomAff : 'Configuration';
   if (sDet) sDet.textContent = complet
     ? (p.cabinet || '') + (p.orias ? ' · ORIAS ' + p.orias : '')
     : 'Affiché sur le PDF';
@@ -5533,6 +5548,7 @@ function clearProfil() {
   updatePdfFooter(p);
   loadTrustpilotPreview();
   loadManualReviews();
+  loadPhoto();
 })();
 
 // Touche Echap ferme la modale
@@ -5718,10 +5734,31 @@ function extractPdfText(file, callback) {
 
 function rPageGarde(){
   var p=loadProfil?loadProfil():{};
-  // Aussi charger depuis mentions legales si dispo
+  // Extraire infos depuis le texte des mentions legales
   try{
-    var ml=localStorage.getItem('cgpskool_ml');
-    if(ml){var d=JSON.parse(ml);if(d.mlRaison&&!p.cabinet)p.cabinet=d.mlRaison;if(d.mlOrias&&!p.orias)p.orias=d.mlOrias;if(d.mlSiege&&!p.adresse)p.adresse=d.mlSiege;}
+    var mlTxt=localStorage.getItem('cgpskool_mentions')||'';
+    if(mlTxt){
+      // Nom conseiller : "Par : Prenom NOM" ou "Nom / Prénom : NOM Prenom"
+      var mNom=mlTxt.match(/(?:Par|Nom\s*\/\s*Pr[eé]nom)\s*[:\-]\s*([A-Za-z\u00c0-\u00ff][A-Za-z\u00c0-\u00ff\s\-]+?)(?:\n|$)/im);
+      if(mNom&&!p.prenom){
+        var parts=mNom[1].trim().split(/\s+/);
+        var allCaps=parts.filter(function(w){return w===w.toUpperCase()&&w.length>1;});
+        if(allCaps.length&&allCaps[0]===parts[0]){p.nom=allCaps.join(' ');p.prenom=parts.slice(allCaps.length).join(' ');}
+        else{p.prenom=parts.slice(0,-1).join(' ');p.nom=parts[parts.length-1];}
+      }
+      // ORIAS
+      var mOrias=mlTxt.match(/ORIAS[^:]*?[:\s]*(\d[\d\s\-]+\d)/i);
+      if(mOrias&&!p.orias)p.orias=mOrias[1].replace(/[\s\-]/g,'');
+      // Adresse
+      var mAdr=mlTxt.match(/Adresse professionnelle\s*[:\-]\s*(.+?)(?:\n|$)/im);
+      if(mAdr&&!p.adresse)p.adresse=mAdr[1].trim();
+      // Email
+      var mMail=mlTxt.match(/E-mail\s*[:\-]\s*([^\s\n]+@[^\s\n]+)/im);
+      if(mMail&&!p.email)p.email=mMail[1].trim();
+      // Tel
+      var mTel=mlTxt.match(/Tel[.\s]*(?:Portable|Mobile)?\s*[:\-]\s*([\d\s]+)/im);
+      if(mTel&&!p.tel)p.tel=mTel[1].trim();
+    }
   }catch(e){}
 
   var civ1=ED.c1.civ||'';
@@ -6124,58 +6161,29 @@ window.addEventListener('afterprint', function() {
 ══════════════════════════════════════════ -->
 <div class="profil-overlay" id="profilOverlay" style="display:none" onclick="if(event.target===this)closeProfil()">
   <div class="profil-modal">
-    <h2>⚙️ Mon profil conseiller</h2>
-    <p class="sub">Sauvegardé une seule fois — injecté automatiquement dans toutes vos études.</p>
-    <div class="profil-row">
-      <div class="profil-fg">
-        <label>Prénom</label>
-        <input type="text" id="pPrenom" placeholder="Alexandre" oninput="saveProfil()">
-      </div>
-      <div class="profil-fg">
-        <label>Nom</label>
-        <input type="text" id="pNom" placeholder="DUSSOURD" oninput="saveProfil()">
-      </div>
-    </div>
+    <h2>Configuration</h2>
+    <p class="sub">Personnalisez votre outil — sauvegardé localement.</p>
+
     <div class="profil-row full">
       <div class="profil-fg">
-        <label>Cabinet / Société</label>
+        <label>Nom du cabinet</label>
         <input type="text" id="pCabinet" placeholder="Peak Patrimoine" oninput="saveProfil()">
       </div>
     </div>
+
     <div class="profil-row">
       <div class="profil-fg">
-        <label>N° ORIAS</label>
-        <input type="text" id="pOrias" placeholder="22002240" oninput="saveProfil()">
+        <label>Logo du cabinet</label>
+        <input type="file" id="pLogo" accept="image/*" onchange="handleLogoUpload(this)" style="font-size:12px">
+        <div id="logoPreview" style="margin-top:6px"></div>
       </div>
       <div class="profil-fg">
-        <label>Téléphone</label>
-        <input type="tel" id="pTel" placeholder="06 68 68 11 88" oninput="saveProfil()">
+        <label>Photo de profil</label>
+        <input type="file" id="pPhoto" accept="image/*" onchange="handlePhotoUpload(this)" style="font-size:12px">
+        <div id="photoPreview" style="margin-top:6px"></div>
       </div>
     </div>
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Email professionnel</label>
-        <input type="email" id="pEmail" placeholder="contact@peakpatrimoine.fr" oninput="saveProfil()">
-      </div>
-    </div>
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Adresse professionnelle</label>
-        <input type="text" id="pAdresse" placeholder="3 avenue de la République" oninput="saveProfil()">
-      </div>
-    </div>
-    <div class="profil-row">
-      <div class="profil-fg">
-        <label>Code postal</label>
-        <input type="text" id="pCP" placeholder="06300" oninput="saveProfil()">
-      </div>
-      <div class="profil-fg">
-        <label>Ville</label>
-        <input type="text" id="pVille" placeholder="Nice" oninput="saveProfil()">
-      </div>
-    </div>
-    <!-- Mentions legales deplacees dans la page Mentions -->
-    <!-- Avis clients deplaces dans la page Avis -->
+
     <div class="profil-row">
       <div class="profil-fg">
         <label>Couleur principale</label>
@@ -6189,20 +6197,19 @@ window.addEventListener('afterprint', function() {
     <div style="margin-bottom:6px">
       <button onclick="resetColors()" style="padding:5px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris)">Reinitialiser les couleurs</button>
     </div>
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Logo du cabinet (affiché sur le PDF)</label>
-        <input type="file" id="pLogo" accept="image/*" onchange="handleLogoUpload(this)" style="font-size:12px">
-        <div id="logoPreview" style="margin-top:6px"></div>
-      </div>
-    </div>
-    <div style="margin-top:8px;padding:10px 12px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--ambre-d);line-height:1.5">
-      ℹ️ Stocké localement sur votre appareil (<code>localStorage</code>). 
-      Aucune donnée envoyée sur internet.
+
+    <!-- Champs caches pour compat (utilises par d autres fonctions) -->
+    <input type="hidden" id="pPrenom"><input type="hidden" id="pNom">
+    <input type="hidden" id="pOrias"><input type="hidden" id="pTel">
+    <input type="hidden" id="pEmail"><input type="hidden" id="pAdresse">
+    <input type="hidden" id="pCP"><input type="hidden" id="pVille">
+
+    <div style="margin-top:12px;padding:10px 12px;background:var(--gris-l);border-radius:8px;font-size:11px;color:var(--gris);line-height:1.5">
+      Stocké localement sur votre appareil. Aucune donnée envoyée sur internet.
     </div>
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-primary" onclick="closeProfil()">✓ Fermer</button>
-      <button class="btn btn-secondary" onclick="clearProfil()" style="margin-left:auto;color:var(--red)">Effacer</button>
+      <button class="btn btn-primary" onclick="closeProfil()">Fermer</button>
+      <button class="btn btn-secondary" onclick="clearProfil()" style="margin-left:auto;color:var(--red)">Tout effacer</button>
     </div>
   </div>
 </div>
