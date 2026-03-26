@@ -4518,9 +4518,10 @@ function renderSolsRetenues(){
     html+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:12px;margin-bottom:14px;border-left:3.5px solid var(--orange);overflow:hidden">';
 
     // Header produit
+    var grpIdx=groups.indexOf(grp)+1;
     html+='<div style="padding:16px 18px 0">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html+='<div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">'+grp.produit+'</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+grpIdx+'</span><span style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">'+grp.produit+'</span></div>';
     html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
     if(cp.sri)html+='<span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span>';
     if(cp.horizon)html+='<span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.horizon+'</span>';
@@ -4703,102 +4704,71 @@ function renderFichesClient(){
     html+='</div>';
     html+='<div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">';
 
+    // Grouper par produit au sein du levier
+    var prodGroups=[];var prodMap={};
     sols.forEach(function(sol){
-      var cp=COPERNIC[sol.produit]||{};
-      var cfg=(typeof SOLUTIONS_CONFIG!=='undefined'&&SOLUTIONS_CONFIG)?SOLUTIONS_CONFIG[sol.produit]:null;
-      var r=(cfg&&cfg.rendement)||cp.rendement||meta.rate||0.025;
-      var h=parseInt(sol.horizon)||10;
-      var isSCPI=/scpi/i.test(sol.produit||'');
+      if(!prodMap[sol.produit]){prodMap[sol.produit]={produit:sol.produit,sols:[]};prodGroups.push(prodMap[sol.produit]);}
+      prodMap[sol.produit].sols.push(sol);
+    });
 
-      // Calcul capital
-      var capitalFinal,rente,totalInvesti;
-      totalInvesti=(sol.vi||0)+(sol.vp||0)*12*h;
-      if(isSCPI){
-        var rDist=0.045;
-        if(sol.reinvest){
-          var rT=rDist+0.01;
-          capitalFinal=Math.round((sol.vi||0)*Math.pow(1+rT,h)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rT,h)-1)/rT):0));
-        } else {
-          capitalFinal=Math.round((sol.vi||0)*Math.pow(1.01,h)+(sol.vp||0)*12*h);
-        }
-        rente=Math.round(capitalFinal*rDist/12);
-      } else {
-        capitalFinal=Math.round((sol.vi||0)*Math.pow(1+r,h)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r,h)-1)/r):0));
-        rente=Math.round(capitalFinal*0.04/12);
-      }
+    prodGroups.forEach(function(pg){
+      var firstSol=pg.sols[0];
+      var cp=COPERNIC[pg.produit]||{};
+      var cfg=(typeof SOLUTIONS_CONFIG!=='undefined'&&SOLUTIONS_CONFIG)?SOLUTIONS_CONFIG[pg.produit]:null;
 
-      // Économie fiscale
-      var economieFisc=0, tmi=ED.fiscal.tmi||0;
-      var prodLC=(sol.produit||'').toLowerCase();
-      if(prodLC.indexOf('per')>=0&&sol.vp>0) economieFisc=Math.round(sol.vp*12*tmi/100);
-      else if(prodLC.indexOf('fip')>=0||prodLC.indexOf('fcpi')>=0||prodLC.indexOf('g3f')>=0)
-        economieFisc=Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
+      // Objectifs (shared) from first sol
+      var objsV=firstSol.objectifsValides&&firstSol.objectifsValides.length?firstSol.objectifsValides:[];
+      if(!objsV.length&&allSolsMap[pg.produit])objsV=allSolsMap[pg.produit].objectifs.slice(0,2);
 
-      // Objectifs validés pour cette solution
-      var objsV=sol.objectifsValides&&sol.objectifsValides.length?sol.objectifsValides:[];
-      // Fallback : objectifs depuis la matrice
-      if(!objsV.length&&allSolsMap[sol.produit]){
-        objsV=allSolsMap[sol.produit].objectifs.slice(0,2);
-      }
-
-      // Titulaire
-      var tit=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei2=+em[1]-1;return(ED.enfants&&ED.enfants[ei2]&&ED.enfants[ei2].prenom)?ED.enfants[ei2].prenom:'Enfant '+em[1];}return sol.titulaire;})());
-
-      // Texte projection depuis template (sans nom produit)
-      var texteProj='';
-      var solCfg2=(typeof SOLUTIONS_CONFIG!=='undefined'&&SOLUTIONS_CONFIG)?SOLUTIONS_CONFIG[sol.produit]:null;
-      var tplTxt=(solCfg2&&solCfg2.texte)||(cp&&cp.texteTemplate)||'';
-      if(tplTxt){
-        texteProj=tplTxt
-          .replace(/\{capital\}/g,fmt(capitalFinal)+'\u00a0\u20ac')
-          .replace(/\{horizon\}/g,h+'\u00a0ans')
-          .replace(/\{impots\}/g,fmt(economieFisc)+'\u00a0\u20ac')
-          .replace(/\{revenus\}/g,fmt(rente)+'\u00a0\u20ac');
-      } else {
-        // Générer un texte par défaut selon le levier
-        if(lev==='fiscal'&&economieFisc>0)
-          texteProj='Réduction de votre impôt de\u00a0<strong>'+fmt(economieFisc)+'\u00a0€</strong> dès cette année, tout en constituant un capital de\u00a0<strong>'+fmt(capitalFinal)+'\u00a0€</strong> dans '+h+'\u00a0ans.';
-        else if(rente>0)
-          texteProj='Capital estimé de\u00a0<strong>'+fmt(capitalFinal)+'\u00a0€</strong> dans\u00a0'+h+'\u00a0ans, générateur d\'un complément de revenus de\u00a0<strong>'+fmt(rente)+'\u00a0€/mois</strong>.';
-        else if(capitalFinal>0)
-          texteProj='Capital estimé de\u00a0<strong>'+fmt(capitalFinal)+'\u00a0€</strong> dans\u00a0'+h+'\u00a0ans.';
-      }
-
-      // ── Carte fiche ──
+      // ── Carte produit ──
       html+='<div style="background:rgba(255,255,255,0.85);border-radius:10px;border:1px solid rgba(0,0,0,0.07);overflow:hidden">';
 
-      // Ligne 1 : numéro étape + objectifs
+      // Header : numéro + objectifs (UNE SEULE FOIS)
       html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-      html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(sol.etape||'?')+'</div>';
+      html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(firstSol.etape||'?')+'</div>';
       if(objsV.length){
         objsV.forEach(function(o){
           html+='<span style="font-size:11px;font-weight:600;color:'+meta.titleBg+';padding:3px 10px;border-radius:20px;background:rgba(0,0,0,0.05)">\u2713 '+o+'</span>';
         });
       }
-      html+='<span style="margin-left:auto;font-size:11px;color:var(--gris)">'+h+'\u00a0ans</span>';
+      html+='<span style="margin-left:auto;font-size:11px;color:var(--gris)">'+(parseInt(firstSol.horizon)||10)+'\u00a0ans</span>';
       html+='</div>';
 
-      // Ligne 2 : qui + montants
-      html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(0,0,0,0.02)">';
-      if(tit)html+='<span style="font-weight:700;font-size:13px;color:var(--noir)">'+tit+'</span><span style="color:var(--bord)">|</span>';
-      if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">initial</span></span>';
-      if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
-      if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong></span>';
-      if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants à définir</span>';
-      html+='</div>';
-
-      // Ligne 3 : projection
-      if(texteProj){
-        html+='<div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,0.04)">';
-        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">'+texteProj+'</div>';
-        if(economieFisc>0){
-          html+='<div style="margin-top:6px;display:inline-flex;align-items:center;gap:5px;background:var(--blue-l);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">';
-          html+='\u25c6 Économie fiscale dès cette année\u00a0: '+fmt(economieFisc)+'\u00a0€</div>';
+      // Ligne par contrat/titulaire
+      pg.sols.forEach(function(sol){
+        var r2=(cfg&&cfg.rendement)||cp.rendement||meta.rate||0.025;
+        var h2=parseInt(sol.horizon)||10;
+        var isSCPI2=/scpi/i.test(sol.produit||'');
+        var capitalFinal2,rente2;
+        if(isSCPI2){
+          var rDist2=0.045;
+          if(sol.reinvest){var rT2=rDist2+0.01;capitalFinal2=Math.round((sol.vi||0)*Math.pow(1+rT2,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rT2,h2)-1)/rT2):0));}
+          else{capitalFinal2=Math.round((sol.vi||0)*Math.pow(1.01,h2)+(sol.vp||0)*12*h2);}
+          rente2=Math.round(capitalFinal2*rDist2/12);
+        } else {
+          capitalFinal2=Math.round((sol.vi||0)*Math.pow(1+r2,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r2,h2)-1)/r2):0));
+          rente2=Math.round(capitalFinal2*0.04/12);
         }
-        html+='</div>';
-      }
+        var economieFisc2=0,tmi2=ED.fiscal.tmi||0;
+        var prodLC2=(sol.produit||'').toLowerCase();
+        if(prodLC2.indexOf('per')>=0&&sol.vp>0)economieFisc2=Math.round(sol.vp*12*tmi2/100);
+        else if(prodLC2.indexOf('fip')>=0||prodLC2.indexOf('fcpi')>=0||prodLC2.indexOf('g3f')>=0)economieFisc2=Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
 
-      html+='</div>'; // close carte
+        var tit2=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei3=+em[1]-1;return(ED.enfants&&ED.enfants[ei3]&&ED.enfants[ei3].prenom)?ED.enfants[ei3].prenom:'Enfant '+em[1];}return sol.titulaire;})());
+
+        html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid rgba(0,0,0,0.04)">';
+        html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
+        html+='<span style="color:var(--bord)">|</span>';
+        if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">initial</span></span>';
+        if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
+        if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong></span>';
+        if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
+        if(capitalFinal2>0)html+='<span style="margin-left:auto;font-size:12px;color:var(--gris-f)">\u2192 <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong></span>';
+        if(economieFisc2>0)html+='<span style="font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-l);padding:2px 8px;border-radius:12px">\u25c6 '+fmt(economieFisc2)+'\u00a0\u20ac/an</span>';
+        html+='</div>';
+      });
+
+      html+='</div>'; // close carte produit
     });
 
     html+='</div></div>'; // close levier
