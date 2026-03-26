@@ -4151,7 +4151,7 @@ var COPERNIC = {
   // ─── ÉPARGNE IMMOBILIÈRE ───────────────────────────────────────
   'SCPI de rendement':      {cat:'epargne-immo', levier:'epargne',     icon:'&#127959;',
     desc:'Revenus fonciers réguliers, mutualisation immobilier professionnel, accessible dès 5 000 €, financement possible',
-    fiscal:'Revenus fonciers taxés à l’IR',sri:'2-4',horizon:'10 ans+',horizonAns:15},
+    fiscal:’Revenus fonciers tax\u00e9s \u00e0 l\’IR’,sri:’2-4’,horizon:’Retraite’,horizonAns:20},
   'SCPI via SCI à l’IS': {cat:'epargne-immo',levier:'entreprise', icon:'&#127959;',
     desc:'Acquisition de SCPI via une SCI soumise à l’IS : revenus peu imposés grâce à l’amortissement, sortie optimisée',
     fiscal:'IS société (25 % ou 15 % taux réduit) puis flat tax',sri:'3-5',horizon:'10 ans+',horizonAns:15},
@@ -4694,7 +4694,7 @@ function renderSolsRetenues(){
     // ── Contrats (sub-rows) ──
     // Header row
     html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
-    var isImmoGrp=cp.cat==='immobilier'||cp.cat==='epargne-immo';
+    var isImmoGrp=cp.cat==='immobilier';
     html+='<div>Titulaire</div><div>'+(isImmoGrp?'Apport':'Versement initial')+'</div><div>'+(isImmoGrp?'\u00c9pargne /mois':'VP mensuel')+'</div><div>Horizon</div><div></div></div>';
 
     grp.indices.forEach(function(idx){
@@ -4933,7 +4933,7 @@ function renderFichesClient(){
 
         var tit2=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei3=+em[1]-1;return(ED.enfants&&ED.enfants[ei3]&&ED.enfants[ei3].prenom)?ED.enfants[ei3].prenom:'Enfant '+em[1];}return sol.titulaire;})());
 
-        var isImmo2=cp.cat==='immobilier'||cp.cat==='epargne-immo';
+        var isImmo2=cp.cat==='immobilier';
         html+='<div style="border-top:1px solid rgba(0,0,0,0.04)">';
 
         if(isImmo2){
