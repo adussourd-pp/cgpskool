@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notre positionnement — CGP Skool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0e0d;--bg2:#161412;--bg3:#1c1917;
+  --p:#F6F3EE;--p2:#EDEAE3;--p3:#E4E0D8;
+  --o:#D4622A;--odim:rgba(212,98,42,.11);--ohov:#b8501f;
+  --w:#fff;--fog:rgba(255,255,255,.58);--fog2:rgba(255,255,255,.30);
+  --rd:rgba(255,255,255,.07);--rl:rgba(24,22,20,.09);--rl2:rgba(24,22,20,.05);
+  --ink:#181614;--i60:rgba(24,22,20,.60);--i30:rgba(24,22,20,.30);
+  --sf:'Playfair Display',serif;--ss:'Inter',system-ui,sans-serif;
+  --gr:#2a9060;--grd:rgba(42,144,96,.10);
+  --red:#c03030;--rdd:rgba(192,48,48,.09);
+  --pur:#5b21b6;--purd:rgba(91,33,182,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{font-family:var(--ss);background:var(--p);color:var(--ink);}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;height:54px;background:rgba(15,14,13,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rd);display:flex;align-items:center;}
+.nav-in{width:100%;max-width:1200px;margin:0 auto;padding:0 40px;display:flex;align-items:center;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:24px;}
+.lm{width:26px;height:26px;border:1.5px solid var(--o);display:flex;align-items:center;justify-content:center;}
+.lm span{font-family:var(--sf);font-size:12px;font-weight:500;color:var(--o);}
+.ln{font-size:9px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.22em;text-transform:uppercase;}
+.nav-links{display:flex;overflow-x:auto;}
+.nl{font-size:11px;color:rgba(255,255,255,.38);text-decoration:none;padding:5px 11px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s;}
+.nl:hover{color:rgba(255,255,255,.7);}
+.nl.active{color:var(--o);border-color:var(--o);}
+
+/* HERO */
+.hero{background:var(--bg);padding:88px 40px 72px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(212,98,42,.08) 0%,transparent 65%);pointer-events:none;}
+.hero-in{max-width:1200px;margin:0 auto;}
+.kd{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.kd-l{width:24px;height:1px;background:var(--o);}
+.kd-t{font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--o);}
+.hero h1{font-family:var(--sf);font-size:clamp(28px,4vw,50px);font-weight:400;line-height:1.08;letter-spacing:-.02em;color:var(--w);max-width:760px;margin-bottom:18px;}
+.hero h1 em{font-style:italic;color:var(--o);}
+.hero-sub{font-size:14px;font-weight:300;line-height:1.8;color:var(--fog);max-width:560px;margin-bottom:40px;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:10px;}
+.hp{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--rd);padding:10px 14px;min-width:200px;flex:1;}
+.hp-i{font-size:18px;flex-shrink:0;}
+.hp-text strong{display:block;font-size:12px;font-weight:600;color:var(--w);margin-bottom:1px;}
+.hp-text span{font-size:11px;color:var(--fog2);}
+
+/* SECTIONS */
+.s{padding:60px 40px;max-width:1200px;margin:0 auto;}
+.bg-alt{background:var(--p2);}
+.bg-dark{background:var(--bg);}
+.bg-dark2{background:var(--bg2);}
+.divider{border-top:1px solid var(--rl);}
+
+.kl{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.kl-l{width:20px;height:1px;background:var(--o);flex-shrink:0;}
+.kl-t{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--o);}
+.h2{font-family:var(--sf);font-size:clamp(20px,2.5vw,30px);font-weight:400;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin-bottom:8px;}
+.h2 em{font-style:italic;color:var(--o);}
+.h2d{color:var(--w);}
+.sdesc{font-size:13px;font-weight:300;line-height:1.8;color:var(--i60);max-width:600px;margin-bottom:36px;}
+.sdesc-d{color:var(--fog2);}
+
+/* ── VALEUR ── */
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+@media(max-width:800px){.val-grid{grid-template-columns:1fr;}}
+
+.pyra{display:flex;flex-direction:column;gap:3px;align-items:center;}
+.py-tier{display:flex;justify-content:center;width:100%;}
+.py-bar{display:flex;align-items:center;justify-content:center;height:50px;color:white;font-weight:600;font-size:12px;}
+.py-lbl{font-size:9px;font-weight:500;color:var(--i60);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
+.py-legs{display:flex;flex-direction:column;gap:4px;margin-top:14px;}
+.py-leg{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--rl2);}
+.py-leg:last-child{border-bottom:none;}
+.py-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.py-lt{font-size:12px;font-weight:500;color:var(--ink);}
+.py-ls{font-size:10px;color:var(--i60);}
+.py-note{font-size:10px;color:var(--i30);margin-top:8px;font-style:italic;}
+
+.args{display:flex;flex-direction:column;gap:12px;}
+.arg{border:1px solid var(--rl);padding:16px 18px;background:white;}
+.arg.primary{border-color:var(--o);border-left-width:3px;}
+.arg-n{font-family:var(--sf);font-size:26px;font-weight:400;color:var(--o);line-height:1;margin-bottom:5px;}
+.arg-t{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+.arg-b{font-size:12px;color:var(--i60);line-height:1.7;}
+.arg-b strong{color:var(--ink);}
+.arg-tag{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:var(--odim);color:var(--o);margin-top:7px;display:inline-block;}
+
+/* ── SOLUTIONS ── */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px;background:var(--rl);}
+.cat{background:white;border-bottom:3px solid var(--o);}
+.cat-body{padding:18px 16px;}
+.cat-icon{font-size:20px;margin-bottom:8px;}
+.cat-title{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);margin-bottom:9px;}
+.cat-items{display:flex;flex-direction:column;gap:4px;}
+.ci{font-size:12px;color:var(--i60);display:flex;align-items:baseline;gap:7px;}
+.ci::before{content:'→';color:var(--o);font-size:10px;flex-shrink:0;}
+
+.infra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(255,255,255,.06);}
+.infra{padding:20px 20px;}
+.infra-i{font-size:16px;margin-bottom:8px;}
+.infra-t{font-size:11px;font-weight:600;color:var(--w);margin-bottom:6px;}
+.infra-items{display:flex;flex-direction:column;gap:4px;}
+.ii{font-size:11px;color:var(--fog2);display:flex;align-items:baseline;gap:7px;}
+.ii::before{content:'·';color:var(--o);font-size:13px;flex-shrink:0;}
+
+/* ── FRAIS ── */
+.frais-layout{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
+@media(max-width:800px){.frais-layout{grid-template-columns:1fr;}}
+
+.frais-tw{border:1px solid var(--rl);}
+table.ft{width:100%;border-collapse:collapse;background:white;font-size:12px;}
+table.ft thead tr{background:var(--ink);}
+table.ft thead th{padding:9px 12px;text-align:left;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.06);}
+table.ft thead th:last-child{border-right:none;}
+table.ft tbody tr{border-bottom:1px solid var(--rl2);}
+table.ft tbody tr:last-child{border-bottom:none;}
+table.ft tbody td{padding:9px 12px;color:var(--i60);border-right:1px solid var(--rl2);}
+table.ft tbody td:last-child{border-right:none;}
+table.ft tbody td:first-child{font-weight:500;color:var(--ink);}
+table.ft tbody td.val{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;}
+table.ft tbody td.val-o{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:var(--o);}
+table.ft tbody td.val-g{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:var(--gr);}
+table.ft tfoot td{background:var(--p2);padding:9px 12px;font-size:11px;color:var(--i60);font-style:italic;border-top:1px solid var(--rl);}
+table.ft tfoot td strong{color:var(--ink);font-style:normal;font-size:12px;}
+
+.frais-notes{display:flex;flex-direction:column;gap:10px;}
+.fn{border:1px solid var(--rl);padding:14px 16px;background:white;}
+.fn.primary{border-left:3px solid var(--o);}
+.fn-t{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--o);margin-bottom:5px;}
+.fn-b{font-size:12px;color:var(--i60);line-height:1.7;}
+.fn-b strong{color:var(--ink);}
+
+/* ── SIMULATEUR ── */
+.sim-card{border:1px solid var(--rl);}
+.sim-head{padding:18px 22px;border-bottom:1px solid var(--rl);background:var(--p2);}
+.sim-title{font-family:var(--sf);font-size:18px;font-weight:400;color:var(--ink);}
+.sim-sub{font-size:11px;color:var(--i60);margin-top:2px;}
+.sim-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:700px){.sim-body{grid-template-columns:1fr;}}
+.sim-controls{padding:20px 22px;border-right:1px solid var(--rl);}
+@media(max-width:700px){.sim-controls{border-right:none;border-bottom:1px solid var(--rl);}}
+.sim-result{padding:20px 22px;}
+.sim-row{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.sim-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--i60);}
+.sim-input-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.sim-input{width:100%;padding:8px 10px;border:1px solid var(--rl);background:var(--p);color:var(--ink);font-family:'Courier New',monospace;font-size:13px;}
+.sim-input:focus{outline:none;border-color:var(--o);}
+.sim-btn-row{display:flex;gap:6px;flex-wrap:wrap;}
+.sim-btn{background:white;border:1px solid var(--rl);color:var(--i60);font-family:'Courier New',monospace;font-size:10px;padding:5px 10px;cursor:pointer;transition:all .13s;}
+.sim-btn:hover{border-color:var(--o);color:var(--o);}
+.sim-btn.active{background:var(--o);border-color:var(--o);color:white;font-weight:700;}
+.sim-unit{font-size:11px;color:var(--i60);white-space:nowrap;}
+.sim-desc{font-size:11px;color:var(--i60);line-height:1.6;margin-top:12px;padding-top:12px;border-top:1px solid var(--rl2);}
+
+.res-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--i60);margin-bottom:8px;}
+.res-contracts{display:flex;flex-direction:column;gap:10px;}
+.res-contract{padding:12px 14px;border:1px solid var(--rl);}
+.rc-name{font-size:11px;font-weight:500;color:var(--i60);margin-bottom:4px;}
+.rc-val{font-family:var(--sf);font-size:28px;font-weight:400;line-height:1;}
+.rc-detail{font-size:10px;color:var(--i60);margin-top:3px;}
+.res-diff{margin-top:12px;padding:12px 14px;border:2px solid var(--o);background:var(--odim);}
+.rd-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--o);margin-bottom:4px;}
+.rd-val{font-family:var(--sf);font-size:22px;font-weight:400;color:var(--o);}
+.rd-body{font-size:11px;color:var(--i60);margin-top:4px;line-height:1.6;}
+.res-note{font-size:10px;color:var(--i30);margin-top:10px;font-style:italic;line-height:1.6;}
+
+/* ── COMPARATIF ── */
+.ctw{overflow-x:auto;border:1px solid var(--rl);}
+table.ct{width:100%;border-collapse:collapse;background:white;font-size:11px;}
+table.ct thead tr{background:var(--ink);}
+table.ct thead th{padding:11px 12px;text-align:left;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap;}
+table.ct thead th.th-o{color:var(--o);border-bottom:2px solid var(--o);}
+table.ct thead th.th-pur{color:#c4b5fd;border-bottom:2px solid var(--pur);}
+table.ct tbody tr.grp td{background:var(--odim);color:var(--o);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;}
+table.ct tbody tr{border-bottom:1px solid var(--rl2);}
+table.ct tbody tr:hover{background:var(--p);}
+table.ct tbody td{padding:9px 12px;color:var(--i60);border-right:1px solid var(--rl2);font-size:11px;vertical-align:top;}
+table.ct tbody td:first-child{font-weight:500;color:var(--ink);}
+table.ct tbody td.co{background:rgba(212,98,42,.03);border-left:2px solid rgba(212,98,42,.2);font-weight:600;color:var(--ink);}
+table.ct tbody td.cp{background:rgba(91,33,182,.03);border-left:2px solid rgba(91,33,182,.2);}
+.yes{color:var(--gr);font-weight:600;}
+.no{color:var(--red);}
+.par{color:var(--o);font-size:11px;}
+.bdg{font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 5px;display:inline-block;line-height:1.4;}
+.bg{background:var(--grd);color:var(--gr);} .br{background:var(--rdd);color:var(--red);} .bo{background:var(--odim);color:var(--o);} .bp{background:var(--purd);color:var(--pur);}
+.note-hybrid{font-size:10px;color:var(--pur);margin-top:2px;display:block;}
+
+/* ── CHIFFRES ── */
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:rgba(255,255,255,.07);}
+.ch{padding:24px 20px;}
+.ch-n{font-family:var(--sf);font-size:36px;font-weight:400;line-height:1;color:var(--o);margin-bottom:5px;}
+.ch-l{font-size:12px;font-weight:500;color:var(--w);margin-bottom:2px;}
+.ch-s{font-size:11px;font-weight:300;color:var(--fog2);line-height:1.5;}
+.bp-block{border:1px solid rgba(255,255,255,.08);padding:22px 26px;margin-top:20px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;}
+@media(max-width:600px){.bp-block{grid-template-columns:1fr;}}
+.bp-logo{font-family:var(--sf);font-size:18px;font-weight:400;color:var(--o);}
+.bp-text{font-size:13px;font-weight:300;color:var(--fog2);line-height:1.75;}
+.bp-text strong{color:var(--w);}
+
+/* FOOTNOTES */
+.fns{background:var(--bg2);border-top:1px solid var(--rd);padding:36px 0;}
+.fns-in{max-width:1200px;margin:0 auto;padding:0 40px;}
+.fns-head{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:12px;}
+.fns-list{display:flex;flex-direction:column;gap:6px;}
+.fns-row{display:flex;gap:10px;font-size:10px;color:rgba(255,255,255,.26);line-height:1.65;}
+.fns-n{color:var(--o);font-family:'Courier New',monospace;font-weight:700;flex-shrink:0;width:14px;}
+
+@media(max-width:768px){
+  .hero,.s,.fns-in{padding-left:24px;padding-right:24px;}
+  .cat-grid,.infra-grid,.ch-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html"><div class="lm"><span>C</span></div><span class="ln">CGP Skool</span></a>
+    <div class="nav-links">
+      <a href="#positionnement" class="nl active">Marché</a>
+      <a href="#solutions" class="nl">Nos solutions</a>
+      <a href="#frais" class="nl">Nos frais</a>
+      <a href="#modeles-remuneration" class="nl">Les 3 modèles</a>
+      <a href="#simulateur" class="nl">Simulateur</a>
+      <a href="#qui-sert-qui" class="nl">Qui sert qui ?</a>
+      <a href="#comparatif" class="nl">Comparatif</a>
+      <a href="#finzzle" class="nl">Finzzle</a>
+    </div>
+    <a href="index.html" style="margin-left:auto;flex-shrink:0;padding:6px 14px;border:1px solid rgba(255,255,255,0.15);font-family:var(--ss);font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-decoration:none;letter-spacing:0.05em;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(212,98,42,0.5)';this.style.color='var(--o)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.5)'">← Accueil</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+
+<!-- ══ HERO ══ -->
+<div id="positionnement" class="hero">
+  <div class="hero-in">
+    <div class="kd"><span class="kd-l"></span><span class="kd-t">Étude du marché du placement en France · Mars 2026</span></div>
+    <h1>15 000 Mds€ de patrimoine,<br><em>2 108 Mds€ dormant</em> en liquidités</h1>
+    <p class="hero-sub">Le marché du conseil patrimonial n'a jamais été aussi porteur. Taux d'épargne à 19–20 % (niveau record depuis 1980), besoin croissant de conseil — et une question centrale pour chaque investisseur : quel modèle d'accompagnement est le plus adapté à son profil ?</p>
+    <div class="hero-pills">
+      <div class="hp"><div class="hp-i">💰</div><div class="hp-text"><strong>650M€ collectés en AV en 2025</strong><span>Finzzle Groupe · +44 % vs 2024</span></div></div>
+      <div class="hp"><div class="hp-i">🏢</div><div class="hp-text"><strong>12% du marché SCPI national</strong><span>1er collecteur en France · 570M€ · 2025</span></div></div>
+      <div class="hp"><div class="hp-i">✅</div><div class="hp-text"><strong>Validé par AT Kearney &amp; Bridgepoint</strong><span>Due diligence complète mai 2025</span></div></div>
+      <div class="hp"><div class="hp-i">📊</div><div class="hp-text"><strong>3 modèles comparés · sources réelles</strong><span>Frais, seuils, rémunérations, limites</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 01. MARCHÉ ══ -->
+<div id="valeur" class="divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Données macroéconomiques · Banque de France 2023 · AT Kearney 2025</span></div>
+  <h2 class="h2">Le marché — <em>un potentiel massif</em></h2>
+  <p class="sdesc">15 000 milliards d'euros de patrimoine des Français. 2 108 milliards dormant en comptes courants et livrets. Un taux d'épargne record. Une pyramide qui montre pourquoi la grande majorité du marché reste inaccessible à la plupart des acteurs.</p>
+
+  <!-- MACRO STATS -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--rl);margin-bottom:44px;">
+    <div style="background:white;padding:18px 16px;">
+      <div style="font-family:var(--sf);font-size:28px;font-weight:400;color:var(--o);line-height:1;margin-bottom:5px;">15 000 Mds€</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Patrimoine total des Français</div>
+      <div style="font-size:10px;color:var(--i60);">41 % actifs financiers · 59 % immobilier</div>
+    </div>
+    <div style="background:white;padding:18px 16px;border-left:1px solid var(--rl);">
+      <div style="font-family:var(--sf);font-size:28px;font-weight:400;color:var(--red);line-height:1;margin-bottom:5px;">2 108 Mds€</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Actifs liquides dormants</div>
+      <div style="font-size:10px;color:var(--i60);">Comptes courants + livrets — opportunité majeure de conversion</div>
+    </div>
+    <div style="background:white;padding:18px 16px;border-left:1px solid var(--rl);">
+      <div style="font-family:var(--sf);font-size:28px;font-weight:400;color:var(--gr);line-height:1;margin-bottom:5px;">19–20 %</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Taux d'épargne des ménages</div>
+      <div style="font-size:10px;color:var(--i60);">Record depuis 1980 hors COVID · moy. historique 16 %</div>
+    </div>
+    <div style="background:white;padding:18px 16px;border-left:1px solid var(--rl);">
+      <div style="font-family:var(--sf);font-size:28px;font-weight:400;color:var(--ink);line-height:1;margin-bottom:5px;">68 %</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Considèrent le conseil essentiel</div>
+      <div style="font-size:10px;color:var(--i60);">68 % sur l'épargne · 75 % estiment payer trop d'impôts</div>
+    </div>
+    <div style="background:white;padding:18px 16px;border-left:1px solid var(--rl);">
+      <div style="font-family:var(--sf);font-size:28px;font-weight:400;color:var(--o);line-height:1;margin-bottom:5px;">+3,6 %/an</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Croissance actifs financiers</div>
+      <div style="font-size:10px;color:var(--i60);">Sur les 5 dernières années — dynamique structurelle favorable</div>
+    </div>
+  </div>
+
+  <div class="val-grid">
+    <!-- PYRAMIDE + POSITIONNEMENT DES ACTEURS -->
+    <div>
+      <div class="py-lbl">Segmentation patrimoniale — 18M ménages (Banque de France 2023)</div>
+      <div class="pyra">
+        <div class="py-tier"><div class="py-bar" style="width:110px;background:#b83028;border-radius:4px 4px 0 0">10%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:182px;background:#d4622a">10%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:272px;background:#e89030">40%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:358px;background:#9a7040;border-radius:0 0 4px 4px">40%</div></div>
+      </div>
+      <div class="py-legs">
+        <div class="py-leg"><div class="py-dot" style="background:#b83028"></div><div><div class="py-lt">Très hauts patrimoines — &gt; 992k€</div><div class="py-ls">Banques privées · wealth management · Prosper Conseil</div></div></div>
+        <div class="py-leg"><div class="py-dot" style="background:#d4622a"></div><div><div class="py-lt">Hauts patrimoines — &gt; 586k€</div><div class="py-ls">CGPI MIF2 · hybride SilmaTec · banques privées · Finzzle</div></div></div>
+        <div class="py-leg"><div class="py-dot" style="background:#e89030"></div><div><div class="py-lt">Patrimoines moyens — &gt; 185k€</div><div class="py-ls">Finzzle · banques · assureurs · hybride (≥50k€) · Prosper (≥100k€)</div></div></div>
+        <div class="py-leg"><div class="py-dot" style="background:#9a7040"></div><div><div class="py-lt" style="font-weight:600">Grand public — &lt; 185k€ · 7,2M foyers</div><div class="py-ls" style="color:var(--o);font-weight:500">Finzzle + banques uniquement. Aucun autre modèle n'est viable ici.</div></div></div>
+      </div>
+      <div class="py-note">Source : Banque de France, 2023</div>
+    </div>
+
+    <!-- ARGUMENTS -->
+    <div class="args">
+      <div class="arg primary">
+        <div class="arg-n">01</div>
+        <div class="arg-t">Sans accompagnement, la plupart ne font rien — ou font moins bien</div>
+        <div class="arg-b">Les CGPI honoraires ne prennent pas de clients sous 100k€. Les cabinets hybrides sont économiquement non viables sur petits montants (bilan 1 500€ TTC = 30% du capital à 5k€). <strong>Sans Finzzle, ces profils restent à leur banque avec des fonds maison à 2–3%/an, ou n'investissent simplement pas.</strong> Nous sommes souvent le premier interlocuteur patrimonial réel de nos clients — et parfois le seul qui soit économiquement accessible pour eux.</div>
+        <div class="arg-tag">Argument central</div>
+      </div>
+      <div class="arg">
+        <div class="arg-n">02</div>
+        <div class="arg-t">Sur les hauts patrimoines aussi, la gamme justifie nos frais</div>
+        <div class="arg-b">Le cabinet hybride et le MIF2 honoraires ciblent structurellement les patrimoines ≥ 100–300k€. Mais même sur ces profils, Finzzle reste compétitif grâce à une gamme que les CGP indépendants ne couvrent pas entièrement : <strong>immobilier locatif, SCPI, private equity, financement, épargne salariale</strong> — dans une seule relation. Un CGP indépendant fera souvent l'impasse sur l'immobilier ou le crédit. Et des services comme <strong>l'aide à la déclaration d'impôts</strong>, qu'ils facturent en plus au taux horaire (260–360€ TTC/h), nous les incluons sans supplément.</div>
+      </div>
+      <div class="arg">
+        <div class="arg-n">03</div>
+        <div class="arg-t">34 ans de process — pas de terrain d'expérimentation</div>
+        <div class="arg-b">Un cabinet hybride construit ses outils, ses partenariats, sa méthode en cours de route. Finzzle applique des <strong>process éprouvés depuis 1992</strong>, une formation institutionnelle structurée et des partenaires négociés au niveau groupe. Validé en due diligence par AT Kearney et Bridgepoint en 2025.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="solutions" class="bg-alt divider">
+<div class="s" style="padding-bottom:0;">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Offre de service · Catalogue complet Finzzle Groupe</span></div>
+  <h2 class="h2">Nos solutions — <em>la gamme la plus large du marché</em></h2>
+  <p class="sdesc">Un seul conseiller, une seule relation, l'ensemble du spectre patrimonial. Des 7 familles officielles aux services immobiliers et de financement — sans facture supplémentaire à chaque nouvelle problématique.</p>
+</div>
+<div class="cat-grid" style="margin:0;">
+  <div class="cat"><div class="cat-body"><div class="cat-icon">📈</div><div class="cat-title">Épargne financière</div><div class="cat-items"><div class="ci">Assurance vie (multi-assureurs)</div><div class="ci">Contrat de capitalisation</div><div class="ci">PEA Assurance</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🏢</div><div class="cat-title">Épargne immobilière</div><div class="cat-items"><div class="ci">SCPI de rendement</div><div class="ci">SCPI via SCI à l'IS</div><div class="ci">SCPI de capitalisation</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🏘️</div><div class="cat-title">Immobilier locatif</div><div class="cat-items"><div class="ci">Investissement locatif neuf</div><div class="ci">Colocation meublée</div><div class="ci">LMNP / LMP</div><div class="ci">Dispositifs fiscaux (Denormandie, LLI…)</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🏦</div><div class="cat-title">Financement</div><div class="cat-items"><div class="ci">Crédit immobilier (Stellium Financement)</div><div class="ci">Effet de levier sur investissement</div><div class="ci">Montage crédit + placement</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🏖️</div><div class="cat-title">Épargne retraite</div><div class="cat-items"><div class="ci">PERIN — Plan Épargne Retraite Individuel</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🛡️</div><div class="cat-title">Prévoyance</div><div class="cat-items"><div class="ci">Prévoyance individuelle</div><div class="ci">Prévoyance professionnelle</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🧾</div><div class="cat-title">Solutions fiscales</div><div class="cat-items"><div class="ci">SCPI fiscales</div><div class="ci">Capital investissement</div><div class="ci">Girardin</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">💼</div><div class="cat-title">Épargne salariale</div><div class="cat-items"><div class="ci">Plan Épargne Entreprise (PEE)</div><div class="ci">PERECO / PERECOI</div></div></div></div>
+  <div class="cat"><div class="cat-body"><div class="cat-icon">🎯</div><div class="cat-title">Diversification</div><div class="cat-items"><div class="ci">Fonds Usufruit</div><div class="ci">NOVAXIA</div><div class="ci">FCPR et FPCI</div></div></div></div>
+</div>
+
+<!-- Infrastructure -->
+<div class="bg-dark2">
+<div class="s" style="padding-bottom:0;padding-top:40px;">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t" style="color:var(--o)">Infrastructure & différenciateurs</span></div>
+</div>
+<div class="infra-grid">
+  <div class="infra"><div class="infra-i">⚙️</div><div class="infra-t">Back-office & outils</div><div class="infra-items"><div class="ii">CRM et suivi portefeuille intégrés</div><div class="ii">Souscription digitale multi-assureurs</div><div class="ii">Outils d'analyse patrimoniale éprouvés</div><div class="ii">Process de conformité centralisé</div></div></div>
+  <div class="infra"><div class="infra-i">⚖️</div><div class="infra-t">Juridique & conformité</div><div class="infra-items"><div class="ii">Veille juridique et fiscale centralisée</div><div class="ii">Documentation réglementaire standardisée</div><div class="ii">Support juridique pour chaque conseiller</div><div class="ii">Conformité MIF2 / DDA niveau groupe</div></div></div>
+  <div class="infra"><div class="infra-i">🎓</div><div class="infra-t">Prodemial Business School</div><div class="infra-items"><div class="ii">Formation initiale structurée</div><div class="ii">Formations continues thématiques</div><div class="ii">Référentiels produits validés</div><div class="ii">34 ans de process — pas d'expérimentation</div></div></div>
+  <div class="infra"><div class="infra-i">🔄</div><div class="infra-t">Continuité & accompagnement</div><div class="infra-items"><div class="ii">4 100+ consultants — backup garanti</div><div class="ii">Disponibilité étendue (WhatsApp, WE)</div><div class="ii">Suivi fiscal + aide déclaration inclus</div><div class="ii">RDV annuel de révision stratégique</div></div></div>
+</div>
+<div style="height:40px;background:var(--bg2);"></div>
+</div>
+</div>
+
+<!-- ══ 03. NOS FRAIS ══ -->
+<div id="frais" class="divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Source : Transparence de frais CRISTALLIANCE AVENIR · Suravenir / Crédit Mutuel Arkea · mis à jour 01/01/2026</span></div>
+  <h2 class="h2">Nos frais — <em>document officiel</em></h2>
+  <p class="sdesc">Données issues du document officiel de transparence des frais transmis aux clients (Suravenir, 01/01/2026). Les frais d'entrée sont prélevés une seule fois. Les frais de gestion sont annuels et prélevés par l'assureur.</p>
+
+  <div class="frais-layout">
+    <div>
+      <div class="frais-tw">
+        <table class="ft">
+          <thead><tr><th>Type de frais</th><th>Montant</th><th>Détail</th></tr></thead>
+          <tbody>
+            <tr><td>Frais sur versement</td><td class="val-o">4,8 %</td><td>Prélevés <strong>une seule fois</strong> · Dégressifs selon montant · Finance le conseil dans le temps</td></tr>
+            <tr><td>→ Dès 50 000 €</td><td class="val-g">3,6 %</td><td>Frais d'entrée modulables automatiquement</td></tr>
+            <tr><td>→ Dès 200 000 €</td><td class="val-g">2,4 %</td><td>Frais d'entrée modulables automatiquement</td></tr>
+            <tr><td>Frais de gestion contrat</td><td class="val">1 %/an</td><td>Fonds euros ET UC — prélevés par Suravenir (norme du marché)</td></tr>
+            <tr><td>Rétrocessions UC (actions)</td><td class="val">0,84 %/an</td><td>Reversées par les fonds au distributeur — incluses dans les frais des fonds</td></tr>
+            <tr><td>Frais d'arbitrage</td><td class="val-g">0 €</td><td>5 arbitrages gratuits par année civile (puis 1% min. 50€)</td></tr>
+            <tr><td>Frais de rachat / sortie</td><td class="val-g">0 %</td><td>Capital libre, sans pénalité</td></tr>
+            <tr><td>Gestion pilotée</td><td class="val-g">N/A</td><td>Non disponible sur ce contrat — gestion libre privilégiée</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="3"><strong>→ Coût moyen sur 10 ans : ≈ 1,48 %/an tous frais confondus</strong><br><em>Indicatif non garanti · Source : formule issue du fichier Excel comparatif officiel Finzzle Groupe</em></td></tr></tfoot>
+        </table>
+      </div>
+
+      <!-- PROFILE TAGS -->
+      <div style="margin-top:16px;">
+        <div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--i60);margin-bottom:8px;">Profils adressés par Finzzle Groupe</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">Salarié débutant · dès 50€/mois</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">TNS / Freelance</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">Couple en accumulation</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">Professions libérales</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">Chefs d'entreprise</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--odim);color:var(--o);border:1px solid rgba(212,98,42,.2);">Hauts patrimoines ≥ 200k€</span>
+          <span style="font-size:10px;font-weight:500;padding:3px 9px;background:var(--p2);color:var(--i60);border:1px solid var(--rl);">Tous sans seuil minimum</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="frais-notes">
+      <div class="fn primary">
+        <div class="fn-t">Comment lire le ≈ 1,48 %/an</div>
+        <div class="fn-b">Les 4,8 % sont prélevés <strong>une seule fois par versement</strong>, puis seuls les 1 %/an s'appliquent sur l'encours. Lissé sur 10 ans : <strong>≈ 1,48 %/an en coût total moyen</strong>. Plus l'horizon est long, plus l'entrée est diluée.</div>
+      </div>
+      <div class="fn">
+        <div class="fn-t">Répartition des 4,8 % — source convention Prodemial</div>
+        <div class="fn-b">Les frais d'entrée servent à rémunérer le conseiller (TPC 5–8% selon qualification) et la lignée (commissions démarrage 2%, expansion 1%, développement 0,5%) via le Plan Marketing de Rémunération (PMR). Stellium assure la plateforme et le back-office.</div>
+      </div>
+      <div class="fn">
+        <div class="fn-t">Dégressivité automatique — aucune négociation nécessaire</div>
+        <div class="fn-b"><strong style="color:var(--gr)">3,6 % dès 50 000 €</strong> · <strong style="color:var(--gr)">2,4 % dès 200 000 €</strong>. Minimum contractuel : 1,2 %. La dégressivité est automatique — elle n'est pas soumise à la discrétion du conseiller.</div>
+      </div>
+      <div class="fn">
+        <div class="fn-t">Rétrocessions UC — ce que le document officiel indique</div>
+        <div class="fn-b">Les fonds en UC reversent une partie de leurs frais au distributeur : <strong>0,84 %/an</strong> (fonds actions) · <strong>0,74 %</strong> (diversifiés) · <strong>0,54 %</strong> (immobilier) · <strong>0,45 %</strong> (obligations). Ces rétrocessions sont incluses dans les frais des fonds — elles ne s'ajoutent pas aux 1 %/an de frais contrat. Source : document Suravenir 01/01/2026.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ 04. SIMULATEUR AVANCÉ ══ -->
+<!-- ══ 05. LES 3 MODÈLES ══ -->
+<div id="modeles-remuneration" class="bg-alt divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">AMF déc. 2025 · CGPulse 30/01/2026 · Barème Generali 2026 · prosper-conseil.fr</span></div>
+  <h2 class="h2">Les 3 modèles de rémunération — <em>faits réels, sources citées</em></h2>
+  <p class="sdesc">Trois modèles coexistent selon l'AMF. Chacun est présenté avec ses vrais chiffres documentés, ses points forts et ses limites — y compris pour notre modèle.</p>
+
+  <!-- BARRE % MARCHÉ -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rl);margin-bottom:36px;">
+    <div style="background:white;padding:16px 18px;text-align:center;border-bottom:3px solid var(--o);">
+      <div style="font-family:var(--sf);font-size:34px;font-weight:400;color:var(--o);line-height:1;margin-bottom:5px;">81%</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Rétrocommissions</div>
+      <div style="font-size:10px;color:var(--i60);">Conseil non-indépendant · Notre modèle</div>
+      <div style="font-size:9px;color:var(--i30);margin-top:3px;">Source AMF déc. 2025</div>
+    </div>
+    <div style="background:white;padding:16px 18px;text-align:center;border-bottom:3px solid var(--pur);border-left:1px solid var(--rl);border-right:1px solid var(--rl);">
+      <div style="font-family:var(--sf);font-size:34px;font-weight:400;color:var(--pur);line-height:1;margin-bottom:5px;">12%</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Hybride honoraires + rétro</div>
+      <div style="font-size:10px;color:var(--i60);">Cabinets qui cumulent les deux</div>
+      <div style="font-size:9px;color:var(--i30);margin-top:3px;">Source AMF déc. 2025</div>
+    </div>
+    <div style="background:white;padding:16px 18px;text-align:center;border-bottom:3px solid var(--gr);">
+      <div style="font-family:var(--sf);font-size:34px;font-weight:400;color:var(--gr);line-height:1;margin-bottom:5px;">7%</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px;">Honoraires purs MIF2</div>
+      <div style="font-size:10px;color:var(--i60);">0 rétrocommission — ex. Prosper Conseil</div>
+      <div style="font-size:9px;color:var(--i30);margin-top:3px;">Source AMF déc. 2025</div>
+    </div>
+  </div>
+
+  <!-- 3 FICHES UNIFORMES — hauteur égale garantie par CSS grid -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rl);align-items:stretch;">
+
+    <!-- MODÈLE 1 — FINZZLE -->
+    <div style="background:white;display:flex;flex-direction:column;">
+      <div style="border-top:3px solid var(--o);padding:16px 18px 12px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;background:var(--odim);color:var(--o);display:inline-block;margin-bottom:8px;">81% du marché · Notre modèle</div>
+        <div style="font-family:var(--sf);font-size:16px;font-weight:400;color:var(--ink);margin-bottom:2px;">Finzzle Groupe</div>
+        <div style="font-size:10px;color:var(--i60);font-style:italic;">Réseau rétrocommissions · 4 100+ conseillers · 1992</div>
+      </div>
+      <div style="padding:12px 18px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--i60);margin-bottom:6px;">Frais</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais d'entrée AV</span><span style="font-family:monospace;font-weight:700;color:var(--o);">4,8 % max.</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">→ dès 50 000 €</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">3,6 %</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">→ dès 200 000 €</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">2,4 %</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais gestion annuels</span><span style="font-family:monospace;font-weight:700;color:var(--ink);">1 %/an</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais pilotée</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">0 %</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Honoraires client</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">0 € TTC</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Coût moyen lissé / 10 ans</span><span style="font-family:monospace;font-weight:700;color:var(--o);">≈ 1,48 %/an</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;"><span style="color:var(--i60);">Seuil d'accès</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">50 €/mois</span></div>
+      </div>
+      <div style="padding:12px 18px;background:var(--grd);border-bottom:1px solid rgba(42,144,96,.12);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gr);margin-bottom:6px;">✓ Points forts</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>Accessible dès 50 €/mois, sans seuil minimum</li>
+          <li>7 familles de produits — une seule relation</li>
+          <li>Aucune facture client</li>
+          <li>Suivi fiscal inclus</li>
+          <li>Backup réseau 4 100+ conseillers</li>
+          <li>34 ans de process éprouvés</li>
+          <li>Frais dégressifs — avantageux sur grands montants</li>
+          <li>Validé AT Kearney &amp; Bridgepoint 2025</li>
+        </ul>
+      </div>
+      <div style="padding:12px 18px;background:var(--rdd);flex:1;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">⚠ Limites honnêtes</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>Frais d'entrée prélevés dès le 1er versement</li>
+          <li>Rémunération liée aux produits — conflit structurel encadré réglementairement</li>
+          <li>Transparence du détail de la lignée variable selon qualification</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- MODÈLE 2 — SILMATEC HYBRIDE -->
+    <div style="background:white;display:flex;flex-direction:column;">
+      <div style="border-top:3px solid var(--pur);padding:16px 18px 12px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;background:var(--purd);color:var(--pur);display:inline-block;margin-bottom:8px;">12% du marché · SilmaTec Finance</div>
+        <div style="font-family:var(--sf);font-size:16px;font-weight:400;color:var(--ink);margin-bottom:2px;">Cabinet hybride honoraires + rétro</div>
+        <div style="font-size:10px;color:var(--i60);font-style:italic;">Stéphane VEAUX · fondé 2003 · AUREP · CNCGP</div>
+        <div style="font-size:10px;color:var(--pur);margin-top:6px;padding:4px 7px;background:var(--purd);line-height:1.55;">Source : Webinaire CGPulse 30/01/2026 — grille réelle, intervention nominative</div>
+      </div>
+      <div style="padding:12px 18px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--i60);margin-bottom:8px;">Frais annuels</div>
+
+        <div style="font-size:9px;font-weight:600;color:var(--i40);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;">Frais de gestion du contrat</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais de gestion (fonds euros)</span><span style="font-family:monospace;font-weight:700;color:var(--ink);">~0,90 % frais maximal</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais de gestion (UC)</span><span style="font-family:monospace;font-weight:700;color:var(--ink);">~0,90 % frais maximal</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Rétrocessions UC maintenues (actions)</span><span style="font-family:monospace;font-weight:700;color:var(--pur);">~0,84 %/an</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Rétrocessions UC (diversifiés)</span><span style="font-family:monospace;font-weight:700;color:var(--pur);">~0,74 %/an</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Suivi patrimonial annuel (CSP Perso)</span><span style="font-family:monospace;font-weight:700;color:var(--red);">650–1 200 €/an TTC <em style="font-size:9px;color:var(--i30)">(optionnel)</em></span></div>
+
+        <div style="font-size:9px;font-weight:600;color:var(--i40);text-transform:uppercase;letter-spacing:.08em;margin-top:10px;margin-bottom:3px;">Frais ponctuels par opération</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais d'entrée AV</span><span style="font-family:monospace;font-weight:700;color:var(--ink);">0–2 %</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Audit / bilan patrimonial global</span><span style="font-family:monospace;font-weight:700;color:var(--red);">1 500–3 000 € TTC</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Départ en retraite</span><span style="font-family:monospace;font-weight:700;color:var(--red);">5 400 € TTC</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Taux horaire expert (THX)</span><span style="font-family:monospace;font-weight:700;color:var(--red);">360 € TTC/h</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">TVA sur honoraires</span><span style="font-family:monospace;font-weight:700;color:var(--red);">20 % non récupérable</span></div>
+
+        <div style="margin-top:8px;padding:6px 8px;background:rgba(91,33,182,.06);border:1px solid rgba(91,33,182,.15);font-size:10px;color:var(--i60);line-height:1.6;">
+          <strong style="color:var(--pur);">Scénario minimal</strong> (bilan 1×, sans CSP) · 50k€/10 ans : ~8 600€ total<br>
+          <strong style="color:var(--pur);">Scénario complet</strong> (bilan + CSP 650€/an) · 50k€/10 ans : ~15 100€ total<br>
+          <span style="color:var(--i30);">Aide à la déclaration fiscale : facturée en sus (THB 200€/h ou THX 360€/h) — incluse sans supplément chez Finzzle.</span>
+        </div>
+      </div>
+      <div style="padding:12px 18px;background:var(--grd);border-bottom:1px solid rgba(42,144,96,.12);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gr);margin-bottom:6px;">✓ Points forts</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>Expertise pointue sur missions complexes</li>
+          <li>OBO, succession, SCI, ingénierie patrimoniale</li>
+          <li>Indépendance dans les choix produits</li>
+          <li>Équipe structurée 4–5 personnes</li>
+        </ul>
+      </div>
+      <div style="padding:12px 18px;background:var(--rdd);flex:1;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">⚠ Limites réelles</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>Non viable sous 30k€</li>
+          <li>Double rémunération (honoraires + rétros en parallèle)</li>
+          <li>TVA 20% non récupérable sur les honoraires</li>
+          <li>2× plus cher que Finzzle sur 30k€/10 ans</li>
+          <li>Gamme 3–4 familles seulement</li>
+          <li>Cabinet reconstruit ses process en cours de route</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- MODÈLE 3 — HONORAIRES PURS -->
+    <div style="background:white;display:flex;flex-direction:column;">
+      <div style="border-top:3px solid var(--gr);padding:16px 18px 12px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;background:var(--grd);color:var(--gr);display:inline-block;margin-bottom:8px;">7% du marché · Ex. Prosper Conseil</div>
+        <div style="font-family:var(--sf);font-size:16px;font-weight:400;color:var(--ink);margin-bottom:2px;">CGPI honoraires purs MIF2</div>
+        <div style="font-size:10px;color:var(--i60);font-style:italic;">Prosper Conseil · Scala Patrimoine · Alpha&K</div>
+        <div style="font-size:10px;color:var(--gr);margin-top:6px;padding:4px 7px;background:var(--grd);line-height:1.55;">0 rétrocommission — si perçues, reversées intégralement au client (MIF2)</div>
+      </div>
+      <div style="padding:12px 18px;border-bottom:1px solid var(--rl2);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--i60);margin-bottom:6px;">Frais — Prosper Conseil (tarifs publiés)</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais d'entrée AV</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">0 %</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">1er RDV assistance</span><span style="font-family:monospace;font-weight:700;color:var(--red);">150 € TTC</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Forfait 1ère année</span><span style="font-family:monospace;font-weight:700;color:var(--red);">~3 600–8 000 € TTC</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Suivi annuel dès an 2</span><span style="font-family:monospace;font-weight:700;color:var(--red);">0,50 % HT dégressif</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">→ minimum</span><span style="font-family:monospace;font-weight:700;color:var(--ink);">0,20 % HT</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--rl2);font-size:11px;"><span style="color:var(--i60);">Frais contrat (clean share)</span><span style="font-family:monospace;font-weight:700;color:var(--gr);">0,50 %/an</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;"><span style="color:var(--i60);">Seuil recommandé</span><span style="font-family:monospace;font-weight:700;color:var(--red);">~300k€</span></div>
+      </div>
+      <div style="padding:12px 18px;background:var(--grd);border-bottom:1px solid rgba(42,144,96,.12);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gr);margin-bottom:6px;">✓ Points forts</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>0 conflit d'intérêt structurel</li>
+          <li>ETF clean share prioritaires = frais produits les plus bas</li>
+          <li>Transparence totale — rémunération 100% visible</li>
+          <li>Alignement parfait conseiller / client</li>
+          <li>AV Luxembourg accessible</li>
+        </ul>
+      </div>
+      <div style="padding:12px 18px;background:var(--rdd);flex:1;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">⚠ Limites réelles</div>
+        <ul style="font-size:11px;color:var(--i60);line-height:1.8;padding-left:14px;margin:0;">
+          <li>Non viable sous 100k€</li>
+          <li>Optimisé à partir de ~300k€</li>
+          <li>Facture TTC à régler — sortie réelle de trésorerie</li>
+          <li>Gamme 3–4 familles (pas d'épargne salariale, prévoyance pro, SCPI fiscales)</li>
+          <li>Prosper Conseil fondé en 2022 seulement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYNTHÈSE DARK -->
+  <div style="background:var(--ink);margin-top:1px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+    <div style="padding:16px 20px;border-right:1px solid var(--rd);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--o);margin-bottom:5px;">Finzzle — Pour qui</div>
+      <div style="font-size:11px;color:var(--fog2);line-height:1.75;">Tout profil dès 50€/mois. Du premier versement aux patrimoines élevés. 7 familles. Idéal pour construire dans la durée.</div>
+    </div>
+    <div style="padding:16px 20px;border-right:1px solid var(--rd);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Hybride — Pour qui</div>
+      <div style="font-size:11px;color:var(--fog2);line-height:1.75;">Patrimoine ≥ 50k€ avec complexité réelle : OBO, succession, SCI. Pas pour profils standards.</div>
+    </div>
+    <div style="padding:16px 20px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(42,144,96,.8);margin-bottom:5px;">Honoraires purs — Pour qui</div>
+      <div style="font-size:11px;color:var(--fog2);line-height:1.75;">Patrimoine ≥ 300k€, profil autonome acceptant une facture visible. Gamme plus étroite.</div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="simulateur" class="bg-alt divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Simulateur · Formule exacte du fichier Excel Finzzle · 3 modèles comparés</span></div>
+  <h2 class="h2">Simulateur — coût client <em>&amp; rémunération conseiller</em></h2>
+  <p class="sdesc">Sélectionnez le montant, la durée et le modèle. Le simulateur calcule le coût total pour le client et l'estimation de la rémunération du conseiller, selon les données documentées.</p>
+
+  <div class="sim-card">
+    <div class="sim-head">
+      <div class="sim-title">Simulateur 3 modèles</div>
+      <div class="sim-sub">Capital final = Montant × (1 − frais entrée) × (1 + rendement − frais gestion)^durée · Les modèles inaccessibles à un montant donné sont automatiquement signalés</div>
+    </div>
+    <div style="padding:16px 20px;border-bottom:1px solid var(--rl);background:var(--p);display:flex;flex-direction:column;gap:14px;">
+
+      <!-- MONTANT SLIDER -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--i60);">Montant investi</span>
+          <span id="amt-lbl" style="font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:var(--o);">50 000 €</span>
+        </div>
+        <input type="range" id="amt-slider" min="0" max="1000000" step="5000" value="50000" oninput="setAmtSlider(this.value)" style="width:100%;accent-color:var(--o);">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--i30);">
+          <span>0 €</span><span>50k€</span><span>100k€</span><span>200k€</span><span>500k€</span><span>1 000k€</span>
+        </div>
+      </div>
+
+      <!-- DURÉE + RENDEMENT -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <span style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--i60);">Durée :</span>
+        <div id="dur-btns" style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="sim-btn" onclick="setDur(5)" data-v="5">5 ans</button>
+          <button class="sim-btn" onclick="setDur(10)" data-v="10">10 ans</button>
+          <button class="sim-btn active" onclick="setDur(20)" data-v="20">20 ans</button>
+          <button class="sim-btn" onclick="setDur(30)" data-v="30">30 ans</button>
+          <button class="sim-btn" onclick="setDur(40)" data-v="40">40 ans</button>
+        </div>
+        <span style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--i60);margin-left:8px;">Rendement brut :</span>
+        <input type="range" id="rend" min="2" max="10" step="0.5" value="5" oninput="updateSim()" style="width:100px;accent-color:var(--o);">
+        <span id="rend-lbl" style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;color:var(--o);min-width:42px;">5 %/an</span>
+        <span style="font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--pur);margin-left:16px;">SilmaTec :</span>
+        <button id="toggle-csp" onclick="toggleCSP()" style="font-size:9px;padding:3px 10px;border:1px solid var(--pur);background:transparent;color:var(--pur);cursor:pointer;font-weight:600;letter-spacing:.05em;">minimal</button>
+      </div>
+    </div>
+
+    <!-- RESULTS GRID 4 cards -->
+    <div id="sim-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rl);align-items:stretch;"></div>
+
+    <!-- COMPARISON BAR CHART -->
+    <div style="padding:16px 20px;border-top:1px solid var(--rl);background:var(--p2);">
+      <div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--i60);margin-bottom:10px;">Coût total client comparé</div>
+      <div id="bar-chart" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div style="padding:10px 20px;border-top:1px solid var(--rl);font-size:10px;color:var(--i30);">
+      Simulation indicative non contractuelle. Formule : Capital = Montant×(1−fe)×(1+r−fg−fp)^n. Rémunération conseiller estimée : 2/3 des frais réseau (entrée) + ~0,30%/an sur encours (running moyen, source CGPulse/barème Generali 2026).
+    </div>
+  </div>
+</div>
+</div>
+<!-- ══ POSITIONNEMENT RÉEL ══ -->
+<div class="divider bg-alt">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Sources : Banque de France 2023 · AMF déc. 2025 · prosper-conseil.fr · webinaire CGPulse 30/01/2026</span></div>
+  <h2 class="h2">Qui peut servir qui — <em>positionnement réel</em></h2>
+  <p class="sdesc">Selon le patrimoine du client, tous les modèles ne sont pas économiquement viables. Ce tableau positionne chaque acteur honnêtement.</p>
+  <div style="border:1px solid var(--rl);overflow:hidden;margin-top:16px;">
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);background:var(--ink);">
+      <div style="padding:8px 10px;font-size:9px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;">Acteur</div>
+      <div style="padding:8px 6px;font-size:9px;font-weight:600;color:#9a7040;text-align:center;">&lt; 185k€</div>
+      <div style="padding:8px 6px;font-size:9px;font-weight:600;color:#e89030;text-align:center;">185–586k€</div>
+      <div style="padding:8px 6px;font-size:9px;font-weight:600;color:#d4622a;text-align:center;">586–992k€</div>
+      <div style="padding:8px 6px;font-size:9px;font-weight:600;color:#b83028;text-align:center;">&gt; 992k€</div>
+    </div>
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);border-top:1px solid var(--rl);background:rgba(212,98,42,.04);">
+      <div style="padding:10px;font-size:10px;font-weight:700;color:var(--o);border-right:1px solid var(--rl);">Finzzle Groupe</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;">✅</div>
+    </div>
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);border-top:1px solid var(--rl);">
+      <div style="padding:10px;font-size:10px;font-weight:700;color:var(--pur);border-right:1px solid var(--rl);">Hybride SilmaTec</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">🚫</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">⚠️</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;">✅</div>
+    </div>
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);border-top:1px solid var(--rl);">
+      <div style="padding:10px;font-size:10px;font-weight:700;color:var(--gr);border-right:1px solid var(--rl);">Prosper Conseil</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">🚫</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">🚫</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;">✅</div>
+    </div>
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);border-top:1px solid var(--rl);">
+      <div style="padding:10px;font-size:10px;font-weight:700;color:var(--red);border-right:1px solid var(--rl);">Banques / Assureurs</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">✅</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">⚠️</div>
+      <div style="padding:10px;font-size:13px;text-align:center;">🚫</div>
+    </div>
+    <div style="display:grid;grid-template-columns:150px repeat(4,1fr);border-top:1px solid var(--rl);">
+      <div style="padding:10px;font-size:10px;font-weight:700;color:var(--i60);border-right:1px solid var(--rl);">Banques privées</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">🚫</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">🚫</div>
+      <div style="padding:10px;font-size:13px;text-align:center;border-right:1px solid var(--rl2);">⚠️</div>
+      <div style="padding:10px;font-size:13px;text-align:center;">✅</div>
+    </div>
+    <div style="padding:8px 10px;background:var(--p2);border-top:1px solid var(--rl);font-size:9px;color:var(--i30);">
+      ✅ Accessible économiquement · ⚠️ Viable avec réserves ou seuil informel · 🚫 Non viable économiquement
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ 07. COMPARATIF ══ -->
+<div id="comparatif" class="divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t">Tableau officiel Finzzle Groupe 2025 · Complété SilmaTec Finance + Prosper Conseil</span></div>
+  <h2 class="h2">Comparer les acteurs — <em>les vraies données</em></h2>
+  <p class="sdesc">Notre accompagnement · Modèle hybride SilmaTec Finance · Modèle MIF2 Prosper Conseil · Puis contrats en ligne, banques et banques privées.</p>
+
+  <div class="ctw">
+    <table class="ct">
+      <thead>
+        <tr>
+          <th>Critères</th>
+          <th class="th-o">Notre accompagnement<br><span style="font-weight:400;font-size:8px;color:rgba(255,255,255,.4)">Finzzle Groupe</span></th>
+          <th class="th-pur">Modèle hybride<br><span style="font-weight:400;font-size:8px;color:rgba(255,255,255,.4)">SilmaTec Finance ⓘ</span></th>
+          <th style="color:#86efac;border-bottom:2px solid var(--gr);">CGPI honoraires purs<br><span style="font-weight:400;font-size:8px;color:rgba(255,255,255,.4)">Ex. Prosper Conseil ⓘ</span></th>
+          <th>Contrats en ligne<br>Roboadvisor</th>
+          <th>Banques &amp; Assureurs</th>
+          <th>Banques privées<br>Cabinets indép.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="grp"><td colspan="7">Accès &amp; cible</td></tr>
+        <tr>
+          <td>Seuil d'accès</td>
+          <td class="co"><span class="bdg bg">50 €/mois</span></td>
+          <td class="cp"><span class="bdg bp">~30k€ min. viable</span></td>
+          <td style="color:var(--red)">~100k€ min. viable<br><span style="font-size:9px;color:var(--i30)">~300k€ recommandé</span></td>
+          <td>50 €/mois</td>
+          <td>50 €/mois</td>
+          <td><span class="bdg br">250k€ – 500k€</span></td>
+        </tr>
+        <tr>
+          <td>Cible réelle</td>
+          <td class="co"><strong>Tous profils — dès le 1er euro épargné</strong></td>
+          <td class="cp">Patrimoine complexe ≥50k€<br><span style="font-size:10px;color:var(--i60)">OBO, succession, SCI</span></td>
+          <td>Patrimoine ≥ 300k€<br><span style="font-size:10px;color:var(--i60)">Profil autonome</span></td>
+          <td>Autonomes</td>
+          <td>Grand public</td>
+          <td>Patrimoines élevés (jusqu'à 10–20M€)</td>
+        </tr>
+        <tr class="grp"><td colspan="7">Frais</td></tr>
+        <tr>
+          <td>Frais sur versement</td>
+          <td class="co"><span class="bdg bo">4,8 %</span> dégressif</td>
+          <td class="cp">0–2 % <span style="font-size:9px;color:var(--i30)">+ honoraires</span></td>
+          <td><span class="bdg bg">0 %</span></td>
+          <td><span class="bdg bg">0 %</span></td>
+          <td>3–4,75 %</td>
+          <td>0–5 % (négociés)</td>
+        </tr>
+        <tr>
+          <td>Frais de gestion annuels</td>
+          <td class="co">1 %/an</td>
+          <td class="cp">0,8–1 %/an</td>
+          <td><span class="bdg bg">0,50 %/an</span></td>
+          <td>inclus</td>
+          <td>1 %/an</td>
+          <td>0,5–1 %/an + fonds internes</td>
+        </tr>
+        <tr>
+          <td>Frais pilotée</td>
+          <td class="co"><span class="bdg bg">0 % ✓</span></td>
+          <td class="cp">0–0,6 %/an</td>
+          <td><span class="bdg bg">0 % ✓</span></td>
+          <td>inclus</td>
+          <td style="color:var(--red)">0,6 %/an (courant)</td>
+          <td>Inclus / variable</td>
+        </tr>
+        <tr>
+          <td>Honoraires conseil TTC</td>
+          <td class="co"><span class="bdg bg">❌ Non facturés</span></td>
+          <td class="cp" style="color:var(--red)">1 500–3 000 € bilan<br>650–1 200 €/an suivi<br>TVA 20 % non récup.</td>
+          <td style="color:var(--red)">150 € 1er RDV<br>3 600–8 000 € an 1<br>0,50 % HT/an dès an 2</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>Fréquents + TVA 20 %</td>
+        </tr>
+        <tr>
+          <td>Coût total moyen</td>
+          <td class="co" style="color:var(--o);font-weight:700">≈ 1,48 %/an sur 10 ans</td>
+          <td class="cp" style="color:var(--pur);font-weight:700">≈ 2× plus cher sur 30k€<br><span style="font-size:9px;font-weight:400">~12 700 € vs 6 690 €</span></td>
+          <td style="color:var(--gr);font-weight:700">~1,35 %/an total<br><span style="font-size:9px;font-weight:400">hors forfait 1ère année</span></td>
+          <td>0,9–1,7 %/an</td>
+          <td style="color:var(--red)">1,5–2 %/an + frais fonds</td>
+          <td>~1–2,5 % + honoraires</td>
+        </tr>
+        <tr class="grp"><td colspan="7">Rémunération &amp; transparence</td></tr>
+        <tr>
+          <td>Mode de rémunération</td>
+          <td class="co">Rétrocommissions</td>
+          <td class="cp">Honoraires TTC <strong>ET</strong> rétros maintenues</td>
+          <td>Honoraires purs<br><span style="font-size:10px;color:var(--gr)">0 rétrocommission</span></td>
+          <td>Aucun conseil</td>
+          <td>Rétrocommissions</td>
+          <td>Honoraires et/ou rétrocommissions</td>
+        </tr>
+        <tr>
+          <td>TVA applicable</td>
+          <td class="co"><span class="bdg bg">N/A — pas de facture</span></td>
+          <td class="cp" style="color:var(--red)">20 % non récupérable</td>
+          <td style="color:var(--red)">20 % (sauf cas spéc.)</td>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td style="color:var(--red)">20 % sur honoraires</td>
+        </tr>
+        <tr>
+          <td>Transparence réelle</td>
+          <td class="co">Élevée</td>
+          <td class="cp">Variable — devis requis</td>
+          <td><span class="yes">Totale ✓</span></td>
+          <td>Élevée</td>
+          <td>Moyenne</td>
+          <td>Variable (complexe)</td>
+        </tr>
+        <tr class="grp"><td colspan="7">Conseil &amp; services</td></tr>
+        <tr>
+          <td>Type de supports</td>
+          <td class="co"><strong>ETF, OPCVM, SCPI, Structurés</strong></td>
+          <td class="cp">OPCVM, SCPI, structurés</td>
+          <td>ETF clean share, OPCVM<br><span style="font-size:10px;color:var(--gr)">AV Luxembourg</span></td>
+          <td>ETF, OPCVM</td>
+          <td style="color:var(--red)">OPCVM maison</td>
+          <td>ETF, OPCVM, PE, dette privée</td>
+        </tr>
+        <tr>
+          <td>Conseil humain</td>
+          <td class="co"><span class="yes">✔️ Fort</span></td>
+          <td class="cp"><span class="yes">✔️ Fort</span></td>
+          <td><span class="yes">✔️ Fort</span></td>
+          <td><span class="no">❌ Aucun</span></td>
+          <td><span class="par">◐ Faible</span></td>
+          <td><span class="yes">✔️ Fort</span></td>
+        </tr>
+        <tr>
+          <td>7 familles de solutions</td>
+          <td class="co"><span class="yes">✔️ Toutes les 7</span></td>
+          <td class="cp"><span class="par">◐ 3–4 familles</span></td>
+          <td><span class="par">◐ 3–4 familles</span></td>
+          <td><span class="no">❌ 1–2</span></td>
+          <td><span class="no">❌ 1–2 (captives)</span></td>
+          <td><span class="par">◐ 3–4</span></td>
+        </tr>
+        <tr>
+          <td>Viable sous 30k€</td>
+          <td class="co"><span class="yes">✔️ Oui</span></td>
+          <td class="cp"><span class="no">❌ Non viable</span></td>
+          <td><span class="no">❌ Non viable</span></td>
+          <td><span class="yes">✔️ Oui</span></td>
+          <td><span class="yes">✔️ Oui</span></td>
+          <td><span class="no">❌ Seuil 250k€</span></td>
+        </tr>
+        <tr>
+          <td>Backup / continuité</td>
+          <td class="co"><span class="yes">✔️ Réseau 4 100+</span></td>
+          <td class="cp"><span class="par">◐ Équipe 4–5 pers.</span></td>
+          <td><span class="par">◐ Cabinet 10+ pers.</span></td>
+          <td><span class="yes">✔️ Plateforme</span></td>
+          <td><span class="yes">✔️ Institution</span></td>
+          <td><span class="yes">✔️ Cabinet</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;font-size:10px;color:var(--i30);font-style:italic;">Source tableau 4 colonnes : Comparatif officiel Finzzle Groupe 2025. Modèle hybride : source terrain anonymisée, webinaire professionnel janvier 2026 — grille tarifaire réelle.</div>
+</div>
+</div>
+
+<!-- ══ 06. FINZZLE ══ -->
+<div id="finzzle" class="bg-dark divider">
+<div class="s">
+  <div class="kl"><span class="kl-l"></span><span class="kl-t" style="color:var(--o)">Finzzle Groupe · finzzle-groupe.com</span></div>
+  <h2 class="h2 h2d">Le réseau en <em>chiffres</em></h2>
+  <p class="sdesc sdesc-d">La solidité d'un réseau qui accompagne depuis 34 ans — maintenant soutenu par un acteur institutionnel de premier plan.</p>
+</div>
+<div class="ch-grid">
+  <div class="ch"><div class="ch-n">1992</div><div class="ch-l">Année de fondation</div><div class="ch-s">34 ans d'existence — une des plus longues trajectoires du secteur CGP en France</div></div>
+  <div class="ch"><div class="ch-n">4 100+</div><div class="ch-l">Consultants indépendants</div><div class="ch-s">Habilités via Prodemial Business School, présents partout en France</div></div>
+  <div class="ch"><div class="ch-n">650M€</div><div class="ch-l">Collecte AV 2025</div><div class="ch-s">+44 % vs 2024 · 380M€ en 2023 → 450M€ 2024 → 650M€ 2025</div></div>
+  <div class="ch"><div class="ch-n">570M€</div><div class="ch-l">Collecte SCPI 2025</div><div class="ch-s">12 % de part de marché national — 1er collecteur en France · +35% sur un marché à +12%</div></div>
+  <div class="ch"><div class="ch-n">200M€</div><div class="ch-l">Collecte PER 2025</div><div class="ch-s">+71 % vs 2023 · 117M€ → 200M€</div></div>
+  <div class="ch"><div class="ch-n">3,4 Mds€</div><div class="ch-l">Encours Stellium</div><div class="ch-s">vs 1 milliard pour Cyrus, leader historique</div></div>
+</div>
+<div class="s" style="padding-top:28px;padding-bottom:48px;">
+  <!-- RÉPARTITION RÉMUNÉRATION — 2/3 expliqué honnêtement -->
+  <div style="margin-bottom:40px;">
+    <div class="kl"><span class="kl-l"></span><span class="kl-t" style="color:var(--o)">Répartition · Source : Convention Cadre Prodemial + PMR annexe 1 (nov. 2021)</span></div>
+    <h3 style="font-family:var(--sf);font-size:18px;font-weight:400;color:var(--w);margin-bottom:16px;">Les 4,8 % : à qui vont-ils, et pourquoi ?</h3>
+
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:28px;align-items:start;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <canvas id="donut-remun" width="190" height="190"></canvas>
+        <div style="font-size:10px;color:var(--fog2);margin-top:8px;text-align:center;">Répartition des frais d'entrée · tous montants</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="border-left:3px solid #b8501f;padding:10px 14px;background:rgba(255,255,255,.05);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e07040;margin-bottom:4px;">1/3 → Stellium · plateforme &amp; infrastructure</div>
+          <div style="font-size:11px;color:var(--fog2);line-height:1.75;">Plateforme de souscription multi-assureurs, CRM, conformité MIF2/DDA centralisée, partenariats négociés au niveau groupe. L'équivalent des charges fixes d'un cabinet indépendant (~30–50% de ses revenus), ici mutualisées sur 4 100 conseillers.</div>
+        </div>
+        <div style="border-left:3px solid #e89030;padding:10px 14px;background:rgba(255,255,255,.05);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e89030;margin-bottom:8px;">2/3 → Réseau · conseiller + lignée — taux PMR officiels</div>
+          <div style="font-size:11px;color:var(--fog2);line-height:1.65;margin-bottom:10px;">Les 2/3 se répartissent entre le conseiller qui signe et sa lignée. La <strong style="color:var(--w)">part personnelle (TPC) est définie exactement par le PMR</strong> selon la qualification :</div>
+          <div style="display:grid;grid-template-columns:1fr auto auto;gap:1px;background:rgba(255,255,255,.1);font-size:10px;margin-bottom:8px;">
+            <div style="background:rgba(0,0,0,.3);padding:4px 8px;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Qualification</div>
+            <div style="background:rgba(0,0,0,.3);padding:4px 8px;color:rgba(255,255,255,.4);font-weight:600;text-align:center;">TPC perso.</div>
+            <div style="background:rgba(0,0,0,.3);padding:4px 8px;color:rgba(255,255,255,.4);font-weight:600;text-align:center;">+ Lignée</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:var(--fog2);">Consultant</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:#e89030;font-weight:700;text-align:center;font-family:monospace;">5 %</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:rgba(255,255,255,.35);text-align:center;">—</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:var(--fog2);">Manager</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:#e89030;font-weight:700;text-align:center;font-family:monospace;">6 %</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:rgba(255,255,255,.5);text-align:center;">+2% démarrage filleuls</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:var(--fog2);">Manager Planète→Galaxie</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:#D4622A;font-weight:700;text-align:center;font-family:monospace;">6,5→8 %</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:rgba(255,255,255,.5);text-align:center;">+1% expansion +0,5%/niv. dév.</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:var(--fog2);">+ Prime Qualité (≥1M€ vol.)</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:#D4622A;font-weight:700;text-align:center;font-family:monospace;">+1→2 %</div>
+            <div style="background:rgba(255,255,255,.04);padding:4px 8px;color:rgba(255,255,255,.35);text-align:center;">plafonné à 8% total</div>
+          </div>
+          <div style="font-size:9px;color:rgba(255,255,255,.3);line-height:1.6;">Source : Convention Cadre Prodemial — Annexe 1 Plan Marketing de Rémunération (PMR), novembre 2021.</div>
+        </div>
+        <div style="padding:8px 12px;background:rgba(212,98,42,.07);border:1px solid rgba(212,98,42,.2);font-size:10px;color:var(--fog2);line-height:1.7;">
+          <strong style="color:var(--o)">Rappel dégressivité :</strong> minimum absolu de frais : <strong style="color:var(--w)">1,2%</strong> (sans rémunération conseiller). Max Finzzle : 4,8%. À 50k€ → 3,6%. À 200k€ → 2,4%.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bp-block">
+    <div class="bp-logo">Bridgepoint</div>
+    <div class="bp-text"><strong>Rapprochement Bridgepoint × Finzzle Groupe — mai 2025.</strong> Bridgepoint est un fonds de private equity européen majeur gérant plus de 75 milliards de dollars d'actifs, investisseur également dans Primonial, Cyrus-Herez et Kereis.<br><br>Dans le cadre de cette opération, <strong>AT Kearney</strong> (l'un des plus grands cabinets de conseil mondiaux) a réalisé une due diligence approfondie du marché français du patrimoine et du modèle Finzzle Groupe — validant le positionnement stratégique, les avantages compétitifs durables et le potentiel de croissance. Ce rapprochement apporte une garantie de continuité, de solidité financière et de développement accéléré.</div>
+  </div>
+</div>
+</div>
+
+<!-- FOOTNOTES -->
+<div class="fns">
+  <div class="fns-in">
+    <div class="fns-head">Sources documentées — cliquez pour accéder</div>
+    <div class="fns-list">
+      <div class="fns-row"><span class="fns-n">①</span><span><a href="https://finzzle-groupe.com" target="_blank" style="color:var(--o);text-decoration:none;">finzzle-groupe.com</a> — Finzzle Groupe : 4 100+ consultants, 3,4 Mds€ encours Stellium, fondé en 1992. Collecte 2025 : 650M€ AV, 570M€ SCPI (12% marché national), 200M€ PER.</span></div>
+      <div class="fns-row"><span class="fns-n">②</span><span>Fiche descriptive AV officielle Finzzle — 4,8% versement / 1%/an gestion / 0% arbitrage / 0% sortie / 0% pilotée → ≈ 1,48%/an moyen sur 10 ans. Frais dégressifs : 3,6% à 50k€, 2,4% à 200k€. Simulateur : formule issue du fichier Excel officiel Finzzle.</span></div>
+      <div class="fns-row"><span class="fns-n">③</span><span>Modèle hybride — <strong>Stéphane VEAUX, SilmaTec Finance</strong> (fondé 2003, Paris/Lyon/Normandie, AUREP, CNCGP). Grille tarifaire présentée nominativement, <a href="https://cgpulse.fr" target="_blank" style="color:rgba(255,255,255,.45);text-decoration:none;">webinaire CGPulse</a> du 30/01/2026. Mix 40–50% honoraires / 50–60% rétrocommissions. Budget IT 40k€/an.</span></div>
+      <div class="fns-row"><span class="fns-n">④</span><span>Synthèse CGPulse (31/01/2026) — ~0,75–0,80%/an en rétrocommissions moyennes · 1M€ d'encours ≈ 7 500–8 000€/an running. <strong>Barème Generali Patrimoine 2026</strong> : taux UC 0,75–1,55%/an.</span></div>
+      <div class="fns-row"><span class="fns-n">⑤</span><span><a href="https://prosper-conseil.fr/services/" target="_blank" style="color:rgba(255,255,255,.45);text-decoration:none;">prosper-conseil.fr/services</a> — Prosper Conseil (fondé 2022). 150€ TTC 1er RDV, forfait 1ère année ~3 600–8 000€ TTC, 0,50% HT dégressif jusqu'à 0,20% HT. Seuil recommandé ~300k€.</span></div>
+      <div class="fns-row"><span class="fns-n">⑥</span><span>CIF indépendant Christy — source Discord CGPulse, 24/02/2026. Forfait annuel : jusqu'à 3 enveloppes (PEA, AV, PER) × 3 supports max. Frais d'installation par enveloppe.</span></div>
+      <div class="fns-row"><span class="fns-n">⑦</span><span><a href="https://www.amf-france.org" target="_blank" style="color:rgba(255,255,255,.45);text-decoration:none;">amf-france.org</a> — Rapport chiffres-clés CIF, décembre 2025 : 5 985 CIF-CGP, 81% non-indépendants, 12% mixtes, 7% honoraires purs MIF2.</span></div>
+      <div class="fns-row"><span class="fns-n">⑧</span><span>Banque de France 2023 — 18M ménages : 40% &lt;185k€, 40% 185–586k€, 10% 586–992k€, 10% &gt;992k€. Patrimoine total : 15 000 Mds€. Actifs liquides : 2 108 Mds€.</span></div>
+      <div class="fns-row"><span class="fns-n">⑨</span><span>AT Kearney / Bridgepoint — due diligence mai 2025 sur Finzzle Groupe. AUM Bridgepoint ~75 Mds$. Données collecte 2025 : source présentation interne réseau Finzzle Groupe.</span></div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+/* ── SIMULATEUR 3 MODÈLES — calculs corrigés ── */
+var simAmt=50000, simDur=20, hybridCSP=false;
+
+function fmt(n){return Math.round(n).toLocaleString('fr');}
+function fmtPct(n){return n.toFixed(2)+'%';}
+
+/*
+  ═══════════════════════════════════════════════════
+  LOGIQUE ÉCONOMIQUE CORRIGÉE — calcul sans double comptage
+  ═══════════════════════════════════════════════════
+
+  RÈGLE : totalCost = fraisEntrée + (fg+fp)×montant×durée + honoraires
+  Les honoraires NE doivent PAS contenir des éléments déjà dans fg/fp.
+
+  FINZZLE
+  ─ fe : 4,8% (<50k) / 3,6% (<200k) / 2,4% (≥200k)
+  ─ fg : 1%/an contrat (norme assureur)
+  ─ fp : 0% (pas de frais pilotée)
+  ─ hono : 0€ (aucune facture client)
+  ✅ Accessible dès 0€
+
+  HYBRIDE SILMATEC (SilmaTec Finance)
+  ─ fe : 1% entrée (vs 2,4-4,8% Finzzle → avantage sur grands montants)
+  ─ fg : 0,9%/an frais contrat + rétros UC ~0,75%/an = 1,65%/an TOTAL annuels variables
+  ─ fp : 0 (inclus dans fg)
+  ─ hono : honoraires FIXES uniquement : bilan 1500€ + CSP 650€/an TTC
+  → Sur 50k€ : avantage entrée (+1 700€) mais honoraires fixes pèsent lourd
+  → Sur 200k€ : avantage entrée net (+2 600€) + honoraires fixes négligeables = COMPÉTITIF
+  → Sur 500k€ : avantage entrée (+7 000€) + fg similaire → peut BATTRE Finzzle
+  🚫 Non viable sous 30 000€ (honoraires fixes disproportionnés)
+
+  PROSPER CONSEIL
+  ─ fe : 0% (avantage majeur sur grands montants)
+  ─ fg : 0,5%/an frais contrat clean share
+  ─ fp : 0
+  ─ hono : 150€ + forfait an1 (min 3600€, max 8000€) + 0,6%TTC/an dès an2 (<300k€)
+             → 0,5%TTC/an (300-500k€) → 0,3%TTC/an (>500k€)
+  → Sur 100k€ : 0% entrée + honoraires ~4000€ an1 + ~540€/an → légèrement > Finzzle
+  → Sur 300k€ : 0% entrée (vs 7200€) + honoraires ~2%/an → BASCULE : MOINS CHER que Finzzle
+  → Sur 1M€ : 0% entrée (vs 24000€) + honoraires ~0,8%/an → TRÈS attractif
+  🚫 Non accessible sous 100 000€
+
+  BANQUES
+  ─ fe : 1%/an (geste commercial)
+  ─ fg : 1%/an contrat + 0,6%/an pilotée = 1,6%/an
+  ─ hono : 0€
+  → Coûte plus sur longue durée à cause du 0,6%/an pilotée cumulé
+  ═══════════════════════════════════════════════════
+*/
+
+var MODELS=[
+  {
+    id:'reseau', name:'Finzzle Groupe', tag:'Notre modèle', color:'#D4622A',
+    seuil:0,
+    /*
+      SCÉNARIO DÉFAVORABLE CONSERVÉ — correspond à la réalité des versements mensuels :
+      Sur des versements mensuels réguliers, les 4,8% s'appliquent sur CHAQUE versement.
+      Il n'y a pas de "dilution" dans le temps comme sur un versement unique.
+      → fe fixe à 4,8% quelle que soit la taille (scénario le plus courant)
+      → fg = 1%/an frais contrat Suravenir (source : doc officiel 01/01/2026)
+      → Les rétrocessions UC (0,84%/an actions) sont DANS les frais des fonds UC
+         et s'appliquent également chez tous les acteurs utilisant les mêmes fonds.
+         Elles ne s'ajoutent PAS au coût client Finzzle.
+    */
+    fe:function(a){ return a*0.048; }, /* 4,8% fixe — scénario défavorable / versements mensuels */
+    fg:0.010, fp:0.000,
+    hono:function(a,y){ return 0; },
+    remCons:function(a,y){
+      var fe=a*0.048;
+      /* PMR Prodemial : TPC 5% sur VAVC + commissions récurrentes barème 1 (0,40%/an) */
+      var entree=Math.round(fe*0.60);   /* ~60% des frais entrée vers réseau (TPC+lignée) */
+      var running=Math.round(a*0.004*y);
+      return {entree:entree, running:running, total:entree+running};
+    },
+    seuilMsg:null,
+    desc:'4,8% entrée (sur chaque versement) · 1%/an contrat · 0€ honoraires · scénario versements mensuels'
+  },
+  {
+    id:'hybride', name:'SilmaTec Finance type', tag:'Hybride', color:'#5b21b6',
+    seuil:100000,
+    /*
+      STRUCTURE RÉELLE SILMATEC (source : webinaire CGPulse 30/01/2026) :
+      Deux flux distincts et cumulables :
+
+      FLUX 1 — Honoraires (facturés directement au client) :
+        - One-shot : bilan patrimonial 1 500–3 000€ TTC (selon complexité)
+        - Récurrent optionnel : CSP 650–1 200€/an TTC (suivi actif)
+        → On prend le scénario minimal : bilan 1 500€ one-shot + CSP 650€/an
+
+      FLUX 2 — Rétrocommissions maintenues (perçues via les fonds) :
+        - ~0,74%/an sur l'encours UC (source : barème Suravenir)
+        - Autorisées en modèle hybride MIF2 — EN PLUS des honoraires
+        - Du point de vue coût client : dans les frais des fonds, identiques à Finzzle
+        → NE s'ajoutent PAS au totalCost car le client les paie dans les frais fonds
+          de la même façon chez tous les acteurs
+
+      Le vrai différentiateur de coût client vs Finzzle = frais entrée (1% vs 4,8%)
+      moins les honoraires fixes (bilan + CSP optionnel)
+    */
+    fe:function(a){ return a*0.010; },
+    fg:0.009, fp:0.000,
+    /* Scénario affiché : minimal = bilan one-shot seulement */
+    hono:function(a,y){
+      var bilan=1500;
+      return hybridCSP ? Math.round(bilan + 650*y) : Math.round(bilan);
+    },
+    /* Scénario complet avec CSP pour l'affichage détaillé */
+    honoAvecCSP:function(a,y){
+      return Math.round(1500 + 650*y);
+    },
+    honoDetail:function(a,y){
+      return {
+        bilan:1500,
+        csp_min:Math.round(650*y),   /* si suivi actif — optionnel */
+        retros:Math.round(a*0.0074*y) /* info seulement — dans les fonds, pas ajouté au coût */
+      };
+    },
+    remCons:function(a,y){
+      var retros=Math.round(a*0.0074*y);
+      return {entree:1500, running:retros, total:1500+retros};
+    },
+    seuilMsg:'Honoraires fixes (bilan 1 500€) représentent<br>une part trop importante du capital sous 100 000 €.',
+    desc:'1% entrée (1×) · 0,9%/an contrat · bilan 1 500€ one-shot · CSP 650€/an optionnel · rétros UC maintenues'
+  },
+  {
+    id:'prosper', name:'Prosper Conseil type', tag:'CGPI MIF2', color:'#2a9060',
+    seuil:100000,
+    fe:function(a){ return 0; },
+    /*
+      fg : 0,5%/an frais contrat clean share (ETF prioritaires, frais fonds réduits)
+      0 rétrocession reçue — toute rétro perçue est reversée au client (MIF2 strict)
+      → économie sur les frais fonds : ETF clean share ~0,2-0,3%/an vs ~0,7-0,8%/an pour fonds actifs
+      Mais cet avantage est dans les fonds eux-mêmes — pas modélisé ici pour rester conservateur
+    */
+    fg:0.005, fp:0.000,
+    hono:function(a,y){
+      var an1=Math.min(Math.max(3600, Math.round(a*0.025)), 8000);
+      var taux=a<300000?0.006 : a<500000?0.005 : 0.003;
+      return 150+an1+Math.round(a*taux*(y-1));
+    },
+    remCons:function(a,y){
+      var an1=Math.min(Math.max(3600, Math.round(a*0.025)), 8000);
+      var taux=a<300000?0.006:a<500000?0.005:0.003;
+      return {entree:150+an1, running:Math.round(a*taux*(y-1)), total:150+an1+Math.round(a*taux*(y-1))};
+    },
+    seuilMsg:'Forfait 1ère année (3 600–8 000€ TTC) non rentable sur ce montant.<br><strong>Seuil Prosper recommandé : 100 000€ min — 300 000€ idéal.</strong>',
+    desc:'0% entrée · 0,5%/an contrat clean share · forfait an1 · 0,6%TTC/an dégressif · 0 rétrocommission'
+  },
+  {
+    id:'banque', name:'Banques / Assureurs', tag:'Banques', color:'#c03030',
+    seuil:0,
+    fe:function(a){ return a*0.010; },
+    fg:0.010, fp:0.006,
+    hono:function(a,y){ return 0; },
+    remCons:function(a,y){ return {entree:0, running:Math.round(a*0.008*y), total:Math.round(a*0.008*y)}; },
+    seuilMsg:null,
+    desc:'~1% entrée · 1%/an contrat · 0,6%/an pilotée · fonds maison non clean share'
+  }
+];
+
+function isOk(m,a){ return a>=m.seuil; }
+
+function calcModel(m,a,y){
+  var r=parseFloat(document.getElementById('rend').value)/100;
+  var fe=m.fe(a);
+  var cap=a*(1-fe/a)*Math.pow(1+r-m.fg-m.fp,y);
+  var hono=m.hono(a,y);
+  var annuels=Math.round(a*(m.fg+m.fp)*y);
+  var totalCost=Math.round(fe)+annuels+Math.round(hono);
+  /* Coût moyen/an correct :
+     - frais entrée lissés sur la durée : fe/y
+     - frais annuels : (fg+fp)*a
+     - honoraires lissés : hono/y
+     → en % du capital initial */
+  var avgPctAn=((Math.round(fe)/y + a*(m.fg+m.fp) + Math.round(hono)/y)/a*100);
+  return {cap:Math.round(cap), fee:Math.round(fe), annuels:annuels, hono:Math.round(hono),
+          totalCost:totalCost, rem:m.remCons(a,y), avgPct:avgPctAn};
+}
+
+function setAmtSlider(v){
+  simAmt=parseInt(v)||0;
+  var lbl=simAmt>=1000000?(simAmt/1000000).toFixed(1)+'M€':simAmt>=1000?Math.round(simAmt/1000)+'k€':simAmt+'€';
+  document.getElementById('amt-lbl').textContent=simAmt.toLocaleString('fr')+' €  ('+lbl+')';
+  updateSim();
+}
+
+function setDur(v){
+  simDur=v;
+  document.querySelectorAll('#dur-btns .sim-btn').forEach(function(b){
+    b.classList.toggle('active',parseInt(b.dataset.v)===v);
+  });
+  updateSim();
+}
+
+function toggleCSP(){
+  hybridCSP=!hybridCSP;
+  var btn=document.getElementById('toggle-csp');
+  if(btn){
+    btn.textContent=hybridCSP?'+ CSP 650€/an':'minimal';
+    btn.style.background=hybridCSP?'var(--pur)':'transparent';
+    btn.style.color=hybridCSP?'white':'var(--pur)';
+  }
+  updateSim();
+}
+
+function updateSim(){
+  var r=parseFloat(document.getElementById('rend').value)/100;
+  document.getElementById('rend-lbl').textContent=(r*100).toFixed(1)+' %/an';
+
+  var results=MODELS.map(function(m){
+    var ok=isOk(m,simAmt);
+    return {m:m, ok:ok, res:ok?calcModel(m,simAmt,simDur):null};
+  });
+
+  var accessible=results.filter(function(x){return x.ok;});
+  var maxCost=accessible.length?Math.max.apply(null,accessible.map(function(x){return x.res.totalCost;})):1;
+  var bestCost=accessible.length?Math.min.apply(null,accessible.map(function(x){return x.res.totalCost;})):0;
+
+  /* ─ CARDS ─ */
+  var grid=document.getElementById('sim-grid');
+  grid.style.gridTemplateColumns='repeat(4,1fr)';
+  grid.innerHTML=results.map(function(obj){
+    var m=obj.m, ok=obj.ok, res=obj.res;
+    var isOurs=m.id==='reseau';
+    var ring=isOurs?'outline:2px solid var(--o);outline-offset:-2px;':'';
+
+    if(!ok){
+      return '<div style="background:#faf9f8;padding:16px 14px;'+ring+'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:240px;opacity:.85;">'+
+        '<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:'+m.color+'18;color:'+m.color+';display:inline-block;margin-bottom:10px;">'+m.tag+'</div>'+
+        '<div style="font-family:var(--sf);font-size:13px;color:var(--ink);margin-bottom:12px;">'+m.name+'</div>'+
+        '<div style="font-size:22px;margin-bottom:10px;">🚫</div>'+
+        '<div style="font-size:11px;color:var(--i60);line-height:1.7;">'+m.seuilMsg+'</div>'+
+        '</div>';
+    }
+
+    var isBest=res.totalCost===bestCost;
+    var capColor=isBest?'var(--gr)':m.color;
+
+    /* Frais d'entrée */
+    var feTaux = m.id==='reseau' ? '4,8%' : '';
+    var feDerogeNote = m.id==='reseau' ? '<div style="font-size:9px;color:var(--i30);margin-top:1px;">Scénario versements mensuels — 4,8% sur chaque versement</div>' : '';
+    var feeLine= res.fee>0
+      ? '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">Frais entrée (1×)'+(feTaux?' <span style="color:var(--o);font-weight:600;">'+feTaux+'</span>':'')+'</span><span style="font-family:monospace;font-weight:600;">'+fmt(res.fee)+'€</span></div>'+feDerogeNote
+      : '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">Frais entrée</span><span style="font-family:monospace;font-weight:600;color:var(--gr);">0€ ✓</span></div>';
+
+    var honoLines='';
+    if(m.id==='hybride' && m.honoDetail){
+      var hd=m.honoDetail(simAmt,simDur);
+      var cspTotal=m.honoAvecCSP(simAmt,simDur);
+      honoLines=
+        '<div style="font-size:9px;font-weight:600;color:var(--pur);margin-top:4px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em;">Honoraires (en plus)</div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">└ Bilan patrimonial (1×)</span><span style="font-family:monospace;font-weight:600;color:var(--pur);">'+fmt(hd.bilan)+'€</span></div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">└ CSP ×'+simDur+' <em style="color:var(--i30)">(optionnel)</em></span><span style="font-family:monospace;font-weight:600;color:var(--i60);">'+fmt(hd.csp_min)+'€</span></div>'+
+        '<div style="font-size:9px;color:var(--i30);padding:3px 0 3px 10px;border-top:1px dashed var(--rl2);margin-top:2px;">'+
+          'Scénario minimal (bilan seul) : <strong style="color:var(--pur)">'+fmt(hd.bilan)+'€</strong><br>'+
+          'Scénario complet (+ CSP) : <strong style="color:var(--pur)">'+fmt(cspTotal)+'€</strong>'+
+        '</div>'+
+        '<div style="font-size:9px;color:var(--i30);margin-top:3px;padding:3px 6px;background:rgba(91,33,182,.06);border-left:2px solid var(--pur);">'+
+          '+ Rétros UC ~0,74%/an = <strong>'+fmt(hd.retros)+'€</strong> sur '+simDur+' ans<br>'+
+          '<em>Revenus cabinet via fonds — non ajoutés au coût client</em>'+
+        '</div>';
+    } else if(res.hono>0){
+      honoLines='<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">Honoraires total</span><span style="font-family:monospace;font-weight:600;color:var(--red);">'+fmt(res.hono)+'€</span></div>';
+    }
+
+    return '<div style="background:white;padding:16px 14px;display:flex;flex-direction:column;'+ring+'">'+
+      '<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:'+m.color+'18;color:'+m.color+';display:inline-block;margin-bottom:8px;">'+m.tag+'</div>'+
+      (isBest?'<div style="font-size:9px;background:var(--gr);color:white;padding:1px 6px;display:inline-block;margin-left:4px;margin-bottom:8px;">✓ LE MOINS CHER</div>':'')+
+      '<div style="font-family:var(--sf);font-size:13px;color:var(--ink);margin-bottom:10px;">'+m.name+'</div>'+
+      '<div style="font-family:var(--sf);font-size:22px;font-weight:400;color:'+capColor+';line-height:1.1;margin-bottom:4px;">'+fmt(res.cap)+' €</div>'+
+      '<div style="font-size:10px;color:var(--i60);margin-bottom:10px;">capital final · '+simDur+' ans · '+(r*100).toFixed(1)+'%/an</div>'+
+      '<div style="display:flex;flex-direction:column;gap:3px;padding-top:8px;border-top:1px solid var(--rl2);">'+
+      feeLine+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--i60);">Frais contrat ×'+simDur+'</span><span style="font-family:monospace;font-weight:600;">'+fmt(res.annuels)+'€</span></div>'+
+      honoLines+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:3px;padding-top:3px;border-top:1px solid var(--rl2);">'+
+        '<span style="color:var(--i60);">Coût total <em style="color:var(--i30)">(scénario minimal)</em></span>'+
+        '<span style="font-family:monospace;font-weight:700;color:'+(isBest?'var(--gr)':'var(--red)')+';">'+fmt(res.totalCost)+'€</span>'+
+      '</div>'+
+      (m.id==='hybride'?
+        '<div style="display:flex;justify-content:space-between;font-size:11px;padding-top:2px;">'+
+          '<span style="color:var(--i60);">Coût total <em style="color:var(--i30)">(+ CSP '+fmt(Math.round(650*simDur))+'€)</em></span>'+
+          '<span style="font-family:monospace;font-weight:600;color:var(--pur);">'+fmt(res.totalCost+Math.round(650*simDur))+'€</span>'+
+        '</div>'
+      :'')+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;">'+
+        '<span style="color:var(--i60);">Rémun. conseiller</span>'+
+        '<span style="font-family:monospace;font-weight:600;color:'+m.color+';">'+fmt(res.rem.total)+'€</span>'+
+      '</div>'+
+      '</div>'+
+      '<div style="font-size:9px;color:var(--i30);margin-top:8px;line-height:1.5;">'+m.desc+'</div>'+
+      '</div>';
+  }).join('');
+
+  /* ─ BARRES ─ */
+  var bars=document.getElementById('bar-chart');
+  bars.innerHTML=results.map(function(obj){
+    var m=obj.m, ok=obj.ok, res=obj.res;
+    if(!ok){
+      return '<div style="display:grid;grid-template-columns:160px 1fr 120px;gap:10px;align-items:center;opacity:.35;">'+
+        '<div style="font-size:11px;color:'+m.color+';">'+m.name+'</div>'+
+        '<div style="height:18px;background:var(--p3);display:flex;align-items:center;padding:0 8px;">'+
+          '<span style="font-size:9px;color:var(--i30);font-style:italic;">Non accessible à ce montant</span>'+
+        '</div>'+
+        '<div style="font-size:11px;color:var(--i30);text-align:right;">—</div>'+
+        '</div>';
+    }
+    var pct=maxCost>0?Math.round(res.totalCost/maxCost*100):0;
+    var isBest=res.totalCost===bestCost;
+    var diff=res.totalCost-bestCost;
+    return '<div style="display:grid;grid-template-columns:160px 1fr 120px;gap:10px;align-items:center;">'+
+      '<div style="font-size:11px;font-weight:500;color:'+m.color+';">'+m.name+'</div>'+
+      '<div style="height:18px;background:var(--p3);position:relative;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+m.color+';transition:width .3s;"></div>'+
+      '</div>'+
+      '<div style="font-family:monospace;font-size:11px;font-weight:700;color:'+(isBest?'var(--gr)':m.color)+';text-align:right;">'+
+        fmt(res.totalCost)+'€'+(isBest?' ✓ min.':diff>0?' +'+fmt(diff):'')+
+      '</div>'+
+      '</div>';
+  }).join('');
+}
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll',function(){
+  var ids=['positionnement','valeur','solutions','frais','modeles-remuneration','simulateur','qui-sert-qui','comparatif','finzzle'];
+  var cur='';
+  ids.forEach(function(id){var el=document.getElementById(id);if(el&&window.scrollY>=el.getBoundingClientRect().top+window.scrollY-120)cur=id;});
+  document.querySelectorAll('.nl').forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+cur);});
+});
+
+updateSim();
+
+/* ── DONUT RÉPARTITION RÉMUNÉRATION — 3 segments ── */
+function drawDonut(){
+  var canvas=document.getElementById('donut-remun');
+  if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var cx=canvas.width/2,cy=canvas.height/2,r=78,ri=44;
+  var slices=[
+    {pct:1/3,color:'#b8501f',line1:'1/3',line2:'Stellium'},
+    {pct:2/3,color:'#D4622A',line1:'2/3',line2:'Réseau'}
+  ];
+  var start=-Math.PI/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  slices.forEach(function(s){
+    var end=start+s.pct*2*Math.PI;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,end);
+    ctx.closePath();ctx.fillStyle=s.color;ctx.fill();
+    /* gap line */
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,end-0.01,end+0.01);
+    ctx.strokeStyle='#161412';ctx.lineWidth=2;ctx.stroke();
+    /* label */
+    var mid=start+s.pct*Math.PI;
+    var lx=cx+Math.cos(mid)*58,ly=cy+Math.sin(mid)*58;
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(s.line1,lx,ly-6);
+    ctx.font='8px sans-serif';ctx.fillStyle='rgba(255,255,255,.8)';
+    ctx.fillText(s.line2,lx,ly+6);
+    start=end;
+  });
+  /* hole */
+  ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);
+  ctx.fillStyle='#161412';ctx.fill();
+  /* centre */
+  ctx.fillStyle='#D4622A';ctx.font='bold 11px sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('Finzzle',cx,cy-7);
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='8px sans-serif';
+  ctx.fillText('Rémunération',cx,cy+7);
+}
+window.addEventListener('load',drawDonut);
+</script>
+</body>
+</html>
