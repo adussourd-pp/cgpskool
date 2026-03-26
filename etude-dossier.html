@@ -4429,13 +4429,24 @@ function buildMatriceObjSol(impot,capa,aSum){
 // ║  SOLUTIONS                                                     ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function toggleSolution(produit){
-  var idx=solsSelectionnees.findIndex(function(s){return s.produit===produit;});
-  if(idx>=0){solsSelectionnees.splice(idx,1);}
-  else{var cp=COPERNIC[produit];var hAns=cp?(cp.horizonAns||(parseInt(cp.horizon)||10)):10;solsSelectionnees.push({produit:produit,levier:cp?cp.levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:hAns+' ans',horizonLabel:cp?cp.horizon:'10 ans',objectifs:[],etape:solsSelectionnees.length+1,objectifsValides:[]});}
-  var card=document.getElementById('btn_sol_'+produit.replace(/[^a-zA-Z0-9]/g,'_'));
-  if(card){var isSel=solsSelectionnees.some(function(s){return s.produit===produit;});card.style.borderColor=isSel?'#2D7A5B':'var(--bord)';card.style.background=isSel?'rgba(45,122,91,0.06)':'#fff';var chk=card.querySelector('div[style*="border-radius:4px"]');if(chk){chk.style.borderColor=isSel?'#2D7A5B':'var(--bord)';chk.style.background=isSel?'#2D7A5B':'transparent';chk.innerHTML=isSel?'&#10003;':'';};}
+  // Toujours ajouter une nouvelle instance (permet plusieurs du même produit pour différents titulaires)
+  var cp=COPERNIC[produit];var hAns=cp?(cp.horizonAns||(parseInt(cp.horizon)||10)):10;
+  solsSelectionnees.push({produit:produit,levier:cp?cp.levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:hAns+' ans',horizonLabel:cp?cp.horizon:'10 ans',objectifs:[],etape:solsSelectionnees.length+1,objectifsValides:[]});
+  _refreshSolUI(produit);
+}
+function removeSol(idx){
+  var produit=solsSelectionnees[idx]?solsSelectionnees[idx].produit:'';
+  solsSelectionnees.splice(idx,1);
+  // Recalculer les étapes
+  solsSelectionnees.forEach(function(s,i){s.etape=i+1;});
+  _refreshSolUI(produit);
+}
+function _refreshSolUI(produit){
+  if(produit){
+    var card=document.getElementById('btn_sol_'+produit.replace(/[^a-zA-Z0-9]/g,'_'));
+    if(card){var isSel=solsSelectionnees.some(function(s){return s.produit===produit;});var count=solsSelectionnees.filter(function(s){return s.produit===produit;}).length;card.style.borderColor=isSel?'#2D7A5B':'var(--bord)';card.style.background=isSel?'rgba(45,122,91,0.06)':'#fff';var chk=card.querySelector('div[style*="border-radius:4px"]');if(chk){chk.style.borderColor=isSel?'#2D7A5B':'var(--bord)';chk.style.background=isSel?'#2D7A5B':'transparent';chk.innerHTML=isSel?(count>1?count:'&#10003;'):'';}}
+  }
   renderSolsRetenues();renderFichesClient();
-  // Rebuild the matrix to reflect new checked state
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var revM=revMens();
   var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
@@ -4466,7 +4477,7 @@ function renderSolsRetenues(){
     html+='</div>';
     html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+sol.produit+'</div>';
     html+='</div>';
-    html+='<button onclick="toggleSolution(\''+sol.produit+'\')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px">&times;</button></div>';
+    html+='<button onclick="removeSol('+i+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px" title="Supprimer cette instance">&times;</button></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
     html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"><span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span><span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">Horizon : '+cp.horizon+'</span><span style="background:var(--gris-l);color:var(--gris-f);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.fiscal+'</span></div>';
     // Objectifs cochables pour cette solution
@@ -4497,11 +4508,14 @@ function renderSolsRetenues(){
     }
     html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:2px">';
     html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif">';
-    var titOptions=['C1','C2','Commun'];
+    var titOptions=['C1'];
     var titLabels={};
     titLabels['C1']=nomC(1);
-    titLabels['C2']=ED.type!=='seul'?nomC(2):'C2';
-    titLabels['Commun']='Commun';
+    if(ED.type!=='seul'){titOptions.push('C2');titLabels['C2']=nomC(2);}
+    titOptions.push('Commun');titLabels['Commun']='Commun';
+    // Ajouter les enfants comme options
+    var nbEnf=ED.nbEnfants||0;
+    for(var ei=1;ei<=nbEnf;ei++){var eKey='E'+ei;titOptions.push(eKey);titLabels[eKey]=(ED.enfants&&ED.enfants[ei-1]&&ED.enfants[ei-1].prenom)?ED.enfants[ei-1].prenom:'Enfant '+ei;}
     titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
     html+='</select></div>';
     html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
@@ -4632,7 +4646,7 @@ function renderFichesClient(){
       }
 
       // Titulaire
-      var tit=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:(n1&&n2?n1+' & '+n2:(n1||'Commun')));
+      var tit=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei2=+em[1]-1;return(ED.enfants&&ED.enfants[ei2]&&ED.enfants[ei2].prenom)?ED.enfants[ei2].prenom:'Enfant '+em[1];}return sol.titulaire;})());
 
       // Texte projection depuis template (sans nom produit)
       var texteProj='';
@@ -6037,7 +6051,7 @@ function saveMentionsDirect(){
     {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs',badge:''}
   ];
 
-  // Detect which sections exist for the sidebar sommaire
+  // Detect sections
   var foundSections=[];
   var secNum=0;
   SECTIONS.forEach(function(sec){
@@ -6055,65 +6069,33 @@ function saveMentionsDirect(){
     foundSections.push({sec:sec,num:secNum<10?'0'+secNum:''+secNum,content:content});
   });
 
-  // ── Build 2-column layout ──
+  // ── Layout simple : bulle contact puis sections ──
   var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
 
-  var h='<div style="display:flex;gap:40px;font-family:var(--sans);align-items:flex-start">';
+  var h='<div style="font-family:var(--sans)">';
 
-  // ── COLONNE GAUCHE : sidebar sticky ──
-  h+='<div style="width:220px;flex-shrink:0;position:sticky;top:24px">';
-  h+='<div style="background:rgba(212,98,42,0.04);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:24px 20px">';
-
-  // Photo
-  if(photoUrl)h+='<div style="margin-bottom:16px"><img src="'+photoUrl+'" style="width:56px;height:56px;border-radius:12px;object-fit:cover;display:block"></div>';
-
-  // Nom
-  if(mNom)h+='<div style="font-weight:700;font-size:15px;color:var(--noir);line-height:1.3;margin-bottom:4px">'+mNom[1].trim()+'</div>';
-
-  // Adresse + ville
-  if(mAdr){
-    var adrText=mAdr[1].trim();
-    if(mVille)adrText+=', '+mVille[1].trim();
-    h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5;margin-bottom:2px">'+adrText+'</div>';
-  } else if(mVille){
-    h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5;margin-bottom:2px">'+mVille[1].trim()+'</div>';
-  }
-
-  // Email
-  if(mMail)h+='<div style="margin-top:8px"><span style="font-size:12px;color:var(--orange);cursor:pointer">\u25CF '+mMail[1]+'</span></div>';
-
-  // ORIAS badge
-  if(mOrias)h+='<div style="margin-top:10px"><span style="display:inline-block;font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
-
-  h+='</div>'; // fin carte contact
-
-  // Sommaire
-  if(foundSections.length){
-    h+='<div style="margin-top:24px;padding:0 4px">';
-    h+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">SOMMAIRE</div>';
-    foundSections.forEach(function(fs){
-      h+='<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="var t=document.getElementById(\'ml-sec-'+fs.sec.id+'\');if(t)t.scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
-      h+='<span style="width:6px;height:6px;border-radius:50%;background:rgba(212,98,42,0.3);flex-shrink:0"></span>';
-      h+='<span style="font-size:13px;color:var(--noir);font-weight:400">'+fs.sec.title+'</span>';
-      h+='</div>';
-    });
-    h+='</div>';
-  }
-
-  h+='</div>'; // fin sidebar
-
-  // ── COLONNE DROITE : contenu ──
+  // ── Bulle contact en haut ──
+  h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.05);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:20px 24px;margin-bottom:32px">';
+  if(photoUrl)h+='<img src="'+photoUrl+'" style="width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0">';
   h+='<div style="flex:1;min-width:0">';
+  if(mNom)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:4px">'+mNom[1].trim()+'</div>';
+  if(mAdr){var adrText=mAdr[1].trim();if(mVille)adrText+=', '+mVille[1].trim();h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+adrText+'</div>';}
+  else if(mVille)h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+mVille[1].trim()+'</div>';
+  if(mMail)h+='<div style="margin-top:4px"><span style="font-size:12px;color:var(--orange)">\u25CF '+mMail[1]+'</span></div>';
+  h+='</div>';
+  if(mOrias)h+='<span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;flex-shrink:0;white-space:nowrap">ORIAS n\u00b0 '+mOrias[1].trim()+'</span>';
+  h+='</div>';
 
+  // ── Sections numérotées ──
   foundSections.forEach(function(fs){
     var sec=fs.sec;
     var num=fs.num;
     var content=fs.content;
 
     // Section header
-    h+='<div id="ml-sec-'+sec.id+'" style="margin-top:'+(num==='01'?'0':'48')+'px;margin-bottom:24px;display:flex;align-items:baseline;gap:14px">';
+    h+='<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:baseline;gap:14px">';
     h+='<span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span>';
-    h+='<span style="font-family:var(--serif);font-size:24px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
+    h+='<span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
     if(sec.badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+sec.badge+'</span>';
     h+='</div>';
 
@@ -6146,7 +6128,23 @@ function saveMentionsDirect(){
         ci2++;continue;
       }
 
-      // Tags
+      // Detect assureur/partenaire tags : "avec les assureurs suivants" pattern
+      var assureurMatch=cl.match(/avec\s+l(?:es|\')\s*assureurs?\s+suivants?\s*[:\s]*(.*)/i);
+      if(assureurMatch){
+        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        // Extract partner name before "avec"
+        var partnerName=cl.match(/^(.+?)\s+avec\s+l/i);
+        var assureurs=assureurMatch[1].split(/[,;]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+        var tagHtml='<div style="margin:10px 0">';
+        if(partnerName)tagHtml+='<div style="font-size:12px;font-weight:600;color:var(--noir);margin-bottom:8px">'+partnerName[1].trim()+'</div>';
+        tagHtml+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+        assureurs.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
+        tagHtml+='</div></div>';
+        h+=tagHtml;
+        ci2++;continue;
+      }
+
+      // Tags (original detection: lines with 2+ items separated by double spaces)
       var tagItems=[];
       if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
         while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
@@ -6157,10 +6155,10 @@ function saveMentionsDirect(){
         }
       }
       if(tagItems.length>=2){
-        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">';
-        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
-        tagHtml+='</div>';
-        cardBuf.push(tagHtml);
+        var tagHtml2='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">';
+        tagItems.forEach(function(t){tagHtml2+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
+        tagHtml2+='</div>';
+        cardBuf.push(tagHtml2);
         continue;
       }
 
@@ -6176,8 +6174,7 @@ function saveMentionsDirect(){
     if(cardBuf.length)h+=renderMlCard2(cardBuf);
   });
 
-  h+='</div>'; // fin colonne droite
-  h+='</div>'; // fin layout 2 colonnes
+  h+='</div>';
   mel.innerHTML=h;
 }
 
