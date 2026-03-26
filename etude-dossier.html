@@ -3960,53 +3960,68 @@ function rRetraite(){
   // Plugin custom : dessine un trait vertical + label à côté de chaque point client
   var clientTagPlugin={id:'clientTagPlugin',afterDraw:function(chart){
     var ctx3=chart.ctx;
+    var area=chart.chartArea;
+    var px=8,py=4,br=6,labelH=16+py*2;
+    // 1) Collect all tag rects
+    var tags=[];
     chart.data.datasets.forEach(function(ds,dsi){
       if(!ds._clientTag)return;
       var tag=ds._clientTag;
       var meta=chart.getDatasetMeta(dsi);
       var pt=meta.data[tag.idx];
       if(!pt)return;
-      var x=pt.x,y=pt.y;
-      var area=chart.chartArea;
-      // Trait vertical pointillé
       ctx3.save();
-      ctx3.setLineDash([3,3]);
-      ctx3.strokeStyle=tag.color;
-      ctx3.lineWidth=1.5;
-      ctx3.beginPath();
-      ctx3.moveTo(x,y-6);
-      ctx3.lineTo(x,area.top);
-      ctx3.stroke();
-      ctx3.setLineDash([]);
-      // Label tag
-      var txt=tag.name+' \u2014 '+tag.age+' ans ('+tag.taux+'%)';
       ctx3.font='600 10px Inter,system-ui,sans-serif';
+      var txt=tag.name+' \u2014 '+tag.age+' ans ('+tag.taux+'%)';
       var tw=ctx3.measureText(txt).width;
-      var px=8,py=4,br=6;
-      var lx=x-tw/2-px;
-      var ly=area.top-22;
+      ctx3.restore();
+      var lx=pt.x-tw/2-px;
       if(lx<area.left)lx=area.left+2;
       if(lx+tw+px*2>area.right)lx=area.right-tw-px*2-2;
-      // Fond arrondi
-      ctx3.fillStyle=tag.color+'18';
-      ctx3.strokeStyle=tag.color+'40';
+      tags.push({x:pt.x,y:pt.y,lx:lx,ly:area.top-22,w:tw+px*2,h:labelH,txt:txt,color:tag.color});
+    });
+    // 2) Resolve overlaps: if two labels overlap horizontally, stack the second one above
+    for(var ti=1;ti<tags.length;ti++){
+      for(var tj=0;tj<ti;tj++){
+        var a=tags[tj],b=tags[ti];
+        if(b.lx<a.lx+a.w&&b.lx+b.w>a.lx&&Math.abs(b.ly-a.ly)<labelH+2){
+          b.ly=a.ly-labelH-4;
+        }
+      }
+    }
+    // 3) Draw
+    tags.forEach(function(t){
+      ctx3.save();
+      // Dashed vertical line
+      ctx3.setLineDash([3,3]);
+      ctx3.strokeStyle=t.color;
+      ctx3.lineWidth=1.5;
+      ctx3.beginPath();
+      ctx3.moveTo(t.x,t.y-6);
+      ctx3.lineTo(t.x,t.ly+t.h);
+      ctx3.stroke();
+      ctx3.setLineDash([]);
+      // Label background
+      ctx3.fillStyle=t.color+'18';
+      ctx3.strokeStyle=t.color+'40';
       ctx3.lineWidth=1;
       ctx3.beginPath();
-      ctx3.roundRect(lx,ly,tw+px*2,16+py*2,br);
+      ctx3.roundRect(t.lx,t.ly,t.w,t.h,br);
       ctx3.fill();
       ctx3.stroke();
-      // Texte
-      ctx3.fillStyle=tag.color;
+      // Label text
+      ctx3.font='600 10px Inter,system-ui,sans-serif';
+      ctx3.fillStyle=t.color;
       ctx3.textAlign='left';
       ctx3.textBaseline='middle';
-      ctx3.fillText(txt,lx+px,ly+8+py);
+      ctx3.fillText(t.txt,t.lx+px,t.ly+t.h/2);
       ctx3.restore();
     });
   }};
   var ctx=document.getElementById('retChart');
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
-  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}},plugins:[clientTagPlugin]});
+  window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:55}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}},plugins:[clientTagPlugin]});
   // Remove header tags (now drawn on chart)
   var tagsEl=document.getElementById('retClientTags');
   if(tagsEl)tagsEl.innerHTML='';
@@ -4051,7 +4066,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
     ifEl.innerHTML='<div class="card" style="margin-bottom:0"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impColor+';font-weight:700;font-size:16px">- '+fmt(Math.abs(impactFoyer))+' €</span></div></div>';
   }
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
-  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
+  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--noir)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--noir)'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
   tblHtml+='</tbody></table>';
