@@ -917,28 +917,24 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 04</div><div class="sec-h1">Financement</div></div>
   </div>
 
-  <!-- Analyse par personne -->
-  <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+    <!-- Analyse par personne -->
+    <div id="finAnalyseBlock"></div>
 
-  <!-- Projection financement -->
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-      <span><span class="dot" style="background:var(--green)"></span>Projection financement</span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:10px;color:var(--gris)" id="projFinPDFLabel">Masqu&#233; du PDF</span>
-        <label class="cz-switch"><input type="checkbox" id="projFinPrint" onchange="var c=document.getElementById('projFinCard');var l=document.getElementById('projFinPDFLabel');if(c)c.classList.toggle('proj-fin-print',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
+    <!-- Projection financement -->
+    <div class="card" id="projFinCard" style="margin-bottom:0;background:#FAFFFE;border-color:rgba(45,122,91,0.2)">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span><span class="dot" style="background:var(--green)"></span>Projection</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;color:var(--gris)" id="projFinPDFLabel">Masqu&#233; du PDF</span>
+          <label class="cz-switch"><input type="checkbox" id="projFinPrint" onchange="var c=document.getElementById('projFinCard');var l=document.getElementById('projFinPDFLabel');if(c)c.classList.toggle('proj-fin-print',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
+        </div>
       </div>
-    </div>
-    <div id="projFinCard">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Montant emprunt&#233;</label><input class="fi" type="number" id="projFinMontant" oninput="calcProjectionFin()"></div>
-        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Taux nominal (%)</label><input class="fi" type="number" id="projFinTaux" step="0.01" value="3.5" oninput="calcProjectionFin()"></div>
-        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dur&#233;e (ans)</label><input class="fi" type="number" id="projFinDuree" value="20" min="1" max="30" oninput="calcProjectionFin()"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Assurance (%)</label><input class="fi" type="number" id="projFinAssur" step="0.01" value="0.30" oninput="calcProjectionFin()"></div>
-        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Apport</label><input class="fi" type="number" id="projFinApport" oninput="calcProjectionFin()"></div>
-      </div>
+      <div class="fiscal-row"><span class="fr-l">Montant emprunt&#233;</span><span class="fr-v"><input class="fi" type="number" id="projFinMontant" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Taux nominal (%)</span><span class="fr-v"><input class="fi" type="number" id="projFinTaux" step="0.01" value="3.5" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Dur&#233;e (ans)</span><span class="fr-v"><input class="fi" type="number" id="projFinDuree" value="20" min="1" max="30" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Assurance (%)</span><span class="fr-v"><input class="fi" type="number" id="projFinAssur" step="0.01" value="0.30" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Apport</span><span class="fr-v"><input class="fi" type="number" id="projFinApport" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div id="projFinResultat"></div>
     </div>
   </div>
