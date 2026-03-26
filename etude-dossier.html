@@ -4158,6 +4158,9 @@ var COPERNIC = {
   'LLI':                    {cat:'immobilier',   levier:'financement',      icon:'&#127968;',
     desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
     fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
+  'Jeanbrun':               {cat:'immobilier',   levier:'financement',icon:'&#127968;',
+    desc:'Amortissement annuel 3,5 \u00e0 5,5 % imputable sur revenu global \u2014 successeur du Pinel (Loi n\u00b02026-103)',
+    fiscal:'Amortissement imputable sur revenu global',sri:'3-5',horizon:'9 ans',horizonAns:9},
   'Immobilier d\u00e9fiscalisant': {cat:'immobilier',levier:'financement',icon:'&#127968;',
     desc:'Dispositifs de d\u00e9fiscalisation immobili\u00e8re : r\u00e9duction IR en contrepartie d\'un engagement de location',
     fiscal:'R\u00e9duction IR plafonn\u00e9e niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
@@ -4215,15 +4218,15 @@ var COPERNIC = {
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Apport-cession 150-0 B ter'],
+  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
   'Prot\u00e9ger son conjoint':              ['Assurance vie','PER','Pr\u00e9voyance individuelle','Pr\u00e9voyance pro','Donation'],
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
-  'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
-  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','SCI a l\'IS']
+  'Investir via le financement':        ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Jeanbrun'],
+  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','Jeanbrun','SCI a l\'IS']
 };
 var solsSelectionnees=[];
 
@@ -4782,6 +4785,101 @@ function renderSolsRetenues(){
 
     html+='</div>'; // fin header padding
 
+    // ── Formulaire Jeanbrun custom ──
+    var isJB=grp.produit==='Jeanbrun';
+    if(isJB){
+      var jb=firstSol._jb||{typeBien:'neuf',prix:0,travaux:0,loyer:'intermediaire',tmi:30,loyersBruts:0,charges:0,points:[]};
+      if(!firstSol._jb)firstSol._jb=jb;
+      var jbTaux={'neuf':{intermediaire:0.035,social:0.045,tres_social:0.055},'ancien':{intermediaire:0.03,social:0.035,tres_social:0.04}};
+      var taux=jbTaux[jb.typeBien]?jbTaux[jb.typeBien][jb.loyer]||0.035:0.035;
+      var baseAmort=Math.round((jb.prix||0)*0.80);
+      var amortCalc=Math.round(baseAmort*taux);
+      var plafMap={intermediaire:8000,social:10000,tres_social:12000};
+      var plafond=plafMap[jb.loyer]||8000;
+      var amortRetenu=Math.min(amortCalc,plafond);
+      var revFoncNet=(jb.loyersBruts||0)-(jb.charges||0)-amortRetenu;
+      var deficit=revFoncNet<0?Math.min(Math.abs(revFoncNet),10700):0;
+      var ecoIR=Math.round(deficit*(jb.tmi||30)/100);
+      var jfs='width:100%;padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none';
+      html+='<div style="margin-top:10px;padding:14px;background:rgba(133,79,11,0.04);border:1.5px solid rgba(133,79,11,0.15);border-radius:10px">';
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr'+(jb.typeBien==='ancien'?' 1fr':'')+';gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Type de bien</label><div style="display:flex;gap:6px;margin-top:4px">';
+      ['neuf','ancien'].forEach(function(t){
+        html+='<button onclick="updJB(\'typeBien\',\''+t+'\')" style="flex:1;padding:6px;border-radius:6px;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid '+(jb.typeBien===t?'#854F0B':'var(--bord)')+';background:'+(jb.typeBien===t?'rgba(133,79,11,0.08)':'#fff')+';color:'+(jb.typeBien===t?'#854F0B':'var(--gris)')+'">'+(t==='neuf'?'Neuf (RE2020)':'Ancien + travaux')+'</button>';
+      });
+      html+='</div></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Prix acquisition</label><input type="number" value="'+(jb.prix||0)+'" min="0" onchange="updJB(\'prix\',+this.value)" style="'+jfs+'"></div>';
+      if(jb.typeBien==='ancien')html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Travaux</label><input type="number" value="'+(jb.travaux||0)+'" min="0" onchange="updJB(\'travaux\',+this.value)" style="'+jfs+'"><div style="font-size:10px;color:var(--gris);margin-top:2px">Min. 30 % du prix</div></div>';
+      html+='</div>';
+      html+='<div style="display:grid;grid-template-columns:1fr 0.6fr 0.7fr 0.7fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Niveau loyer</label><select onchange="updJB(\'loyer\',this.value)" style="'+jfs+'"><option value="intermediaire"'+(jb.loyer==='intermediaire'?' selected':'')+'>Interm\u00e9diaire</option><option value="social"'+(jb.loyer==='social'?' selected':'')+'>Social</option><option value="tres_social"'+(jb.loyer==='tres_social'?' selected':'')+'>Tr\u00e8s social</option></select></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">TMI</label><select onchange="updJB(\'tmi\',+this.value)" style="'+jfs+'">';
+      [0,11,30,41,45].forEach(function(t){html+='<option value="'+t+'"'+(jb.tmi===t?' selected':'')+'>'+t+' %</option>';});
+      html+='</select></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Loyers bruts/an</label><input type="number" value="'+(jb.loyersBruts||0)+'" min="0" onchange="updJB(\'loyersBruts\',+this.value)" style="'+jfs+'"></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Charges/an</label><input type="number" value="'+(jb.charges||0)+'" min="0" onchange="updJB(\'charges\',+this.value)" style="'+jfs+'"></div>';
+      html+='</div>';
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;font-size:11px">';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Taux amort.</div><div style="font-weight:700;color:var(--noir)">'+(taux*100).toFixed(1)+' %</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Amort. retenu/an</div><div style="font-weight:700;color:var(--noir)">'+fmt(amortRetenu)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">D\u00e9ficit imputable</div><div style="font-weight:700;color:'+(deficit>0?'var(--green)':'var(--gris)')+'">'+fmt(deficit)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">\u00c9conomie IR</div><div style="font-weight:700;color:var(--green)">'+fmt(ecoIR)+' \u20ac/an</div></div>';
+      html+='</div>';
+      html+='<div style="display:inline-block;font-size:11px;font-weight:600;color:#854F0B;background:rgba(133,79,11,0.08);padding:4px 10px;border-radius:20px;margin-bottom:10px">Engagement 9 ans \u2014 location nue</div>';
+      html+='<div style="padding:10px 12px;background:rgba(133,79,11,0.06);border-radius:8px;margin-bottom:10px;font-size:11px;color:var(--gris-f);line-height:1.6">\ud83d\udca1 Contrairement au Pinel, le Jeanbrun fonctionne par <strong>amortissement</strong> imputable sur votre revenu global (y compris salaires). Pas de zonage. Limit\u00e9 \u00e0 2 logements/foyer.</div>';
+      if(!jb.points)jb.points=[];
+      html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Points \u00e0 aborder</div>';
+      [{k:'nue',l:'Location nue obligatoire'},{k:'rp',l:'R\u00e9sidence principale du locataire'},{k:'famille',l:'Interdiction louer \u00e0 la famille (2e degr\u00e9)'},{k:'plafond',l:'Loyers et ressources plafonn\u00e9s'},{k:'decrets',l:'D\u00e9crets d\'application en cours'}].forEach(function(pt){
+        var ck=jb.points.indexOf(pt.k)>=0;
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleJBPt(\''+pt.k+'\',this.checked)" style="accent-color:#854F0B">'+pt.l+'</label>';
+      });
+      html+='</div>';
+      html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">\u26a0\ufe0f Loi n\u00b02026-103. D\u00e9crets attendus. Simulation indicative. \u00c0 valider avec un conseiller fiscal.</div>';
+      html+='</div>';
+    }
+
+    // ── Formulaire Denormandie custom ──
+    var isDenorm=grp.produit==='Denormandie';
+    if(isDenorm){
+      var dn=firstSol._denorm||{prixBien:0,duree:9,loyer:'intermediaire'};
+      if(!firstSol._denorm)firstSol._denorm=dn;
+      var dnTaux={6:0.12,9:0.18,12:0.21};
+      var dnBase=Math.min(dn.prixBien||0,300000);
+      var dnRedTotal=Math.round(dnBase*(dnTaux[dn.duree]||0.18));
+      var dnRedAn=dn.duree>0?Math.round(dnRedTotal/dn.duree):0;
+      var dnAlerte=dnRedAn>10000;
+      var dfs='width:100%;padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none';
+      html+='<div style="margin-top:10px;padding:14px;background:rgba(192,57,43,0.04);border:1.5px solid rgba(192,57,43,0.15);border-radius:10px">';
+      // Prix + durée + loyer
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Prix du bien</label><input type="number" value="'+(dn.prixBien||0)+'" min="0" onchange="updDenorm(\'prixBien\',+this.value)" style="'+dfs+'"><div style="font-size:10px;color:var(--gris);margin-top:2px">Base plafonn\u00e9e \u00e0 300 000 \u20ac</div></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dur\u00e9e engagement</label><div style="display:flex;gap:6px;margin-top:4px">';
+      [6,9,12].forEach(function(y){
+        html+='<button onclick="updDenorm(\'duree\','+y+')" style="flex:1;padding:6px;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid '+(dn.duree===y?'#C0392B':'var(--bord)')+';background:'+(dn.duree===y?'rgba(192,57,43,0.08)':'#fff')+';color:'+(dn.duree===y?'#C0392B':'var(--gris)')+'">'+y+' ans</button>';
+      });
+      html+='</div></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Niveau de loyer</label><select onchange="updDenorm(\'loyer\',this.value)" style="'+dfs+'"><option value="intermediaire"'+(dn.loyer==='intermediaire'?' selected':'')+'>Interm\u00e9diaire (plafond Pinel)</option><option value="social"'+(dn.loyer==='social'?' selected':'')+'>Social (-15%)</option><option value="tres_social"'+(dn.loyer==='tres_social'?' selected':'')+'>Tr\u00e8s social (-30%)</option></select></div>';
+      html+='</div>';
+      // Calculs auto
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px">';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Taux r\u00e9duction</div><div style="font-weight:700;color:var(--noir)">'+Math.round((dnTaux[dn.duree]||0.18)*100)+' %</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">R\u00e9duction IR totale</div><div style="font-weight:700;color:var(--green)">'+fmt(dnRedTotal)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">R\u00e9duction IR / an</div><div style="font-weight:700;color:'+(dnAlerte?'var(--orange)':'var(--green)')+'">'+fmt(dnRedAn)+' \u20ac</div></div>';
+      html+='</div>';
+      if(dnAlerte)html+='<div style="padding:8px 10px;background:rgba(212,98,42,0.08);border-radius:6px;font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px">\u26a0\ufe0f Plafond niches fiscales 10 000 \u20ac/an \u2014 v\u00e9rifier les autres dispositifs actifs</div>';
+      // Points à aborder
+      if(!dn.points)dn.points=[];
+      html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Points \u00e0 aborder</div>';
+      var dnPts=[{k:'zone',l:'Bien situ\u00e9 en centre-ville ancien r\u00e9nov\u00e9 (zone \u00e9ligible \u00e0 v\u00e9rifier)'},{k:'loyers',l:'Loyers plafonn\u00e9s selon zone Pinel'},{k:'locataire',l:'Locataire sous conditions de ressources'},{k:'travaux',l:'Travaux minimum 25 % du co\u00fbt total'}];
+      dnPts.forEach(function(pt){
+        var ck=dn.points.indexOf(pt.k)>=0;
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleDenormPt(\''+pt.k+'\',this.checked)" style="accent-color:#C0392B">'+pt.l+'</label>';
+      });
+      html+='</div>';
+      html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">\u26a0\ufe0f R\u00e9duction IR plafonn\u00e9e \u00e0 300 000 \u20ac de prix. Soumis au plafond global des niches fiscales de 10 000 \u20ac/an. \u00c9ligibilit\u00e9 \u00e0 v\u00e9rifier avec un conseiller fiscal.</div>';
+      html+='</div>';
+    }
+
     // ── Contrats (sub-rows) ──
     // Header row
     var isImmoGrp=cp.cat==='immobilier'||cp.levier==='financement';
@@ -4901,6 +4999,38 @@ function toggleDonStrat(key,checked){
   var sol=solsSelectionnees.find(function(s){return s.produit==='Donation';});
   if(!sol)return;if(!sol._don)sol._don={};if(!sol._don.strategies)sol._don.strategies=[];
   var arr=sol._don.strategies;
+  if(checked&&arr.indexOf(key)<0)arr.push(key);
+  else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
+}
+// ── Jeanbrun helpers ──
+function updJB(field,val){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Jeanbrun';});
+  if(!sol)return;if(!sol._jb)sol._jb={};
+  sol._jb[field]=val;
+  solsSelectionnees.forEach(function(s){if(s.produit==='Jeanbrun')s._jb=sol._jb;});
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleJBPt(key,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Jeanbrun';});
+  if(!sol)return;if(!sol._jb)sol._jb={};if(!sol._jb.points)sol._jb.points=[];
+  var arr=sol._jb.points;
+  if(checked&&arr.indexOf(key)<0)arr.push(key);
+  else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
+}
+// ── Denormandie helpers ──
+function updDenorm(field,val){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Denormandie';});
+  if(!sol)return;if(!sol._denorm)sol._denorm={};
+  sol._denorm[field]=val;
+  solsSelectionnees.forEach(function(s){if(s.produit==='Denormandie')s._denorm=sol._denorm;});
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleDenormPt(key,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Denormandie';});
+  if(!sol)return;if(!sol._denorm)sol._denorm={};if(!sol._denorm.points)sol._denorm.points=[];
+  var arr=sol._denorm.points;
   if(checked&&arr.indexOf(key)<0)arr.push(key);
   else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
   renderSolsRetenues();renderFichesClient();
@@ -5028,6 +5158,7 @@ function renderFichesClient(){
     'FCPR / FPCI':'Diversifier votre patrimoine dans l\'\u00e9conomie r\u00e9elle non cot\u00e9e',
     'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
     'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
+    'Jeanbrun':'R\u00e9duire votre revenu imposable gr\u00e2ce \u00e0 un investissement locatif neuf',
     'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
     'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
     'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
@@ -5236,6 +5367,61 @@ function renderFichesClient(){
         }
         html+='</div>';
       });
+
+      // Rendu Jeanbrun spécifique
+      if(pg.produit==='Jeanbrun'&&firstSol._jb){
+        var jbb=firstSol._jb;
+        var jbT2={'neuf':{intermediaire:0.035,social:0.045,tres_social:0.055},'ancien':{intermediaire:0.03,social:0.035,tres_social:0.04}};
+        var tx2=jbT2[jbb.typeBien]?jbT2[jbb.typeBien][jbb.loyer]||0.035:0.035;
+        var ba2=Math.round((jbb.prix||0)*0.80);
+        var ac2=Math.round(ba2*tx2);
+        var pf2={intermediaire:8000,social:10000,tres_social:12000};
+        var ar2=Math.min(ac2,pf2[jbb.loyer]||8000);
+        var rfn2=(jbb.loyersBruts||0)-(jbb.charges||0)-ar2;
+        var def2=rfn2<0?Math.min(Math.abs(rfn2),10700):0;
+        var eco2=Math.round(def2*(jbb.tmi||30)/100);
+        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">';
+        html+=(jbb.typeBien==='neuf'?'Bien neuf RE2020':'Ancien avec travaux');
+        html+=' \u2014 prix <strong>'+fmt(jbb.prix||0)+' \u20ac</strong>';
+        html+=' \u2014 taux amortissement <strong>'+(tx2*100).toFixed(1)+' %</strong>.';
+        html+='<br>Amortissement retenu : <strong>'+fmt(ar2)+' \u20ac/an</strong>';
+        if(def2>0)html+=' \u2014 D\u00e9ficit imputable : <strong>'+fmt(def2)+' \u20ac</strong>';
+        html+=' \u2014 \u00c9conomie IR : <strong>'+fmt(eco2)+' \u20ac/an</strong>.';
+        html+='<br><span style="font-size:11px;color:#854F0B;font-weight:600">Engagement 9 ans \u2014 location nue obligatoire.</span>';
+        html+='</div>';
+        if(jbb.points&&jbb.points.length){
+          var jbPtL={nue:'Location nue',rp:'R\u00e9sidence principale locataire',famille:'Interdiction famille',plafond:'Loyers plafonn\u00e9s',decrets:'D\u00e9crets en cours'};
+          html+='<div style="margin-top:6px;font-size:11px;color:var(--gris)">'+jbb.points.map(function(k){return '\u2022 '+(jbPtL[k]||k);}).join('<br>')+'</div>';
+        }
+        html+='<div style="margin-top:6px;font-size:11px;color:var(--orange);font-weight:600">\u26a0\ufe0f Loi n\u00b02026-103. D\u00e9crets attendus. Simulation indicative.</div>';
+        html+='</div>';
+      }
+
+      // Rendu Denormandie spécifique
+      if(pg.produit==='Denormandie'&&firstSol._denorm){
+        var dnn=firstSol._denorm;
+        var dnnTaux={6:0.12,9:0.18,12:0.21};
+        var dnnBase=Math.min(dnn.prixBien||0,300000);
+        var dnnRedT=Math.round(dnnBase*(dnnTaux[dnn.duree]||0.18));
+        var dnnRedA=dnn.duree>0?Math.round(dnnRedT/dnn.duree):0;
+        var loyLbl={intermediaire:'Interm\u00e9diaire',social:'Social (-15%)',tres_social:'Tr\u00e8s social (-30%)'};
+        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">';
+        html+='Bien \u00e0 <strong>'+fmt(dnn.prixBien||0)+' \u20ac</strong>';
+        html+=' \u2014 engagement <strong>'+(dnn.duree||9)+' ans</strong>';
+        html+=' \u2014 loyer '+(loyLbl[dnn.loyer]||'interm\u00e9diaire')+'.';
+        html+='<br>Taux r\u00e9duction : <strong>'+Math.round((dnnTaux[dnn.duree]||0.18)*100)+' %</strong>';
+        html+=' \u2014 R\u00e9duction IR : <strong>'+fmt(dnnRedA)+' \u20ac/an</strong>';
+        html+=' (total <strong>'+fmt(dnnRedT)+' \u20ac</strong>).';
+        html+='</div>';
+        if(dnn.points&&dnn.points.length){
+          var dnPtL={zone:'Centre-ville ancien r\u00e9nov\u00e9',loyers:'Loyers plafonn\u00e9s',locataire:'Locataire sous conditions',travaux:'Travaux min. 25%'};
+          html+='<div style="margin-top:6px;font-size:11px;color:var(--gris)">'+dnn.points.map(function(k){return '\u2022 '+(dnPtL[k]||k);}).join('<br>')+'</div>';
+        }
+        html+='<div style="margin-top:6px;font-size:11px;color:var(--orange);font-weight:600">\u26a0\ufe0f R\u00e9duction IR plafonn\u00e9e. Soumis au plafond niches fiscales 10 000 \u20ac/an.</div>';
+        html+='</div>';
+      }
 
       // Rendu FIP/FCPI spécifique
       if(pg.produit==='FIP / FCPI'&&firstSol._fip){
