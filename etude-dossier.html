@@ -4564,8 +4564,17 @@ function buildMatriceObjSol(impot,capa,aSum){
 // ║  SOLUTIONS                                                     ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function toggleSolution(produit){
+  // Si déjà sélectionné avec 1 seule instance et aucun montant saisi → désélectionner
+  var existing=solsSelectionnees.filter(function(s){return s.produit===produit;});
+  if(existing.length===1&&!existing[0].vi&&!existing[0].vp){
+    var idx=solsSelectionnees.indexOf(existing[0]);
+    solsSelectionnees.splice(idx,1);
+    solsSelectionnees.forEach(function(s,i){s.etape=i+1;});
+    _refreshSolUI(produit);
+    return;
+  }
+  // Sinon ajouter une nouvelle instance
   var cp=COPERNIC[produit];var hAns=cp?(cp.horizonAns||(parseInt(cp.horizon)||10)):10;
-  // Pré-cocher les objectifs du client qui matchent ce produit
   var preChecked=[];
   var clientObjs=ED.objectifs||[];
   if(clientObjs.length&&window.OBJ_SOLUTIONS){
