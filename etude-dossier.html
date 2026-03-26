@@ -3811,8 +3811,8 @@ function rPatrimoine(){
   const prows=ED.passifs.map(p=>`<tr style="border-bottom:1px solid var(--bord)">
     <td style="padding:5px 8px;color:var(--gris-f);white-space:nowrap">${titLabel(p.titulaire)}</td>
     <td style="padding:5px 8px;color:var(--noir)">${p.nom}</td>
-    <td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">${fmt(p.crd)} \u20ac</td></tr>`).join('');
-  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Titulaire</th><th style="text-align:left;padding:6px 8px">D\u00e9signation</th><th style="text-align:right;padding:6px 8px">CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="3" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="2">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} \u20ac</td></tr></tbody>`;
+    <td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--red);white-space:nowrap">${fmt(p.crd)} \u20ac</td></tr>`).join('');
+  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Titulaire</th><th style="text-align:left;padding:6px 8px">D\u00e9signation</th><th style="text-align:right;padding:6px 8px">CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="3" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="2">TOTAL PASSIFS</td><td class="right" style="color:var(--red)">${fmt(pSum)} \u20ac</td></tr></tbody>`;
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
