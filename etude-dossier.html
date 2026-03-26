@@ -509,6 +509,9 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
+  <div class="sidebar-lbl" style="margin-top:8px">PDF</div>
+  <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
+  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions &amp; Avis</button>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
@@ -998,6 +1001,72 @@ select.span2{grid-column:span 2}
     <button class="btn btn-success" onclick="exportPDF()">↓ Exporter PDF complet</button>
   </div>
 </div><!-- /sec-synthese -->
+
+<!-- ════════════════════════════════════════
+     8 — PAGE DE GARDE
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-pagegarde">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Page de garde</div><div class="sec-sub">Premiere page du PDF — logo, nom client, coordonnees</div></div>
+  </div>
+
+  <div style="border:2px dashed var(--bord);border-radius:16px;padding:40px;background:#fff;min-height:500px;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center;max-width:500px">
+      <div id="gardeLogoPreview" style="margin-bottom:24px"></div>
+      <div style="font-family:var(--sans);font-size:28px;font-weight:700;color:var(--noir);margin-bottom:8px">Etude de Dossier</div>
+      <div id="gardeClientPreview" style="font-family:var(--sans);font-size:18px;color:var(--gris-f);margin-bottom:20px">Nom du client</div>
+      <div id="gardeDatePreview" style="font-size:13px;color:var(--gris);margin-bottom:28px"></div>
+      <div style="width:60px;height:2px;background:var(--orange);margin:0 auto 28px"></div>
+      <div id="gardeConseillerPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
+    Pour modifier le logo et les coordonnees, ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong>.
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
+    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions &amp; Avis &#8594;</button>
+  </div>
+</div><!-- /sec-pagegarde -->
+
+<!-- ════════════════════════════════════════
+     9 — MENTIONS LÉGALES & AVIS
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-mentions">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions legales &amp; Avis clients</div><div class="sec-sub">Derniere page du PDF</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Mentions legales</div>
+    <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
+    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucun avis charge — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> et entrez votre URL Trustpilot.</em>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--gris-l);border-color:transparent">
+    <div style="font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
+      Les simulations presentees dans ce document ne constituent en aucun cas une promesse de rendement.
+      Les performances passees ne prejugent pas des performances futures.
+      Tout investissement comporte des risques, y compris de perte en capital.
+      Ce document est strictement confidentiel et destine uniquement a l'usage du client designe.
+    </div>
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
+    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
+  </div>
+</div><!-- /sec-mentions -->
 
 </main>
 </div><!-- /app -->
@@ -2746,6 +2815,8 @@ function renderSection(sec){
   else if(sec==='transmission')rTransmission();
   else if(sec==='preconisations')rPreconisations();
   else if(sec==='synthese')rSynthese();
+  else if(sec==='pagegarde')rPageGarde();
+  else if(sec==='mentions')rMentions();
 }
 
 
@@ -3759,20 +3830,34 @@ var COPERNIC = {
     fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
   'Donation au dernier vivant':{cat:'transmission',levier:'transmission',icon:'&#128141;',
     desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',
-    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'}
+    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'},
+
+  // ─── ENTREPRISE ──────────────────────────────────────────────
+  'Apport-cession 150-0 B ter':{cat:'entreprise',levier:'entreprise',icon:'&#127981;',
+    desc:'Report d\'imposition de la plus-value lors de l\'apport de titres a une holding controlee. Reinvestissement de 60% du produit dans des activites eligibles sous 2 ans',
+    fiscal:'Report d\'imposition PV — reinvestissement 60% obligatoire',sri:'6-7',horizon:'5-10 ans',horizonAns:7},
+  'FCPR/FPCI (remploi 150-0 B ter)':{cat:'entreprise',levier:'entreprise',icon:'&#128200;',
+    desc:'Fonds de capital-investissement eligible au remploi 150-0 B ter : maintien du report d\'imposition, diversification du patrimoine du dirigeant',
+    fiscal:'Eligible remploi 150-0 B ter + exoneration PV apres 5 ans',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+  'Contrat de capitalisation PM':{cat:'entreprise',levier:'entreprise',icon:'&#128196;',
+    desc:'Contrat de capitalisation souscrit par une personne morale (holding, SCI IS) : capitalisation a fiscalite reduite, tresorerie d\'entreprise optimisee',
+    fiscal:'IS sur base forfaitaire (105% TME) — pas sur gains reels',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+  'SCI a l\'IS':{cat:'entreprise',levier:'entreprise',icon:'&#127968;',
+    desc:'Societe civile immobiliere a l\'IS : amortissement du bien, reinvestissement facilite, transmission optimisee via donation de parts avec decote',
+    fiscal:'IS 15-25% + flat tax sur dividendes, amortissement deductible',sri:'5',horizon:'15 ans+',horizonAns:15}
 };
 var OBJ_SOLUTIONS = {
-  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI'],
+  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','PERIN','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP'],
+  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
-  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété'],
+  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l’IS','LLI','Denormandie','LMNP'],
   'Protéger son conjoint':              ['Assurance vie','PER','Prévoyance individuelle','Prévoyance pro','Donation au dernier vivant'],
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de capitalisation'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de capitalisation'],
   'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
-  'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement']
+  'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement','SCI a l\'IS']
 };
 var solsSelectionnees=[];
 
@@ -5277,7 +5362,84 @@ function extractPdfText(file, callback) {
 
 
 // ══════════════════════════════════════════════════════════════
-// EXPORT PDF — conversion canvas + en-tête dynamique
+// PAGE DE GARDE & MENTIONS — rendu ecran
+// ══════════════════════════════════════════════════════════════
+
+function rPageGarde(){
+  var p=loadProfil?loadProfil():{};
+  var nom=ED.c1.prenom?(ED.c1.prenom+' '+(ED.c1.nom||'')):'Nom du client';
+  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom)nom+=' & '+ED.c2.prenom+' '+(ED.c2.nom||'');
+  var dateStr=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+
+  var cl=document.getElementById('gardeClientPreview');
+  if(cl)cl.textContent=nom.trim();
+  var dt=document.getElementById('gardeDatePreview');
+  if(dt)dt.textContent=dateStr;
+
+  var cons=document.getElementById('gardeConseillerPreview');
+  if(cons&&p&&p.nom){
+    var lines=[];
+    lines.push(((p.prenom||'')+' '+(p.nom||'')).trim());
+    if(p.cabinet)lines.push(p.cabinet);
+    if(p.tel)lines.push(p.tel);
+    if(p.email)lines.push(p.email);
+    cons.innerHTML=lines.join('<br>');
+  }
+
+  var logo=document.getElementById('gardeLogoPreview');
+  if(logo){
+    try{
+      var dataUrl=localStorage.getItem('cgpskool_logo');
+      if(dataUrl)logo.innerHTML='<img src="'+dataUrl+'" style="max-height:60px;max-width:200px">';
+      else logo.innerHTML='<div style="color:var(--gris);font-size:12px">Aucun logo — configurez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil</strong></div>';
+    }catch(e){}
+  }
+}
+
+function rMentions(){
+  var p=loadProfil?loadProfil():{};
+
+  // Mentions legales
+  var mel=document.getElementById('mentionsPreview');
+  if(mel){
+    if(p&&p.mentions){
+      mel.innerHTML=p.mentions.replace(/\n/g,'<br>');
+    } else {
+      mel.innerHTML='<em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>';
+    }
+  }
+
+  // Trustpilot
+  var tEl=document.getElementById('trustpilotSectionPreview');
+  if(tEl){
+    try{
+      var raw=localStorage.getItem('cgpskool_trustpilot');
+      if(raw){
+        var reviews=JSON.parse(raw);
+        if(reviews.length){
+          var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+          h+='<span style="font-size:20px">&#11088;</span>';
+          h+='<strong>'+reviews.length+' avis clients</strong>';
+          if(p&&p.trustpilot)h+=' — <a href="'+p.trustpilot+'" target="_blank" style="color:var(--orange);font-size:11px">Voir sur Trustpilot</a>';
+          h+='</div>';
+          reviews.forEach(function(r){
+            h+='<div style="padding:8px 0;border-bottom:1px solid var(--bord)">';
+            h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+            h+='<strong style="font-size:13px">'+r.name+'</strong>';
+            if(r.stars)h+='<span style="color:var(--orange);font-weight:700">'+r.stars+'/5</span>';
+            h+='</div>';
+            if(r.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+r.text+'</div>';
+            h+='</div>';
+          });
+          tEl.innerHTML=h;
+        }
+      }
+    }catch(e){}
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT PDF — conversion canvas + en-tete dynamique
 // ══════════════════════════════════════════════════════════════
 
 function exportPDF() {
