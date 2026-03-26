@@ -1108,6 +1108,12 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 07</div><div class="sec-h1">Synthèse & Étapes</div></div>
   </div>
 
+  <!-- ── AVANT / APRÈS PAR LEVIER ── -->
+  <div id="synthAvantApres" style="margin-bottom:18px"></div>
+
+  <!-- ── IMPACT RETRAITE ── -->
+  <div id="synthImpactRetraite" style="margin-bottom:18px"></div>
+
   <!-- ── FEUILLE DE ROUTE (stepper horizontal) ── -->
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Feuille de route</div>
@@ -1115,34 +1121,8 @@ select.span2{grid-column:span 2}
     <div style="display:flex;gap:8px;margin-top:8px">
       <input class="fi" id="newStepInput" placeholder="Ex : Ouvrir un PER avant le 31/12" style="flex:1">
       <button class="btn btn-primary" onclick="addStep()">+ Ajouter</button>
-      <button class="btn btn-secondary" onclick="resetSteps()" style="font-size:11px">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="resetSteps()" style="font-size:11px">R&#233;initialiser</button>
     </div>
-  </div>
-
-  <!-- ── AVANT / APRÈS PATRIMONIAL ── -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Avant</div>
-      <div id="synthAvant" style="font-size:13px;line-height:1.9;color:var(--gris-f)">—</div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Après</div>
-      <div id="synthApres" style="font-size:13px;line-height:1.9;color:var(--gris-f)">—</div>
-    </div>
-  </div>
-
-  <!-- ── GRAPHIQUE FISCAL ── -->
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Impact fiscal des préconisations</div>
-    <div style="position:relative;height:220px"><canvas id="fiscalChart"></canvas></div>
-    <div id="fiscalLegend" style="margin-top:8px;font-size:11px;color:var(--gris)"></div>
-  </div>
-
-  <!-- ── RETRAITE AVANT/APRÈS ── -->
-  <div class="card" style="margin-bottom:18px" id="synthRetraiteBlock">
-    <div class="card-title"><span class="dot"></span>Revenus retraite — sans / avec solutions</div>
-    <div style="position:relative;height:200px"><canvas id="synthRetChart"></canvas></div>
-    <div id="synthRetLegend" style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;font-size:11px"></div>
   </div>
 
   <!-- ── Note de synthèse ── -->
@@ -5111,69 +5091,128 @@ function rSynthese(){
   },0);
   var irApres=Math.max(0,irNet-economieFiscTotale);
 
-  // ── 6.1 AVANT ──────────────────────────────────────────────────
-  var sa=document.getElementById('synthAvant');
-  if(sa){
-    var kpis=[
-      {l:'Patrimoine net',v:fmt(patNet)+' €',bold:true,color:'var(--noir)'},
-      {l:'Actifs bruts',v:fmt(aSum)+' €'},
-      {l:'Passifs (CRD)',v:fmt(pSum)+' €'},
-      {sep:true},
-      {l:'Revenus nets / mois',v:fmt(revM)+' €'},
-      {l:'Taux endettement',v:endett+'%',color:parseFloat(endett)>35?'var(--red)':parseFloat(endett)>28?'var(--ambre-d)':'inherit'},
-      {l:'Reste a vivre',v:fmt(revM-chrCredit)+' €'},
-      {sep:true},
-      {l:'Impot annuel',v:fmt(impot)+' €',color:impot>5000?'var(--red)':'inherit'},
-      {l:'TMI',v:(ED.fiscal.tmi||'—')+'%'},
-      {l:'Epargne mensuelle',v:fmt(ED.epMens||0)+' €'},
+  // ── AVANT / APRÈS PAR LEVIER ──────────────────────────────────
+  var aaEl=document.getElementById('synthAvantApres');
+  if(aaEl){
+    var aaH='';
+    // Données AVANT globales
+    var avantData=[
+      {l:'Patrimoine net',v:fmt(patNet)+' \u20ac',bold:true},
+      {l:'Actifs bruts',v:fmt(aSum)+' \u20ac'},
+      {l:'Passifs (CRD)',v:fmt(pSum)+' \u20ac'},
     ];
-    sa.innerHTML=kpis.map(function(k){
-      if(k.sep)return '<div style="border-top:1px solid var(--bord);margin:5px 0"></div>';
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">'
-        +'<span style="font-size:12px;color:var(--gris)">'+k.l+'</span>'
-        +'<span style="font-size:12px;font-weight:'+(k.bold?'700':'600')+';color:'+(k.color||'var(--gris-f)')+'">'+k.v+'</span>'
-        +'</div>';
-    }).join('');
+    // Grouper solutions par levier
+    var levGrps={placement:[],fiscal:[],financement:[]};
+    sorted.forEach(function(sol){
+      var cp2=COPERNIC[sol.produit]||{};
+      var lk=getLevierCategory(cp2.levier||sol.levier||'epargne');
+      if(!levGrps[lk])levGrps[lk]=[];
+      levGrps[lk].push(sol);
+    });
+    // Render row helper
+    function kpiRow(l,v,opts){
+      opts=opts||{};
+      return '<div style="display:flex;justify-content:space-between;padding:4px 0"><span style="font-size:12px;color:var(--gris)">'+l+'</span><span style="font-size:12px;font-weight:'+(opts.bold?'700':'600')+';color:'+(opts.color||'var(--gris-f)')+'">'+v+'</span></div>';
+    }
+    var sepLine='<div style="border-top:1px solid var(--bord);margin:5px 0"></div>';
+    var sepGreen='<div style="border-top:1px solid rgba(45,122,91,0.2);margin:5px 0"></div>';
+
+    // ── PATRIMOINE (Avant / Après) ──
+    var capPlacement=0,vpPlacement=0;
+    levGrps.placement.forEach(function(sol){
+      var h3=parseInt(sol.horizon)||10;var r3=0.03;
+      capPlacement+=Math.round((sol.vi||0)*Math.pow(1+r3,h3)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r3,h3)-1)/r3):0));
+      vpPlacement+=(sol.vp||0);
+    });
+    aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
+    aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Patrimoine \u2014 Avant</div>';
+    aaH+=kpiRow('Patrimoine net',fmt(patNet)+' \u20ac',{bold:true});
+    aaH+=kpiRow('Actifs bruts',fmt(aSum)+' \u20ac');
+    aaH+=kpiRow('Passifs (CRD)',fmt(pSum)+' \u20ac');
+    aaH+=sepLine+kpiRow('Revenus nets / mois',fmt(revM)+' \u20ac');
+    aaH+=kpiRow('\u00c9pargne mensuelle',fmt(ED.epMens||0)+' \u20ac');
+    aaH+='</div>';
+    aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Patrimoine \u2014 Apr\u00e8s</div>';
+    if(levGrps.placement.length){
+      aaH+=kpiRow('Patrimoine net projet\u00e9',fmt(patNet+capPlacement)+' \u20ac',{bold:true,color:'var(--green)'});
+      aaH+=kpiRow('Capital constitu\u00e9 (placement)','+'+fmt(capPlacement)+' \u20ac',{color:'var(--green)'});
+      aaH+=sepGreen+kpiRow('VP placement',fmt(vpPlacement)+' \u20ac/mois');
+      aaH+=kpiRow('Compl\u00e9ment revenus','~'+fmt(Math.round(capPlacement*0.04/12))+' \u20ac/mois',{color:'var(--green)'});
+    } else {aaH+='<div style="color:var(--gris);font-size:12px;font-style:italic;padding:8px 0">Aucune solution placement</div>';}
+    aaH+='</div></div>';
+
+    // ── IMPÔTS (Avant / Après) ──
+    if(impot>0||levGrps.fiscal.length){
+      aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
+      aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Imp\u00f4ts \u2014 Avant</div>';
+      aaH+=kpiRow('IR net',fmt(irNet)+' \u20ac');
+      aaH+=kpiRow('TMI',(ED.fiscal.tmi||'\u2014')+' %');
+      aaH+='</div>';
+      aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Imp\u00f4ts \u2014 Apr\u00e8s</div>';
+      if(economieFiscTotale>0){
+        aaH+=kpiRow('IR apr\u00e8s',fmt(irApres)+' \u20ac',{color:'var(--green)'});
+        aaH+=kpiRow('\u00c9conomie fiscale','-'+fmt(economieFiscTotale)+' \u20ac/an',{bold:true,color:'var(--green)'});
+      } else {aaH+='<div style="color:var(--gris);font-size:12px;font-style:italic;padding:8px 0">Aucune \u00e9conomie fiscale</div>';}
+      aaH+='</div></div>';
+    }
+
+    // ── FINANCEMENT (Avant / Après) ──
+    if(levGrps.financement.length){
+      var capFin=0;
+      levGrps.financement.forEach(function(sol){capFin+=Math.round((sol.vi||0)*1.5+(sol.vp||0)*12*(parseInt(sol.horizon)||15));});
+      aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
+      aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement \u2014 Avant</div>';
+      aaH+=kpiRow('Taux endettement',endett+' %',{color:parseFloat(endett)>35?'var(--red)':'inherit'});
+      aaH+=kpiRow('Reste \u00e0 vivre',fmt(revM-chrCredit)+' \u20ac/mois');
+      aaH+='</div>';
+      aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement \u2014 Apr\u00e8s</div>';
+      aaH+=kpiRow('Patrimoine immo. constitu\u00e9',fmt(capFin)+' \u20ac',{bold:true,color:'var(--green)'});
+      aaH+=kpiRow(levGrps.financement.length+' op\u00e9ration'+(levGrps.financement.length>1?'s':''),'',{});
+      aaH+='</div></div>';
+    }
+
+    aaEl.innerHTML=aaH;
   }
 
-  // ── 6.1 APRES ──────────────────────────────────────────────────
-  var sap=document.getElementById('synthApres');
-  if(sap){
-    if(!sorted.length){
-      sap.innerHTML='<div style="color:var(--gris);font-size:13px;font-style:italic;padding:8px 0">Aucune solution ajout\u00e9e.<br>Revenez aux Pr\u00e9conisations pour ajouter des solutions.</div>';
-    } else {
-      var totalVI2=0,totalVP2=0,totalCap2=0;
-      sorted.forEach(function(sol){
-        var vi=sol.vi||0,vp=sol.vp||0;
-        var h2=parseInt(sol.horizon)||10;
-        var cp2=COPERNIC[sol.produit]||{};
-        var r2=cp2.rendement||0.04;
-        totalVI2+=vi;totalVP2+=vp;
-        totalCap2+=Math.round(vi*Math.pow(1+r2,h2)+(vp>0?vp*12*((Math.pow(1+r2,h2)-1)/r2):0));
-      });
-      var revComplem2=Math.round(totalCap2*0.04/12);
-      var patNetApres=patNet+totalCap2;
-      var apHtml='';
-      var kpisAp=[
-        {l:'Patrimoine net projet\u00e9',v:fmt(patNetApres)+' \u20ac',bold:true,color:'var(--green)'},
-        {l:'Capital constitu\u00e9',v:'+'+fmt(totalCap2)+' \u20ac',color:'var(--green)'},
-        {sep:true},
-        {l:'Versement initial total',v:fmt(totalVI2)+' \u20ac'},
-        {l:'Versements mensuels',v:fmt(totalVP2)+' \u20ac/mois'},
-        {l:'Compl\u00e9ment de revenus potentiel',v:'~'+fmt(revComplem2)+' \u20ac/mois',color:'var(--green)'},
-        {sep:true},
-        {l:'Imp\u00f4t annuel apr\u00e8s',v:fmt(irApres)+' \u20ac',color:economieFiscTotale>0?'var(--green)':'inherit'},
-      ];
-      if(economieFiscTotale>0)kpisAp.push({l:'\u00c9conomie fiscale',v:'-'+fmt(economieFiscTotale)+' \u20ac/an',color:'var(--green)'});
-      apHtml+=kpisAp.map(function(k){
-        if(k.sep)return '<div style="border-top:1px solid rgba(45,122,91,0.2);margin:5px 0"></div>';
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">'
-          +'<span style="font-size:12px;color:var(--gris)">'+k.l+'</span>'
-          +'<span style="font-size:12px;font-weight:'+(k.bold?'700':'600')+';color:'+(k.color||'var(--gris-f)')+'">'+k.v+'</span>'
-          +'</div>';
-      }).join('');
-      sap.innerHTML=apHtml;
+  // ── IMPACT RETRAITE : gap comblé par les investissements ──────
+  var irEl=document.getElementById('synthImpactRetraite');
+  if(irEl){
+    var isCouple=ED.type!=='seul';
+    var age1=calcAge(ED.c1.dob)||40;
+    var csp1=CSP_MAP[ED.c1.sitpro||'']||'Sal. cadre';
+    var tx1=getRetTaux(csp1,age1);
+    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
+    var pensM1=Math.floor(sal1/12*tx1/100);
+    var souh1=(ED.retraite&&ED.retraite.pension1)||2500;
+    var gap1=Math.max(0,souh1-pensM1);
+    var totalGap=gap1;
+    if(isCouple&&ED.c2&&ED.c2.prenom){
+      var age2=calcAge(ED.c2.dob)||40;
+      var csp2=CSP_MAP[ED.c2.sitpro||'']||'Sal. cadre';
+      var tx2=getRetTaux(csp2,age2);
+      var sal2=ED.revenus.sal2||ED.revenus.c2||0;
+      var pensM2=Math.floor(sal2/12*tx2/100);
+      var souh2=(ED.retraite&&ED.retraite.pension2)||2000;
+      totalGap+=Math.max(0,souh2-pensM2);
     }
+    // Revenus complémentaires générés par les solutions
+    var revComSols=sorted.reduce(function(s,sol){
+      var h3=parseInt(sol.horizon)||10;var r3=0.03;
+      var cap3=Math.round((sol.vi||0)*Math.pow(1+r3,h3)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r3,h3)-1)/r3):0));
+      return s+Math.round(cap3*0.04/12);
+    },0);
+    var gapApres=Math.max(0,totalGap-revComSols);
+    var pctComble=totalGap>0?Math.min(100,Math.round(revComSols/totalGap*100)):0;
+    var barColor=pctComble>=100?'#2D7A5B':pctComble>=50?'#D4622A':'#C0392B';
+
+    var rH='<div class="card"><div class="card-title"><span class="dot"></span>Impact retraite du foyer</div>';
+    rH+=kpiRow('Manque mensuel sans solutions',fmt(totalGap)+' \u20ac/mois',{color:totalGap>0?'var(--red)':'var(--green)'});
+    rH+=kpiRow('Revenus compl\u00e9mentaires g\u00e9n\u00e9r\u00e9s','~'+fmt(revComSols)+' \u20ac/mois',{color:'var(--green)'});
+    rH+=kpiRow('Manque r\u00e9siduel',gapApres>0?fmt(gapApres)+' \u20ac/mois':'Couvert',{bold:true,color:gapApres>0?'var(--red)':'var(--green)'});
+    rH+='<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--gris)">Gap combl\u00e9</span><span style="font-size:11px;font-weight:700;color:'+barColor+'">'+pctComble+' %</span></div>';
+    rH+='<div style="height:10px;background:rgba(0,0,0,0.06);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pctComble+'%;background:'+barColor+';border-radius:5px;transition:width 0.5s"></div></div></div>';
+    rH+='</div>';
+    irEl.innerHTML=rH;
   }
 
 
@@ -5224,8 +5263,10 @@ function rSynthese(){
     }
   })();
 
-  // ── 6.2b GRAPHIQUE BILAN FISCAL AVANT/APRÈS ────────────────────
-  (function buildFiscal(){
+  // (graphiques fiscal et retraite supprimés — remplacés par avant/après par levier + impact retraite)
+
+  // ── ANCIEN CODE GRAPHIQUES (désactivé, canvas supprimés) ──
+  (function(){return;/* buildFiscal désactivé */
     var ctx=document.getElementById('fiscalChart');
     if(!ctx)return;
     if(window._fiscalChart)window._fiscalChart.destroy();
