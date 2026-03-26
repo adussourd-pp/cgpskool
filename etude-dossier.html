@@ -1036,7 +1036,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-preconisations">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 06</div><div class="sec-h1">Préconisations Patrimoniales</div></div>
+    <div><div class="sec-tag">Section 06</div><div class="sec-h1">Pr&#233;conisations</div></div>
   </div>
 
   <!-- Leviers disponibles + Objectifs client -->
@@ -4221,6 +4221,7 @@ function rPreconisations(){
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
   var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
+  var endett=revM>0?(chrCredit/revM*100).toFixed(1):'0';
 
   // ── Leviers disponibles (tick vert / rond rouge grise) ──
   var levEl=document.getElementById('precoLeviers');
@@ -4229,8 +4230,8 @@ function rPreconisations(){
     var entAct=isEntrepriseActive();
     var allLeviers=[
       {key:'placement',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' \u20ac/mois',active:ED.epMens>0||aSum>5000,color:'#2B5EA7'},
-      {key:'fiscal',label:'Fiscal',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' \u2014 PER dispo '+fmt(plafondPER)+' \u20ac':''),active:impot>=2000,color:'#D4622A'},
-      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois',active:capa>200,color:'#2D7A5B'}
+      {key:'fiscal',label:'Imp\u00f4ts',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%',active:impot>=2000,color:'#D4622A'},
+      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois \u2014 Endettement '+endett+'%',active:capa>200,color:'#2D7A5B'}
     ];
     if(entAct)allLeviers.push({key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'});
     allLeviers.forEach(function(l){
