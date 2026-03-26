@@ -463,8 +463,8 @@ select.span2{grid-column:span 2}
 .ml-input:focus{border-color:var(--orange)}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}.comment-zone.comment-off{display:none!important}}
 
-/* ── NUMÉROTATION DE PAGE ── */
-.page-number{text-align:center;font-family:var(--sans);font-size:11px;color:var(--gris);padding:18px 0 4px;margin-top:18px;border-top:1px solid var(--bord)}
+/* ── PIED DE PAGE ── */
+.page-number{display:flex;justify-content:space-between;align-items:center;font-family:var(--sans);font-size:10px;color:var(--gris);padding:14px 0 4px;margin-top:18px;border-top:1px solid var(--bord)}
 
 /* ── PAGE DE GARDE PDF ── */
 .pdf-cover-page{display:none}
@@ -479,9 +479,9 @@ select.span2{grid-column:span 2}
 .pdf-mentions-page{display:none}
 .pdf-mentions-inner{padding:40px 20px}
 
-/* ── EN-TÊTE PDF (caché à l'écran) ── */
-.pdf-page-header{display:none;padding:8pt 0 10pt;border-bottom:1pt solid #ddd;margin-bottom:14pt;
-  display:flex;justify-content:space-between;align-items:center}
+/* ── EN-TÊTE SECTION (au-dessus du cadre A4) ── */
+.pdf-page-header{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0 12px;margin:0 auto 14px;max-width:794px}
 .pdf-page-header-left{font-family:var(--sans)}
 .pdf-page-header-nom{font-weight:700;font-size:13pt;color:#111}
 .pdf-page-header-date{font-size:9pt;color:#888;margin-top:2pt}
@@ -2202,6 +2202,14 @@ function goTo(sec){
   if(btn)btn.classList.add('active');
   window.scrollTo(0,0);
   if(sec!=='import') renderSection(sec);
+  // Mettre à jour le titre de navigation au-dessus du cadre A4
+  var secNames={import:'Import / Saisie',situation:'Situation personnelle & Objectifs',
+    patrimoine:'Patrimoine',fiscal:'Bilan Fiscal & Leviers',financement:'Revenus & Capacité de Financement',
+    retraite:'Bilan Retraite',transmission:'Transmission',entreprise:'Analyse Entreprise',
+    preconisations:'Préconisations Patrimoniales',synthese:'Synthèse & Étapes',
+    pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions légales',avis:'Avis clients'};
+  var headerNom=document.getElementById('pdfHeaderNom');
+  if(headerNom)headerNom.textContent=secNames[sec]||sec;
   updatePageNumbers();
   // Marquer les sauts de page A4 après le rendu
   requestAnimationFrame(function(){updatePageBreaks(sec);});
@@ -2223,6 +2231,9 @@ function updatePageNumbers(){
     return true;
   });
   var total=activeSections.length;
+  // Nom du cabinet depuis le profil
+  var profil=loadProfil();
+  var cabinetName=profil.cabinet||'';
   // Mettre à jour chaque .page-number
   sectionIds.forEach(function(id){
     var sec=document.getElementById('sec-'+id);
@@ -2230,8 +2241,8 @@ function updatePageNumbers(){
     var pn=sec.querySelector('.page-number');
     if(!pn)return;
     var idx=activeSections.indexOf(id);
-    if(idx===-1){pn.textContent='';return;}
-    pn.textContent='Page '+(idx+1)+' / '+total;
+    if(idx===-1){pn.innerHTML='';return;}
+    pn.innerHTML='<span>'+cabinetName+'</span><span style="font-style:italic">Document confidentiel</span><span>Page '+(idx+1)+' / '+total+'</span>';
   });
 }
 
