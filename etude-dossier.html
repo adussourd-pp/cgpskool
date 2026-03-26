@@ -3091,13 +3091,18 @@ function rSituation(){
   const chrCr=ED.chargesCredit||0;
   const endett=chrCr>0&&revM>0?chrCr/revM*100:0;
   const rav=revM-chrCr;
-  set('kSit1',fmt(ED.epMens)+'  €');
-  set('kSit2',fmt(revM)+' €');
+  set('kSit1',fmt(ED.epMens)+' €/mois');
+  set('kSit2',fmt(revM)+' €/mois');
   const ke=document.getElementById('kSit3');
-  ke.textContent=endett>0?endett.toFixed(1)+' %':'—';
-  ke.style.color=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'inherit';
+  var endPct=Math.min(100,Math.round(endett/35*100));
+  var endColor=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
+  ke.innerHTML='<div style="font-size:17px;font-weight:700;color:'+endColor+'">'+( endett>0?endett.toFixed(1)+' %':'—')+'</div>'
+    +'<div style="height:6px;background:var(--bord);border-radius:3px;margin-top:5px;overflow:hidden">'
+    +'<div style="width:'+endPct+'%;height:100%;background:'+endColor+';border-radius:3px;transition:width 0.5s"></div>'
+    +'</div>'
+    +'<div style="font-size:9px;color:var(--gris);margin-top:2px;text-align:right">max 35%</div>';
   const krav=document.getElementById('kSit4');
-  krav.textContent=fmt(rav)+' €';
+  krav.textContent=fmt(rav)+' €/mois';
   krav.style.color=rav<500?'var(--red)':rav<1500?'var(--ambre-d)':'inherit';
 }
 
