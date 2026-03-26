@@ -5016,6 +5016,28 @@ function renderFichesClient(){
     'protection':  {label:'Protéger votre famille',              bg:'#FDF0F0',border:'#F5C4C4',titleBg:'#A32D2D',rate:0}
   };
 
+  // Labels client (pas de nom technique dans le PDF)
+  var CLIENT_LABELS={
+    'Assurance vie':'Faire fructifier et transmettre votre patrimoine hors succession',
+    'Contrat de capitalisation':'Capitaliser \u00e0 long terme avec transmission facilit\u00e9e',
+    'PER':'Baisser votre imposition aujourd\'hui en pr\u00e9parant votre retraite',
+    'SCPI de rendement':'Percevoir des revenus r\u00e9guliers sans gestion locative',
+    'SCPI financ\u00e9e':'Construire un patrimoine immobilier \u00e0 cr\u00e9dit sans gestion',
+    'SCPI fiscale':'R\u00e9duire vos imp\u00f4ts via l\'immobilier sans contrainte de gestion',
+    'FIP / FCPI':'R\u00e9duire vos imp\u00f4ts en finan\u00e7ant l\'\u00e9conomie r\u00e9elle fran\u00e7aise',
+    'FCPR / FPCI':'Diversifier votre patrimoine dans l\'\u00e9conomie r\u00e9elle non cot\u00e9e',
+    'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
+    'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
+    'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
+    'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
+    'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
+    'Nue-propri\u00e9t\u00e9 immo':'Acqu\u00e9rir un bien d\u00e9cot\u00e9 sans charge ni fiscalit\u00e9',
+    'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
+    'Pr\u00e9voyance individuelle':'Prot\u00e9ger vos proches en cas d\'al\u00e9a de la vie',
+    'Pr\u00e9voyance pro':'S\u00e9curiser votre activit\u00e9 professionnelle et vos associ\u00e9s'
+  };
+  function clientLabel(produit){return CLIENT_LABELS[produit]||produit;}
+
   var n1=(ED.c1.prenom||'')+(ED.c1.nom?' '+ED.c1.nom[0]+'.':'');
   var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom||'')+(ED.c2.nom?' '+ED.c2.nom[0]+'.':''):'';
   var html='';
@@ -5057,13 +5079,18 @@ function renderFichesClient(){
       // ── Carte produit ──
       html+='<div style="background:rgba(255,255,255,0.85);border-radius:10px;border:1px solid rgba(0,0,0,0.07);overflow:hidden">';
 
-      // Header : numéro + objectifs (UNE SEULE FOIS)
-      html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+      // Header : numéro + label client + objectifs
+      html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05)">';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(firstSol.etape||'?')+'</div>';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+clientLabel(pg.produit)+'</div>';
+      html+='</div>';
       if(objsV.length){
+        html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
         objsV.forEach(function(o){
           html+='<span style="font-size:11px;font-weight:600;color:'+meta.titleBg+';padding:3px 10px;border-radius:20px;background:rgba(0,0,0,0.05)">\u2713 '+o+'</span>';
         });
+        html+='</div>';
       }
       html+='</div>';
 
