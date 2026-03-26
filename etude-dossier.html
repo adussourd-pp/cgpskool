@@ -5841,15 +5841,17 @@ function formatMentionsContent(lines){
         tableLines.forEach(function(tl,ti){
           var cols=tl.split('\t').map(function(c){return c.trim();}).filter(Boolean);
           if(ti===0&&!/\d/.test(cols[cols.length-1])){
-            // Header row
-            out+='<tr style="border-bottom:1px solid var(--bord)">';
-            cols.forEach(function(c){out+='<td style="padding:6px 10px;font-size:11px;font-weight:700;color:var(--gris)">'+c+'</td>';});
+            out+='<tr style="background:var(--gris-l)">';
+            cols.forEach(function(c){out+='<td style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--gris)">'+c+'</td>';});
             out+='</tr>';
           } else {
             out+='<tr style="border-bottom:1px solid var(--bord)">';
             cols.forEach(function(c,ci){
-              var isAmount=/[\d]+.*\u20ac|[\d]+.*€/.test(c)||/^\d[\d\s,.]+$/.test(c);
-              out+='<td style="padding:6px 10px;'+(isAmount?'text-align:right;font-weight:700;color:var(--orange)':'color:var(--gris-f)')+'">'+c+'</td>';
+              var isAmount=/[\d]+.*[\u20ac€]|^\d[\d\s,.]+\s*€?$/.test(c);
+              var isZero=/^0[\s€]*$|^0\.0/.test(c.trim());
+              var display=isZero?'Non applicable':c;
+              var style=isAmount&&!isZero?'text-align:right;font-weight:700;color:var(--orange)':isZero?'text-align:right;color:var(--gris)':'color:var(--gris-f)';
+              out+='<td style="padding:8px 12px;'+style+'">'+display+'</td>';
             });
             out+='</tr>';
           }
@@ -5897,7 +5899,7 @@ function saveMentionsDirect(){
   try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
   var mel=document.getElementById('mentionsPreview');
   if(!mel)return;
-  var raw=input.value.trim();
+  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
   if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions l\u00e9gales ci-dessus.</em>';return;}
 
   // En-tete auto depuis le profil
@@ -5918,6 +5920,8 @@ function saveMentionsDirect(){
   }
 
   // Parser le texte en sections (double saut de ligne = nouvelle section)
+  // Filtrer les lignes inutiles
+  raw=raw.replace(/Date et signature.*$/gim,'').replace(/PROTECTION DES DONN.*$/gims,'').trim();
   var blocks=raw.split(/\n\s*\n/).filter(function(b){return b.trim();});
   var sectionNum=0;
 
@@ -5941,13 +5945,12 @@ function saveMentionsDirect(){
       // Reste du bloc = contenu
       var content=formatMentionsContent(lines.slice(1));
       if(content){
-        h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
+        h+='<div style="padding:4px 0;margin-bottom:12px">';
         h+=content;
         h+='</div>';
       }
     } else {
-      // Bloc sans titre = contenu simple avec bordure
-      h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
+      h+='<div style="padding:4px 0;margin-bottom:12px">';
       h+=formatMentionsContent(lines);
       h+='</div>';
     }
