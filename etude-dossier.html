@@ -375,7 +375,7 @@ select.span2{grid-column:span 2}
   #panneauConseiller,button,input[type="file"],.import-zone label,
   .comment-zone textarea,.riDropzone,.avisDropzone,
   #riDropzone,#avisDropzone,#riFileStatus,#avisIRStatus,
-  #newStepInput,.profil-overlay,
+  #newStepInput,.profil-overlay,.panneau-interne,
   #syntheseConseillerBadge{display:none!important}
   /* ── LAYOUT : pleine largeur ── */
   .app{grid-template-columns:1fr!important}
@@ -1117,10 +1117,23 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions légales</div><div class="sec-sub">Incluses en dernière page du PDF</div></div>
   </div>
 
+  <!-- Zone conseiller (pas dans le PDF) -->
+  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
+    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:14px">&#128274;</span>
+      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — pas visible dans le PDF</div>
+    </div>
+    <div style="padding:16px;background:#fefcf8">
+      <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:6px">Vos mentions légales</label>
+      <textarea id="mentionsDirectInput" rows="6" placeholder="Inscrit à l'ORIAS sous le n°...&#10;Conseiller en Investissements Financiers...&#10;Membre de la CNCGP..." style="width:100%;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none" oninput="saveMentionsDirect()"></textarea>
+    </div>
+  </div>
+
+  <!-- Apercu (visible dans le PDF) -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Mentions légales</div>
+    <div class="card-title"><span class="dot"></span>Aperçu mentions légales</div>
     <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucune mention configurée — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
+      <em style="color:var(--gris)">Aucune mention saisie.</em>
     </div>
   </div>
 
@@ -1147,18 +1160,23 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">PDF — Optionnel</div><div class="sec-h1">Avis clients</div><div class="sec-sub">Inclus dans le PDF si la case est cochée</div></div>
   </div>
 
-  <!-- Saisie des avis -->
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Avis clients</div>
-    <div id="avisManualList"></div>
-    <button onclick="addAvisManuel()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter un avis</button>
+  <!-- Zone conseiller (pas dans le PDF) -->
+  <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
+    <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:14px">&#128274;</span>
+      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — pas visible dans le PDF</div>
+    </div>
+    <div style="padding:16px;background:#fefcf8">
+      <div id="avisManualList"></div>
+      <button onclick="addAvisManuel()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--bord);border-radius:8px;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer">+ Ajouter un avis</button>
+    </div>
   </div>
 
-  <!-- Apercu -->
+  <!-- Apercu (visible dans le PDF) -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Aperçu (inclus dans le PDF)</div>
+    <div class="card-title"><span class="dot"></span>Aperçu — inclus dans le PDF</div>
     <div id="avisPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8;min-height:40px">
-      <em style="color:var(--gris)">Aucun avis. Importez depuis Trustpilot ou ajoutez manuellement ci-dessus.</em>
+      <em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>
     </div>
   </div>
 
@@ -5796,44 +5814,38 @@ function rPageGarde(){
 }
 
 function rMentions(){
-  var p=loadProfil?loadProfil():{};
+  // Charger les mentions depuis localStorage
+  var txt='';
+  try{txt=localStorage.getItem('cgpskool_mentions')||'';}catch(e){}
+  // Fallback : profil
+  if(!txt){var p=loadProfil?loadProfil():{};txt=(p&&p.mentions)||'';}
 
-  // Mentions legales
+  var input=document.getElementById('mentionsDirectInput');
+  if(input&&!input.value&&txt)input.value=txt;
+
   var mel=document.getElementById('mentionsPreview');
   if(mel){
-    if(p&&p.mentions){
-      mel.innerHTML=p.mentions.replace(/\n/g,'<br>');
+    var val=input?input.value.trim():txt;
+    if(val){
+      mel.innerHTML=val.replace(/\n/g,'<br>');
     } else {
-      mel.innerHTML='<em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>';
+      mel.innerHTML='<em style="color:var(--gris)">Aucune mention saisie.</em>';
     }
   }
+}
 
-  // Trustpilot
-  var tEl=document.getElementById('trustpilotSectionPreview');
-  if(tEl){
-    try{
-      var raw=localStorage.getItem('cgpskool_trustpilot');
-      if(raw){
-        var reviews=JSON.parse(raw);
-        if(reviews.length){
-          var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
-          h+='<span style="font-size:20px">&#11088;</span>';
-          h+='<strong>'+reviews.length+' avis clients</strong>';
-          if(p&&p.trustpilot)h+=' — <a href="'+p.trustpilot+'" target="_blank" style="color:var(--orange);font-size:11px">Voir sur Trustpilot</a>';
-          h+='</div>';
-          reviews.forEach(function(r){
-            h+='<div style="padding:8px 0;border-bottom:1px solid var(--bord)">';
-            h+='<div style="display:flex;justify-content:space-between;align-items:center">';
-            h+='<strong style="font-size:13px">'+r.name+'</strong>';
-            if(r.stars)h+='<span style="color:var(--orange);font-weight:700">'+r.stars+'/5</span>';
-            h+='</div>';
-            if(r.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+r.text+'</div>';
-            h+='</div>';
-          });
-          tEl.innerHTML=h;
-        }
-      }
-    }catch(e){}
+function saveMentionsDirect(){
+  var input=document.getElementById('mentionsDirectInput');
+  if(!input)return;
+  try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
+  // Mettre a jour l apercu
+  var mel=document.getElementById('mentionsPreview');
+  if(mel){
+    if(input.value.trim()){
+      mel.innerHTML=input.value.trim().replace(/\n/g,'<br>');
+    } else {
+      mel.innerHTML='<em style="color:var(--gris)">Aucune mention saisie.</em>';
+    }
   }
 }
 
