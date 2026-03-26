@@ -7222,32 +7222,41 @@ function saveMentionsDirect(){
   }
 
   // Bloc compact infos légales
-  h+='<div style="font-size:12px;color:var(--gris-f);line-height:2">';
-  if(orias)h+='<div>Inscrit \u00e0 l\'ORIAS n\u00b0 <strong>'+orias+'</strong> (www.orias.fr)</div>';
+  // Bloc compact
+  h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">';
 
+  // Qualités
+  if(orias)h+='<div style="margin-bottom:8px">Inscrit \u00e0 l\'ORIAS n\u00b0 <strong>'+orias+'</strong> \u2014 <a href="https://www.orias.fr" target="_blank" style="color:var(--orange);text-decoration:none">www.orias.fr</a></div>';
   var qualites=[];
   if(habIOBSP)qualites.push('Mandataire IOBSP \u2014 Stellium Financement');
   if(habIAS)qualites.push('Mandataire IAS \u2014 Stellium Courtage');
-  if(habCIF)qualites.push('Agent li\u00e9 \u2014 Stellium Invest (agr\u00e9\u00e9 ACPR n\u00b0 10983)');
-  if(habImmo)qualites.push('Agent commercial immobilier \u2014 Stellium Immobilier'+(cpi?' \u2014 CPI n\u00b0 '+cpi:''));
+  if(habCIF)qualites.push('Agent li\u00e9 \u2014 Stellium Invest (ACPR n\u00b0 10983)');
+  if(habImmo)qualites.push('Agent commercial \u2014 Stellium Immobilier'+(cpi?' \u2014 CPI '+cpi:''));
   if(qualites.length){
-    qualites.forEach(function(q){h+='<div>\u2022 '+q+'</div>';});
+    qualites.forEach(function(q){h+='<div style="padding:2px 0">\u2022 '+q+'</div>';});
   }
 
-  h+='<div style="margin-top:8px">Contr\u00f4le : ACPR \u2014 4 Place de Budapest, 75436 Paris</div>';
-  if(habCIF)h+='<div>CIF membre ANACOFI (agr\u00e9\u00e9e AMF)</div>';
+  // Contrôle + CIF
+  h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
+  h+='Contr\u00f4le ACPR \u2014 4 Place de Budapest, 75436 Paris';
+  if(habCIF)h+='<br>CIF membre ANACOFI (agr\u00e9\u00e9e AMF)';
+  h+='</div>';
 
-  h+='<div style="margin-top:8px">RCP : <strong>Zurich Insurance</strong> \u2014 112 av. de Wagram, 75017 Paris</div>';
-
+  // RCP + SIRET
+  h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
+  h+='RCP : <strong>Zurich Insurance</strong> \u2014 112 av. de Wagram, 75017 Paris';
   var identParts=[];
   if(mSiret)identParts.push('SIRET '+mSiret[1].trim());
   if(mRSAC)identParts.push('RSAC '+mRSAC[1]);
-  if(mAPE)identParts.push('APE '+mAPE[1]);
-  if(identParts.length)h+='<div>'+identParts.join(' \u2014 ')+'</div>';
+  if(identParts.length)h+='<br>'+identParts.join(' \u2014 ');
+  h+='</div>';
 
-  h+='<div style="margin-top:8px">R\u00e9clamations : <strong>reclamations@stellium.fr</strong></div>';
-  h+='<div>M\u00e9diateur AMF : 17 place de la Bourse, 75082 Paris</div>';
-  h+='<div>M\u00e9diateur assurance : AME Conso, 11 place Dauphine, 75001 Paris</div>';
+  // Réclamations + Médiateurs
+  h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
+  h+='R\u00e9clamations : <strong>reclamations@stellium.fr</strong>';
+  h+='<br>M\u00e9diateur AMF : 17 place de la Bourse, 75082 Paris';
+  h+='<br>M\u00e9diateur assurance : AME Conso, 11 place Dauphine, 75001 Paris';
+  h+='</div>';
 
   h+='</div>';
   h+='</div>';
