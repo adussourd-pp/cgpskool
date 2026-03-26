@@ -2282,8 +2282,14 @@ function syncNotePrint(zone){
   var cb=zone.querySelector('.cz-switch input');
   var np=document.getElementById('notePrint-'+secId);
   if(!np||!ta||!cb)return;
-  if(cb.checked&&ta.value.trim()){np.style.display='';np.textContent=ta.value;}
-  else{np.style.display='none';np.textContent='';}
+  if(cb.checked){
+    np.style.display='';
+    np.textContent=ta.value.trim()||'(note vide)';
+    np.style.opacity=ta.value.trim()?'1':'0.4';
+  } else {
+    np.style.display='none';
+    np.textContent='';
+  }
 }
 function toggleComment(cb){
   var zone=cb.closest('.comment-zone');
@@ -2296,8 +2302,8 @@ function autoEnableComment(ta){
   if(!zone)return;
   var cb=zone.querySelector('.cz-switch input');
   if(!cb)return;
+  // Auto-activer le switch dès qu'on tape du texte
   if(ta.value.trim().length>0&&!cb.checked){cb.checked=true;zone.classList.remove('comment-off');}
-  if(ta.value.trim().length===0&&cb.checked){cb.checked=false;zone.classList.add('comment-off');}
   syncNotePrint(zone);
 }
 
