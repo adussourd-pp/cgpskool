@@ -3113,15 +3113,10 @@ function parseAvisIR(){
 // ║  SECTION — SITUATION                                           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function rSituation(){
-  const n1=`${ED.c1.civ} ${ED.c1.prenom} ${ED.c1.nom}`.trim();
-  const a1=ageFrom(ED.c1.dob);
-  let sit=`<strong>${n1}</strong>${a1?' — '+a1+' ans':''}<br>${ED.c1.profession||ED.c1.sitpro||'—'}<br>${ED.sitmat}`;
-  if(ED.type!=='seul'&&ED.c2?.prenom){
-    const n2=`${ED.c2.civ} ${ED.c2.prenom} ${ED.c2.nom}`.trim();
-    const a2=ageFrom(ED.c2.dob);
-    sit+=`<br><br><strong>${n2}</strong>${a2?' — '+a2+' ans':''}<br>${ED.c2.profession||ED.c2.sitpro||'—'}<br>${ED.convention||''}`;
-  }
-  // Enfants détaillés (prénoms + âges)
+  var isCoupleSit=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
+  var n1=`${ED.c1.civ||''} ${ED.c1.prenom||''} ${ED.c1.nom||''}`.trim();
+  var a1=ageFrom(ED.c1.dob);
+  // Enfants
   var enfDisplay='';
   if(ED.enfants&&ED.enfants.length){
     enfDisplay=ED.enfants.map(function(e){
@@ -3129,10 +3124,42 @@ function rSituation(){
       return e.nom+(age!==null?' ('+age+' ans)':'');
     }).join(', ');
     enfDisplay=ED.enfants.length+' enfant(s) : '+enfDisplay;
-  } else {
+  } else if(ED.nbEnfants){
     enfDisplay=ED.nbEnfants+' enfant(s)';
   }
-  sit+=`<br><br><span style="color:var(--blue);font-weight:600">${enfDisplay}</span> · ${ED.logement}`;
+  var sit='';
+  if(isCoupleSit){
+    var n2=`${ED.c2.civ||''} ${ED.c2.prenom||''} ${ED.c2.nom||''}`.trim();
+    var a2=ageFrom(ED.c2.dob);
+    sit+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
+    // Col C1
+    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
+    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Déclarant 1</div>';
+    sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
+    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
+    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' €/an</span>';
+    sit+='</div>';
+    // Col C2
+    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
+    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Déclarant 2</div>';
+    sit+='<strong>'+n2+'</strong>'+(a2?' — '+a2+' ans':'')+'<br>';
+    sit+=(ED.c2.profession||ED.c2.sitpro||'—')+'<br>';
+    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal2||ED.revenus.c2||0)+' €/an</span>';
+    sit+='</div>';
+    sit+='</div>';
+    // Commun
+    sit+='<div style="padding:10px 12px;border-top:1px solid var(--bord)">';
+    sit+='<strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'<br>';
+    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
+    sit+=ED.logement||'';
+    sit+='</div>';
+  } else {
+    sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
+    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
+    sit+=ED.sitmat+'<br>';
+    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
+    sit+=ED.logement||'';
+  }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
 
