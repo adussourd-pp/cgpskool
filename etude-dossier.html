@@ -4269,6 +4269,35 @@ var RECOS_DATA={
 'FCPR/FPCI (remploi 150-0 B ter)':['Confirmer l\'\u00e9ligibilit\u00e9 du fonds au remploi','Ticket min 100 000\u20ac \u2014 investisseur qualifi\u00e9','Coordonner avec l\'avocat 150-0 B ter','Anticiper le blocage 5 ans minimum','Diversifier entre plusieurs fonds'],
 'Contrat de capitalisation PM':['V\u00e9rifier que l\'objet social autorise ce placement','Inscrire au bilan \u2014 traitement comptable','Envisager le nantissement pour garantir un pr\u00eat','Anticiper la fiscalit\u00e9 IS \u00e0 la sortie']
 };
+var CLIENT_LABELS={
+'Assurance vie':'Faire fructifier et transmettre votre patrimoine hors succession',
+'Contrat de capitalisation':'Capitaliser \u00e0 long terme avec transmission facilit\u00e9e',
+'PER':'Baisser votre imposition aujourd\'hui en pr\u00e9parant votre retraite',
+'SCPI de rendement':'Percevoir des revenus r\u00e9guliers sans gestion locative',
+'SCPI financ\u00e9e':'Construire un patrimoine immobilier \u00e0 cr\u00e9dit sans gestion',
+'SCPI fiscale':'R\u00e9duire vos imp\u00f4ts via l\'immobilier sans contrainte de gestion',
+'FIP / FCPI':'R\u00e9duire vos imp\u00f4ts en finan\u00e7ant l\'\u00e9conomie r\u00e9elle fran\u00e7aise',
+'FCPR / FPCI':'Diversifier votre patrimoine dans l\'\u00e9conomie r\u00e9elle non cot\u00e9e',
+'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
+'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
+'Jeanbrun':'R\u00e9duire votre revenu imposable gr\u00e2ce \u00e0 un investissement locatif neuf',
+'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
+'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
+'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
+'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
+'Nue-propri\u00e9t\u00e9 immo':'Acqu\u00e9rir un bien d\u00e9cot\u00e9 sans charge ni fiscalit\u00e9',
+'Pr\u00e9voyance individuelle':'Prot\u00e9ger vos revenus en cas d\'arr\u00eat ou de d\u00e9c\u00e8s',
+'Pr\u00e9voyance pro':'Prot\u00e9ger votre entreprise et votre famille',
+'SCPI via SCI \u00e0 l\'IS':'Investir la tr\u00e9sorerie dans l\'immobilier avec fiscalit\u00e9 all\u00e9g\u00e9e',
+'SCPI en usufruit':'Booster le rendement de la tr\u00e9sorerie sur une dur\u00e9e d\u00e9finie',
+'PEE':'Fid\u00e9liser vos collaborateurs et r\u00e9duire le b\u00e9n\u00e9fice imposable',
+'PERECO/PERECOI':'Pr\u00e9parer votre retraite en optimisant la fiscalit\u00e9 entreprise',
+'Apport-cession 150-0 B ter':'Reporter l\'imposition de votre plus-value lors de la cession',
+'FCPR/FPCI (remploi 150-0 B ter)':'R\u00e9investir le produit de cession en report d\'imposition',
+'Contrat de capitalisation PM':'Faire fructifier la tr\u00e9sorerie fiscalement',
+'Holding patrimoniale':'Structurer et optimiser la d\u00e9tention de votre patrimoine'
+};
+function clientLabel(produit){return CLIENT_LABELS[produit]||produit;}
 function toggleReco(produit,idx,checked){
   solsSelectionnees.forEach(function(s){
     if(s.produit!==produit)return;
@@ -4683,6 +4712,12 @@ function renderSolsRetenues(){
     html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
     html+='</div></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);line-height:1.5;margin-bottom:10px">'+cp.desc+'</div>';
+
+    // Libellé PDF éditable
+    var defLabel=clientLabel(grp.produit);
+    var curLabel=firstSol._labelPDF||defLabel;
+    html+='<div style="margin-bottom:10px"><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Libell\u00e9 PDF</label>';
+    html+='<input type="text" value="'+curLabel.replace(/"/g,'&quot;')+'" onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_labelPDF\',this.value);renderFichesClient()" style="width:100%;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;color:var(--noir);background:var(--gris-l);outline:none"></div>';
 
     // Objectifs (shared across group, use first sol's objectifsValides)
     var solObjs=allSolsMap&&allSolsMap[grp.produit]?allSolsMap[grp.produit].objectifs:[];
@@ -5215,35 +5250,7 @@ function renderFichesClient(){
   };
 
   // Labels client (pas de nom technique dans le PDF)
-  var CLIENT_LABELS={
-    'Assurance vie':'Faire fructifier et transmettre votre patrimoine hors succession',
-    'Contrat de capitalisation':'Capitaliser \u00e0 long terme avec transmission facilit\u00e9e',
-    'PER':'Baisser votre imposition aujourd\'hui en pr\u00e9parant votre retraite',
-    'SCPI de rendement':'Percevoir des revenus r\u00e9guliers sans gestion locative',
-    'SCPI financ\u00e9e':'Construire un patrimoine immobilier \u00e0 cr\u00e9dit sans gestion',
-    'SCPI fiscale':'R\u00e9duire vos imp\u00f4ts via l\'immobilier sans contrainte de gestion',
-    'FIP / FCPI':'R\u00e9duire vos imp\u00f4ts en finan\u00e7ant l\'\u00e9conomie r\u00e9elle fran\u00e7aise',
-    'FCPR / FPCI':'Diversifier votre patrimoine dans l\'\u00e9conomie r\u00e9elle non cot\u00e9e',
-    'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
-    'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
-    'Jeanbrun':'R\u00e9duire votre revenu imposable gr\u00e2ce \u00e0 un investissement locatif neuf',
-    'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
-    'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
-    'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
-    'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
-    'Nue-propri\u00e9t\u00e9 immo':'Acqu\u00e9rir un bien d\u00e9cot\u00e9 sans charge ni fiscalit\u00e9 pendant la dur\u00e9e',
-    'Pr\u00e9voyance individuelle':'Prot\u00e9ger vos revenus en cas d\'arr\u00eat, d\'invalidit\u00e9 ou de d\u00e9c\u00e8s',
-    'Pr\u00e9voyance pro':'Prot\u00e9ger la continuit\u00e9 de votre entreprise et votre famille en cas d\'impr\u00e9vu',
-    'SCPI via SCI \u00e0 l\'IS':'Investir la tr\u00e9sorerie dans l\'immobilier avec une fiscalit\u00e9 all\u00e9g\u00e9e',
-    'SCPI en usufruit':'Booster le rendement de la tr\u00e9sorerie sur une dur\u00e9e d\u00e9finie',
-    'PEE':'Fid\u00e9liser vos collaborateurs et r\u00e9duire le b\u00e9n\u00e9fice imposable',
-    'PERECO/PERECOI':'Pr\u00e9parer votre retraite et celle de vos salari\u00e9s en optimisant la fiscalit\u00e9',
-    'Apport-cession 150-0 B ter':'Reporter l\'imposition de votre plus-value lors de la cession',
-    'FCPR/FPCI (remploi 150-0 B ter)':'R\u00e9investir le produit de cession en report d\'imposition',
-    'Contrat de capitalisation PM':'Faire fructifier la tr\u00e9sorerie dans une enveloppe fiscalement optimis\u00e9e',
-    'Holding patrimoniale':'Structurer et optimiser la d\u00e9tention de votre patrimoine'
-  };
-  function clientLabel(produit){return CLIENT_LABELS[produit]||produit;}
+  // CLIENT_LABELS et clientLabel déplacés au niveau global (avant solsSelectionnees)
 
   var n1=(ED.c1.prenom||'')+(ED.c1.nom?' '+ED.c1.nom[0]+'.':'');
   var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom||'')+(ED.c2.nom?' '+ED.c2.nom[0]+'.':''):'';
@@ -5290,7 +5297,7 @@ function renderFichesClient(){
       html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05)">';
       html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(firstSol.etape||'?')+'</div>';
-      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+clientLabel(pg.produit)+'</div>';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+(firstSol._labelPDF||clientLabel(pg.produit))+'</div>';
       html+='</div>';
       if(objsV.length){
         html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
