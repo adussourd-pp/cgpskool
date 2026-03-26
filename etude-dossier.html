@@ -880,15 +880,35 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 06</div><div class="sec-h1">Préconisations Patrimoniales</div></div>
   </div>
 
-  <!-- Avant / Après -->
+  <!-- Leviers disponibles + Situation visee -->
   <div class="preco-avant-apres" style="margin-bottom:18px">
-    <div class="preco-panel avant">
-      <div class="preco-panel-title">📍 Situation actuelle</div>
-      <div id="precoAvant" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
+    <div class="preco-panel avant" style="border-color:rgba(43,94,167,0.2);background:#FAFCFF">
+      <div class="preco-panel-title" style="color:var(--blue)">Leviers disponibles</div>
+      <div id="precoLeviers" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
     <div class="preco-panel apres">
-      <div class="preco-panel-title">🎯 Situation visée après préconisations</div>
-      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Décrivez la situation patrimoniale cible, les bénéfices attendus pour le client…"></div>
+      <div class="preco-panel-title">Situation visee apres preconisations</div>
+      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Decrivez la situation patrimoniale cible, les benefices attendus pour le client..."></div>
+    </div>
+  </div>
+
+  <!-- Epargne financiere — vue conseiller (editable) + vue client -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title"><span class="dot"></span>Epargne financiere preconisee</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--gris)">Patrimoine financier total (hors immobilier)</div>
+      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 &euro;</div>
+    </div>
+    <div id="precoEpargneTable" style="margin-bottom:14px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;background:var(--gris-l);border-radius:10px">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a conserver</div>
+        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 &euro;</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a reorienter</div>
+        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 &euro;</div>
+      </div>
     </div>
   </div>
 
@@ -3890,38 +3910,128 @@ function togglePanneauConseiller(){
   chev.style.transform=isOpen?'rotate(-90deg)':'rotate(0deg)';
 }
 
+// Store conseilled amounts for epargne reorientation
+if(!window._precoConseille)window._precoConseille={};
+
 function rPreconisations(){
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
   var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
-  var endett=revM>0?(chrCredit/revM*100).toFixed(1):'—';
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
   var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
-  var av=document.getElementById('precoAvant');
-  if(av){
-    var rows=[
-      ['Patrimoine brut',    fmt(aSum)+' €', false],
-      ['Passifs (CRD)',      fmt(pSum)+' €', false],
-      ['Patrimoine net',     fmt(aSum-pSum)+' €', true],
-      ['Revenus nets / mois',fmt(revM)+' €', false],
-      ['Taux endettement',   endett+' %', false],
-      ['Impôt annuel',       fmt(impot)+' € — TMI '+(ED.fiscal.tmi||'—')+'%', false],
-      ['Épargne mensuelle',  fmt(ED.epMens||0)+' €', false],
-    ];
-    if(plafondPER>0) rows.push(['Plafond PER', fmt(plafondPER)+' € → éco. '+fmt(economiePER)+' €', false]);
-    av.innerHTML=rows.map(function(r){
-      return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bord)">'
-        +'<span style="font-size:12px;color:var(--gris)">'+r[0]+'</span>'
-        +'<span style="font-size:12px;font-weight:'+(r[2]?'700':'600')+';color:'+(r[2]?'var(--noir)':'var(--gris-f)')+'">'+r[1]+'</span>'
-        +'</div>';
-    }).join('');
+
+  // ── Leviers disponibles ──
+  var levEl=document.getElementById('precoLeviers');
+  if(levEl){
+    var levH='';
+    var leviers=[];
+    if(ED.epMens>0||aSum>5000)leviers.push({icon:'&#128176;',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' &euro;/mois'});
+    if(impot>=2000)leviers.push({icon:'&#128200;',label:'Fiscal',desc:'IR '+fmt(impot)+' &euro; — TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' — PER dispo '+fmt(plafondPER)+' &euro;':'')});
+    if(capa>200)leviers.push({icon:'&#127968;',label:'Financement',desc:'Capacite emprunt ~'+fmt(Math.round(capa))+' &euro;/mois'});
+    leviers.push({icon:'&#127981;',label:'Entreprise',desc:'SCI, holding, 150-0 B ter'});
+    leviers.forEach(function(l){
+      levH+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bord)">';
+      levH+='<span style="font-size:18px">'+l.icon+'</span>';
+      levH+='<div><div style="font-weight:700;font-size:12px;color:var(--noir)">'+l.label+'</div>';
+      levH+='<div style="font-size:11px;color:var(--gris)">'+l.desc+'</div></div>';
+      levH+='</div>';
+    });
+    levEl.innerHTML=levH;
   }
+
+  // ── Epargne financiere (hors immo) — tableau editable ──
+  var finActifs=[];
+  (ED.actifs||[]).forEach(function(a){
+    var cfg=getActifConfig(a.label||a.nom||'');
+    if(cfg.immo)return; // exclure immobilier
+    var h=a.horizon||cfg.h||'CT';
+    var hLabel=h==='ct'||h==='CT'?'Court terme':h==='mt'||h==='MT'?'Moyen terme':'Long terme';
+    var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
+    finActifs.push({nom:a.label||a.nom||'Actif',montant:a.montant||0,horizon:hKey,horizonLabel:hLabel,titulaire:a.titulaire||'C1'});
+  });
+
+  var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
+  var ftEl=document.getElementById('precoFinTotal');
+  if(ftEl)ftEl.textContent=fmt(finTotal)+' \u20ac';
+
+  var tEl=document.getElementById('precoEpargneTable');
+  if(tEl){
+    var groups={lt:[],mt:[],ct:[]};
+    finActifs.forEach(function(a){(groups[a.horizon]||groups.ct).push(a);});
+    var horizons=[
+      {key:'lt',label:'Long terme',color:'#C0392B',bg:'rgba(192,57,43,0.06)'},
+      {key:'mt',label:'Moyen terme',color:'#D4622A',bg:'rgba(212,98,42,0.06)'},
+      {key:'ct',label:'Court terme',color:'#2B5EA7',bg:'rgba(43,94,167,0.06)'}
+    ];
+    var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    h+='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">';
+    h+='<th style="text-align:left;padding:6px 8px">Actif</th>';
+    h+='<th style="text-align:right;padding:6px 8px">Actuel</th>';
+    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">Conseille</th>';
+    h+='</tr></thead><tbody>';
+
+    horizons.forEach(function(hz){
+      var items=groups[hz.key];
+      if(!items.length)return;
+      var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
+      h+='<tr style="background:'+hz.bg+'"><td colspan="3" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' &euro;</td></tr>';
+      items.forEach(function(a,i){
+        var uid=hz.key+'_'+i;
+        var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
+        h+='<tr style="border-bottom:1px solid var(--bord)">';
+        h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
+        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' &euro;</td>';
+        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:90px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"></td>';
+        h+='</tr>';
+      });
+    });
+    h+='</tbody></table>';
+    tEl.innerHTML=h;
+  }
+
+  updatePrecoTotals();
   buildMatriceObjSol(impot,capa,aSum);
   renderSolsRetenues();
   renderFichesClient();
+}
+
+function updatePrecoTotals(){
+  var finActifs=[];
+  (ED.actifs||[]).forEach(function(a){
+    var cfg=getActifConfig(a.label||a.nom||'');
+    if(cfg.immo)return;
+    var h=a.horizon||cfg.h||'CT';
+    var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
+    finActifs.push({montant:a.montant||0,horizon:hKey});
+  });
+  var totalActuel=0,totalConseille=0;
+  finActifs.forEach(function(a,i){
+    var hzKeys=['lt','mt','ct'];
+    // Reconstruct uid
+    var counts={lt:0,mt:0,ct:0};
+    var uid='';
+    (ED.actifs||[]).forEach(function(act){
+      var cfg=getActifConfig(act.label||act.nom||'');
+      if(cfg.immo)return;
+      var hh=act.horizon||cfg.h||'CT';
+      var hk=hh==='ct'||hh==='CT'?'ct':hh==='mt'||hh==='MT'?'mt':'lt';
+      if(act===arguments)return; // skip
+    });
+  });
+  // Simpler approach: iterate all inputs
+  var inputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
+  var consTot=0;
+  inputs.forEach(function(inp){consTot+=+(inp.value||0);});
+  var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
+  var reorienter=finTotal-consTot;
+
+  var cEl=document.getElementById('precoConserver');
+  var rEl=document.getElementById('precoReorienter');
+  if(cEl)cEl.textContent=fmt(consTot)+' \u20ac';
+  if(rEl)rEl.textContent=fmt(Math.max(0,reorienter))+' \u20ac';
 }
 
 
