@@ -926,7 +926,7 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-entreprise -->
 
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
-<div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
+<div id="extPanelPreconisations" class="panneau-interne" style="display:none;border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
   <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
     <div>
@@ -1068,7 +1068,7 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-synthese -->
 
 <!-- ── TIP PAGE DE GARDE (hors section-page) ── -->
-<div class="panneau-interne" style="padding:10px 14px;background:rgba(212,98,42,0.06);border:1px dashed var(--orange);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5;margin-bottom:18px">
+<div id="extPanelPagegarde" class="panneau-interne" style="display:none;padding:10px 14px;background:rgba(212,98,42,0.06);border:1px dashed var(--orange);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5;margin-bottom:18px">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:4px">⚠️ Non imprimé — visible conseiller uniquement</div>
   Pour modifier le logo, ouvrez la <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">configuration</strong>.
 </div>
@@ -1148,7 +1148,7 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-sommaire -->
 
 <!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
-<div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
+<div id="extPanelMentions" class="panneau-interne" style="display:none;background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
   <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-radius:10px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="margin-bottom:14px">
     <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
@@ -1194,7 +1194,7 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-mentions -->
 
 <!-- ── ZONE CONSEILLER AVIS (hors section-page) ── -->
-<div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
+<div id="extPanelAvis" class="panneau-interne" style="display:none;border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
   <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
     <span style="font-size:14px">&#128274;</span>
@@ -2198,6 +2198,9 @@ function goTo(sec){
   window.scrollTo(0,0);
   if(sec!=='import') renderSection(sec);
   updatePageNumbers();
+  // Afficher/masquer les panneaux conseiller selon la section active
+  var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis'};
+  Object.keys(extPanels).forEach(function(k){var el=document.getElementById(extPanels[k]);if(el)el.style.display=(k===sec)?'':'none';});
 }
 
 // ── NUMÉROTATION DYNAMIQUE DES PAGES ─────────────────────────────
