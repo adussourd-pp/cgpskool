@@ -3232,48 +3232,62 @@ function rPatrimoine(){
     return t;
   }
   function getAssetType(nom){
-    // Nomenclature exacte Excel V12 — tags par mots-clés de désignation
     var n=(nom||'').toLowerCase();
-    // Immobilier jouissance
-    if(/r[ée]sidence principale/.test(n))           return{label:'R\u00e9s. principale',  bg:'#EAF5EF',color:'#1a5e3a'};
-    if(/r[ée]sidence secondaire/.test(n))            return{label:'R\u00e9s. secondaire',  bg:'#EAF5EF',color:'#1a5e3a'};
-    // Immobilier locatif
-    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/pinel|duflot|robien|jean brun/.test(n))      return{label:'Loi fiscale',            bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCEBEB',color:'#A32D2D'};
-    if(/^foncier$|terrain|bois|\bfoncier\b.*non b[aâ]ti|bien rural|\bgfa\b|\bgfv\b|\bgff\b/i.test(n)&&!/immobilier|immo|foncier.*SCI|SCI.*foncier/i.test(n)) return{label:'Foncier',bg:'#EAF5EF',color:'#2D7A5B'};
-    // Court terme (A19-A25)
-    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A/Bleu',          bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/livret jeune/.test(n))                       return{label:'Livret Jeune',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\blep\b|livret d.[\u00e9e]pargne populaire/.test(n)) return{label:'LEP',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\bcel\b|compte [\u00e9e]pargne logement/.test(n))    return{label:'CEL',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F2F1EE',color:'#6B6B6B'};
-    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FEF9EC',color:'var(--orange-hover)'};
-    // Moyen terme (A27-A29) — PEL + Autre liquidité
-    if(/\bpel\b|plan d.[\u00e9e]pargne logement/.test(n))   return{label:'PEL',            bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'CAT',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    // Long terme (A31-A37) — AV, Capi, PEP, CTO, PEA, Autre
-    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F5EFF8',color:'#534AB7'};
-    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F5EFF8',color:'#534AB7'};
-    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    // Retraite et Salariale (A39-A44)
-    if(/\bper\b|\bperin\b/.test(n))                  return{label:'PER',                   bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/article 83/.test(n))                         return{label:'Art. 83',               bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#EDF2FB',color:'#2B5EA7'};
-    // Biens professionnels
-    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/parts de soci|sarl|sas |holding/.test(n))    return{label:'Soci\u00e9t\u00e9',    bg:'#FCEBEB',color:'#A32D2D'};
-    if(/chalet|immo/.test(n))                        return{label:'Immobilier',            bg:'#EAF5EF',color:'#2D7A5B'};
-    return{label:'Autre',bg:'#F2F1EE',color:'#6B6B6B'};
+    // ── Immobilier ──
+    if(/r[ée]sidence principale/.test(n))           return{label:'Résidence principale',  bg:'#DCEDC8',color:'#33691E'};
+    if(/r[ée]sidence secondaire/.test(n))            return{label:'Résidence secondaire',  bg:'#DCEDC8',color:'#33691E'};
+    if(/immobilier locatif|locatif/.test(n)&&!/meub/.test(n)) return{label:'Immobilier locatif',bg:'#C8E6C9',color:'#1B5E20'};
+    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#C8E6C9',color:'#1B5E20'};
+    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#C8E6C9',color:'#1B5E20'};
+    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'#FFF3E0',color:'#E65100'};
+    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'#FFF3E0',color:'#E65100'};
+    if(/pinel|duflot|robien|scellier|borloo/.test(n))return{label:'Loi fiscale',            bg:'#FFF3E0',color:'#E65100'};
+    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCE4EC',color:'#880E4F'};
+    if(/terrain|bois|\bgfa\b|\bgfv\b|\bgff\b|foncier.*non b/i.test(n)) return{label:'Foncier',bg:'#DCEDC8',color:'#33691E'};
+    // ── Court terme (épargne réglementée) ──
+    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F5F5F5',color:'#616161'};
+    if(/\blep\b|livret d.[\u00e9e]pargne pop/.test(n))return{label:'LEP',                  bg:'#FFF9C4',color:'#F57F17'};
+    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A',               bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bcel\b|compte [\u00e9e]pargne log/.test(n)) return{label:'CEL',                   bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bcsl\b|livret classique/.test(n))           return{label:'CSL',                   bg:'#FFF9C4',color:'#F57F17'};
+    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FFF9C4',color:'#F57F17'};
+    // ── Moyen terme ──
+    if(/\bpel\b|plan d.[\u00e9e]pargne log/.test(n))return{label:'PEL',                   bg:'#E8EAF6',color:'#283593'};
+    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'Compte à terme',        bg:'#E8EAF6',color:'#283593'};
+    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F3E5F5',color:'#6A1B9A'};
+    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F3E5F5',color:'#6A1B9A'};
+    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#F3E5F5',color:'#6A1B9A'};
+    // ── Valeurs mobilières ──
+    if(/\bpea\s*pme\b/.test(n))                      return{label:'PEA PME',               bg:'#E8EAF6',color:'#283593'};
+    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#E8EAF6',color:'#283593'};
+    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#E8EAF6',color:'#283593'};
+    if(/autre valeur mobili/.test(n))                return{label:'Autre val. mob.',        bg:'#E8EAF6',color:'#283593'};
+    // ── Retraite et salariale ──
+    if(/\bper\b|\bperin\b/.test(n)&&!/perco/.test(n))return{label:'PER',                   bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#E8F5E9',color:'#2E7D32'};
+    if(/article 83|art\.?\s*83/.test(n))             return{label:'Art. 83',               bg:'#E8F5E9',color:'#2E7D32'};
+    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#E8F5E9',color:'#2E7D32'};
+    // ── Investissements alternatifs ──
+    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#E0F7FA',color:'#00695C'};
+    if(/\bopci\b/.test(n))                           return{label:'OPCI',                  bg:'#E0F7FA',color:'#00695C'};
+    if(/crowdfunding|financement participat/.test(n))return{label:'Crowdfunding',           bg:'#FFF3E0',color:'#E65100'};
+    if(/crypto|bitcoin|\beth\b/.test(n))             return{label:'Crypto',                bg:'#FFF3E0',color:'#E65100'};
+    if(/capinvest|capital.investissement|fcpr|fpci|fcpi/.test(n))return{label:'Capinvest',  bg:'#FFF3E0',color:'#E65100'};
+    if(/tontine|tontinier/.test(n))                  return{label:'Tontine',               bg:'#FCE4EC',color:'#880E4F'};
+    if(/\bfip\b/.test(n))                            return{label:'FIP',                   bg:'#FFF3E0',color:'#E65100'};
+    if(/sofica/.test(n))                             return{label:'Sofica',                bg:'#FFF3E0',color:'#E65100'};
+    // ── Sociétés / pro ──
+    if(/parts de soci|sarl|sas\b|holding/.test(n))   return{label:'Société',               bg:'#FCE4EC',color:'#880E4F'};
+    if(/fonds de commerce/.test(n))                  return{label:'Fds commerce',           bg:'#FCE4EC',color:'#880E4F'};
+    if(/mat[eé]riel pro|v[eé]hicule pro/.test(n))    return{label:'Bien pro.',             bg:'#FCE4EC',color:'#880E4F'};
+    // ── Objets de valeur ──
+    if(/bijoux|m[eé]taux pr[eé]cieux|objet d.art|meuble/.test(n)) return{label:'Objet valeur',bg:'#F5F5F5',color:'#616161'};
+    // ── Fallback immo ──
+    if(/immo/.test(n))                               return{label:'Immobilier',            bg:'#DCEDC8',color:'#33691E'};
+    return{label:'Autre',bg:'#F5F5F5',color:'#616161'};
   }
 
   // ── Horizon selon nomenclature Excel V12 exacte ────────────────────
