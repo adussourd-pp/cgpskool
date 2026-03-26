@@ -5820,74 +5820,6 @@ function rMentions(){
   saveMentionsDirect();
 }
 
-function formatMentionsContent(lines){
-  var out='';
-  // Grouper les lignes en sous-blocs (ligne vide = separateur)
-  var i=0;
-  while(i<lines.length){
-    var line=lines[i];
-
-    // 1. Detecter tableau (2+ lignes consecutives avec tab et montants €)
-    if(line.indexOf('\t')>=0&&/\d/.test(line)){
-      var tableLines=[];
-      while(i<lines.length&&lines[i].indexOf('\t')>=0){tableLines.push(lines[i]);i++;}
-      if(tableLines.length>=2){
-        out+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">';
-        tableLines.forEach(function(tl,ti){
-          var cols=tl.split('\t').map(function(c){return c.trim();}).filter(Boolean);
-          if(ti===0&&!/\d/.test(cols[cols.length-1])){
-            out+='<tr style="background:var(--gris-l)">';
-            cols.forEach(function(c){out+='<td style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--gris)">'+c+'</td>';});
-            out+='</tr>';
-          } else {
-            out+='<tr style="border-bottom:1px solid var(--bord)">';
-            cols.forEach(function(c,ci){
-              var isAmount=/[\d]+.*[\u20ac€]|^\d[\d\s,.]+\s*€?$/.test(c);
-              var isZero=/^0[\s€]*$|^0\.0/.test(c.trim());
-              var display=isZero?'Non applicable':c;
-              var style=isAmount&&!isZero?'text-align:right;font-weight:700;color:var(--orange)':isZero?'text-align:right;color:var(--gris)':'color:var(--gris-f)';
-              out+='<td style="padding:8px 12px;'+style+'">'+display+'</td>';
-            });
-            out+='</tr>';
-          }
-        });
-        out+='</table>';
-        continue;
-      }
-    }
-
-    // 2. Detecter tags (tab/|| ou 3+ espaces avec 3+ items courts)
-    var items=[];
-    if(line.indexOf('\t')>=0){
-      items=line.split('\t').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-    } else if(line.indexOf('||')>=0){
-      items=line.split('||').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-    }
-    if(!items.length&&/\s{3,}/.test(line)){
-      items=line.split(/\s{3,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-    }
-    if(items.length>=3&&items.every(function(it){return it.length<50;})){
-      out+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">';
-      items.forEach(function(it){
-        out+='<span style="display:inline-block;padding:5px 14px;border:1px solid var(--bord);border-radius:20px;font-size:11px;font-weight:500;color:var(--noir);background:#fff">'+it+'</span>';
-      });
-      out+='</div>';
-      i++;continue;
-    }
-
-    // 3. Detecter sous-titre en majuscules (court, tout caps)
-    if(line===line.toUpperCase()&&line.length>3&&line.length<80&&!/\d{4}/.test(line)){
-      out+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin:12px 0 6px">'+line+'</div>';
-      i++;continue;
-    }
-
-    // 4. Texte normal
-    out+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+line+'</div>';
-    i++;
-  }
-  return out;
-}
-
 function saveMentionsDirect(){
   var input=document.getElementById('mentionsDirectInput');
   if(!input)return;
@@ -5897,62 +5829,137 @@ function saveMentionsDirect(){
   var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
   if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions l\u00e9gales ci-dessus.</em>';return;}
 
-  // En-tete auto depuis le profil
-  var p=loadProfil?loadProfil():{};
+  // Filtrer les lignes inutiles
+  raw=raw.replace(/Date et signature.*$/gim,'').replace(/PROTECTION DES DONN[\s\S]*$/gim,'').trim();
+
+  // Extraire infos consultant pour la sidebar
+  var mNom=raw.match(/(?:Par|Nom\s*\/\s*Pr[eé]nom)\s*[:\-]\s*([^\n]+)/im);
+  var mAdr=raw.match(/Adresse professionnelle\s*[:\-]\s*([^\n]+(?:\n[^\n]*\d{5}[^\n]*)?)/im);
+  var mMail=raw.match(/E-mail\s*[:\-]\s*([^\s\n]+@[^\s\n]+)/im);
+  var mOrias=raw.match(/N[°o]\s*[:\-]?\s*(\d[\d\s\-]+\d)/im);
+
   var h='<div style="font-family:var(--sans)">';
-  if(p.cabinet||p.orias||p.adresse){
-    h+='<div style="padding:16px;border:1px solid var(--bord);border-radius:8px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start">';
-    h+='<div>';
-    if(p.cabinet)h+='<div style="font-size:16px;font-weight:700;color:var(--noir)">'+p.cabinet+'</div>';
-    var infos=[];
-    if(p.adresse)infos.push(p.adresse+(p.cp?' '+p.cp:'')+(p.ville?' '+p.ville:''));
-    if(p.email)infos.push(p.email);
-    if(p.tel)infos.push(p.tel);
-    if(infos.length)h+='<div style="font-size:11px;color:var(--gris);margin-top:4px;line-height:1.6">'+infos.join(' \u00b7 ')+'</div>';
-    h+='</div>';
-    if(p.orias)h+='<div style="text-align:right"><div style="font-size:11px;color:var(--gris)">ORIAS n\u00b0 '+p.orias+'</div></div>';
+
+  // Sidebar contact card
+  var hasContact=mNom||mAdr||mMail||mOrias;
+  if(hasContact){
+    h+='<div style="background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15);border-radius:12px;padding:20px;margin-bottom:24px">';
+    if(mNom){var nm=mNom[1].trim();h+='<div style="font-weight:600;font-size:15px;color:var(--noir);margin-bottom:8px">'+nm+'</div>';}
+    if(mAdr)h+='<div style="font-size:13px;color:var(--gris-f);line-height:1.5">'+mAdr[1].trim().replace(/\n/g,', ')+'</div>';
+    if(mMail)h+='<div style="margin-top:4px"><a href="mailto:'+mMail[1]+'" style="font-size:13px;color:var(--orange);text-decoration:none">'+mMail[1]+'</a></div>';
+    if(mOrias)h+='<div style="margin-top:8px"><span style="font-size:12px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:4px 12px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
     h+='</div>';
   }
 
-  // Parser le texte en sections (double saut de ligne = nouvelle section)
-  // Filtrer les lignes inutiles
-  raw=raw.replace(/Date et signature.*$/gim,'').replace(/PROTECTION DES DONN.*$/gims,'').trim();
+  // Parser en sections (double saut de ligne)
   var blocks=raw.split(/\n\s*\n/).filter(function(b){return b.trim();});
   var sectionNum=0;
+  // Skip le premier bloc si c est l en-tete du document
+  var startIdx=0;
+  if(blocks.length>1&&/DOCUMENT D.ENTREE|Fiche d.informations|Par\s*:/i.test(blocks[0]))startIdx=1;
+  if(blocks.length>2&&/VOTRE CONSULTANT|IDENTITE/i.test(blocks[1]))startIdx=2;
 
-  blocks.forEach(function(block){
+  for(var bi=startIdx;bi<blocks.length;bi++){
+    var block=blocks[bi];
     var lines=block.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
-    if(!lines.length)return;
+    if(!lines.length)continue;
 
-    // Heuristique : si la premiere ligne est courte (<60 car) et pas de chiffre = titre de section
     var firstLine=lines[0];
-    var isTitle=firstLine.length<80&&!/\d{3}/.test(firstLine)&&lines.length>1;
-    // Ou si c est tout en majuscules
-    if(firstLine===firstLine.toUpperCase()&&firstLine.length>3)isTitle=true;
+    // Detecter titre de section
+    var isTitle=(firstLine===firstLine.toUpperCase()&&firstLine.length>3&&firstLine.length<80)
+      ||(firstLine.length<80&&!/\d{5}/.test(firstLine)&&lines.length>1&&!/:\s/.test(firstLine));
 
-    if(isTitle){
+    if(isTitle&&lines.length>1){
       sectionNum++;
-      var num=sectionNum<10?'0'+sectionNum:sectionNum;
-      h+='<div style="margin-top:'+(sectionNum>1?'24':'0')+'px;margin-bottom:16px;display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--orange);padding-bottom:8px">';
-      h+='<span style="font-family:var(--sans);font-size:22px;font-weight:300;color:var(--orange)">'+num+'</span>';
-      h+='<span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir)">'+firstLine+'</span>';
+      var num=sectionNum<10?'0'+sectionNum:''+sectionNum;
+      // Section header (style Peak Patrimoine)
+      h+='<div style="margin-top:'+(sectionNum>1?'40':'0')+'px;margin-bottom:20px;display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:2px solid rgba(212,98,42,0.2)">';
+      h+='<span style="font-family:var(--serif);font-size:28px;font-weight:600;color:rgba(212,98,42,0.3);line-height:1;min-width:36px">'+num+'</span>';
+      h+='<span style="font-family:var(--serif);font-size:20px;font-weight:600;color:var(--noir);line-height:1.2">'+firstLine+'</span>';
       h+='</div>';
-      // Reste du bloc = contenu
-      var content=formatMentionsContent(lines.slice(1));
-      if(content){
-        h+='<div style="padding:4px 0;margin-bottom:12px">';
-        h+=content;
-        h+='</div>';
+
+      // Contenu : grouper en sous-blocs par ligne vide ou sous-titre
+      var contentLines=lines.slice(1);
+      var cardLines=[];
+      var currentSubTitle='';
+
+      for(var ci=0;ci<contentLines.length;ci++){
+        var cl=contentLines[ci];
+
+        // Sous-titre en majuscules
+        if(cl===cl.toUpperCase()&&cl.length>3&&cl.length<80&&!/\d{5}/.test(cl)&&!/^\d/.test(cl)){
+          // Flush previous card
+          if(cardLines.length){
+            h+=renderMlCard(currentSubTitle,cardLines);
+            cardLines=[];
+          }
+          currentSubTitle=cl;
+          continue;
+        }
+
+        // Tags (tab/espaces multiples avec items courts)
+        var items=[];
+        if(cl.indexOf('\t')>=0)items=cl.split('\t').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+        else if(/\s{3,}/.test(cl))items=cl.split(/\s{3,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+        if(items.length>=3&&items.every(function(it){return it.length<60;})){
+          if(cardLines.length){h+=renderMlCard(currentSubTitle,cardLines);cardLines=[];currentSubTitle='';}
+          h+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0">';
+          items.forEach(function(it){
+            h+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+it+'</span>';
+          });
+          h+='</div>';
+          continue;
+        }
+
+        // Table row (tab with amounts)
+        if(cl.indexOf('\t')>=0&&/\d/.test(cl)){
+          var tRows=[cl];
+          while(ci+1<contentLines.length&&contentLines[ci+1].indexOf('\t')>=0){ci++;tRows.push(contentLines[ci]);}
+          if(cardLines.length){h+=renderMlCard(currentSubTitle,cardLines);cardLines=[];currentSubTitle='';}
+          h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
+          tRows.forEach(function(tr,ti){
+            var cols=tr.split('\t').map(function(c){return c.trim();}).filter(Boolean);
+            if(ti===0&&cols.length>=2&&!/\d/.test(cols[cols.length-1])){
+              h+='<tr><th style="background:var(--gris-l);padding:10px 14px;text-align:left;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">'+cols[0]+'</th><th style="background:var(--gris-l);padding:10px 14px;text-align:right;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">'+cols.slice(1).join('</th><th style="background:var(--gris-l);padding:10px 14px;text-align:right;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">')+'</th></tr>';
+            } else {
+              h+='<tr>';
+              cols.forEach(function(c,ci2){
+                var isAmt=/[\d]+.*€|^\d[\d\s,.]+/.test(c);
+                var isZero=/^0[\s€]*$|^0\.0/.test(c.trim());
+                h+='<td style="padding:10px 14px;border-bottom:1px solid var(--bord);'+(isAmt&&!isZero?'font-weight:600;color:var(--orange);text-align:right':isZero?'color:var(--gris);text-align:right':'color:var(--noir)')+(ci2===0?'':'')+'">'+( isZero?'Non applicable':c)+'</td>';
+              });
+              h+='</tr>';
+            }
+          });
+          h+='</table>';
+          continue;
+        }
+
+        cardLines.push(cl);
       }
+      // Flush remaining
+      if(cardLines.length)h+=renderMlCard(currentSubTitle,cardLines);
     } else {
-      h+='<div style="padding:4px 0;margin-bottom:12px">';
-      h+=formatMentionsContent(lines);
-      h+='</div>';
+      // Bloc sans titre
+      h+=renderMlCard('',lines);
     }
-  });
+  }
 
   h+='</div>';
   mel.innerHTML=h;
+}
+
+function renderMlCard(subtitle,lines){
+  if(!lines.length)return'';
+  var c='<div style="background:#fff;border:1px solid var(--bord);border-radius:12px;padding:20px 22px;margin-bottom:12px'+(subtitle?';border-left:3px solid var(--orange)':'')+'">';
+  if(subtitle)c+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:10px">'+subtitle+'</div>';
+  lines.forEach(function(l){
+    // Bold key words
+    l=l.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.75;margin:0 0 8px">'+l+'</p>';
+  });
+  c+='</div>';
+  return c;
 }
 
 // ══════════════════════════════════════════════════════════════
