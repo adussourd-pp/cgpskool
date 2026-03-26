@@ -615,7 +615,7 @@ select.span2{grid-column:span 2}
 
       <!-- Réinitialiser -->
       <div style="margin-top:14px;text-align:right">
-        <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()" style="font-size:11px;border-color:var(--red);color:var(--red)" onmouseover="this.style.background='var(--red-l)'" onmouseout="this.style.background='transparent'">&#8635; Réinitialiser l'étude</button>
+        <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()">Réinitialiser</button>
       </div>
     </div>
 
@@ -626,8 +626,8 @@ select.span2{grid-column:span 2}
           <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
           <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
         </div>
-        <label id="avisDropzone" style="display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#fff;color:var(--blue);border:1.5px solid var(--blue);font-family:var(--sans);font-weight:700;font-size:14px;border-radius:9px;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:16px" onmouseover="this.style.background='var(--blue-l)'" onmouseout="this.style.background='#fff'" ondragover="event.preventDefault();this.style.background='var(--blue-l)'" ondragleave="this.style.background='#fff'" ondrop="handleAvisDrop(event)">
-          &#8599; Importer
+        <label id="avisDropzone" class="btn btn-primary" style="cursor:pointer;flex-shrink:0;margin-left:16px" ondragover="event.preventDefault()" ondrop="handleAvisDrop(event)">
+          &#9654; Importer PDF
           <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
         </label>
       </div>
