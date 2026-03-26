@@ -159,6 +159,8 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 - **R1** : Pas de quotes autour de font-family dans les strings JS
 - **R2** : Pas de `\xa0` (espace insécable) dans le code
+- **R2b** : **JAMAIS de curly/smart quotes** (`'` `'` `"` `"`) dans le code. Toujours utiliser les apostrophes droites (`'` `"`). Après chaque Edit, vérifier avec : `grep -Pn $'\xe2\x80\x99|\xe2\x80\x98' etude-dossier.html`
+- **R2c** : **Vérifier la syntaxe JS** après chaque modification : extraire le bloc `<script>` et lancer `node --check`. Commande : `sed -n '2124,6790p' etude-dossier.html > /tmp/check.js && node --check /tmp/check.js`
 - **R3** : Pas de doublon de variable
 - **R4** : Revenus stockés ANNUELS, `revMens()` divise par 12
 - **R7** : Clés internes sans accent (`synthese` pas `synthèse`)
