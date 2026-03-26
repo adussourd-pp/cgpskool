@@ -1528,7 +1528,6 @@ var SOLUTIONS_CONFIG = {
     objectifs:['Reorganiser votre patrimoine','Optimiser vos placements','Creer patrimoine immobilier','Diversifier votre patrimoine','Optimiser votre patrimoine','Optimiser votre transmission','Preparer votre retraite'],
   },
   'PINEL': {
-    label:'Immobilier d\u00e9fiscalisant', levier:'Financement',
     horizon:'25 ans', horizonAns:25, rendement:0.04,
     texte:"Se constituer un patrimoine dans l'immobilier d'environ {capital} et generateur de revenus complementaires d'environ {revenus}/mois, dans {horizon} ans.",
     objectifs:['Creer patrimoine immobilier','Optimiser votre fiscalite','Proteger votre conjoint','Proteger vos enfants','Preparer votre retraite'],
@@ -4159,9 +4158,6 @@ var COPERNIC = {
   'Jeanbrun':               {cat:'immobilier',   levier:'financement',icon:'&#127968;',
     desc:'Amortissement annuel 3,5 \u00e0 5,5 % imputable sur revenu global \u2014 successeur du Pinel (Loi n\u00b02026-103)',
     fiscal:'Amortissement imputable sur revenu global',sri:'3-5',horizon:'9 ans',horizonAns:9},
-  'Immobilier d\u00e9fiscalisant': {cat:'immobilier',levier:'financement',icon:'&#127968;',
-    desc:'Dispositifs de d\u00e9fiscalisation immobili\u00e8re : r\u00e9duction IR en contrepartie d\'un engagement de location',
-    fiscal:'R\u00e9duction IR plafonn\u00e9e niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
 
   // ─── ÉPARGNE RETRAITE ──────────────────────────────────────────
 
@@ -4213,7 +4209,7 @@ var COPERNIC = {
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
+  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
@@ -4221,7 +4217,7 @@ var OBJ_SOLUTIONS = {
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
   'Investir via le financement':        ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Jeanbrun'],
-  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','Jeanbrun']
+  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','SCPI de rendement','Jeanbrun']
 };
 var solsSelectionnees=[];
 
@@ -4631,6 +4627,12 @@ function renderSolsRetenues(){
     html+='</div></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);line-height:1.5;margin-bottom:10px">'+cp.desc+'</div>';
 
+    // Libellé PDF éditable
+    var defLabel=clientLabel(grp.produit);
+    var curLabel=firstSol._labelPDF||defLabel;
+    html+='<div style="margin-bottom:10px"><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Libell\u00e9 PDF</label>';
+    html+='<input type="text" value="'+curLabel.replace(/"/g,'&quot;')+'" onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_labelPDF\',this.value);renderFichesClient()" style="width:100%;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;color:var(--noir);background:var(--gris-l);outline:none"></div>';
+
     // Objectifs (shared across group, use first sol's objectifsValides)
     var solObjs=allSolsMap&&allSolsMap[grp.produit]?allSolsMap[grp.produit].objectifs:[];
     if(solObjs.length){
@@ -4661,7 +4663,6 @@ function renderSolsRetenues(){
       'Nue-propri\u00e9t\u00e9 immo':['V\u00e9rifier la solidit\u00e9 du bailleur social (usufruitier)','Anticiper la r\u00e9cup\u00e9ration de la pleine propri\u00e9t\u00e9','Pas de revenus pendant la dur\u00e9e \u2014 v\u00e9rifier la coh\u00e9rence','Int\u00e9ressant pour r\u00e9duire l\'assiette IFI'],
       'LLI':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 TVA r\u00e9duite (zone et op\u00e9rateur agr\u00e9\u00e9)','Envisager la SCI \u00e0 l\'IS pour optimiser l\'amortissement','V\u00e9rifier les plafonds de loyers applicables','Anticiper la fiscalit\u00e9 des revenus selon structure'],
       'Jeanbrun':['V\u00e9rifier que le bien est un immeuble collectif (appartement)','Confirmer le DPE A ou B (neuf RE2020 obligatoire)','V\u00e9rifier les plafonds de loyers par zone','V\u00e9rifier les ressources du locataire','D\u00e9crets d\'application en cours \u2014 confirmer avec conseiller fiscal'],
-      'Immobilier d\u00e9fiscalisant':['Identifier le dispositif applicable','V\u00e9rifier le plafond niches fiscales restant','Anticiper la fiscalit\u00e9 des revenus g\u00e9n\u00e9r\u00e9s','Faire valider le montage par un conseiller fiscal'],
       'SCPI via SCI \u00e0 l\'IS':['V\u00e9rifier l\'objet social de la SCI','Anticiper la double imposition \u00e0 la sortie (IS + IR dividendes)','Faire \u00e9tablir les statuts par un juriste','Inscrire les parts au bilan de la SCI'],
       'SCPI en usufruit':['Identifier le nu-propri\u00e9taire en parall\u00e8le','V\u00e9rifier la convention d\'usufruit','Anticiper la fiscalit\u00e9 IS sur les revenus per\u00e7us','Dur\u00e9e \u00e0 adapter aux besoins de tr\u00e9sorerie'],
       'Pr\u00e9voyance individuelle':['Faire \u00e9tablir plusieurs devis comparatifs','V\u00e9rifier les exclusions de garantie','Adapter le d\u00e9lai de franchise \u00e0 la tr\u00e9sorerie','R\u00e9viser annuellement selon \u00e9volution des revenus'],
@@ -5348,7 +5349,6 @@ function renderFichesClient(){
     'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
     'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
     'Jeanbrun':'R\u00e9duire votre revenu imposable gr\u00e2ce \u00e0 un investissement locatif neuf',
-    'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
     'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
     'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
     'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
@@ -5411,7 +5411,7 @@ function renderFichesClient(){
       html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05)">';
       html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(firstSol.etape||'?')+'</div>';
-      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+clientLabel(pg.produit)+'</div>';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+(firstSol._labelPDF||clientLabel(pg.produit))+'</div>';
       html+='</div>';
       if(objsV.length){
         html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
