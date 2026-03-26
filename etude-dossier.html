@@ -3354,15 +3354,6 @@ function rFiscal(){
   const tot=(f.irnet||0)+(f.ps||0);
   set('fiTotal',tot?fmt(tot)+' €':'0 €');
 
-  const lb=document.getElementById('levierBox');
-  const lt=document.getElementById('levierText');
-  if(tot>=3000){
-    lb.style.background='var(--green-l)';lb.style.borderColor='rgba(45,122,91,0.2)';
-    lt.innerHTML=`<strong style="color:var(--green)">✅ Levier fiscal disponible</strong><br>Avec <strong>${fmt(tot)} €</strong> d'impôts, des solutions d'économie fiscale peuvent être mobilisées : PER, FCPI/FIP, déductions spécifiques.`;
-  }else{
-    lb.style.background='var(--ambre-l)';lb.style.borderColor='var(--ambre-m)';
-    lt.innerHTML=`<strong style="color:var(--ambre-d)">💡 Levier fiscal limité</strong><br>Imposition de <strong>${fmt(tot)} €</strong>. Les préconisations prioritaires seront orientées vers la capitalisation et le financement.`;
-  }
   // Levier impot badge
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
   var levierFiscal = tot>=3000;
