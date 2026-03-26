@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Plan — CGP Skool</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+
+/* ── Hero ── */
+.page-hero { background: var(--bg); padding: 36px 52px 40px; position: relative; overflow: hidden; }
+.page-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 80% 50%, rgba(212,98,42,0.06) 0%, transparent 60%),
+    linear-gradient(var(--rule-d) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule-d) 1px, transparent 1px);
+  background-size: 100% 100%, 80px 80px, 80px 80px;
+  pointer-events: none;
+}
+.hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(212,98,42,0.12); border: 1px solid rgba(212,98,42,0.25);
+  padding: 4px 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--orange); margin-bottom: 12px;
+}
+
+/* ── Layout ── */
+.bp-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 240px); }
+
+/* ── Sidebar ── */
+.panel-left { background: var(--paper-2); border-right: 1px solid var(--rule-l); padding: 24px 20px 40px; overflow-y: auto; }
+.ps { margin-bottom: 20px; }
+.ps-title { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 7px; }
+.ps-title span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+.pr { margin-bottom: 10px; }
+.pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+.pl small { font-size: 9px; color: var(--ink-30); }
+.iu { display: flex; border: 1px solid var(--rule-l); background: #fff; transition: border-color 0.2s; }
+.iu:focus-within { border-color: var(--orange); }
+.iu input { flex: 1; padding: 7px 10px; border: none; background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink); outline: none; min-width: 0; }
+.iu-u { padding: 0 10px; display: flex; align-items: center; font-size: 11px; font-weight: 600; color: var(--ink-30); background: var(--paper); border-left: 1px solid var(--rule-l); flex-shrink: 0; white-space: nowrap; }
+
+.btn-calc { width: 100%; padding: 12px; background: var(--orange); color: #fff; font-family: var(--sans); font-size: 13px; font-weight: 500; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(212,98,42,0.28); transition: background 0.2s; margin-top: 8px; }
+.btn-calc:hover { background: var(--orange-hover); }
+
+/* Note Prodémial */
+.pmr-note { background: var(--o-dim); border: 1px solid rgba(212,98,42,0.2); padding: 12px 14px; margin-bottom: 16px; font-size: 11px; line-height: 1.7; color: var(--ink-60); }
+.pmr-note strong { color: var(--orange); }
+
+/* ── Résultats ── */
+.panel-right { background: var(--paper); padding: 24px 28px 48px; overflow-y: auto; }
+
+/* Timeline progression */
+.timeline { margin-bottom: 24px; }
+.tl-header { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 14px; }
+.tl-track { position: relative; padding-left: 20px; }
+.tl-track::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 0; width: 1px; background: var(--rule-l); }
+.tl-year { position: relative; margin-bottom: 0; }
+.tl-year::before { content: ''; position: absolute; left: -15px; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--paper-2); border: 2px solid var(--rule-l); }
+.tl-year.active::before { background: var(--orange); border-color: var(--orange); }
+.tl-year.manager::before { background: var(--ink); border-color: var(--ink); }
+
+/* KPI barres */
+.kpi-bar-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule-l); }
+.kpi-bar-row:last-child { border-bottom: none; }
+.kpi-bar-lbl { font-size: 11px; color: var(--ink-60); width: 120px; flex-shrink: 0; }
+.kpi-bar-val { font-size: 12px; font-weight: 700; color: var(--ink); width: 90px; flex-shrink: 0; text-align: right; }
+.kpi-bar-track { flex: 1; height: 6px; background: var(--paper-2); border-radius: 0; overflow: hidden; }
+.kpi-bar-fill { height: 100%; background: var(--orange); transition: width 0.6s; }
+.kpi-bar-fill.green { background: #1a7a4a; }
+.kpi-bar-fill.blue { background: #2563eb; }
+
+/* Section titre */
+.section-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-30); margin: 22px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 8px; }
+.section-lbl span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+
+/* Cards qualif */
+.qual-row { display: flex; gap: 3px; margin-bottom: 16px; flex-wrap: wrap; }
+.qual-card { flex: 1; min-width: 100px; background: #fff; border: 1px solid var(--rule-l); padding: 12px 14px; position: relative; overflow: hidden; }
+.qual-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--kc, var(--rule-l)); }
+.qual-card.reached::before { background: var(--orange); }
+.qual-card.reached { border-color: rgba(212,98,42,0.2); }
+.qual-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 6px; }
+.qual-val { font-family: var(--serif); font-size: 16px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); line-height: 1.1; }
+.qual-sub { font-size: 10px; color: var(--ink-30); margin-top: 2px; }
+.qual-badge { display: inline-block; font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; margin-top: 4px; }
+.qual-badge.oui { background: rgba(26,122,74,0.12); color: #1a7a4a; }
+.qual-badge.non { background: var(--paper-2); color: var(--ink-30); }
+
+/* Tableau 5 ans */
+.tbl-block { background: #fff; border: 1px solid var(--rule-l); overflow: hidden; margin-bottom: 16px; }
+.tbl-block-header { padding: 12px 16px; border-bottom: 1px solid var(--rule-l); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+table th { background: var(--ink); color: #fff; padding: 8px 12px; text-align: right; font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; }
+table th:first-child { text-align: left; }
+table td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--rule-l); color: var(--ink-60); }
+table td:first-child { text-align: left; font-weight: 600; color: var(--ink); font-size: 10px; }
+table td.o { color: var(--orange); font-weight: 700; }
+table td.g { color: #1a7a4a; font-weight: 700; }
+table td.muted { color: var(--ink-30); }
+table tr.subtotal td { background: var(--paper); font-style: italic; }
+table tr.total td { background: var(--ink); color: #fff; font-weight: 700; border-bottom: none; }
+table tr.total td.o { color: var(--orange-lt); }
+table tr:hover td { background: var(--paper); }
+
+/* Chart */
+.chart-block { background: #fff; border: 1px solid var(--rule-l); padding: 18px 20px; margin-bottom: 16px; }
+.chart-title { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 14px; }
+
+/* Empty */
+.empty-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 420px; text-align: center; gap: 10px; }
+.empty-title { font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); }
+.empty-sub { font-size: 13px; color: var(--ink-60); font-weight: 300; max-width: 280px; line-height: 1.8; }
+
+.sim-note { font-size: 10.5px; color: var(--ink-30); border-top: 1px solid var(--rule-l); padding-top: 12px; margin-top: 20px; line-height: 1.7; }
+
+@media (max-width: 900px) {
+  .bp-layout { grid-template-columns: 1fr; }
+  .qual-row { grid-template-columns: 1fr 1fr; }
+  .panel-left { border-right: none; border-bottom: 1px solid var(--rule-l); }
+  .page-hero { padding: 28px 20px; }
+  .panel-left, .panel-right { padding: 16px; }
+  .hero-inner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">📈 Développement réseau</div>
+      <h1 class="cs-h1 light" style="font-size:clamp(22px,2.6vw,36px);margin-bottom:6px">Business Plan <em>à 5 ans</em></h1>
+      <p style="font-size:13px;font-weight:300;color:var(--fog);max-width:500px;line-height:1.7">Projetez votre progression dans le réseau Prodémial — qualifications, CA, organisation, commissions.</p>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <div style="text-align:right">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Passage Manager</div>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:400;color:var(--orange-lt)">~18 mois</div>
+        <div style="font-size:10px;color:var(--fog-2)">~27 clients en moyenne</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">TPC cible</div>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:400;color:var(--orange-lt)">5% → 8%</div>
+        <div style="font-size:10px;color:var(--fog-2)">Consultant → Galaxie</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bp-layout">
+
+  <!-- Sidebar -->
+  <div class="panel-left">
+
+    <div class="pmr-note">
+      Basé sur le <strong>Plan Marketing de Rémunération (PMR) Prodémial</strong>. Commission de vente = VA × TPC × PV. Passage Manager moyen en 18 mois avec ~27 clients.
+    </div>
+
+    <div class="ps">
+      <div class="ps-title"><span></span>Votre activité personnelle</div>
+      <div class="pr"><div class="pl">VA perso An 0 <small>(base)</small></div>
+        <div class="iu"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="pr"><div class="pl">Croissance VA perso / an</div>
+        <div class="iu"><input type="number" id="croissVA" value="25" step="5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
+      <div class="pr"><div class="pl">PV moyen (Point Valeur)</div>
+        <div class="iu"><input type="number" id="pvPerso" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-title"><span></span>Organisation — Niveau 1</div>
+      <div class="pr"><div class="pl">Consultants inscrits/an <small>(moyenne)</small></div>
+        <div class="iu"><input type="number" id="inscNiv1" value="2" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
+      <div class="pr"><div class="pl">Taux d'actifs</div>
+        <div class="iu"><input type="number" id="tauxActifs" value="62" step="5" oninput="recalc()"><div class="iu-u">%</div></div></div>
+      <div class="pr"><div class="pl">VA moyenne / actif niv.1</div>
+        <div class="iu"><input type="number" id="vaNiv1" value="250000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="pr"><div class="pl">PV moyen équipe niv.1</div>
+        <div class="iu"><input type="number" id="pvNiv1" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-title"><span></span>Organisation — Niveaux 2+</div>
+      <div class="pr"><div class="pl">Consultants inscrits niv.2+ / an</div>
+        <div class="iu"><input type="number" id="inscNiv2" value="1" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
+      <div class="pr"><div class="pl">VA moyenne / actif niv.2+</div>
+        <div class="iu"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="pr"><div class="pl">PV moyen équipe niv.2+</div>
+        <div class="iu"><input type="number" id="pvNiv2" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-title"><span></span>Hypothèses PMR</div>
+      <div class="pr"><div class="pl">Mois passage Manager <small>(depuis signature)</small></div>
+        <div class="iu"><input type="number" id="moisManager" value="18" step="3" oninput="recalc()"><div class="iu-u">mois</div></div></div>
+      <div class="pr"><div class="pl">Commission récurrente (encours UC)</div>
+        <div class="iu"><input type="number" id="tauxRec" value="0.4" step="0.1" oninput="recalc()"><div class="iu-u">%</div></div></div>
+      <div class="pr"><div class="pl">Encours moyen / client</div>
+        <div class="iu"><input type="number" id="encoursClient" value="50000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+    </div>
+
+    <button class="btn-calc" onclick="recalc()">Calculer mon business plan →</button>
+  </div>
+
+  <!-- Résultats -->
+  <div class="panel-right">
+    <div class="empty-panel" id="emptyPanel">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="opacity:0.15">
+        <path d="M8 44 L8 20 L16 20 L16 44" stroke="#181614" stroke-width="1.5" fill="none"/>
+        <path d="M22 44 L22 12 L30 12 L30 44" stroke="#D4622A" stroke-width="1.5" fill="none"/>
+        <path d="M36 44 L36 4 L44 4 L44 44" stroke="#181614" stroke-width="1.5" fill="none"/>
+        <line x1="4" y1="44" x2="48" y2="44" stroke="#181614" stroke-width="1.5"/>
+        <polyline points="8,38 22,28 36,18 44,10" stroke="#D4622A" stroke-width="1.2" fill="none" stroke-dasharray="3,2"/>
+      </svg>
+      <div class="empty-title">Business Plan Prodémial</div>
+      <div class="empty-sub">Renseignez vos objectifs et lancez la projection sur 5 ans.</div>
+    </div>
+
+    <div id="results" style="display:none">
+
+      <!-- Qualifications atteintes -->
+      <div class="section-lbl"><span></span>Qualifications & TPC projetés</div>
+      <div class="qual-row" id="qualRow"></div>
+
+      <!-- Graphique CA -->
+      <div class="chart-block">
+        <div class="chart-title">Évolution du CA sur 5 ans</div>
+        <div style="height:220px;position:relative"><canvas id="caChart"></canvas></div>
+      </div>
+
+      <!-- Tableau principal -->
+      <div class="section-lbl"><span></span>Projection détaillée an par an</div>
+      <div class="tbl-block">
+        <div class="tbl-block-header">Business plan — Prodémial PMR</div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr id="tblHead"></tr></thead>
+            <tbody id="tblBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KPIs barres organisation -->
+      <div class="section-lbl"><span></span>Croissance de l'organisation</div>
+      <div class="tbl-block" style="padding:16px 20px">
+        <div id="orgBars"></div>
+      </div>
+
+      <!-- Commissions récurrentes -->
+      <div class="section-lbl"><span></span>Commissions récurrentes (encours)</div>
+      <div class="chart-block">
+        <div class="chart-title">Encours cumulé & commission récurrente annuelle estimée</div>
+        <div style="height:180px;position:relative"><canvas id="encChart"></canvas></div>
+      </div>
+
+      <div class="sim-note" id="simNote"></div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);padding:28px 52px;display:flex;align-items:center;justify-content:space-between">
+  <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div style="width:26px;height:26px;border:1px solid rgba(212,98,42,0.38);display:flex;align-items:center;justify-content:center">
+      <span style="font-family:var(--serif);font-size:12px;color:var(--orange);line-height:1">C</span>
+    </div>
+    <span style="font-size:10.5px;color:rgba(255,255,255,0.25);letter-spacing:0.2em;text-transform:uppercase">CGP Skool</span>
+  </a>
+  <span style="font-size:11px;color:rgba(255,255,255,0.16)">© 2025 — Outil interne réservé aux consultants du réseau</span>
+</footer>
+
+<script>
+var caChartInst = null, encChartInst = null;
+
+function gv(id,def) { var el=document.getElementById(id); return el?(parseFloat(el.value)||0):(def||0); }
+function fmt(n) { return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(n)); }
+function fmtE(n) { return fmt(n)+' €'; }
+function fmtPct(n,d) { return n.toFixed(d||1)+' %'; }
+function setHTML(id,v) { var el=document.getElementById(id); if(el) el.innerHTML=v; }
+function show(id) { var el=document.getElementById(id); if(el) el.style.display=''; }
+function hide(id) { var el=document.getElementById(id); if(el) el.style.display='none'; }
+
+// PMR : TPC selon qualification
+function getTPC(vaOrga, branchesActives) {
+  if(branchesActives >= 4) return 0.08;
+  if(branchesActives === 3) return 0.075;
+  if(branchesActives === 2) return 0.07;
+  if(branchesActives === 1) return 0.065;
+  if(vaOrga >= 50000) return 0.06; // Manager
+  return 0.05;
+}
+
+// Estimation branches actives (branche = filleul Manager avec >500k VA)
+function getBranchesActives(consultantsNiv1Actifs, vaNiv1) {
+  // On estime qu'une branche sur 3 actifs atteint le seuil Manager
+  var managersEstimes = Math.floor(consultantsNiv1Actifs / 3);
+  return Math.min(managersEstimes, 4);
+}
+
+function getQualif(tpc, branchesActives) {
+  if(branchesActives >= 4) return 'Manager Galaxie';
+  if(branchesActives === 3) return 'Manager Constellation';
+  if(branchesActives === 2) return 'Manager Étoile';
+  if(branchesActives === 1) return 'Manager Planète';
+  if(tpc >= 0.06) return 'Manager';
+  return 'Consultant';
+}
+
+function recalc() {
+  var va0         = gv('va0', 500000);
+  var croissVA    = gv('croissVA', 25) / 100;
+  var pvPerso     = gv('pvPerso', 0.4);
+  var inscNiv1    = gv('inscNiv1', 2);
+  var tauxActifs  = gv('tauxActifs', 62) / 100;
+  var vaNiv1      = gv('vaNiv1', 250000);
+  var pvNiv1      = gv('pvNiv1', 0.4);
+  var inscNiv2    = gv('inscNiv2', 1);
+  var vaNiv2      = gv('vaNiv2', 100000);
+  var pvNiv2      = gv('pvNiv2', 0.4);
+  var moisManager = gv('moisManager', 18);
+  var tauxRec     = gv('tauxRec', 0.4) / 100;
+  var encoursClient = gv('encoursClient', 50000);
+
+  // Année Manager (an 0 = inscription)
+  var anManager = moisManager <= 12 ? 0 : moisManager <= 24 ? 1 : moisManager <= 36 ? 2 : 3;
+
+  var rows = [];
+  var totalInscNiv1 = 0, totalInscNiv2 = 0;
+  var totalActifsNiv1 = 0, totalActifsNiv2 = 0;
+  var encoursCumule = 0;
+
+  for(var an = 0; an <= 5; an++) {
+    var vaPerso = va0 * Math.pow(1 + croissVA, an);
+
+    // Equipe niv 1
+    totalInscNiv1 += (an === 0 ? 1 : inscNiv1);
+    totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
+    var vaEquipeNiv1 = totalActifsNiv1 * vaNiv1;
+
+    // Equipe niv 2+
+    totalInscNiv2 += (an === 0 ? 0 : inscNiv2);
+    totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
+    var vaEquipeNiv2 = totalActifsNiv2 * vaNiv2;
+
+    var vaOrga = vaPerso + vaEquipeNiv1 + vaEquipeNiv2;
+
+    // Qualification
+    var branchesActives = an >= anManager ? getBranchesActives(totalActifsNiv1, vaNiv1) : 0;
+    var tpc = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
+    var qualif = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
+
+    // CA perso : VA × TPC × PV
+    var caPerso = vaPerso * tpc * pvPerso;
+
+    // Commission démarrage niv1 (Manager) = 2% × VA équipe niv1 × PV
+    var comDemarrage = (an >= anManager) ? vaEquipeNiv1 * 0.02 * pvNiv1 : 0;
+
+    // Commission expansion niv1 (si branche active) = 1% × VA filleuls managers
+    var comExpansion = branchesActives > 0 ? vaEquipeNiv1 * 0.5 * 0.01 * pvNiv1 : 0;
+
+    // Commission développement niv2+ = 0.5% × VA équipe niv2
+    var comDevelop = branchesActives > 0 ? vaEquipeNiv2 * 0.005 * pvNiv2 : 0;
+
+    var caTotal = caPerso + comDemarrage + comExpansion + comDevelop;
+
+    // Encours et commission récurrente (AV/PER)
+    var nbClientsAn = Math.round(vaPerso / 200000 * 5); // ~5 nouveaux clients par 200k VA
+    encoursCumule += nbClientsAn * encoursClient;
+    var comRec = encoursCumule > 50000 ? encoursCumule * tauxRec : 0;
+
+    rows.push({ an, vaPerso, vaEquipeNiv1, vaEquipeNiv2, vaOrga,
+      totalInscNiv1, totalActifsNiv1, totalInscNiv2, totalActifsNiv2,
+      caPerso, comDemarrage, comExpansion, comDevelop, caTotal,
+      tpc, qualif, branchesActives, encoursCumule, comRec });
+  }
+
+  // ── Affichage ──
+  hide('emptyPanel'); show('results');
+
+  // Qualifications
+  var qualifs = [
+    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:-1, c:'var(--rule-l)' },
+    { lbl:'Manager', tpc:'6%', seuil:'VA orga 50k€', annee:-1, c:'#181614' },
+    { lbl:'Manager Planète', tpc:'6,5%', seuil:'1 branche active', annee:-1, c:'#6366f1' },
+    { lbl:'Manager Étoile', tpc:'7%', seuil:'2 branches actives', annee:-1, c:'#2563eb' },
+    { lbl:'Manager Galaxie', tpc:'8%', seuil:'4 branches actives', annee:-1, c:'var(--orange)' },
+  ];
+  // Chercher l'année où chaque qualification est atteinte
+  var qualifOrder = ['Consultant','Manager','Manager Planète','Manager Étoile','Manager Constellation','Manager Galaxie'];
+  rows.forEach(function(r) {
+    if(r.qualif === 'Manager' && qualifs[1].annee < 0) qualifs[1].annee = r.an;
+    if(r.qualif === 'Manager Planète' && qualifs[2].annee < 0) qualifs[2].annee = r.an;
+    if(r.qualif === 'Manager Étoile' && qualifs[3].annee < 0) qualifs[3].annee = r.an;
+    if(r.qualif === 'Manager Galaxie' && qualifs[4].annee < 0) qualifs[4].annee = r.an;
+  });
+  // Consultant toujours an 0
+  qualifs[0].annee = 0;
+
+  setHTML('qualRow', qualifs.map(q => {
+    var reached = q.annee >= 0;
+    return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
+      +'<div class="qual-lbl">'+q.lbl+'</div>'
+      +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'">'+q.tpc+'</div>'
+      +'<div class="qual-sub">'+q.seuil+'</div>'
+      +(reached?'<span class="qual-badge oui">An '+q.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
+      +'</div>';
+  }).join(''));
+
+  // Tableau
+  var headers = '<th>Indicateur</th>' + rows.map(function(r) {
+    var isManager = r.qualif !== 'Consultant';
+    return '<th style="'+(isManager?'background:var(--orange)':'')+'">An '+r.an+(isManager?'<br><span style="font-size:8px;opacity:0.8">'+r.qualif+'</span>':'')+'</th>';
+  }).join('');
+  setHTML('tblHead', headers);
+
+  function tblRow(lbl, vals, cls, sub) {
+    return '<tr class="'+(sub?'subtotal':'')+'"><td>'+lbl+'</td>'+vals.map(function(v){ return '<td class="'+(cls||'')+'">' + v + '</td>'; }).join('')+'</tr>';
+  }
+  var tbody = '';
+  tbody += tblRow('VA personnelle', rows.map(r=>fmtE(r.vaPerso)));
+  tbody += tblRow('TPC', rows.map(r=>(r.tpc*100).toFixed(1)+'%'), 'o');
+  tbody += tblRow('CA personnel', rows.map(r=>fmtE(r.caPerso)), 'g');
+  tbody += tblRow('── Consultants inscrits niv.1', rows.map(r=>r.totalInscNiv1), '', true);
+  tbody += tblRow('── Consultants actifs niv.1', rows.map(r=>r.totalActifsNiv1), '', true);
+  tbody += tblRow('VA équipe niv.1', rows.map(r=>fmtE(r.vaEquipeNiv1)));
+  tbody += tblRow('Com. Démarrage (2%)', rows.map(r=>r.comDemarrage>0?fmtE(r.comDemarrage):'—'), '');
+  tbody += tblRow('Com. Expansion (1%)', rows.map(r=>r.comExpansion>0?fmtE(r.comExpansion):'—'), '');
+  tbody += tblRow('── Consultants inscrits niv.2+', rows.map(r=>r.totalInscNiv2), '', true);
+  tbody += tblRow('── Consultants actifs niv.2+', rows.map(r=>r.totalActifsNiv2), '', true);
+  tbody += tblRow('VA équipe niv.2+', rows.map(r=>fmtE(r.vaEquipeNiv2)));
+  tbody += tblRow('Com. Développement (0,5%)', rows.map(r=>r.comDevelop>0?fmtE(r.comDevelop):'—'), '');
+  tbody += '<tr class="total"><td>CA TOTAL</td>'+rows.map(r=>'<td class="o">'+fmtE(r.caTotal)+'</td>').join('')+'</tr>';
+  tbody += tblRow('Encours cumulé', rows.map(r=>fmtE(r.encoursCumule)));
+  tbody += tblRow('Com. récurrente (~'+fmtPct(gv('tauxRec',0.4),1)+'%)', rows.map(r=>r.comRec>0?fmtE(r.comRec):'—'), 'g');
+  setHTML('tblBody', tbody);
+
+  // Graphique CA
+  if(caChartInst) caChartInst.destroy();
+  caChartInst = new Chart(document.getElementById('caChart'), {
+    type: 'bar',
+    data: {
+      labels: rows.map(r=>'An '+r.an),
+      datasets: [
+        { label: 'CA Personnel', data: rows.map(r=>Math.round(r.caPerso)), backgroundColor:'rgba(212,98,42,0.8)', stack:'a' },
+        { label: 'Com. Démarrage', data: rows.map(r=>Math.round(r.comDemarrage)), backgroundColor:'rgba(24,22,20,0.5)', stack:'a' },
+        { label: 'Com. Expansion', data: rows.map(r=>Math.round(r.comExpansion)), backgroundColor:'rgba(24,22,20,0.3)', stack:'a' },
+        { label: 'Com. Développement', data: rows.map(r=>Math.round(r.comDevelop)), backgroundColor:'rgba(24,22,20,0.15)', stack:'a' },
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top',labels:{font:{family:'Inter',size:10},padding:12}},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}} },
+      scales:{ x:{stacked:true,grid:{display:false},ticks:{font:{family:'Inter',size:10}}},
+        y:{stacked:true,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:10},callback:v=>fmt(v)+'€'}} }
+    }
+  });
+
+  // KPIs organisation
+  var maxOrga = Math.max(...rows.map(r=>r.totalInscNiv1+r.totalInscNiv2));
+  setHTML('orgBars', rows.slice(1).map(function(r) {
+    var total = r.totalInscNiv1 + r.totalInscNiv2;
+    var actifs = r.totalActifsNiv1 + r.totalActifsNiv2;
+    return '<div class="kpi-bar-row">'
+      +'<div class="kpi-bar-lbl">An '+r.an+' — '+r.qualif+'</div>'
+      +'<div class="kpi-bar-val">'+total+' inscrits</div>'
+      +'<div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:'+Math.min(100,total/maxOrga*100)+'%"></div></div>'
+      +'<div style="font-size:10px;color:var(--ink-30);min-width:60px;text-align:right">'+actifs+' actifs</div>'
+      +'</div>';
+  }).join(''));
+
+  // Graphique encours
+  if(encChartInst) encChartInst.destroy();
+  encChartInst = new Chart(document.getElementById('encChart'), {
+    type: 'line',
+    data: {
+      labels: rows.map(r=>'An '+r.an),
+      datasets: [
+        { label: 'Encours cumulé', data: rows.map(r=>Math.round(r.encoursCumule)), borderColor:'#181614', backgroundColor:'rgba(24,22,20,0.05)', fill:true, borderWidth:2, pointRadius:3, tension:0.4, yAxisID:'y' },
+        { label: 'Com. récurrente / an', data: rows.map(r=>Math.round(r.comRec)), borderColor:'var(--orange)', backgroundColor:'rgba(212,98,42,0.08)', fill:false, borderWidth:2.5, pointRadius:4, tension:0.4, yAxisID:'y2' },
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top',labels:{font:{family:'Inter',size:10},padding:12}} },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'Inter',size:9}}},
+        y:{position:'left',grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:9},callback:v=>fmt(v)+'€'}},
+        y2:{position:'right',grid:{display:false},ticks:{font:{family:'Inter',size:9},callback:v=>fmt(v)+'€'}}
+      }
+    }
+  });
+
+  var last = rows[rows.length-1];
+  setHTML('simNote', 'Projection indicative — hypothèses PMR Prodémial (nov. 2021). TPC : 5% → 8% selon qualification. Commission démarrage : 2% sur VA équipe niv.1 (filleuls non Manager). Commission expansion : 1% sur VA équipe managers de 1er niveau. Commission développement : 0,5% sur VA niv.2+. Passage Manager estimé à '+(anManager===0?'l\'an 0':'l\'an '+anManager)+' ('+gv('moisManager',18)+' mois). CA total an 5 projeté : '+fmtE(last.caTotal)+'. Ces projections sont non contractuelles et dépendent des performances réelles.');
+}
+
+document.addEventListener('DOMContentLoaded', recalc);
+</script>
+</body>
+</html>
