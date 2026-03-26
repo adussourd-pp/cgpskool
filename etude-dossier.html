@@ -3398,19 +3398,19 @@ function rSituation(){
 function renderLevierBadge(containerId, items){
   var el=document.getElementById(containerId);
   if(!el)return;
-  var h='<div class="card" style="padding:16px 18px;margin-bottom:10px">';
-  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:10px">Levier identifi\u00e9</div>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+  var h='<div class="card" style="padding:20px 22px;margin-bottom:10px">';
+  h+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:14px">Levier identifi\u00e9</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:10px">';
   items.forEach(function(item){
     var isActive=item.ok||item.partial;
     var color=item.ok?'#2D7A5B':item.partial?'#D4622A':'#999';
     var bg=item.ok?'rgba(45,122,91,0.06)':item.partial?'rgba(212,98,42,0.06)':'rgba(0,0,0,0.02)';
     var border=item.ok?'rgba(45,122,91,0.25)':item.partial?'rgba(212,98,42,0.25)':'var(--bord)';
-    var tick=isActive?'<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:'+color+';color:#fff;font-size:12px;font-weight:700;flex-shrink:0">&#10003;</span>':'<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:2px solid #ccc;flex-shrink:0"></span>';
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;border:1.5px solid '+border+';background:'+bg+'">';
+    var tick=isActive?'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:'+color+';color:#fff;font-size:14px;font-weight:700;flex-shrink:0">&#10003;</span>':'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:2px solid #ccc;flex-shrink:0"></span>';
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:10px;border:1.5px solid '+border+';background:'+bg+'">';
     h+=tick;
-    h+='<div><div style="font-size:13px;font-weight:700;color:'+color+'">'+item.label+'</div>';
-    if(item.detail&&isActive)h+='<div style="font-size:11px;color:var(--gris);margin-top:2px">'+item.detail+'</div>';
+    h+='<div><div style="font-size:15px;font-weight:700;color:'+color+'">'+item.label+'</div>';
+    if(item.detail&&isActive)h+='<div style="font-size:12px;color:var(--gris);margin-top:3px">'+item.detail+'</div>';
     if(item.extra)h+=item.extra;
     h+='</div></div>';
   });
