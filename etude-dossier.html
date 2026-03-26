@@ -1128,30 +1128,31 @@ select.span2{grid-column:span 2}
   <div class="page-number"></div>
 </div><!-- /sec-pagegarde -->
 
+<!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
+<div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-radius:10px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
+    <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entrée en relation (fiche légale)</div>
+  </div>
+  <textarea id="mentionsDirectInput" rows="6"
+    placeholder="Collez ici le contenu de votre fiche d'informations légales..."
+    style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
+    oninput="saveMentionsDirect()"
+    onfocus="this.style.borderColor='var(--orange)'"
+    onblur="this.style.borderColor='var(--bord)'"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════
      9 — MENTIONS LÉGALES & AVIS
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-mentions">
   <div class="sec-header">
     <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions légales</div><div class="sec-sub">Incluses en dernière page du PDF</div></div>
-  </div>
-
-  <!-- Zone saisie mentions (copier-coller) -->
-  <div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
-    <div style="margin-bottom:14px">
-      <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
-      <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entrée en relation (fiche légale)</div>
-    </div>
-    <textarea id="mentionsDirectInput" rows="6"
-      placeholder="Collez ici le contenu de votre fiche d'informations légales..."
-      style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
-      oninput="saveMentionsDirect()"
-      onfocus="this.style.borderColor='var(--orange)'"
-      onblur="this.style.borderColor='var(--bord)'"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
-    </div>
   </div>
 
   <!-- Rendu mentions (visible dans le PDF) -->
