@@ -4673,21 +4673,20 @@ function renderSolsRetenues(){
 
     // ── Contrats (sub-rows) ──
     // Header row
-    html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
     var isImmoGrp=cp.cat==='immobilier'||cp.levier==='financement';
     var inSt='padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif';
     if(isImmoGrp){
-      // Grille financement : 6 colonnes + delete
-      html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.8fr 28px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
+      html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.5fr 0.8fr 0.8fr 28px;gap:4px;padding:8px 18px;background:var(--gris-l);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);border-top:1px solid var(--bord)">';
       html+='<div>Titulaire</div><div>Apport</div><div>\u00c9pargne /mois</div><div>Horizon</div><div>Patrimoine final</div><div>Revenus /mois</div><div></div></div>';
     } else {
+      html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
       html+='<div>Titulaire</div><div>Versement initial</div><div>VP mensuel</div><div>Horizon</div><div></div></div>';
     }
 
     grp.indices.forEach(function(idx){
       var sol=solsSelectionnees[idx];
       if(isImmoGrp){
-        html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.8fr 28px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
+        html+='<div style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.5fr 0.8fr 0.8fr 28px;gap:4px;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
       } else {
         html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:6px 18px;align-items:center;border-top:1px solid rgba(0,0,0,0.04)">';
       }
