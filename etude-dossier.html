@@ -613,7 +613,7 @@ select.span2{grid-column:span 2}
   </div>
 
   <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Épargne mensuelle <span style="font-size:8px;font-weight:400;color:var(--gris)">(saisie R1)</span></div><div class="kpi-val"><input type="number" id="kSit1Input" value="0" min="0" step="50" style="width:80px;border:none;border-bottom:1.5px solid var(--ambre-m);background:transparent;font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir);text-align:center;outline:none;padding:2px 0" onchange="ED.epMens=+this.value;rSituation&&rSituation()"> <span style="font-size:13px;font-weight:400;color:var(--gris)">€/mois</span></div></div>
+    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Épargne mensuelle <span style="font-size:8px;font-weight:400;color:var(--gris)">(saisie R1)</span></div><div class="kpi-val" id="kSit1Wrap"></div></div>
     <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kSit2">0 €</div></div>
     <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Taux d'endettement</div><div class="kpi-val" id="kSit3">—</div></div>
     <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Reste à vivre /mois</div><div class="kpi-val" id="kSit4">0 €</div></div>
@@ -3113,8 +3113,24 @@ function rSituation(){
   const chrCr=ED.chargesCredit||0;
   const endett=chrCr>0&&revM>0?chrCr/revM*100:0;
   const rav=revM-chrCr;
-  var epInput=document.getElementById('kSit1Input');
-  if(epInput&&!epInput.matches(':focus'))epInput.value=ED.epMens||0;
+  // Épargne mensuelle : 1 input si seul, 2 si couple
+  var epWrap=document.getElementById('kSit1Wrap');
+  if(epWrap){
+    var isC=ED.type!=='seul';
+    if(!ED.epMens2) ED.epMens2=0;
+    var inputStyle='width:60px;border:none;border-bottom:1.5px solid var(--ambre-m);background:transparent;font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);text-align:center;outline:none;padding:2px 0';
+    if(isC){
+      var lbl1=(ED.c1.prenom||'C1').split(' ')[0];
+      var lbl2=(ED.c2.prenom||'C2').split(' ')[0];
+      epWrap.innerHTML='<div style="display:flex;flex-direction:column;gap:4px">'
+        +'<div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--gris);width:50px">'+lbl1+'</span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:11px;color:var(--gris)">€</span></div>'
+        +'<div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--gris);width:50px">'+lbl2+'</span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens2=+this.value"><span style="font-size:11px;color:var(--gris)">€</span></div>'
+        +'<div style="font-size:10px;color:var(--ambre-d);font-weight:600;margin-top:2px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</div>'
+        +'</div>';
+    } else {
+      epWrap.innerHTML='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+';font-size:17px" onchange="ED.epMens=+this.value"> <span style="font-size:13px;font-weight:400;color:var(--gris)">€/mois</span>';
+    }
+  }
   set('kSit2',fmt(revM)+' €/mois');
   const ke=document.getElementById('kSit3');
   var endPct=Math.min(100,Math.round(endett/35*100));
@@ -3282,9 +3298,10 @@ function rPatrimoine(){
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
-  var levierPlacement = capEpargne>0 || ct>epCible;
+  var epTotal=(ED.epMens||0)+(ED.epMens2||0);
+  var levierPlacement = epTotal>0 || ct>epCible;
   var detailPlacement = [];
-  if(capEpargne>0) detailPlacement.push(fmt(capEpargne)+' €/mois d\'épargne disponible');
+  if(epTotal>0) detailPlacement.push(fmt(epTotal)+' €/mois d\'épargne disponible');
   if(ct>epCible) detailPlacement.push(fmt(ct-epCible)+' € réorientable (excédent précaution)');
   renderLevierBadge('levierPat',[
     {label:'Placement', ok:levierPlacement, detail:levierPlacement?detailPlacement.join(' + '):'Pas de marge'}
