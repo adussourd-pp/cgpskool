@@ -2134,8 +2134,8 @@ function calcSynthese(ED, solsSelectionnees) {
 // ── STATE ─────────────────────────────────────────────────────────
 let ED = {
   type:'seul', consultant:'',
-  c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:''},
-  c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:''},
+  c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''},
+  c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''},
   sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[],
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
@@ -2560,6 +2560,15 @@ function parseTextRI(txt){
       if(cspVal){ ED.c1.sitpro = mapCSP(cspVal); }
     }
 
+    // Profession
+    var profPt=pt01['profession']||pt01['activit\u00e9 professionnelle']||pt01['activite professionnelle'];
+    if(profPt&&profPt.v1){ED.c1.profession=profPt.v1;if(isCouple&&profPt.v2)ED.c2.profession=profPt.v2;}
+    else{var profVal=kv01['profession']||kv01['activit\u00e9 professionnelle']||'';if(profVal)ED.c1.profession=profVal;}
+    // Société / Employeur
+    var socPt=pt01['soci\u00e9t\u00e9']||pt01['societe']||pt01['employeur']||pt01['entreprise'];
+    if(socPt&&socPt.v1){ED.c1.societe=socPt.v1;if(isCouple&&socPt.v2)ED.c2.societe=socPt.v2;}
+    else{var socVal=kv01['soci\u00e9t\u00e9']||kv01['societe']||kv01['employeur']||kv01['entreprise']||'';if(socVal)ED.c1.societe=socVal;}
+
     // Enfants
     ED.nbEnfants = 0; ED.enfants=[];
     var enfMatch = s01.match(/(?:Enfants?)\s*\n([^\n]+)/i);
@@ -2859,6 +2868,10 @@ function parseTextRI(txt){
   // CSP
   var catRow=t01['cat\u00e9gorie socio-professionnelle']||t01['categorie socio-professionnelle']||t01['cat\u00e9gorie socio'];
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
+  var profRow2=t01['profession']||t01['activit\u00e9 professionnelle']||t01['activite professionnelle'];
+  if(profRow2){ED.c1.profession=profRow2.v1||'';if(isCouple2&&profRow2.v2)ED.c2.profession=profRow2.v2;}
+  var socRow2=t01['soci\u00e9t\u00e9']||t01['societe']||t01['employeur']||t01['entreprise'];
+  if(socRow2){ED.c1.societe=socRow2.v1||'';if(isCouple2&&socRow2.v2)ED.c2.societe=socRow2.v2;}
   // Enfants
   ED.nbEnfants=0;
   // Parser enfants : chercher les lignes avec des dates (dd/mm/yyyy) après "Enfants"
@@ -3432,12 +3445,12 @@ function rSituation(){
   // Enfants
   var enfDisplay='';
   if(ED.enfants&&ED.enfants.length){
-    enfDisplay=ED.enfants.map(function(e){
+    enfDisplay=ED.enfants.length+' enfant'+(ED.enfants.length>1?'s':'')+'<br>';
+    enfDisplay+=ED.enfants.map(function(e){
       var age=e.dob?ageFrom(e.dob):null;
       var nm=e.nom.replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
       return nm+(age!==null?' ('+age+' ans)':'');
-    }).join(', ');
-    enfDisplay=ED.enfants.length+' enfant(s) : '+enfDisplay;
+    }).join('<br>');
   } else if(ED.nbEnfants){
     enfDisplay=ED.nbEnfants+' enfant(s)';
   }
@@ -3463,11 +3476,14 @@ function rSituation(){
     var n2=`${ED.c2.civ||''} ${ED.c2.prenom||''} ${ED.c2.nom||''}`.trim();
     var a2=ageFrom(ED.c2.dob);
     sit+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
-    sit+=personCard('D\u00e9clarant 1',n1,a1,ED.c1.profession||ED.c1.sitpro||'\u2014',ED.revenus.sal1||ED.revenus.c1||0);
-    sit+=personCard('D\u00e9clarant 2',n2,a2,ED.c2.profession||ED.c2.sitpro||'\u2014',ED.revenus.sal2||ED.revenus.c2||0);
+    var prof1=(ED.c1.profession||ED.c1.sitpro||'\u2014')+(ED.c1.societe?' \u2014 '+ED.c1.societe:'');
+    var prof2=(ED.c2.profession||ED.c2.sitpro||'\u2014')+(ED.c2.societe?' \u2014 '+ED.c2.societe:'');
+    sit+=personCard('D\u00e9clarant 1',n1,a1,prof1,ED.revenus.sal1||ED.revenus.c1||0);
+    sit+=personCard('D\u00e9clarant 2',n2,a2,prof2,ED.revenus.sal2||ED.revenus.c2||0);
     sit+='</div>';
   } else {
-    sit+=personCard('D\u00e9clarant',n1,a1,ED.c1.profession||ED.c1.sitpro||'\u2014',ED.revenus.sal1||ED.revenus.c1||0);
+    var prof1s=(ED.c1.profession||ED.c1.sitpro||'\u2014')+(ED.c1.societe?' \u2014 '+ED.c1.societe:'');
+    sit+=personCard('D\u00e9clarant',n1,a1,prof1s,ED.revenus.sal1||ED.revenus.c1||0);
     sit+='<div style="height:12px"></div>';
   }
 
