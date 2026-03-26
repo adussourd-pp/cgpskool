@@ -3188,14 +3188,14 @@ function renderLevierBadge(containerId, items){
   h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:10px">Leviers identifiés</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
   items.forEach(function(item){
-    var color=item.ok?'var(--green)':'var(--gris)';
-    var bg=item.ok?'var(--green-l)':'rgba(0,0,0,0.04)';
-    var border=item.ok?'rgba(45,122,91,0.3)':'var(--bord)';
-    var icon=item.ok?'&#10003;':'&#8212;';
+    var color=item.ok?'var(--green)':item.partial?'var(--orange)':'var(--gris)';
+    var bg=item.ok?'var(--green-l)':item.partial?'var(--o-dim)':'rgba(0,0,0,0.04)';
+    var border=item.ok?'rgba(45,122,91,0.3)':item.partial?'rgba(212,98,42,0.3)':'var(--bord)';
+    var icon=item.ok?'&#10003;':item.partial?'~':'&#8212;';
     h+='<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid '+border+';background:'+bg+'">';
     h+='<span style="font-size:12px;color:'+color+';font-weight:700">'+icon+'</span>';
-    h+='<div><span style="font-size:12px;font-weight:600;color:'+(item.ok?'var(--green)':'var(--gris-f)')+'">'+item.label+'</span>';
-    if(item.detail&&item.ok)h+='<br><span style="font-size:10px;color:var(--gris)">'+item.detail+'</span>';
+    h+='<div><span style="font-size:12px;font-weight:600;color:'+(item.ok?'var(--green)':item.partial?'var(--orange)':'var(--gris-f)')+'">'+item.label+'</span>';
+    if(item.detail&&(item.ok||item.partial))h+='<br><span style="font-size:10px;color:var(--gris)">'+item.detail+'</span>';
     h+='</div></div>';
   });
   h+='</div></div>';
@@ -3379,8 +3379,12 @@ function rFiscal(){
   // Levier impot badge
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
   var levierFiscal = tot>=3000;
+  var levierFiscalPeu = tot>=1000 && tot<3000;
+  var levierFisDetail = levierFiscal ? fmt(tot)+' €/an d\'impôts — économies fiscales mobilisables'
+    : levierFiscalPeu ? fmt(tot)+' €/an d\'impôts — levier fiscal limité mais existant'
+    : 'Impôts < 1 000 € — pas de levier fiscal significatif';
   renderLevierBadge('levierFis',[
-    {label:'Bilan fiscal', ok:levierFiscal, detail:levierFiscal?fmt(tot)+' €/an d\'impôts — économies fiscales mobilisables':'Impôts < 3 000 € — levier fiscal limité'}
+    {label:'Levier fiscal', ok:levierFiscal, partial:levierFiscalPeu, detail:levierFisDetail}
   ]);
 }
 
@@ -3844,8 +3848,8 @@ function renderSolsRetenues(){
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
     html+='<div style="display:flex;align-items:center;gap:8px">';
     html+='<div style="display:flex;align-items:center;gap:4px">';
-    html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Étape</span>';
-    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
+    html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Solution</span>';
+    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro de solution dans la stratégie">';
     html+='</div>';
     html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
     html+='</div>';
@@ -4114,7 +4118,7 @@ function rSynthese(){
   var economieFiscTotale=sorted.reduce(function(s,sol){
     var prodLC=(sol.produit||'').toLowerCase();
     var tmi=ED.fiscal.tmi||0;
-    if(prodLC.indexOf('per')>=0&&sol.vp>0) return s+Math.round(sol.vp*12*tmi/100);
+    if(prodLC.indexOf('per')>=0) return s+Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmi/100);
     if(prodLC.indexOf('fip')>=0||prodLC.indexOf('fcpi')>=0||prodLC.indexOf('g3f')>=0||prodLC.indexOf('girar')>=0)
       return s+Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
     return s;
@@ -4286,8 +4290,7 @@ function rSynthese(){
       data:{
         labels:['Avant','Après'],
         datasets:[
-          {label:'IR net',data:[irNet,irApres],backgroundColor:['rgba(192,57,43,0.7)','rgba(45,122,91,0.7)'],borderRadius:6},
-          {label:'PS (17,2%)',data:[ps,ps],backgroundColor:['rgba(192,57,43,0.3)','rgba(45,122,91,0.3)'],borderRadius:6}
+          {label:'Impôts (IR + PS)',data:[impot,irApres+ps],backgroundColor:['rgba(192,57,43,0.7)','rgba(45,122,91,0.7)'],borderRadius:6}
         ]
       },
       options:{
@@ -4392,20 +4395,21 @@ function rSynthese(){
 
 function resetSteps(){
   steps=[];
-  // Étape 1 toujours : bilan réalisé
+  // Étape 1 : bilan réalisé
   steps.push({label:'Bilan patrimonial réalisé', done:true});
-  // Générer les étapes depuis les préconisations validées (solsSelectionnees)
+  // Étape 2 : présentation du bilan
+  steps.push({label:'Présentation du bilan', done:false});
+  // Étapes suivantes : solutions validées dans les préconisations
   if(solsSelectionnees&&solsSelectionnees.length){
-    // Trier par numéro d'étape
     var sorted=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
-    sorted.forEach(function(sol){
+    sorted.forEach(function(sol,i){
       var cp=COPERNIC&&COPERNIC[sol.produit];
-      var label=cp?cp.label:sol.produit;
+      var label='Solution '+(i+1)+' : '+(cp?cp.label:sol.produit);
       if(sol.horizonLabel) label+=' ('+sol.horizonLabel+')';
       steps.push({label:label, done:false});
     });
   }
-  // Étape finale toujours : suivi
+  // Étape finale : suivi
   steps.push({label:'Suivi & révision annuelle', done:false});
   renderSteps();
 }
