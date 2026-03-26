@@ -471,6 +471,10 @@ select.span2{grid-column:span 2}
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
   <div class="sidebar-lbl">Navigation</div>
+  <div id="progressBar" style="padding:0 10px 8px">
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-bottom:4px"><span id="progressLbl">0 / 7</span><span id="progressPct">0%</span></div>
+    <div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div id="progressFill" style="height:100%;width:0%;border-radius:2px;transition:width 0.4s"></div></div>
+  </div>
   <button class="step-btn active" data-sec="import" onclick="goTo('import')"><span class="step-dot"></span>Import / Saisie</button>
   <div class="sidebar-lbl" style="margin-top:8px">Analyse</div>
   <button class="step-btn" data-sec="situation" onclick="goTo('situation')"><span class="step-dot"></span>Situation &amp; Objectifs</button>
@@ -4692,9 +4696,57 @@ function markDone(){
     if(b.dataset.sec!=='import'){b.classList.add('pending');b.classList.remove('done');}
   });
   // Import est toujours done
+  validatedSections['import']=true;
   var importBtn=document.querySelector('[data-sec="import"]');
   if(importBtn){importBtn.classList.add('done');importBtn.classList.remove('pending');}
+  updateProgress();
 }
+// ── Couleurs personnalisées ──
+function applyColors(){
+  var c1=document.getElementById('pColor1');
+  var c2=document.getElementById('pColor2');
+  if(!c1||!c2)return;
+  var color1=c1.value||'#D4622A';
+  var color2=c2.value||'#181614';
+  // Générer les variantes
+  document.documentElement.style.setProperty('--ambre',color1);
+  document.documentElement.style.setProperty('--ambre-d',color1);
+  document.documentElement.style.setProperty('--orange',color1);
+  document.documentElement.style.setProperty('--orange-hover',color2);
+  document.documentElement.style.setProperty('--o-dim',color1+'1a');
+  document.documentElement.style.setProperty('--ambre-l',color1+'18');
+  document.documentElement.style.setProperty('--ambre-m',color1+'4d');
+  document.documentElement.style.setProperty('--noir',color2);
+  document.documentElement.style.setProperty('--ink',color2);
+  saveProfil();
+}
+function loadColors(){
+  var p=loadProfil();
+  if(p.color1){
+    var c1=document.getElementById('pColor1');if(c1)c1.value=p.color1;
+    var c2=document.getElementById('pColor2');if(c2)c2.value=p.color2||'#181614';
+    applyColors();
+  }
+}
+// ── Logo upload ──
+function handleLogoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var dataUrl=e.target.result;
+    try{localStorage.setItem('cgpskool_logo',dataUrl);}catch(err){}
+    showLogoPreview(dataUrl);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showLogoPreview(dataUrl){
+  var el=document.getElementById('logoPreview');
+  if(el&&dataUrl)el.innerHTML='<img src="'+dataUrl+'" style="max-height:50px;max-width:200px;border:1px solid var(--bord);border-radius:4px;padding:4px">';
+}
+function loadLogo(){
+  try{var logo=localStorage.getItem('cgpskool_logo');if(logo)showLogoPreview(logo);}catch(e){}
+}
+
 function updEpTotal(){
   var t=(ED.epMens||0)+(ED.epMens2||0);
   var el=document.getElementById('epTotalLbl');
@@ -4704,6 +4756,17 @@ function validateSection(sec){
   validatedSections[sec]=true;
   var btn=document.querySelector('[data-sec="'+sec+'"]');
   if(btn){btn.classList.remove('pending');btn.classList.add('done');}
+  updateProgress();
+}
+function updateProgress(){
+  var sections=['import','situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'];
+  var total=sections.length;
+  var done=sections.filter(function(s){return validatedSections[s];}).length;
+  var pct=Math.round(done/total*100);
+  var color=pct>=100?'var(--green)':pct>=50?'var(--orange)':'var(--blue)';
+  var lbl=document.getElementById('progressLbl');if(lbl)lbl.textContent=done+' / '+total;
+  var pctEl=document.getElementById('progressPct');if(pctEl)pctEl.textContent=pct+'%';
+  var fill=document.getElementById('progressFill');if(fill){fill.style.width=pct+'%';fill.style.background=color;}
 }
 function addObj(){
   const c=document.getElementById('objList');const n=c.querySelectorAll('.fg').length+1;
@@ -4762,6 +4825,8 @@ var PROFIL_FIELDS = [
   {id:'pCP',       key:'cp',       label:'CP'},
   {id:'pVille',    key:'ville',    label:'Ville'},
   {id:'pMentions', key:'mentions', label:'Mentions'},
+  {id:'pColor1',   key:'color1',   label:'Couleur 1'},
+  {id:'pColor2',   key:'color2',   label:'Couleur 2'},
 ];
 
 function loadProfil() {
@@ -4961,6 +5026,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (adz) adz.addEventListener('click', function() {
     document.getElementById('avisFileInput').click();
   });
+  // Charger couleurs et logo personnalisés
+  loadColors();
+  loadLogo();
 });
 
 // ── Avis d'imposition — upload PDF ───────────────────────────
@@ -5179,8 +5247,25 @@ window.addEventListener('afterprint', function() {
     </div>
     <div class="profil-row full">
       <div class="profil-fg">
-        <label>Mentions légales (texte libre)</label>
-        <textarea id="pMentions" placeholder="Inscrit à l'ORIAS sous le n°..." oninput="saveProfil()"></textarea>
+        <label>Mentions légales (texte libre — incluses en fin de PDF)</label>
+        <textarea id="pMentions" rows="4" placeholder="Inscrit à l'ORIAS sous le n°..." oninput="saveProfil()"></textarea>
+      </div>
+    </div>
+    <div class="profil-row">
+      <div class="profil-fg">
+        <label>Couleur principale</label>
+        <input type="color" id="pColor1" value="#D4622A" oninput="applyColors()" style="width:100%;height:36px;border:1px solid var(--bord);border-radius:6px;cursor:pointer">
+      </div>
+      <div class="profil-fg">
+        <label>Couleur secondaire</label>
+        <input type="color" id="pColor2" value="#181614" oninput="applyColors()" style="width:100%;height:36px;border:1px solid var(--bord);border-radius:6px;cursor:pointer">
+      </div>
+    </div>
+    <div class="profil-row full">
+      <div class="profil-fg">
+        <label>Logo du cabinet (affiché sur le PDF)</label>
+        <input type="file" id="pLogo" accept="image/*" onchange="handleLogoUpload(this)" style="font-size:12px">
+        <div id="logoPreview" style="margin-top:6px"></div>
       </div>
     </div>
     <div style="margin-top:8px;padding:10px 12px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--ambre-d);line-height:1.5">
