@@ -451,7 +451,8 @@ function calcSynthese(ED, solsSelectionnees) {
     capitalSuppl += cap;
     revComplem   += calcRente(cap);
     if (sol.produit === 'PER' || sol.produit === 'PER_ENFANT') {
-      economieFisc += calcEconomiePER((sol.vp||0)*12, irResult.tmi);
+      // Économie d'impôt PER = (VI + VP×12) × TMI
+      economieFisc += calcEconomiePER((sol.vi||0) + (sol.vp||0)*12, irResult.tmi);
     }
     if (sol.produit === 'FIP_FCPI') {
       economieFisc += calcReductionFIP(sol.vi||0, isCouple);

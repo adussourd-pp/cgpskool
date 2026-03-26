@@ -1318,7 +1318,7 @@ var SOLUTIONS_CONFIG = {
   'PER': {
     label:'PER adulte', levier:'Impots',
     horizon:'Retraite', horizonAns:20, rendement:0.04,
-    texte:"Capital d'environ {capital} dans {horizon} ans, pour la retraite, avec une reduction d'impots de {impots} des cette annee.",
+    texte:"Capital d'environ {capital} dans {horizon} ans, pour la retraite, avec une economie d'impot de {impots} des cette annee.",
     objectifs:['Optimiser votre fiscalite','Optimiser votre transmission','Proteger votre conjoint','Transmettre votre patrimoine','Preparer votre retraite'],
   },
   'PER_ENFANT': {
@@ -1902,7 +1902,9 @@ function calcSynthese(ED, solsSelectionnees) {
     capitalSuppl += cap;
     revComplem   += calcRente(cap);
     if (sol.produit === 'PER' || sol.produit === 'PER_ENFANT') {
-      economieFisc += calcEconomiePER((sol.vp||0)*12, irResult.tmi);
+      // Économie d'impôt PER = (VI + VP×12) × TMI la 1ère année
+      // Puis VP×12 × TMI les années suivantes
+      economieFisc += calcEconomiePER((sol.vi||0) + (sol.vp||0)*12, irResult.tmi);
     }
     if (sol.produit === 'FIP_FCPI') {
       economieFisc += calcReductionFIP(sol.vi||0, isCouple);
@@ -3285,7 +3287,7 @@ function rFiscal(){
   const lt=document.getElementById('levierText');
   if(tot>=3000){
     lb.style.background='var(--green-l)';lb.style.borderColor='rgba(45,122,91,0.2)';
-    lt.innerHTML=`<strong style="color:var(--green)">✅ Levier fiscal disponible</strong><br>Avec <strong>${fmt(tot)} €</strong> d'impôts, des solutions de réduction fiscale peuvent être mobilisées : PER, FCPI/FIP, déductions spécifiques.`;
+    lt.innerHTML=`<strong style="color:var(--green)">✅ Levier fiscal disponible</strong><br>Avec <strong>${fmt(tot)} €</strong> d'impôts, des solutions d'économie fiscale peuvent être mobilisées : PER, FCPI/FIP, déductions spécifiques.`;
   }else{
     lb.style.background='var(--ambre-l)';lb.style.borderColor='var(--ambre-m)';
     lt.innerHTML=`<strong style="color:var(--ambre-d)">💡 Levier fiscal limité</strong><br>Imposition de <strong>${fmt(tot)} €</strong>. Les préconisations prioritaires seront orientées vers la capitalisation et le financement.`;
@@ -3294,7 +3296,7 @@ function rFiscal(){
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
   var levierFiscal = tot>=3000;
   renderLevierBadge('levierFis',[
-    {label:'Bilan fiscal', ok:levierFiscal, detail:levierFiscal?fmt(tot)+' €/an d\'impôts — solutions de réduction mobilisables':'Impôts < 3 000 € — levier fiscal limité'}
+    {label:'Bilan fiscal', ok:levierFiscal, detail:levierFiscal?fmt(tot)+' €/an d\'impôts — économies fiscales mobilisables':'Impôts < 3 000 € — levier fiscal limité'}
   ]);
 }
 
@@ -3423,7 +3425,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,i){return a>=age?i:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);
         var espVie=getEspVie(c.civ,cl.retAge||64);
         var impactTotal=Math.round((cl.pension-pensM)*espVie);
-        var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
+        var revMensClient=Math.round(cl.rev/12);var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Revenu actuel considéré</span><span class="fr-v">'+fmt(revMensClient)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
         +'<div class="fiscal-row"><span class="fr-l">Espérance de vie</span><span class="fr-v">'+espVie+' mois</span></div>'
         +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact retraite total</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
         +'</div>';});
