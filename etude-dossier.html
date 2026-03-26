@@ -441,6 +441,9 @@ select.span2{grid-column:span 2}
 .comment-zone textarea{width:100%;min-height:60px;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none;background:#fafaf9;transition:border-color 0.2s}
 .comment-zone textarea:focus{border-color:var(--ambre);background:#fff}
 .comment-zone textarea::placeholder{color:var(--gris);opacity:0.7}
+.ml-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);display:block;margin-bottom:4px}
+.ml-input{width:100%;padding:7px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);outline:none}
+.ml-input:focus{border-color:var(--orange)}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}}
 
 /* ── PAGE DE GARDE PDF ── */
@@ -1104,11 +1107,28 @@ select.span2{grid-column:span 2}
   <div class="panneau-interne" style="border:2px dashed var(--orange);border-radius:14px;overflow:hidden;margin-bottom:18px">
     <div style="background:linear-gradient(135deg,#1a1208,#2d1f08);padding:10px 16px;display:flex;align-items:center;gap:8px">
       <span style="font-size:14px">&#128274;</span>
-      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — pas visible dans le PDF</div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--orange)">Zone conseiller — saisie des mentions légales</div>
     </div>
-    <div style="padding:16px;background:#fefcf8">
-      <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:6px">Vos mentions légales</label>
-      <textarea id="mentionsDirectInput" rows="6" placeholder="Inscrit à l'ORIAS sous le n°...&#10;Conseiller en Investissements Financiers...&#10;Membre de la CNCGP..." style="width:100%;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;resize:vertical;outline:none" oninput="saveMentionsDirect()"></textarea>
+    <div style="padding:16px;background:#fefcf8;display:grid;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="ml-label">Raison sociale</label><input class="ml-input" id="mlRaison" placeholder="Peak Patrimoine" oninput="renderMentionsPreview()"></div>
+        <div><label class="ml-label">Forme juridique</label><input class="ml-input" id="mlForme" placeholder="SAS / SARL / EI..." oninput="renderMentionsPreview()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="ml-label">Siège social</label><input class="ml-input" id="mlSiege" placeholder="3 avenue de la République, 06300 Nice" oninput="renderMentionsPreview()"></div>
+        <div><label class="ml-label">RCS / SIREN</label><input class="ml-input" id="mlRcs" placeholder="RCS Nice 123 456 789" oninput="renderMentionsPreview()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="ml-label">N° ORIAS</label><input class="ml-input" id="mlOrias" placeholder="22002240" oninput="renderMentionsPreview()"></div>
+        <div><label class="ml-label">Statut / Activité</label><input class="ml-input" id="mlStatut" placeholder="CIF, COA, IOBSP, agent immobilier..." oninput="renderMentionsPreview()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="ml-label">Association professionnelle</label><input class="ml-input" id="mlAsso" placeholder="CNCGP, ANACOFI, Chambre des CIF..." oninput="renderMentionsPreview()"></div>
+        <div><label class="ml-label">Assurance RCP</label><input class="ml-input" id="mlRcp" placeholder="MMA IARD, contrat n°..." oninput="renderMentionsPreview()"></div>
+      </div>
+      <div><label class="ml-label">Mentions complémentaires (texte libre)</label>
+        <textarea id="mlComplement" rows="3" placeholder="Médiateur : ... / Autres mentions..." style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--gris-f);resize:vertical;outline:none" oninput="renderMentionsPreview()"></textarea>
+      </div>
     </div>
   </div>
 
@@ -1116,17 +1136,15 @@ select.span2{grid-column:span 2}
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Aperçu — inclus dans le PDF</div>
     <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Saisissez vos mentions légales ci-dessus.</em>
+      <em style="color:var(--gris)">Renseignez les champs ci-dessus.</em>
     </div>
   </div>
 
-  <div class="card" style="background:var(--gris-l);border-color:transparent">
-    <div style="font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
-      Les simulations présentées dans ce document ne constituent en aucun cas une promesse de rendement.
-      Les performances passées ne préjugent pas des performances futures.
-      Tout investissement comporte des risques, y compris de perte en capital.
-      Ce document est strictement confidentiel et destiné uniquement à l'usage du client désigné.
-    </div>
+  <div style="padding:12px 16px;background:var(--gris-l);border-radius:8px;font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
+    Les simulations présentées dans ce document ne constituent en aucun cas une promesse de rendement.
+    Les performances passées ne préjugent pas des performances futures.
+    Tout investissement comporte des risques, y compris de perte en capital.
+    Ce document est strictement confidentiel et destiné uniquement à l'usage du client désigné.
   </div>
 
   <div class="row-btns" style="margin-top:18px">
@@ -5758,39 +5776,69 @@ function rPageGarde(){
 }
 
 function rMentions(){
-  // Charger les mentions depuis localStorage
-  var txt='';
-  try{txt=localStorage.getItem('cgpskool_mentions')||'';}catch(e){}
-  // Fallback : profil
-  if(!txt){var p=loadProfil?loadProfil():{};txt=(p&&p.mentions)||'';}
-
-  var input=document.getElementById('mentionsDirectInput');
-  if(input&&!input.value&&txt)input.value=txt;
-
-  var mel=document.getElementById('mentionsPreview');
-  if(mel){
-    var val=input?input.value.trim():txt;
-    if(val){
-      mel.innerHTML=val.replace(/\n/g,'<br>');
+  // Charger depuis localStorage
+  try{
+    var raw=localStorage.getItem('cgpskool_ml');
+    if(raw){
+      var d=JSON.parse(raw);
+      var fields=['mlRaison','mlForme','mlSiege','mlRcs','mlOrias','mlStatut','mlAsso','mlRcp','mlComplement'];
+      fields.forEach(function(id){
+        var el=document.getElementById(id);
+        if(el&&!el.value&&d[id])el.value=d[id];
+      });
     } else {
-      mel.innerHTML='<em style="color:var(--gris)">Aucune mention saisie.</em>';
+      // Fallback : pre-remplir depuis le profil
+      var p=loadProfil?loadProfil():{};
+      if(p.cabinet){var el=document.getElementById('mlRaison');if(el&&!el.value)el.value=p.cabinet;}
+      if(p.orias){var el2=document.getElementById('mlOrias');if(el2&&!el2.value)el2.value=p.orias;}
+      if(p.adresse){var el3=document.getElementById('mlSiege');if(el3&&!el3.value)el3.value=p.adresse+(p.cp?' '+p.cp:'')+(p.ville?' '+p.ville:'');}
     }
-  }
+  }catch(e){}
+  renderMentionsPreview();
 }
 
-function saveMentionsDirect(){
-  var input=document.getElementById('mentionsDirectInput');
-  if(!input)return;
-  try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
-  // Mettre a jour l apercu
-  var mel=document.getElementById('mentionsPreview');
-  if(mel){
-    if(input.value.trim()){
-      mel.innerHTML=input.value.trim().replace(/\n/g,'<br>');
-    } else {
-      mel.innerHTML='<em style="color:var(--gris)">Aucune mention saisie.</em>';
-    }
+function renderMentionsPreview(){
+  // Sauvegarder
+  var fields=['mlRaison','mlForme','mlSiege','mlRcs','mlOrias','mlStatut','mlAsso','mlRcp','mlComplement'];
+  var d={};
+  fields.forEach(function(id){var el=document.getElementById(id);if(el)d[id]=el.value.trim();});
+  try{localStorage.setItem('cgpskool_ml',JSON.stringify(d));}catch(e){}
+
+  // Sync vers profil (cabinet, orias, adresse)
+  var p=loadProfil?loadProfil():{};
+  var changed=false;
+  if(d.mlRaison&&d.mlRaison!==p.cabinet){p.cabinet=d.mlRaison;changed=true;}
+  if(d.mlOrias&&d.mlOrias!==p.orias){p.orias=d.mlOrias;changed=true;}
+  if(d.mlSiege&&d.mlSiege!==p.adresse){p.adresse=d.mlSiege;changed=true;}
+  if(changed){try{localStorage.setItem('cgpskool_profil_v1',JSON.stringify(p));}catch(e){}}
+
+  // Rendu apercu
+  var el=document.getElementById('mentionsPreview');
+  if(!el)return;
+  var hasData=Object.values(d).some(function(v){return v;});
+  if(!hasData){el.innerHTML='<em style="color:var(--gris)">Renseignez les champs ci-dessus.</em>';return;}
+
+  var h='<div style="font-family:var(--sans)">';
+  if(d.mlRaison){
+    h+='<div style="font-size:16px;font-weight:700;color:var(--noir);margin-bottom:4px">'+d.mlRaison+'</div>';
+    if(d.mlForme)h+='<div style="font-size:12px;color:var(--gris);margin-bottom:12px">'+d.mlForme+'</div>';
   }
+  var sections=[];
+  if(d.mlSiege)sections.push({t:'Si\u00e8ge social',v:d.mlSiege});
+  if(d.mlRcs)sections.push({t:'RCS / SIREN',v:d.mlRcs});
+  if(d.mlOrias)sections.push({t:'ORIAS',v:'n\u00b0 '+d.mlOrias+' \u2014 <a href="https://www.orias.fr" target="_blank" style="color:var(--orange)">www.orias.fr</a>'});
+  if(d.mlStatut)sections.push({t:'Statut',v:d.mlStatut});
+  if(d.mlAsso)sections.push({t:'Association professionnelle',v:d.mlAsso});
+  if(d.mlRcp)sections.push({t:'Assurance RCP',v:d.mlRcp});
+  sections.forEach(function(s){
+    h+='<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)">';
+    h+='<span style="font-size:11px;color:var(--gris);min-width:160px">'+s.t+'</span>';
+    h+='<span style="font-size:11px;color:var(--noir);font-weight:600">'+s.v+'</span>';
+    h+='</div>';
+  });
+  if(d.mlComplement)h+='<div style="margin-top:10px;font-size:11px;color:var(--gris-f);line-height:1.7">'+d.mlComplement.replace(/\n/g,'<br>')+'</div>';
+  h+='</div>';
+  el.innerHTML=h;
 }
 
 // ══════════════════════════════════════════════════════════════
