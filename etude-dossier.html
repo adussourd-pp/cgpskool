@@ -4935,26 +4935,25 @@ function renderFichesClient(){
 
         var isImmoFin=cp.cat==='immobilier'||cp.levier==='financement';
         if(isImmoFin){
-          // ── Rendu financement/immobilier : utilise les valeurs saisies ou estimation ──
+          // ── Rendu financement/immobilier : phrase narrative ──
           var patrimoineImmo=sol._patFinal||(sol.vi>0?Math.round((sol.vi||0)*1.5+(sol.vp||0)*12*h2):0);
           var loyerImmo=sol._revCompl||(patrimoineImmo>0?Math.round(patrimoineImmo*0.04/12):0);
-          html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-          html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
-          html+='<span style="color:var(--bord)">:</span>';
-          if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">apport</span></span>';
-          if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
-          if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">/ mois</span></span>';
-          if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
-          html+='<span style="margin-left:auto;font-size:11px;color:var(--gris);white-space:nowrap">'+h2+'\u00a0ans</span>';
-          html+='</div>';
+          html+='<div style="padding:10px 14px">';
+          html+='<div style="font-weight:700;font-size:13px;color:var(--noir);margin-bottom:6px">'+tit2+'</div>';
           if(sol.vi>0||sol.vp>0){
-            html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
-            html+='\u27A4 Patrimoine de <strong>'+fmt(patrimoineImmo)+'\u00a0\u20ac</strong>';
-            html+=' et g\u00e9n\u00e9rateur de revenus compl\u00e9mentaires de <strong>'+fmt(loyerImmo)+'\u00a0\u20ac/mois</strong>';
-            html+=' (hors fiscalit\u00e9) dans '+h2+'\u00a0ans.';
+            html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">';
+            html+='Avec un financement sur <strong>'+h2+' ans</strong>';
+            if(sol.vi>0)html+=' et <strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong> d\'apport';
+            if(sol.vp>0)html+=' + <strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong> d\'\u00e9pargne';
+            html+=', vous pourrez vous constituer un patrimoine de <strong>'+fmt(patrimoineImmo)+'\u00a0\u20ac</strong>';
+            if(loyerImmo>0)html+=', g\u00e9n\u00e9rateur de revenus compl\u00e9mentaires de <strong>'+fmt(loyerImmo)+'\u00a0\u20ac/mois</strong>';
+            html+=' (hors fiscalit\u00e9).';
             if(economieFisc2>0)html+='<br>\u25c6 \u00c9conomie fiscale : <strong>'+fmt(economieFisc2)+'\u00a0\u20ac/an</strong>';
             html+='</div>';
+          } else {
+            html+='<div style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</div>';
           }
+          html+='</div>';
         } else {
           // ── Rendu placement standard ──
           html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
