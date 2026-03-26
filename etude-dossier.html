@@ -286,13 +286,13 @@ to{opacity:1;transform:translateY(0)}}
 /* ── FORM ── */
 select.span2{grid-column:span 2}
 
-/* ── PYRAMID (forme trapeze bisautee 3D) ── */
-.pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px;padding:0 10px}
-.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:relative;border:none;color:#fff}
-.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c);width:40%;clip-path:polygon(8% 0%,92% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a);width:60%;clip-path:polygon(6% 0%,94% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7);width:80%;clip-path:polygon(5% 0%,95% 0%,100% 100%,0% 100%);margin-bottom:-1px}
-.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74);width:100%;clip-path:polygon(3% 0%,97% 0%,100% 100%,0% 100%)}
+/* ── PYRAMID (rectangles colores) ── */
+.pyramid{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:8px;color:#fff}
+.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c)}
+.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a)}
+.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7)}
+.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74)}
 .pyr-name{font-size:12px;font-weight:700;color:#fff}
 .pyr-desc{font-size:10px;color:rgba(255,255,255,0.7)}
 .pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;color:#fff;text-align:right}
@@ -2317,10 +2317,12 @@ function parseTextRI(txt){
     if(enfMatch){
       var enfLine = enfMatch[1].trim();
       var enfParts2=enfLine.split(',');
+      var enfSeenB={};
       enfParts2.forEach(function(part){
-        var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
-        else if(part.trim().length>2){ED.enfants.push({nom:part.trim(),dob:''});}
+        var clean=part.trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
+        var m=clean.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+        if(m){var nn=m[1].trim();if(!enfSeenB[nn]){enfSeenB[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
+        else if(clean.length>2){if(!enfSeenB[clean]){enfSeenB[clean]=true;ED.enfants.push({nom:clean,dob:''});}}
       });
       ED.nbEnfants=ED.enfants.length;
     }
@@ -2330,12 +2332,13 @@ function parseTextRI(txt){
     var objSeen = {};
     // Try pipe-table extraction first (R14: objective is in column 1, not column 0)
     var objRows02 = parsePipeTable(s02);
-    var SKIP_OBJ_LABEL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d)/i;
+    var SKIP_OBJ_HDR = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d+$)/i;
+    var SKIP_OBJ_VAL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation)$/i;
     objRows02.forEach(function(cols){
-      if(SKIP_OBJ_LABEL.test((cols[0]||'').trim())) return;
+      if(SKIP_OBJ_HDR.test((cols[0]||'').trim())) return;
       var obj = (cols[1] || '').trim();
       if(obj.length < 5 || obj.length > 200) return;
-      if(SKIP_OBJ_LABEL.test(obj)) return;
+      if(SKIP_OBJ_VAL.test(obj)) return;
       if(!objSeen[obj]){ objSeen[obj] = true; ED.objectifs.push(obj); }
     });
     // Fallback: line-by-line heuristic for non-pipe mammoth text
@@ -2344,7 +2347,7 @@ function parseTextRI(txt){
       var isName = false;
       for(var oi=0;oi<objLines.length;oi++){
         var ol = objLines[oi];
-        if(SKIP_OBJ_LABEL.test(ol) || /^\|/.test(ol)) continue;
+        if(SKIP_OBJ_HDR.test(ol) || /^\|/.test(ol)) continue;
         if(/^[A-ZÉÈÊ][a-zéèêàùûî]+\s+[A-ZÉÈÊ]+/.test(ol)){
           isName = true; continue;
         }
@@ -2604,6 +2607,7 @@ function parseTextRI(txt){
   ED.nbEnfants=0;
   // Parser enfants : chercher les lignes avec des dates (dd/mm/yyyy) après "Enfants"
   ED.enfants=[];
+  var enfSeenA={};
   var enfLines=ss01.split('\n');
   for(var ei=0;ei<enfLines.length;ei++){
     var el=enfLines[ei];
@@ -2615,7 +2619,7 @@ function parseTextRI(txt){
     if(enfDates){
       enfDates.forEach(function(part){
         var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m)ED.enfants.push({nom:m[1].trim(),dob:m[2]});
+        if(m){var nn=m[1].trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();if(!enfSeenA[nn]){enfSeenA[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
       });
     }
   }
@@ -2635,7 +2639,7 @@ function parseTextRI(txt){
     if(/^(personnes|objectif|horizon|moyen|epargne|\u00e9pargne|d\u00e9signation)/i.test(p[0]))return;
     var obj=p[1]||'';
     if(obj.length<5||obj.length>200)return;
-    if(/^(personnes|objectif|horizon|moyen|\d)/i.test(obj))return;
+    if(/^(personnes|objectif|horizon|moyen)$/i.test(obj))return;
     // Filtrer les noms de clients qui se glissent comme objectifs (R14)
     var objUp=obj.toUpperCase();
     var isClientName=clientNames.some(function(cn){return cn.length>2&&objUp.indexOf(cn)>=0;});
@@ -3172,7 +3176,8 @@ function rSituation(){
   if(ED.enfants&&ED.enfants.length){
     enfDisplay=ED.enfants.map(function(e){
       var age=e.dob?ageFrom(e.dob):null;
-      return e.nom+(age!==null?' ('+age+' ans)':'');
+      var nm=e.nom.replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
+      return nm+(age!==null?' ('+age+' ans)':'');
     }).join(', ');
     enfDisplay=ED.enfants.length+' enfant(s) : '+enfDisplay;
   } else if(ED.nbEnfants){
