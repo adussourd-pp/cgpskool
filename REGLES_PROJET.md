@@ -88,6 +88,7 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 - [ ] Test Alexia : revMens() = 4 326 EUR
 - [ ] Test Mathieu : endett = 33,0 %
 - [ ] Test Mathieu : pension = 4 704 EUR (taux interpolé 54%)
+- [ ] 0 curly quote comme délimiteur JS (R23) — `node --check` passe
 
 ---
 
@@ -629,6 +630,27 @@ Le fichier `etude-dossier.html` contient deux chemins de parsing (mammoth pour W
 - **R16** : distinction `_salSpecific` vs `_salCategory` (préférer spécifique)
 
 Toute modification du parsing dans un chemin doit être répliquée dans l'autre.
+
+---
+
+## RÈGLE R23 -- Pas de curly quotes dans le code JS
+
+Les guillemets courbes (U+2018 `'`, U+2019 `'`, U+201C `"`, U+201D `"`) sont **interdits** comme délimiteurs de chaînes JS. Utiliser uniquement les apostrophes droites `'` (U+0027) et guillemets droits `"` (U+0022).
+
+**Exception** : les chaînes de l'objet `COPERNIC` contiennent des apostrophes courbes U+2019 **à l'intérieur** du texte français (`l'IS`, `d'emprunt`…). C'est volontaire pour éviter de casser les délimiteurs `'`. Ne pas les remplacer par `'`.
+
+```js
+// INTERDIT — curly quotes comme délimiteurs
+var x = 'valeur';  // U+2018 / U+2019
+
+// CORRECT — apostrophes droites
+var x = 'valeur';  // U+0027
+
+// OK — curly quote DANS le texte (objet COPERNIC uniquement)
+desc:'Acquisition de l\u2019usufruit temporaire'  // U+2019 dans le contenu = OK
+```
+
+**Vérification** : `node --check` sur le bloc `<script>` extrait doit passer sans erreur.
 
 ---
 
