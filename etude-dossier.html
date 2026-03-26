@@ -2191,13 +2191,17 @@ function goTo(sec){
   window.scrollTo(0,0);
   if(sec!=='import') renderSection(sec);
   // Mettre à jour le titre de navigation au-dessus du cadre A4
-  var secNames={import:'Import / Saisie',situation:'Situation personnelle & Objectifs',
-    patrimoine:'Patrimoine',fiscal:'Bilan Fiscal & Leviers',financement:'Revenus & Capacité de Financement',
-    retraite:'Bilan Retraite',transmission:'Transmission',entreprise:'Analyse Entreprise',
-    preconisations:'Préconisations Patrimoniales',synthese:'Synthèse & Étapes',
+  var secNames={import:'Import / Saisie',situation:'Section 01 — Situation personnelle & Objectifs',
+    patrimoine:'Section 02 — Patrimoine',fiscal:'Section 03 — Bilan Fiscal & Leviers',
+    financement:'Section 04 — Revenus & Capacité de Financement',
+    retraite:'Section 05 — Bilan Retraite',transmission:'Section 05b — Transmission',
+    entreprise:'Section 05b — Analyse Entreprise',
+    preconisations:'Section 06 — Préconisations Patrimoniales',synthese:'Section 07 — Synthèse & Étapes',
     pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions légales',avis:'Avis clients'};
   var headerNom=document.getElementById('pdfHeaderNom');
   if(headerNom)headerNom.textContent=secNames[sec]||sec;
+  var headerRight=document.getElementById('pdfHeaderRight');
+  if(headerRight)headerRight.textContent='Étude de Dossier';
   updatePageNumbers();
   // Marquer les sauts de page A4 après le rendu
   requestAnimationFrame(function(){updatePageBreaks(sec);});
