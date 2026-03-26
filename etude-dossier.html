@@ -880,34 +880,34 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 06</div><div class="sec-h1">Préconisations Patrimoniales</div></div>
   </div>
 
-  <!-- Leviers disponibles + Situation visee -->
+  <!-- Leviers disponibles + Objectifs client -->
   <div class="preco-avant-apres" style="margin-bottom:18px">
     <div class="preco-panel avant" style="border-color:rgba(43,94,167,0.2);background:#FAFCFF">
       <div class="preco-panel-title" style="color:var(--blue)">Leviers disponibles</div>
       <div id="precoLeviers" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
-    <div class="preco-panel apres">
-      <div class="preco-panel-title">Situation visee apres preconisations</div>
-      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Decrivez la situation patrimoniale cible, les benefices attendus pour le client..."></div>
+    <div class="preco-panel apres" style="border-color:rgba(45,122,91,0.2);background:#FAFFFE">
+      <div class="preco-panel-title" style="color:var(--green)">Objectifs patrimoniaux</div>
+      <div id="precoObjectifs" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
   </div>
 
-  <!-- Epargne financiere — vue conseiller (editable) + vue client -->
+  <!-- Épargne financière — vue conseiller (éditable) + vue client -->
   <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Epargne financiere preconisee</div>
+    <div class="card-title"><span class="dot"></span>Épargne financière préconisée</div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="font-size:12px;color:var(--gris)">Patrimoine financier total (hors immobilier)</div>
-      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 &euro;</div>
+      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 €</div>
     </div>
     <div id="precoEpargneTable" style="margin-bottom:14px"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;background:var(--gris-l);border-radius:10px">
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a conserver</div>
-        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 &euro;</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à conserver</div>
+        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 €</div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a reorienter</div>
-        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 &euro;</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à réorienter</div>
+        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 €</div>
       </div>
     </div>
   </div>
@@ -2300,6 +2300,11 @@ function parseTextRI(txt){
     var logVal = (logPt ? logPt.v1 : '') || kv01['logement'] || '';
     if(logVal) ED.logement = logVal;
 
+    // Adresse
+    var adrPt = pt01['adresse'] || pt01['adresse de résidence'] || pt01['adresse residence'];
+    var adrVal = (adrPt ? adrPt.v1 : '') || kv01['adresse'] || kv01['adresse de résidence'] || '';
+    if(adrVal) ED.adresse = adrVal;
+
     // CSP
     var cspPt = pt01['catégorie socio-professionnelle'] || pt01['categorie socio-professionnelle'] || pt01['catégorie socio'];
     if(cspPt && cspPt.v1){
@@ -2601,6 +2606,9 @@ function parseTextRI(txt){
   var sitRow=t01['situation']||t01['situation\u00a0'];if(sitRow)ED.sitmat=sitRow.v1;
   // Logement
   var logRow=t01['logement'];if(logRow)ED.logement=logRow.v1;
+  // Adresse
+  var adrRow=t01['adresse']||t01['adresse de r\u00e9sidence']||t01['adresse residence'];
+  if(adrRow)ED.adresse=adrRow.v1;
   // CSP
   var catRow=t01['cat\u00e9gorie socio-professionnelle']||t01['categorie socio-professionnelle']||t01['cat\u00e9gorie socio'];
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
@@ -3196,6 +3204,7 @@ function rSituation(){
     sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' €/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     // Col C2
     sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
@@ -3204,12 +3213,15 @@ function rSituation(){
     sit+=(ED.c2.profession||ED.c2.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal2||ED.revenus.c2||0)+' €/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     sit+='</div>';
     // Commun
     sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
+    var sitLabel=ED.sitmat||'';
+    if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabel+'</strong></div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
@@ -3220,10 +3232,13 @@ function rSituation(){
     sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
     sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' &euro;/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
+    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
     sit+='</div>';
     sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong></div>';
+    var sitLabelS=ED.sitmat||'';
+    if(ED.convention&&sitLabelS)sitLabelS+=' \u2014 '+ED.convention;
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabelS+'</strong></div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
@@ -3926,23 +3941,38 @@ function rPreconisations(){
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
   var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
 
-  // ── Leviers disponibles ──
+  // ── Leviers disponibles (tick vert / rond rouge grise) ──
   var levEl=document.getElementById('precoLeviers');
   if(levEl){
     var levH='';
-    var leviers=[];
-    if(ED.epMens>0||aSum>5000)leviers.push({icon:'&#128176;',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' &euro;/mois'});
-    if(impot>=2000)leviers.push({icon:'&#128200;',label:'Fiscal',desc:'IR '+fmt(impot)+' &euro; — TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' — PER dispo '+fmt(plafondPER)+' &euro;':'')});
-    if(capa>200)leviers.push({icon:'&#127968;',label:'Financement',desc:'Capacite emprunt ~'+fmt(Math.round(capa))+' &euro;/mois'});
-    leviers.push({icon:'&#127981;',label:'Entreprise',desc:'SCI, holding, 150-0 B ter'});
-    leviers.forEach(function(l){
-      levH+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bord)">';
-      levH+='<span style="font-size:18px">'+l.icon+'</span>';
+    var allLeviers=[
+      {key:'placement',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' \u20ac/mois',active:ED.epMens>0||aSum>5000,color:'#2B5EA7'},
+      {key:'fiscal',label:'Fiscal',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' \u2014 PER dispo '+fmt(plafondPER)+' \u20ac':''),active:impot>=2000,color:'#D4622A'},
+      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois',active:capa>200,color:'#2D7A5B'},
+      {key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'}
+    ];
+    allLeviers.forEach(function(l){
+      var opacity=l.active?'1':'0.4';
+      var tick=l.active?'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:'+l.color+';color:#fff;font-size:11px;font-weight:700">&#10003;</span>':'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid #ccc;color:#ccc;font-size:9px">&#9679;</span>';
+      levH+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bord);opacity:'+opacity+'">';
+      levH+=tick;
       levH+='<div><div style="font-weight:700;font-size:12px;color:var(--noir)">'+l.label+'</div>';
       levH+='<div style="font-size:11px;color:var(--gris)">'+l.desc+'</div></div>';
       levH+='</div>';
     });
     levEl.innerHTML=levH;
+  }
+
+  // ── Objectifs client ──
+  var objEl=document.getElementById('precoObjectifs');
+  if(objEl){
+    if(ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!=='Objectifs \u00e0 compl\u00e9ter'){
+      objEl.innerHTML=ED.objectifs.map(function(o,i){
+        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--green);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
+      }).join('');
+    } else {
+      objEl.innerHTML='<em style="color:var(--gris)">Aucun objectif identifi\u00e9</em>';
+    }
   }
 
   // ── Epargne financiere (hors immo) — tableau editable ──
@@ -3972,22 +4002,25 @@ function rPreconisations(){
     var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
     h+='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">';
     h+='<th style="text-align:left;padding:6px 8px">Actif</th>';
-    h+='<th style="text-align:right;padding:6px 8px">Actuel</th>';
-    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">Conseille</th>';
+    h+='<th style="text-align:right;padding:6px 8px">\u20ac actuel</th>';
+    h+='<th style="text-align:center;padding:6px 8px">Conserver</th>';
+    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">\u20ac conseill\u00e9</th>';
     h+='</tr></thead><tbody>';
 
     horizons.forEach(function(hz){
       var items=groups[hz.key];
       if(!items.length)return;
       var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
-      h+='<tr style="background:'+hz.bg+'"><td colspan="3" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' &euro;</td></tr>';
+      h+='<tr style="background:'+hz.bg+'"><td colspan="4" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' \u20ac</td></tr>';
       items.forEach(function(a,i){
         var uid=hz.key+'_'+i;
         var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
-        h+='<tr style="border-bottom:1px solid var(--bord)">';
+        var isKept=conseille>0;
+        h+='<tr style="border-bottom:1px solid var(--bord);opacity:'+(isKept?'1':'0.5')+'" id="row_'+uid+'">';
         h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
-        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' &euro;</td>';
-        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:90px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"></td>';
+        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' \u20ac</td>';
+        h+='<td style="padding:5px 8px;text-align:center"><label style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer"><input type="checkbox" '+(isKept?'checked':'')+' onchange="togglePrecoSwitch(\''+uid+'\','+a.montant+',this.checked)" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;border-radius:9px;background:'+(isKept?'#2D7A5B':'#ccc')+';transition:0.2s"></span><span style="position:absolute;top:2px;left:'+(isKept?'18':'2')+'px;width:14px;height:14px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span></label></td>';
+        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:80px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"> \u20ac</td>';
         h+='</tr>';
       });
     });
@@ -4035,6 +4068,12 @@ function updatePrecoTotals(){
   var rEl=document.getElementById('precoReorienter');
   if(cEl)cEl.textContent=fmt(consTot)+' \u20ac';
   if(rEl)rEl.textContent=fmt(Math.max(0,reorienter))+' \u20ac';
+}
+
+function togglePrecoSwitch(uid,montantActuel,checked){
+  window._precoConseille[uid]=checked?montantActuel:0;
+  // Re-render
+  rPreconisations();
 }
 
 
