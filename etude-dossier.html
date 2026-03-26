@@ -4594,7 +4594,7 @@ function renderSolsRetenues(){
     var grpIdx=groups.indexOf(grp)+1;
     html+='<div style="padding:16px 18px 0">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html+='<div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+grpIdx+'</span><span style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">'+grp.produit+'</span></div>';
+    html+='<div style="display:flex;align-items:center;gap:8px"><input type="number" min="1" max="20" value="'+(firstSol.etape||grpIdx)+'" style="width:36px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;text-align:center;border:none;padding:0;font-family:Inter,system-ui,sans-serif;cursor:pointer;flex-shrink:0" onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'etape\',+this.value);renderFichesClient()" title="N\u00b0 de solution"><span style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">'+grp.produit+'</span></div>';
     html+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
     if(cp.sri)html+='<span style="background:var(--ambre-l);color:var(--ambre-d);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">SRI '+cp.sri+'</span>';
     if(cp.horizon)html+='<span style="background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px">'+cp.horizon+'</span>';
