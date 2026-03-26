@@ -287,7 +287,7 @@ table tr:hover td { background: var(--paper); }
 
       <!-- Graphique CA -->
       <div class="chart-block">
-        <div class="chart-title">Évolution du CA sur 5 ans</div>
+        <div class="chart-title" id="caTitleLbl">Évolution du CA</div>
         <div style="height:220px;position:relative"><canvas id="caChart"></canvas></div>
       </div>
 
@@ -619,44 +619,65 @@ function recalc() {
     + '<div style="font-size:10px;color:var(--fog-2)">Prime Qualité '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div></div>' : '')
     + '</div>';
 
-  setHTML('qualRow',
-    synthHTML
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule-l)">Qualifications PMR — TPC par année</div>'
+  // ── Nomenclature qualifications & titres (compacte) ──
+  var QUALIF_COLORS = {
+    'Consultant':'var(--ink-30)',
+    'Manager':'var(--ink)',
+    'Manager Planète':'var(--ink)',
+    'Manager Étoile':'var(--ink)',
+    'Manager Constellation':'var(--ink)',
+    'Manager Galaxie':'var(--orange)'
+  };
+  var TITRE_COLORS = { 'Senior':'var(--ink)', 'Major':'var(--ink)', 'Expert':'var(--orange)' };
+
+  var nomenclHTML = synthHTML
+
+    // ── Qualifications ──
+    + '<div style="width:100%;display:flex;gap:0;flex-wrap:wrap;margin-bottom:3px">'
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);padding:10px 0 6px;border-bottom:1px solid var(--rule-l);margin-bottom:6px">Qualifications PMR</div>'
     + qualifs.map(function(q) {
       var reached = q.annee >= 0;
       var isCurrentAn0 = q.annee === 0 && hasExistingActivity;
-      // Trouver la row correspondant à l'année d'atteinte pour afficher le TPC réel
-      var matchRow = q.annee >= 0 ? rows.find(function(r){ return r.an === q.annee; }) : null;
+      var matchRow = reached ? rows.find(function(r){ return r.an === q.annee; }) : null;
       var tpcReel = matchRow ? (matchRow.tpc*100).toFixed(1)+'%' : q.tpc;
-      var tpcEffLabel = matchRow && matchRow.tpcEffectif > matchRow.tpc
-        ? tpcReel + ' <span style="color:var(--green,#1a7a4a);font-size:10px">(+'+(matchRow.caPrimeQualite>0?(((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1)):'0')+'% PQ)</span>'
-        : tpcReel;
-      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
-        +'<div class="qual-lbl">'+q.lbl+'</div>'
-        +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'" title="TPC effectif cette année">'+tpcReel+'</div>'
-        +(matchRow && matchRow.tpcEffectif > matchRow.tpc
-          ? '<div class="qual-sub" style="color:#1a7a4a;font-size:9px">+ '+(((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1))+'% Prime Qualité → '+(matchRow.tpcEffectif*100).toFixed(1)+'% eff.</div>'
-          : '<div class="qual-sub">&nbsp;</div>')
-        +(reached && matchRow ? '<div class="qual-sub" style="font-size:9px;color:var(--ink-30)">Titre : '+(matchRow.titre||'—')+'</div>' : '')
-        +badgeLabel(q.annee, isCurrentAn0)
-        +'</div>';
+      var pq = matchRow && matchRow.tpcEffectif > matchRow.tpc ? ' +'+((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1)+'% PQ' : '';
+      var c = reached ? (QUALIF_COLORS[q.lbl]||'var(--ink)') : 'var(--ink-30)';
+      var badgeStyle = isCurrentAn0
+        ? 'background:rgba(37,99,235,0.1);color:#2563eb'
+        : reached ? 'background:var(--o-dim);color:var(--orange)' : 'background:var(--paper-2);color:var(--ink-30)';
+      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+q.annee : '—';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule-l);width:100%">'
+        +'<span style="font-size:12px;font-weight:600;color:'+c+'">'+q.lbl+'</span>'
+        +'<span style="display:flex;align-items:center;gap:10px">'
+        +'<span style="font-size:11px;font-weight:700;color:var(--orange)">'+tpcReel+(pq?'<span style="font-size:9px;color:#1a7a4a">'+pq+'</span>':'')+'</span>'
+        +'<span style="font-size:9px;font-weight:700;padding:2px 8px;'+badgeStyle+'">'+badgeTxt+'</span>'
+        +'</span></div>';
     }).join('')
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité <span style="font-weight:400;font-style:italic">(enquête satisfaction + volume annuel)</span></div>'
+    + '</div>'
+
+    // ── Titres ──
+    + '<div style="width:100%;display:flex;gap:0;flex-wrap:wrap;margin-top:8px">'
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);padding:10px 0 6px;border-bottom:1px solid var(--rule-l);margin-bottom:6px">Titres — Prime Qualité <span style="font-weight:400;font-style:italic;text-transform:none">(enquête satisfaction + volume annuel)</span></div>'
     + titresData.map(function(t) {
       var reached = t.annee >= 0;
       var isCurrentAn0 = t.annee === 0 && hasExistingActivity;
-      var matchRow = t.annee >= 0 ? rows.find(function(r){ return r.an === t.annee; }) : null;
-      var vaAn = matchRow ? '<div class="qual-sub" style="font-size:9px">VA perso : '+fmtE(matchRow.vaPerso)+'</div>' : '';
-      var tpcEff = matchRow ? '<div class="qual-sub" style="font-size:9px;color:#1a7a4a">TPC effectif : '+(matchRow.tpcEffectif*100).toFixed(1)+'%</div>' : '';
-      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?t.c:'var(--rule-l)')+';min-width:150px">'
-        +'<div class="qual-lbl">'+t.lbl+'</div>'
-        +'<div class="qual-val" style="color:'+(reached?t.c:'var(--ink-30)')+'">'+t.prime+'</div>'
-        +'<div class="qual-sub">'+t.seuil+'</div>'
-        +vaAn+tpcEff
-        +badgeLabel(t.annee, isCurrentAn0)
-        +'</div>';
+      var matchRow = reached ? rows.find(function(r){ return r.an === t.annee; }) : null;
+      var c = reached ? (TITRE_COLORS[t.lbl]||'var(--ink)') : 'var(--ink-30)';
+      var badgeStyle = isCurrentAn0
+        ? 'background:rgba(37,99,235,0.1);color:#2563eb'
+        : reached ? 'background:var(--o-dim);color:var(--orange)' : 'background:var(--paper-2);color:var(--ink-30)';
+      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+t.annee : '—';
+      var tpcEff = matchRow ? ' → TPC eff. '+(matchRow.tpcEffectif*100).toFixed(1)+'%' : '';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule-l);width:100%">'
+        +'<span style="font-size:12px;font-weight:600;color:'+c+'">'+t.lbl+'</span>'
+        +'<span style="display:flex;align-items:center;gap:10px">'
+        +'<span style="font-size:11px;color:var(--ink-60)">'+t.seuil+'<span style="font-weight:700;color:var(--orange);margin-left:6px">'+t.prime+tpcEff+'</span></span>'
+        +'<span style="font-size:9px;font-weight:700;padding:2px 8px;'+badgeStyle+'">'+badgeTxt+'</span>'
+        +'</span></div>';
     }).join('')
-  );
+    + '</div>';
+
+  setHTML('qualRow', nomenclHTML);
 
   // Tableau — en-têtes avec titre + qualification
   var headers = '<th>Indicateur</th>' + rows.map(function(r) {
@@ -709,6 +730,9 @@ function recalc() {
   setHTML('tblBody', tbody);
 
   // Graphique CA
+  var caTitleEl = document.getElementById('caTitleLbl');
+  if(caTitleEl) caTitleEl.textContent = 'Évolution du CA sur ' + dureePlan + ' ans';
+
   if(caChartInst) caChartInst.destroy();
   caChartInst = new Chart(document.getElementById('caChart'), {
     type: 'bar',
