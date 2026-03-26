@@ -146,7 +146,7 @@ table tr:hover td { background: var(--paper); }
   <div class="hero-inner">
     <div>
       <div class="hero-badge">📈 Développement réseau</div>
-      <h1 class="cs-h1 light" style="font-size:clamp(22px,2.6vw,36px);margin-bottom:6px">Business Plan <em>à 5 ans</em></h1>
+      <h1 class="cs-h1 light" style="font-size:clamp(22px,2.6vw,36px);margin-bottom:6px">Business Plan</h1>
       <p style="font-size:13px;font-weight:300;color:var(--fog);max-width:500px;line-height:1.7">Projetez votre progression dans le réseau Prodémial — qualifications, CA, organisation, commissions.</p>
     </div>
     <div style="display:flex;gap:24px;flex-wrap:wrap">
@@ -283,9 +283,7 @@ table tr:hover td { background: var(--paper); }
 
     <div id="results" style="display:none">
 
-      <!-- Qualifications atteintes -->
-      <div class="section-lbl"><span></span>Qualifications & TPC projetés</div>
-      <div class="qual-row" id="qualRow"></div>
+      <div id="qualRow"></div>
 
       <!-- Graphique CA -->
       <div class="chart-block">
@@ -678,8 +676,20 @@ function recalc() {
   }
   var tbody = '';
   tbody += tblRow('VA personnelle', rows.map(r=>fmtE(r.vaPerso)));
-  tbody += tblRow('TPC (à l\'acte)', rows.map(r=>(r.tpc*100).toFixed(1)+'%'), 'o');
-  tbody += tblRow('Titre annuel', rows.map(r=>r.titre||'—'));
+  // Ligne qualification — colorée selon le niveau
+  tbody += '<tr><td>Qualification</td>'+ rows.map(function(r) {
+    var c = r.qualif==='Manager Galaxie'?'var(--orange)':r.qualif==='Manager Constellation'?'#059669':r.qualif==='Manager Étoile'?'#2563eb':r.qualif==='Manager Planète'?'#6366f1':r.qualif==='Manager'?'#181614':'var(--ink-30)';
+    return '<td style="font-weight:700;font-size:10px;color:'+c+'">'+r.qualif+'</td>';
+  }).join('')+'</tr>';
+  // Ligne titre — avec TPC effectif si prime qualité
+  tbody += '<tr><td>Titre &amp; TPC effectif</td>'+ rows.map(function(r) {
+    var titreColor = r.titre==='Expert'?'#dc2626':r.titre==='Major'?'#7c3aed':r.titre==='Senior'?'#d97706':'var(--ink-30)';
+    var titreLbl = r.titre || '—';
+    var tpcLbl = (r.tpcEffectif*100).toFixed(1)+'%';
+    var plusPQ = r.tpcEffectif>r.tpc ? ' <span style="color:#1a7a4a;font-size:9px">(+'+((r.tpcEffectif-r.tpc)*100).toFixed(1)+'% PQ)</span>' : '';
+    return '<td><span style="font-weight:700;color:'+titreColor+'">'+titreLbl+'</span>'
+      +'<br><span style="font-size:10px;color:var(--orange);font-weight:600">'+tpcLbl+'</span>'+plusPQ+'</td>';
+  }).join('')+'</tr>';
   tbody += tblRow('Prime Qualité (fin exercice)', rows.map(r=>r.tpcEffectif>r.tpc?fmtPct((r.tpcEffectif-r.tpc)*100,1):'—'), 'g');
   tbody += tblRow('Taux effectif total', rows.map(r=>fmtPct(r.tpcEffectif*100,1)), 'o');
   tbody += tblRow('CA personnel (à l\'acte)', rows.map(r=>fmtE(r.caPerso)));
@@ -736,9 +746,14 @@ function recalc() {
       var actifs = r.totalActifsNiv1 + r.totalActifsNiv2;
       var pct1 = maxOrga > 0 ? Math.min(100, r.totalInscNiv1 / maxOrga * 100) : 0;
       var pct2 = maxOrga > 0 ? Math.min(100 - pct1, r.totalInscNiv2 / maxOrga * 100) : 0;
-      var titreBadge = r.titre ? ' <span style="font-size:9px;font-weight:600;color:var(--orange)">'+r.titre+'</span>' : '';
+      var titreColor = r.titre==='Expert'?'#dc2626':r.titre==='Major'?'#7c3aed':r.titre==='Senior'?'#d97706':'';
+      var titreBadge = r.titre ? ' <span style="font-size:9px;font-weight:700;color:'+titreColor+'">'+r.titre+'</span>' : '';
+      var qualifColor = r.qualif==='Manager Galaxie'?'var(--orange)':r.qualif==='Manager Constellation'?'#059669':r.qualif==='Manager Étoile'?'#2563eb':r.qualif==='Manager Planète'?'#6366f1':r.qualif==='Manager'?'#181614':'var(--ink-30)';
       return '<div class="kpi-bar-row">'
-        +'<div class="kpi-bar-lbl" style="width:150px">An '+r.an+' — '+r.qualif+titreBadge+'</div>'
+        +'<div class="kpi-bar-lbl" style="width:200px;line-height:1.4">'
+        +'An '+r.an+' <span style="font-size:10px;font-weight:700;color:'+qualifColor+'">'+r.qualif+'</span>'+titreBadge
+        +'<br><span style="font-size:9px;color:var(--ink-30)">TPC '+(r.tpcEffectif*100).toFixed(1)+'%'+(r.tpcEffectif>r.tpc?' (+PQ)':'')+'</span>'
+        +'</div>'
         +'<div class="kpi-bar-val" style="width:80px">'+total+' inscrits</div>'
         +'<div class="kpi-bar-track" style="flex:1;position:relative;height:10px">'
         +'<div style="position:absolute;left:0;top:0;height:100%;width:'+pct1+'%;background:var(--orange)"></div>'
