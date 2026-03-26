@@ -6087,7 +6087,7 @@ function saveMentionsDirect(){
         if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
         var headers=cl.split(/\s{2,}/).filter(Boolean);
         var amounts=[];
-        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;amounts.push(cLines[ci2].trim());}
+        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;var amtLine=cLines[ci2].trim();var amtParts=amtLine.split(/\s{2,}/).filter(Boolean);if(amtParts.length>=headers.length){amounts=amtParts;}else if(amtParts.length>1){amounts=amounts.concat(amtParts);}else{amounts.push(amtLine);}}
         // Render as table
         h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
         h+='<tr><th style="background:var(--gris-l);padding:10px 14px;text-align:left;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Activit\u00e9</th><th style="background:var(--gris-l);padding:10px 14px;text-align:right;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Montant garanti / an</th></tr>';
