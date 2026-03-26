@@ -2180,45 +2180,79 @@ function parseTextRI(txt){
 
     // ══ SECTION 01 ══
     var kv01 = kvMap(s01);
+    // Also try pipe-table parsing for tabular identity data (couples have 2+ columns)
+    var tbl01 = parsePipeTable(s01);
+    var pt01 = {};
+    tbl01.forEach(function(cols){
+      var key = cols[0].replace(/[\s\*:]+$/,'').toLowerCase().trim();
+      if(key) pt01[key] = {v1: cols[1]||'', v2: cols[2]||''};
+    });
 
-    // Couple ?
+    // Couple detection
     var isCouple = /c2\.|madame.*monsieur|monsieur.*madame/i.test(s01);
-    // Fallback : chercher "Déclarant 2" ou double colonne nom/prénom
     if(!isCouple && s01.indexOf('Déclarant 2')>=0) isCouple = true;
+    if(!isCouple){
+      tbl01.forEach(function(cols){
+        if(cols.length>=3 && cols[1] && cols[1].trim() && cols[2] && cols[2].trim()
+           && cols[2].trim()!==cols[1].trim()) isCouple=true;
+      });
+    }
     ED.type = isCouple ? 'sep' : 'seul';
 
-    // Nom/prénom
-    var nomVal  = kv01['nom / prénom'] || kv01['nom / prenom'] || kv01['nom/prénom'] || '';
-    if(!nomVal){
-      // Chercher "NOM Prénom" juste après "Nom / prénom : *"
-      var nmMatch = s01.match(/nom \/ pr[eé]nom\s*[:\*\s]+\n([^\n]+)/i);
-      if(nmMatch) nomVal = nmMatch[1].trim();
-    }
-    if(nomVal){
-      var n1 = parseNom(nomVal);
-      ED.c1.prenom = n1.prenom; ED.c1.nom = n1.nom;
+    // Nom/prénom — pipe-table first, kvMap fallback
+    var nomPt = pt01['nom / prénom'] || pt01['nom / prenom'] || pt01['nom/prénom'];
+    if(nomPt && nomPt.v1){
+      var n1 = parseNom(nomPt.v1); ED.c1.prenom = n1.prenom; ED.c1.nom = n1.nom;
+      if(isCouple && nomPt.v2){ var n2 = parseNom(nomPt.v2); ED.c2.prenom = n2.prenom; ED.c2.nom = n2.nom; }
+    } else {
+      var nomVal = kv01['nom / prénom'] || kv01['nom / prenom'] || kv01['nom/prénom'] || '';
+      if(!nomVal){
+        var nmMatch = s01.match(/nom \/ pr[eé]nom\s*[:\*\s]+\n([^\n]+)/i);
+        if(nmMatch) nomVal = nmMatch[1].trim();
+      }
+      if(nomVal){ var n1b = parseNom(nomVal); ED.c1.prenom = n1b.prenom; ED.c1.nom = n1b.nom; }
     }
 
     // Civilité
-    var civVal = kv01['civilité'] || kv01['civilite'] || '';
-    if(civVal) ED.c1.civ = /madame|mme/i.test(civVal) ? 'Mme' : 'M.';
+    var civPt = pt01['civilité'] || pt01['civilite'];
+    if(civPt && civPt.v1){
+      ED.c1.civ = /madame|mme/i.test(civPt.v1) ? 'Mme' : 'M.';
+      if(isCouple && civPt.v2) ED.c2.civ = /madame|mme/i.test(civPt.v2) ? 'Mme' : 'M.';
+    } else {
+      var civVal = kv01['civilité'] || kv01['civilite'] || '';
+      if(civVal) ED.c1.civ = /madame|mme/i.test(civVal) ? 'Mme' : 'M.';
+    }
 
     // Date de naissance
-    var dobVal = kv01['né(e) le'] || kv01['ne(e) le'] || kv01['né le'] || '';
-    if(dobVal) ED.c1.dob = parseDob(dobVal);
+    var dobPt = pt01['né(e) le'] || pt01['ne(e) le'] || pt01['né le'];
+    if(dobPt && dobPt.v1){
+      ED.c1.dob = parseDob(dobPt.v1);
+      if(isCouple && dobPt.v2) ED.c2.dob = parseDob(dobPt.v2);
+    } else {
+      var dobVal = kv01['né(e) le'] || kv01['ne(e) le'] || kv01['né le'] || '';
+      if(dobVal) ED.c1.dob = parseDob(dobVal);
+    }
 
     // Situation matrimoniale
-    var sitVal = kv01['situation'] || '';
+    var sitPt = pt01['situation'];
+    var sitVal = (sitPt ? sitPt.v1 : '') || kv01['situation'] || '';
     if(sitVal) ED.sitmat = sitVal;
 
     // Logement
-    var logVal = kv01['logement'] || '';
+    var logPt = pt01['logement'];
+    var logVal = (logPt ? logPt.v1 : '') || kv01['logement'] || '';
     if(logVal) ED.logement = logVal;
 
     // CSP
-    var cspVal = kv01['catégorie socio-professionnelle'] || kv01['categorie socio-professionnelle']
-               || kv01['catégorie socio'] || '';
-    if(cspVal){ ED.c1.sitpro = mapCSP(cspVal); }
+    var cspPt = pt01['catégorie socio-professionnelle'] || pt01['categorie socio-professionnelle'] || pt01['catégorie socio'];
+    if(cspPt && cspPt.v1){
+      ED.c1.sitpro = mapCSP(cspPt.v1);
+      if(isCouple && cspPt.v2) ED.c2.sitpro = mapCSP(cspPt.v2);
+    } else {
+      var cspVal = kv01['catégorie socio-professionnelle'] || kv01['categorie socio-professionnelle']
+                 || kv01['catégorie socio'] || '';
+      if(cspVal){ ED.c1.sitpro = mapCSP(cspVal); }
+    }
 
     // Enfants
     ED.nbEnfants = 0;
@@ -2235,22 +2269,45 @@ function parseTextRI(txt){
     // ══ SECTION 02 — OBJECTIFS ══
     ED.objectifs = [];
     var objSeen = {};
-    var objLines = s02.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-    var SKIP_OBJ = /^(objectifs?|personnes?|horizon|moyen|épargne|epargne|désignation|designation|\||\d)/i;
-    var isName = false;
-    for(var i=0;i<objLines.length;i++){
-      var l = objLines[i];
-      if(SKIP_OBJ.test(l)) continue;
-      // Ligne nom du client → la suivante est l'objectif
-      if(/^[A-ZÉÈÊ][a-zéèêàùûî]+\s+[A-ZÉÈÊ]+/.test(l)){
-        isName = true; continue;
+    // Try pipe-table extraction first (R14: objective is in column 1, not column 0)
+    var objRows02 = parsePipeTable(s02);
+    var SKIP_OBJ_LABEL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d)/i;
+    objRows02.forEach(function(cols){
+      if(SKIP_OBJ_LABEL.test((cols[0]||'').trim())) return;
+      var obj = (cols[1] || '').trim();
+      if(obj.length < 5 || obj.length > 200) return;
+      if(SKIP_OBJ_LABEL.test(obj)) return;
+      if(!objSeen[obj]){ objSeen[obj] = true; ED.objectifs.push(obj); }
+    });
+    // Fallback: line-by-line heuristic for non-pipe mammoth text
+    if(!ED.objectifs.length){
+      var objLines = s02.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      var isName = false;
+      for(var oi=0;oi<objLines.length;oi++){
+        var ol = objLines[oi];
+        if(SKIP_OBJ_LABEL.test(ol) || /^\|/.test(ol)) continue;
+        if(/^[A-ZÉÈÊ][a-zéèêàùûî]+\s+[A-ZÉÈÊ]+/.test(ol)){
+          isName = true; continue;
+        }
+        if(isName && ol.length>5 && ol.length<200 && !objSeen[ol]){
+          ED.objectifs.push(ol); objSeen[ol]=true;
+        }
+        isName = false;
       }
-      if(isName && l.length>5 && l.length<200 && !objSeen[l]){
-        ED.objectifs.push(l); objSeen[l]=true;
-      }
-      isName = false;
     }
     if(!ED.objectifs.length) ED.objectifs = ['Objectifs à compléter'];
+
+    // Épargne de précaution souhaitée
+    var kv02 = kvMap(s02);
+    var epPrecVal = kv02['épargne de précaution souhaitée'] || kv02['epargne de precaution souhaitee'] || '';
+    if(epPrecVal) ED.epPrec = pEur(epPrecVal);
+    if(!ED.epPrec){
+      objRows02.forEach(function(cols){
+        if(/épargne de précaution|epargne de precaution/i.test(cols[0])){
+          ED.epPrec = pEur(cols[1]) || pEur(cols[2]) || 0;
+        }
+      });
+    }
 
     // ══ SECTION 03 — PATRIMOINE ══
     var SKIP_A = /^(désignation|designation|total|immobilier & foncier|immobilier de jouissance|immobilier locatif|épargne|epargne|court terme|moyen terme|long terme|retraite et salariale|biens professionnels|foncier)$/i;
@@ -2397,6 +2454,17 @@ function parseTextRI(txt){
 
     // Épargne mensuelle estimée
     var revM = revMens();
+    // Charges (non-crédit) from CHARGES sub-section
+    ED.charges = 0;
+    var chSection = (s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i)||['',''])[1];
+    var chRows = parsePipeTable(chSection);
+    chRows.forEach(function(cols){
+      if(/^total$/i.test((cols[0]||'').trim())){
+        var chVals = cols.slice(1).map(pEur).filter(function(v){return v>0;});
+        if(chVals.length) ED.charges = Math.round(Math.max.apply(null, chVals) / 12);
+      }
+    });
+
     ED.epMens = Math.max(0, Math.round((revM - ED.chargesCredit) * 0.30));
 
     launch();
