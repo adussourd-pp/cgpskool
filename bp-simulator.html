@@ -207,6 +207,16 @@ table tr:hover td { background: var(--paper); }
           </select>
         </div>
       </div>
+      <div class="pr"><div class="pl">Titre actuel <small>(volume perso annuel)</small></div>
+        <div class="iu" style="background:var(--paper)">
+          <select id="titreActuel" onchange="recalc()" style="flex:1;padding:7px 10px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink);outline:none">
+            <option value="">Aucun (VA perso &lt; 500k€)</option>
+            <option value="Senior">Senior (VA perso &gt; 500k€)</option>
+            <option value="Major">Major (VA perso &gt; 1 M€)</option>
+            <option value="Expert">Expert (VA perso &gt; 1,5 M€)</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="ps">
@@ -406,6 +416,8 @@ function recalc() {
   var encoursCumuleActuel= gv('encoursCumuleActuel', 0);
   var qualifActuelleEl   = document.getElementById('qualifActuelle');
   var qualifActuelle     = qualifActuelleEl ? qualifActuelleEl.value : 'consultant';
+  var titreActuelEl      = document.getElementById('titreActuel');
+  var titreActuel        = titreActuelEl ? titreActuelEl.value : '';
 
   // TPC depuis qualification actuelle saisie
   var tpcAn0Map = { consultant:0.05, manager:0.06, planete:0.065, etoile:0.07, constellation:0.075, galaxie:0.08 };
@@ -466,13 +478,29 @@ function recalc() {
     // ── Qualification ──
     var branchesActives, tpc, qualif, isManager;
     if(an === 0 && hasExistingActivity) {
-      // Utiliser la qualification saisie manuellement
+      // An 0 : utiliser exactement ce que le consultant saisit
       branchesActives = branchesAn0Map[qualifActuelle] || 0;
       tpc             = tpcAn0Map[qualifActuelle] || 0.05;
       qualif          = qualifLabelMap[qualifActuelle] || 'Consultant';
       isManager       = qualifActuelle !== 'consultant';
+    } else if(hasExistingActivity) {
+      // An 1+ avec activité existante : on repart des branches actives de an0
+      // et on progresse vers Galaxie selon moisGalaxie (en delta depuis aujourd'hui)
+      var branchesDepart = branchesAn0Map[qualifActuelle] || 0;
+      var anGalaxieDepuisAn0 = Math.max(1, anGalaxie); // relatif à l'an0
+      if(branchesDepart >= 4) {
+        // Déjà Galaxie → on reste Galaxie
+        branchesActives = 4;
+      } else {
+        // Progression : de branchesDepart vers 4 sur anGalaxieDepuisAn0 années
+        var progGal = an / anGalaxieDepuisAn0;
+        branchesActives = Math.min(4, branchesDepart + Math.floor(progGal * (4 - branchesDepart)));
+      }
+      tpc     = getTPC(vaOrga, branchesActives);
+      qualif  = getQualif(tpc, branchesActives);
+      isManager = true; // activité existante → au moins Manager
     } else {
-      // Progression selon les paramètres
+      // Démarrage de zéro : progression selon moisManager / moisGalaxie
       if(an >= anManager) {
         if(an >= anGalaxie) {
           branchesActives = 4;
@@ -483,13 +511,14 @@ function recalc() {
       } else {
         branchesActives = 0;
       }
-      tpc     = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
-      qualif  = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
+      tpc       = an >= anManager ? getTPC(vaOrga, branchesActives) : 0.05;
+      qualif    = an >= anManager ? getQualif(tpc, branchesActives) : 'Consultant';
       isManager = an >= anManager;
     }
 
     var vgpAnnuel    = vaPerso;
-    var titre        = isManager ? getTitre(vgpAnnuel) : null;
+    // Titre : an0 avec activité → utiliser le titre saisi, sinon calculer
+    var titre        = (an === 0 && hasExistingActivity && titreActuel) ? titreActuel : (isManager ? getTitre(vgpAnnuel) : null);
     var primeQualite = getPrimeQualite(titre, tpc, isManager);
     var tpcEffectif  = tpc + primeQualite;
 
@@ -517,51 +546,72 @@ function recalc() {
 
   // Qualifications & Titres
   var qualifs = [
-    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:0, c:'var(--rule-l)' },
+    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:-1, c:'var(--rule-l)' },
     { lbl:'Manager', tpc:'6%', seuil:'VA orga 50k€', annee:-1, c:'#181614' },
     { lbl:'Manager Planète', tpc:'6,5%', seuil:'1 branche active', annee:-1, c:'#6366f1' },
     { lbl:'Manager Étoile', tpc:'7%', seuil:'2 branches actives', annee:-1, c:'#2563eb' },
+    { lbl:'Manager Constellation', tpc:'7,5%', seuil:'3 branches actives', annee:-1, c:'#059669' },
     { lbl:'Manager Galaxie', tpc:'8%', seuil:'4 branches actives', annee:-1, c:'var(--orange)' },
   ];
+  // Marquer les qualifs atteintes (an0 réel compte comme "Actuel")
   rows.forEach(function(r) {
-    if(r.qualif === 'Manager' && qualifs[1].annee < 0) qualifs[1].annee = r.an;
-    if(r.qualif === 'Manager Planète' && qualifs[2].annee < 0) qualifs[2].annee = r.an;
-    if(r.qualif === 'Manager Étoile' && qualifs[3].annee < 0) qualifs[3].annee = r.an;
-    if(r.qualif === 'Manager Galaxie' && qualifs[4].annee < 0) qualifs[4].annee = r.an;
+    var qmap = [
+      {k:'Consultant',q:0},{k:'Manager',q:1},{k:'Manager Planète',q:2},
+      {k:'Manager Étoile',q:3},{k:'Manager Constellation',q:4},{k:'Manager Galaxie',q:5}
+    ];
+    qmap.forEach(function(m) {
+      if(r.qualif === m.k && qualifs[m.q].annee < 0) qualifs[m.q].annee = r.an;
+    });
   });
+  // Si on démarre de Consultant (démarrage pur), marquer an0
+  if(!hasExistingActivity) qualifs[0].annee = 0;
 
-  // Titres (Senior / Major / Expert)
+  // Titres — prendre en compte le titre saisi en An0
   var titresData = [
-    { lbl:'Senior', seuil:'> 0,5 M€ VGP/an', prime:'+1%', desc:'Éligible Prime Qualité', annee:-1, c:'#d97706' },
-    { lbl:'Major',  seuil:'> 1 M€ VGP/an',   prime:'+1%', desc:'Éligible Prime Qualité', annee:-1, c:'#7c3aed' },
-    { lbl:'Expert', seuil:'> 1,5 M€ VGP/an', prime:'+2%', desc:'Prime Qualité max', annee:-1, c:'#dc2626' },
+    { lbl:'Senior', seuil:'VA perso > 500k€/an', prime:'+1%', desc:'Prime Qualité +1%', annee:-1, c:'#d97706' },
+    { lbl:'Major',  seuil:'VA perso > 1 M€/an',  prime:'+1%', desc:'Prime Qualité +1%', annee:-1, c:'#7c3aed' },
+    { lbl:'Expert', seuil:'VA perso > 1,5 M€/an',prime:'+2%', desc:'Prime Qualité +2% (max)', annee:-1, c:'#dc2626' },
   ];
+  // An0 avec titre saisi → marquer comme annee 0
+  if(hasExistingActivity && titreActuel === 'Senior') titresData[0].annee = 0;
+  if(hasExistingActivity && titreActuel === 'Major')  titresData[0].annee = 0, titresData[1].annee = 0;
+  if(hasExistingActivity && titreActuel === 'Expert') titresData[0].annee = 0, titresData[1].annee = 0, titresData[2].annee = 0;
+  // Années projetées depuis an1
   rows.forEach(function(r) {
+    if(r.an === 0) return; // déjà traité ci-dessus
     if(r.titre === 'Senior' && titresData[0].annee < 0) titresData[0].annee = r.an;
     if(r.titre === 'Major'  && titresData[1].annee < 0) titresData[1].annee = r.an;
     if(r.titre === 'Expert' && titresData[2].annee < 0) titresData[2].annee = r.an;
   });
 
+  function badgeLabel(annee, isExisting) {
+    if(annee < 0) return '<span class="qual-badge non">Non atteint</span>';
+    if(annee === 0 && isExisting) return '<span class="qual-badge oui" style="background:rgba(37,99,235,0.12);color:#2563eb">Actuel</span>';
+    return '<span class="qual-badge oui">An '+annee+'</span>';
+  }
+
   setHTML('qualRow',
     '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule-l)">Qualifications PMR</div>'
-    + qualifs.map(q => {
+    + qualifs.map(function(q) {
       var reached = q.annee >= 0;
+      var isCurrentAn0 = q.annee === 0 && hasExistingActivity;
       return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
         +'<div class="qual-lbl">'+q.lbl+'</div>'
         +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'">'+q.tpc+'</div>'
         +'<div class="qual-sub">'+q.seuil+'</div>'
-        +(reached?'<span class="qual-badge oui">An '+q.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
+        +badgeLabel(q.annee, isCurrentAn0)
         +'</div>';
     }).join('')
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité (enquête satisfaction positive requise)</div>'
-    + titresData.map(t => {
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité <span style="font-weight:400;font-style:italic">(enquête satisfaction positive requise)</span></div>'
+    + titresData.map(function(t) {
       var reached = t.annee >= 0;
+      var isCurrentAn0 = t.annee === 0 && hasExistingActivity;
       return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?t.c:'var(--rule-l)')+';min-width:140px">'
         +'<div class="qual-lbl">'+t.lbl+'</div>'
         +'<div class="qual-val" style="color:'+(reached?t.c:'var(--ink-30)')+'">'+t.prime+'</div>'
         +'<div class="qual-sub">'+t.seuil+'</div>'
         +'<div class="qual-sub" style="font-size:9px;color:var(--ink-30);margin-top:1px">'+t.desc+'</div>'
-        +(reached?'<span class="qual-badge oui">An '+t.annee+'</span>':'<span class="qual-badge non">Non atteint</span>')
+        +badgeLabel(t.annee, isCurrentAn0)
         +'</div>';
     }).join('')
   );
