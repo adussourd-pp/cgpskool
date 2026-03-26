@@ -6045,14 +6045,17 @@ function saveMentionsDirect(){
 
   var h='<div style="font-family:var(--sans)">';
 
-  // Carte contact
-  h+='<div style="background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15);border-radius:12px;padding:20px;margin-bottom:28px">';
-  if(mNom)h+='<div style="font-weight:600;font-size:15px;color:var(--noir);margin-bottom:6px">'+mNom[1].trim()+'</div>';
-  if(mAdr)h+='<div style="font-size:13px;color:var(--gris-f)">'+mAdr[1].trim()+(mVille?', '+mVille[1].trim():'')+'</div>';
-  if(mMail)h+='<div style="margin-top:4px"><a style="font-size:13px;color:var(--orange);text-decoration:none">'+mMail[1]+'</a></div>';
-  if(mTel)h+='<div style="font-size:13px;color:var(--gris-f);margin-top:2px">'+mTel[1].trim()+'</div>';
-  if(mOrias)h+='<div style="margin-top:8px"><span style="font-size:12px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:4px 12px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
-  h+='</div>';
+  // Carte contact avec photo de profil
+  var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
+  h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15);border-radius:12px;padding:16px 20px;margin-bottom:28px">';
+  if(photoUrl)h+='<img src="'+photoUrl+'" style="width:72px;height:72px;border-radius:12px;object-fit:cover;flex-shrink:0">';
+  h+='<div style="flex:1;min-width:0">';
+  if(mNom)h+='<div style="font-weight:600;font-size:15px;color:var(--noir);margin-bottom:4px">'+mNom[1].trim()+'</div>';
+  if(mAdr)h+='<div style="font-size:12px;color:var(--gris-f)">'+mAdr[1].trim()+(mVille?', '+mVille[1].trim():'')+'</div>';
+  if(mMail)h+='<div style="margin-top:3px"><a style="font-size:12px;color:var(--orange);text-decoration:none">'+mMail[1]+'</a></div>';
+  if(mTel)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:2px">'+mTel[1].trim()+'</div>';
+  if(mOrias)h+='<div style="margin-top:6px"><span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:3px 10px;border-radius:20px">ORIAS n\u00b0 '+mOrias[1].trim()+'</span></div>';
+  h+='</div></div>';
 
   // Decouper le texte en sections
   var secNum=0;
