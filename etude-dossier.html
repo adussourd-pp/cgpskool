@@ -463,6 +463,10 @@ select.span2{grid-column:span 2}
 .ml-input:focus{border-color:var(--orange)}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}.comment-zone.comment-off{display:none!important}}
 
+/* ── NOTE PRINT (dans la page, visible quand switch ON) ── */
+.note-print{margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;white-space:pre-wrap}
+.note-print::before{content:'Note conseiller';display:block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
+
 /* ── PIED DE PAGE ── */
 .page-number{display:flex;justify-content:space-between;align-items:center;font-family:var(--sans);font-size:10px;color:var(--gris);padding:14px 0 4px;margin-top:18px;border-top:1px solid var(--bord)}
 
@@ -694,13 +698,15 @@ select.span2{grid-column:span 2}
     <div id="objDisplay" style="font-size:13px;color:var(--gris-f)">—</div>
   </div>
 
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-situation" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-situation -->
+<div class="comment-zone comment-off panneau-interne" data-sec="situation" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      2 — PATRIMOINE
@@ -738,13 +744,15 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierPat" style="margin-bottom:10px"></div>
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-patrimoine" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-patrimoine -->
+<div class="comment-zone comment-off panneau-interne" data-sec="patrimoine" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      3 — FISCAL
@@ -780,13 +788,15 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierFis" style="margin-bottom:10px"></div>
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-fiscal" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-fiscal -->
+<div class="comment-zone comment-off panneau-interne" data-sec="fiscal" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      4 — REVENUS & FINANCEMENT
@@ -800,13 +810,15 @@ select.span2{grid-column:span 2}
   <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
 
   <div id="levierFin" style="margin-bottom:10px"></div>
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-financement" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-financement -->
+<div class="comment-zone comment-off panneau-interne" data-sec="financement" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      5 — RETRAITE
@@ -841,13 +853,15 @@ select.span2{grid-column:span 2}
     <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
     <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
   </div>
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-retraite -->
+<div class="comment-zone comment-off panneau-interne" data-sec="retraite" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      5b — TRANSMISSION
@@ -923,10 +937,6 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
   </div>
 
-  <div class="row-btns" style="margin-top:18px">
-    <button class="btn btn-secondary" onclick="goTo('transmission')">&#8592; Transmission</button>
-    <button class="btn btn-secondary" onclick="goTo('preconisations')">Préconisations &#8594;</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-entreprise -->
 
@@ -1002,13 +1012,15 @@ select.span2{grid-column:span 2}
 
   <div id="solContainer" style="display:none"></div>
 
-  <div class="comment-zone comment-off">
-    <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
-    <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2" oninput="autoEnableComment(this)"></textarea>
-  </div>
+  <div class="note-print" id="notePrint-preconisations" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-preconisations -->
+<div class="comment-zone comment-off panneau-interne" data-sec="preconisations" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note conseiller</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 <!-- ════════════════════════════════════════
      7 — SYNTHÈSE
@@ -1016,10 +1028,6 @@ select.span2{grid-column:span 2}
 <div class="section-page" id="sec-synthese">
   <div class="sec-header">
     <div><div class="sec-tag">Section 07</div><div class="sec-h1">Synthèse & Étapes</div></div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div id="syntheseConseillerBadge" style="display:none;font-size:11px;color:var(--gris);background:var(--gris-l);padding:4px 10px;border-radius:6px"></div>
-      <button class="btn btn-success" onclick="exportPDF()">⬇ Exporter PDF</button>
-    </div>
   </div>
 
   <!-- ── FEUILLE DE ROUTE (stepper horizontal) ── -->
@@ -1065,10 +1073,6 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteSynthese" contenteditable="true" data-placeholder="Résumé de l'étude, logique de la stratégie préconisée, points clés pour le client…"></div>
   </div>
 
-  <div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('preconisations')">← Préconisations</button>
-    <button class="btn btn-success" onclick="exportPDF()">↓ Exporter PDF complet</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-synthese -->
 
@@ -1128,10 +1132,6 @@ select.span2{grid-column:span 2}
 
   </div>
 
-  <div class="row-btns" style="margin-top:18px">
-    <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
-    <button class="btn btn-secondary" onclick="goTo('sommaire')">Sommaire &#8594;</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-pagegarde -->
 
@@ -1145,10 +1145,6 @@ select.span2{grid-column:span 2}
 
   <div id="gardeSommaire" style="font-family:var(--sans)"></div>
 
-  <div class="row-btns" style="margin-top:18px">
-    <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
-    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions légales &#8594;</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-sommaire -->
 
@@ -1191,10 +1187,6 @@ select.span2{grid-column:span 2}
     Ce document est strictement confidentiel et destiné uniquement à l'usage du client désigné.
   </div>
 
-  <div class="row-btns" style="margin-top:18px">
-    <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
-    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-mentions -->
 
@@ -1231,10 +1223,6 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <div class="row-btns" style="margin-top:18px">
-    <button class="btn btn-secondary" onclick="goTo('mentions')">&#8592; Mentions légales</button>
-    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
-  </div>
   <div class="page-number"></div>
 </div><!-- /sec-avis -->
 
@@ -2216,6 +2204,10 @@ function goTo(sec){
   // Afficher/masquer les panneaux conseiller selon la section active
   var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis'};
   Object.keys(extPanels).forEach(function(k){var el=document.getElementById(extPanels[k]);if(el)el.style.display=(k===sec)?'':'none';});
+  // Afficher/masquer les zones note conseiller selon la section active
+  document.querySelectorAll('.comment-zone[data-sec]').forEach(function(el){
+    el.style.display=(el.getAttribute('data-sec')===sec)?'':'none';
+  });
 }
 
 // ── NUMÉROTATION DYNAMIQUE DES PAGES ─────────────────────────────
@@ -2280,10 +2272,20 @@ function updatePageBreaks(secId){
 }
 
 // ── TOGGLE NOTE CONSEILLER ────────────────────────────────────────
+function syncNotePrint(zone){
+  var secId=zone.getAttribute('data-sec');
+  var ta=zone.querySelector('textarea');
+  var cb=zone.querySelector('.cz-switch input');
+  var np=document.getElementById('notePrint-'+secId);
+  if(!np||!ta||!cb)return;
+  if(cb.checked&&ta.value.trim()){np.style.display='';np.textContent=ta.value;}
+  else{np.style.display='none';np.textContent='';}
+}
 function toggleComment(cb){
   var zone=cb.closest('.comment-zone');
   if(!zone)return;
   zone.classList.toggle('comment-off',!cb.checked);
+  syncNotePrint(zone);
 }
 function autoEnableComment(ta){
   var zone=ta.closest('.comment-zone');
@@ -2292,6 +2294,7 @@ function autoEnableComment(ta){
   if(!cb)return;
   if(ta.value.trim().length>0&&!cb.checked){cb.checked=true;zone.classList.remove('comment-off');}
   if(ta.value.trim().length===0&&cb.checked){cb.checked=false;zone.classList.add('comment-off');}
+  syncNotePrint(zone);
 }
 
 // ── MODE IMPORT/MANUAL ────────────────────────────────────────────
