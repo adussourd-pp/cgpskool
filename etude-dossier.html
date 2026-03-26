@@ -5758,13 +5758,49 @@ function saveMentionsDirect(){
   if(!input)return;
   try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
   var mel=document.getElementById('mentionsPreview');
-  if(mel){
-    if(input.value.trim()){
-      mel.innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.8;white-space:pre-line">'+input.value.trim()+'</div>';
+  if(!mel)return;
+  var raw=input.value.trim();
+  if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions l\u00e9gales ci-dessus.</em>';return;}
+
+  // Parser le texte en sections (double saut de ligne = nouvelle section)
+  var blocks=raw.split(/\n\s*\n/).filter(function(b){return b.trim();});
+  var h='<div style="font-family:var(--sans)">';
+  var sectionNum=0;
+
+  blocks.forEach(function(block){
+    var lines=block.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    if(!lines.length)return;
+
+    // Heuristique : si la premiere ligne est courte (<60 car) et pas de chiffre = titre de section
+    var firstLine=lines[0];
+    var isTitle=firstLine.length<80&&!/\d{3}/.test(firstLine)&&lines.length>1;
+    // Ou si c est tout en majuscules
+    if(firstLine===firstLine.toUpperCase()&&firstLine.length>3)isTitle=true;
+
+    if(isTitle){
+      sectionNum++;
+      var num=sectionNum<10?'0'+sectionNum:sectionNum;
+      h+='<div style="margin-top:'+(sectionNum>1?'24':'0')+'px;margin-bottom:16px;display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--orange);padding-bottom:8px">';
+      h+='<span style="font-family:var(--sans);font-size:22px;font-weight:300;color:var(--orange)">'+num+'</span>';
+      h+='<span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--noir)">'+firstLine+'</span>';
+      h+='</div>';
+      // Reste du bloc = contenu
+      var content=lines.slice(1).join('<br>');
+      if(content){
+        h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
+        h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+content+'</div>';
+        h+='</div>';
+      }
     } else {
-      mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions légales ci-dessus.</em>';
+      // Bloc sans titre = contenu simple avec bordure
+      h+='<div style="border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:12px;background:var(--gris-l);border-radius:0 8px 8px 0">';
+      h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">'+lines.join('<br>')+'</div>';
+      h+='</div>';
     }
-  }
+  });
+
+  h+='</div>';
+  mel.innerHTML=h;
 }
 
 // ══════════════════════════════════════════════════════════════
