@@ -982,40 +982,66 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-entreprise">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b — Optionnel</div><div class="sec-h1">Analyse Entreprise</div><div class="sec-sub">SCI, Holding, 150-0 B ter, FCPR remploi</div></div>
+    <div><div class="sec-tag">Section 05b &#8212; Optionnel</div><div class="sec-h1">Analyse Entreprise</div></div>
   </div>
 
+  <!-- Votre entreprise (visible PDF) -->
+  <div id="entRecap" style="margin-bottom:16px"></div>
+
+  <!-- Solutions Entreprise -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Solutions Entreprise disponibles</div>
-    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f);line-height:1.8">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Apport-cession 150-0 B ter</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Report d'imposition PV — reinvestissement 60% dans 2 ans</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">FCPR/FPCI remploi</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Eligible remploi 150-0 B ter + exoneration PV apres 5 ans</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Contrat de capitalisation PM</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Tresorerie d'entreprise optimisee, IS forfaitaire</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">SCI a l\'IS</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Amortissement, transmission via donation de parts</div>
-        </div>
-      </div>
-    </div>
+    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f)"></div>
   </div>
 
+  <!-- Note conseiller -->
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller — Entreprise</div>
-    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, trésorerie PM, PEE..."></div>
   </div>
 
   <div class="page-number"></div>
 </div><!-- /sec-entreprise -->
+
+<!-- Panneau saisie entreprise (hors section-page) -->
+<div id="extPanelEntreprise" class="panneau-interne" style="display:none;background:#fff;border:2px dashed #7B5EA7;border-radius:14px;padding:24px;margin-bottom:18px">
+  <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir);margin-bottom:14px">Hypoth&#232;ses de l'entreprise</div>
+
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Informations</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+    <div><label style="font-size:10px;color:var(--gris)">Raison sociale</label><input class="fi" id="entRaisonSociale" oninput="renderEntreprise()"></div>
+    <div><label style="font-size:10px;color:var(--gris)">Forme juridique</label><select class="fi" id="entForme" onchange="renderEntreprise()"><option>SARL</option><option>SAS</option><option>EURL</option><option>SASU</option><option>SA</option><option>SCI</option><option>Autre</option></select></div>
+    <div><label style="font-size:10px;color:var(--gris)">R&#233;gime fiscal</label><div style="display:flex;gap:6px;margin-top:4px"><button onclick="document.getElementById('entRegime').value='IS';renderEntreprise()" id="entIS" class="fi" style="flex:1;text-align:center;font-weight:600">IS</button><button onclick="document.getElementById('entRegime').value='IR';renderEntreprise()" id="entIR" class="fi" style="flex:1;text-align:center">IR</button></div><input type="hidden" id="entRegime" value="IS"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+    <div><label style="font-size:10px;color:var(--gris)">Capital social</label><input class="fi" type="number" id="entCapital" oninput="renderEntreprise()"></div>
+    <div><label style="font-size:10px;color:var(--gris)">CA annuel</label><input class="fi" type="number" id="entCA" oninput="renderEntreprise()"></div>
+    <div><label style="font-size:10px;color:var(--gris)">R&#233;sultat net</label><input class="fi" type="number" id="entResultat" oninput="renderEntreprise()"></div>
+    <div><label style="font-size:10px;color:var(--gris)">R&#233;mun&#233;ration dirigeant/an</label><input class="fi" type="number" id="entRemun" oninput="renderEntreprise()"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+    <div><label style="font-size:10px;color:var(--gris)">Tr&#233;sorerie disponible</label><input class="fi" type="number" id="entTreso" oninput="renderEntreprise()"></div>
+    <div><label style="font-size:10px;color:var(--gris)">Valeur estim&#233;e entreprise</label><input class="fi" type="number" id="entValeur" oninput="renderEntreprise()"><div style="font-size:9px;color:var(--gris);font-style:italic">&#192; affiner avec un expert</div></div>
+    <div><label style="font-size:10px;color:var(--gris)">Nb salari&#233;s</label><input class="fi" type="number" id="entSalaries" oninput="renderEntreprise()"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <label style="font-size:12px;font-weight:600;color:var(--noir);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="entCession" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Projet de cession</label>
+    <select class="fi" id="entHorizonCession" style="width:120px;display:none" onchange="renderEntreprise()"><option>1 an</option><option>2 ans</option><option>3 ans</option><option>5 ans</option><option>+ de 5 ans</option></select>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Objectifs du dirigeant</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px" id="entObjectifs">
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="remun" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Optimiser la r&#233;mun&#233;ration</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="treso" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Valoriser la tr&#233;sorerie</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="transm" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Pr&#233;parer la transmission</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="protect" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Prot&#233;ger dirigeant/associ&#233;s</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="retraite" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Pr&#233;parer la retraite</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="cession" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Optimiser fiscalit&#233; cession</label>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Calculs automatiques</div>
+  <div id="entCalcs" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px"></div>
+</div>
 
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
 <div id="extPanelPreconisations" class="panneau-interne" style="display:none;border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
@@ -2207,7 +2233,7 @@ function goTo(sec){
   // Marquer les sauts de page A4 après le rendu
   // Page break markers désactivés
   // Afficher/masquer les panneaux conseiller selon la section active
-  var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis'};
+  var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis',entreprise:'extPanelEntreprise'};
   Object.keys(extPanels).forEach(function(k){var el=document.getElementById(extPanels[k]);if(el)el.style.display=(k===sec)?'':'none';});
   // Afficher/masquer les zones note conseiller selon la section active
   document.querySelectorAll('.comment-zone[data-sec]').forEach(function(el){
@@ -7075,6 +7101,56 @@ function rPageGarde(){
   }
 }
 
+// ── ENTREPRISE ──
+function renderEntreprise(){
+  var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
+  var n=function(id){return +(v(id))||0;};
+  var cb=function(id){var e=document.getElementById(id);return e&&e.checked;};
+  // Toggle cession horizon
+  var hc=document.getElementById('entHorizonCession');
+  if(hc)hc.style.display=cb('entCession')?'':'none';
+  // Toggle regime buttons
+  var regime=v('entRegime')||'IS';
+  var btnIS=document.getElementById('entIS');var btnIR=document.getElementById('entIR');
+  if(btnIS){btnIS.style.fontWeight=regime==='IS'?'700':'400';btnIS.style.color=regime==='IS'?'#7B5EA7':'var(--gris)';}
+  if(btnIR){btnIR.style.fontWeight=regime==='IR'?'700':'400';btnIR.style.color=regime==='IR'?'#7B5EA7':'var(--gris)';}
+  // Calculs
+  var ca=n('entCA'),res=n('entResultat'),treso=n('entTreso'),capital=n('entCapital'),valeur=n('entValeur');
+  var margeNette=ca>0?(res/ca*100).toFixed(1):'0';
+  var ratioTreso=ca>0?(treso/ca*100).toFixed(1):'0';
+  var pv=valeur>capital?valeur-capital:0;
+  var cEl=document.getElementById('entCalcs');
+  if(cEl){
+    var ch='';
+    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Marge nette</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+margeNette+' %</div></div>';
+    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Ratio tr\u00e9so / CA</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+ratioTreso+' %</div></div>';
+    if(regime==='IS')ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">IS th\u00e9orique</div><div style="font-size:11px;color:var(--noir)">15% jusqu\'\u00e0 42 500\u20ac \u2014 25% au-del\u00e0</div></div>';
+    if(cb('entCession')&&pv>0)ch+='<div style="background:rgba(123,79,166,0.06);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">PV estim\u00e9e</div><div style="font-size:14px;font-weight:700;color:#7B5EA7">'+fmt(pv)+' \u20ac</div><div style="font-size:9px;color:var(--gris);font-style:italic">\u00c0 affiner avec expert-comptable</div></div>';
+    cEl.innerHTML=ch;
+  }
+  // Récap PDF
+  var rEl=document.getElementById('entRecap');
+  if(rEl){
+    var rs=v('entRaisonSociale');
+    if(!rs&&!ca){rEl.innerHTML='';return;}
+    var rh='<div class="card" style="margin-bottom:16px"><div class="card-title"><span class="dot"></span>Votre entreprise</div>';
+    rh+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">';
+    var rows=[['Raison sociale',rs],['Forme juridique',v('entForme')],['R\u00e9gime fiscal',regime],['Capital social',fmt(capital)+' \u20ac'],['CA annuel',fmt(ca)+' \u20ac'],['R\u00e9sultat net',fmt(res)+' \u20ac'],['R\u00e9mun\u00e9ration dirigeant',fmt(n('entRemun'))+' \u20ac/an'],['Tr\u00e9sorerie',fmt(treso)+' \u20ac'],['Valeur estim\u00e9e',fmt(valeur)+' \u20ac'],['Salari\u00e9s',v('entSalaries')||'0']];
+    rows.forEach(function(r){rh+='<div style="padding:6px 14px;border-bottom:1px solid var(--bord);display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--gris)">'+r[0]+'</span><span style="font-size:12px;font-weight:600;color:var(--noir)">'+r[1]+'</span></div>';});
+    rh+='</div>';
+    if(cb('entCession'))rh+='<div style="padding:10px 14px;background:rgba(123,79,166,0.06);border-radius:8px;margin-top:10px;font-size:12px;color:#7B5EA7;font-weight:600">Projet de cession \u00e0 horizon '+v('entHorizonCession')+'</div>';
+    // Objectifs
+    var objs=[];
+    document.querySelectorAll('#entObjectifs input:checked').forEach(function(c){objs.push(c.parentNode.textContent.trim());});
+    if(objs.length){
+      rh+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
+      objs.forEach(function(o){rh+='<span style="font-size:11px;padding:4px 12px;background:rgba(123,79,166,0.08);border:1px solid rgba(123,79,166,0.2);border-radius:20px;color:#7B5EA7;font-weight:600">'+o+'</span>';});
+      rh+='</div>';
+    }
+    rh+='</div>';
+    rEl.innerHTML=rh;
+  }
+}
 function rMentions(){renderMentionsLegales();}
 function renderMentionsLegales(){
   // Lire les champs du formulaire
