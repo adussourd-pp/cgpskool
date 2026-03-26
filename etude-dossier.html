@@ -747,15 +747,26 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- Chiffres clés du foyer (commun) -->
+  <!-- Épargne & Projets -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Chiffres clés du foyer</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0">
-      <div style="padding:10px 14px;border-right:1px solid var(--bord)"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Revenus nets /mois</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kSit2">0 €</div></div>
-      <div style="padding:10px 14px;border-right:1px solid var(--bord)"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Taux d'endettement</div><div id="kSit3">—</div></div>
-      <div style="padding:10px 14px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Reste à vivre /mois</div><div style="font-size:18px;font-weight:700" id="kSit4">0 €</div></div>
+    <div class="card-title"><span class="dot"></span>&#201;pargne &amp; Projets</div>
+    <div id="kSit1Wrap" style="padding:10px 14px"></div>
+    <div style="padding:10px 14px;border-top:1px solid var(--bord);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:700;color:var(--noir)">&#201;pargne de pr&#233;caution souhait&#233;e</span>
+      <input type="number" id="epPrecInput" value="0" min="0" step="1000" style="width:120px;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);text-align:center;outline:none" onchange="ED.epPrec=+this.value">
+      <span style="font-size:12px;color:var(--gris)">&#8364;</span>
     </div>
-    <div id="kSit1Wrap" style="padding:10px 14px;border-top:1px solid var(--bord)"></div>
+    <!-- Projets court terme -->
+    <div style="padding:10px 14px;border-top:1px solid var(--bord)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--noir)">Projets &#224; court terme</span>
+        <label class="cz-switch"><input type="checkbox" id="projetsSwitch" onchange="toggleProjets(this.checked)"><span class="cz-slider"></span></label>
+      </div>
+      <div id="projetsContainer" style="display:none">
+        <div id="projetsList"></div>
+        <button onclick="addProjet()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);padding:4px 0;margin-top:6px">+ Ajouter un projet</button>
+      </div>
+    </div>
   </div>
 
   <!-- Objectifs (commun, pleine largeur) -->
@@ -3448,6 +3459,48 @@ function parseAvisIR(){
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  SECTION — SITUATION                                           ║
 // ╚══════════════════════════════════════════════════════════════════╝
+// ── Projets court terme ──
+if(!ED.projets)ED.projets=[];
+function toggleProjets(on){
+  var c=document.getElementById('projetsContainer');
+  if(c)c.style.display=on?'':'none';
+  if(on&&!ED.projets.length)addProjet();
+}
+function addProjet(){
+  ED.projets.push({titre:'',pour:'C1',montant:0,horizon:'< 1 an'});
+  renderProjets();
+}
+function removeProjet(idx){
+  ED.projets.splice(idx,1);
+  if(!ED.projets.length){var sw=document.getElementById('projetsSwitch');if(sw)sw.checked=false;toggleProjets(false);}
+  renderProjets();
+}
+function updateProjet(idx,field,val){if(ED.projets[idx])ED.projets[idx][field]=val;}
+function renderProjets(){
+  var el=document.getElementById('projetsList');if(!el)return;
+  var titOptions=['C1'];var titLabels={};
+  titLabels['C1']=nomC(1);
+  if(ED.type!=='seul'){titOptions.push('C2');titLabels['C2']=nomC(2);}
+  titOptions.push('Commun');titLabels['Commun']='Commun';
+  var nbEnf=ED.nbEnfants||0;
+  for(var ei=1;ei<=nbEnf;ei++){var eKey='E'+ei;titOptions.push(eKey);titLabels[eKey]=(ED.enfants&&ED.enfants[ei-1]&&ED.enfants[ei-1].prenom)?ED.enfants[ei-1].prenom:'Enfant '+ei;}
+  var h='';
+  ED.projets.forEach(function(p,i){
+    h+='<div style="display:grid;grid-template-columns:1.5fr 1fr 0.8fr 1fr 28px;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.04)">';
+    h+='<input type="text" value="'+(p.titre||'')+'" placeholder="Nom du projet" onchange="updateProjet('+i+',\'titre\',this.value)" style="padding:5px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none">';
+    h+='<select onchange="updateProjet('+i+',\'pour\',this.value)" style="padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:var(--sans)">';
+    titOptions.forEach(function(t){h+='<option value="'+t+'"'+(p.pour===t?' selected':'')+'>'+titLabels[t]+'</option>';});
+    h+='</select>';
+    h+='<input type="number" value="'+(p.montant||0)+'" min="0" step="1000" onchange="updateProjet('+i+',\'montant\',+this.value)" style="padding:5px 8px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:var(--sans);text-align:right">';
+    h+='<select onchange="updateProjet('+i+',\'horizon\',this.value)" style="padding:5px 6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:var(--sans)">';
+    ['< 6 mois','< 1 an','2 ans','3 ans'].forEach(function(opt){h+='<option'+(p.horizon===opt?' selected':'')+'>'+opt+'</option>';});
+    h+='</select>';
+    h+='<button onclick="removeProjet('+i+')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:16px;padding:0">&times;</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
 function rSituation(){
   var isCoupleSit=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
   var n1=`${ED.c1.civ||''} ${ED.c1.prenom||''} ${ED.c1.nom||''}`.trim();
@@ -3537,18 +3590,15 @@ function rSituation(){
     epH+='</div>';
     epWrap.innerHTML=epH;
   }
-  set('kSit2',fmt(revM)+' €/mois');
-  const ke=document.getElementById('kSit3');
-  var endPct=Math.min(100,Math.round(endett/35*100));
-  var endColor=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
-  ke.innerHTML='<div style="font-size:17px;font-weight:700;color:'+endColor+'">'+( endett>0?endett.toFixed(1)+' %':'—')+'</div>'
-    +'<div style="height:6px;background:var(--bord);border-radius:3px;margin-top:5px;overflow:hidden">'
-    +'<div style="width:'+endPct+'%;height:100%;background:'+endColor+';border-radius:3px;transition:width 0.5s"></div>'
-    +'</div>'
-    +'<div style="font-size:9px;color:var(--gris);margin-top:2px;text-align:right">max 35%</div>';
-  const krav=document.getElementById('kSit4');
-  krav.textContent=fmt(rav)+' €/mois';
-  krav.style.color=rav<500?'var(--red)':rav<1500?'var(--ambre-d)':'inherit';
+  // Épargne de précaution
+  var epPrecIn=document.getElementById('epPrecInput');
+  if(epPrecIn)epPrecIn.value=ED.epPrec||0;
+  // Projets
+  if(ED.projets&&ED.projets.length){
+    var sw=document.getElementById('projetsSwitch');if(sw)sw.checked=true;
+    var c=document.getElementById('projetsContainer');if(c)c.style.display='';
+    renderProjets();
+  }
 }
 
 
