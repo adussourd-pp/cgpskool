@@ -5726,9 +5726,15 @@ function renderFichesClient(){
       }
 
       // Note client par produit (si switch ON et texte non vide)
-      if(firstSol._noteOn&&firstSol._noteText&&firstSol._noteText.trim()){
-        html+='<div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,0.05);background:rgba(0,0,0,0.02)">';
-        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7;white-space:pre-wrap">'+firstSol._noteText.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+      var noteText3=firstSol._noteText||'';
+      // Sync : chercher le texte sur tous les sols du groupe si le premier est vide
+      if(!noteText3){pg.sols.forEach(function(ss){if(ss._noteText)noteText3=ss._noteText;});}
+      var noteOn3=firstSol._noteOn||false;
+      if(!noteOn3){pg.sols.forEach(function(ss){if(ss._noteOn)noteOn3=true;});}
+      if(noteOn3&&noteText3.trim()){
+        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05);background:#fdf8f0;border-left:3px solid var(--orange)">';
+        html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:4px">Note du conseiller</div>';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7;font-style:italic;white-space:pre-wrap">'+noteText3.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
         html+='</div>';
       }
 
