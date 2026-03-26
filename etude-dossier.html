@@ -247,11 +247,8 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .section-page.active{display:block;animation:fadeUp 0.25s ease}
 /* Cadre A4 sur les sections (sauf import) */
 .section-page:not(#sec-import){background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px 40px 70px;max-width:794px;margin:0 auto;min-height:1045px;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative}
-/* Marqueur de saut de page */
-.page-break-marker{position:relative;height:0;margin:0 -40px;border:none;pointer-events:none}
-.page-break-marker::before{content:'';position:absolute;left:0;right:0;top:-1px;border-top:2px dashed rgba(212,98,42,0.35)}
-.page-break-marker::after{content:'Saut de page';position:absolute;right:12px;top:-10px;font-family:var(--sans);font-size:9px;font-weight:600;color:var(--orange);background:#ECEAE6;padding:0 8px;letter-spacing:0.05em;text-transform:uppercase}
-.page-break-spacer{height:48px}
+/* Marqueurs de saut de page — désactivés */
+.page-break-marker,.page-break-spacer{display:none}
 #sec-import{background:transparent;padding:0}
 to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -2197,7 +2194,7 @@ function goTo(sec){
   if(headerRight)headerRight.textContent='Étude de Dossier';
   updatePageNumbers();
   // Marquer les sauts de page A4 après le rendu
-  requestAnimationFrame(function(){updatePageBreaks(sec);});
+  // Page break markers désactivés
   // Afficher/masquer les panneaux conseiller selon la section active
   var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis'};
   Object.keys(extPanels).forEach(function(k){var el=document.getElementById(extPanels[k]);if(el)el.style.display=(k===sec)?'':'none';});
