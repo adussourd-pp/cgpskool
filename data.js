@@ -279,7 +279,7 @@ var SOLUTIONS_CONFIG = {
   'PER': {
     label:'PER adulte', levier:'Impots',
     horizon:'Retraite', horizonAns:20, rendement:0.04,
-    texte:"Capital d'environ {capital} dans {horizon} ans, pour la retraite, avec une reduction d'impots de {impots} des cette annee.",
+    texte:"Capital d'environ {capital} dans {horizon} ans, pour la retraite, avec une economie d'impot de {impots} des cette annee.",
     objectifs:['Optimiser votre fiscalite','Optimiser votre transmission','Proteger votre conjoint','Transmettre votre patrimoine','Preparer votre retraite'],
   },
   'PER_ENFANT': {
