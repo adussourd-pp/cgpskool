@@ -982,72 +982,48 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-entreprise">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b &#8212; Optionnel</div><div class="sec-h1">Analyse Entreprise</div></div>
+    <div><div class="sec-tag">Section 05b — Optionnel</div><div class="sec-h1">Analyse Entreprise</div><div class="sec-sub">SCI, Holding, 150-0 B ter, FCPR remploi</div></div>
   </div>
 
-  <!-- Votre entreprise (visible PDF) -->
-  <div id="entRecap" style="margin-bottom:16px"></div>
-
-  <!-- Solutions Entreprise -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Solutions Entreprise disponibles</div>
-    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f)"></div>
+    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f);line-height:1.8">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Apport-cession 150-0 B ter</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Report d'imposition PV — reinvestissement 60% dans 2 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">FCPR/FPCI remploi</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Eligible remploi 150-0 B ter + exoneration PV apres 5 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Contrat de capitalisation PM</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Tresorerie d'entreprise optimisee, IS forfaitaire</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">SCI a l\'IS</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Amortissement, transmission via donation de parts</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Note conseiller -->
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller</div>
-    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, trésorerie PM, PEE..."></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller — Entreprise</div>
+    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
   </div>
 
   <div class="page-number"></div>
 </div><!-- /sec-entreprise -->
 
-<!-- Panneau saisie entreprise (hors section-page) -->
-<div id="extPanelEntreprise" class="panneau-interne" style="display:none;background:#fff;border:2px dashed #7B5EA7;border-radius:14px;padding:24px;margin-bottom:18px">
-  <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir);margin-bottom:14px">Hypoth&#232;ses de l'entreprise</div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Informations</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div><label style="font-size:10px;color:var(--gris)">Raison sociale</label><input class="fi" id="entRaisonSociale" oninput="renderEntreprise()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">Forme juridique</label><select class="fi" id="entForme" onchange="renderEntreprise()"><option>SARL</option><option>SAS</option><option>EURL</option><option>SASU</option><option>SA</option><option>SCI</option><option>Autre</option></select></div>
-    <div><label style="font-size:10px;color:var(--gris)">R&#233;gime fiscal</label><div style="display:flex;gap:6px;margin-top:4px"><button onclick="document.getElementById('entRegime').value='IS';renderEntreprise()" id="entIS" class="fi" style="flex:1;text-align:center;font-weight:600">IS</button><button onclick="document.getElementById('entRegime').value='IR';renderEntreprise()" id="entIR" class="fi" style="flex:1;text-align:center">IR</button></div><input type="hidden" id="entRegime" value="IS"></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div><label style="font-size:10px;color:var(--gris)">Capital social</label><input class="fi" type="number" id="entCapital" oninput="renderEntreprise()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">CA annuel</label><input class="fi" type="number" id="entCA" oninput="renderEntreprise()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">R&#233;sultat net</label><input class="fi" type="number" id="entResultat" oninput="renderEntreprise()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">R&#233;mun&#233;ration dirigeant/an</label><input class="fi" type="number" id="entRemun" oninput="renderEntreprise()"></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div><label style="font-size:10px;color:var(--gris)">Tr&#233;sorerie disponible</label><input class="fi" type="number" id="entTreso" oninput="renderEntreprise()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">Valeur estim&#233;e entreprise</label><input class="fi" type="number" id="entValeur" oninput="renderEntreprise()"><div style="font-size:9px;color:var(--gris);font-style:italic">&#192; affiner avec un expert</div></div>
-    <div><label style="font-size:10px;color:var(--gris)">Nb salari&#233;s</label><input class="fi" type="number" id="entSalaries" oninput="renderEntreprise()"></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-    <label style="font-size:12px;font-weight:600;color:var(--noir);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="entCession" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Projet de cession</label>
-    <select class="fi" id="entHorizonCession" style="width:120px;display:none" onchange="renderEntreprise()"><option>1 an</option><option>2 ans</option><option>3 ans</option><option>5 ans</option><option>+ de 5 ans</option></select>
-  </div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Objectifs du dirigeant</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px" id="entObjectifs">
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="remun" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Optimiser la r&#233;mun&#233;ration</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="treso" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Valoriser la tr&#233;sorerie</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="transm" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Pr&#233;parer la transmission</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="protect" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Prot&#233;ger dirigeant/associ&#233;s</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="retraite" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Pr&#233;parer la retraite</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" data-obj="cession" onchange="renderEntreprise()" style="accent-color:#7B5EA7">Optimiser fiscalit&#233; cession</label>
-  </div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Calculs automatiques</div>
-  <div id="entCalcs" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px"></div>
-</div>
-
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
 <div id="extPanelPreconisations" class="panneau-interne" style="display:none;border:2px dashed var(--orange);border-radius:14px;overflow:visible;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-bottom:1px solid var(--bord);font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--bord)" onclick="togglePanneauConseiller()">
     <div>
       <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:var(--noir)">Panneau conseiller</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:1px">Objectifs détectés · Solutions Copernic — pas visible dans le PDF</div>
     </div>
     <span id="panneauChevron" style="color:var(--orange);font-size:18px;transition:transform 0.2s">▼</span>
   </div>
@@ -1161,14 +1137,17 @@ select.span2{grid-column:span 2}
 
 <!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
 <div id="extPanelMentions" class="panneau-interne" style="display:none;background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
+  <div style="padding:6px 18px;background:rgba(212,98,42,0.08);border-radius:10px;margin-bottom:14px;font-size:11px;font-weight:600;color:var(--orange)">⚠️ Non imprimé — visible conseiller uniquement</div>
   <div style="margin-bottom:14px">
-    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations l&#233;gales</div>
-    <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entr&#233;e en relation (fiche l&#233;gale)</div>
+    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations légales</div>
+    <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entrée en relation (fiche légale)</div>
   </div>
   <textarea id="mentionsDirectInput" rows="6"
-    placeholder="Collez ici le contenu de votre fiche d'informations l&#233;gales..."
+    placeholder="Collez ici le contenu de votre fiche d'informations légales..."
     style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
-    oninput="saveMentionsDirect()"></textarea>
+    oninput="saveMentionsDirect()"
+    onfocus="this.style.borderColor='var(--orange)'"
+    onblur="this.style.borderColor='var(--bord)'"></textarea>
   <div style="display:flex;gap:8px;margin-top:10px">
     <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
     <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
@@ -1551,6 +1530,7 @@ var SOLUTIONS_CONFIG = {
     objectifs:['Reorganiser votre patrimoine','Optimiser vos placements','Creer patrimoine immobilier','Diversifier votre patrimoine','Optimiser votre patrimoine','Optimiser votre transmission','Preparer votre retraite'],
   },
   'PINEL': {
+    label:'Immobilier d\u00e9fiscalisant', levier:'Financement',
     horizon:'25 ans', horizonAns:25, rendement:0.04,
     texte:"Se constituer un patrimoine dans l'immobilier d'environ {capital} et generateur de revenus complementaires d'environ {revenus}/mois, dans {horizon} ans.",
     objectifs:['Creer patrimoine immobilier','Optimiser votre fiscalite','Proteger votre conjoint','Proteger vos enfants','Preparer votre retraite'],
@@ -2209,7 +2189,7 @@ function goTo(sec){
   // Marquer les sauts de page A4 après le rendu
   // Page break markers désactivés
   // Afficher/masquer les panneaux conseiller selon la section active
-  var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis',entreprise:'extPanelEntreprise'};
+  var extPanels={preconisations:'extPanelPreconisations',pagegarde:'extPanelPagegarde',mentions:'extPanelMentions',avis:'extPanelAvis'};
   Object.keys(extPanels).forEach(function(k){var el=document.getElementById(extPanels[k]);if(el)el.style.display=(k===sec)?'':'none';});
   // Afficher/masquer les zones note conseiller selon la section active
   document.querySelectorAll('.comment-zone[data-sec]').forEach(function(el){
@@ -4181,6 +4161,9 @@ var COPERNIC = {
   'Jeanbrun':               {cat:'immobilier',   levier:'financement',icon:'&#127968;',
     desc:'Amortissement annuel 3,5 \u00e0 5,5 % imputable sur revenu global \u2014 successeur du Pinel (Loi n\u00b02026-103)',
     fiscal:'Amortissement imputable sur revenu global',sri:'3-5',horizon:'9 ans',horizonAns:9},
+  'Immobilier d\u00e9fiscalisant': {cat:'immobilier',levier:'financement',icon:'&#127968;',
+    desc:'Dispositifs de d\u00e9fiscalisation immobili\u00e8re : r\u00e9duction IR en contrepartie d\'un engagement de location',
+    fiscal:'R\u00e9duction IR plafonn\u00e9e niches fiscales',sri:'5-6',horizon:'6-12 ans',horizonAns:9},
 
   // ─── ÉPARGNE RETRAITE ──────────────────────────────────────────
 
@@ -4232,7 +4215,7 @@ var COPERNIC = {
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
+  'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
   'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
@@ -4240,7 +4223,7 @@ var OBJ_SOLUTIONS = {
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
   'Investir via le financement':        ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Jeanbrun'],
-  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','SCPI de rendement','Jeanbrun']
+  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','Jeanbrun']
 };
 var solsSelectionnees=[];
 
@@ -4650,12 +4633,6 @@ function renderSolsRetenues(){
     html+='</div></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);line-height:1.5;margin-bottom:10px">'+cp.desc+'</div>';
 
-    // Libellé PDF éditable
-    var defLabel=clientLabel(grp.produit);
-    var curLabel=firstSol._labelPDF||defLabel;
-    html+='<div style="margin-bottom:10px"><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Libell\u00e9 PDF</label>';
-    html+='<input type="text" value="'+curLabel.replace(/"/g,'&quot;')+'" onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_labelPDF\',this.value);renderFichesClient()" style="width:100%;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;color:var(--noir);background:var(--gris-l);outline:none"></div>';
-
     // Objectifs (shared across group, use first sol's objectifsValides)
     var solObjs=allSolsMap&&allSolsMap[grp.produit]?allSolsMap[grp.produit].objectifs:[];
     if(solObjs.length){
@@ -4667,45 +4644,6 @@ function renderSolsRetenues(){
         html+=obj+'</label>';
       });
       html+='</div></div>';
-    }
-
-    // ── Recommandations par produit ──
-    var RECOS={
-      'Assurance vie':['Privil\u00e9gier une architecture ouverte (multi-supports)','V\u00e9rifier la clause b\u00e9n\u00e9ficiaire','Anticiper la fiscalit\u00e9 apr\u00e8s 8 ans','Envisager des rachats partiels programm\u00e9s'],
-      'Contrat de capitalisation':['Int\u00e9ressant si patrimoine soumis \u00e0 l\'IFI','Peut \u00eatre transmis par donation de son vivant','V\u00e9rifier la compatibilit\u00e9 avec la succession'],
-      'SCPI de rendement':['Diversifier entre plusieurs SCPI et gestionnaires','V\u00e9rifier le taux d\'occupation financier (TOF)','Envisager le r\u00e9investissement des dividendes','Financement \u00e0 cr\u00e9dit possible pour effet levier'],
-      'FCPR / FPCI':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 investisseur qualifi\u00e9 si ticket > 100k\u20ac','Diversifier les mill\u00e9simes','Anticiper le blocage des fonds (5 \u00e0 10 ans)','Adapter la part au profil de risque global'],
-      'Donation':['V\u00e9rifier la date de la derni\u00e8re donation (rechargement 15 ans)','Envisager une donation-partage pour figer les valeurs','Consulter un notaire pour l\'acte','Pr\u00e9voir le rapport \u00e0 succession si in\u00e9galit\u00e9 entre h\u00e9ritiers'],
-      'PER':['V\u00e9rifier le plafond de d\u00e9duction disponible (avis d\'imposition)','Anticiper la fiscalit\u00e9 \u00e0 la sortie (rente vs capital)','Arbitrer entre PER individuel et PER entreprise','Optimiser le timing des versements selon revenus de l\'ann\u00e9e'],
-      'FIP / FCPI':['R\u00e9it\u00e9rer chaque ann\u00e9e pour cr\u00e9er une boucle de mill\u00e9simes','V\u00e9rifier le plafond niches fiscales restant (10 000\u20ac/an)','Cumuler FIP + FCPI + Corse + Outre-mer si possible','S\u00e9lectionner un op\u00e9rateur avec track record solide'],
-      'Girardin industriel':['Privil\u00e9gier un op\u00e9rateur avec garantie de bonne fin fiscale','V\u00e9rifier le plafond niches fiscales d\u00e9rogatoire (18 000\u20ac Outre-mer)','Souscrire en d\u00e9but d\'ann\u00e9e pour les meilleurs taux','Ne pas d\u00e9passer une exposition raisonnable du patrimoine'],
-      'SCPI fiscale':['Identifier le dispositif fiscal applicable (Malraux / D\u00e9ficit / MH)','V\u00e9rifier le plafond niches fiscales restant','Anticiper la fiscalit\u00e9 des revenus fonciers g\u00e9n\u00e9r\u00e9s','Horizon minimum 8-10 ans recommand\u00e9'],
-      'SCPI financ\u00e9e':['Comparer le co\u00fbt du cr\u00e9dit vs rendement SCPI','V\u00e9rifier la capacit\u00e9 d\'endettement restante','Privil\u00e9gier un cr\u00e9dit in fine si TMI \u00e9lev\u00e9','Anticiper l\'effort d\'\u00e9pargne mensuel net'],
-      'LMNP':['V\u00e9rifier le r\u00e9gime fiscal (r\u00e9el obligatoire pour amortissement)','Anticiper la requalification LMP si revenus > 23 000\u20ac','Faire \u00e9tablir un tableau d\'amortissement par un expert-comptable','V\u00e9rifier la qualit\u00e9 du gestionnaire si r\u00e9sidence services'],
-      'Denormandie':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 de la commune (liste officielle)','Confirmer le montant des travaux (min 25% du co\u00fbt total)','V\u00e9rifier les plafonds de loyers et ressources locataire','Contr\u00f4ler l\'impact sur le plafond niches fiscales (10 000\u20ac/an)'],
-      'Nue-propri\u00e9t\u00e9 immo':['V\u00e9rifier la solidit\u00e9 du bailleur social (usufruitier)','Anticiper la r\u00e9cup\u00e9ration de la pleine propri\u00e9t\u00e9','Pas de revenus pendant la dur\u00e9e \u2014 v\u00e9rifier la coh\u00e9rence','Int\u00e9ressant pour r\u00e9duire l\'assiette IFI'],
-      'LLI':['V\u00e9rifier l\'\u00e9ligibilit\u00e9 TVA r\u00e9duite (zone et op\u00e9rateur agr\u00e9\u00e9)','Envisager la SCI \u00e0 l\'IS pour optimiser l\'amortissement','V\u00e9rifier les plafonds de loyers applicables','Anticiper la fiscalit\u00e9 des revenus selon structure'],
-      'Jeanbrun':['V\u00e9rifier que le bien est un immeuble collectif (appartement)','Confirmer le DPE A ou B (neuf RE2020 obligatoire)','V\u00e9rifier les plafonds de loyers par zone','V\u00e9rifier les ressources du locataire','D\u00e9crets d\'application en cours \u2014 confirmer avec conseiller fiscal'],
-      'SCPI via SCI \u00e0 l\'IS':['V\u00e9rifier l\'objet social de la SCI','Anticiper la double imposition \u00e0 la sortie (IS + IR dividendes)','Faire \u00e9tablir les statuts par un juriste','Inscrire les parts au bilan de la SCI'],
-      'SCPI en usufruit':['Identifier le nu-propri\u00e9taire en parall\u00e8le','V\u00e9rifier la convention d\'usufruit','Anticiper la fiscalit\u00e9 IS sur les revenus per\u00e7us','Dur\u00e9e \u00e0 adapter aux besoins de tr\u00e9sorerie'],
-      'Pr\u00e9voyance individuelle':['Faire \u00e9tablir plusieurs devis comparatifs','V\u00e9rifier les exclusions de garantie','Adapter le d\u00e9lai de franchise \u00e0 la tr\u00e9sorerie','R\u00e9viser annuellement selon \u00e9volution des revenus'],
-      'Pr\u00e9voyance pro':['Valoriser l\'entreprise avant de fixer le capital homme-cl\u00e9','V\u00e9rifier la r\u00e9daction du pacte d\'associ\u00e9s','Adapter selon la structure juridique (SAS / SARL / EURL)','Faire \u00e9tablir plusieurs devis comparatifs'],
-      'PEE':['V\u00e9rifier les conditions d\'acc\u00e8s pour le dirigeant (min 1 salari\u00e9)','R\u00e9diger l\'accord ou la DUE avec un juriste','Communiquer clairement aux salari\u00e9s','Combiner avec PERECO pour maximiser l\'avantage fiscal'],
-      'PERECO/PERECOI':['V\u00e9rifier le statut du dirigeant (TNS vs assimil\u00e9 salari\u00e9)','Combiner avec PEE pour maximiser l\'abondement','D\u00e9finir l\'allocation selon profil de risque et horizon','Anticiper les modalit\u00e9s de sortie (rente / capital / mixte)'],
-      'Apport-cession 150-0 B ter':['Structurer la holding AVANT la cession \u2014 ordre imp\u00e9ratif','Respecter le d\u00e9lai de r\u00e9investissement (2 ans)','Documenter rigoureusement le r\u00e9investissement','Coordonner avec l\'avocat fiscaliste et l\'expert-comptable','Ne pas confondre avec le 150-0 D ter'],
-      'FCPR/FPCI (remploi 150-0 B ter)':['Confirmer l\'\u00e9ligibilit\u00e9 du fonds au remploi','Ticket min 100 000\u20ac \u2014 investisseur qualifi\u00e9','Coordonner avec l\'avocat en charge du 150-0 B ter','Anticiper le blocage 5 ans minimum','Diversifier entre plusieurs fonds si montant important'],
-      'Contrat de capitalisation PM':['V\u00e9rifier que l\'objet social autorise ce placement','Inscrire au bilan \u2014 traitement comptable \u00e0 valider','Envisager le nantissement pour garantir un pr\u00eat','Anticiper la fiscalit\u00e9 IS \u00e0 la sortie']
-    };
-    window._RECOS=RECOS;
-    var recoList=RECOS[grp.produit];
-    if(recoList){
-      if(!firstSol._recos)firstSol._recos=[];
-      html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:6px">Recommandations</div>';
-      recoList.forEach(function(r,ri){
-        var ck=firstSol._recos.indexOf(ri)>=0;
-        html+='<label style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px;line-height:1.4"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleReco(\''+grp.produit.replace(/\'/g,"\\'")+'\','+ri+',this.checked)" style="accent-color:var(--orange);margin-top:2px;flex-shrink:0">'+r+'</label>';
-      });
-      html+='</div>';
     }
 
     // SCPI reinvest toggle (shown once per group)
@@ -4836,127 +4774,6 @@ function renderSolsRetenues(){
       html+='</div>';
       // Note fixe
       html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">\u26a0\ufe0f Le taux de r\u00e9duction IR \u00e9volue chaque ann\u00e9e selon la loi de finances. V\u00e9rifier au moment de la souscription. Capital non garanti.</div>';
-      html+='</div>';
-    }
-
-    // ── Formulaires custom Entreprise (générique) ──
-    var CUSTOM_FORMS={
-      'SCPI via SCI \u00e0 l\'IS':{key:'sciis',color:'#7B5EA7',fields:[
-        {id:'montant',label:'Montant investi',type:'number'},
-        {id:'duree',label:'Dur\u00e9e d\u00e9tention',type:'select',opts:['5 ans','10 ans','15 ans','20 ans'],def:'10 ans'},
-        {id:'tauxIS',label:'Taux IS',type:'radio',opts:['15','25'],def:'25',suffix:'%'}
-      ],calc:function(d){var rev=Math.round((d.montant||0)*0.045);var is2=Math.round(rev*(+(d.tauxIS||25))/100);return[
-        {l:'Revenus SCPI estim\u00e9s',v:fmt(rev)+' \u20ac/an'},{l:'IS annuel',v:fmt(is2)+' \u20ac'},{l:'Revenus nets IS',v:fmt(rev-is2)+' \u20ac/an',color:'var(--green)'}
-      ];},points:[{k:'is',l:'Revenus soumis \u00e0 l\'IS'},{k:'amort',l:'Amortissement parts possible en SCI IS'},{k:'liq',l:'Liquidit\u00e9 limit\u00e9e \u2014 horizon long terme'},{k:'ec',l:'\u00c0 structurer avec un expert-comptable'}],
-      note:'\u26a0\ufe0f Montage \u00e0 valider avec un expert-comptable. Revenus et fiscalit\u00e9 variables selon les SCPI.'},
-      'SCPI en usufruit':{key:'usuf',color:'#7B5EA7',fields:[
-        {id:'montant',label:'Montant investi en usufruit',type:'number'},
-        {id:'duree',label:'Dur\u00e9e usufruit',type:'radio',opts:['3','5','10'],def:'5',suffix:' ans'},
-        {id:'rendement',label:'Rendement estim\u00e9 (%)',type:'number',def:5}
-      ],calc:function(d){var coeff={3:0.85,5:0.77,10:0.60};var np=Math.round((d.montant||0)*(coeff[+(d.duree)||5]||0.77));var revA=Math.round((d.montant||0)*(+(d.rendement)||5)/100);var revT=revA*(+(d.duree)||5);return[
-        {l:'Valeur nue-propri\u00e9t\u00e9',v:fmt(np)+' \u20ac'},{l:'Revenus annuels',v:fmt(revA)+' \u20ac'},{l:'Revenus totaux',v:fmt(revT)+' \u20ac',color:'var(--green)'}
-      ];},points:[{k:'decote',l:'D\u00e9cote \u00e0 l\'achat selon dur\u00e9e'},{k:'rev',l:'Revenus per\u00e7us pendant l\'usufruit'},{k:'ext',l:'Extinction automatique \u00e0 l\'\u00e9ch\u00e9ance'},{k:'fisc',l:'Fiscalit\u00e9 IS sur revenus per\u00e7us'}],
-      note:'\u26a0\ufe0f Rendement variable. Coefficient indicatif. \u00c0 valider avec un expert-comptable.'},
-      'Pr\u00e9voyance individuelle':{key:'prevind',color:'#A32D2D',fields:[
-        {id:'assure',label:'Assur\u00e9',type:'select',opts:['C1','C2'],def:'C1'},
-        {id:'revenus',label:'Revenus \u00e0 prot\u00e9ger (\u20ac/mois)',type:'number'},
-        {id:'cotisation',label:'Cotisation mensuelle estim\u00e9e',type:'number'}
-      ],calc:null,
-      checks:[{k:'arret',l:'Arr\u00eat de travail / Incapacit\u00e9'},{k:'inval',l:'Invalidit\u00e9 permanente'},{k:'deces',l:'D\u00e9c\u00e8s / PTIA'},{k:'rente',l:'Rente \u00e9ducation'},{k:'salaire',l:'Maintien de salaire'}],checksLabel:'Garanties souhait\u00e9es',
-      points:[{k:'carence',l:'D\u00e9lai de carence \u00e0 v\u00e9rifier'},{k:'defInval',l:'D\u00e9finition invalidit\u00e9 selon contrat'},{k:'franchise',l:'Franchise / d\u00e9lai d\'attente'},{k:'deductible',l:'Cotisation d\u00e9ductible du revenu imposable'}],
-      note:'\u26a0\ufe0f Garanties et cotisations \u00e0 affiner selon devis. Conditions soumises \u00e0 l\'\u00e9tat de sant\u00e9.'},
-      'Pr\u00e9voyance pro':{key:'prevpro',color:'#A32D2D',fields:[
-        {id:'assure',label:'Assur\u00e9',type:'select',opts:['C1','C2','Les deux'],def:'C1'},
-        {id:'capitalHC',label:'Capital homme-cl\u00e9 souhait\u00e9',type:'number'},
-        {id:'prime',label:'Prime annuelle estim\u00e9e',type:'number'}
-      ],calc:null,
-      checks:[{k:'hc',l:'Assurance homme-cl\u00e9'},{k:'assoc',l:'Assurance associ\u00e9 (rachat parts)'},{k:'inval',l:'Garantie invalidit\u00e9 dirigeant'},{k:'credit',l:'Assurance cr\u00e9dit professionnel'}],checksLabel:'Garanties souhait\u00e9es',
-      points:[{k:'deduc',l:'Prime d\u00e9ductible du r\u00e9sultat'},{k:'indem',l:'Indemnit\u00e9 per\u00e7ue par l\'entreprise'},{k:'valo',l:'Valorisation entreprise \u00e0 d\u00e9finir'},{k:'pacte',l:'Pacte d\'associ\u00e9s \u00e0 pr\u00e9voir'}],
-      note:'\u26a0\ufe0f Capital et conditions \u00e0 valider avec l\'assureur. \u00c0 coordonner avec expert-comptable et juriste.'},
-      'PEE':{key:'pee',color:'#2B5EA7',fields:[
-        {id:'nbSal',label:'Nb salari\u00e9s concern\u00e9s',type:'number',def:1},
-        {id:'versSal',label:'Versement moyen/salari\u00e9/an',type:'number'},
-        {id:'tauxAbond',label:'Taux abondement (%)',type:'number',def:100},
-        {id:'tauxIS',label:'Taux IS',type:'radio',opts:['15','25'],def:'25',suffix:'%'}
-      ],calc:function(d){var abT=Math.round((d.versSal||0)*(+(d.tauxAbond)||100)/100*(d.nbSal||1));var ecoIS=Math.round(abT*(+(d.tauxIS)||25)/100);return[
-        {l:'Abondement total/an',v:fmt(abT)+' \u20ac'},{l:'\u00c9conomie IS',v:fmt(ecoIS)+' \u20ac',color:'var(--green)'},{l:'Co\u00fbt net employeur',v:fmt(abT-ecoIS)+' \u20ac'}
-      ];},points:[{k:'exo',l:'Abondement exon\u00e9r\u00e9 de charges sociales'},{k:'bloc',l:'Blocage 5 ans (sauf d\u00e9blocage anticip\u00e9)'},{k:'accord',l:'Accord d\'entreprise ou DUE n\u00e9cessaire'},{k:'dir',l:'Accessible au dirigeant si \u22651 salari\u00e9'}],
-      note:'\u26a0\ufe0f Plafonds \u00e0 v\u00e9rifier selon la loi de finances. \u00c0 mettre en place avec l\'expert-comptable.'},
-      'PERECO/PERECOI':{key:'pereco',color:'#854F0B',fields:[
-        {id:'benef',label:'B\u00e9n\u00e9ficiaire',type:'select',opts:['Dirigeant seul','Dirigeant + salari\u00e9s'],def:'Dirigeant seul'},
-        {id:'versAn',label:'Versements annuels',type:'number'},
-        {id:'abondAn',label:'Abondement employeur/an',type:'number'},
-        {id:'horizon',label:'Horizon retraite (ann\u00e9es)',type:'number',def:20}
-      ],calc:function(d){var tot=(+(d.versAn)||0)+(+(d.abondAn)||0);var cap=0;var p=0;for(var y=0;y<(+(d.horizon)||20);y++){p=(p+tot)*1.03;}cap=Math.round(p);var ecoIS=Math.round((+(d.abondAn)||0)*0.25);return[
-        {l:'\u00c9conomie IS sur abondement',v:fmt(ecoIS)+' \u20ac/an',color:'var(--green)'},{l:'Capital estim\u00e9 retraite',v:fmt(cap)+' \u20ac',color:'var(--green)'}
-      ];},points:[{k:'deduc',l:'Abondement d\u00e9ductible du r\u00e9sultat'},{k:'sortie',l:'Sortie rente ou capital \u00e0 la retraite'},{k:'bloc',l:'Blocage jusqu\'\u00e0 la retraite (sauf cas l\u00e9gaux)'},{k:'tns',l:'Accessible au dirigeant TNS si accord collectif'}],
-      note:'\u26a0\ufe0f Conditions selon statut du dirigeant (TNS / assimil\u00e9 salari\u00e9). \u00c0 structurer avec l\'expert-comptable.'},
-      'Apport-cession 150-0 B ter':{key:'appcession',color:'#7B5EA7',fields:[
-        {id:'plusValue',label:'Montant de la plus-value',type:'number'},
-        {id:'reinvesti',label:'Montant r\u00e9investi',type:'number'},
-        {id:'duree',label:'Dur\u00e9e conservation',type:'radio',opts:['1 an','2 ans','3 ans+'],def:'2 ans'}
-      ],calc:function(d){var imp=Math.round((d.plusValue||0)*0.30);var mini=Math.round((d.plusValue||0)*0.60);return[
-        {l:'Imp\u00f4t report\u00e9 estim\u00e9',v:fmt(imp)+' \u20ac',color:'var(--green)'},{l:'Minimum \u00e0 r\u00e9investir (60%)',v:fmt(mini)+' \u20ac'},{l:'\u00c9conomie tr\u00e9sorerie imm\u00e9diate',v:fmt(imp)+' \u20ac',color:'var(--green)'}
-      ];},points:[{k:'holding',l:'Apport titres \u00e0 une holding avant cession'},{k:'reinv',l:'R\u00e9investissement dans les 2 ans'},{k:'pct60',l:'Minimum 60% r\u00e9investi pour maintenir le report'},{k:'caduc',l:'Report caduc si non-respect \u2014 imposition imm\u00e9diate'},{k:'avocat',l:'\u00c0 coordonner avec un avocat fiscaliste'}],
-      note:'\u26a0\ufe0f M\u00e9canisme complexe. \u00c0 structurer avec avocat fiscaliste et expert-comptable. Simulation indicative.'},
-      'FCPR/FPCI (remploi 150-0 B ter)':{key:'fcprremploi',color:'#7B5EA7',fields:[
-        {id:'montant',label:'Montant du remploi',type:'number'},
-        {id:'duree',label:'Dur\u00e9e blocage',type:'select',opts:['5 ans','6 ans','7 ans','8 ans+'],def:'5 ans'},
-        {id:'plusValue',label:'Plus-value d\'origine',type:'number'}
-      ],calc:function(d){var imp=Math.round((d.plusValue||0)*0.30);return[
-        {l:'Imp\u00f4t en report',v:fmt(imp)+' \u20ac',color:'var(--green)'}
-      ];},pedago:'\ud83d\udca1 Le FCPR/FPCI \u00e9ligible au remploi 150-0 B ter permet de maintenir le report d\'imposition tout en r\u00e9investissant dans l\'\u00e9conomie r\u00e9elle non cot\u00e9e.',
-      points:[{k:'qualifie',l:'Investisseur qualifi\u00e9 uniquement \u2014 ticket min 100 000 \u20ac'},{k:'risque',l:'Fonds non garanti \u2014 risque de perte en capital'},{k:'bloc',l:'Blocage 5 ans minimum'},{k:'elig',l:'\u00c9ligibilit\u00e9 du fonds au remploi \u00e0 v\u00e9rifier'},{k:'avocat',l:'\u00c0 coordonner avec l\'avocat fiscaliste'}],
-      note:'\u26a0\ufe0f R\u00e9serv\u00e9 aux investisseurs qualifi\u00e9s. Ticket min 100 000 \u20ac. Capital non garanti.'},
-      'Contrat de capitalisation PM':{key:'capipm',color:'#2B5EA7',fields:[
-        {id:'montant',label:'Montant de tr\u00e9sorerie',type:'number'},
-        {id:'duree',label:'Dur\u00e9e envisag\u00e9e',type:'select',opts:['3 ans','5 ans','8 ans','10 ans+'],def:'5 ans'},
-        {id:'rendement',label:'Rendement estim\u00e9 (%)',type:'number',def:3},
-        {id:'tauxIS',label:'Taux IS',type:'radio',opts:['15','25'],def:'25',suffix:'%'}
-      ],calc:function(d){var dur=parseInt(d.duree)||5;var r=(+(d.rendement)||3)/100;var cap=Math.round((d.montant||0)*Math.pow(1+r,dur));var gains=cap-(d.montant||0);var is2=Math.round(gains*(+(d.tauxIS)||25)/100);return[
-        {l:'Capital estim\u00e9 \u00e0 terme',v:fmt(cap)+' \u20ac'},{l:'Gains estim\u00e9s',v:fmt(gains)+' \u20ac'},{l:'IS sur gains',v:fmt(is2)+' \u20ac'},{l:'Gain net IS',v:fmt(gains-is2)+' \u20ac',color:'var(--green)'}
-      ];},points:[{k:'pm',l:'Souscrit par la personne morale'},{k:'sortie',l:'Fiscalit\u00e9 IS uniquement \u00e0 la sortie'},{k:'nantir',l:'Possibilit\u00e9 de nantissement'},{k:'transm',l:'Transmissible par donation \u00e0 la liquidation'},{k:'bilan',l:'\u00c0 inscrire au bilan de l\'entreprise'}],
-      note:'\u26a0\ufe0f Rendement non garanti. \u00c0 inscrire au bilan \u2014 traitement comptable \u00e0 valider avec l\'expert-comptable.'}
-    };
-
-    var cfForm=CUSTOM_FORMS[grp.produit];
-    if(cfForm){
-      var cfData=firstSol['_'+cfForm.key]||{};
-      if(!firstSol['_'+cfForm.key]){cfForm.fields.forEach(function(f){if(f.def!==undefined)cfData[f.id]=f.def;});firstSol['_'+cfForm.key]=cfData;}
-      var cfs='width:100%;padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none';
-      html+='<div style="margin-top:10px;padding:14px;background:'+cfForm.color+'08;border:1.5px solid '+cfForm.color+'25;border-radius:10px">';
-      // Fields
-      html+='<div style="display:grid;grid-template-columns:repeat('+Math.min(cfForm.fields.length,4)+',1fr);gap:10px;margin-bottom:10px">';
-      cfForm.fields.forEach(function(f){
-        html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">'+f.label+'</label>';
-        if(f.type==='number')html+='<input type="number" value="'+(cfData[f.id]||f.def||0)+'" min="0" onchange="updCF(\''+cfForm.key+'\',\''+f.id+'\',+this.value)" style="'+cfs+'">';
-        else if(f.type==='select'){html+='<select onchange="updCF(\''+cfForm.key+'\',\''+f.id+'\',this.value)" style="'+cfs+'">';f.opts.forEach(function(o){html+='<option'+(cfData[f.id]===o||(!cfData[f.id]&&f.def===o)?' selected':'')+'>'+o+'</option>';});html+='</select>';}
-        else if(f.type==='radio'){html+='<div style="display:flex;gap:6px;margin-top:4px">';f.opts.forEach(function(o){var sel=String(cfData[f.id]||f.def)===o;html+='<button onclick="updCF(\''+cfForm.key+'\',\''+f.id+'\',\''+o+'\')" style="flex:1;padding:5px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid '+(sel?cfForm.color:'var(--bord)')+';background:'+(sel?cfForm.color+'12':'#fff')+';color:'+(sel?cfForm.color:'var(--gris)')+'">'+o+(f.suffix||'')+'</button>';});html+='</div>';}
-        html+='</div>';
-      });
-      html+='</div>';
-      // Calc
-      if(cfForm.calc){
-        var calcRes=cfForm.calc(cfData);
-        html+='<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:repeat('+Math.min(calcRes.length,4)+',1fr);gap:8px;font-size:11px">';
-        calcRes.forEach(function(c){html+='<div><div style="color:var(--gris);margin-bottom:2px">'+c.l+'</div><div style="font-weight:700;color:'+(c.color||'var(--noir)')+'">'+c.v+'</div></div>';});
-        html+='</div>';
-      }
-      // Pedago
-      if(cfForm.pedago)html+='<div style="padding:10px 12px;background:'+cfForm.color+'0a;border-radius:8px;margin-bottom:10px;font-size:11px;color:var(--gris-f);line-height:1.6">'+cfForm.pedago+'</div>';
-      // Checks (garanties)
-      if(cfForm.checks){
-        if(!cfData._checks)cfData._checks=[];
-        html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">'+(cfForm.checksLabel||'Options')+'</div>';
-        cfForm.checks.forEach(function(pt){var ck=cfData._checks.indexOf(pt.k)>=0;html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleCF(\''+cfForm.key+'\',\'_checks\',\''+pt.k+'\',this.checked)" style="accent-color:'+cfForm.color+'">'+pt.l+'</label>';});
-        html+='</div>';
-      }
-      // Points
-      if(!cfData._points)cfData._points=[];
-      html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Points \u00e0 aborder</div>';
-      cfForm.points.forEach(function(pt){var ck=cfData._points.indexOf(pt.k)>=0;html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleCF(\''+cfForm.key+'\',\'_points\',\''+pt.k+'\',this.checked)" style="accent-color:'+cfForm.color+'">'+pt.l+'</label>';});
-      html+='</div>';
-      html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">'+cfForm.note+'</div>';
       html+='</div>';
     }
 
@@ -5189,34 +5006,6 @@ function toggleDonStrat(key,checked){
   else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
   renderSolsRetenues();renderFichesClient();
 }
-// ── Recommandations helpers ──
-function toggleReco(produit,idx,checked){
-  solsSelectionnees.forEach(function(s){
-    if(s.produit!==produit)return;
-    if(!s._recos)s._recos=[];
-    if(checked&&s._recos.indexOf(idx)<0)s._recos.push(idx);
-    else if(!checked){var i=s._recos.indexOf(idx);if(i>=0)s._recos.splice(i,1);}
-  });
-  renderFichesClient();
-}
-// ── Custom Forms generique helpers ──
-function updCF(key,field,val){
-  var sol=solsSelectionnees.find(function(s){return s['_'+key];});
-  if(!sol)sol=solsSelectionnees[solsSelectionnees.length-1];
-  if(!sol)return;if(!sol['_'+key])sol['_'+key]={};
-  sol['_'+key][field]=val;
-  var produit=sol.produit;
-  solsSelectionnees.forEach(function(s){if(s.produit===produit)s['_'+key]=sol['_'+key];});
-  renderSolsRetenues();renderFichesClient();
-}
-function toggleCF(key,arrField,k,checked){
-  var sol=solsSelectionnees.find(function(s){return s['_'+key];});
-  if(!sol)return;if(!sol['_'+key])sol['_'+key]={};if(!sol['_'+key][arrField])sol['_'+key][arrField]=[];
-  var arr=sol['_'+key][arrField];
-  if(checked&&arr.indexOf(k)<0)arr.push(k);
-  else if(!checked){var i=arr.indexOf(k);if(i>=0)arr.splice(i,1);}
-  renderSolsRetenues();renderFichesClient();
-}
 // ── Jeanbrun helpers ──
 function updJB(field,val){
   var sol=solsSelectionnees.find(function(s){return s.produit==='Jeanbrun';});
@@ -5373,6 +5162,7 @@ function renderFichesClient(){
     'Girardin industriel':'Transformer votre imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine',
     'Denormandie':'R\u00e9duire vos imp\u00f4ts en r\u00e9novant un bien ancien en centre-ville',
     'Jeanbrun':'R\u00e9duire votre revenu imposable gr\u00e2ce \u00e0 un investissement locatif neuf',
+    'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
     'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
     'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
     'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
@@ -5435,7 +5225,7 @@ function renderFichesClient(){
       html+='<div style="padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.05)">';
       html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       html+='<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:'+meta.titleBg+';color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+(firstSol.etape||'?')+'</div>';
-      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+(firstSol._labelPDF||clientLabel(pg.produit))+'</div>';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--noir)">'+clientLabel(pg.produit)+'</div>';
       html+='</div>';
       if(objsV.length){
         html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
@@ -5550,7 +5340,7 @@ function renderFichesClient(){
                 totalReinv=Math.round(totalReinv);
                 var loyerMens=Math.round(patSCPI*yieldSCPI/12);
                 html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-                html+='patrimoine immobilier estim\u00e9 \u00e0 <strong>'+fmt(patSCPI)+'\u00a0\u20ac</strong>';
+                html+='patrimoine SCPI estim\u00e9 \u00e0 <strong>'+fmt(patSCPI)+'\u00a0\u20ac</strong>';
                 if(reinvPctSol>=100)html+=' (dividendes 100\u00a0% r\u00e9investis).';
                 else if(reinvPctSol>0)html+=' ('+reinvPctSol+'\u00a0% r\u00e9investis, '+fmt(totalDiv)+'\u00a0\u20ac per\u00e7us).';
                 else html+=totalDiv>0?'. Dividendes per\u00e7us sur la p\u00e9riode : <strong>'+fmt(totalDiv)+'\u00a0\u20ac</strong>.':'.';
@@ -5588,33 +5378,6 @@ function renderFichesClient(){
         }
         html+='</div>';
       });
-
-      // Rendu custom forms entreprise (générique)
-      var CF_DEFS={'SCPI via SCI \u00e0 l\'IS':'sciis','SCPI en usufruit':'usuf','Pr\u00e9voyance individuelle':'prevind','Pr\u00e9voyance pro':'prevpro','PEE':'pee','PERECO/PERECOI':'pereco','Apport-cession 150-0 B ter':'appcession','FCPR/FPCI (remploi 150-0 B ter)':'fcprremploi','Contrat de capitalisation PM':'capipm'};
-      var cfKey2=CF_DEFS[pg.produit];
-      if(cfKey2&&firstSol['_'+cfKey2]){
-        var cfd=firstSol['_'+cfKey2];
-        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
-        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">';
-        // Afficher les valeurs saisies
-        var cfFields=Object.keys(cfd).filter(function(k){return k[0]!=='_'&&cfd[k];});
-        var parts=[];
-        cfFields.forEach(function(k){
-          var v=cfd[k];if(typeof v==='number'&&v>0)parts.push('<strong>'+fmt(v)+'</strong>');
-          else if(typeof v==='string'&&v)parts.push(v);
-        });
-        if(parts.length)html+=parts.join(' \u2014 ');
-        html+='</div>';
-        // Points
-        if(cfd._points&&cfd._points.length){
-          html+='<div style="margin-top:6px;font-size:11px;color:var(--gris)">'+cfd._points.map(function(k){return '\u2022 '+k;}).join('<br>')+'</div>';
-        }
-        // Checks (garanties)
-        if(cfd._checks&&cfd._checks.length){
-          html+='<div style="margin-top:4px;font-size:11px;color:var(--gris)">'+cfd._checks.map(function(k){return '\u2713 '+k;}).join('<br>')+'</div>';
-        }
-        html+='</div>';
-      }
 
       // Rendu LLI + SCI
       if(pg.produit==='LLI'&&firstSol._lliSCI){
@@ -5735,30 +5498,10 @@ function renderFichesClient(){
         html+='</div>';
       }
 
-      // Recommandations cochées (Points de vigilance) dans le PDF
-      if(firstSol._recos&&firstSol._recos.length){
-        var recoListPDF=window._RECOS?window._RECOS[pg.produit]:null;
-        if(recoListPDF){
-          var checkedRecos=firstSol._recos.map(function(ri){return recoListPDF[ri];}).filter(Boolean);
-          if(checkedRecos.length){
-            html+='<div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
-            html+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:6px">Points de vigilance</div>';
-            html+='<div style="font-size:11px;color:var(--gris-f);line-height:1.7">'+checkedRecos.map(function(r){return '\u2022 '+r;}).join('<br>')+'</div>';
-            html+='</div>';
-          }
-        }
-      }
-
       // Note client par produit (si switch ON et texte non vide)
-      var noteText3=firstSol._noteText||'';
-      // Sync : chercher le texte sur tous les sols du groupe si le premier est vide
-      if(!noteText3){pg.sols.forEach(function(ss){if(ss._noteText)noteText3=ss._noteText;});}
-      var noteOn3=firstSol._noteOn||false;
-      if(!noteOn3){pg.sols.forEach(function(ss){if(ss._noteOn)noteOn3=true;});}
-      if(noteOn3&&noteText3.trim()){
-        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05);background:#fdf8f0;border-left:3px solid var(--orange)">';
-        html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:4px">Note du conseiller</div>';
-        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7;font-style:italic;white-space:pre-wrap">'+noteText3.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+      if(firstSol._noteOn&&firstSol._noteText&&firstSol._noteText.trim()){
+        html+='<div style="padding:10px 14px;border-top:1px solid rgba(0,0,0,0.05);background:rgba(0,0,0,0.02)">';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7;white-space:pre-wrap">'+firstSol._noteText.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
         html+='</div>';
       }
 
@@ -7078,56 +6821,6 @@ function rPageGarde(){
   }
 }
 
-// ── ENTREPRISE ──
-function renderEntreprise(){
-  var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
-  var n=function(id){return +(v(id))||0;};
-  var cb=function(id){var e=document.getElementById(id);return e&&e.checked;};
-  // Toggle cession horizon
-  var hc=document.getElementById('entHorizonCession');
-  if(hc)hc.style.display=cb('entCession')?'':'none';
-  // Toggle regime buttons
-  var regime=v('entRegime')||'IS';
-  var btnIS=document.getElementById('entIS');var btnIR=document.getElementById('entIR');
-  if(btnIS){btnIS.style.fontWeight=regime==='IS'?'700':'400';btnIS.style.color=regime==='IS'?'#7B5EA7':'var(--gris)';}
-  if(btnIR){btnIR.style.fontWeight=regime==='IR'?'700':'400';btnIR.style.color=regime==='IR'?'#7B5EA7':'var(--gris)';}
-  // Calculs
-  var ca=n('entCA'),res=n('entResultat'),treso=n('entTreso'),capital=n('entCapital'),valeur=n('entValeur');
-  var margeNette=ca>0?(res/ca*100).toFixed(1):'0';
-  var ratioTreso=ca>0?(treso/ca*100).toFixed(1):'0';
-  var pv=valeur>capital?valeur-capital:0;
-  var cEl=document.getElementById('entCalcs');
-  if(cEl){
-    var ch='';
-    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Marge nette</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+margeNette+' %</div></div>';
-    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Ratio tr\u00e9so / CA</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+ratioTreso+' %</div></div>';
-    if(regime==='IS')ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">IS th\u00e9orique</div><div style="font-size:11px;color:var(--noir)">15% jusqu\'\u00e0 42 500\u20ac \u2014 25% au-del\u00e0</div></div>';
-    if(cb('entCession')&&pv>0)ch+='<div style="background:rgba(123,79,166,0.06);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">PV estim\u00e9e</div><div style="font-size:14px;font-weight:700;color:#7B5EA7">'+fmt(pv)+' \u20ac</div><div style="font-size:9px;color:var(--gris);font-style:italic">\u00c0 affiner avec expert-comptable</div></div>';
-    cEl.innerHTML=ch;
-  }
-  // Récap PDF
-  var rEl=document.getElementById('entRecap');
-  if(rEl){
-    var rs=v('entRaisonSociale');
-    if(!rs&&!ca){rEl.innerHTML='';return;}
-    var rh='<div class="card" style="margin-bottom:16px"><div class="card-title"><span class="dot"></span>Votre entreprise</div>';
-    rh+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">';
-    var rows=[['Raison sociale',rs],['Forme juridique',v('entForme')],['R\u00e9gime fiscal',regime],['Capital social',fmt(capital)+' \u20ac'],['CA annuel',fmt(ca)+' \u20ac'],['R\u00e9sultat net',fmt(res)+' \u20ac'],['R\u00e9mun\u00e9ration dirigeant',fmt(n('entRemun'))+' \u20ac/an'],['Tr\u00e9sorerie',fmt(treso)+' \u20ac'],['Valeur estim\u00e9e',fmt(valeur)+' \u20ac'],['Salari\u00e9s',v('entSalaries')||'0']];
-    rows.forEach(function(r){rh+='<div style="padding:6px 14px;border-bottom:1px solid var(--bord);display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--gris)">'+r[0]+'</span><span style="font-size:12px;font-weight:600;color:var(--noir)">'+r[1]+'</span></div>';});
-    rh+='</div>';
-    if(cb('entCession'))rh+='<div style="padding:10px 14px;background:rgba(123,79,166,0.06);border-radius:8px;margin-top:10px;font-size:12px;color:#7B5EA7;font-weight:600">Projet de cession \u00e0 horizon '+v('entHorizonCession')+'</div>';
-    // Objectifs
-    var objs=[];
-    document.querySelectorAll('#entObjectifs input:checked').forEach(function(c){objs.push(c.parentNode.textContent.trim());});
-    if(objs.length){
-      rh+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
-      objs.forEach(function(o){rh+='<span style="font-size:11px;padding:4px 12px;background:rgba(123,79,166,0.08);border:1px solid rgba(123,79,166,0.2);border-radius:20px;color:#7B5EA7;font-weight:600">'+o+'</span>';});
-      rh+='</div>';
-    }
-    rh+='</div>';
-    rEl.innerHTML=rh;
-  }
-}
 function rMentions(){
   var input=document.getElementById('mentionsDirectInput');
   if(input&&!input.value){
@@ -7135,21 +6828,29 @@ function rMentions(){
   }
   saveMentionsDirect();
 }
+
 function saveMentionsDirect(){
   var input=document.getElementById('mentionsDirectInput');
   if(!input)return;
   try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
   var mel=document.getElementById('mentionsPreview');
   if(!mel)return;
-  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
+  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').replace(/\u00c2(?=[\u0080-\u00bf])/g,'').replace(/\u00c3\u00a9/g,'\u00e9').replace(/\u00c3\u00a8/g,'\u00e8').replace(/\u00c3\u00a0/g,'\u00e0').replace(/\u00c2\u00b0/g,'\u00b0').replace(/\u00c2/g,'').trim();
   if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez votre fiche d\'informations l\u00e9gales ci-dessus.</em>';return;}
+
+  // Nettoyer
   raw=raw.replace(/Date et signature[\s\S]*$/gim,'').replace(/PROTECTION DES DONN[\s\S]*$/gim,'').trim();
+
+  // Extraire les infos cles
   var mNom=raw.match(/Par\s*:\s*([^\n]+)/im);
   var mAdr=raw.match(/Adresse professionnelle\s*[:\t]\s*([^\n]+)/im);
   var mVille=raw.match(/(\d{5}\s+[A-Z\u00c0-\u00dc]+)/m);
   var mMail=raw.match(/E-mail\s*[:\t]\s*([^\s\n]+@[^\s\n]+)/im);
-  var mOrias=raw.match(/IMMATRICULATION[^]*?N[\u00b0o]\s*:\s*(\d+)/im);
-  if(!mOrias)mOrias=raw.match(/N[\u00b0o]\s*:\s*(\d{5,})/m);
+  var mTel=raw.match(/Tel[.\s]*Portable\s*[:\t]\s*([\d\s]+)/im);
+  var mOrias=raw.match(/IMMATRICULATION[^]*?N[°o\u00b0]\s*:\s*(\d+)/im);
+  if(!mOrias)mOrias=raw.match(/N[°o\u00b0]\s*:\s*(\d{5,})/m);
+
+  // Sections connues du RI legal
   var SECTIONS=[
     {id:'immo',re:/(?:^|\n)(IMMOBILIER|SES HABILITATIONS)\s*\n/i,title:'Activit\u00e9 immobili\u00e8re',badge:'TRANSACTION'},
     {id:'orias',re:/IMMATRICULATION.*ORIAS/i,title:'Immatriculation ORIAS',badge:'ORIAS'},
@@ -7160,83 +6861,178 @@ function saveMentionsDirect(){
     {id:'recl',re:/TRAITEMENT DES RECLAMATIONS/i,title:'R\u00e9clamations',badge:''},
     {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs',badge:''}
   ];
-  var foundSections=[];var secNum=0;
+
+  // Detect sections
+  var foundSections=[];
+  var secNum=0;
   SECTIONS.forEach(function(sec){
-    var m=raw.match(sec.re);if(!m)return;
-    var start=m.index+m[0].length;var end=raw.length;
-    for(var si=SECTIONS.indexOf(sec)+1;si<SECTIONS.length;si++){var nm=raw.match(SECTIONS[si].re);if(nm&&nm.index>m.index){end=nm.index;break;}}
-    var content=raw.substring(start,end).trim();if(!content)return;
-    secNum++;foundSections.push({sec:sec,num:secNum<10?'0'+secNum:''+secNum,content:content});
+    var m=raw.match(sec.re);
+    if(!m)return;
+    var start=m.index+m[0].length;
+    var end=raw.length;
+    for(var si=SECTIONS.indexOf(sec)+1;si<SECTIONS.length;si++){
+      var nm=raw.match(SECTIONS[si].re);
+      if(nm&&nm.index>m.index){end=nm.index;break;}
+    }
+    var content=raw.substring(start,end).trim();
+    if(!content)return;
+    secNum++;
+    foundSections.push({sec:sec,num:secNum<10?'0'+secNum:''+secNum,content:content});
   });
+
+  // ── Layout simple : bulle contact puis sections ──
   var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
+
   var h='<div style="font-family:var(--sans)">';
+
+  // ── Bulle contact en haut ──
   h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.05);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:20px 24px;margin-bottom:32px">';
   if(photoUrl)h+='<img src="'+photoUrl+'" style="width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0">';
   h+='<div style="flex:1;min-width:0">';
   if(mNom)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:4px">'+mNom[1].trim()+'</div>';
   if(mAdr){var adrText=mAdr[1].trim();if(mVille)adrText+=', '+mVille[1].trim();h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+adrText+'</div>';}
+  else if(mVille)h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+mVille[1].trim()+'</div>';
   if(mMail)h+='<div style="margin-top:4px"><span style="font-size:12px;color:var(--orange)">'+mMail[1]+'</span></div>';
   h+='</div>';
   if(mOrias)h+='<span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;flex-shrink:0;white-space:nowrap">ORIAS n\u00b0 '+mOrias[1].trim()+'</span>';
   h+='</div>';
+
+  // ── Sections numérotées ──
   foundSections.forEach(function(fs){
-    var sec=fs.sec;var num=fs.num;var content=fs.content;
+    var sec=fs.sec;
+    var num=fs.num;
+    var content=fs.content;
+
+    // Badge dynamique pour instruments financiers : détecter Agent lié vs CIF
     var badge=sec.badge;
-    if(badge==='_auto_inst'){badge=/agent\s+li[e\u00e9]/i.test(content)?'AGENT LI\u00c9':'CIF';}
+    if(badge==='_auto_inst'){
+      if(/agent\s+li[ée]/i.test(content))badge='AGENT LI\u00c9';
+      else badge='CIF';
+    }
+
+    // Section header
     h+='<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:baseline;gap:14px">';
     h+='<span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span>';
     h+='<span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
     if(badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+badge+'</span>';
     h+='</div>';
+
+    // Parse content lines
     var cLines=content.split('\n').map(function(l){return l.replace(/\t/g,'  ').trim();}).filter(Boolean);
     cLines=cLines.filter(function(l){return l.replace(/\s/g,'').length>0;});
-    var cardBuf=[];var ci2=0;
+
+    var cardBuf=[];
+    var ci2=0;
     while(ci2<cLines.length){
       var cl=cLines[ci2];
+
+      // RCP table
       if(/^IMMO\s/.test(cl)||/Activit.*Montant/i.test(cl)){
-        if(cardBuf.length){h+=mlCard(cardBuf);cardBuf=[];}
-        var headers=cl.split(/\s{2,}/).filter(Boolean);var amounts=[];
-        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;var amtParts=cLines[ci2].trim().split(/\s{2,}/).filter(Boolean);amounts=amounts.concat(amtParts);}
-        var rcpMap={IMMO:'Transactions immobili\u00e8res',IOBSP:'Op\u00e9rations de banque',IAS:'Interm\u00e9diaire assurance',CIF:'Conseil en investissement'};
-        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
-        h+='<tr><th style="background:var(--gris-l);padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;color:var(--gris)">Activit\u00e9</th><th style="background:var(--gris-l);padding:12px 16px;text-align:right;font-size:11px;text-transform:uppercase;color:var(--gris)">Montant garanti</th></tr>';
-        headers.forEach(function(hd,hi){var amt=amounts[hi]||'';var isZero=/^0[\s\u20ac]*$|^0\.0/.test(amt);h+='<tr><td style="padding:12px 16px;border-bottom:1px solid var(--bord)">'+(rcpMap[hd]||hd)+'</td><td style="padding:12px 16px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:700;color:var(--orange)')+'">'+(isZero?'Non applicable':amt)+'</td></tr>';});
-        h+='</table>';ci2++;continue;
+        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        var headers=cl.split(/\s{2,}/).filter(Boolean);
+        var amounts=[];
+        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;var amtLine=cLines[ci2].trim();var amtParts=amtLine.split(/\s{2,}/).filter(Boolean);if(amtParts.length>=headers.length){amounts=amtParts;}else if(amtParts.length>1){amounts=amounts.concat(amtParts);}else{amounts.push(amtLine);}}
+        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;border-radius:10px;overflow:hidden">';
+        h+='<tr><th style="background:var(--gris-l);padding:12px 16px;text-align:left;font-weight:600;color:var(--gris);border-bottom:1px solid var(--bord);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Activit\u00e9</th><th style="background:var(--gris-l);padding:12px 16px;text-align:right;font-weight:600;color:var(--gris);border-bottom:1px solid var(--bord);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Montant garanti</th></tr>';
+        var rcpMap={'IMMO':'Transactions immobili\u00e8res (IMMO)','IOBSP':'Op\u00e9rations de banque (IOBSP)','IAS':'Interm\u00e9diaire d\'assurance (IAS)','CIF':'Conseil en investissement (CIF)'};
+        headers.forEach(function(hd,hi){
+          var amt=amounts[hi]||'';
+          var isZero=/^0[\s€]*$|^0\.0/.test(amt);
+          var label=rcpMap[hd]||hd;
+          h+='<tr><td style="padding:12px 16px;border-bottom:1px solid var(--bord);color:var(--noir);font-weight:400">'+label+'</td>';
+          h+='<td style="padding:12px 16px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:700;color:var(--orange)')+'">'+( isZero?'Non applicable':amt)+'</td></tr>';
+        });
+        h+='</table>';
+        ci2++;continue;
       }
+
+      // Detect assureur/partenaire tags : "avec les assureurs suivants" pattern
+      // Keep inside current card buffer
+      var assureurMatch=cl.match(/avec\s+l(?:es|\')\s*assureurs?\s+suivants?\s*[:\s]*(.*)/i);
+      if(assureurMatch){
+        var partnerName=cl.match(/^(.+?)\s+avec\s+l/i);
+        var assureurs=assureurMatch[1].split(/[,;]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+        if(partnerName)cardBuf.push(cl);
+        else cardBuf.push(cl);
+        if(assureurs.length){
+          var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
+          assureurs.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
+          tagHtml+='</div>';
+          cardBuf.push(tagHtml);
+        }
+        ci2++;continue;
+      }
+
+      // Tags (lines with 2+ items separated by double spaces) — keep in card
       var tagItems=[];
       if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
         while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
           var parts=cLines[ci2].split(/\s{2,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-          if(parts.length>=2&&parts.every(function(p){return p.length<60;})){tagItems=tagItems.concat(parts);}else break;ci2++;
+          if(parts.length>=2&&parts.every(function(p){return p.length<60;})){tagItems=tagItems.concat(parts);}
+          else break;
+          ci2++;
         }
       }
       if(tagItems.length>=2){
-        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
-        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
-        cardBuf.push(tagHtml+'</div>');continue;
+        var tagHtml2='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
+        tagItems.forEach(function(t){tagHtml2+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
+        tagHtml2+='</div>';
+        cardBuf.push(tagHtml2);
+        continue;
       }
+
+      // Blank line : flush only if next non-empty line looks like a new sub-section (long uppercase)
+      // Otherwise keep accumulating (partenaires names + tags stay in same card)
       if(!cl){
-        var nextNE=-1;for(var pk=ci2+1;pk<cLines.length;pk++){if(cLines[pk].trim()){nextNE=pk;break;}}
-        var nextIsPart=false;
-        if(nextNE>=0){var nxt=cLines[nextNE].trim();if(nxt.length<60&&nextNE+1<cLines.length&&(/^\s/.test(cLines[nextNE+1])||/\s{2,}/.test(cLines[nextNE+1])))nextIsPart=true;}
-        if(cardBuf.length&&!nextIsPart){h+=mlCard(cardBuf);cardBuf=[];}
+        // Look ahead : if next content is a short name followed by tags, don't flush
+        var nextNonEmpty=-1;
+        for(var peek=ci2+1;peek<cLines.length;peek++){if(cLines[peek].trim()){nextNonEmpty=peek;break;}}
+        var nextIsPartner=false;
+        if(nextNonEmpty>=0){
+          var nxt=cLines[nextNonEmpty].trim();
+          // Short line (partner name) followed by tag-like lines
+          if(nxt.length<60&&nextNonEmpty+1<cLines.length&&(/^\s/.test(cLines[nextNonEmpty+1])||/\s{2,}/.test(cLines[nextNonEmpty+1])))nextIsPartner=true;
+        }
+        if(cardBuf.length&&!nextIsPartner){h+=renderMlCard2(cardBuf);cardBuf=[];}
         ci2++;continue;
       }
-      cardBuf.push(cl);ci2++;
+
+      cardBuf.push(cl);
+      ci2++;
     }
-    if(cardBuf.length)h+=mlCard(cardBuf);
+    if(cardBuf.length)h+=renderMlCard2(cardBuf);
   });
-  h+='</div>';mel.innerHTML=h;
+
+  h+='</div>';
+  mel.innerHTML=h;
 }
-function mlCard(lines){
+
+function mlHighlight(text){
+  // Bold key terms: societe names, ORIAS numbers, CPI numbers, uppercase acronyms
+  text=text.replace(/\b(ORIAS\s*n[°o\u00b0]?\s*\d[\d\s]*\d)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(CPI\s+[\d\s]+\d)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/(Stellium\s+\w+|ANACOFI\s*\w*)/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(agent commercial|mandataire\s+\w+|courtier)\b/gi,'<strong>$1</strong>');
+  text=text.replace(/\b(\d{2}\s*\d{3}\s*\d{3})\b/g,'<strong>$1</strong>');
+  return text;
+}
+
+function renderMlCard2(lines){
   if(!lines.length)return '';
   var sub='';var content=lines;
-  if(typeof lines[0]==='string'&&lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1&&!/</.test(lines[0])){sub=lines[0];content=lines.slice(1);}
+  if(typeof lines[0]==='string'&&lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1&&!/</.test(lines[0])){
+    sub=lines[0];content=lines.slice(1);
+  }
   var c='<div style="background:#fff;border:1.5px solid rgba(212,98,42,0.12);border-left:3.5px solid var(--orange);border-radius:12px;padding:20px 24px;margin-bottom:14px">';
   if(sub)c+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">'+sub+'</div>';
-  content.forEach(function(l){if(/</.test(l)){c+=l;return;}c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">'+l+'</p>';});
-  c+='</div>';return c;
+  content.forEach(function(l){
+    if(/</.test(l)){c+=l;return;} // already HTML (tags)
+    c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">'+mlHighlight(l)+'</p>';
+  });
+  c+='</div>';
+  return c;
 }
+
 // ══════════════════════════════════════════════════════════════
 // AVIS CLIENTS — saisie directe dans la page
 // ══════════════════════════════════════════════════════════════
