@@ -660,9 +660,9 @@ select.span2{grid-column:span 2}
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Pyramide du patrimoine</div>
       <div class="pyramid" id="pyramideEl">
-        <div class="pyr-lv lt"><div><div class="pyr-name">🏔 Long terme</div><div class="pyr-desc">Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
-        <div class="pyr-lv mt"><div><div class="pyr-name">📈 Moyen terme</div><div class="pyr-desc">3 à 10 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
-        <div class="pyr-lv ct"><div><div class="pyr-name">💧 Court terme</div><div class="pyr-desc">Disponible &lt; 3 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
+        <div class="pyr-lv lt"><div><div class="pyr-name">🏔 Long terme</div><div class="pyr-desc">+15 ans · Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
+        <div class="pyr-lv mt"><div><div class="pyr-name">📈 Moyen terme</div><div class="pyr-desc">5 à 15 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
+        <div class="pyr-lv ct"><div><div class="pyr-name">💧 Court terme</div><div class="pyr-desc">Disponible &lt; 5 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
         <div class="pyr-lv ep"><div><div class="pyr-name">🛡 Épargne de précaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
       </div>
     </div>
@@ -713,13 +713,19 @@ select.span2{grid-column:span 2}
       <div class="card-title"><span class="dot"></span>Imposition</div>
       <div class="fiscal-row"><span class="fr-l">Année d'imposition</span><span class="fr-v ed" id="fiAnnee" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true">—</span></div>
+      <div class="fiscal-row"><span class="fr-l">Revenu imposable</span><span class="fr-v" id="fiRevImp">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill" id="fiTMI">—</span></span></div>
+      <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fiTxMoyen">—</span></div>
+      <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fiRfr">—</span></div>
         <div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v" id="fTxMoyen">—</span></div>
         <div class="fiscal-row"><span class="fr-l">Revenu fiscal de réf.</span><span class="fr-v" id="fRfr">—</span></div>
         <div class="fiscal-row"><span class="fr-l">Plafond PER dispo</span><span class="fr-v" id="fPlafondPER">—</span></div>
+      <div class="fiscal-row"><span class="fr-l">IR barème</span><span class="fr-v" id="fiIrBareme">—</span></div>
+      <div class="fiscal-row"><span class="fr-l">Crédits d'impôt</span><span class="fr-v" id="fiCredits">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Impôt net</span><span class="fr-v ed" id="fiIrNet" contenteditable="true">—</span></div>
       <div class="fiscal-row"><span class="fr-l">Prélèvements sociaux</span><span class="fr-v ed" id="fiPS" contenteditable="true">—</span></div>
+      <div class="fiscal-row"><span class="fr-l">Plafond PER dispo</span><span class="fr-v" id="fiPlafPER" style="color:var(--green)">—</span></div>
       <div class="fiscal-row" style="border-top:2px solid var(--ambre-m);padding-top:10px;margin-top:4px">
         <span class="fr-l" style="font-weight:600">Total impôts annuels</span>
         <span class="fr-v" style="color:var(--ambre-d);font-size:16px" id="fiTotal">—</span>
@@ -2435,15 +2441,26 @@ function parseTextRI(txt){
     var irAn = s05.match(/IR acquitt[eé] en\s*[:\*]+\s*(\d{4})/i);
     if(irAn) ED.fiscal.annee = irAn[1];
 
+    ED.fiscal.annee      = '';
+    var irAnM = s05.match(/IR acquitt[eé] en\s*[:\*]+\s*(\d{4})/i);
+    if(irAnM) ED.fiscal.annee = irAnM[1];
     ED.fiscal.rbg        = fiscNum('Revenu brut global');
     ED.fiscal.irnet      = fiscNum('Total de l.imp.t sur le revenu net');
     ED.fiscal.irBareme   = fiscNum('Imp.t sur le revenu soumis au bar.me');
     ED.fiscal.salBruts   = fiscNum('Total des salaires et assimil.s');
     ED.fiscal.revImposable = fiscNum('Revenu imposable');
     ED.fiscal.tmi        = Math.round(fiscPct('TMI IR'));
+    ED.fiscal.txMoyen    = fiscPct('Taux d.imposition');
+    ED.fiscal.rfr        = fiscNum('Revenu fiscal de r.f.rence');
+    ED.fiscal.credits    = fiscNum('Total des cr.dits d.imp.t');
+    ED.fiscal.reductions = fiscNum('Total des r.ductions d.imp.t');
+    ED.fiscal.plafondPER = fiscNum('Plafond .pargne retraite non utilis');
+    ED.fiscal.csgDed     = fiscNum('CSG d.ductible');
+    ED.fiscal.deductions = fiscNum('Charges d.ductibles du revenu global');
     var partsM = s05.match(/Nombre de parts fiscales\s*[:\*\s]+([0-9,\.]+)/i);
     if(partsM) ED.fiscal.parts = parseFloat(partsM[1].replace(',','.'))||1;
     ED.fiscal.ps = fiscNum('pr.l.vements sociaux nets');
+    if(!ED.fiscal.rfr && ED.fiscal.rbg) ED.fiscal.rfr = ED.fiscal.rbg;
 
     if(!ED.fiscal.tmi && ED.fiscal.rbg) ED.fiscal.tmi = tmiFromRBG(ED.fiscal.rbg, ED.fiscal.parts);
     if(!ED.fiscal.irnet && ED.fiscal.rbg){
@@ -2532,12 +2549,14 @@ function parseTextRI(txt){
   // Enfants
   ED.nbEnfants=0;
   var enfM=ss01.match(/(?:^|\n)Enfants[^\n]*\n([^\n]+)/i);
-  if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants\s*\t([^\n]+)/i);
+  if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants?\s*\t([^\n]+)/i);
+  if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants? communs?\s*\t([^\n]+)/i);
   ED.enfants=[];
   if(enfM&&enfM[1]){var ef=enfM[1].trim();var enfParts=ef.split(',');enfParts.forEach(function(part){
-    var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+    part=part.trim();if(!part||part.length<2)return;
+    var m=part.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
     if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
-    else if(part.trim().length>2){ED.enfants.push({nom:part.trim(),dob:''});}
+    else if(part.length>2){ED.enfants.push({nom:part,dob:''});}
   });ED.nbEnfants=ED.enfants.length;}
 
   // SECTION 02
@@ -3324,7 +3343,13 @@ function rFiscal(){
     var irEstEl=document.getElementById('fiIrNet');
     if(irEstEl){irEstEl.textContent=fmt(irCalc.ir)+' € (estimé)';irEstEl.style.color='var(--ambre-d)';}
   }
+  set('fiRevImp',f.revImposable?fmt(f.revImposable)+' €':'—');
+  set('fiTxMoyen',f.txMoyen?f.txMoyen.toFixed(2)+' %':'—');
+  set('fiRfr',f.rfr?fmt(f.rfr)+' €':'—');
+  set('fiIrBareme',f.irBareme?fmt(f.irBareme)+' €':'—');
+  set('fiCredits',f.credits?fmt(f.credits)+' €':'—');
   setEd('fiIrNet',f.irnet?fmt(f.irnet)+' €':'0 €');setEd('fiPS',f.ps?fmt(f.ps)+' €':'0 €');
+  set('fiPlafPER',f.plafondPER?fmt(f.plafondPER)+' €':'—');
   const tot=(f.irnet||0)+(f.ps||0);
   set('fiTotal',tot?fmt(tot)+' €':'0 €');
 
