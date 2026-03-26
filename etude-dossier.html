@@ -499,8 +499,8 @@ select.span2{grid-column:span 2}
     <div class="client-mini-name" id="cmName">&#8212;</div>
     <div class="client-mini-detail" id="cmDetail">&#8212;</div>
   </div>
-  <div id="sidebarProfilBlock" style="margin-top:8px;padding:10px 12px;background:rgba(212,98,42,0.08);border-radius:8px;border:1.5px solid rgba(212,98,42,0.2);cursor:pointer;transition:all 0.2s" onclick="openProfil()">
-    <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ambre-d);margin-bottom:4px">Conseiller</div>
+  <div id="sidebarProfilBlock" style="margin-top:8px;padding:10px 12px;background:var(--gris-l);border-radius:8px;border:1.5px solid var(--bord);cursor:pointer;transition:all 0.2s" onclick="openProfil()">
+    <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">Conseiller</div>
     <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">⚙️ Configurer mon profil</div>
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
   </div>
@@ -637,11 +637,11 @@ select.span2{grid-column:span 2}
     <div id="objDisplay" style="font-size:13px;color:var(--gris-f)">—</div>
   </div>
 
-  <!-- Note conseiller -->
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note du consultant</div>
-    <div class="ed-block" id="noteConsultant" contenteditable="true" data-placeholder="Vos observations sur la situation client…"></div>
+  <div class="comment-zone">
+    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
+    <textarea id="noteConsultant" placeholder="Vos observations sur la situation client..." rows="2"></textarea>
   </div>
+
 </div><!-- /sec-situation -->
 
 <!-- ════════════════════════════════════════
@@ -686,12 +686,6 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierPat" style="margin-bottom:10px"></div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller</div>
-    <div class="ed-block" id="notePat" contenteditable="true" data-placeholder="Vos observations..."></div>
-  </div>
-
-  
   <div class="comment-zone">
     <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
     <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2"></textarea>
@@ -739,12 +733,6 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierFis" style="margin-bottom:10px"></div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller</div>
-    <div class="ed-block" id="noteFiscal" contenteditable="true" data-placeholder="Vos observations..."></div>
-  </div>
-
-  
   <div class="comment-zone">
     <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
     <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2"></textarea>
@@ -774,12 +762,6 @@ select.span2{grid-column:span 2}
   </div>
 
   <div id="levierFin" style="margin-bottom:10px"></div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller</div>
-    <div class="ed-block" id="noteFin" contenteditable="true" data-placeholder="Vos observations..."></div>
-  </div>
-
-  
   <div class="comment-zone">
     <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
     <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2"></textarea>
@@ -808,6 +790,9 @@ select.span2{grid-column:span 2}
     <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
+    <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
+      <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
+    </div>
   </div>
   <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
   <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
@@ -817,11 +802,6 @@ select.span2{grid-column:span 2}
     <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
     <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
   </div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note retraite</div>
-    <div class="ed-block" id="noteRet" contenteditable="true" data-placeholder="Analyse retraite : horizon, manque, solutions..."></div>
-  </div>
-  
   <div class="comment-zone">
     <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
     <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2"></textarea>
@@ -917,11 +897,11 @@ select.span2{grid-column:span 2}
     <div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Sélectionnez des solutions dans le panneau conseiller pour générer les fiches</div>
   </div>
 
-  <!-- Note conseiller -->
   <div id="solContainer" style="display:none"></div>
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note du consultant</div>
-    <div class="ed-block" id="notePreco" contenteditable="true" data-placeholder="Vos observations…"></div>
+
+  <div class="comment-zone">
+    <div class="comment-zone-label">Note conseiller (incluse dans le PDF)</div>
+    <textarea id="commentPreconisations" placeholder="Vos observations et preconisations..." rows="2"></textarea>
   </div>
 
 </div><!-- /sec-preconisations -->
@@ -1942,9 +1922,12 @@ let pieInst=null, solCount=0, steps=[];
 // ║  NAVIGATION                                                    ║
 // ╚══════════════════════════════════════════════════════════════════╝
 var currentSection='import';
+var sectionEnteredAt=0;
 function goTo(sec){
-  // Valider la section qu'on quitte (passe le dot de orange à vert)
-  if(currentSection&&currentSection!=='import'&&validatedSections!==undefined)validateSection(currentSection);
+  // Valider la section qu'on quitte seulement si on y est resté > 3s
+  var elapsed=Date.now()-sectionEnteredAt;
+  if(currentSection&&currentSection!=='import'&&elapsed>3000&&validatedSections!==undefined)validateSection(currentSection);
+  sectionEnteredAt=Date.now();
   currentSection=sec;
   document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
@@ -3587,7 +3570,6 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         +'</div>';});
   // Impact total foyer (somme des impacts individuels)
   // Impact foyer séparé (dans son propre div, pleine largeur)
-  cardsHtml+='<div class="alert warn" style="margin-top:12px"><span>⚠️</span><div><strong>Hypothèse : tous les trimestres requis sont validés.</strong> Les taux de remplacement ci-dessus supposent une carrière complète. Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s\'applique : <strong>pension = pension estimée × (trimestres cotisés / trimestres requis)</strong>.</div></div>';
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   // Impact foyer (pleine largeur sous les cards)
   var ifEl=document.getElementById('retraiteImpactFoyer');
@@ -3867,7 +3849,7 @@ function buildMatriceObjSol(impot,capa,aSum){
 
     html+='<div id="'+bid+'" onclick="toggleSolution(\''+s+'\')" style="cursor:pointer;border-radius:10px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'rgba(45,122,91,0.06)':'#fff')+';padding:10px 12px;transition:all 0.15s;user-select:none" onmouseover="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--ambre)\'" onmouseout="if(!this.classList.contains(\'sel\'))this.style.borderColor=\'var(--bord)\'">';
     html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">';
-    html+='<div style="font-size:12px;font-weight:600;color:var(--noir);display:flex;align-items:center;gap:5px">'+cp.icon+' '+s+'</div>';
+    html+='<div style="font-size:12px;font-weight:600;color:var(--noir)">'+s+'</div>';
     html+='<div style="width:16px;height:16px;border-radius:4px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'#2D7A5B':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff">'+(isSelected?'&#10003;':'')+'</div>';
     html+='</div>';
     html+='<div style="font-size:10px;color:var(--gris);line-height:1.5;margin-bottom:6px">'+cp.desc.substring(0,60)+(cp.desc.length>60?'...':'')+'</div>';
@@ -3923,7 +3905,7 @@ function renderSolsRetenues(){
     html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Solution</span>';
     html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro de solution dans la stratégie">';
     html+='</div>';
-    html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
+    html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+sol.produit+'</div>';
     html+='</div>';
     html+='<button onclick="toggleSolution(\''+sol.produit+'\')" style="border:none;background:transparent;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px">&times;</button></div>';
     if(cp.desc)html+='<div style="font-size:11px;color:var(--gris);margin-bottom:10px;line-height:1.5">'+cp.desc+'</div>';
