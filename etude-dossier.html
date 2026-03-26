@@ -1161,42 +1161,18 @@ select.span2{grid-column:span 2}
 
 <!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
 <div id="extPanelMentions" class="panneau-interne" style="display:none;background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
-  <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir);margin-bottom:14px">Configuration mentions l&#233;gales</div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Identit&#233; du conseiller</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-    <input class="fi" id="mlNom" placeholder="Nom / Pr&#233;nom" oninput="renderMentionsLegales()">
-    <input class="fi" id="mlAdresse" placeholder="Adresse professionnelle" oninput="renderMentionsLegales()">
-    <input class="fi" id="mlTel" placeholder="T&#233;l&#233;phone" oninput="renderMentionsLegales()">
-    <input class="fi" id="mlEmail" placeholder="Email" oninput="renderMentionsLegales()">
-    <input class="fi" id="mlOrias" placeholder="N&#176; ORIAS personnel" oninput="renderMentionsLegales()">
+  <div style="margin-bottom:14px">
+    <div style="font-family:var(--sans);font-weight:700;font-size:16px;color:var(--noir)">Fiche d'informations l&#233;gales</div>
+    <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre Document d'entr&#233;e en relation (fiche l&#233;gale)</div>
   </div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Habilitations actives</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mlHabImmo" onchange="renderMentionsLegales()" style="accent-color:var(--orange)">IMMO &#8212; Agent commercial</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mlHabIOBSP" onchange="renderMentionsLegales()" style="accent-color:var(--orange)">IOBSP &#8212; Mandataire Financement</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mlHabIAS" onchange="renderMentionsLegales()" style="accent-color:var(--orange)">IAS &#8212; Mandataire Assurance</label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="mlHabCIF" onchange="renderMentionsLegales()" style="accent-color:var(--orange)">CIF &#8212; Agent li&#233;</label>
+  <textarea id="mentionsDirectInput" rows="6"
+    placeholder="Collez ici le contenu de votre fiche d'informations l&#233;gales..."
+    style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
+    oninput="saveMentionsDirect()"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
   </div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Montants RCP</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div><label style="font-size:10px;color:var(--gris)">IMMO</label><input class="fi" type="number" id="mlRcpImmo" value="2000000" oninput="renderMentionsLegales()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">IOBSP</label><input class="fi" type="number" id="mlRcpIOBSP" value="2000000" oninput="renderMentionsLegales()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">IAS</label><input class="fi" type="number" id="mlRcpIAS" value="2000000" oninput="renderMentionsLegales()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">CIF</label><input class="fi" type="number" id="mlRcpCIF" value="0" oninput="renderMentionsLegales()"></div>
-  </div>
-
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:8px">Partenaires</div>
-  <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px">
-    <div><label style="font-size:10px;color:var(--gris)">Partenaires bancaires</label><input class="fi" id="mlPartBanque" value="BNP | CFCAL | Caisse d'&#201;pargne | LCL | SOFIAP" oninput="renderMentionsLegales()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">Assureurs directs</label><input class="fi" id="mlPartAssureurs" value="Suravenir (Vie Plus) | APICIL Assurances | APICIL LIFE | APICIL &#201;pargne Retraite" oninput="renderMentionsLegales()"></div>
-    <div><label style="font-size:10px;color:var(--gris)">Courtiers grossistes</label><textarea class="fi" id="mlPartCourtiers" rows="2" oninput="renderMentionsLegales()" style="resize:vertical">ODDO BHF | G&#233;n&#233;ration Vie | Generali Vie | Oradea | Eres | Swiss Life | Spirica | Digital Insure | Groupama Gan Vie | AG2R La Mondiale | Miltis | April Sant&#233; Pr&#233;voyance | Pr&#233;voir Vie</textarea></div>
-    <div><label style="font-size:10px;color:var(--gris)">Soci&#233;t&#233;s de gestion</label><textarea class="fi" id="mlPartSocietes" rows="2" oninput="renderMentionsLegales()" style="resize:vertical">Advenis REIM | Alderan | Altarea RIM | Arkea REIM | Atland Voisin | Atream | Corum | Eiffel IG | Elevation Capital | La Fran&#231;aise AM | Mata Capital | Nextstage AM | Norma Capital | Oddo BHF | P&#233;rial AM | Urban Premium | Sofidy</textarea></div>
-  </div>
-  <div style="font-size:10px;color:var(--gris);font-style:italic;margin-bottom:10px">S&#233;parer les entr&#233;es par | &#8212; chaque entr&#233;e devient une bulle</div>
-  <button class="btn btn-primary" onclick="renderMentionsLegales()" style="padding:8px 18px;font-size:13px">Appliquer</button>
 </div>
 
 <!-- ════════════════════════════════════════
@@ -4694,7 +4670,7 @@ function renderSolsRetenues(){
     }
 
     // ── Recommandations par produit ──
-    if(!window.RECOS)window.RECOS={
+    var RECOS={
       'Assurance vie':['Privil\u00e9gier une architecture ouverte (multi-supports)','V\u00e9rifier la clause b\u00e9n\u00e9ficiaire','Anticiper la fiscalit\u00e9 apr\u00e8s 8 ans','Envisager des rachats partiels programm\u00e9s'],
       'Contrat de capitalisation':['Int\u00e9ressant si patrimoine soumis \u00e0 l\'IFI','Peut \u00eatre transmis par donation de son vivant','V\u00e9rifier la compatibilit\u00e9 avec la succession'],
       'SCPI de rendement':['Diversifier entre plusieurs SCPI et gestionnaires','V\u00e9rifier le taux d\'occupation financier (TOF)','Envisager le r\u00e9investissement des dividendes','Financement \u00e0 cr\u00e9dit possible pour effet levier'],
@@ -4720,6 +4696,7 @@ function renderSolsRetenues(){
       'FCPR/FPCI (remploi 150-0 B ter)':['Confirmer l\'\u00e9ligibilit\u00e9 du fonds au remploi','Ticket min 100 000\u20ac \u2014 investisseur qualifi\u00e9','Coordonner avec l\'avocat en charge du 150-0 B ter','Anticiper le blocage 5 ans minimum','Diversifier entre plusieurs fonds si montant important'],
       'Contrat de capitalisation PM':['V\u00e9rifier que l\'objet social autorise ce placement','Inscrire au bilan \u2014 traitement comptable \u00e0 valider','Envisager le nantissement pour garantir un pr\u00eat','Anticiper la fiscalit\u00e9 IS \u00e0 la sortie']
     };
+    window._RECOS=RECOS;
     var recoList=RECOS[grp.produit];
     if(recoList){
       if(!firstSol._recos)firstSol._recos=[];
@@ -5760,7 +5737,7 @@ function renderFichesClient(){
 
       // Recommandations cochées (Points de vigilance) dans le PDF
       if(firstSol._recos&&firstSol._recos.length){
-        var recoListPDF=window.RECOS?window.RECOS[pg.produit]:null;
+        var recoListPDF=window._RECOS?window._RECOS[pg.produit]:null;
         if(recoListPDF){
           var checkedRecos=firstSol._recos.map(function(ri){return recoListPDF[ri];}).filter(Boolean);
           if(checkedRecos.length){
@@ -7151,102 +7128,114 @@ function renderEntreprise(){
     rEl.innerHTML=rh;
   }
 }
-function rMentions(){renderMentionsLegales();}
-function renderMentionsLegales(){
-  // Lire les champs du formulaire
-  var nom=document.getElementById('mlNom')?document.getElementById('mlNom').value:'';
-  var adresse=document.getElementById('mlAdresse')?document.getElementById('mlAdresse').value:'';
-  var tel=document.getElementById('mlTel')?document.getElementById('mlTel').value:'';
-  var email=document.getElementById('mlEmail')?document.getElementById('mlEmail').value:'';
-  var orias=document.getElementById('mlOrias')?document.getElementById('mlOrias').value:'';
-  var habImmo=document.getElementById('mlHabImmo')&&document.getElementById('mlHabImmo').checked;
-  var habIOBSP=document.getElementById('mlHabIOBSP')&&document.getElementById('mlHabIOBSP').checked;
-  var habIAS=document.getElementById('mlHabIAS')&&document.getElementById('mlHabIAS').checked;
-  var habCIF=document.getElementById('mlHabCIF')&&document.getElementById('mlHabCIF').checked;
-  var rcpImmo=+(document.getElementById('mlRcpImmo')?document.getElementById('mlRcpImmo').value:0);
-  var rcpIOBSP=+(document.getElementById('mlRcpIOBSP')?document.getElementById('mlRcpIOBSP').value:0);
-  var rcpIAS=+(document.getElementById('mlRcpIAS')?document.getElementById('mlRcpIAS').value:0);
-  var rcpCIF=+(document.getElementById('mlRcpCIF')?document.getElementById('mlRcpCIF').value:0);
-  var partBanque=(document.getElementById('mlPartBanque')?document.getElementById('mlPartBanque').value:'').split('|').map(function(s){return s.trim();}).filter(Boolean);
-  var partAssureurs=(document.getElementById('mlPartAssureurs')?document.getElementById('mlPartAssureurs').value:'').split('|').map(function(s){return s.trim();}).filter(Boolean);
-  var partCourtiers=(document.getElementById('mlPartCourtiers')?document.getElementById('mlPartCourtiers').value:'').split('|').map(function(s){return s.trim();}).filter(Boolean);
-  var partSocietes=(document.getElementById('mlPartSocietes')?document.getElementById('mlPartSocietes').value:'').split('|').map(function(s){return s.trim();}).filter(Boolean);
-
+function rMentions(){
+  var input=document.getElementById('mentionsDirectInput');
+  if(input&&!input.value){
+    try{var txt=localStorage.getItem('cgpskool_mentions')||'';if(txt)input.value=txt;}catch(e){}
+  }
+  saveMentionsDirect();
+}
+function saveMentionsDirect(){
+  var input=document.getElementById('mentionsDirectInput');
+  if(!input)return;
+  try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
   var mel=document.getElementById('mentionsPreview');
   if(!mel)return;
-  if(!nom&&!habImmo&&!habIOBSP&&!habIAS&&!habCIF){
-    mel.innerHTML='<em style="color:var(--gris)">Renseignez vos informations dans le panneau conseiller.</em>';
-    return;
-  }
-
-  var pill=function(items){return '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">'+items.map(function(t){return '<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';}).join('')+'</div>';};
-  var card=function(sub,body){return '<div style="background:#fff;border:1.5px solid rgba(212,98,42,0.12);border-left:3.5px solid var(--orange);border-radius:12px;padding:20px 24px;margin-bottom:14px">'+(sub?'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">'+sub+'</div>':'')+body+'</div>';};
-  var secH=function(num,title,badge){return '<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:baseline;gap:14px"><span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span><span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+title+'</span>'+(badge?'<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+badge+'</span>':'')+'</div>';};
-
-  var h='<div style="font-family:var(--sans)">';
-
-  // Bulle contact
+  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
+  if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez votre fiche d\'informations l\u00e9gales ci-dessus.</em>';return;}
+  raw=raw.replace(/Date et signature[\s\S]*$/gim,'').replace(/PROTECTION DES DONN[\s\S]*$/gim,'').trim();
+  var mNom=raw.match(/Par\s*:\s*([^\n]+)/im);
+  var mAdr=raw.match(/Adresse professionnelle\s*[:\t]\s*([^\n]+)/im);
+  var mVille=raw.match(/(\d{5}\s+[A-Z\u00c0-\u00dc]+)/m);
+  var mMail=raw.match(/E-mail\s*[:\t]\s*([^\s\n]+@[^\s\n]+)/im);
+  var mOrias=raw.match(/IMMATRICULATION[^]*?N[\u00b0o]\s*:\s*(\d+)/im);
+  if(!mOrias)mOrias=raw.match(/N[\u00b0o]\s*:\s*(\d{5,})/m);
+  var SECTIONS=[
+    {id:'immo',re:/(?:^|\n)(IMMOBILIER|SES HABILITATIONS)\s*\n/i,title:'Activit\u00e9 immobili\u00e8re',badge:'TRANSACTION'},
+    {id:'orias',re:/IMMATRICULATION.*ORIAS/i,title:'Immatriculation ORIAS',badge:'ORIAS'},
+    {id:'fin',re:/(?:^|\n)FINANCEMENT\s*\n/i,title:'Financement',badge:'IOBSP'},
+    {id:'ass',re:/(?:^|\n)ASSURANCE\s*\n/i,title:'Assurance',badge:'IAS'},
+    {id:'inst',re:/INSTRUMENTS FINANCIERS/i,title:'Instruments financiers',badge:'_auto_inst'},
+    {id:'rcp',re:/ASSURANCES?\s*RCP/i,title:'Assurance RCP',badge:''},
+    {id:'recl',re:/TRAITEMENT DES RECLAMATIONS/i,title:'R\u00e9clamations',badge:''},
+    {id:'med',re:/MEDIATEURS/i,title:'M\u00e9diateurs',badge:''}
+  ];
+  var foundSections=[];var secNum=0;
+  SECTIONS.forEach(function(sec){
+    var m=raw.match(sec.re);if(!m)return;
+    var start=m.index+m[0].length;var end=raw.length;
+    for(var si=SECTIONS.indexOf(sec)+1;si<SECTIONS.length;si++){var nm=raw.match(SECTIONS[si].re);if(nm&&nm.index>m.index){end=nm.index;break;}}
+    var content=raw.substring(start,end).trim();if(!content)return;
+    secNum++;foundSections.push({sec:sec,num:secNum<10?'0'+secNum:''+secNum,content:content});
+  });
   var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
+  var h='<div style="font-family:var(--sans)">';
   h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.05);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:20px 24px;margin-bottom:32px">';
   if(photoUrl)h+='<img src="'+photoUrl+'" style="width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0">';
   h+='<div style="flex:1;min-width:0">';
-  if(nom)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:4px">'+nom+'</div>';
-  if(adresse)h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+adresse+'</div>';
-  if(email)h+='<div style="margin-top:4px"><span style="font-size:12px;color:var(--orange)">'+email+'</span></div>';
+  if(mNom)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:4px">'+mNom[1].trim()+'</div>';
+  if(mAdr){var adrText=mAdr[1].trim();if(mVille)adrText+=', '+mVille[1].trim();h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.5">'+adrText+'</div>';}
+  if(mMail)h+='<div style="margin-top:4px"><span style="font-size:12px;color:var(--orange)">'+mMail[1]+'</span></div>';
   h+='</div>';
-  if(orias)h+='<span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;flex-shrink:0;white-space:nowrap">ORIAS n\u00b0 '+orias+'</span>';
+  if(mOrias)h+='<span style="font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;flex-shrink:0;white-space:nowrap">ORIAS n\u00b0 '+mOrias[1].trim()+'</span>';
   h+='</div>';
-
-  var secNum=0;
-
-  // Section IMMO
-  if(habImmo){
-    secNum++;var sn=secNum<10?'0'+secNum:''+secNum;
-    h+=secH(sn,'Activit\u00e9 immobili\u00e8re','TRANSACTION');
-    h+=card('AGENT COMMERCIAL','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">'+nom+' exerce en qualit\u00e9 d\'agent commercial en immobilier pour le compte de <strong>Stellium Immobilier SAS</strong>, soci\u00e9t\u00e9 titulaire de la carte professionnelle CPI 3301 2019 000 038 003 d\u00e9livr\u00e9e par la CCI de Bordeaux.</p><p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0">ORIAS personnel n\u00b0 <strong>'+orias+'</strong></p>');
-  }
-  // Section Financement
-  if(habIOBSP){
-    secNum++;var sn2=secNum<10?'0'+secNum:''+secNum;
-    h+=secH(sn2,'Financement','IOBSP');
-    h+=card('MANDATAIRE IOBSP','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">Le mandataire distribue exclusivement les produits r\u00e9f\u00e9renc\u00e9s par <strong>Stellium Financement</strong>.</p>'+(partBanque.length?'<div style="font-size:12px;font-weight:600;color:var(--noir);margin:8px 0 4px">Partenaires bancaires</div>'+pill(partBanque):''));
-  }
-  // Section Assurance
-  if(habIAS){
-    secNum++;var sn3=secNum<10?'0'+secNum:''+secNum;
-    h+=secH(sn3,'Assurance','IAS');
-    var assBody='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">Mandataire d\'interm\u00e9diaire en assurance pour <strong>Stellium Courtage</strong>.</p>';
-    if(partAssureurs.length)assBody+='<div style="font-size:12px;font-weight:600;color:var(--noir);margin:8px 0 4px">Assureurs</div>'+pill(partAssureurs);
-    if(partCourtiers.length)assBody+='<div style="font-size:12px;font-weight:600;color:var(--noir);margin:8px 0 4px">Courtiers grossistes</div>'+pill(partCourtiers);
-    h+=card('MANDATAIRE IAS',assBody);
-  }
-  // Section Instruments financiers
-  if(habCIF){
-    secNum++;var sn4=secNum<10?'0'+secNum:''+secNum;
-    h+=secH(sn4,'Instruments financiers','AGENT LI\u00c9');
-    h+=card('AGENT LI\u00c9','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">Agent li\u00e9 pour le compte de <strong>Stellium Invest</strong>, prestataire de services d\'investissement agr\u00e9\u00e9 par l\'ACPR.</p>'+(partSocietes.length?'<div style="font-size:12px;font-weight:600;color:var(--noir);margin:8px 0 4px">Soci\u00e9t\u00e9s de gestion</div>'+pill(partSocietes):''));
-  }
-  // Section RCP
-  secNum++;var sn5=secNum<10?'0'+secNum:''+secNum;
-  h+=secH(sn5,'Assurance RCP','');
-  var rcpRows=[{label:'Transactions immobili\u00e8res (IMMO)',val:rcpImmo},{label:'Op\u00e9rations de banque (IOBSP)',val:rcpIOBSP},{label:'Interm\u00e9diaire d\'assurance (IAS)',val:rcpIAS},{label:'Conseil en investissement (CIF)',val:rcpCIF}];
-  var rcpH='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;border-radius:10px;overflow:hidden"><tr><th style="background:var(--gris-l);padding:12px 16px;text-align:left;font-weight:600;color:var(--gris);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Activit\u00e9</th><th style="background:var(--gris-l);padding:12px 16px;text-align:right;font-weight:600;color:var(--gris);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">Montant garanti</th></tr>';
-  rcpRows.forEach(function(r){rcpH+='<tr><td style="padding:12px 16px;border-bottom:1px solid var(--bord)">'+r.label+'</td><td style="padding:12px 16px;border-bottom:1px solid var(--bord);text-align:right;'+(r.val>0?'font-weight:700;color:var(--orange)':'color:var(--gris)')+'">'+( r.val>0?fmt(r.val)+' \u20ac':'Non applicable')+'</td></tr>';});
-  rcpH+='</table>';
-  h+=card('ZURICH INSURANCE PLC','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">Assurance de responsabilit\u00e9 civile professionnelle souscrite aupr\u00e8s de <strong>Zurich Insurance PLC</strong>.</p>'+rcpH);
-
-  // Section Réclamations
-  secNum++;var sn6=secNum<10?'0'+secNum:''+secNum;
-  h+=secH(sn6,'R\u00e9clamations','');
-  h+=card('TRAITEMENT DES R\u00c9CLAMATIONS','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">Toute r\u00e9clamation peut \u00eatre adress\u00e9e \u00e0 votre consultant :'+(email?' <strong>'+email+'</strong>':'')+'</p><p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0">En l\'absence de r\u00e9ponse satisfaisante sous 60 jours, vous pouvez saisir le m\u00e9diateur comp\u00e9tent.</p>');
-
-  // Section Médiateurs
-  secNum++;var sn7=secNum<10?'0'+secNum:''+secNum;
-  h+=secH(sn7,'M\u00e9diateurs','');
-  h+=card('M\u00c9DIATEURS COMP\u00c9TENTS','<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px"><strong>M\u00e9diation Assurance :</strong> La M\u00e9diation de l\'Assurance \u2014 TSA 50110 \u2014 75441 Paris Cedex 09</p><p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px"><strong>M\u00e9diation Bancaire :</strong> M\u00e9diateur aupr\u00e8s de la F\u00e9d\u00e9ration Bancaire Fran\u00e7aise</p><p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0"><strong>M\u00e9diation AMF :</strong> M\u00e9diateur de l\'Autorit\u00e9 des March\u00e9s Financiers \u2014 17 place de la Bourse \u2014 75082 Paris Cedex 02</p>');
-
-  h+='</div>';
-  mel.innerHTML=h;
+  foundSections.forEach(function(fs){
+    var sec=fs.sec;var num=fs.num;var content=fs.content;
+    var badge=sec.badge;
+    if(badge==='_auto_inst'){badge=/agent\s+li[e\u00e9]/i.test(content)?'AGENT LI\u00c9':'CIF';}
+    h+='<div style="margin-top:40px;margin-bottom:20px;display:flex;align-items:baseline;gap:14px">';
+    h+='<span style="font-family:var(--serif);font-size:30px;font-weight:300;color:rgba(212,98,42,0.35);line-height:1">'+num+'</span>';
+    h+='<span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);flex:1;font-style:italic">'+sec.title+'</span>';
+    if(badge)h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:4px 14px;border-radius:20px">'+badge+'</span>';
+    h+='</div>';
+    var cLines=content.split('\n').map(function(l){return l.replace(/\t/g,'  ').trim();}).filter(Boolean);
+    cLines=cLines.filter(function(l){return l.replace(/\s/g,'').length>0;});
+    var cardBuf=[];var ci2=0;
+    while(ci2<cLines.length){
+      var cl=cLines[ci2];
+      if(/^IMMO\s/.test(cl)||/Activit.*Montant/i.test(cl)){
+        if(cardBuf.length){h+=mlCard(cardBuf);cardBuf=[];}
+        var headers=cl.split(/\s{2,}/).filter(Boolean);var amounts=[];
+        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;var amtParts=cLines[ci2].trim().split(/\s{2,}/).filter(Boolean);amounts=amounts.concat(amtParts);}
+        var rcpMap={IMMO:'Transactions immobili\u00e8res',IOBSP:'Op\u00e9rations de banque',IAS:'Interm\u00e9diaire assurance',CIF:'Conseil en investissement'};
+        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
+        h+='<tr><th style="background:var(--gris-l);padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;color:var(--gris)">Activit\u00e9</th><th style="background:var(--gris-l);padding:12px 16px;text-align:right;font-size:11px;text-transform:uppercase;color:var(--gris)">Montant garanti</th></tr>';
+        headers.forEach(function(hd,hi){var amt=amounts[hi]||'';var isZero=/^0[\s\u20ac]*$|^0\.0/.test(amt);h+='<tr><td style="padding:12px 16px;border-bottom:1px solid var(--bord)">'+(rcpMap[hd]||hd)+'</td><td style="padding:12px 16px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:700;color:var(--orange)')+'">'+(isZero?'Non applicable':amt)+'</td></tr>';});
+        h+='</table>';ci2++;continue;
+      }
+      var tagItems=[];
+      if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
+        while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
+          var parts=cLines[ci2].split(/\s{2,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+          if(parts.length>=2&&parts.every(function(p){return p.length<60;})){tagItems=tagItems.concat(parts);}else break;ci2++;
+        }
+      }
+      if(tagItems.length>=2){
+        var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
+        tagItems.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
+        cardBuf.push(tagHtml+'</div>');continue;
+      }
+      if(!cl){
+        var nextNE=-1;for(var pk=ci2+1;pk<cLines.length;pk++){if(cLines[pk].trim()){nextNE=pk;break;}}
+        var nextIsPart=false;
+        if(nextNE>=0){var nxt=cLines[nextNE].trim();if(nxt.length<60&&nextNE+1<cLines.length&&(/^\s/.test(cLines[nextNE+1])||/\s{2,}/.test(cLines[nextNE+1])))nextIsPart=true;}
+        if(cardBuf.length&&!nextIsPart){h+=mlCard(cardBuf);cardBuf=[];}
+        ci2++;continue;
+      }
+      cardBuf.push(cl);ci2++;
+    }
+    if(cardBuf.length)h+=mlCard(cardBuf);
+  });
+  h+='</div>';mel.innerHTML=h;
+}
+function mlCard(lines){
+  if(!lines.length)return '';
+  var sub='';var content=lines;
+  if(typeof lines[0]==='string'&&lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1&&!/</.test(lines[0])){sub=lines[0];content=lines.slice(1);}
+  var c='<div style="background:#fff;border:1.5px solid rgba(212,98,42,0.12);border-left:3.5px solid var(--orange);border-radius:12px;padding:20px 24px;margin-bottom:14px">';
+  if(sub)c+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--gris);margin-bottom:12px">'+sub+'</div>';
+  content.forEach(function(l){if(/</.test(l)){c+=l;return;}c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.8;margin:0 0 8px">'+l+'</p>';});
+  c+='</div>';return c;
 }
 // ══════════════════════════════════════════════════════════════
 // AVIS CLIENTS — saisie directe dans la page
