@@ -64,7 +64,7 @@ body{font-family:var(--sans);-webkit-font-smoothing:antialiased}
 /* ── COMPOSANTS COMMUNS ───────────────────────────────────────────── */
 
 /* Badges */
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;gap:3px}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;gap:3px;white-space:nowrap}
 .badge-amber{background:var(--o-dim);color:var(--orange)}
 .badge-green{background:var(--green-l);color:var(--green)}
 .badge-red{background:var(--red-l);color:var(--red)}
@@ -114,7 +114,7 @@ body{font-family:var(--sans);-webkit-font-smoothing:antialiased}
 .kpi.red{background:var(--red-l);border-color:rgba(192,57,43,0.15)}
 .kpi-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:5px}
 .kpi.featured .kpi-label{color:rgba(13,13,13,0.5)}
-.kpi-val{font-family:var(--sans);font-size:19px;font-weight:700;color:var(--noir);line-height:1}
+.kpi-val{font-family:var(--sans);font-size:19px;font-weight:700;color:var(--noir);line-height:1;white-space:nowrap}
 .kpi.featured .kpi-val{color:#111}
 .kpi.green .kpi-val{color:var(--green)}
 .kpi.red .kpi-val{color:var(--red)}
@@ -308,7 +308,7 @@ select.span2{grid-column:span 2}
 .fiscal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bord)}
 .fiscal-row:last-child{border-bottom:none}
 .fr-l{font-size:13px;color:var(--gris-f);font-weight:300}
-.fr-v{font-size:13px;font-weight:600;color:var(--noir)}
+.fr-v{font-size:13px;font-weight:600;color:var(--noir);white-space:nowrap}
 .tmi-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700}
 .tmi-0,.tmi-11,.tmi-30,.tmi-41,.tmi-45{background:#F2F1EE;color:#3A3A3A}
 
@@ -780,10 +780,10 @@ select.span2{grid-column:span 2}
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
-    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Actifs bruts</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kPat1">0 €</div></div>
-    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Passifs (CRD)</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kPat2">0 €</div></div>
-    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Patrimoine net</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kPat3">0 €</div></div>
-    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Patrimoine financier</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kPat4">0 €</div></div>
+    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Actifs bruts</div><div style="font-size:18px;font-weight:700;color:var(--noir);white-space:nowrap" id="kPat1">0 €</div></div>
+    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Passifs (CRD)</div><div style="font-size:18px;font-weight:700;color:var(--noir);white-space:nowrap" id="kPat2">0 €</div></div>
+    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Patrimoine net</div><div style="font-size:18px;font-weight:700;color:var(--noir);white-space:nowrap" id="kPat3">0 €</div></div>
+    <div class="card" style="margin-bottom:0;padding:14px 16px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Patrimoine financier</div><div style="font-size:18px;font-weight:700;color:var(--noir);white-space:nowrap" id="kPat4">0 €</div></div>
   </div>
 
   <div class="card" style="margin-bottom:18px">
@@ -797,12 +797,12 @@ select.span2{grid-column:span 2}
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Détail des actifs</div>
+    <div class="card-title"><span class="dot"></span>Actifs</div>
     <div style="overflow-x:auto"><table class="tbl" id="actifsTbl"></table></div>
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Passifs en cours</div>
+    <div class="card-title"><span class="dot"></span>Passifs</div>
     <div style="overflow-x:auto"><table class="tbl" id="passifsTbl"></table></div>
   </div>
 
@@ -3692,10 +3692,10 @@ function rPatrimoine(){
   var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th>Type</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr>
-    <td class="bold">${p.nom}</td><td>${p.titulaire}</td>
+    <td>${titLabel(p.titulaire)}</td><td class="bold">${p.nom}</td>
     <td class="right">${fmt(p.echeance)} €</td>
     <td class="right red">${fmt(p.crd)} €</td></tr>`).join('');
-  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr><th>Désignation</th><th>Titulaire</th><th>Échéance /an</th><th>CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="4" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="3">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} €</td></tr></tbody>`;
+  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr><th>Titulaire</th><th>Désignation</th><th>Échéance /an</th><th>CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="4" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="3">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} €</td></tr></tbody>`;
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
