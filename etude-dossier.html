@@ -3821,7 +3821,9 @@ function rPatrimoine(){
   var detailPlacement = [];
   if(epTotal>0) detailPlacement.push(fmt(epTotal)+' €/mois d\'épargne disponible');
   if(ct>epCible) detailPlacement.push(fmt(ct-epCible)+' € réorientable (excédent précaution)');
+  var epAtteinte=ct>=epCible;
   renderLevierBadge('levierPat',[
+    {label:'\u00c9pargne de pr\u00e9caution', ok:epAtteinte, detail:epAtteinte?fmt(ct)+' \u20ac disponibles / '+fmt(epCible)+' \u20ac cible':fmt(ct)+' \u20ac / '+fmt(epCible)+' \u20ac cible \u2014 \u00e0 compl\u00e9ter'},
     {label:'Placement', ok:levierPlacement, detail:levierPlacement?detailPlacement.join(' + '):'Pas de marge'}
   ]);
 }
