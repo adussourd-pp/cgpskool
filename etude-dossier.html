@@ -375,6 +375,8 @@ select.span2{grid-column:span 2}
 
 /* ── PRINT ── */
 @media print{
+  /* ── COULEURS DE FOND : forcer l'impression ── */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   /* ── MASQUER : navigation, sidebar, boutons, zones conseiller ── */
   nav,.sidebar,.nav-actions,.row-btns,.add-row-btn,.add-sol-btn,.add-sol-bar,
   .sol-del,.mode-toggle,.import-zone,.btn,.ed:hover,.ed-block:hover,
@@ -513,8 +515,8 @@ select.span2{grid-column:span 2}
 <aside class="sidebar">
   <div class="sidebar-lbl">Navigation</div>
   <div id="progressBar" style="padding:0 10px 8px">
-    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-bottom:4px"><span id="progressLbl">0 / 7</span><span id="progressPct">0%</span></div>
-    <div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div id="progressFill" style="height:100%;width:0%;border-radius:2px;transition:width 0.4s"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-bottom:4px"><span id="progressLbl">0 / 8</span><span id="progressPct">0%</span></div>
+    <div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div id="progressFill" style="height:100%;width:0%;border-radius:2px;transition:width 0.4s;background:var(--blue)"></div></div>
   </div>
   <button class="step-btn active" data-sec="import" onclick="goTo('import')"><span class="step-dot"></span>Import / Saisie</button>
   <div class="sidebar-lbl" style="margin-top:8px">Analyse</div>
@@ -902,7 +904,7 @@ select.span2{grid-column:span 2}
       <span style="font-size:11px;font-weight:400;color:var(--gris);margin-left:8px">&#8212; Le point <span style="color:var(--ambre);font-weight:700">&#9679;</span> positionne votre client</span>
     </div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
-    <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
+    <div style="position:relative;height:360px;overflow:hidden"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
     <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
       <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
@@ -3903,7 +3905,7 @@ function rRetraite(){
   var tauxClient=TAUX[cspKey][ageIdx];
   var keys=Object.keys(TAUX);
   var datasets=keys.map(function(k,i){var isC=k===cspKey;return{label:k,data:TAUX[k],borderColor:COLORS[i],backgroundColor:COLORS[i],borderWidth:isC?3:1.5,pointRadius:isC?5:3,pointHoverRadius:isC?7:5,tension:0.35,fill:false,order:isC?0:1};});
-  datasets.push({label:'Votre client',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'var(--orange)',backgroundColor:'var(--orange)',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
+  datasets.push({label:'Votre client',data:AGES.map(function(a,i){return i===ageIdx?tauxClient:null;}),borderColor:'#D4622A',backgroundColor:'#D4622A',pointRadius:AGES.map(function(a,i){return i===ageIdx?10:0;}),pointHoverRadius:12,showLine:false,order:0});
   var ctx=document.getElementById('retChart');
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
