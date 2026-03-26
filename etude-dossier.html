@@ -524,7 +524,7 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
-  <div class="sidebar-lbl" style="margin-top:8px">PDF</div>
+  <div class="sidebar-lbl" style="margin-top:8px">Mise en page</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
   <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions légales</button>
   <button class="step-btn" id="btnAvis" data-sec="avis"
@@ -5929,36 +5929,88 @@ function saveMentionsDirect(){
     if(sec.badge)h+='<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.15);padding:3px 10px;border-radius:20px">'+sec.badge+'</span>';
     h+='</div>';
 
-    // Contenu : paragraphes
-    var paras=content.split(/\n\s*\n/).filter(function(p){return p.trim();});
-    paras.forEach(function(para){
-      var lines=para.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
-      if(!lines.length)return;
-      // Detecter tags (items courts sur une ligne avec tabs ou espaces)
-      var allTags=[];
-      lines.forEach(function(l){
-        var items=[];
-        if(l.indexOf('\t')>=0)items=l.split('\t').map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-        else if(/\s{3,}/.test(l))items=l.split(/\s{3,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-        if(items.length>=2&&items.every(function(it){return it.length<60;}))allTags=allTags.concat(items);
-      });
-      if(allTags.length>=3){
-        h+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:12px 0">';
-        allTags.forEach(function(t){h+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
-        h+='</div>';
-        return;
+    // Contenu : lignes
+    var cLines=content.split('\n').map(function(l){return l.replace(/\t/g,'  ').trim();}).filter(Boolean);
+    // Filtrer caractere  et lignes vides
+    cLines=cLines.filter(function(l){return l.replace(/\s/g,'').length>0;});
+
+    var cardBuf=[];
+    var ci2=0;
+    while(ci2<cLines.length){
+      var cl=cLines[ci2];
+
+      // Detecter RCP : ligne header (IMMO IOBSP...) suivie de montants
+      if(/^IMMO\s/.test(cl)||/Activit.*Montant/i.test(cl)){
+        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        var headers=cl.split(/\s{2,}/).filter(Boolean);
+        var amounts=[];
+        while(ci2+1<cLines.length&&/^\d|^Non/i.test(cLines[ci2+1].trim())){ci2++;amounts.push(cLines[ci2].trim());}
+        // Render as table
+        h+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';
+        h+='<tr><th style="background:var(--gris-l);padding:10px 14px;text-align:left;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Activit\u00e9</th><th style="background:var(--gris-l);padding:10px 14px;text-align:right;font-weight:500;color:var(--gris);border-bottom:1px solid var(--bord);font-size:12px">Montant garanti / an</th></tr>';
+        var rcpMap={'IMMO':'Transactions immobili\u00e8res (IMMO)','IOBSP':'Op\u00e9rations de banque (IOBSP)','IAS':'Interm\u00e9diaire d\'assurance (IAS)','CIF':'Conseil en investissement (CIF)'};
+        headers.forEach(function(hd,hi){
+          var amt=amounts[hi]||'';
+          var isZero=/^0[\s€]*$|^0\.0/.test(amt);
+          var label=rcpMap[hd]||hd;
+          h+='<tr><td style="padding:10px 14px;border-bottom:1px solid var(--bord);color:var(--noir);font-weight:300">'+label+'</td>';
+          h+='<td style="padding:10px 14px;border-bottom:1px solid var(--bord);text-align:right;'+(isZero?'color:var(--gris)':'font-weight:600;color:var(--orange)')+'">'+( isZero?'Non applicable':amt)+'</td></tr>';
+        });
+        h+='</table>';
+        ci2++;continue;
       }
-      // Card
-      h+='<div style="background:#fff;border:1px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:12px">';
-      lines.forEach(function(l){
-        h+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.75;margin:0 0 6px">'+l+'</p>';
-      });
-      h+='</div>';
-    });
+
+      // Detecter tags : ligne commencant par espace ou avec 2+ items courts separes par espaces
+      var tagItems=[];
+      if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
+        // Accumuler les lignes adjacentes commencant par espace
+        var tagLines=[];
+        while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
+          var parts=cLines[ci2].split(/\s{2,}/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+          if(parts.length>=2&&parts.every(function(p){return p.length<60;})){tagItems=tagItems.concat(parts);}
+          else break;
+          ci2++;
+        }
+      }
+      if(tagItems.length>=2){
+        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        h+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0">';
+        tagItems.forEach(function(t){h+='<span style="font-size:12px;padding:4px 12px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir)">'+t+'</span>';});
+        h+='</div>';
+        continue;
+      }
+
+      // Ligne vide = flush card
+      if(!cl){
+        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        ci2++;continue;
+      }
+
+      // Accumuler dans card
+      cardBuf.push(cl);
+      ci2++;
+    }
+    if(cardBuf.length)h+=renderMlCard2(cardBuf);
   });
 
   h+='</div>';
   mel.innerHTML=h;
+}
+
+function renderMlCard2(lines){
+  if(!lines.length)return '';
+  // First line as subtitle if short and caps
+  var sub='';var content=lines;
+  if(lines[0]===lines[0].toUpperCase()&&lines[0].length<80&&lines.length>1){
+    sub=lines[0];content=lines.slice(1);
+  }
+  var c='<div style="background:#fff;border:1px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:12px'+(sub?';border-left:3px solid var(--orange)':'')+'">';
+  if(sub)c+='<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:10px">'+sub+'</div>';
+  content.forEach(function(l){
+    c+='<p style="font-size:14px;font-weight:300;color:#333;line-height:1.75;margin:0 0 6px">'+l+'</p>';
+  });
+  c+='</div>';
+  return c;
 }
 
 // ══════════════════════════════════════════════════════════════
