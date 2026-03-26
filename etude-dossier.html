@@ -2015,7 +2015,7 @@ let ED = {
   type:'seul', consultant:'',
   c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:''},
   c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:''},
-  sitmat:'Célibataire', convention:'', logement:'Propriétaire', nbEnfants:0, enfants:[],
+  sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[],
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
@@ -2405,9 +2405,10 @@ function parseTextRI(txt){
     ED.passifs = [];
     var passifSection = (s03.match(/PASSIFS([\s\S]*?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|$)/i)||['',''])[1];
     var passifRows = parsePipeTable(passifSection);
+    var SKIP_P = /^(désignation|designation|total|crédit immobilier|credit immobilier|crédit personnel|credit personnel|crédit|credit|prêt|pret)$/i;
     passifRows.forEach(function(cols){
       var nom = cols[0];
-      if(!nom||nom.length<2||/^(désignation|designation|total)$/i.test(nom.trim())) return;
+      if(!nom||nom.length<2||SKIP_P.test(nom.trim())) return;
       // Format : [Nom, Titulaire, Echéance/an, CRD, Date]
       var ech=0, crd=0;
       var nums=[];
@@ -2680,7 +2681,7 @@ function parseTextRI(txt){
       if(line.indexOf('\t')<0)return;
       var p=line.split('\t').map(function(x){return x.trim();});
       var nom=p[0];if(!nom||nom.length<2)return;
-      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier$|cr\u00e9dit personnel|credit)$/i.test(nom.trim()))return;
+      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier|credit immobilier|cr\u00e9dit personnel|credit personnel|cr\u00e9dit|credit|pr\u00eat|pret)$/i.test(nom.trim()))return;
       var ech=0,crd=0;
       if(p.length>=4){var nums=p.slice(1).map(function(x,i){return{i:i+1,v:pEur2(x)};}).filter(function(x){return x.v>0;});
         if(nums.length>=2){ech=nums[0].v;crd=nums[1].v;}else if(nums.length===1){crd=nums[0].v;}
