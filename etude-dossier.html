@@ -290,7 +290,7 @@ select.span2{grid-column:span 2}
 .pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-radius:10px;border:1.5px solid}
 .pyr-lv.lt{background:var(--red-l);border-color:rgba(192,57,43,0.25)}
 .pyr-lv.mt{background:var(--o-dim);border-color:var(--ambre-m)}
-.pyr-lv.ct{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
+.pyr-lv.ct{background:var(--blue-l);border-color:rgba(43,94,167,0.2)}
 .pyr-lv.ep{background:var(--green-l);border-color:rgba(45,122,91,0.2)}
 .pyr-name{font-size:13px;font-weight:600;color:var(--noir)}
 .pyr-desc{font-size:11px;color:var(--gris)}
@@ -663,7 +663,7 @@ select.span2{grid-column:span 2}
         <div class="pyr-lv lt"><div><div class="pyr-name">🏔 Long terme</div><div class="pyr-desc">Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
         <div class="pyr-lv mt"><div><div class="pyr-name">📈 Moyen terme</div><div class="pyr-desc">3 à 10 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
         <div class="pyr-lv ct"><div><div class="pyr-name">💧 Court terme</div><div class="pyr-desc">Disponible &lt; 3 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
-        <div class="pyr-lv ep"><div><div class="pyr-name">🛡 Précaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
+        <div class="pyr-lv ep"><div><div class="pyr-name">🛡 Épargne de précaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
       </div>
     </div>
     <div class="chart-box">
@@ -3146,7 +3146,7 @@ function rPatrimoine(){
   pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
     type:'doughnut',
     data:{labels:['Long terme','Moyen terme','Court terme'],
-      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(192,57,43,0.2)','rgba(212,98,42,0.25)','rgba(45,122,91,0.2)'],borderColor:['#C0392B','#D4622A','#2D7A5B'],borderWidth:2}]},
+      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(192,57,43,0.2)','rgba(212,98,42,0.25)','rgba(43,94,167,0.2)'],borderColor:['#C0392B','#D4622A','#2B5EA7'],borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:12}}}}
   });
 
@@ -3241,7 +3241,7 @@ function rPatrimoine(){
   var ltItems=ED.actifs.filter(function(a){return a.horizon==='lt';});
   var allRows=buildHorizonSection('Long terme','badge-red',ltItems)
              +buildHorizonSection('Moyen terme','badge-amber',mtItems)
-             +buildHorizonSection('Court terme','badge-green',ctItems);
+             +buildHorizonSection('Court terme','badge-blue',ctItems);
   var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th>Type</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr>
