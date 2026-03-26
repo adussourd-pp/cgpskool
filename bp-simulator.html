@@ -233,8 +233,8 @@ table tr:hover td { background: var(--paper); }
       <div class="ps-title"><span></span>Organisation — Niveau 1</div>
       <div class="pr"><div class="pl">Consultants inscrits/an <small>(moyenne)</small></div>
         <div class="iu"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
-      <div class="pr"><div class="pl">Taux de parrainage <small>(filleuls/consultant actif)</small></div>
-        <div class="iu"><input type="number" id="tauxParrainage" value="1.5" step="0.5" min="0" oninput="recalc()"><div class="iu-u">/ actif</div></div></div>
+      <div class="pr"><div class="pl">Taux de parrainage <small>(top performers réseau Forman : 1 à 2)</small></div>
+        <div class="iu"><input type="number" id="tauxParrainage" value="1.5" step="0.5" min="0" oninput="recalc()"><div class="iu-u">/ actif / an</div></div></div>
       <div class="pr"><div class="pl">Taux d'actifs</div>
         <div class="iu"><input type="number" id="tauxActifs" value="62" step="5" oninput="recalc()"><div class="iu-u">%</div></div></div>
       <div class="pr"><div class="pl">VA moyenne / actif niv.1</div>
@@ -434,10 +434,13 @@ function recalc() {
   // Manager Constellation : 3 branches actives
   // Manager Galaxie    : 4+ branches actives
 
-  function calcBranchesActives(totalActifsNiv1, vaMoyenneNiv1, vaManagerActif) {
-    // Un actif niv.1 est une "branche active" si sa VA estimée dépasse vaManagerActif
-    // On suppose que les actifs sont distribués : une fraction dépasse ce seuil
-    var nbManagersEstimes = totalActifsNiv1 * (vaMoyenneNiv1 / vaManagerActif);
+  function calcBranchesActives(actifsNiv1_precedents, vaMoyenneNiv1, vaManagerActif) {
+    // Règle PMR : une branche active = actif niv.1 ayant eu le temps de se développer
+    // On utilise les actifs de l'ANNÉE PRÉCÉDENTE (ils ont eu 1 an pour faire leur VA)
+    // et on estime la fraction dont la VA dépasse le seuil branche active (500k€)
+    // Un actif vaNiv1 "moyen" → proportion qui atteint vaManagerActif
+    if(actifsNiv1_precedents <= 0) return 0;
+    var nbManagersEstimes = actifsNiv1_precedents * (vaMoyenneNiv1 / vaManagerActif);
     return Math.min(4, Math.floor(nbManagersEstimes));
   }
 
@@ -448,11 +451,11 @@ function recalc() {
   var totalInscNiv2   = niv2Actuel;
   var totalActifsNiv2 = niv2ActifsActuel;
   var encoursCumule   = encoursCumuleActuel;
+  // Actifs niv1 de l'année PRÉCÉDENTE pour calcul branches (décalage 1 an)
+  var prevActifsNiv1  = niv1ActifsActuel;
 
   for(var an = 0; an <= dureePlan; an++) {
     // ── VA perso ──
-    // An 0 : si activité existante → utiliser va0actuel, sinon 0 (démarrage)
-    // An 1+ : croissance depuis va0 (cible an1)
     var vaPerso;
     if(an === 0) {
       vaPerso = hasExistingActivity ? va0actuel : 0;
@@ -461,31 +464,26 @@ function recalc() {
     }
 
     // ── Organisation — parrainage en cascade ──
-    // Logique : chaque actif (niv1 OU niv2+) génère tauxParrainage nouveaux filleuls/an
-    // Niv1 = filleuls directs du consultant
-    // Niv2+ = filleuls des filleuls (et au-delà)
+    var actifsNiv1_avant = totalActifsNiv1; // sauvegarder avant mise à jour
     if(an === 0) {
       // Situation initiale déjà chargée — rien à faire
     } else if(an === 1) {
-      // An 1 : inscriptions directes du consultant
       if(!hasExistingActivity) totalInscNiv1 += 1;
       totalInscNiv1 += inscNiv1;
       totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
-      // Les actifs niv1 génèrent leurs filleuls (niv2)
       var newNiv2_an1 = Math.round(totalActifsNiv1 * tauxParrainage);
       totalInscNiv2 += newNiv2_an1;
       totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
     } else {
-      // An 2+ : le consultant recrute + les actifs niv1 et niv2 recrutent en cascade
-      // Nouvelles inscriptions niv1 = directs du consultant
       totalInscNiv1 += inscNiv1;
       totalActifsNiv1 = Math.round(totalInscNiv1 * tauxActifs);
-      // Nouvelles inscriptions niv2+ = parrainage par TOUS les actifs (niv1 + niv2)
       var totalActifsAll = totalActifsNiv1 + totalActifsNiv2;
       var newNiv2_an = Math.round(totalActifsAll * tauxParrainage);
       totalInscNiv2 += newNiv2_an;
       totalActifsNiv2 = Math.round(totalInscNiv2 * tauxActifs);
     }
+    // Mettre à jour le décalage : les actifs "anciens" sont ceux d'avant cette année
+    prevActifsNiv1 = actifsNiv1_avant;
 
     var vaEquipeNiv1 = totalActifsNiv1 * vaNiv1;
     var vaEquipeNiv2 = totalActifsNiv2 * vaNiv2;
@@ -494,19 +492,17 @@ function recalc() {
     // ── Qualification : dérivée du volume, pas du temps ──
     var branchesActives, tpc, qualif, isManager;
     if(an === 0 && hasExistingActivity) {
-      // An 0 : utiliser la qualification saisie manuellement
       branchesActives = branchesAn0Map[qualifActuelle] || 0;
       tpc             = tpcAn0Map[qualifActuelle] || 0.05;
       qualif          = qualifLabelMap[qualifActuelle] || 'Consultant';
       isManager       = qualifActuelle !== 'consultant';
     } else {
-      // Qualification entièrement dérivée du volume calculé cette année
-      // 1. Est-on Manager ? VA perso ≥ 50k€ (condition minimale PMR)
       isManager = vaPerso >= 50000;
       if(isManager) {
-        // 2. Combien de branches actives ?
-        branchesActives = calcBranchesActives(totalActifsNiv1, vaNiv1, vaManagerActif);
-        tpc   = getTPC(vaOrga, branchesActives);
+        // Branches calculées sur les actifs de l'année PRÉCÉDENTE
+        // (ils ont eu 1 an pour développer leur VA et devenir Manager)
+        branchesActives = calcBranchesActives(prevActifsNiv1, vaNiv1, vaManagerActif);
+        tpc    = getTPC(vaOrga, branchesActives);
         qualif = getQualif(tpc, branchesActives);
       } else {
         branchesActives = 0;
@@ -812,7 +808,7 @@ function recalc() {
   });
 
   var last = rows[rows.length-1];
-  setHTML('simNote', 'Projection indicative — hypothèses PMR Prodémial (nov. 2021). TPC : 5% → 8% selon qualification. La qualification et les titres sont des conséquences du volume réalisé, pas d\'hypothèses temporelles. Commission démarrage : 2% sur VA équipe niv.1. Commission expansion : 1% sur VA équipe managers de 1er niveau. Commission développement : 0,5% sur VA niv.2+. Manager à partir de 50k€ VAVC perso. VA Manager actif moyen : '+fmtE(gv('vaManagerActif',700000))+'. CA total an '+dureePlan+' projeté : '+fmtE(last.caTotal)+'. Projections non contractuelles.');
+  setHTML('simNote', 'Projection indicative — hypothèses PMR Prodémial. TPC : 5% → 8% selon qualification. La qualification et les titres sont des conséquences du volume réalisé. Commission démarrage : 2% sur VA équipe niv.1. Commission expansion : 1% sur VA équipe managers niv.1. Commission développement : 0,5% sur VA niv.2+. Manager à partir de 50k€ VAVC perso (~18-20 mois en moyenne selon les mails experts). VA Manager actif moyen : '+fmtE(gv('vaManagerActif',700000))+' (source : équipe Payraudeau S12/2026). Taux parrainage 1,5/actif/an = top performers réseau Forman (Darmaillacq 8, Van Ledeghem 7, Geraud 7 filleuls sur l\'exercice). Taux moyen réseau : ~0,5/actif/an. Taux d\'actifs 62% validé (équipe Payraudeau : 658/1010 = 65%). CA total an '+dureePlan+' projeté : '+fmtE(last.caTotal)+'. Projections non contractuelles.');
 }
 
 document.addEventListener('DOMContentLoaded', recalc);
