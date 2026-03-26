@@ -613,7 +613,7 @@ select.span2{grid-column:span 2}
   </div>
 
   <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Épargne mensuelle</div><div class="kpi-val" id="kSit1">0 €</div></div>
+    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Épargne mensuelle <span style="font-size:8px;font-weight:400;color:var(--gris)">(saisie R1)</span></div><div class="kpi-val"><input type="number" id="kSit1Input" value="0" min="0" step="50" style="width:80px;border:none;border-bottom:1.5px solid var(--ambre-m);background:transparent;font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir);text-align:center;outline:none;padding:2px 0" onchange="ED.epMens=+this.value;rSituation&&rSituation()"> <span style="font-size:13px;font-weight:400;color:var(--gris)">€/mois</span></div></div>
     <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kSit2">0 €</div></div>
     <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Taux d'endettement</div><div class="kpi-val" id="kSit3">—</div></div>
     <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Reste à vivre /mois</div><div class="kpi-val" id="kSit4">0 €</div></div>
@@ -3091,7 +3091,8 @@ function rSituation(){
   const chrCr=ED.chargesCredit||0;
   const endett=chrCr>0&&revM>0?chrCr/revM*100:0;
   const rav=revM-chrCr;
-  set('kSit1',fmt(ED.epMens)+' €/mois');
+  var epInput=document.getElementById('kSit1Input');
+  if(epInput&&!epInput.matches(':focus'))epInput.value=ED.epMens||0;
   set('kSit2',fmt(revM)+' €/mois');
   const ke=document.getElementById('kSit3');
   var endPct=Math.min(100,Math.round(endett/35*100));
