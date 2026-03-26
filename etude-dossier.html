@@ -6017,7 +6017,7 @@ function saveMentionsDirect(){
   try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
   var mel=document.getElementById('mentionsPreview');
   if(!mel)return;
-  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
+  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').replace(/\u00c2(?=[\u0080-\u00bf])/g,'').replace(/\u00c3\u00a9/g,'\u00e9').replace(/\u00c3\u00a8/g,'\u00e8').replace(/\u00c3\u00a0/g,'\u00e0').replace(/\u00c2\u00b0/g,'\u00b0').replace(/\u00c2/g,'').trim();
   if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez votre fiche d\'informations l\u00e9gales ci-dessus.</em>';return;}
 
   // Nettoyer
