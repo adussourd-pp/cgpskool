@@ -4229,7 +4229,7 @@ function rSynthese(){
         labels:['Court terme','Moyen terme','Long terme'],
         datasets:[{
           data:[ct,mt,lt],
-          backgroundColor:['var(--orange)','#185FA5','#0F6E56'],
+          backgroundColor:['rgba(43,94,167,0.7)','rgba(212,98,42,0.7)','rgba(192,57,43,0.7)'],
           borderWidth:2,borderColor:'#fff'
         }]
       },
@@ -4248,7 +4248,7 @@ function rSynthese(){
     var leg=document.getElementById('pyramideLegend');
     if(leg){
       var total=ct+mt+lt;
-      leg.innerHTML=[{l:'Court terme',v:ct,c:'var(--orange)'},{l:'Moyen terme',v:mt,c:'#185FA5'},{l:'Long terme',v:lt,c:'#0F6E56'}].map(function(i){
+      leg.innerHTML=[{l:'Court terme',v:ct,c:'#2B5EA7'},{l:'Moyen terme',v:mt,c:'#D4622A'},{l:'Long terme',v:lt,c:'#C0392B'}].map(function(i){
         return '<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:'+i.c+';flex-shrink:0"></span>'
           +'<span style="color:var(--gris)">'+i.l+'</span> <strong>'+fmt(i.v)+' €</strong>'
           +(total>0?' <span style="color:var(--gris)">('+Math.round(i.v/total*100)+'%)</span>':'')
@@ -4295,18 +4295,12 @@ function rSynthese(){
     else if(leg2) leg2.textContent='Aucune economie fiscale calculee.';
   })();
 
-  // ── 6.3 GRAPHIQUE RETRAITE SANS/AVEC PRÉCO ─────────────────────
+  // ── 6.3 GRAPHIQUE RETRAITE PAR PERSONNE DU FOYER ───────────────
   (function buildSynthRet(){
     var ctx=document.getElementById('synthRetChart');
     if(!ctx)return;
     if(window._synthRetChart)window._synthRetChart.destroy();
     var isCouple=ED.type!=='seul';
-    var age1=calcAge(ED.c1.dob)||40;
-    var retAge1=(ED.retraite&&ED.retraite.age1)||64;
-    var csp1=CSP_MAP[ED.c1.sitpro||'']||'Sal. cadre';
-    var tx1=getRetTaux(csp1,age1);
-    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
-    var pensM1=Math.floor(sal1/12*tx1/100);
     // Rente totale des solutions
     var renteTotale=sorted.reduce(function(s,sol){
       var cfg=(typeof SOLUTIONS_CONFIG!=='undefined'&&SOLUTIONS_CONFIG)?SOLUTIONS_CONFIG[sol.produit]:null;
@@ -4316,37 +4310,65 @@ function rSynthese(){
       var cap=Math.round((sol.vi||0)*Math.pow(1+r,h)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r,h)-1)/r):0));
       return s+Math.round(cap*0.04/12);
     },0);
-    var labels=['Pension seule','+ Solutions'],colors=['rgba(192,57,43,0.7)','rgba(45,122,91,0.7)'];
-    var souhait=(ED.retraite&&ED.retraite.pension1)||2500;
+    // Construire les données par personne
+    var members=[];
+    var age1=calcAge(ED.c1.dob)||40;
+    var csp1=CSP_MAP[ED.c1.sitpro||'']||'Sal. cadre';
+    var tx1=getRetTaux(csp1,age1);
+    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
+    var pensM1=Math.floor(sal1/12*tx1/100);
+    var souh1=(ED.retraite&&ED.retraite.pension1)||2500;
+    var name1=(ED.c1.prenom||'C1').split(' ')[0];
+    members.push({name:name1,pension:pensM1,souhait:souh1});
+    if(isCouple&&ED.c2&&ED.c2.prenom){
+      var age2=calcAge(ED.c2.dob)||40;
+      var csp2=CSP_MAP[ED.c2.sitpro||'']||'Sal. cadre';
+      var tx2=getRetTaux(csp2,age2);
+      var sal2=ED.revenus.sal2||ED.revenus.c2||0;
+      var pensM2=Math.floor(sal2/12*tx2/100);
+      var souh2=(ED.retraite&&ED.retraite.pension2)||2000;
+      var name2=(ED.c2.prenom||'C2').split(' ')[0];
+      members.push({name:name2,pension:pensM2,souhait:souh2});
+    }
+    var labels=[];var dataPension=[];var dataAvec=[];var dataObj=[];
+    members.forEach(function(m){
+      labels.push(m.name);
+      dataPension.push(m.pension);
+      dataAvec.push(m.pension+Math.round(renteTotale/members.length));
+      dataObj.push(m.souhait);
+    });
     window._synthRetChart=new Chart(ctx,{
       type:'bar',
       data:{
-        labels:['Pension seule','Avec solutions','Objectif'],
-        datasets:[{
-          label:'Revenus retraite C1 /mois',
-          data:[pensM1,pensM1+renteTotale,souhait],
-          backgroundColor:['rgba(192,57,43,0.7)','rgba(45,122,91,0.7)','rgba(43,94,167,0.4)'],
-          borderRadius:6
-        }]
+        labels:labels,
+        datasets:[
+          {label:'Pension seule',data:dataPension,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:6},
+          {label:'Avec solutions',data:dataAvec,backgroundColor:'rgba(45,122,91,0.7)',borderRadius:6},
+          {label:'Objectif',data:dataObj,backgroundColor:'rgba(43,94,167,0.4)',borderRadius:6}
+        ]
       },
       options:{
-        responsive:true,maintainAspectRatio:false,indexAxis:'y',
+        responsive:true,maintainAspectRatio:false,
         plugins:{
-          legend:{display:false},
-          tooltip:{callbacks:{label:function(ctx){return ' '+Math.round(ctx.parsed.x).toLocaleString('fr-FR')+' €/mois';}}}
+          legend:{position:'top',labels:{font:{family:'Inter',size:10},padding:12}},
+          tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+' : '+Math.round(ctx.parsed.y).toLocaleString('fr-FR')+' €/mois';}}}
         },
         scales:{
-          x:{ticks:{callback:function(v){return Math.round(v).toLocaleString('fr-FR')+' €';}},grid:{color:'rgba(0,0,0,0.04)'}},
-          y:{grid:{display:false}}
+          x:{grid:{display:false}},
+          y:{ticks:{callback:function(v){return Math.round(v).toLocaleString('fr-FR')+' €';}},grid:{color:'rgba(0,0,0,0.04)'}}
         }
       }
     });
     var leg=document.getElementById('synthRetLegend');
     if(leg){
-      var gap=souhait-(pensM1+renteTotale);
-      leg.innerHTML='<span>Pension estimee : <strong>'+fmt(pensM1)+' €/mois</strong></span>'
-        +'<span>Avec solutions : <strong style="color:var(--green)">+'+fmt(renteTotale)+' €/mois</strong></span>'
-        +(gap>0?'<span style="color:var(--red)">Manque residuel : <strong>'+fmt(gap)+' €/mois</strong></span>':'<span style="color:var(--green)">Objectif atteint</span>');
+      leg.innerHTML=members.map(function(m,i){
+        var avecSol=m.pension+Math.round(renteTotale/members.length);
+        var gap=m.souhait-avecSol;
+        return '<span><strong>'+m.name+'</strong> : '+fmt(m.pension)+' €'
+          +' → <span style="color:var(--green)">'+fmt(avecSol)+' €</span>'
+          +(gap>0?' <span style="color:var(--red)">(manque '+fmt(gap)+')</span>':' <span style="color:var(--green)">✓</span>')
+          +'</span>';
+      }).join(' · ');
     }
   })();
 
