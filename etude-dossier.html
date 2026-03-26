@@ -683,8 +683,8 @@ select.span2{grid-column:span 2}
 
   <div id="levierPat" style="margin-bottom:10px"></div>
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note patrimoine</div>
-    <div class="ed-block" id="notePat" contenteditable="true" data-placeholder="Observations sur le patrimoine : structuration, points forts, points d'attention…"></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="notePat" contenteditable="true" data-placeholder="Vos observations..."></div>
   </div>
 
   
@@ -736,8 +736,8 @@ select.span2{grid-column:span 2}
 
   <div id="levierFis" style="margin-bottom:10px"></div>
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note fiscale</div>
-    <div class="ed-block" id="noteFiscal" contenteditable="true" data-placeholder="Leviers identifiés : PER, réductions d'impôt, niches fiscales à mobiliser…"></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="noteFiscal" contenteditable="true" data-placeholder="Vos observations..."></div>
   </div>
 
   
@@ -771,8 +771,8 @@ select.span2{grid-column:span 2}
 
   <div id="levierFin" style="margin-bottom:10px"></div>
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note financement</div>
-    <div class="ed-block" id="noteFin" contenteditable="true" data-placeholder="Observations sur la capacité d'emprunt, l'épargne mobilisable, les projets en cours…"></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="noteFin" contenteditable="true" data-placeholder="Vos observations..."></div>
   </div>
 
   
@@ -805,7 +805,8 @@ select.span2{grid-column:span 2}
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
   </div>
-  <div id="retraiteCards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px"></div>
+  <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
+  <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:12px" id="retSimuLegend">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
@@ -3221,61 +3222,63 @@ function rPatrimoine(){
   }
   function getAssetType(nom){
     var n=(nom||'').toLowerCase();
-    // ── Immobilier ──
-    if(/r[ée]sidence principale/.test(n))           return{label:'Résidence principale',  bg:'#DCEDC8',color:'#33691E'};
-    if(/r[ée]sidence secondaire/.test(n))            return{label:'Résidence secondaire',  bg:'#DCEDC8',color:'#33691E'};
-    if(/immobilier locatif|locatif/.test(n)&&!/meub/.test(n)) return{label:'Immobilier locatif',bg:'#C8E6C9',color:'#1B5E20'};
-    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#C8E6C9',color:'#1B5E20'};
-    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#C8E6C9',color:'#1B5E20'};
-    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'#FFF3E0',color:'#E65100'};
-    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'#FFF3E0',color:'#E65100'};
-    if(/pinel|duflot|robien|scellier|borloo/.test(n))return{label:'Loi fiscale',            bg:'#FFF3E0',color:'#E65100'};
-    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCE4EC',color:'#880E4F'};
-    if(/terrain|bois|\bgfa\b|\bgfv\b|\bgff\b|foncier.*non b/i.test(n)) return{label:'Foncier',bg:'#DCEDC8',color:'#33691E'};
-    // ── Court terme (épargne réglementée) ──
-    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F5F5F5',color:'#616161'};
-    if(/\blep\b|livret d.[\u00e9e]pargne pop/.test(n))return{label:'LEP',                  bg:'#FFF9C4',color:'#F57F17'};
-    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A',               bg:'#FFF9C4',color:'#F57F17'};
-    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FFF9C4',color:'#F57F17'};
-    if(/\bcel\b|compte [\u00e9e]pargne log/.test(n)) return{label:'CEL',                   bg:'#FFF9C4',color:'#F57F17'};
-    if(/\bcsl\b|livret classique/.test(n))           return{label:'CSL',                   bg:'#FFF9C4',color:'#F57F17'};
-    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FFF9C4',color:'#F57F17'};
-    // ── Moyen terme ──
-    if(/\bpel\b|plan d.[\u00e9e]pargne log/.test(n))return{label:'PEL',                   bg:'#E8EAF6',color:'#283593'};
-    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'Compte à terme',        bg:'#E8EAF6',color:'#283593'};
-    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F3E5F5',color:'#6A1B9A'};
-    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F3E5F5',color:'#6A1B9A'};
-    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#F3E5F5',color:'#6A1B9A'};
-    // ── Valeurs mobilières ──
-    if(/\bpea\s*pme\b/.test(n))                      return{label:'PEA PME',               bg:'#E8EAF6',color:'#283593'};
-    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#E8EAF6',color:'#283593'};
-    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#E8EAF6',color:'#283593'};
-    if(/autre valeur mobili/.test(n))                return{label:'Autre val. mob.',        bg:'#E8EAF6',color:'#283593'};
-    // ── Retraite et salariale ──
-    if(/\bper\b|\bperin\b/.test(n)&&!/perco/.test(n))return{label:'PER',                   bg:'#E8F5E9',color:'#2E7D32'};
-    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#E8F5E9',color:'#2E7D32'};
-    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#E8F5E9',color:'#2E7D32'};
-    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#E8F5E9',color:'#2E7D32'};
-    if(/article 83|art\.?\s*83/.test(n))             return{label:'Art. 83',               bg:'#E8F5E9',color:'#2E7D32'};
-    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#E8F5E9',color:'#2E7D32'};
-    // ── Investissements alternatifs ──
-    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#E0F7FA',color:'#00695C'};
-    if(/\bopci\b/.test(n))                           return{label:'OPCI',                  bg:'#E0F7FA',color:'#00695C'};
-    if(/crowdfunding|financement participat/.test(n))return{label:'Crowdfunding',           bg:'#FFF3E0',color:'#E65100'};
-    if(/crypto|bitcoin|\beth\b/.test(n))             return{label:'Crypto',                bg:'#FFF3E0',color:'#E65100'};
-    if(/capinvest|capital.investissement|fcpr|fpci|fcpi/.test(n))return{label:'Capinvest',  bg:'#FFF3E0',color:'#E65100'};
-    if(/tontine|tontinier/.test(n))                  return{label:'Tontine',               bg:'#FCE4EC',color:'#880E4F'};
-    if(/\bfip\b/.test(n))                            return{label:'FIP',                   bg:'#FFF3E0',color:'#E65100'};
-    if(/sofica/.test(n))                             return{label:'Sofica',                bg:'#FFF3E0',color:'#E65100'};
+    // Couleurs par famille : Immo=vert, CT=bleu, Financier=rose, Épargne entreprise=violet
+    var IMMO={bg:'#E8F5E9',color:'#2E7D32'};
+    var CT={bg:'#E3F2FD',color:'#1565C0'};
+    var FIN={bg:'#FCE4EC',color:'#AD1457'};
+    var ENT={bg:'#EDE7F6',color:'#4527A0'};
+    var GRIS={bg:'#F5F5F5',color:'#616161'};
+    // ── Immobilier (vert) ──
+    if(/r[ée]sidence principale/.test(n))           return{label:'Rés. principale',bg:IMMO.bg,color:IMMO.color};
+    if(/r[ée]sidence secondaire/.test(n))            return{label:'Rés. secondaire',bg:IMMO.bg,color:IMMO.color};
+    if(/immobilier locatif|locatif/.test(n)&&!/meub/.test(n)) return{label:'Immo locatif',bg:IMMO.bg,color:IMMO.color};
+    if(/\blmnp\b/.test(n))                           return{label:'LMNP',bg:IMMO.bg,color:IMMO.color};
+    if(/\blmp\b/.test(n))                            return{label:'LMP',bg:IMMO.bg,color:IMMO.color};
+    if(/malraux/.test(n))                            return{label:'Malraux',bg:IMMO.bg,color:IMMO.color};
+    if(/monument historique/.test(n))                return{label:'Mon. Hist.',bg:IMMO.bg,color:IMMO.color};
+    if(/pinel|duflot|robien|scellier|borloo/.test(n))return{label:'Loi fiscale',bg:IMMO.bg,color:IMMO.color};
+    if(/\bsci\b/.test(n))                            return{label:'SCI',bg:IMMO.bg,color:IMMO.color};
+    if(/terrain|bois|\bgfa\b|\bgfv\b|\bgff\b|foncier/i.test(n)&&!/immobilier.*foncier/i.test(n)) return{label:'Foncier',bg:IMMO.bg,color:IMMO.color};
+    // ── Court terme (bleu) ──
+    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',bg:CT.bg,color:CT.color};
+    if(/\blep\b|livret d.[\u00e9e]pargne pop/.test(n))return{label:'LEP',bg:CT.bg,color:CT.color};
+    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A',bg:CT.bg,color:CT.color};
+    if(/\bldds?\b/.test(n))                          return{label:'LDDS',bg:CT.bg,color:CT.color};
+    if(/\bcel\b|compte [\u00e9e]pargne log/.test(n)) return{label:'CEL',bg:CT.bg,color:CT.color};
+    if(/\bcsl\b|livret classique/.test(n))           return{label:'CSL',bg:CT.bg,color:CT.color};
+    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',bg:CT.bg,color:CT.color};
+    if(/\bpel\b|plan d.[\u00e9e]pargne log/.test(n))return{label:'PEL',bg:CT.bg,color:CT.color};
+    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'Compte à terme',bg:CT.bg,color:CT.color};
+    // ── Financier (rose) ──
+    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',bg:FIN.bg,color:FIN.color};
+    if(/capitalisation/.test(n))                     return{label:'Capi.',bg:FIN.bg,color:FIN.color};
+    if(/\bpep\b/.test(n))                            return{label:'PEP',bg:FIN.bg,color:FIN.color};
+    if(/\bpea\s*pme\b/.test(n))                      return{label:'PEA PME',bg:FIN.bg,color:FIN.color};
+    if(/\bpea\b/.test(n))                            return{label:'PEA',bg:FIN.bg,color:FIN.color};
+    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',bg:FIN.bg,color:FIN.color};
+    if(/\bscpi\b/.test(n))                           return{label:'SCPI',bg:FIN.bg,color:FIN.color};
+    if(/\bopci\b/.test(n))                           return{label:'OPCI',bg:FIN.bg,color:FIN.color};
+    if(/crowdfunding/.test(n))                       return{label:'Crowdfunding',bg:FIN.bg,color:FIN.color};
+    if(/crypto|bitcoin/.test(n))                     return{label:'Crypto',bg:FIN.bg,color:FIN.color};
+    if(/capinvest|capital.invest|fcpr|fpci|fcpi/.test(n))return{label:'Capinvest',bg:FIN.bg,color:FIN.color};
+    if(/\bfip\b/.test(n))                            return{label:'FIP',bg:FIN.bg,color:FIN.color};
+    if(/sofica/.test(n))                             return{label:'Sofica',bg:FIN.bg,color:FIN.color};
+    if(/tontine/.test(n))                            return{label:'Tontine',bg:FIN.bg,color:FIN.color};
+    if(/autre valeur mobili/.test(n))                return{label:'Autre val. mob.',bg:FIN.bg,color:FIN.color};
+    // ── Épargne entreprise / retraite (violet) ──
+    if(/\bper\b|\bperin\b/.test(n)&&!/perco/.test(n))return{label:'PER',bg:ENT.bg,color:ENT.color};
+    if(/\bperp\b/.test(n))                           return{label:'PERP',bg:ENT.bg,color:ENT.color};
+    if(/\bperco\b/.test(n))                          return{label:'PERCO',bg:ENT.bg,color:ENT.color};
+    if(/\bpee\b/.test(n))                            return{label:'PEE',bg:ENT.bg,color:ENT.color};
+    if(/article 83|art\.?\s*83/.test(n))             return{label:'Art. 83',bg:ENT.bg,color:ENT.color};
+    if(/madelin/.test(n))                            return{label:'Madelin',bg:ENT.bg,color:ENT.color};
     // ── Sociétés / pro ──
-    if(/parts de soci|sarl|sas\b|holding/.test(n))   return{label:'Société',               bg:'#FCE4EC',color:'#880E4F'};
-    if(/fonds de commerce/.test(n))                  return{label:'Fds commerce',           bg:'#FCE4EC',color:'#880E4F'};
-    if(/mat[eé]riel pro|v[eé]hicule pro/.test(n))    return{label:'Bien pro.',             bg:'#FCE4EC',color:'#880E4F'};
-    // ── Objets de valeur ──
-    if(/bijoux|m[eé]taux pr[eé]cieux|objet d.art|meuble/.test(n)) return{label:'Objet valeur',bg:'#F5F5F5',color:'#616161'};
-    // ── Fallback immo ──
-    if(/immo/.test(n))                               return{label:'Immobilier',            bg:'#DCEDC8',color:'#33691E'};
-    return{label:'Autre',bg:'#F5F5F5',color:'#616161'};
+    if(/parts de soci|sarl|sas\b|holding/.test(n))   return{label:'Société',bg:GRIS.bg,color:GRIS.color};
+    if(/fonds de commerce/.test(n))                  return{label:'Fds commerce',bg:GRIS.bg,color:GRIS.color};
+    if(/mat[eé]riel pro|v[eé]hicule pro/.test(n))    return{label:'Bien pro.',bg:GRIS.bg,color:GRIS.color};
+    if(/bijoux|m[eé]taux|objet d.art|meuble/.test(n))return{label:'Objet valeur',bg:GRIS.bg,color:GRIS.color};
+    if(/immo/.test(n))                               return{label:'Immobilier',bg:IMMO.bg,color:IMMO.color};
+    return{label:'Autre',bg:GRIS.bg,color:GRIS.color};
   }
 
   // ── Horizon selon nomenclature Excel V12 exacte ────────────────────
@@ -3574,35 +3577,38 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         var espVie=getEspVie(c.civ,cl.retAge||64);
         var impactTotal=Math.round((cl.pension-pensM)*espVie);
         impactFoyer+=impactTotal;
-        var revMensClient=Math.round(cl.rev/12);var alert=gap>500;var bc=alert?'rgba(192,57,43,0.2)':'rgba(45,122,91,0.2)';var bg=alert?'var(--red-l)':'var(--green-l)';var fc=alert?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="border-color:'+bc+';background:'+bg+';margin-bottom:0"><div class="card-title" style="color:'+fc+';margin-bottom:12px">'+(alert?'&#9888;':'&#10003;')+' '+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Categorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Revenu actuel considéré</span><span class="fr-v">'+fmt(revMensClient)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimee</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitee</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid '+bc+';padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
+        var revMensClient=Math.round(cl.rev/12);var gapColor=gap>0?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="margin-bottom:0"><div class="card-title" style="margin-bottom:12px"><span class="dot"></span>'+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Catégorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Revenu actuel considéré</span><span class="fr-v">'+fmt(revMensClient)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimée</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitée</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+gapColor+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
         +'<div class="fiscal-row"><span class="fr-l">Espérance de vie</span><span class="fr-v">'+espVie+' mois</span></div>'
-        +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
+        +'<div class="fiscal-row" style="border-top:1px solid var(--bord);padding-top:6px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+gapColor+';font-weight:700">- '+fmt(Math.abs(impactTotal))+' €</span></div>'
         +'</div>';});
   // Impact total foyer (somme des impacts individuels)
-  // impactFoyer > 0 = il manque de l'argent (négatif pour le foyer)
-  // impactFoyer < 0 = surplus (positif pour le foyer)
-  var impFoyerNegatif=impactFoyer>0; // manque = négatif pour le patrimoine
-  var impFoyerColor=impFoyerNegatif?'var(--red)':'var(--green)';
-  cardsHtml+='<div class="card" style="border-color:'+impFoyerColor+';border-width:2px;margin-bottom:0;margin-top:8px"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impFoyerColor+';font-weight:700;font-size:16px">'+(impFoyerNegatif?'- '+fmt(Math.abs(impactFoyer)):'+  '+fmt(Math.abs(impactFoyer)))+' €</span></div></div>';
+  // Impact foyer séparé (dans son propre div, pleine largeur)
   cardsHtml+='<div class="alert warn" style="margin-top:12px"><span>⚠️</span><div><strong>Hypothèse : tous les trimestres requis sont validés.</strong> Les taux de remplacement ci-dessus supposent une carrière complète. Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s\'applique : <strong>pension = pension estimée × (trimestres cotisés / trimestres requis)</strong>.</div></div>';
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
+  // Impact foyer (pleine largeur sous les cards)
+  var ifEl=document.getElementById('retraiteImpactFoyer');
+  if(ifEl){
+    var impColor=impactFoyer>0?'var(--red)':'var(--green)';
+    ifEl.innerHTML='<div class="card" style="margin-bottom:0"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impColor+';font-weight:700;font-size:16px">- '+fmt(Math.abs(impactFoyer))+' €</span></div></div>';
+  }
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
-  tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C1 à combler</td><td class="right">'+fmt(gap0)+' €/mois</td></tr>';
-  // Manque C2 et couple si applicable
+  var n1Lbl=(ED.c1.prenom||'C1').split(' ')[0];
+  tblHtml+='<tr style="background:var(--gris-l)"><td colspan="3" style="font-weight:700;color:var(--gris-f)">Manque mensuel '+n1Lbl+'</td><td class="right" style="font-weight:700;color:var(--red)">'+fmt(gap0)+' €/mois</td></tr>';
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){
+    var n2Lbl=(ED.c2.prenom||'C2').split(' ')[0];
     var age2=ageFrom(ED.c2.dob)||40;
     var ageI2=AGES.reduce(function(bi,a,i){return a>=age2?i:bi;},0);
     var cspKey2tab=CSP_MAP[ED.c2.sitpro||'']||'Sal. cadre';
     var tx2=(TAUX[cspKey2tab]||TAUX['Sal. cadre'])[ageI2];
     var pensM2=Math.floor(((ED.revenus.sal2||ED.revenus.c2||0)+foncC2)/12*tx2/100);
     var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
-    if(gap2>0)tblHtml+='<tr class="total-row"><td colspan="3">Manque mensuel C2 à combler</td><td class="right">'+fmt(gap2)+' €/mois</td></tr>';
+    if(gap2>0)tblHtml+='<tr style="background:var(--gris-l)"><td colspan="3" style="font-weight:700;color:var(--gris-f)">Manque mensuel '+n2Lbl+'</td><td class="right" style="font-weight:700;color:var(--red)">'+fmt(gap2)+' €/mois</td></tr>';
     if(gap0>0&&gap2>0){
       var gapTotal=gap0+gap2;
-      tblHtml+='<tr class="total-row" style="background:var(--ambre-l);font-size:13px"><td colspan="3"><strong>Manque couple total</strong></td><td class="right" style="color:var(--ambre-d)"><strong>'+fmt(gapTotal)+' €/mois</strong></td></tr>';
+      tblHtml+='<tr style="background:var(--gris-l)"><td colspan="3" style="font-weight:700;color:var(--gris-f)">Manque couple total</td><td class="right" style="font-weight:700;color:var(--red)">'+fmt(gapTotal)+' €/mois</td></tr>';
     }
   }
   tblHtml+='</tbody>';
