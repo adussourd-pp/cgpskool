@@ -605,7 +605,7 @@ select.span2{grid-column:span 2}
      1 — SITUATION & OBJECTIFS
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-situation">
-  <div id="importBanner"></div>
+  <div id="importBanner" style="display:none"></div>
   <div class="sec-header">
     <div><div class="sec-tag">Section 01</div><div class="sec-h1">Situation personnelle & Objectifs</div></div>
     <div style="display:flex;gap:6px">
@@ -652,7 +652,7 @@ select.span2{grid-column:span 2}
   <div class="kpi-row">
     <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Actifs bruts</div><div class="kpi-val" id="kPat1">0 €</div></div>
     <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Passifs (CRD)</div><div class="kpi-val" id="kPat2">0 €</div></div>
-    <div class="kpi featured"><div class="kpi-label">Patrimoine net</div><div class="kpi-val" id="kPat3">0 €</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Patrimoine net</div><div class="kpi-val" id="kPat3">0 €</div></div>
     <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Patrimoine financier</div><div class="kpi-val" id="kPat4">0 €</div></div>
   </div>
 
@@ -757,33 +757,16 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 04</div><div class="sec-h1">Revenus & Capacité de Financement</div></div>
   </div>
 
-  <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Revenus bruts /an</div><div class="kpi-val" id="kFin1">0 €</div></div>
-    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kFin2">0 €</div></div>
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Charges /mois</div><div class="kpi-val" id="kFin3">0 €</div></div>
-    <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Taux endettement</div><div class="kpi-val" id="kFin4">—</div></div>
-  </div>
+  <!-- Analyse par personne -->
+  <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Analyse</div>
-      <div class="fiscal-row"><span class="fr-l">Revenus nets /mois</span><span class="fr-v ed" id="ffRevMens" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Charges totales /mois</span><span class="fr-v ed" id="ffCharges" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Reste à vivre</span><span class="fr-v ed" id="ffRAV" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Taux d'endettement</span><span class="fr-v" id="ffEndett">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" id="ffCapa">—</span></div>
-      <div class="fiscal-row" style="border-top:2px solid var(--ambre-m);padding-top:10px;margin-top:4px">
-        <span class="fr-l" style="font-weight:600">Épargne mensuelle disponible</span>
-        <span class="fr-v" style="color:var(--green);font-size:16px" id="ffEpMens">—</span>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Levier financement</div>
-      <div id="levierFinText" style="font-size:13px;line-height:1.7;color:var(--gris-f);margin-bottom:14px">—</div>
-      <div class="prog-wrap">
-        <div class="prog-labels"><span>Taux d'endettement actuel</span><span id="progEndettLbl">—</span></div>
-        <div class="prog-track"><div class="prog-fill" id="progEndett" style="width:0;background:var(--green)"></div></div>
-      </div>
+  <!-- Levier financement -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title"><span class="dot"></span>Levier financement</div>
+    <div id="levierFinText" style="font-size:13px;line-height:1.7;color:var(--gris-f);margin-bottom:14px">—</div>
+    <div class="prog-wrap">
+      <div class="prog-labels"><span>Taux d'endettement actuel</span><span id="progEndettLbl">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="progEndett" style="width:0;background:var(--green)"></div></div>
     </div>
   </div>
 
@@ -823,7 +806,7 @@ select.span2{grid-column:span 2}
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
   </div>
-  <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
+  <div id="retraiteCards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:12px" id="retSimuLegend">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
@@ -3114,17 +3097,23 @@ function rSituation(){
     sit+='</div>';
     sit+='</div>';
     // Commun
-    sit+='<div style="padding:10px 12px;border-top:1px solid var(--bord)">';
-    sit+='<strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'<br>';
-    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
-    sit+=ED.logement||'';
+    sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
+    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
+    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
+    sit+='</div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
     sit+='</div>';
   } else {
+    sit+='<div class="card" style="margin-bottom:12px;padding:12px">';
     sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
-    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
-    sit+=ED.sitmat+'<br>';
-    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
-    sit+=ED.logement||'';
+    sit+=(ED.c1.profession||ED.c1.sitpro||'—');
+    sit+='</div>';
+    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br>'+ED.sitmat+'</div>';
+    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
+    sit+='</div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
   }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
@@ -3149,9 +3138,9 @@ function rSituation(){
     if(isC){
       var lbl1=(ED.c1.prenom||'C1').split(' ')[0];
       var lbl2=(ED.c2.prenom||'C2').split(' ')[0];
-      epH+='<span style="font-size:12px;color:var(--gris-f)">'+lbl1+' </span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
-      epH+='<span style="font-size:12px;color:var(--gris-f);margin-left:8px">'+lbl2+' </span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens2=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
-      epH+='<span style="font-size:12px;font-weight:700;color:var(--orange);margin-left:8px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</span>';
+      epH+='<span style="font-size:12px;color:var(--gris-f)">'+lbl1+' </span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" oninput="ED.epMens=+this.value;updEpTotal()"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span style="font-size:12px;color:var(--gris-f);margin-left:8px">'+lbl2+' </span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" oninput="ED.epMens2=+this.value;updEpTotal()"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span id="epTotalLbl" style="font-size:12px;font-weight:700;color:var(--orange);margin-left:8px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</span>';
     } else {
       epH+='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:12px;color:var(--gris)"> €/mois</span>';
     }
@@ -3441,35 +3430,58 @@ function rFiscal(){
 // ║  SECTION — FINANCEMENT                                         ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function rFinancement(){
-  // Revenus bruts annuels (affichage) : salaires + fonciers bruts
-  const revB=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0)+(ED.revenus.fonc||0);
-  const revM=revMens();
-  const chr=ED.charges||0; // charges totales /mois (affichage)
-  // Taux endettement bancaire = crédits seuls (passifs) / revenus mensuels
-  const chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12)||chr;
-  const rav=revM-chrCredit;
-  const endett=revM>0?chrCredit/revM*100:0;
-  const capa=revM*0.35-chrCredit; // 35% = seuil bancaire max
-  const col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
+  var revM=revMens();
+  var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+  var rav=revM-chrCredit;
+  var endett=revM>0?chrCredit/revM*100:0;
+  var capa=Math.max(0,revM*0.35-chrCredit);
+  var col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
+  var isCoupleFin=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
 
-  set('kFin1',fmt(revB)+' €');set('kFin2',fmt(revM)+' €');set('kFin3',fmt(chrCredit)+' €');
-  const ke=document.getElementById('kFin4');ke.textContent=endett>0?endett.toFixed(1)+' %':'—';ke.style.color=col;
+  // Analyse par personne
+  var ab=document.getElementById('finAnalyseBlock');
+  if(ab){
+    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
+    var sal2=ED.revenus.sal2||ED.revenus.c2||0;
+    var fonc=ED.revenus.fonc||0;
+    var h='';
+    if(isCoupleFin){
+      var n1=(ED.c1.prenom||'C1').split(' ')[0];
+      var n2=(ED.c2.prenom||'C2').split(' ')[0];
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
+      h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>'+n1+'</div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v">'+fmt(sal1)+' €</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v">'+fmt(Math.round(sal1/12))+' €/mois</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Épargne mensuelle</span><span class="fr-v" style="color:var(--orange);font-weight:600">'+fmt(ED.epMens||0)+' €/mois</span></div>';
+      h+='</div>';
+      h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>'+n2+'</div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v">'+fmt(sal2)+' €</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v">'+fmt(Math.round(sal2/12))+' €/mois</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Épargne mensuelle</span><span class="fr-v" style="color:var(--orange);font-weight:600">'+fmt(ED.epMens2||0)+' €/mois</span></div>';
+      h+='</div>';
+      h+='</div>';
+    }
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Analyse du foyer</div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
+    if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Charges crédit /mois</span><span class="fr-v">'+fmt(chrCredit)+' €/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Reste à vivre</span><span class="fr-v">'+fmt(rav)+' €/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Taux d\'endettement</span><span class="fr-v" style="color:'+col+';font-weight:700">'+endett.toFixed(1)+' %</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" style="color:'+(capa>0?'var(--green)':'var(--red)')+'">'+fmt(capa)+' €/mois</span></div>';
+    h+='</div>';
+    ab.innerHTML=h;
+  }
 
-  setEd('ffRevMens',fmt(revM)+' €/mois');setEd('ffCharges',fmt(chrCredit)+' €/mois');setEd('ffRAV',fmt(rav)+' €/mois');
-  document.getElementById('ffEndett').innerHTML=`<span style="color:${col};font-weight:700">${endett>0?endett.toFixed(1)+' %':'—'}</span>`;
-  const capEl=document.getElementById('ffCapa');
-  capEl.textContent=capa>0?fmt(capa)+' €/mois':'Capacité saturée';capEl.style.color=capa>0?'var(--green)':'var(--red)';
-  setEd('ffEpMens',fmt(ED.epMens||rav*0.3)+' €/mois');
+  // Levier
+  var lf=document.getElementById('levierFinText');
+  if(endett<=28)lf.innerHTML='<span class="badge badge-green">Levier disponible</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong> — capacité d\'emprunt additionnelle estimée à <strong>'+fmt(capa)+' €/mois</strong>.';
+  else if(endett<=35)lf.innerHTML='<span class="badge badge-amber">Levier limité</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong>. Financement possible mais contraint.';
+  else lf.innerHTML='<span class="badge badge-red">Capacité saturée</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong>. Préconisations orientées épargne uniquement.';
 
-  const lf=document.getElementById('levierFinText');
-  if(endett<=28)lf.innerHTML=`<span class="badge badge-green">✅ Levier disponible</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong> — capacité d'emprunt additionnelle estimée à <strong>${fmt(Math.max(0,capa))} €/mois</strong>.`;
-  else if(endett<=35)lf.innerHTML=`<span class="badge badge-amber">⚠️ Levier limité</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Financement possible mais contraint. Prioriser les versements programmés.`;
-  else lf.innerHTML=`<span class="badge badge-red">❌ Capacité saturée</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Préconisations orientées épargne uniquement.`;
-
-  const pct=Math.min(100,endett/35*100); // 35% = seuil max = barre pleine
+  var pct=Math.min(100,endett/35*100);
   var pe=document.getElementById('progEndett');if(pe){pe.style.width=pct+'%';pe.style.background=endett>35?'var(--red)':endett>28?'var(--ambre)':'var(--green)';}
   set('progEndettLbl',endett>0?endett.toFixed(1)+' %':'—');
-  var levierFinancement = endett<33;
+  var levierFinancement=endett<33;
   renderLevierBadge('levierFin',[
     {label:'Financement', ok:levierFinancement, detail:levierFinancement?'Endettement '+endett.toFixed(1)+' % — capacité d\'emprunt disponible':'Endettement '+endett.toFixed(1)+' % — capacité saturée'}
   ]);
@@ -3568,8 +3580,11 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
         +'</div>';});
   // Impact total foyer (somme des impacts individuels)
-  var impFoyerColor=impactFoyer<0?'var(--red)':'var(--green)';
-  cardsHtml+='<div class="card" style="background:var(--ink);border-color:var(--ink);margin-bottom:0;margin-top:8px"><div class="fiscal-row" style="border:none"><span class="fr-l" style="color:#fff;font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:var(--orange);font-weight:700;font-size:16px">'+(impactFoyer<0?'- '+fmt(Math.abs(impactFoyer)):'+ '+fmt(Math.abs(impactFoyer)))+' €</span></div></div>';
+  // impactFoyer > 0 = il manque de l'argent (négatif pour le foyer)
+  // impactFoyer < 0 = surplus (positif pour le foyer)
+  var impFoyerNegatif=impactFoyer>0; // manque = négatif pour le patrimoine
+  var impFoyerColor=impFoyerNegatif?'var(--red)':'var(--green)';
+  cardsHtml+='<div class="card" style="border-color:'+impFoyerColor+';border-width:2px;margin-bottom:0;margin-top:8px"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impFoyerColor+';font-weight:700;font-size:16px">'+(impFoyerNegatif?'- '+fmt(Math.abs(impactFoyer)):'+  '+fmt(Math.abs(impactFoyer)))+' €</span></div></div>';
   cardsHtml+='<div class="alert warn" style="margin-top:12px"><span>⚠️</span><div><strong>Hypothèse : tous les trimestres requis sont validés.</strong> Les taux de remplacement ci-dessus supposent une carrière complète. Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s\'applique : <strong>pension = pension estimée × (trimestres cotisés / trimestres requis)</strong>.</div></div>';
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
@@ -4664,6 +4679,11 @@ function markDone(){
   // Import est toujours done
   var importBtn=document.querySelector('[data-sec="import"]');
   if(importBtn){importBtn.classList.add('done');importBtn.classList.remove('pending');}
+}
+function updEpTotal(){
+  var t=(ED.epMens||0)+(ED.epMens2||0);
+  var el=document.getElementById('epTotalLbl');
+  if(el)el.textContent='Total : '+fmt(t)+' €/mois';
 }
 function validateSection(sec){
   validatedSections[sec]=true;
