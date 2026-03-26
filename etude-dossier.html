@@ -4976,27 +4976,32 @@ function rSynthese(){
   // ── 6.1 APRES ──────────────────────────────────────────────────
   var sap=document.getElementById('synthApres');
   if(sap){
-    var solCards=document.querySelectorAll('#solContainer .sol-card');
-    if(!solCards.length){
-      sap.innerHTML='<div style="color:var(--gris);font-size:13px;font-style:italic;padding:8px 0">Aucune solution ajoutée.<br>Revenez aux Préconisations pour ajouter des solutions.</div>';
+    if(!sorted.length){
+      sap.innerHTML='<div style="color:var(--gris);font-size:13px;font-style:italic;padding:8px 0">Aucune solution ajout\u00e9e.<br>Revenez aux Pr\u00e9conisations pour ajouter des solutions.</div>';
     } else {
       var totalVI2=0,totalVP2=0,totalCap2=0;
-      solCards.forEach(function(card){
-        var inputs=card.querySelectorAll('input[type=number]');
-        var vi=parseFloat((inputs[0]||{}).value)||0;
-        var vp=parseFloat((inputs[1]||{}).value)||0;
-        totalVI2+=vi; totalVP2+=vp;
-        totalCap2+=Math.round(vi*Math.pow(1.025,10)+vp*12*((Math.pow(1.025,10)-1)/0.025));
+      sorted.forEach(function(sol){
+        var vi=sol.vi||0,vp=sol.vp||0;
+        var h2=parseInt(sol.horizon)||10;
+        var cp2=COPERNIC[sol.produit]||{};
+        var r2=cp2.rendement||0.04;
+        totalVI2+=vi;totalVP2+=vp;
+        totalCap2+=Math.round(vi*Math.pow(1+r2,h2)+(vp>0?vp*12*((Math.pow(1+r2,h2)-1)/r2):0));
       });
+      var revComplem2=Math.round(totalCap2*0.04/12);
       var patNetApres=patNet+totalCap2;
       var apHtml='';
       var kpisAp=[
-        {l:'Patrimoine net projeté',v:fmt(patNetApres)+' €',bold:true,color:'var(--green)'},
-        {l:'Capital constitué (préco)',v:fmt(totalCap2)+' €',color:'var(--green)'},
+        {l:'Patrimoine net projet\u00e9',v:fmt(patNetApres)+' \u20ac',bold:true,color:'var(--green)'},
+        {l:'Capital constitu\u00e9',v:'+'+fmt(totalCap2)+' \u20ac',color:'var(--green)'},
         {sep:true},
-        {l:'Investissement initial total',v:fmt(totalVI2)+' €'},
-        {l:'Versements mensuels cumulés',v:fmt(totalVP2)+' €/mois'},
+        {l:'Versement initial total',v:fmt(totalVI2)+' \u20ac'},
+        {l:'Versements mensuels',v:fmt(totalVP2)+' \u20ac/mois'},
+        {l:'Compl\u00e9ment de revenus potentiel',v:'~'+fmt(revComplem2)+' \u20ac/mois',color:'var(--green)'},
+        {sep:true},
+        {l:'Imp\u00f4t annuel apr\u00e8s',v:fmt(irApres)+' \u20ac',color:economieFiscTotale>0?'var(--green)':'inherit'},
       ];
+      if(economieFiscTotale>0)kpisAp.push({l:'\u00c9conomie fiscale',v:'-'+fmt(economieFiscTotale)+' \u20ac/an',color:'var(--green)'});
       apHtml+=kpisAp.map(function(k){
         if(k.sep)return '<div style="border-top:1px solid rgba(45,122,91,0.2);margin:5px 0"></div>';
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">'
@@ -5004,47 +5009,6 @@ function rSynthese(){
           +'<span style="font-size:12px;font-weight:'+(k.bold?'700':'600')+';color:'+(k.color||'var(--gris-f)')+'">'+k.v+'</span>'
           +'</div>';
       }).join('');
-      apHtml+='<div style="border-top:1px solid rgba(45,122,91,0.2);padding-top:10px;margin-top:8px">';
-      apHtml+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:8px">Répartition CT / MT / LT</div>';
-      // CT/MT/LT actuel
-      var ctAct=0,mtAct=0,ltAct=0;
-      ED.actifs.forEach(function(a){
-        var m=a.montant||0;
-        if(a.horizon==='ct')ctAct+=m;
-        else if(a.horizon==='mt')mtAct+=m;
-        else ltAct+=m;
-      });
-      // Ventiler le capital des sol-cards par horizon
-      var ctAdd=0,mtAdd=0,ltAdd=0;
-      solCards.forEach(function(card){
-        var inputs=card.querySelectorAll('input[type=number]');
-        var vi=parseFloat((inputs[0]||{}).value)||0;
-        var vp=parseFloat((inputs[1]||{}).value)||0;
-        var sel=card.querySelector('select.fi');
-        var horizVal=(sel&&sel.value)||'Long terme (+10 ans)';
-        var capFin=Math.round(vi*Math.pow(1.025,10)+vp*12*((Math.pow(1.025,10)-1)/0.025));
-        if(horizVal.indexOf('Court')>=0)ctAdd+=capFin;
-        else if(horizVal.indexOf('Moyen')>=0)mtAdd+=capFin;
-        else ltAdd+=capFin;
-      });
-      var ctAp=ctAct+ctAdd, mtAp=mtAct+mtAdd, ltAp=ltAct+ltAdd;
-      var totAp=ctAp+mtAp+ltAp||1;
-      [{label:'Court terme',act:ctAct,ap:ctAp,color:'var(--orange)'},
-       {label:'Moyen terme',act:mtAct,ap:mtAp,color:'#185FA5'},
-       {label:'Long terme', act:ltAct,ap:ltAp,color:'#0F6E56'}].forEach(function(h){
-        if(h.act===0&&h.ap===0)return;
-        var pct=Math.round(h.ap/totAp*100);
-        var gain=h.ap-h.act;
-        apHtml+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px">'
-          +'<span style="font-size:11px;font-weight:600;color:var(--noir)">'+h.label+'</span>'
-          +'<span style="font-size:11px;color:var(--gris-f)"><strong>'+fmt(h.ap)+' €</strong>'
-          +(gain>0?' <span style="color:var(--green);font-size:10px">+'+fmt(gain)+' €</span>':'')
-          +'</span></div>'
-          +'<div style="height:6px;background:rgba(0,0,0,0.07);border-radius:3px;overflow:hidden">'
-          +'<div style="height:100%;width:'+pct+'%;background:'+h.color+';border-radius:3px"></div>'
-          +'</div></div>';
-      });
-      apHtml+='</div>';
       sap.innerHTML=apHtml;
     }
   }
