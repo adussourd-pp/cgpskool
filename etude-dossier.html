@@ -420,12 +420,12 @@ select.span2{grid-column:span 2}
   /* ── FOOTER PDF FIXE : répété sur chaque page imprimée ── */
   .pdf-print-footer{display:flex!important;justify-content:space-between;align-items:center;
     position:fixed;bottom:0;left:0;right:0;
-    border-top:0.5pt solid #ddd;padding:6pt 0;
-    font-family:var(--sans);font-size:8pt;color:#888;background:#fff}
-  .pdf-print-footer .pf-center{font-style:italic}
+    padding:4pt 0 0;border-top:0.5pt solid #ccc;
+    font-family:var(--sans);font-size:7pt;color:#999;background:#fff;line-height:1.4}
+  .pdf-print-footer .pf-center{font-style:italic;color:#bbb}
   .pdf-conseiller-footer{display:none!important}
   /* ── FORMAT A4 ── */
-  @page{size:A4 portrait;margin:1.5cm 1.5cm 2cm 1.5cm}
+  @page{size:A4 portrait;margin:1.5cm 1.5cm 1.5cm 1.5cm}
 }
 /* Dropdown SCPI */
 .nav-dropdown:hover .nav-dropdown-item.active{color:#D4622A;background:rgba(212,98,42,0.08)}
@@ -1216,9 +1216,9 @@ select.span2{grid-column:span 2}
 
 <!-- ── FOOTER PDF (fixe, répété sur chaque page imprimée) ── -->
 <div class="pdf-print-footer" id="pdfPrintFooter">
-  <span class="pf-left" id="pdfFootCabinet"></span>
-  <span class="pf-center">Document confidentiel</span>
-  <span class="pf-right" id="pdfFootPage"></span>
+  <span class="pf-left" id="pdfFootLeft"></span>
+  <span class="pf-center">Document confidentiel — ne peut être reproduit sans accord</span>
+  <span class="pf-right" id="pdfFootRight"></span>
 </div>
 
 </main>
@@ -6436,8 +6436,19 @@ function exportPDF() {
   });
   // Remplir le footer PDF
   var profil=loadProfil();
-  var footCab=document.getElementById('pdfFootCabinet');
-  if(footCab)footCab.textContent=profil.cabinet||'';
+  var footLeft=document.getElementById('pdfFootLeft');
+  if(footLeft){
+    var parts=[];
+    if(profil.cabinet)parts.push(profil.cabinet);
+    if(profil.orias)parts.push('ORIAS n\u00b0 '+profil.orias);
+    footLeft.textContent=parts.join(' \u2014 ')||'';
+  }
+  // Pagination : compter les sections visibles
+  var footRight=document.getElementById('pdfFootRight');
+  if(footRight){
+    var nbPages=document.querySelectorAll('.section-page.print-visible').length;
+    footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
+  }
   // Convertir tous les canvas Chart.js en img PNG
   convertChartsToImg(function() {
     window.print();
