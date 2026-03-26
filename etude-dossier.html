@@ -4681,7 +4681,8 @@ function renderSolsRetenues(){
     // ── Contrats (sub-rows) ──
     // Header row
     html+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 32px;gap:0;padding:8px 18px;background:var(--gris-l);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);border-top:1px solid var(--bord)">';
-    html+='<div>Titulaire</div><div>Versement initial</div><div>VP mensuel</div><div>Horizon</div><div></div></div>';
+    var isImmoGrp=cp.cat==='immobilier'||cp.cat==='epargne-immo';
+    html+='<div>Titulaire</div><div>'+(isImmoGrp?'Apport':'Versement initial')+'</div><div>'+(isImmoGrp?'\u00c9pargne /mois':'VP mensuel')+'</div><div>Horizon</div><div></div></div>';
 
     grp.indices.forEach(function(idx){
       var sol=solsSelectionnees[idx];
@@ -4919,41 +4920,72 @@ function renderFichesClient(){
 
         var tit2=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei3=+em[1]-1;return(ED.enfants&&ED.enfants[ei3]&&ED.enfants[ei3].prenom)?ED.enfants[ei3].prenom:'Enfant '+em[1];}return sol.titulaire;})());
 
+        var isImmo2=cp.cat==='immobilier'||cp.cat==='epargne-immo';
         html+='<div style="border-top:1px solid rgba(0,0,0,0.04)">';
-        // Ligne titulaire + montants
-        html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-        html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
-        html+='<span style="color:var(--bord)">|</span>';
-        if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">initial</span></span>';
-        if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
-        if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong></span>';
-        if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
-        html+='<span style="margin-left:auto;font-size:11px;color:var(--gris);white-space:nowrap">'+h2+'\u00a0ans</span>';
-        html+='</div>';
-        // Projection narrative
-        if(sol.vi>0||sol.vp>0){
-          var totalVerse2=Math.round((sol.vi||0)+(sol.vp||0)*12*h2);
-          // Fourchette rendement
-          var capBas=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
-          var capHaut=Math.round((sol.vi||0)*Math.pow(1.05,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.05,h2)-1)/0.05):0));
-          var renteBas=Math.round(capBas*0.04/12);
-          var renteHaut=Math.round(capHaut*0.04/12);
-          html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
-          if(isSCPI2){
-            var loyer2=Math.round(capitalFinal2*0.045/12);
-            html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-            html+='le capital estim\u00e9 serait de <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong>';
-            html+=loyer2>0?' avec des loyers potentiels de <strong>~'+fmt(loyer2)+'\u00a0\u20ac/mois</strong>.':'.';
-          } else if(economieFisc2>0){
-            html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
-            html+='Dans '+h2+' ans, capital estim\u00e9 entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> (rendement 3 \u00e0 5\u00a0%).';
-          } else {
-            html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-            html+='le capital estim\u00e9 serait entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> ';
-            html+='(rendement 3 \u00e0 5\u00a0%), ';
-            html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>'+fmt(renteBas)+' \u00e0 '+fmt(renteHaut)+'\u00a0\u20ac/mois</strong>.';
-          }
+
+        if(isImmo2){
+          // ── Rendu immobilier : apport + épargne mensuelle + patrimoine + revenus ──
+          var patrimoineImmo=sol.vi>0?Math.round((sol.vi||0)*1.5+(sol.vp||0)*12*h2):0; // estimation patrimoine constitué
+          var loyerImmo=patrimoineImmo>0?Math.round(patrimoineImmo*0.04/12):0;
+          html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+          html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
+          html+='<span style="color:var(--bord)">:</span>';
+          if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">apport</span></span>';
+          if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
+          if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">/ mois</span></span>';
+          if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
+          html+='<span style="margin-left:auto;font-size:11px;color:var(--gris);white-space:nowrap">'+h2+'\u00a0ans</span>';
           html+='</div>';
+          if(sol.vi>0||sol.vp>0){
+            html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
+            html+='\u27A4 Patrimoine de <strong>'+fmt(patrimoineImmo)+'\u00a0\u20ac</strong>';
+            html+=' et g\u00e9n\u00e9rateur de revenus compl\u00e9mentaires de <strong>'+fmt(loyerImmo)+'\u00a0\u20ac/mois</strong>';
+            html+=' (hors fiscalit\u00e9) dans '+h2+'\u00a0ans.';
+            if(economieFisc2>0)html+='<br>\u25c6 \u00c9conomie fiscale : <strong>'+fmt(economieFisc2)+'\u00a0\u20ac/an</strong>';
+            html+='</div>';
+          }
+        } else {
+          // ── Rendu placement standard ──
+          html+='<div style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+          html+='<span style="font-weight:700;font-size:13px;color:var(--noir);min-width:80px">'+tit2+'</span>';
+          html+='<span style="color:var(--bord)">|</span>';
+          if(sol.vi>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vi)+'\u00a0\u20ac</strong><span style="font-size:11px;color:var(--gris);margin-left:3px">initial</span></span>';
+          if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
+          if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong></span>';
+          if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
+          html+='<span style="margin-left:auto;font-size:11px;color:var(--gris);white-space:nowrap">'+h2+'\u00a0ans</span>';
+          html+='</div>';
+          if(sol.vi>0||sol.vp>0){
+            var totalVerse2=Math.round((sol.vi||0)+(sol.vp||0)*12*h2);
+            var capBas=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+            var capHaut=Math.round((sol.vi||0)*Math.pow(1.05,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.05,h2)-1)/0.05):0));
+            var renteBas=Math.round(capBas*0.04/12);
+            var renteHaut=Math.round(capHaut*0.04/12);
+            html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
+            if(isSCPI2){
+              var loyer2=Math.round(capitalFinal2*0.045/12);
+              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
+              html+='le capital estim\u00e9 serait de <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong>';
+              html+=loyer2>0?' avec des loyers potentiels de <strong>~'+fmt(loyer2)+'\u00a0\u20ac/mois</strong>.':'.';
+            } else if(/per\b/i.test(sol.produit||'')){
+              var tmiPer=ED.fiscal.tmi||0;
+              var ecoAn1=Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmiPer/100);
+              var ecoSuiv=sol.vp>0?Math.round(sol.vp*12*tmiPer/100):0;
+              html+='Ann\u00e9e 1 : \u00e9conomie fiscale de <strong>'+fmt(ecoAn1)+'\u00a0\u20ac</strong>';
+              html+=' (versement initial'+(sol.vp>0?' + mensualit\u00e9s':'')+' \u00d7 TMI '+tmiPer+'\u00a0%).';
+              if(ecoSuiv>0&&h2>1)html+='<br>Ann\u00e9es suivantes : <strong>'+fmt(ecoSuiv)+'\u00a0\u20ac/an</strong> d\'\u00e9conomie d\'imp\u00f4t ('+fmt(sol.vp)+' \u00d7 12 \u00d7 '+tmiPer+'\u00a0%).';
+              html+='<br>Dans '+h2+' ans, capital estim\u00e9 entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> (rendement 3 \u00e0 5\u00a0%).';
+            } else if(economieFisc2>0){
+              html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
+              html+='Dans '+h2+' ans, capital estim\u00e9 entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> (rendement 3 \u00e0 5\u00a0%).';
+            } else {
+              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
+              html+='le capital estim\u00e9 serait entre <strong>'+fmt(capBas)+'\u00a0\u20ac</strong> et <strong>'+fmt(capHaut)+'\u00a0\u20ac</strong> ';
+              html+='(rendement 3 \u00e0 5\u00a0%), ';
+              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>'+fmt(renteBas)+' \u00e0 '+fmt(renteHaut)+'\u00a0\u20ac/mois</strong>.';
+            }
+            html+='</div>';
+          }
         }
         html+='</div>';
       });
