@@ -5733,13 +5733,23 @@ function closeProfil() {
 }
 
 function clearProfil() {
-  if (!confirm('Effacer toutes vos infos conseiller ?')) return;
+  if (!confirm('Effacer toutes vos infos conseiller (cabinet, logo, photo, couleurs) ?')) return;
   try { localStorage.removeItem(PROFIL_KEY); } catch(e) {}
+  try { localStorage.removeItem('cgpskool_logo'); } catch(e) {}
+  try { localStorage.removeItem('cgpskool_photo'); } catch(e) {}
   PROFIL_FIELDS.forEach(function(f) {
     var el = document.getElementById(f.id);
     if (el) el.value = '';
   });
+  var logoP=document.getElementById('logoPreview');if(logoP)logoP.innerHTML='';
+  var photoP=document.getElementById('photoPreview');if(photoP)photoP.innerHTML='';
+  var logoIn=document.getElementById('pLogo');if(logoIn)logoIn.value='';
+  var photoIn=document.getElementById('pPhoto');if(photoIn)photoIn.value='';
+  document.getElementById('pColor1').value='#D4622A';
+  document.getElementById('pColor2').value='#181614';
+  var st=document.getElementById('customColorStyle');if(st)st.remove();
   updateProfilBadge({});
+  updatePdfFooter({});
 }
 
 // Initialisation au chargement
@@ -6549,7 +6559,8 @@ window.addEventListener('afterprint', function() {
       Stocké localement sur votre appareil. Aucune donnée envoyée sur internet.
     </div>
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-primary" onclick="closeProfil()">Fermer</button>
+      <button class="btn btn-primary" onclick="saveProfil();closeProfil()">Valider</button>
+      <button class="btn btn-secondary" onclick="closeProfil()">Fermer</button>
       <button class="btn btn-secondary" onclick="clearProfil()" style="margin-left:auto;color:var(--red)">Tout effacer</button>
     </div>
   </div>
