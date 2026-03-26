@@ -4211,22 +4211,19 @@ var COPERNIC = {
   'Contrat de capitalisation PM':{cat:'entreprise',levier:'entreprise',icon:'&#128196;',
     desc:'Contrat de capitalisation souscrit par une personne morale (holding, SCI IS) : capitalisation a fiscalite reduite, tresorerie d\'entreprise optimisee',
     fiscal:'IS sur base forfaitaire (105% TME) — pas sur gains reels',sri:'1-7',horizon:'8 ans+',horizonAns:10},
-  'SCI a l\'IS':{cat:'entreprise',levier:'entreprise',icon:'&#127968;',
-    desc:'Societe civile immobiliere a l\'IS : amortissement du bien, reinvestissement facilite, transmission optimisee via donation de parts avec decote',
-    fiscal:'IS 15-25% + flat tax sur dividendes, amortissement deductible',sri:'5',horizon:'15 ans+',horizonAns:15}
 };
 var OBJ_SOLUTIONS = {
   'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
   'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Jeanbrun','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
-  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','SCI a l\'IS','Apport-cession 150-0 B ter'],
+  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
   'Prot\u00e9ger son conjoint':              ['Assurance vie','PER','Pr\u00e9voyance individuelle','Pr\u00e9voyance pro','Donation'],
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
   'Investir via le financement':        ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Jeanbrun'],
-  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','Jeanbrun','SCI a l\'IS']
+  'Cr\u00e9er un patrimoine immobilier':     ['SCPI financ\u00e9e','LMNP','Denormandie','LLI','Immobilier d\u00e9fiscalisant','SCPI de rendement','Jeanbrun']
 };
 var solsSelectionnees=[];
 
@@ -4839,6 +4836,15 @@ function renderSolsRetenues(){
     }
 
     // ── Formulaire Denormandie custom ──
+    // ── LLI : coche SCI à l'IS ──
+    if(grp.produit==='LLI'){
+      var lliSCI=firstSol._lliSCI||false;
+      html+='<div style="margin-top:10px;padding:10px 14px;background:rgba(123,79,166,0.04);border:1.5px solid rgba(123,79,166,0.12);border-radius:10px">';
+      html+='<label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--noir);cursor:pointer"><input type="checkbox" '+(lliSCI?'checked':'')+' onchange="var s=solsSelectionnees.find(function(x){return x.produit===\'LLI\';});if(s){s._lliSCI=this.checked;solsSelectionnees.forEach(function(x){if(x.produit===\'LLI\')x._lliSCI=s._lliSCI;});renderSolsRetenues();renderFichesClient();}" style="accent-color:#7B4FA6">Acquisition via SCI \u00e0 l\'IS (optimisation IS + amortissement)</label>';
+      if(lliSCI)html+='<div style="font-size:11px;color:var(--gris-f);margin-top:6px;padding:8px 10px;background:rgba(123,79,166,0.06);border-radius:6px">La SCI \u00e0 l\'IS permet d\'amortir le bien et de lisser la fiscalit\u00e9 sur les revenus locatifs. \u00c0 structurer avec un expert-comptable.</div>';
+      html+='</div>';
+    }
+
     var isDenorm=grp.produit==='Denormandie';
     if(isDenorm){
       var dn=firstSol._denorm||{prixBien:0,duree:9,loyer:'intermediaire'};
@@ -5162,10 +5168,18 @@ function renderFichesClient(){
     'Immobilier d\u00e9fiscalisant':'Investir dans la pierre en r\u00e9duisant vos imp\u00f4ts',
     'LMNP':'Percevoir des revenus locatifs faiblement fiscalis\u00e9s en meubl\u00e9',
     'LLI':'Investir dans le neuf \u00e0 TVA r\u00e9duite avec loyers libres',
-    'Nue-propri\u00e9t\u00e9 immo':'Acqu\u00e9rir un bien d\u00e9cot\u00e9 sans charge ni fiscalit\u00e9',
     'Donation':'Transmettre votre patrimoine de votre vivant en limitant les droits',
-    'Pr\u00e9voyance individuelle':'Prot\u00e9ger vos proches en cas d\'al\u00e9a de la vie',
-    'Pr\u00e9voyance pro':'S\u00e9curiser votre activit\u00e9 professionnelle et vos associ\u00e9s'
+    'Nue-propri\u00e9t\u00e9 immo':'Acqu\u00e9rir un bien d\u00e9cot\u00e9 sans charge ni fiscalit\u00e9 pendant la dur\u00e9e',
+    'Pr\u00e9voyance individuelle':'Prot\u00e9ger vos revenus en cas d\'arr\u00eat, d\'invalidit\u00e9 ou de d\u00e9c\u00e8s',
+    'Pr\u00e9voyance pro':'Prot\u00e9ger la continuit\u00e9 de votre entreprise et votre famille en cas d\'impr\u00e9vu',
+    'SCPI via SCI \u00e0 l\'IS':'Investir la tr\u00e9sorerie dans l\'immobilier avec une fiscalit\u00e9 all\u00e9g\u00e9e',
+    'SCPI en usufruit':'Booster le rendement de la tr\u00e9sorerie sur une dur\u00e9e d\u00e9finie',
+    'PEE':'Fid\u00e9liser vos collaborateurs et r\u00e9duire le b\u00e9n\u00e9fice imposable',
+    'PERECO/PERECOI':'Pr\u00e9parer votre retraite et celle de vos salari\u00e9s en optimisant la fiscalit\u00e9',
+    'Apport-cession 150-0 B ter':'Reporter l\'imposition de votre plus-value lors de la cession',
+    'FCPR/FPCI (remploi 150-0 B ter)':'R\u00e9investir le produit de cession en report d\'imposition',
+    'Contrat de capitalisation PM':'Faire fructifier la tr\u00e9sorerie dans une enveloppe fiscalement optimis\u00e9e',
+    'Holding patrimoniale':'Structurer et optimiser la d\u00e9tention de votre patrimoine'
   };
   function clientLabel(produit){return CLIENT_LABELS[produit]||produit;}
 
@@ -5367,6 +5381,11 @@ function renderFichesClient(){
         }
         html+='</div>';
       });
+
+      // Rendu LLI + SCI
+      if(pg.produit==='LLI'&&firstSol._lliSCI){
+        html+='<div style="padding:8px 14px;border-top:1px solid rgba(0,0,0,0.05);font-size:11px;color:#7B4FA6;font-weight:600">\u2713 Acquisition via SCI \u00e0 l\'IS \u2014 amortissement du bien + fiscalit\u00e9 liss\u00e9e. \u00c0 structurer avec un expert-comptable.</div>';
+      }
 
       // Rendu Jeanbrun spécifique
       if(pg.produit==='Jeanbrun'&&firstSol._jb){
