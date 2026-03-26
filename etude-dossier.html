@@ -5440,6 +5440,9 @@ function saveProfil() {
   updateProfilBadge(p);
   injectProfilIntoED(p);
   updatePdfFooter(p);
+  // Rafraichir page de garde si visible
+  var secG=document.getElementById('sec-pagegarde');
+  if(secG&&secG.classList.contains('active'))rPageGarde();
 }
 
 function updateProfilBadge(p) {
@@ -5794,9 +5797,25 @@ function saveMentionsDirect(){
   var raw=input.value.trim();
   if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez ou saisissez vos mentions l\u00e9gales ci-dessus.</em>';return;}
 
+  // En-tete auto depuis le profil
+  var p=loadProfil?loadProfil():{};
+  var h='<div style="font-family:var(--sans)">';
+  if(p.cabinet||p.orias||p.adresse){
+    h+='<div style="padding:16px;border:1px solid var(--bord);border-radius:8px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start">';
+    h+='<div>';
+    if(p.cabinet)h+='<div style="font-size:16px;font-weight:700;color:var(--noir)">'+p.cabinet+'</div>';
+    var infos=[];
+    if(p.adresse)infos.push(p.adresse+(p.cp?' '+p.cp:'')+(p.ville?' '+p.ville:''));
+    if(p.email)infos.push(p.email);
+    if(p.tel)infos.push(p.tel);
+    if(infos.length)h+='<div style="font-size:11px;color:var(--gris);margin-top:4px;line-height:1.6">'+infos.join(' \u00b7 ')+'</div>';
+    h+='</div>';
+    if(p.orias)h+='<div style="text-align:right"><div style="font-size:11px;color:var(--gris)">ORIAS n\u00b0 '+p.orias+'</div></div>';
+    h+='</div>';
+  }
+
   // Parser le texte en sections (double saut de ligne = nouvelle section)
   var blocks=raw.split(/\n\s*\n/).filter(function(b){return b.trim();});
-  var h='<div style="font-family:var(--sans)">';
   var sectionNum=0;
 
   blocks.forEach(function(block){
