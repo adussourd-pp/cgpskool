@@ -3730,7 +3730,7 @@ function rPatrimoine(){
     return 'lt';
   }
   
-  function buildHorizonSection(label, badgeCls, items, hzColor){
+  function buildHorizonSection(label, badgeCls, items){
     if(!items.length) return '';
     var sorted=items.slice().sort(function(a,b){return (b.montant||0)-(a.montant||0);});
     var total=sorted.reduce(function(s,a){return s+(a.montant||0);},0);
@@ -3739,12 +3739,16 @@ function rPatrimoine(){
     var bg=bgMap[badgeCls]||'var(--gris-l)';
     var color=colorMap[badgeCls]||'var(--gris-f)';
     var rows=sorted.map(function(a){
+      var t=getAssetType(a.nom);
+      var tag='<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:'+t.bg+';color:'+t.color+';white-space:nowrap">'+t.label+'</span>';
       return '<tr style="border-bottom:1px solid var(--bord)">'
-        +'<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>'
+        +'<td style="padding:5px 8px;color:var(--gris-f);white-space:nowrap">'+titLabel(a.titulaire)+'</td>'
+        +'<td style="padding:5px 8px;color:var(--noir)">'+a.nom+'</td>'
+        +'<td style="padding:5px 8px">'+tag+'</td>'
         +'<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">'+fmt(a.montant)+' \u20ac</td>'
         +'</tr>';
     }).join('');
-    return '<tr style="background:'+bg+'"><td colspan="2" style="padding:6px 8px;font-weight:700;color:'+color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+label+' : '+fmt(total)+' \u20ac</td></tr>'+rows;
+    return '<tr style="background:'+bg+'"><td colspan="4" style="padding:6px 8px;font-weight:700;color:'+color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+label+' : '+fmt(total)+' \u20ac</td></tr>'+rows;
   }
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
   var mtItems=ED.actifs.filter(function(a){return a.horizon==='mt';});
@@ -3752,12 +3756,13 @@ function rPatrimoine(){
   var allRows=buildHorizonSection('Long terme','badge-red',ltItems)
              +buildHorizonSection('Moyen terme','badge-amber',mtItems)
              +buildHorizonSection('Court terme','badge-blue',ctItems);
-  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Actif</th><th style="text-align:right;padding:6px 8px">\u20ac actuel</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td>TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' \u20ac</td></tr></tbody>';
+  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Titulaire</th><th style="text-align:left;padding:6px 8px">D\u00e9signation</th><th style="text-align:left;padding:6px 8px">Type</th><th style="text-align:right;padding:6px 8px">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' \u20ac</td></tr></tbody>';
 
   const prows=ED.passifs.map(p=>`<tr style="border-bottom:1px solid var(--bord)">
-    <td style="padding:5px 8px;color:var(--gris-f)">${p.nom}</td>
+    <td style="padding:5px 8px;color:var(--gris-f);white-space:nowrap">${titLabel(p.titulaire)}</td>
+    <td style="padding:5px 8px;color:var(--noir)">${p.nom}</td>
     <td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">${fmt(p.crd)} \u20ac</td></tr>`).join('');
-  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Passif</th><th style="text-align:right;padding:6px 8px">CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="2" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td>TOTAL PASSIFS</td><td class="right">${fmt(pSum)} \u20ac</td></tr></tbody>`;
+  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Titulaire</th><th style="text-align:left;padding:6px 8px">D\u00e9signation</th><th style="text-align:right;padding:6px 8px">CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="3" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="2">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} \u20ac</td></tr></tbody>`;
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
