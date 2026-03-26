@@ -982,36 +982,50 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-entreprise">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b — Optionnel</div><div class="sec-h1">Analyse Entreprise</div><div class="sec-sub">SCI, Holding, 150-0 B ter, FCPR remploi</div></div>
+    <div><div class="sec-tag">Section 05b &#8212; Optionnel</div><div class="sec-h1">Analyse Entreprise</div></div>
   </div>
 
+  <!-- Saisie hypothèses (visible écran + PDF) -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Solutions Entreprise disponibles</div>
-    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f);line-height:1.8">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Apport-cession 150-0 B ter</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Report d'imposition PV — reinvestissement 60% dans 2 ans</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">FCPR/FPCI remploi</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Eligible remploi 150-0 B ter + exoneration PV apres 5 ans</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Contrat de capitalisation PM</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Tresorerie d'entreprise optimisee, IS forfaitaire</div>
-        </div>
-        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
-          <div style="font-weight:700;font-size:12px;color:#7B5EA7">SCI a l\'IS</div>
-          <div style="font-size:11px;color:var(--gris);margin-top:4px">Amortissement, transmission via donation de parts</div>
-        </div>
-      </div>
+    <div class="card-title"><span class="dot"></span>Votre entreprise</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Raison sociale</label><input class="fi" id="entRS" oninput="updEntreprise()" placeholder="Nom de la soci&#233;t&#233;"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Forme juridique</label><select class="fi" id="entForme" onchange="updEntreprise()"><option>SARL</option><option>SAS</option><option>EURL</option><option>SASU</option><option>SA</option><option>SCI</option><option>Autre</option></select></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;gime fiscal</label><select class="fi" id="entRegime" onchange="updEntreprise()"><option>IS</option><option>IR</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Capital social</label><input class="fi" type="number" id="entCapital" oninput="updEntreprise()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">CA annuel</label><input class="fi" type="number" id="entCA" oninput="updEntreprise()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;sultat net</label><input class="fi" type="number" id="entResultat" oninput="updEntreprise()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;mun. dirigeant /an</label><input class="fi" type="number" id="entRemun" oninput="updEntreprise()"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Tr&#233;sorerie disponible</label><input class="fi" type="number" id="entTreso" oninput="updEntreprise()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Valeur estim&#233;e</label><input class="fi" type="number" id="entValeur" oninput="updEntreprise()"><div style="font-size:9px;color:var(--gris);font-style:italic">&#192; affiner avec expert-comptable</div></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Nb salari&#233;s</label><input class="fi" type="number" id="entSalaries" oninput="updEntreprise()"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--noir);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="entCession" onchange="var h=document.getElementById('entHzCession');if(h)h.style.display=this.checked?'':'none';updEntreprise()" style="accent-color:#7B5EA7">Projet de cession</label>
+      <select class="fi" id="entHzCession" style="width:120px;display:none" onchange="updEntreprise()"><option>1 an</option><option>2 ans</option><option>3 ans</option><option>5 ans</option><option>+ de 5 ans</option></select>
+    </div>
+    <!-- Calculs auto -->
+    <div id="entCalcs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"></div>
+    <!-- Objectifs dirigeant -->
+    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Objectifs du dirigeant</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px" id="entObjectifs">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Optimiser la r&#233;mun&#233;ration</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Valoriser la tr&#233;sorerie</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Pr&#233;parer la transmission</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Prot&#233;ger dirigeant / associ&#233;s</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Pr&#233;parer la retraite</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#7B5EA7" onchange="updEntreprise()">Optimiser fiscalit&#233; cession</label>
     </div>
   </div>
 
+  <!-- Note conseiller -->
   <div class="card">
-    <div class="card-title"><span class="dot"></span>Note conseiller — Entreprise</div>
-    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
+    <div class="card-title"><span class="dot"></span>Note conseiller</div>
+    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tr&#233;sorerie PM, PEE..."></div>
   </div>
 
   <div class="page-number"></div>
@@ -6821,6 +6835,25 @@ function rPageGarde(){
   }
 }
 
+function updEntreprise(){
+  var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
+  var n=function(id){return +(v(id))||0;};
+  var ca=n('entCA'),res=n('entResultat'),treso=n('entTreso'),capital=n('entCapital'),valeur=n('entValeur');
+  var regime=v('entRegime')||'IS';
+  var cession=document.getElementById('entCession')&&document.getElementById('entCession').checked;
+  var margeNette=ca>0?(res/ca*100).toFixed(1):'0';
+  var ratioTreso=ca>0?(treso/ca*100).toFixed(1):'0';
+  var pv=valeur>capital?valeur-capital:0;
+  var cEl=document.getElementById('entCalcs');
+  if(cEl){
+    var ch='';
+    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Marge nette</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+margeNette+' %</div></div>';
+    ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Ratio tr\u00e9so / CA</div><div style="font-size:14px;font-weight:700;color:var(--noir)">'+ratioTreso+' %</div></div>';
+    if(regime==='IS')ch+='<div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">IS th\u00e9orique</div><div style="font-size:11px;color:var(--noir)">15% \u2264 42 500\u20ac / 25% au-del\u00e0</div></div>';
+    if(cession&&pv>0)ch+='<div style="background:rgba(123,79,166,0.06);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">PV estim\u00e9e</div><div style="font-size:14px;font-weight:700;color:#7B5EA7">'+fmt(pv)+' \u20ac</div></div>';
+    cEl.innerHTML=ch;
+  }
+}
 function rMentions(){
   var input=document.getElementById('mentionsDirectInput');
   if(input&&!input.value){
