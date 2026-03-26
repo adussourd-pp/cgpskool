@@ -2548,16 +2548,24 @@ function parseTextRI(txt){
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
   // Enfants
   ED.nbEnfants=0;
-  var enfM=ss01.match(/(?:^|\n)Enfants[^\n]*\n([^\n]+)/i);
-  if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants?\s*\t([^\n]+)/i);
-  if(!enfM)enfM=ss01.match(/(?:^|\n)Enfants? communs?\s*\t([^\n]+)/i);
+  // Parser enfants : chercher les lignes avec des dates (dd/mm/yyyy) après "Enfants"
   ED.enfants=[];
-  if(enfM&&enfM[1]){var ef=enfM[1].trim();var enfParts=ef.split(',');enfParts.forEach(function(part){
-    part=part.trim();if(!part||part.length<2)return;
-    var m=part.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-    if(m){ED.enfants.push({nom:m[1].trim(),dob:m[2]});}
-    else if(part.length>2){ED.enfants.push({nom:part,dob:''});}
-  });ED.nbEnfants=ED.enfants.length;}
+  var enfLines=ss01.split('\n');
+  for(var ei=0;ei<enfLines.length;ei++){
+    var el=enfLines[ei];
+    if(!/enfants/i.test(el))continue;
+    // Chercher les dates dans cette ligne ET la suivante
+    var enfText=el;
+    if(ei+1<enfLines.length)enfText+='\t'+enfLines[ei+1];
+    var enfDates=enfText.match(/[A-ZÉÈÊÀa-zéèêà][\wéèêàùûîôç\s'-]+\s*\(\d{2}\/\d{2}\/\d{4}\)/g);
+    if(enfDates){
+      enfDates.forEach(function(part){
+        var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
+        if(m)ED.enfants.push({nom:m[1].trim(),dob:m[2]});
+      });
+    }
+  }
+  ED.nbEnfants=ED.enfants.length||parseInt((ss01.match(/(\d+)\s*enfant/i)||[])[1])||0;
 
   // SECTION 02
   var t02=tabMap(ss02);
