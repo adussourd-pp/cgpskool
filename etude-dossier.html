@@ -605,7 +605,7 @@ select.span2{grid-column:span 2}
      1 — SITUATION & OBJECTIFS
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-situation">
-  <div id="importBanner"></div>
+  <div id="importBanner" style="display:none"></div>
   <div class="sec-header">
     <div><div class="sec-tag">Section 01</div><div class="sec-h1">Situation personnelle & Objectifs</div></div>
     <div style="display:flex;gap:6px">
@@ -652,7 +652,7 @@ select.span2{grid-column:span 2}
   <div class="kpi-row">
     <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Actifs bruts</div><div class="kpi-val" id="kPat1">0 €</div></div>
     <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Passifs (CRD)</div><div class="kpi-val" id="kPat2">0 €</div></div>
-    <div class="kpi featured"><div class="kpi-label">Patrimoine net</div><div class="kpi-val" id="kPat3">0 €</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Patrimoine net</div><div class="kpi-val" id="kPat3">0 €</div></div>
     <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Patrimoine financier</div><div class="kpi-val" id="kPat4">0 €</div></div>
   </div>
 
@@ -729,17 +729,8 @@ select.span2{grid-column:span 2}
     </div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="card" style="margin-bottom:0">
-        <div class="card-title" style="margin-bottom:10px"><span class="dot"></span>Barème 2025</div>
-        <table class="tbl">
-          <thead><tr><th>Tranche</th><th>Taux</th></tr></thead>
-          <tbody>
-            <tr><td>≤ 11 497 €</td><td class="green">0 %</td></tr>
-            <tr><td>11 497 – 29 315 €</td><td style="color:var(--blue)">11 %</td></tr>
-            <tr><td>29 315 – 83 823 €</td><td class="gold">30 %</td></tr>
-            <tr><td>83 823 – 180 294 €</td><td class="red">41 %</td></tr>
-            <tr><td>&gt; 180 294 €</td><td class="red" style="font-weight:700">45 %</td></tr>
-          </tbody>
-        </table>
+        <div class="card-title" style="margin-bottom:10px"><span class="dot"></span>Barème TMI 2025 (revenus 2024)</div>
+        <div id="baremeComplet" style="overflow-x:auto;font-size:11px"></div>
       </div>
     </div>
   </div>
@@ -766,33 +757,16 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 04</div><div class="sec-h1">Revenus & Capacité de Financement</div></div>
   </div>
 
-  <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Revenus bruts /an</div><div class="kpi-val" id="kFin1">0 €</div></div>
-    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kFin2">0 €</div></div>
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Charges /mois</div><div class="kpi-val" id="kFin3">0 €</div></div>
-    <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Taux endettement</div><div class="kpi-val" id="kFin4">—</div></div>
-  </div>
+  <!-- Analyse par personne -->
+  <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Analyse</div>
-      <div class="fiscal-row"><span class="fr-l">Revenus nets /mois</span><span class="fr-v ed" id="ffRevMens" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Charges totales /mois</span><span class="fr-v ed" id="ffCharges" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Reste à vivre</span><span class="fr-v ed" id="ffRAV" contenteditable="true">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Taux d'endettement</span><span class="fr-v" id="ffEndett">—</span></div>
-      <div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" id="ffCapa">—</span></div>
-      <div class="fiscal-row" style="border-top:2px solid var(--ambre-m);padding-top:10px;margin-top:4px">
-        <span class="fr-l" style="font-weight:600">Épargne mensuelle disponible</span>
-        <span class="fr-v" style="color:var(--green);font-size:16px" id="ffEpMens">—</span>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title"><span class="dot"></span>Levier financement</div>
-      <div id="levierFinText" style="font-size:13px;line-height:1.7;color:var(--gris-f);margin-bottom:14px">—</div>
-      <div class="prog-wrap">
-        <div class="prog-labels"><span>Taux d'endettement actuel</span><span id="progEndettLbl">—</span></div>
-        <div class="prog-track"><div class="prog-fill" id="progEndett" style="width:0;background:var(--green)"></div></div>
-      </div>
+  <!-- Levier financement -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title"><span class="dot"></span>Levier financement</div>
+    <div id="levierFinText" style="font-size:13px;line-height:1.7;color:var(--gris-f);margin-bottom:14px">—</div>
+    <div class="prog-wrap">
+      <div class="prog-labels"><span>Taux d'endettement actuel</span><span id="progEndettLbl">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="progEndett" style="width:0;background:var(--green)"></div></div>
     </div>
   </div>
 
@@ -832,7 +806,7 @@ select.span2{grid-column:span 2}
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
   </div>
-  <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
+  <div id="retraiteCards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:12px" id="retSimuLegend">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
@@ -3123,17 +3097,23 @@ function rSituation(){
     sit+='</div>';
     sit+='</div>';
     // Commun
-    sit+='<div style="padding:10px 12px;border-top:1px solid var(--bord)">';
-    sit+='<strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'<br>';
-    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
-    sit+=ED.logement||'';
+    sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
+    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
+    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
+    sit+='</div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
     sit+='</div>';
   } else {
+    sit+='<div class="card" style="margin-bottom:12px;padding:12px">';
     sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
-    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
-    sit+=ED.sitmat+'<br>';
-    if(enfDisplay) sit+='<span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span> · ';
-    sit+=ED.logement||'';
+    sit+=(ED.c1.profession||ED.c1.sitpro||'—');
+    sit+='</div>';
+    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br>'+ED.sitmat+'</div>';
+    if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
+    sit+='</div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
   }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
@@ -3158,9 +3138,9 @@ function rSituation(){
     if(isC){
       var lbl1=(ED.c1.prenom||'C1').split(' ')[0];
       var lbl2=(ED.c2.prenom||'C2').split(' ')[0];
-      epH+='<span style="font-size:12px;color:var(--gris-f)">'+lbl1+' </span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
-      epH+='<span style="font-size:12px;color:var(--gris-f);margin-left:8px">'+lbl2+' </span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens2=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
-      epH+='<span style="font-size:12px;font-weight:700;color:var(--orange);margin-left:8px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</span>';
+      epH+='<span style="font-size:12px;color:var(--gris-f)">'+lbl1+' </span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" oninput="ED.epMens=+this.value;updEpTotal()"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span style="font-size:12px;color:var(--gris-f);margin-left:8px">'+lbl2+' </span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" oninput="ED.epMens2=+this.value;updEpTotal()"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span id="epTotalLbl" style="font-size:12px;font-weight:700;color:var(--orange);margin-left:8px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</span>';
     } else {
       epH+='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:12px;color:var(--gris)"> €/mois</span>';
     }
@@ -3241,48 +3221,62 @@ function rPatrimoine(){
     return t;
   }
   function getAssetType(nom){
-    // Nomenclature exacte Excel V12 — tags par mots-clés de désignation
     var n=(nom||'').toLowerCase();
-    // Immobilier jouissance
-    if(/r[ée]sidence principale/.test(n))           return{label:'R\u00e9s. principale',  bg:'#EAF5EF',color:'#1a5e3a'};
-    if(/r[ée]sidence secondaire/.test(n))            return{label:'R\u00e9s. secondaire',  bg:'#EAF5EF',color:'#1a5e3a'};
-    // Immobilier locatif
-    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/pinel|duflot|robien|jean brun/.test(n))      return{label:'Loi fiscale',            bg:'var(--o-dim)',color:'#8B4A00'};
-    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCEBEB',color:'#A32D2D'};
-    if(/^foncier$|terrain|bois|\bfoncier\b.*non b[aâ]ti|bien rural|\bgfa\b|\bgfv\b|\bgff\b/i.test(n)&&!/immobilier|immo|foncier.*SCI|SCI.*foncier/i.test(n)) return{label:'Foncier',bg:'#EAF5EF',color:'#2D7A5B'};
-    // Court terme (A19-A25)
-    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A/Bleu',          bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/livret jeune/.test(n))                       return{label:'Livret Jeune',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\blep\b|livret d.[\u00e9e]pargne populaire/.test(n)) return{label:'LEP',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/\bcel\b|compte [\u00e9e]pargne logement/.test(n))    return{label:'CEL',           bg:'#FEF9EC',color:'var(--orange-hover)'};
-    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F2F1EE',color:'#6B6B6B'};
-    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FEF9EC',color:'var(--orange-hover)'};
-    // Moyen terme (A27-A29) — PEL + Autre liquidité
-    if(/\bpel\b|plan d.[\u00e9e]pargne logement/.test(n))   return{label:'PEL',            bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'CAT',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    // Long terme (A31-A37) — AV, Capi, PEP, CTO, PEA, Autre
-    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F5EFF8',color:'#534AB7'};
-    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F5EFF8',color:'#534AB7'};
-    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    // Retraite et Salariale (A39-A44)
-    if(/\bper\b|\bperin\b/.test(n))                  return{label:'PER',                   bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#EAF5EF',color:'#2D7A5B'};
-    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/article 83/.test(n))                         return{label:'Art. 83',               bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#EDF2FB',color:'#2B5EA7'};
-    // Biens professionnels
-    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#EDF2FB',color:'#2B5EA7'};
-    if(/parts de soci|sarl|sas |holding/.test(n))    return{label:'Soci\u00e9t\u00e9',    bg:'#FCEBEB',color:'#A32D2D'};
-    if(/chalet|immo/.test(n))                        return{label:'Immobilier',            bg:'#EAF5EF',color:'#2D7A5B'};
-    return{label:'Autre',bg:'#F2F1EE',color:'#6B6B6B'};
+    // ── Immobilier ──
+    if(/r[ée]sidence principale/.test(n))           return{label:'Résidence principale',  bg:'#DCEDC8',color:'#33691E'};
+    if(/r[ée]sidence secondaire/.test(n))            return{label:'Résidence secondaire',  bg:'#DCEDC8',color:'#33691E'};
+    if(/immobilier locatif|locatif/.test(n)&&!/meub/.test(n)) return{label:'Immobilier locatif',bg:'#C8E6C9',color:'#1B5E20'};
+    if(/\blmnp\b/.test(n))                           return{label:'LMNP',                  bg:'#C8E6C9',color:'#1B5E20'};
+    if(/\blmp\b/.test(n))                            return{label:'LMP',                   bg:'#C8E6C9',color:'#1B5E20'};
+    if(/malraux/.test(n))                            return{label:'Malraux',               bg:'#FFF3E0',color:'#E65100'};
+    if(/monument historique/.test(n))                return{label:'Mon. Hist.',             bg:'#FFF3E0',color:'#E65100'};
+    if(/pinel|duflot|robien|scellier|borloo/.test(n))return{label:'Loi fiscale',            bg:'#FFF3E0',color:'#E65100'};
+    if(/\bsci\b/.test(n))                            return{label:'SCI',                   bg:'#FCE4EC',color:'#880E4F'};
+    if(/terrain|bois|\bgfa\b|\bgfv\b|\bgff\b|foncier.*non b/i.test(n)) return{label:'Foncier',bg:'#DCEDC8',color:'#33691E'};
+    // ── Court terme (épargne réglementée) ──
+    if(/compte courant|\bcc\b/.test(n))              return{label:'Compte courant',         bg:'#F5F5F5',color:'#616161'};
+    if(/\blep\b|livret d.[\u00e9e]pargne pop/.test(n))return{label:'LEP',                  bg:'#FFF9C4',color:'#F57F17'};
+    if(/livret a\b|livret bleu/.test(n))             return{label:'Livret A',               bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bldds?\b/.test(n))                          return{label:'LDDS',                  bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bcel\b|compte [\u00e9e]pargne log/.test(n)) return{label:'CEL',                   bg:'#FFF9C4',color:'#F57F17'};
+    if(/\bcsl\b|livret classique/.test(n))           return{label:'CSL',                   bg:'#FFF9C4',color:'#F57F17'};
+    if(/\blivret\b/.test(n)&&!/pel/.test(n))         return{label:'Livret',                bg:'#FFF9C4',color:'#F57F17'};
+    // ── Moyen terme ──
+    if(/\bpel\b|plan d.[\u00e9e]pargne log/.test(n))return{label:'PEL',                   bg:'#E8EAF6',color:'#283593'};
+    if(/\bcat\b|compte [\u00e0a] terme/.test(n))     return{label:'Compte à terme',        bg:'#E8EAF6',color:'#283593'};
+    if(/assurance[- ]vie/.test(n))                   return{label:'Assurance vie',          bg:'#F3E5F5',color:'#6A1B9A'};
+    if(/capitalisation/.test(n))                     return{label:'Capi.',                  bg:'#F3E5F5',color:'#6A1B9A'};
+    if(/\bpep\b/.test(n))                            return{label:'PEP',                   bg:'#F3E5F5',color:'#6A1B9A'};
+    // ── Valeurs mobilières ──
+    if(/\bpea\s*pme\b/.test(n))                      return{label:'PEA PME',               bg:'#E8EAF6',color:'#283593'};
+    if(/\bpea\b/.test(n))                            return{label:'PEA',                   bg:'#E8EAF6',color:'#283593'};
+    if(/\bcto\b|compte[- ]titre/.test(n))            return{label:'CTO',                   bg:'#E8EAF6',color:'#283593'};
+    if(/autre valeur mobili/.test(n))                return{label:'Autre val. mob.',        bg:'#E8EAF6',color:'#283593'};
+    // ── Retraite et salariale ──
+    if(/\bper\b|\bperin\b/.test(n)&&!/perco/.test(n))return{label:'PER',                   bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bperp\b/.test(n))                           return{label:'PERP',                  bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bperco\b/.test(n))                          return{label:'PERCO',                 bg:'#E8F5E9',color:'#2E7D32'};
+    if(/\bpee\b/.test(n))                            return{label:'PEE',                   bg:'#E8F5E9',color:'#2E7D32'};
+    if(/article 83|art\.?\s*83/.test(n))             return{label:'Art. 83',               bg:'#E8F5E9',color:'#2E7D32'};
+    if(/madelin/.test(n))                            return{label:'Madelin',               bg:'#E8F5E9',color:'#2E7D32'};
+    // ── Investissements alternatifs ──
+    if(/\bscpi\b/.test(n))                           return{label:'SCPI',                  bg:'#E0F7FA',color:'#00695C'};
+    if(/\bopci\b/.test(n))                           return{label:'OPCI',                  bg:'#E0F7FA',color:'#00695C'};
+    if(/crowdfunding|financement participat/.test(n))return{label:'Crowdfunding',           bg:'#FFF3E0',color:'#E65100'};
+    if(/crypto|bitcoin|\beth\b/.test(n))             return{label:'Crypto',                bg:'#FFF3E0',color:'#E65100'};
+    if(/capinvest|capital.investissement|fcpr|fpci|fcpi/.test(n))return{label:'Capinvest',  bg:'#FFF3E0',color:'#E65100'};
+    if(/tontine|tontinier/.test(n))                  return{label:'Tontine',               bg:'#FCE4EC',color:'#880E4F'};
+    if(/\bfip\b/.test(n))                            return{label:'FIP',                   bg:'#FFF3E0',color:'#E65100'};
+    if(/sofica/.test(n))                             return{label:'Sofica',                bg:'#FFF3E0',color:'#E65100'};
+    // ── Sociétés / pro ──
+    if(/parts de soci|sarl|sas\b|holding/.test(n))   return{label:'Société',               bg:'#FCE4EC',color:'#880E4F'};
+    if(/fonds de commerce/.test(n))                  return{label:'Fds commerce',           bg:'#FCE4EC',color:'#880E4F'};
+    if(/mat[eé]riel pro|v[eé]hicule pro/.test(n))    return{label:'Bien pro.',             bg:'#FCE4EC',color:'#880E4F'};
+    // ── Objets de valeur ──
+    if(/bijoux|m[eé]taux pr[eé]cieux|objet d.art|meuble/.test(n)) return{label:'Objet valeur',bg:'#F5F5F5',color:'#616161'};
+    // ── Fallback immo ──
+    if(/immo/.test(n))                               return{label:'Immobilier',            bg:'#DCEDC8',color:'#33691E'};
+    return{label:'Autre',bg:'#F5F5F5',color:'#616161'};
   }
 
   // ── Horizon selon nomenclature Excel V12 exacte ────────────────────
@@ -3390,6 +3384,45 @@ function rFiscal(){
   renderLevierBadge('levierFis',[
     {label:'Levier fiscal', ok:levierFiscal, partial:levierFiscalPeu, detail:levierFisDetail}
   ]);
+  // Barème complet dynamique
+  var bEl=document.getElementById('baremeComplet');
+  if(bEl){
+    var cols=[
+      {sit:'Célibataire',enf:'-',parts:1,key:'celibataire',e:0},
+      {sit:'Célib. Div.',enf:'1',parts:1.5,key:'celibataire',e:1},
+      {sit:'Célib. Div.',enf:'1',parts:2,key:'celibataire_seul',e:1},
+      {sit:'Marié/PACS',enf:'-',parts:2,key:'marie',e:0},
+      {sit:'Marié/PACS',enf:'1',parts:2.5,key:'marie',e:1},
+      {sit:'Marié/PACS',enf:'2',parts:3,key:'marie',e:2},
+      {sit:'Marié/PACS',enf:'3',parts:4,key:'marie',e:3},
+    ];
+    // Trouver la colonne du client
+    var clientParts=f.parts||1;
+    var taux=[0.45,0.41,0.30,0.11];
+    var tauxLbl=['45%','41%','30%','11%'];
+    var tauxColors=['#C0392B','#C0392B','#D4622A','#2B5EA7'];
+    var bH='<table style="width:100%;border-collapse:collapse;font-size:10px">';
+    bH+='<thead><tr style="background:var(--ink);color:#fff"><th style="padding:5px 6px;text-align:left">TMI</th>';
+    cols.forEach(function(c){
+      var isMe=Math.abs(c.parts-clientParts)<0.01;
+      bH+='<th style="padding:5px 6px;text-align:center;'+(isMe?'background:var(--orange);color:#fff':'')+'">'+c.sit+'<br><span style="font-weight:400;font-size:9px">'+c.parts+' part'+(c.parts>1?'s':'')+'</span></th>';
+    });
+    bH+='</tr></thead><tbody>';
+    taux.forEach(function(t,ti){
+      bH+='<tr>';
+      bH+='<td style="padding:4px 6px;font-weight:700;color:'+tauxColors[ti]+'">'+tauxLbl[ti]+'</td>';
+      cols.forEach(function(c){
+        var isMe=Math.abs(c.parts-clientParts)<0.01;
+        var cfg=BAREME_IR[c.key]&&BAREME_IR[c.key][c.e];
+        var seuil=cfg?cfg.seuils[4-ti]:'—';
+        var lbl=typeof seuil==='number'?'> '+fmt(seuil)+' €':'—';
+        bH+='<td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--bord);'+(isMe?'background:var(--o-dim);font-weight:600':'')+'">'+lbl+'</td>';
+      });
+      bH+='</tr>';
+    });
+    bH+='</tbody></table>';
+    bEl.innerHTML=bH;
+  }
 }
 
 
@@ -3397,35 +3430,58 @@ function rFiscal(){
 // ║  SECTION — FINANCEMENT                                         ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function rFinancement(){
-  // Revenus bruts annuels (affichage) : salaires + fonciers bruts
-  const revB=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0)+(ED.revenus.fonc||0);
-  const revM=revMens();
-  const chr=ED.charges||0; // charges totales /mois (affichage)
-  // Taux endettement bancaire = crédits seuls (passifs) / revenus mensuels
-  const chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12)||chr;
-  const rav=revM-chrCredit;
-  const endett=revM>0?chrCredit/revM*100:0;
-  const capa=revM*0.35-chrCredit; // 35% = seuil bancaire max
-  const col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
+  var revM=revMens();
+  var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+  var rav=revM-chrCredit;
+  var endett=revM>0?chrCredit/revM*100:0;
+  var capa=Math.max(0,revM*0.35-chrCredit);
+  var col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
+  var isCoupleFin=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
 
-  set('kFin1',fmt(revB)+' €');set('kFin2',fmt(revM)+' €');set('kFin3',fmt(chrCredit)+' €');
-  const ke=document.getElementById('kFin4');ke.textContent=endett>0?endett.toFixed(1)+' %':'—';ke.style.color=col;
+  // Analyse par personne
+  var ab=document.getElementById('finAnalyseBlock');
+  if(ab){
+    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
+    var sal2=ED.revenus.sal2||ED.revenus.c2||0;
+    var fonc=ED.revenus.fonc||0;
+    var h='';
+    if(isCoupleFin){
+      var n1=(ED.c1.prenom||'C1').split(' ')[0];
+      var n2=(ED.c2.prenom||'C2').split(' ')[0];
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
+      h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>'+n1+'</div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v">'+fmt(sal1)+' €</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v">'+fmt(Math.round(sal1/12))+' €/mois</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Épargne mensuelle</span><span class="fr-v" style="color:var(--orange);font-weight:600">'+fmt(ED.epMens||0)+' €/mois</span></div>';
+      h+='</div>';
+      h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>'+n2+'</div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v">'+fmt(sal2)+' €</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Revenus mensuels</span><span class="fr-v">'+fmt(Math.round(sal2/12))+' €/mois</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Épargne mensuelle</span><span class="fr-v" style="color:var(--orange);font-weight:600">'+fmt(ED.epMens2||0)+' €/mois</span></div>';
+      h+='</div>';
+      h+='</div>';
+    }
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Analyse du foyer</div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
+    if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Charges crédit /mois</span><span class="fr-v">'+fmt(chrCredit)+' €/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Reste à vivre</span><span class="fr-v">'+fmt(rav)+' €/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Taux d\'endettement</span><span class="fr-v" style="color:'+col+';font-weight:700">'+endett.toFixed(1)+' %</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" style="color:'+(capa>0?'var(--green)':'var(--red)')+'">'+fmt(capa)+' €/mois</span></div>';
+    h+='</div>';
+    ab.innerHTML=h;
+  }
 
-  setEd('ffRevMens',fmt(revM)+' €/mois');setEd('ffCharges',fmt(chrCredit)+' €/mois');setEd('ffRAV',fmt(rav)+' €/mois');
-  document.getElementById('ffEndett').innerHTML=`<span style="color:${col};font-weight:700">${endett>0?endett.toFixed(1)+' %':'—'}</span>`;
-  const capEl=document.getElementById('ffCapa');
-  capEl.textContent=capa>0?fmt(capa)+' €/mois':'Capacité saturée';capEl.style.color=capa>0?'var(--green)':'var(--red)';
-  setEd('ffEpMens',fmt(ED.epMens||rav*0.3)+' €/mois');
+  // Levier
+  var lf=document.getElementById('levierFinText');
+  if(endett<=28)lf.innerHTML='<span class="badge badge-green">Levier disponible</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong> — capacité d\'emprunt additionnelle estimée à <strong>'+fmt(capa)+' €/mois</strong>.';
+  else if(endett<=35)lf.innerHTML='<span class="badge badge-amber">Levier limité</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong>. Financement possible mais contraint.';
+  else lf.innerHTML='<span class="badge badge-red">Capacité saturée</span><br><br>Endettement à <strong>'+endett.toFixed(1)+' %</strong>. Préconisations orientées épargne uniquement.';
 
-  const lf=document.getElementById('levierFinText');
-  if(endett<=28)lf.innerHTML=`<span class="badge badge-green">✅ Levier disponible</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong> — capacité d'emprunt additionnelle estimée à <strong>${fmt(Math.max(0,capa))} €/mois</strong>.`;
-  else if(endett<=35)lf.innerHTML=`<span class="badge badge-amber">⚠️ Levier limité</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Financement possible mais contraint. Prioriser les versements programmés.`;
-  else lf.innerHTML=`<span class="badge badge-red">❌ Capacité saturée</span><br><br>Endettement à <strong>${endett.toFixed(1)} %</strong>. Préconisations orientées épargne uniquement.`;
-
-  const pct=Math.min(100,endett/35*100); // 35% = seuil max = barre pleine
+  var pct=Math.min(100,endett/35*100);
   var pe=document.getElementById('progEndett');if(pe){pe.style.width=pct+'%';pe.style.background=endett>35?'var(--red)':endett>28?'var(--ambre)':'var(--green)';}
   set('progEndettLbl',endett>0?endett.toFixed(1)+' %':'—');
-  var levierFinancement = endett<33;
+  var levierFinancement=endett<33;
   renderLevierBadge('levierFin',[
     {label:'Financement', ok:levierFinancement, detail:levierFinancement?'Endettement '+endett.toFixed(1)+' % — capacité d\'emprunt disponible':'Endettement '+endett.toFixed(1)+' % — capacité saturée'}
   ]);
@@ -3524,8 +3580,11 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
         +'</div>';});
   // Impact total foyer (somme des impacts individuels)
-  var impFoyerColor=impactFoyer<0?'var(--red)':'var(--green)';
-  cardsHtml+='<div class="card" style="background:var(--ink);border-color:var(--ink);margin-bottom:0;margin-top:8px"><div class="fiscal-row" style="border:none"><span class="fr-l" style="color:#fff;font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:var(--orange);font-weight:700;font-size:16px">'+(impactFoyer<0?'- '+fmt(Math.abs(impactFoyer)):'+ '+fmt(Math.abs(impactFoyer)))+' €</span></div></div>';
+  // impactFoyer > 0 = il manque de l'argent (négatif pour le foyer)
+  // impactFoyer < 0 = surplus (positif pour le foyer)
+  var impFoyerNegatif=impactFoyer>0; // manque = négatif pour le patrimoine
+  var impFoyerColor=impFoyerNegatif?'var(--red)':'var(--green)';
+  cardsHtml+='<div class="card" style="border-color:'+impFoyerColor+';border-width:2px;margin-bottom:0;margin-top:8px"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impFoyerColor+';font-weight:700;font-size:16px">'+(impFoyerNegatif?'- '+fmt(Math.abs(impactFoyer)):'+  '+fmt(Math.abs(impactFoyer)))+' €</span></div></div>';
   cardsHtml+='<div class="alert warn" style="margin-top:12px"><span>⚠️</span><div><strong>Hypothèse : tous les trimestres requis sont validés.</strong> Les taux de remplacement ci-dessus supposent une carrière complète. Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s\'applique : <strong>pension = pension estimée × (trimestres cotisés / trimestres requis)</strong>.</div></div>';
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
@@ -4620,6 +4679,11 @@ function markDone(){
   // Import est toujours done
   var importBtn=document.querySelector('[data-sec="import"]');
   if(importBtn){importBtn.classList.add('done');importBtn.classList.remove('pending');}
+}
+function updEpTotal(){
+  var t=(ED.epMens||0)+(ED.epMens2||0);
+  var el=document.getElementById('epTotalLbl');
+  if(el)el.textContent='Total : '+fmt(t)+' €/mois';
 }
 function validateSection(sec){
   validatedSections[sec]=true;
