@@ -4429,7 +4429,7 @@ function togglePrecoSwitch(uid,montantActuel,checked){
 var LEVIER_CATEGORIES = [
   {key:'placement',   label:'Placement',   icon:'&#128176;', color:'#2B5EA7', bg:'#EDF2FB',
    match:['epargne','transmission']},
-  {key:'fiscal',      label:'Fiscal',      icon:'&#128200;', color:'#D4622A', bg:'rgba(212,98,42,0.08)',
+  {key:'fiscal',      label:'Imp\u00f4ts', icon:'&#128200;', color:'#D4622A', bg:'rgba(212,98,42,0.08)',
    match:['fiscal']},
   {key:'financement', label:'Financement', icon:'&#127968;', color:'#2D7A5B', bg:'#EAF5EF',
    match:['financement']},
@@ -4667,6 +4667,15 @@ function renderSolsRetenues(){
       html+='<input type="checkbox" '+(firstSol.reinvest?'checked':'')+' onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'reinvest\',this.checked)" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer">';
       html+='<span style="font-size:11px;font-weight:600;color:'+(firstSol.reinvest?'var(--blue)':'var(--gris)')+'">'+( firstSol.reinvest?'Activ\u00e9':'D\u00e9sactiv\u00e9')+'</span>';
       html+='</label></div>';
+    }
+
+    // SCPI : toggle Pleine propriété / Nue-propriété
+    if(isSCPI3){
+      var scpiMode=firstSol._scpiMode||'pp';
+      html+='<div style="margin-bottom:10px;display:flex;gap:6px">';
+      html+='<button onclick="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_scpiMode\',\'pp\');renderSolsRetenues();renderFichesClient()" style="flex:1;padding:8px;border-radius:8px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid '+(scpiMode==='pp'?'#2D7A5B':'var(--bord)')+';background:'+(scpiMode==='pp'?'var(--green-l)':'#fff')+';color:'+(scpiMode==='pp'?'var(--green)':'var(--gris)')+'">Pleine propri\u00e9t\u00e9</button>';
+      html+='<button onclick="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_scpiMode\',\'np\');renderSolsRetenues();renderFichesClient()" style="flex:1;padding:8px;border-radius:8px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid '+(scpiMode==='np'?'#7B4FA6':'var(--bord)')+';background:'+(scpiMode==='np'?'rgba(123,79,166,0.08)':'#fff')+';color:'+(scpiMode==='np'?'#7B4FA6':'var(--gris)')+'">Nue-propri\u00e9t\u00e9</button>';
+      html+='</div>';
     }
 
     html+='</div>'; // fin header padding
@@ -4961,24 +4970,40 @@ function renderFichesClient(){
               html+='le capital estim\u00e9 serait de <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong>';
               html+=loyer2>0?' avec des loyers potentiels de <strong>~'+fmt(loyer2)+'\u00a0\u20ac/mois</strong>.':'.';
             } else if(isSCPI2){
-              // SCPI de rendement : modèle distribution + réinvestissement
-              var yieldSCPI=0.05; // taux distribution 5%
-              var revaloSCPI=0.01; // revalorisation part 1%/an
-              var patSCPI=(sol.vi||0);
-              var totalDiv=0;
-              for(var ySCPI=0;ySCPI<h2;ySCPI++){
-                var divAn=Math.round(patSCPI*yieldSCPI);
-                if(sol.reinvest)patSCPI+=divAn;
-                else totalDiv+=divAn;
-                patSCPI+=((sol.vp||0)*12);
-                patSCPI=Math.round(patSCPI*(1+revaloSCPI));
+              var scpiMode3=sol._scpiMode||'pp';
+              if(scpiMode3==='np'){
+                // Nue-propriété : décote selon durée, pas de revenus pendant la période
+                var npPct={5:0.82,7:0.77,10:0.70,15:0.62,20:0.55};
+                var nearH=Object.keys(npPct).reduce(function(best,k){return Math.abs(k-h2)<Math.abs(best-h2)?+k:best;},10);
+                var decote=npPct[nearH]||0.70;
+                var valPP=Math.round((sol.vi||0)/decote); // valeur en pleine propriété
+                var valTerme=Math.round(valPP*Math.pow(1.015,h2)); // revalorisation 1.5%/an
+                var loyerTerme=Math.round(valTerme*0.05/12);
+                html+='Acquisition en nue-propri\u00e9t\u00e9 : d\u00e9cote <strong>'+Math.round((1-decote)*100)+'\u00a0%</strong> sur '+nearH+' ans.';
+                html+='<br>Valeur pleine propri\u00e9t\u00e9 \u00e0 l\'achat : <strong>'+fmt(valPP)+'\u00a0\u20ac</strong>, ';
+                html+='valeur estim\u00e9e \u00e0 terme : <strong>'+fmt(valTerme)+'\u00a0\u20ac</strong>.';
+                html+='<br>Revenus potentiels au terme : <strong>~'+fmt(loyerTerme)+'\u00a0\u20ac/mois</strong>.';
+                html+='<br><span style="font-size:11px;color:var(--gris)">Aucun revenu ni IFI pendant la p\u00e9riode de d\u00e9membrement.</span>';
+              } else {
+                // Pleine propriété : modèle distribution + réinvestissement
+                var yieldSCPI=0.05;
+                var revaloSCPI=0.01;
+                var patSCPI=(sol.vi||0);
+                var totalDiv=0;
+                for(var ySCPI=0;ySCPI<h2;ySCPI++){
+                  var divAn=Math.round(patSCPI*yieldSCPI);
+                  if(sol.reinvest)patSCPI+=divAn;
+                  else totalDiv+=divAn;
+                  patSCPI+=((sol.vp||0)*12);
+                  patSCPI=Math.round(patSCPI*(1+revaloSCPI));
+                }
+                var loyerMens=Math.round(patSCPI*yieldSCPI/12);
+                html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
+                html+='patrimoine SCPI estim\u00e9 \u00e0 <strong>'+fmt(patSCPI)+'\u00a0\u20ac</strong>';
+                if(sol.reinvest)html+=' (dividendes r\u00e9investis).';
+                else html+=totalDiv>0?'. Dividendes per\u00e7us sur la p\u00e9riode : <strong>'+fmt(totalDiv)+'\u00a0\u20ac</strong>.':'.';
+                html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution 5\u00a0%).';
               }
-              var loyerMens=Math.round(patSCPI*yieldSCPI/12);
-              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='patrimoine SCPI estim\u00e9 \u00e0 <strong>'+fmt(patSCPI)+'\u00a0\u20ac</strong>';
-              if(sol.reinvest)html+=' (dividendes r\u00e9investis).';
-              else html+=totalDiv>0?'. Dividendes per\u00e7us sur la p\u00e9riode : <strong>'+fmt(totalDiv)+'\u00a0\u20ac</strong>.':'.';
-              html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution 5\u00a0%).';
             } else if(/per\b/i.test(sol.produit||'')){
               // PER : rendement 3% fixe + économie fiscale
               var tmiPer=ED.fiscal.tmi||0;
