@@ -669,9 +669,8 @@ select.span2{grid-column:span 2}
   <div style="display:flex;flex-direction:column;min-height:900px">
 
     <!-- En-tete cabinet (haut de page) -->
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div id="gardeLogoPreview" style="margin-bottom:8px"></div>
         <div id="gardeCabinetName" style="font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)"></div>
         <div id="gardeCabinetSub" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--gris);margin-top:2px">Conseil en gestion de patrimoine</div>
       </div>
@@ -6157,16 +6156,6 @@ function rPageGarde(){
   if(cons){
     var consName=((p.prenom||'')+' '+(p.nom||'')).trim();
     cons.textContent=consName||'';
-  }
-
-  // Logo
-  var logo=document.getElementById('gardeLogoPreview');
-  if(logo){
-    try{
-      var dataUrl=localStorage.getItem('cgpskool_logo');
-      if(dataUrl)logo.innerHTML='<img src="'+dataUrl+'" style="max-height:40px;max-width:160px">';
-      else logo.innerHTML='';
-    }catch(e){}
   }
 
   // Footer
