@@ -4027,12 +4027,13 @@ function rPreconisations(){
   var levEl=document.getElementById('precoLeviers');
   if(levEl){
     var levH='';
+    var entAct=isEntrepriseActive();
     var allLeviers=[
       {key:'placement',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' \u20ac/mois',active:ED.epMens>0||aSum>5000,color:'#2B5EA7'},
       {key:'fiscal',label:'Fiscal',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' \u2014 PER dispo '+fmt(plafondPER)+' \u20ac':''),active:impot>=2000,color:'#D4622A'},
-      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois',active:capa>200,color:'#2D7A5B'},
-      {key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'}
+      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois',active:capa>200,color:'#2D7A5B'}
     ];
+    if(entAct)allLeviers.push({key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'});
     allLeviers.forEach(function(l){
       var opacity=l.active?'1':'0.4';
       var tick=l.active?'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:'+l.color+';color:#fff;font-size:11px;font-weight:700">&#10003;</span>':'<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid #ccc;color:#ccc;font-size:9px">&#9679;</span>';
@@ -4217,13 +4218,14 @@ function buildMatriceObjSol(impot,capa,aSum){
   var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(sol.vp||0);},0);
   var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
 
-  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">';
+  var entActive=isEntrepriseActive();
   var levierStats=[
     {label:'Placement',color:'#2B5EA7',active:hasPlacement,val:fmt(reorMontant)+' \u20ac',sub:'A r\u00e9orienter'},
     {label:'Fiscal',color:'#D4622A',active:hasFiscal,val:'TMI '+(ED.fiscal.tmi||0)+'%',sub:'IR '+fmt(impot)+' \u20ac'},
-    {label:'Financement',color:'#2D7A5B',active:hasFinancement,val:fmt(Math.round(capa))+' \u20ac/m',sub:'Capacit\u00e9'},
-    {label:'Entreprise',color:'#7B5EA7',active:true,val:'SCI / Holding',sub:'150-0 B ter'}
+    {label:'Financement',color:'#2D7A5B',active:hasFinancement,val:fmt(Math.round(capa))+' \u20ac/m',sub:'Capacit\u00e9'}
   ];
+  if(entActive)levierStats.push({label:'Entreprise',color:'#7B5EA7',active:true,val:'SCI / Holding',sub:'150-0 B ter'});
+  html+='<div style="display:grid;grid-template-columns:repeat('+levierStats.length+',1fr);gap:8px;margin-bottom:14px">';
   levierStats.forEach(function(l){
     var op=l.active?'1':'0.35';
     var tick=l.active?'&#10003;':'&#9679;';
@@ -4250,7 +4252,9 @@ function buildMatriceObjSol(impot,capa,aSum){
   });
 
   // Render each levier category
+  var entOn=isEntrepriseActive();
   LEVIER_CATEGORIES.forEach(function(lev){
+    if(lev.key==='entreprise'&&!entOn) return;
     var sols=groups[lev.key]||[];
     if(!sols.length) return;
     // Section header
@@ -5112,6 +5116,11 @@ function toggleTransmission(checked){
     if(secTrans&&secTrans.classList.contains('active'))goTo('retraite');
   }
 }
+function isEntrepriseActive(){
+  var cb=document.getElementById('checkEntreprise');
+  return cb&&cb.checked;
+}
+
 function toggleEntreprise(checked){
   var btn=document.getElementById('btnEntreprise');
   var dot=document.getElementById('dotEntreprise');
@@ -5127,6 +5136,9 @@ function toggleEntreprise(checked){
     var sec=document.getElementById('sec-entreprise');
     if(sec&&sec.classList.contains('active'))goTo('retraite');
   }
+  // Rafraichir preconisations si ouverte
+  var secPreco=document.getElementById('sec-preconisations');
+  if(secPreco&&secPreco.classList.contains('active'))rPreconisations();
 }
 
 function toggleAvis(checked){
