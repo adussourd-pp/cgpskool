@@ -619,13 +619,12 @@ select.span2{grid-column:span 2}
   <!-- Chiffres clés du foyer (commun) -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Chiffres clés du foyer</div>
-    <div class="kpi-row" id="kpiSitRow">
-      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kSit2">0 €</div></div>
-      <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Taux d'endettement</div><div class="kpi-val" id="kSit3">—</div></div>
-      <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Reste à vivre /mois</div><div class="kpi-val" id="kSit4">0 €</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0">
+      <div style="padding:10px 14px;border-right:1px solid var(--bord)"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Revenus nets /mois</div><div style="font-size:18px;font-weight:700;color:var(--noir)" id="kSit2">0 €</div></div>
+      <div style="padding:10px 14px;border-right:1px solid var(--bord)"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Taux d'endettement</div><div id="kSit3">—</div></div>
+      <div style="padding:10px 14px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Reste à vivre /mois</div><div style="font-size:18px;font-weight:700" id="kSit4">0 €</div></div>
     </div>
-    <!-- Épargne mensuelle par personne -->
-    <div id="kSit1Wrap" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)"></div>
+    <div id="kSit1Wrap" style="padding:10px 14px;border-top:1px solid var(--bord)"></div>
   </div>
 
   <!-- Objectifs (commun, pleine largeur) -->
@@ -3102,7 +3101,7 @@ function rSituation(){
     sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong>'+(ED.convention?' · '+ED.convention:'')+'</div>';
     if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
     sit+='</div>';
-    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
   } else {
     sit+='<div class="card" style="margin-bottom:12px;padding:12px">';
@@ -3113,7 +3112,7 @@ function rSituation(){
     sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br>'+ED.sitmat+'</div>';
     if(ED.logement) sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Logement</span><br>'+ED.logement+'</div>';
     sit+='</div>';
-    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="color:var(--blue);font-weight:600">'+enfDisplay+'</span></div>';
+    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
   }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
@@ -4467,9 +4466,11 @@ function resetSteps(){
     var sorted=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
     sorted.forEach(function(sol,i){
       var cp=COPERNIC&&COPERNIC[sol.produit];
-      var label='Solution '+(i+1)+' : '+(cp?cp.label:sol.produit);
-      if(sol.horizonLabel) label+=' ('+sol.horizonLabel+')';
-      steps.push({label:label, done:false});
+      var label=sol.produit||'Solution '+(i+1);
+      var sub=[];
+      if(cp&&cp.horizon) sub.push(cp.horizon);
+      if(sol.objectifsValides&&sol.objectifsValides.length) sub.push(sol.objectifsValides.join(', '));
+      steps.push({label:label, sub:sub.join(' · '), done:false, date:''});
     });
   }
   // Étape finale : suivi
@@ -4519,19 +4520,27 @@ function renderSteps(){
     container.innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic;padding:8px 0">Aucune étape — ajoutez-en ci-dessous.</div>';
     return;
   }
-  // Stepper horizontal
-  container.innerHTML='<div class="synthese-steps">'
-    +steps.map(function(s,i){
-      return '<div class="synthese-step'+(s.done?' done':'')+'" style="position:relative">'
-        +'<div onclick="toggleStep('+i+')" style="cursor:pointer">'
-        +'<div class="ss-num">Étape '+(i+1)+'</div>'
-        +'<div class="ss-label">'+s.label+'</div>'
-        +'<div class="ss-status">'+(s.done?'✅ Fait':'En attente')+'</div>'
-        +'</div>'
-        +'<button onclick="event.stopPropagation();removeStep('+i+')" style="position:absolute;top:4px;right:6px;background:none;border:none;font-size:14px;color:var(--gris);cursor:pointer;padding:2px 5px;line-height:1" title="Supprimer cette étape">×</button>'
-        +'</div>';
-    }).join('')
-    +'</div>';
+  // Feuille de route verticale
+  container.innerHTML=steps.map(function(s,i){
+    var dotColor=s.done?'var(--green)':'var(--orange)';
+    var bg=s.done?'var(--green-l)':'#fff';
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bord)">'
+      +'<div onclick="toggleStep('+i+')" style="cursor:pointer;margin-top:4px;width:14px;height:14px;border-radius:50%;background:'+dotColor+';flex-shrink:0" title="Cliquer pour valider"></div>'
+      +'<div style="flex:1">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div><span style="font-size:10px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:0.1em">Étape '+(i+1)+'</span>'
+      +'<div style="font-size:13px;font-weight:600;color:var(--noir);margin-top:2px">'+s.label+'</div>'
+      +(s.sub?'<div style="font-size:11px;color:var(--gris);margin-top:2px">'+s.sub+'</div>':'')
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<input type="date" value="'+(s.date||'')+'" style="font-size:11px;border:1px solid var(--bord);border-radius:4px;padding:3px 6px;color:var(--gris-f);font-family:var(--sans)" onchange="steps['+i+'].date=this.value" title="Date prévue">'
+      +'<span style="font-size:11px;font-weight:600;color:'+(s.done?'var(--green)':'var(--orange)')+'">'+(s.done?'✓ Fait':'En attente')+'</span>'
+      +'<button onclick="removeStep('+i+')" style="background:none;border:none;font-size:14px;color:var(--gris);cursor:pointer;padding:2px 5px" title="Supprimer">×</button>'
+      +'</div>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 function toggleStep(i){if(steps[i])steps[i].done=!steps[i].done;renderSteps();}
 function addStep(){
