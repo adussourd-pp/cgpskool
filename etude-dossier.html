@@ -3988,6 +3988,7 @@ function rFinancement(){
   renderLevierBadge('levierFin',[
     {label:'Financement', ok:levierFinancement, detail:'', extra:barHtml}
   ]);
+  initProjectionFin();
 }
 
 
@@ -7154,11 +7155,28 @@ function calcProjectionIR(){
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionIR error:',e);}
 }
+function initProjectionFin(){
+  try{
+    var revM=revMens();
+    var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    var capaMsg=Math.max(0,Math.round(revM*0.35-chrCredit));
+    // Calculer montant max empruntable à partir de la capacité restante
+    var taux=0.035,duree=20,assur=0.003;
+    var tauxM=taux/12;
+    var nbMois=duree*12;
+    var mensMaxHorsAssur=capaMsg/(1+assur*12/12/tauxM*(1-Math.pow(1+tauxM,-nbMois)));
+    // Formule inverse : montant = mensualité × (1-(1+r)^-n) / r
+    var montantMax=tauxM>0?Math.round(capaMsg/(tauxM/(1-Math.pow(1+tauxM,-nbMois))+assur/12)):0;
+    var el=document.getElementById('projFinMontant');
+    if(el&&!+el.value&&montantMax>0)el.value=montantMax;
+    calcProjectionFin();
+  }catch(e){}
+}
 function calcProjectionFin(){
   try{
     var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
     var montant=n('projFinMontant'),taux=n('projFinTaux')/100,duree=n('projFinDuree'),assur=n('projFinAssur')/100,apport=n('projFinApport');
-    if(!montant||!duree)return;
+    if(!duree)return;
     var nbMois=duree*12;
     var tauxM=taux/12;
     var mensualite=tauxM>0?Math.round(montant*tauxM/(1-Math.pow(1+tauxM,-nbMois))):Math.round(montant/nbMois);
@@ -7167,18 +7185,22 @@ function calcProjectionFin(){
     var coutTotal=mensTotale*nbMois-montant;
     var revM=revMens();
     var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    var capaRestante=Math.max(0,Math.round(revM*0.35-chrCredit));
     var nouvEndett=revM>0?((chrCredit+mensTotale)/revM*100).toFixed(1):'0';
     var nouvRAV=revM-chrCredit-mensTotale;
     var el=document.getElementById('projFinResultat');
     if(!el)return;
     var endColor=+nouvEndett>35?'var(--red)':+nouvEndett>28?'var(--orange)':'var(--green)';
     var h='';
-    h+='<div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Mensualit\u00e9 totale</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(mensTotale)+' \u20ac/mois</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Dont cr\u00e9dit</span><span class="fr-v">'+fmt(mensualite)+' \u20ac</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Dont assurance</span><span class="fr-v">'+fmt(mensAssur)+' \u20ac</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Co\u00fbt total cr\u00e9dit</span><span class="fr-v" style="color:var(--red)">'+fmt(coutTotal)+' \u20ac</span></div>';
-    h+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:8px;margin-top:4px"><span class="fr-l" style="font-weight:600">Nouvel endettement</span><span class="fr-v" style="font-weight:700;color:'+endColor+'">'+nouvEndett+' %</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Nouveau reste \u00e0 vivre</span><span class="fr-v" style="font-weight:700;color:'+(nouvRAV<0?'var(--red)':'var(--green)')+'">'+fmt(nouvRAV)+' \u20ac/mois</span></div>';
+    h+='<div class="fiscal-row" style="background:rgba(45,122,91,0.06);margin:6px -20px;padding:6px 20px"><span class="fr-l" style="font-weight:600;color:var(--green)">Capacit\u00e9 restante</span><span class="fr-v" style="font-weight:700;color:var(--green)">'+fmt(capaRestante)+' \u20ac/mois</span></div>';
+    if(montant>0){
+      h+='<div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Mensualit\u00e9 totale</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(mensTotale)+' \u20ac/mois</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Dont cr\u00e9dit</span><span class="fr-v">'+fmt(mensualite)+' \u20ac</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Dont assurance</span><span class="fr-v">'+fmt(mensAssur)+' \u20ac</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Co\u00fbt total cr\u00e9dit</span><span class="fr-v" style="color:var(--red)">'+fmt(coutTotal)+' \u20ac</span></div>';
+      h+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:8px;margin-top:4px"><span class="fr-l" style="font-weight:600">Nouvel endettement</span><span class="fr-v" style="font-weight:700;color:'+endColor+'">'+nouvEndett+' %</span></div>';
+      h+='<div class="fiscal-row"><span class="fr-l">Nouveau reste \u00e0 vivre</span><span class="fr-v" style="font-weight:700;color:'+(nouvRAV<0?'var(--red)':'var(--green)')+'">'+fmt(nouvRAV)+' \u20ac/mois</span></div>';
+    }
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
 }
