@@ -6304,22 +6304,23 @@ function saveMentionsDirect(){
       }
 
       // Detect assureur/partenaire tags : "avec les assureurs suivants" pattern
+      // Keep inside current card buffer
       var assureurMatch=cl.match(/avec\s+l(?:es|\')\s*assureurs?\s+suivants?\s*[:\s]*(.*)/i);
       if(assureurMatch){
-        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
-        // Extract partner name before "avec"
         var partnerName=cl.match(/^(.+?)\s+avec\s+l/i);
         var assureurs=assureurMatch[1].split(/[,;]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-        var tagHtml='<div style="margin:10px 0">';
-        if(partnerName)tagHtml+='<div style="font-size:12px;font-weight:600;color:var(--noir);margin-bottom:8px">'+partnerName[1].trim()+'</div>';
-        tagHtml+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-        assureurs.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
-        tagHtml+='</div></div>';
-        h+=tagHtml;
+        if(partnerName)cardBuf.push(cl);
+        else cardBuf.push(cl);
+        if(assureurs.length){
+          var tagHtml='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
+          assureurs.forEach(function(t){tagHtml+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
+          tagHtml+='</div>';
+          cardBuf.push(tagHtml);
+        }
         ci2++;continue;
       }
 
-      // Tags (original detection: lines with 2+ items separated by double spaces)
+      // Tags (lines with 2+ items separated by double spaces) — keep in card
       var tagItems=[];
       if(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cl)){
         while(ci2<cLines.length&&(/^\s/.test(cLines[ci2])||/\s{2,}/.test(cLines[ci2]))){
@@ -6330,16 +6331,26 @@ function saveMentionsDirect(){
         }
       }
       if(tagItems.length>=2){
-        var tagHtml2='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">';
+        var tagHtml2='<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">';
         tagItems.forEach(function(t){tagHtml2+='<span style="font-size:12px;padding:5px 14px;background:var(--gris-l);border:1px solid var(--bord);border-radius:20px;color:var(--noir);font-weight:400">'+t+'</span>';});
         tagHtml2+='</div>';
         cardBuf.push(tagHtml2);
         continue;
       }
 
-      // Blank line = flush card
+      // Blank line : flush only if next non-empty line looks like a new sub-section (long uppercase)
+      // Otherwise keep accumulating (partenaires names + tags stay in same card)
       if(!cl){
-        if(cardBuf.length){h+=renderMlCard2(cardBuf);cardBuf=[];}
+        // Look ahead : if next content is a short name followed by tags, don't flush
+        var nextNonEmpty=-1;
+        for(var peek=ci2+1;peek<cLines.length;peek++){if(cLines[peek].trim()){nextNonEmpty=peek;break;}}
+        var nextIsPartner=false;
+        if(nextNonEmpty>=0){
+          var nxt=cLines[nextNonEmpty].trim();
+          // Short line (partner name) followed by tag-like lines
+          if(nxt.length<60&&nextNonEmpty+1<cLines.length&&(/^\s/.test(cLines[nextNonEmpty+1])||/\s{2,}/.test(cLines[nextNonEmpty+1])))nextIsPartner=true;
+        }
+        if(cardBuf.length&&!nextIsPartner){h+=renderMlCard2(cardBuf);cardBuf=[];}
         ci2++;continue;
       }
 
