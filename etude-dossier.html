@@ -537,6 +537,7 @@ select.span2{grid-column:span 2}
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
   <div class="sidebar-lbl" style="margin-top:8px">Mise en page</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
+  <button class="step-btn" data-sec="sommaire" onclick="goTo('sommaire')"><span class="step-dot"></span>Sommaire</button>
   <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions légales</button>
   <button class="step-btn" id="btnAvis" data-sec="avis"
     onclick="if(document.getElementById('checkAvis').checked)goTo('avis')"
@@ -1069,6 +1070,12 @@ select.span2{grid-column:span 2}
   <div class="page-number"></div>
 </div><!-- /sec-synthese -->
 
+<!-- ── TIP PAGE DE GARDE (hors section-page) ── -->
+<div class="panneau-interne" style="padding:10px 14px;background:rgba(212,98,42,0.06);border:1px dashed var(--orange);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5;margin-bottom:18px">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:4px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  Pour modifier le logo, ouvrez la <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">configuration</strong>.
+</div>
+
 <!-- ════════════════════════════════════════
      8 — PAGE DE GARDE
 ════════════════════════════════════════ -->
@@ -1119,22 +1126,29 @@ select.span2{grid-column:span 2}
 
   </div>
 
-  <!-- Sommaire (page 2) -->
-  <div style="margin-top:32px;padding-top:32px;border-top:1px solid var(--bord)">
-    <div style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);margin-bottom:20px">Sommaire</div>
-    <div id="gardeSommaire" style="font-family:var(--sans)"></div>
-  </div>
-
-  <div class="panneau-interne" style="margin-top:18px;padding:10px 14px;background:rgba(212,98,42,0.06);border:1px dashed var(--orange);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
-    Pour modifier le logo, ouvrez la <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">configuration</strong>.
-  </div>
-
   <div class="row-btns" style="margin-top:18px">
     <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
-    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions légales &#8594;</button>
+    <button class="btn btn-secondary" onclick="goTo('sommaire')">Sommaire &#8594;</button>
   </div>
   <div class="page-number"></div>
 </div><!-- /sec-pagegarde -->
+
+<!-- ════════════════════════════════════════
+     8b — SOMMAIRE
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-sommaire">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Sommaire</div><div class="sec-sub">Table des matières du dossier</div></div>
+  </div>
+
+  <div id="gardeSommaire" style="font-family:var(--sans)"></div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
+    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions légales &#8594;</button>
+  </div>
+  <div class="page-number"></div>
+</div><!-- /sec-sommaire -->
 
 <!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
 <div class="panneau-interne" style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:24px;margin-bottom:18px">
@@ -2191,9 +2205,9 @@ function goTo(sec){
 
 // ── NUMÉROTATION DYNAMIQUE DES PAGES ─────────────────────────────
 function updatePageNumbers(){
-  // Sections éligibles à la numérotation (hors import)
-  var sectionIds=['situation','patrimoine','fiscal','financement','retraite',
-    'transmission','entreprise','preconisations','synthese','pagegarde','mentions','avis'];
+  // Ordre PDF : page de garde (1), sommaire (2), sections métier, mentions (dernière), avis (si activé, avant mentions)
+  var sectionIds=['pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite',
+    'transmission','entreprise','preconisations','synthese','avis','mentions'];
   // Filtrer les sections activées (checkbox cochée ou pas de checkbox = toujours active)
   var checkMap={transmission:'checkTransmission',entreprise:'checkEntreprise',avis:'checkAvis'};
   var activeSections=sectionIds.filter(function(id){
@@ -3035,6 +3049,7 @@ function renderSection(sec){
   else if(sec==='preconisations')rPreconisations();
   else if(sec==='synthese')rSynthese();
   else if(sec==='pagegarde')rPageGarde();
+  else if(sec==='sommaire')rPageGarde();
   else if(sec==='mentions')rMentions();
   else if(sec==='avis')rAvis();
 }
