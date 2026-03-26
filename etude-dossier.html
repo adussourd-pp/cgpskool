@@ -234,6 +234,7 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .step-btn.done{color:var(--green)}
 .step-dot{width:7px;height:7px;border-radius:50%;background:var(--bord);flex-shrink:0;transition:all 0.2s}
 .step-btn.active .step-dot{background:var(--orange)}
+.step-btn.pending .step-dot{background:var(--orange)}
 .step-btn.done .step-dot{background:var(--green)}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
 .client-mini{background:rgba(0,0,0,0.07);border-radius:8px;padding:12px;margin-top:auto}
@@ -1987,7 +1988,11 @@ let pieInst=null, solCount=0, steps=[];
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  NAVIGATION                                                    ║
 // ╚══════════════════════════════════════════════════════════════════╝
+var currentSection='import';
 function goTo(sec){
+  // Valider la section qu'on quitte (passe le dot de orange à vert)
+  if(currentSection&&currentSection!=='import'&&validatedSections!==undefined)validateSection(currentSection);
+  currentSection=sec;
   document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
   var secEl=document.getElementById('sec-'+sec);
@@ -4597,7 +4602,22 @@ function toggleTransmission(checked){
     if(secTrans&&secTrans.classList.contains('active'))goTo('retraite');
   }
 }
-function markDone(){document.querySelectorAll('.step-btn').forEach(function(b){if(b.dataset.sec!=='import')b.classList.add('done');});}
+// Après import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
+var validatedSections={};
+function markDone(){
+  // Après import, toutes les sections sont "pending" (orange)
+  document.querySelectorAll('.step-btn').forEach(function(b){
+    if(b.dataset.sec!=='import'){b.classList.add('pending');b.classList.remove('done');}
+  });
+  // Import est toujours done
+  var importBtn=document.querySelector('[data-sec="import"]');
+  if(importBtn){importBtn.classList.add('done');importBtn.classList.remove('pending');}
+}
+function validateSection(sec){
+  validatedSections[sec]=true;
+  var btn=document.querySelector('[data-sec="'+sec+'"]');
+  if(btn){btn.classList.remove('pending');btn.classList.add('done');}
+}
 function addObj(){
   const c=document.getElementById('objList');const n=c.querySelectorAll('.fg').length+1;
   const d=document.createElement('div');d.className='fg';
