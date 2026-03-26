@@ -3429,6 +3429,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         +'<div class="fiscal-row"><span class="fr-l">Espérance de vie</span><span class="fr-v">'+espVie+' mois</span></div>'
         +'<div class="fiscal-row" style="background:'+bc+';border-radius:6px;padding:6px 10px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact retraite total</span><span class="fr-v" style="color:'+fc+';font-weight:700">'+(impactTotal<0?'+ '+fmt(Math.abs(impactTotal)):'- '+fmt(Math.abs(impactTotal)))+' €</span></div>'
         +'</div>';});
+  cardsHtml+='<div class="alert warn" style="margin-top:12px"><span>⚠️</span><div><strong>Hypothèse : tous les trimestres requis sont validés.</strong> Les taux de remplacement ci-dessus supposent une carrière complète. Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s\'applique : <strong>pension = pension estimée × (trimestres cotisés / trimestres requis)</strong>.</div></div>';
   var rc=document.getElementById('retraiteCards');if(rc)rc.innerHTML=cardsHtml;
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
