@@ -426,6 +426,9 @@ select.span2{grid-column:span 2}
   .pdf-print-footer .pf-center{font-style:italic;color:#bbb}
   .pdf-conseiller-footer{display:none!important}
   .garde-footer-mask{display:block!important;position:fixed;bottom:0;left:0;right:0;height:24pt;background:#fff;z-index:999}
+  /* ── PROJECTION : masquée par défaut en print sauf si switch ON ── */
+  #projFiscCard{display:none!important}
+  #projFiscCard.proj-print-visible{display:block!important}
   /* ── FORMAT A4 ── */
   @page{size:A4 portrait;margin:1.5cm 1.5cm 1.5cm 1.5cm}
 }
@@ -867,8 +870,14 @@ select.span2{grid-column:span 2}
         <span class="fr-v" style="color:var(--ambre-d);font-size:16px" id="fiTotal">&#8212;</span>
       </div>
     </div>
-    <div class="card" style="margin-bottom:0;background:#FAFFFE;border-color:rgba(45,122,91,0.2)">
-      <div class="card-title"><span class="dot" style="background:var(--green)"></span>Projection</div>
+    <div class="card" id="projFiscCard" style="margin-bottom:0;background:#FAFFFE;border-color:rgba(45,122,91,0.2)">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span><span class="dot" style="background:var(--green)"></span>Projection</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;color:var(--gris);font-weight:400" id="projFiscPDFLabel">Masqu&#233; du PDF</span>
+          <label class="cz-switch"><input type="checkbox" id="projFiscPrint" onchange="var c=document.getElementById('projFiscCard');var l=document.getElementById('projFiscPDFLabel');if(c)c.classList.toggle('proj-print-visible',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
+        </div>
+      </div>
       <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Autres revenus</span><span class="fr-v"><input class="fi" type="number" id="projAutres" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
@@ -5743,9 +5752,9 @@ function renderFichesClient(){
         }
       }catch(e){}
 
-      // Note client par produit (chercher sur tous les sols du groupe)
+      // Note client par produit (chercher sur TOUS les sols globaux du même produit)
       var noteT3='';var noteOn3=false;
-      pg.sols.forEach(function(ss){if(ss._noteText)noteT3=ss._noteText;if(ss._noteOn)noteOn3=true;});
+      solsSelectionnees.forEach(function(ss){if(ss.produit===pg.produit){if(ss._noteText)noteT3=ss._noteText;if(ss._noteOn)noteOn3=true;}});
       if(noteOn3&&noteT3.trim()){
         html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05);background:#fdf8f0;border-left:3px solid var(--orange)">';
         html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:4px">Note du conseiller</div>';
