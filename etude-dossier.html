@@ -4512,22 +4512,31 @@ function renderSteps(){
     container.innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic;padding:8px 0">Aucune étape — ajoutez-en ci-dessous.</div>';
     return;
   }
-  // Feuille de route verticale
+  // Feuille de route verticale — 3 états : fait (vert), planifié (jaune), en attente (orange)
   container.innerHTML=steps.map(function(s,i){
-    var dotColor=s.done?'var(--green)':'var(--orange)';
-    var bg=s.done?'var(--green-l)':'#fff';
-    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bord)">'
-      +'<div onclick="toggleStep('+i+')" style="cursor:pointer;margin-top:4px;width:14px;height:14px;border-radius:50%;background:'+dotColor+';flex-shrink:0" title="Cliquer pour valider"></div>'
+    var status, dotColor, statusBg, statusColor, statusIcon;
+    if(s.done){
+      status='Fait'; dotColor='#2E7D32'; statusBg='#E8F5E9'; statusColor='#2E7D32'; statusIcon='✓';
+    } else if(s.date){
+      status='Planifié'; dotColor='#F9A825'; statusBg='#FFF9C4'; statusColor='#F57F17'; statusIcon='◎';
+    } else {
+      status='À venir'; dotColor='#E65100'; statusBg='#FFF3E0'; statusColor='#E65100'; statusIcon='○';
+    }
+    var borderLeft=s.done?'3px solid #2E7D32':s.date?'3px solid #F9A825':'3px solid #E0E0E0';
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin-bottom:6px;border-left:'+borderLeft+';background:'+(s.done?'#FAFFF9':'#fff')+';border-radius:0 8px 8px 0;transition:all 0.2s">'
+      +'<div onclick="toggleStep('+i+')" style="cursor:pointer;margin-top:2px;width:18px;height:18px;border-radius:50%;background:'+dotColor+';flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700" title="Cliquer pour changer le statut">'+statusIcon+'</div>'
       +'<div style="flex:1">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'
-      +'<div><span style="font-size:10px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:0.1em">Étape '+(i+1)+'</span>'
-      +'<div style="font-size:13px;font-weight:600;color:var(--noir);margin-top:2px">'+s.label+'</div>'
-      +(s.sub?'<div style="font-size:11px;color:var(--gris);margin-top:2px">'+s.sub+'</div>':'')
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+      +'<div style="flex:1"><span style="font-size:9px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:0.12em">Étape '+(i+1)+'</span>'
+      +'<div style="font-size:13px;font-weight:600;color:var(--noir);margin-top:3px">'+s.label+'</div>'
+      +(s.sub?'<div style="font-size:11px;color:var(--gris);margin-top:3px;line-height:1.4">'+s.sub+'</div>':'')
       +'</div>'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<input type="date" value="'+(s.date||'')+'" style="font-size:11px;border:1px solid var(--bord);border-radius:4px;padding:3px 6px;color:var(--gris-f);font-family:var(--sans)" onchange="steps['+i+'].date=this.value" title="Date prévue">'
-      +'<span style="font-size:11px;font-weight:600;color:'+(s.done?'var(--green)':'var(--orange)')+'">'+(s.done?'✓ Fait':'En attente')+'</span>'
-      +'<button onclick="removeStep('+i+')" style="background:none;border:none;font-size:14px;color:var(--gris);cursor:pointer;padding:2px 5px" title="Supprimer">×</button>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<input type="date" value="'+(s.date||'')+'" style="font-size:10px;border:1px solid var(--bord);border-radius:4px;padding:3px 6px;color:var(--gris-f);font-family:var(--sans);width:120px" onchange="steps['+i+'].date=this.value;renderSteps()" title="Date prévue">'
+      +'<button onclick="removeStep('+i+')" style="background:none;border:none;font-size:14px;color:var(--gris);cursor:pointer;padding:0 3px;line-height:1" title="Supprimer">×</button>'
+      +'</div>'
+      +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+statusBg+';color:'+statusColor+'">'+status+'</span>'
       +'</div>'
       +'</div>'
       +'</div>'
