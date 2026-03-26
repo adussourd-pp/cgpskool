@@ -3297,56 +3297,39 @@ function rSituation(){
     enfDisplay=ED.nbEnfants+' enfant(s)';
   }
   var sit='';
+  var sitLabel=ED.sitmat||'';
+  if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
+
+  function personCard(label,name,age,profession,revenus){
+    var c='<div class="card" style="margin-bottom:0">';
+    c+='<div class="card-title"><span class="dot"></span>'+label+'</div>';
+    c+='<div class="fiscal-row"><span class="fr-l">Nom</span><span class="fr-v" style="font-weight:700">'+name+(age?' \u2014 '+age+' ans':'')+'</span></div>';
+    c+='<div class="fiscal-row"><span class="fr-l">Profession</span><span class="fr-v">'+profession+'</span></div>';
+    c+='<div class="fiscal-row"><span class="fr-l">Revenus annuels</span><span class="fr-v" style="font-weight:700">'+fmt(revenus)+' \u20ac</span></div>';
+    if(ED.logement)c+='<div class="fiscal-row"><span class="fr-l">Logement</span><span class="fr-v">'+ED.logement+'</span></div>';
+    if(ED.adresse)c+='<div class="fiscal-row"><span class="fr-l">Adresse</span><span class="fr-v">'+ED.adresse+'</span></div>';
+    c+='</div>';
+    return c;
+  }
+
   if(isCoupleSit){
     var n2=`${ED.c2.civ||''} ${ED.c2.prenom||''} ${ED.c2.nom||''}`.trim();
     var a2=ageFrom(ED.c2.dob);
     sit+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">';
-    // Col C1
-    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
-    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Déclarant 1</div>';
-    sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
-    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
-    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' €/an</span>';
-    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
-    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
-    sit+='</div>';
-    // Col C2
-    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px">';
-    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Déclarant 2</div>';
-    sit+='<strong>'+n2+'</strong>'+(a2?' — '+a2+' ans':'')+'<br>';
-    sit+=(ED.c2.profession||ED.c2.sitpro||'—')+'<br>';
-    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal2||ED.revenus.c2||0)+' €/an</span>';
-    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
-    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
-    sit+='</div>';
-    sit+='</div>';
-    // Commun
-    sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
-    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    var sitLabel=ED.sitmat||'';
-    if(ED.convention&&sitLabel)sitLabel+=' \u2014 '+ED.convention;
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabel+'</strong></div>';
-    sit+='</div>';
-    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
+    sit+=personCard('D\u00e9clarant 1',n1,a1,ED.c1.profession||ED.c1.sitpro||'\u2014',ED.revenus.sal1||ED.revenus.c1||0);
+    sit+=personCard('D\u00e9clarant 2',n2,a2,ED.c2.profession||ED.c2.sitpro||'\u2014',ED.revenus.sal2||ED.revenus.c2||0);
     sit+='</div>';
   } else {
-    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px;margin-bottom:12px">';
-    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Declarant</div>';
-    sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
-    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
-    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' &euro;/an</span>';
-    if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
-    if(ED.adresse) sit+='<br><span style="font-size:11px;color:var(--gris)">&#128205; '+ED.adresse+'</span>';
-    sit+='</div>';
-    sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
-    sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    var sitLabelS=ED.sitmat||'';
-    if(ED.convention&&sitLabelS)sitLabelS+=' \u2014 '+ED.convention;
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+sitLabelS+'</strong></div>';
-    sit+='</div>';
-    if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
-    sit+='</div>';
+    sit+=personCard('D\u00e9clarant',n1,a1,ED.c1.profession||ED.c1.sitpro||'\u2014',ED.revenus.sal1||ED.revenus.c1||0);
+    sit+='<div style="height:12px"></div>';
   }
+
+  // Situation familiale
+  sit+='<div class="card">';
+  sit+='<div class="card-title"><span class="dot"></span>Situation familiale</div>';
+  sit+='<div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v" style="font-weight:700">'+sitLabel+'</span></div>';
+  if(enfDisplay)sit+='<div class="fiscal-row"><span class="fr-l">Enfants</span><span class="fr-v">'+enfDisplay+'</span></div>';
+  sit+='</div>';
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple \u2014 Communaut\u00e9':'Couple \u2014 S\u00e9paration de biens';
 
