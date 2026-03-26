@@ -544,41 +544,48 @@ function recalc() {
   // ── Affichage ──
   hide('emptyPanel'); show('results');
 
-  // Qualifications & Titres
-  var qualifs = [
-    { lbl:'Consultant', tpc:'5%', seuil:'1ère habilitation', annee:-1, c:'var(--rule-l)' },
-    { lbl:'Manager', tpc:'6%', seuil:'VA orga 50k€', annee:-1, c:'#181614' },
-    { lbl:'Manager Planète', tpc:'6,5%', seuil:'1 branche active', annee:-1, c:'#6366f1' },
-    { lbl:'Manager Étoile', tpc:'7%', seuil:'2 branches actives', annee:-1, c:'#2563eb' },
-    { lbl:'Manager Constellation', tpc:'7,5%', seuil:'3 branches actives', annee:-1, c:'#059669' },
-    { lbl:'Manager Galaxie', tpc:'8%', seuil:'4 branches actives', annee:-1, c:'var(--orange)' },
-  ];
-  // Marquer les qualifs atteintes (an0 réel compte comme "Actuel")
-  rows.forEach(function(r) {
-    var qmap = [
-      {k:'Consultant',q:0},{k:'Manager',q:1},{k:'Manager Planète',q:2},
-      {k:'Manager Étoile',q:3},{k:'Manager Constellation',q:4},{k:'Manager Galaxie',q:5}
-    ];
-    qmap.forEach(function(m) {
-      if(r.qualif === m.k && qualifs[m.q].annee < 0) qualifs[m.q].annee = r.an;
-    });
-  });
-  // Si on démarre de Consultant (démarrage pur), marquer an0
-  if(!hasExistingActivity) qualifs[0].annee = 0;
+  // ── Cards qualifications & titres : dynamiques depuis les rows ──
 
-  // Titres — prendre en compte le titre saisi en An0
-  var titresData = [
-    { lbl:'Senior', seuil:'VA perso > 500k€/an', prime:'+1%', desc:'Prime Qualité +1%', annee:-1, c:'#d97706' },
-    { lbl:'Major',  seuil:'VA perso > 1 M€/an',  prime:'+1%', desc:'Prime Qualité +1%', annee:-1, c:'#7c3aed' },
-    { lbl:'Expert', seuil:'VA perso > 1,5 M€/an',prime:'+2%', desc:'Prime Qualité +2% (max)', annee:-1, c:'#dc2626' },
+  // Trouver la première année de chaque qualification et titre
+  var qualifs = [
+    { lbl:'Consultant',           tpc:'5%',   c:'var(--rule-l)', annee:-1 },
+    { lbl:'Manager',              tpc:'6%',   c:'#181614',       annee:-1 },
+    { lbl:'Manager Planète',      tpc:'6,5%', c:'#6366f1',       annee:-1 },
+    { lbl:'Manager Étoile',       tpc:'7%',   c:'#2563eb',       annee:-1 },
+    { lbl:'Manager Constellation',tpc:'7,5%', c:'#059669',       annee:-1 },
+    { lbl:'Manager Galaxie',      tpc:'8%',   c:'var(--orange)', annee:-1 },
   ];
-  // An0 avec titre saisi → marquer comme annee 0
-  if(hasExistingActivity && titreActuel === 'Senior') titresData[0].annee = 0;
-  if(hasExistingActivity && titreActuel === 'Major')  titresData[0].annee = 0, titresData[1].annee = 0;
-  if(hasExistingActivity && titreActuel === 'Expert') titresData[0].annee = 0, titresData[1].annee = 0, titresData[2].annee = 0;
-  // Années projetées depuis an1
+  var titresData = [
+    { lbl:'Senior', prime:'+1%', seuil:'VA > 500k€/an', c:'#d97706', annee:-1 },
+    { lbl:'Major',  prime:'+1%', seuil:'VA > 1 M€/an',  c:'#7c3aed', annee:-1 },
+    { lbl:'Expert', prime:'+2%', seuil:'VA > 1,5 M€/an',c:'#dc2626', annee:-1 },
+  ];
+
+  // An0 existant : initialiser avec la qualification/titre saisis
+  if(hasExistingActivity) {
+    var qmap0 = {consultant:0, manager:1, planete:2, etoile:3, constellation:4, galaxie:5};
+    var qi = qmap0[qualifActuelle] || 0;
+    qualifs[qi].annee = 0;
+    // Toutes les qualifs inférieures aussi (on les a forcément atteintes)
+    for(var i=0;i<qi;i++) qualifs[i].annee = 0;
+    if(titreActuel === 'Senior')  { titresData[0].annee = 0; }
+    if(titreActuel === 'Major')   { titresData[0].annee = 0; titresData[1].annee = 0; }
+    if(titreActuel === 'Expert')  { titresData[0].annee = 0; titresData[1].annee = 0; titresData[2].annee = 0; }
+  } else {
+    qualifs[0].annee = 0; // Consultant toujours en an0 si démarrage pur
+  }
   rows.forEach(function(r) {
-    if(r.an === 0) return; // déjà traité ci-dessus
+    if(r.an === 0 && hasExistingActivity) return;
+    // Qualifications
+    var qmap = [{k:'Consultant',q:0},{k:'Manager',q:1},{k:'Manager Planète',q:2},
+                {k:'Manager Étoile',q:3},{k:'Manager Constellation',q:4},{k:'Manager Galaxie',q:5}];
+    qmap.forEach(function(m) {
+      if(r.qualif === m.k && qualifs[m.q].annee < 0) {
+        // Marquer aussi toutes les qualifs intermédiaires
+        for(var ii=0;ii<=m.q;ii++) if(qualifs[ii].annee<0) qualifs[ii].annee = r.an;
+      }
+    });
+    // Titres
     if(r.titre === 'Senior' && titresData[0].annee < 0) titresData[0].annee = r.an;
     if(r.titre === 'Major'  && titresData[1].annee < 0) titresData[1].annee = r.an;
     if(r.titre === 'Expert' && titresData[2].annee < 0) titresData[2].annee = r.an;
@@ -590,27 +597,63 @@ function recalc() {
     return '<span class="qual-badge oui">An '+annee+'</span>';
   }
 
+  // Trouver le TPC effectif max atteint et le titre max atteint
+  var lastRow = rows[rows.length - 1];
+  var tpcMaxEffectif = Math.max.apply(null, rows.map(function(r){ return r.tpcEffectif; }));
+  var titreMaxAtteint = rows.reduce(function(acc, r) {
+    if(r.titre === 'Expert') return 'Expert';
+    if(r.titre === 'Major' && acc !== 'Expert') return 'Major';
+    if(r.titre === 'Senior' && acc !== 'Expert' && acc !== 'Major') return 'Senior';
+    return acc;
+  }, '');
+
+  // ── Ligne de synthèse en haut ──
+  var synthHTML = '<div style="width:100%;background:var(--ink);padding:14px 16px;margin-bottom:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">'
+    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">TPC effectif max projeté</div>'
+    + '<div style="font-family:var(--serif);font-size:22px;color:var(--orange-lt)">'+(tpcMaxEffectif*100).toFixed(1)+'%</div>'
+    + '<div style="font-size:10px;color:var(--fog-2)">TPC + Prime Qualité</div></div>'
+    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Qualification terminale</div>'
+    + '<div style="font-family:var(--serif);font-size:18px;color:#fff">'+lastRow.qualif+'</div>'
+    + '<div style="font-size:10px;color:var(--fog-2)">An '+dureePlan+'</div></div>'
+    + (titreMaxAtteint ? '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Titre max atteint</div>'
+    + '<div style="font-family:var(--serif);font-size:18px;color:var(--orange-lt)">'+titreMaxAtteint+'</div>'
+    + '<div style="font-size:10px;color:var(--fog-2)">Prime Qualité '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div></div>' : '')
+    + '</div>';
+
   setHTML('qualRow',
-    '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule-l)">Qualifications PMR</div>'
+    synthHTML
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule-l)">Qualifications PMR — TPC par année</div>'
     + qualifs.map(function(q) {
       var reached = q.annee >= 0;
       var isCurrentAn0 = q.annee === 0 && hasExistingActivity;
+      // Trouver la row correspondant à l'année d'atteinte pour afficher le TPC réel
+      var matchRow = q.annee >= 0 ? rows.find(function(r){ return r.an === q.annee; }) : null;
+      var tpcReel = matchRow ? (matchRow.tpc*100).toFixed(1)+'%' : q.tpc;
+      var tpcEffLabel = matchRow && matchRow.tpcEffectif > matchRow.tpc
+        ? tpcReel + ' <span style="color:var(--green,#1a7a4a);font-size:10px">(+'+(matchRow.caPrimeQualite>0?(((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1)):'0')+'% PQ)</span>'
+        : tpcReel;
       return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?q.c:'var(--rule-l)')+'">'
         +'<div class="qual-lbl">'+q.lbl+'</div>'
-        +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'">'+q.tpc+'</div>'
-        +'<div class="qual-sub">'+q.seuil+'</div>'
+        +'<div class="qual-val" style="color:'+(reached?q.c:'var(--ink-30)')+'" title="TPC effectif cette année">'+tpcReel+'</div>'
+        +(matchRow && matchRow.tpcEffectif > matchRow.tpc
+          ? '<div class="qual-sub" style="color:#1a7a4a;font-size:9px">+ '+(((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1))+'% Prime Qualité → '+(matchRow.tpcEffectif*100).toFixed(1)+'% eff.</div>'
+          : '<div class="qual-sub">&nbsp;</div>')
+        +(reached && matchRow ? '<div class="qual-sub" style="font-size:9px;color:var(--ink-30)">Titre : '+(matchRow.titre||'—')+'</div>' : '')
         +badgeLabel(q.annee, isCurrentAn0)
         +'</div>';
     }).join('')
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité <span style="font-weight:400;font-style:italic">(enquête satisfaction positive requise)</span></div>'
+    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule-l)">Titres — Prime Qualité <span style="font-weight:400;font-style:italic">(enquête satisfaction + volume annuel)</span></div>'
     + titresData.map(function(t) {
       var reached = t.annee >= 0;
       var isCurrentAn0 = t.annee === 0 && hasExistingActivity;
-      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?t.c:'var(--rule-l)')+';min-width:140px">'
+      var matchRow = t.annee >= 0 ? rows.find(function(r){ return r.an === t.annee; }) : null;
+      var vaAn = matchRow ? '<div class="qual-sub" style="font-size:9px">VA perso : '+fmtE(matchRow.vaPerso)+'</div>' : '';
+      var tpcEff = matchRow ? '<div class="qual-sub" style="font-size:9px;color:#1a7a4a">TPC effectif : '+(matchRow.tpcEffectif*100).toFixed(1)+'%</div>' : '';
+      return '<div class="qual-card'+(reached?' reached':'')+'" style="--kc:'+(reached?t.c:'var(--rule-l)')+';min-width:150px">'
         +'<div class="qual-lbl">'+t.lbl+'</div>'
         +'<div class="qual-val" style="color:'+(reached?t.c:'var(--ink-30)')+'">'+t.prime+'</div>'
         +'<div class="qual-sub">'+t.seuil+'</div>'
-        +'<div class="qual-sub" style="font-size:9px;color:var(--ink-30);margin-top:1px">'+t.desc+'</div>'
+        +vaAn+tpcEff
         +badgeLabel(t.annee, isCurrentAn0)
         +'</div>';
     }).join('')
