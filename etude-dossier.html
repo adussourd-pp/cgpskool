@@ -265,7 +265,7 @@ to{opacity:1;transform:translateY(0)}}
 
 /* ── CARDS ── */
 /* ── KPI ROW ── */
-.kpi.featured .kpi.featured .kpi.green .kpi.red /* ── TABLES ── */
+/* ── TABLES ── */
 .tbl .cat-row td{font-weight:700;color:var(--noir);background:var(--gris-l);font-size:12px}
 .tbl td.bold{font-weight:600;color:var(--noir)}
 
@@ -459,23 +459,9 @@ select.span2{grid-column:span 2}
       <div class="cs-logo-mark"><span>C</span></div>
       <span class="cs-logo-name">CGP Skool</span>
     </a>
-    <div class="cs-nav-links">
-      <a class="cs-nav-a active" href="etude-dossier.html">Étude de Dossier</a>
-      <div class="nav-dropdown">
-        <button class="cs-nav-a nav-dropdown-btn">SCPI <span class="arr">▾</span></button>
-        <div class="nav-dropdown-menu">
-          <a class="nav-dropdown-item" href="scpi-simulator.html">📈 SCPI Cash</a>
-          <div class="nav-dropdown-sep"></div>
-          <a class="nav-dropdown-item" href="scpi-financement.html">🏦 Financement SCPI</a>
-        </div>
-      </div>
-      <a class="cs-nav-a" href="immo-simulator.html">Immobilier</a>
-    </div>
+    <div style="flex:1"></div>
     <div class="cs-nav-actions">
-      <button id="btnProfil" class="cs-btn-ghost missing" onclick="openProfil()">
-        ⚙ <span id="profilBadgeLabel">Mon profil</span>
-      </button>
-      <button class="cs-btn-primary" onclick="window.print()">⬇ PDF</button>
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
     </div>
   </div>
 </nav>
@@ -2319,32 +2305,52 @@ function parseTextRI(txt){
     var revSection  = (s04.match(/(?:^|\n)REVENUS\s*\n([\s\S]*?)(?=\nCHARGES\s*\n|TOTAL DES REVENUS|$)/i)||['',''])[1];
     var revRows = parsePipeTable(revSection);
     var _sal1=0, _sal2=0, _fonc=0;
+    var vals; // helper for max(vals)
+    function max(arr){return Math.max.apply(null,arr.length?arr:[0]);}
     revRows.forEach(function(cols){
       var label = cols[0].toLowerCase();
       if(/désignation|designation/i.test(label)) return;
       var v1=pEur(cols[1]||''), v2=isCouple?pEur(cols[2]||''):0;
       var total=pEur(cols[cols.length-1]||'')||v1;
-      if(/salaire|salaires|bic|bnc|ba\b|auto.entr/i.test(label)){
+      vals=cols.slice(1).map(pEur).filter(function(v){return v>0;});
+      // R16 : distinction specific vs category pour salaires
+      if(/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label)){
+        ED.revenus._salSpecific = (ED.revenus._salSpecific||0) + v1;
         _sal1+=v1; if(isCouple)_sal2+=v2;
+      } else if(/revenus d.activit/i.test(label)){
+        ED.revenus._salCategory = (ED.revenus._salCategory||0) + v1;
+        if(!_sal1){_sal1+=v1; if(isCouple)_sal2+=v2;}
       }
-      if(/foncier|location.meublée|location.meublee/i.test(label)){
+      // R10/R13 : distinction specific vs category pour fonciers
+      if(/revenus fonciers|location.meuble/i.test(label) && !/immobilier.*foncier|foncier.*immobilier/i.test(label)){
+        ED.revenus._foncSpecific = (ED.revenus._foncSpecific||0) + max(vals);
         _fonc+=total;
+      } else if(/revenus immobiliers/i.test(label) && !/immobilier.*foncier/i.test(label)){
+        ED.revenus._foncCategory = (ED.revenus._foncCategory||0) + max(vals);
+        if(!_fonc) _fonc+=total;
       }
       if(/^total$/i.test(label) && !_sal1){
         _sal1=v1; if(isCouple)_sal2=v2;
       }
     });
 
+    // Finalize R16 : prefer specific over category for salaries
+    ED.revenus.sal1 = ED.revenus._salSpecific || ED.revenus._salCategory || _sal1 || 0;
+    // Finalize R10/R13 : prefer specific over category for fonciers
+    ED.revenus.fonc = ED.revenus._foncSpecific || ED.revenus._foncCategory || _fonc || 0;
+
     // Fallback : TOTAL DES REVENUS
     var totalRevMatch = full.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
-    if(!_sal1 && totalRevMatch) {
+    if(!ED.revenus.sal1 && totalRevMatch) {
       var totalRev = pEur(totalRevMatch[1]);
       _sal1 = isCouple ? totalRev/2 : totalRev;
       if(isCouple) _sal2 = totalRev/2;
+      ED.revenus.sal1=_sal1;
     }
-    ED.revenus.sal1=_sal1; ED.revenus.sal2=_sal2;
-    ED.revenus.c1=_sal1;   ED.revenus.c2=_sal2;
-    ED.revenus.fonc=_fonc; ED.revenus.compl=_fonc;
+    if(!ED.revenus.sal1) ED.revenus.sal1=_sal1;
+    ED.revenus.sal2=_sal2;
+    ED.revenus.c1=ED.revenus.sal1;   ED.revenus.c2=_sal2;
+    ED.revenus.compl=ED.revenus.fonc;
 
     // Charges crédit (sum des échéances passifs)
     var totalEch = ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0);
@@ -3006,7 +3012,7 @@ function rSituation(){
   }
   sit+=`<br><br>${ED.nbEnfants} enfant(s) · ${ED.logement}`;
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
-  document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparatiste';
+  document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
 
   const objH=ED.objectifs.length
     ? ED.objectifs.map((o,i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span></div>`).join('')
@@ -3311,10 +3317,8 @@ function rRetraite(){
     retParamsEl.innerHTML=parHtml;
   }
 
-    var AGES=[65,60,55,50,45,40,35,30];
+    var AGES=[65,60,55,50,45,40,35,30,0];
   var COLORS=['#2B5EA7','#C0392B','#5D9E4B','#7B4FA6','#1A9E8F','#E8842A'];
-  var CSP_MAP={'Fonctionnaire':'Fonctionnaire','Salarie non-cadre':'Sal. non cadre','Salarie cadre':'Sal. cadre','Independant / TNS':'TNS lib.','Retraite':'Sal. non cadre'};
-  CSP_MAP["Chef d'entreprise"]='TNS artisan';
   var rawCSP=ED.c1.sitpro||ED.c1.profession||'';
   var cspKey=CSP_MAP[rawCSP]||'Sal. cadre';
   var age1=ageFrom(ED.c1.dob)||40;
@@ -3682,7 +3686,7 @@ function renderSolsRetenues(){
     html+='<div style="display:flex;align-items:center;gap:8px">';
     html+='<div style="display:flex;align-items:center;gap:4px">';
     html+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Étape</span>';
-    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
+    html+='<input type="number" min="1" max="20" value="'+(sol.etape||i+1)+'" style="width:46px;padding:3px 6px;border:1.5px solid var(--ambre-m);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif;text-align:center;font-weight:700;color:var(--ambre-d);background:var(--ambre-l)" onchange="updateSol('+i+',\'etape\',+this.value)" title="Numéro d\'étape de cette solution dans la stratégie">';
     html+='</div>';
     html+='<div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir)">'+(cp.icon||'')+' '+sol.produit+'</div>';
     html+='</div>';
@@ -3716,7 +3720,7 @@ function renderSolsRetenues(){
       html+='</label></div>';
     }
     html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:2px">';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif">';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pour qui</label><select onchange="updateSol('+i+',\'titulaire\',this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif">';
     var titOptions=['C1','C2','Commun'];
     var titLabels={};
     titLabels['C1']=nomC(1);
@@ -3724,9 +3728,9 @@ function renderSolsRetenues(){
     titLabels['Commun']='Commun';
     titOptions.forEach(function(t){html+='<option value="'+t+'"'+(sol.titulaire===t?' selected':'')+'>'+titLabels[t]+'</option>';});
     html+='</select></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">VP mensuel</label><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+i+',\'vp\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
-    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Horizon (ans)</label><input type="number" value="'+(parseInt(sol.horizon)||10)+'" title="'+(sol.horizonLabel||'')+'" min="1" max="40" oninput="updateSol('+i+',\'horizon\',this.value+\' ans\')" onchange="updateSol('+i+',\'horizon\',this.value+\' ans\')" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:\'Inter\',system-ui,sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Versement initial</label><input type="number" value="'+sol.vi+'" min="0" onchange="updateSol('+i+',\'vi\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">VP mensuel</label><input type="number" value="'+sol.vp+'" min="0" onchange="updateSol('+i+',\'vp\',+this.value)" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
+    html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Horizon (ans)</label><input type="number" value="'+(parseInt(sol.horizon)||10)+'" title="'+(sol.horizonLabel||'')+'" min="1" max="40" oninput="updateSol('+i+',\'horizon\',this.value+\' ans\')" onchange="updateSol('+i+',\'horizon\',this.value+\' ans\')" style="width:100%;padding:6px;border:1.5px solid var(--bord);border-radius:6px;font-size:12px;font-family:Inter,system-ui,sans-serif"></div>';
     html+='</div></div>';
   });
   el.innerHTML=html;
@@ -3932,18 +3936,6 @@ function rSynthese(){
   var irNet=(ED.fiscal.irnet||0);
   var ps=(ED.fiscal.ps||0);
   var impot=irNet+ps;
-  // Lire les sol-cards manuelles du panneau préconisations
-  var solCards=document.querySelectorAll('#solContainer .sol-card');
-  var totalVI=0,totalVP=0,totalCap=0;
-  solCards.forEach(function(card){
-    var inputs=card.querySelectorAll('input[type=number]');
-    if(inputs[0])totalVI+=parseFloat(inputs[0].value)||0;
-    if(inputs[1])totalVP+=parseFloat(inputs[1].value)||0;
-    // Estimation capital : VI + VP*12*10 ans (simplifiée)
-    var vi=parseFloat((inputs[0]||{}).value)||0;
-    var vp=parseFloat((inputs[1]||{}).value)||0;
-    totalCap+=Math.round(vi*Math.pow(1.025,10)+vp*12*((Math.pow(1.025,10)-1)/0.025));
-  });
   // Compat avec l'ancien code (sols pour les graphiques)
   var sols=solsSelectionnees||[];
   var sorted=sols.slice().sort(function(a,b){return (a.etape||99)-(b.etape||99);});
@@ -4411,7 +4403,7 @@ function updateMiniFromED(){
     var cme=document.getElementById('clientMini');if(cme)cme.style.display='block';
     var cmn2=document.getElementById('cmName');if(cmn2)cmn2.textContent=(ED.c1.prenom+' '+ED.c1.nom).trim();
     var cmd2=document.getElementById('cmDetail');if(cmd2)cmd2.textContent=
-      `${ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparatiste'} · ${ED.sitmat||''}`;
+      `${ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens'} · ${ED.sitmat||''}`;
   }
 }
 function toggleTransmission(checked){
@@ -4462,7 +4454,7 @@ function addPassif(){
 // ║  UTILITAIRES                                                   ║
 // ╚══════════════════════════════════════════════════════════════════╝
 // exportPDF definie dans le bloc Phase 7 (canvas→PNG + en-tête)
-function resetAll(){if(confirm('Réinitialiser toute l\'étude ?'))location.reload()}
+function resetAll(){location.reload()}
 function showNotif(m){const e=document.getElementById('notif');if(!e)return;e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3500)}
 
 // Placeholder sur contenteditable
@@ -4664,7 +4656,6 @@ function handleRiFile(file) {
         if (txt && txt.length > 100) {
           document.getElementById('riPasteZone').value = txt;
           riPasteBuffer = txt;
-          if (btn) btn.disabled = false;
           if (status) status.innerHTML = '<span style="color:var(--green)">✅ Texte extrait du PDF (' + txt.split('\n').length + ' lignes)</span>';
           onRiPaste(txt);
         }
