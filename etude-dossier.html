@@ -1059,16 +1059,6 @@ select.span2{grid-column:span 2}
       <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 €</div>
     </div>
     <div id="precoEpargneTable" style="margin-bottom:14px"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;background:var(--gris-l);border-radius:10px">
-      <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à conserver</div>
-        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 €</div>
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Épargne à réorienter</div>
-        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 €</div>
-      </div>
-    </div>
   </div>
 
   <!-- ── FICHES CLIENT (générées depuis Copernic) ── -->
@@ -4289,24 +4279,17 @@ function rPreconisations(){
     h+='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">';
     h+='<th style="text-align:left;padding:6px 8px">Actif</th>';
     h+='<th style="text-align:right;padding:6px 8px">\u20ac actuel</th>';
-    h+='<th style="text-align:center;padding:6px 8px">Conserver</th>';
-    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">\u20ac conseill\u00e9</th>';
     h+='</tr></thead><tbody>';
 
     horizons.forEach(function(hz){
       var items=groups[hz.key];
       if(!items.length)return;
       var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
-      h+='<tr style="background:'+hz.bg+'"><td colspan="4" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' \u20ac</td></tr>';
-      items.forEach(function(a,i){
-        var uid=hz.key+'_'+i;
-        var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
-        var isKept=conseille>0;
-        h+='<tr style="border-bottom:1px solid var(--bord);opacity:'+(isKept?'1':'0.5')+'" id="row_'+uid+'">';
+      h+='<tr style="background:'+hz.bg+'"><td colspan="2" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' \u20ac</td></tr>';
+      items.forEach(function(a){
+        h+='<tr style="border-bottom:1px solid var(--bord)">';
         h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
-        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' \u20ac</td>';
-        h+='<td style="padding:5px 8px;text-align:center"><label style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer"><input type="checkbox" '+(isKept?'checked':'')+' onchange="togglePrecoSwitch(\''+uid+'\','+a.montant+',this.checked)" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;border-radius:9px;background:'+(isKept?'#2D7A5B':'#ccc')+';transition:0.2s"></span><span style="position:absolute;top:2px;left:'+(isKept?'18':'2')+'px;width:14px;height:14px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span></label></td>';
-        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:80px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"> \u20ac</td>';
+        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">'+fmt(a.montant)+' \u20ac</td>';
         h+='</tr>';
       });
     });
