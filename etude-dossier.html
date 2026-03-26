@@ -505,12 +505,30 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
+  <button class="step-btn" id="btnEntreprise" data-sec="entreprise"
+    onclick="if(document.getElementById('checkEntreprise').checked)goTo('entreprise')"
+    style="opacity:0.38;pointer-events:none;display:flex;justify-content:space-between;align-items:center">
+    <span style="display:flex;align-items:center;gap:8px"><span class="step-dot" id="dotEntreprise"></span>Entreprise</span>
+    <input type="checkbox" id="checkEntreprise"
+      onchange="toggleEntreprise(this.checked)"
+      onclick="event.stopPropagation()"
+      style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
+  </button>
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
   <div class="sidebar-lbl" style="margin-top:8px">PDF</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
-  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions &amp; Avis</button>
+  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions l\u00e9gales</button>
+  <button class="step-btn" id="btnAvis" data-sec="avis"
+    onclick="if(document.getElementById('checkAvis').checked)goTo('avis')"
+    style="opacity:0.38;pointer-events:none;display:flex;justify-content:space-between;align-items:center">
+    <span style="display:flex;align-items:center;gap:8px"><span class="step-dot" id="dotAvis"></span>Avis clients</span>
+    <input type="checkbox" id="checkAvis"
+      onchange="toggleAvis(this.checked)"
+      onclick="event.stopPropagation()"
+      style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
+  </button>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
@@ -868,6 +886,49 @@ select.span2{grid-column:span 2}
 </div><!-- /sec-transmission -->
 
 <!-- ════════════════════════════════════════
+     5b — ENTREPRISE (optionnel)
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-entreprise">
+  <div class="sec-header">
+    <div><div class="sec-tag">Section 05b — Optionnel</div><div class="sec-h1">Analyse Entreprise</div><div class="sec-sub">SCI, Holding, 150-0 B ter, FCPR remploi</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Solutions Entreprise disponibles</div>
+    <div id="entrepriseSolutions" style="font-size:13px;color:var(--gris-f);line-height:1.8">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Apport-cession 150-0 B ter</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Report d'imposition PV — reinvestissement 60% dans 2 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">FCPR/FPCI remploi</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Eligible remploi 150-0 B ter + exoneration PV apres 5 ans</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">Contrat de capitalisation PM</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Tresorerie d'entreprise optimisee, IS forfaitaire</div>
+        </div>
+        <div style="padding:12px;border:1.5px solid #7B5EA722;border-radius:8px;background:#7B5EA708">
+          <div style="font-weight:700;font-size:12px;color:#7B5EA7">SCI a l'IS</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">Amortissement, transmission via donation de parts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Note conseiller — Entreprise</div>
+    <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tresorerie PM, PEE..."></div>
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('transmission')">&#8592; Transmission</button>
+    <button class="btn btn-secondary" onclick="goTo('preconisations')">Pr\u00e9conisations &#8594;</button>
+  </div>
+</div><!-- /sec-entreprise -->
+
+<!-- ════════════════════════════════════════
      6 — PRÉCONISATIONS
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-preconisations">
@@ -1050,29 +1111,22 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-mentions">
   <div class="sec-header">
-    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions legales &amp; Avis clients</div><div class="sec-sub">Derniere page du PDF</div></div>
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions l\u00e9gales</div><div class="sec-sub">Incluses en derni\u00e8re page du PDF</div></div>
   </div>
 
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Mentions legales</div>
+    <div class="card-title"><span class="dot"></span>Mentions l\u00e9gales</div>
     <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
-    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
-      <em style="color:var(--gris)">Aucun avis charge — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> et entrez votre URL Trustpilot.</em>
+      <em style="color:var(--gris)">Aucune mention configur\u00e9e — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
     </div>
   </div>
 
   <div class="card" style="background:var(--gris-l);border-color:transparent">
     <div style="font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
-      Les simulations presentees dans ce document ne constituent en aucun cas une promesse de rendement.
-      Les performances passees ne prejugent pas des performances futures.
+      Les simulations pr\u00e9sent\u00e9es dans ce document ne constituent en aucun cas une promesse de rendement.
+      Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.
       Tout investissement comporte des risques, y compris de perte en capital.
-      Ce document est strictement confidentiel et destine uniquement a l'usage du client designe.
+      Ce document est strictement confidentiel et destin\u00e9 uniquement \u00e0 l'usage du client d\u00e9sign\u00e9.
     </div>
   </div>
 
@@ -1081,6 +1135,31 @@ select.span2{grid-column:span 2}
     <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
   </div>
 </div><!-- /sec-mentions -->
+
+<!-- ════════════════════════════════════════
+     10 — AVIS CLIENTS (optionnel)
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-avis">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF — Optionnel</div><div class="sec-h1">Avis clients</div><div class="sec-sub">Page Trustpilot incluse dans le PDF si activ\u00e9e</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
+    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucun avis — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour charger ou saisir des avis.</em>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
+    Cette page n'est incluse dans le PDF que si la case "Avis clients" est coch\u00e9e dans la navigation.
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('mentions')">&#8592; Mentions l\u00e9gales</button>
+    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
+  </div>
+</div><!-- /sec-avis -->
 
 </main>
 </div><!-- /app -->
@@ -2844,6 +2923,7 @@ function renderSection(sec){
   else if(sec==='synthese')rSynthese();
   else if(sec==='pagegarde')rPageGarde();
   else if(sec==='mentions')rMentions();
+  else if(sec==='avis')rMentions();
 }
 
 
@@ -5025,7 +5105,41 @@ function toggleTransmission(checked){
     if(secTrans&&secTrans.classList.contains('active'))goTo('retraite');
   }
 }
-// Après import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
+function toggleEntreprise(checked){
+  var btn=document.getElementById('btnEntreprise');
+  var dot=document.getElementById('dotEntreprise');
+  if(!btn)return;
+  if(checked){
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+    if(dot)dot.style.background='var(--ambre)';
+  } else {
+    btn.style.opacity='0.38';
+    btn.style.pointerEvents='none';
+    if(dot)dot.style.background='';
+    var sec=document.getElementById('sec-entreprise');
+    if(sec&&sec.classList.contains('active'))goTo('retraite');
+  }
+}
+
+function toggleAvis(checked){
+  var btn=document.getElementById('btnAvis');
+  var dot=document.getElementById('dotAvis');
+  if(!btn)return;
+  if(checked){
+    btn.style.opacity='1';
+    btn.style.pointerEvents='auto';
+    if(dot)dot.style.background='var(--ambre)';
+  } else {
+    btn.style.opacity='0.38';
+    btn.style.pointerEvents='none';
+    if(dot)dot.style.background='';
+    var secAvis=document.getElementById('sec-avis');
+    if(secAvis&&secAvis.classList.contains('active'))goTo('mentions');
+  }
+}
+
+// Apres import : dots en orange (pending). Le conseiller les passe en vert (done) en naviguant.
 var validatedSections={};
 function markDone(){
   // Après import, toutes les sections sont "pending" (orange)
