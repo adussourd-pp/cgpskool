@@ -232,10 +232,11 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .step-btn:hover{background:rgba(0,0,0,0.06)}
 .step-btn.active{background:var(--o-dim);color:var(--orange);font-weight:600}
 .step-btn.done{color:var(--noir)}
-.step-dot{width:7px;height:7px;border-radius:50%;background:var(--bord);flex-shrink:0;transition:all 0.2s}
-.step-btn.active .step-dot{background:var(--noir)}
-.step-btn.pending .step-dot{background:var(--gris)}
-.step-btn.done .step-dot{background:var(--noir)}
+.step-dot{width:10px;height:10px;border-radius:50%;background:#C0392B;border:2px solid #C0392B;flex-shrink:0;transition:all 0.2s;position:relative}
+.step-btn.active .step-dot{background:#D4622A;border-color:#D4622A;box-shadow:0 0 0 3px rgba(212,98,42,0.2)}
+.step-btn.pending .step-dot{background:#C0392B;border-color:#C0392B}
+.step-btn.done .step-dot{background:#2D7A5B;border-color:#2D7A5B}
+.step-btn.done .step-dot::after{content:'\2713';position:absolute;top:-2px;left:0.5px;font-size:7px;color:#fff;font-weight:700;line-height:10px}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
 .client-mini{background:rgba(0,0,0,0.07);border-radius:8px;padding:12px;margin-top:auto}
 .client-mini-name{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:2px}
@@ -304,10 +305,7 @@ select.span2{grid-column:span 2}
 .fr-l{font-size:13px;color:var(--gris-f);font-weight:300}
 .fr-v{font-size:13px;font-weight:600;color:var(--noir)}
 .tmi-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:700}
-.tmi-0{background:var(--green-l);color:var(--green)}
-.tmi-11{background:var(--blue-l);color:var(--blue)}
-.tmi-30{background:var(--o-dim);color:var(--orange)}
-.tmi-41,.tmi-45{background:var(--red-l);color:var(--red)}
+.tmi-0,.tmi-11,.tmi-30,.tmi-41,.tmi-45{background:#F2F1EE;color:#3A3A3A}
 
 /* ── PROGRESS ── */
 .prog-wrap{margin:10px 0}
@@ -729,7 +727,7 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 03</div><div class="sec-h1">Bilan Fiscal & Leviers</div></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+  <div style="margin-bottom:18px">
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Imposition</div>
       <div class="fiscal-row"><span class="fr-l">Année d'imposition</span><span class="fr-v ed" id="fiAnnee" contenteditable="true">—</span></div>
@@ -752,12 +750,11 @@ select.span2{grid-column:span 2}
         <span class="fr-v" style="color:var(--ambre-d);font-size:16px" id="fiTotal">—</span>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="card" style="margin-bottom:0">
-        <div class="card-title" style="margin-bottom:10px"><span class="dot"></span>Barème TMI 2025 (revenus 2024)</div>
-        <div id="baremeComplet" style="overflow-x:auto;font-size:11px"></div>
-      </div>
-    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title" style="margin-bottom:10px"><span class="dot"></span>Barème TMI 2025 (revenus 2024)</div>
+    <div id="baremeComplet" style="overflow-x:auto;font-size:11px"></div>
   </div>
 
   <div id="levierFis" style="margin-bottom:10px"></div>
@@ -4489,9 +4486,9 @@ function rSynthese(){
       data:{
         labels:labels,
         datasets:[
-          {label:'Pension seule',data:dataPension,backgroundColor:'rgba(192,57,43,0.7)',borderRadius:6},
-          {label:'Avec solutions',data:dataAvec,backgroundColor:'rgba(45,122,91,0.7)',borderRadius:6},
-          {label:'Objectif',data:dataObj,backgroundColor:'rgba(43,94,167,0.4)',borderRadius:6}
+          {label:'Pension seule',data:dataPension,backgroundColor:'#8B8B8B',borderRadius:6},
+          {label:'Avec solutions',data:dataAvec,backgroundColor:'#2D7A5B',borderRadius:6},
+          {label:'Objectif',data:dataObj,backgroundColor:'rgba(43,94,167,0.25)',borderColor:'#2B5EA7',borderWidth:1.5,borderRadius:6}
         ]
       },
       options:{
@@ -4803,6 +4800,89 @@ function loadColors(){
     applyColors();
   }
 }
+// ── Reset couleurs ──
+function resetColors(){
+  var c1=document.getElementById('pColor1');
+  var c2=document.getElementById('pColor2');
+  if(c1)c1.value='#D4622A';
+  if(c2)c2.value='#181614';
+  var st=document.getElementById('customColorStyle');
+  if(st)st.textContent='';
+  saveProfil();
+}
+
+// ── Trustpilot ──
+function fetchTrustpilotReviews(){
+  var urlEl=document.getElementById('pTrustpilot');
+  var preview=document.getElementById('trustpilotPreview');
+  if(!urlEl||!urlEl.value.trim()){if(preview)preview.innerHTML='<span style="color:var(--red)">Entrez une URL Trustpilot</span>';return;}
+  var url=urlEl.value.trim();
+  if(preview)preview.innerHTML='<span style="color:var(--gris)">Chargement...</span>';
+  // Utilise un proxy CORS pour scraper la page Trustpilot
+  var proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(url);
+  fetch(proxyUrl).then(function(r){return r.text();}).then(function(html){
+    var reviews=parseTrustpilotHTML(html);
+    if(reviews.length){
+      try{localStorage.setItem('cgpskool_trustpilot',JSON.stringify(reviews));}catch(e){}
+      showTrustpilotPreview(reviews);
+    } else {
+      if(preview)preview.innerHTML='<span style="color:var(--red)">Aucun avis trouve. Verifiez l\'URL.</span>';
+    }
+  }).catch(function(err){
+    if(preview)preview.innerHTML='<span style="color:var(--red)">Erreur de chargement : '+err.message+'</span>';
+  });
+}
+
+function parseTrustpilotHTML(html){
+  var reviews=[];
+  var parser=new DOMParser();
+  var doc=parser.parseFromString(html,'text/html');
+  // Extraire le score global
+  var scoreEl=doc.querySelector('[data-rating-typography]');
+  var globalScore=scoreEl?scoreEl.textContent.trim():'';
+  // Extraire les avis individuels
+  var cards=doc.querySelectorAll('[data-review-content],.review-card,article[data-service-review-card-paper]');
+  if(!cards.length) cards=doc.querySelectorAll('article');
+  cards.forEach(function(card,i){
+    if(i>=5)return; // Max 5 avis
+    var nameEl=card.querySelector('[data-consumer-name-typography],span[data-consumer-profile-link] span');
+    var textEl=card.querySelector('[data-service-review-text-typography],p[data-service-review-text-typography]');
+    var starsEl=card.querySelector('[data-service-review-rating] img,[data-rating]');
+    var stars=starsEl?(starsEl.getAttribute('data-rating')||starsEl.getAttribute('alt')||''):'';
+    if(nameEl||textEl){
+      reviews.push({
+        name:nameEl?nameEl.textContent.trim():'Anonyme',
+        text:textEl?textEl.textContent.trim().substring(0,200):'',
+        stars:stars,
+        score:globalScore
+      });
+    }
+  });
+  // Stocker le score global
+  if(globalScore&&reviews.length)reviews[0].globalScore=globalScore;
+  return reviews;
+}
+
+function showTrustpilotPreview(reviews){
+  var preview=document.getElementById('trustpilotPreview');
+  if(!preview)return;
+  var h='<div style="color:var(--green);font-weight:600;margin-bottom:4px">'+reviews.length+' avis charges</div>';
+  reviews.forEach(function(r){
+    h+='<div style="padding:4px 0;border-bottom:1px solid var(--bord)"><strong>'+r.name+'</strong>';
+    if(r.stars)h+=' — '+r.stars+'/5';
+    if(r.text)h+='<br><span style="color:var(--gris)">'+r.text.substring(0,80)+(r.text.length>80?'...':'')+'</span>';
+    h+='</div>';
+  });
+  preview.innerHTML=h;
+}
+
+function loadTrustpilotPreview(){
+  try{
+    var raw=localStorage.getItem('cgpskool_trustpilot');
+    if(raw){var reviews=JSON.parse(raw);showTrustpilotPreview(reviews);}
+  }catch(e){}
+}
+
 // ── Logo upload ──
 function handleLogoUpload(input){
   if(!input.files||!input.files[0])return;
@@ -4900,6 +4980,7 @@ var PROFIL_FIELDS = [
   {id:'pCP',       key:'cp',       label:'CP'},
   {id:'pVille',    key:'ville',    label:'Ville'},
   {id:'pMentions', key:'mentions', label:'Mentions'},
+  {id:'pTrustpilot', key:'trustpilot', label:'Trustpilot'},
   {id:'pColor1',   key:'color1',   label:'Couleur 1'},
   {id:'pColor2',   key:'color2',   label:'Couleur 2'},
 ];
@@ -5011,6 +5092,7 @@ function clearProfil() {
   updateProfilBadge(p);
   injectProfilIntoED(p);
   updatePdfFooter(p);
+  loadTrustpilotPreview();
 })();
 
 // Touche Echap ferme la modale
@@ -5280,8 +5362,30 @@ function updatePdfHeader() {
   // Page mentions legales
   var mentionsContent = document.getElementById('pdfMentionsContent');
   var mentionsFooter = document.getElementById('pdfMentionsFooter');
-  if (mentionsContent && p && p.mentions) {
-    mentionsContent.innerHTML = p.mentions.replace(/\n/g, '<br>');
+  if (mentionsContent) {
+    var mHtml = '';
+    if (p && p.mentions) mHtml += p.mentions.replace(/\n/g, '<br>');
+    // Trustpilot reviews
+    try {
+      var tpRaw = localStorage.getItem('cgpskool_trustpilot');
+      if (tpRaw) {
+        var tpReviews = JSON.parse(tpRaw);
+        if (tpReviews.length) {
+          mHtml += '<div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--bord)">';
+          mHtml += '<div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--noir)">Avis clients Trustpilot</div>';
+          if (p && p.trustpilot) mHtml += '<div style="font-size:9px;color:var(--gris);margin-bottom:8px">' + p.trustpilot + '</div>';
+          tpReviews.forEach(function(r) {
+            mHtml += '<div style="padding:6px 0;border-bottom:1px solid #eee">';
+            mHtml += '<strong>' + r.name + '</strong>';
+            if (r.stars) mHtml += ' — ' + r.stars + '/5';
+            if (r.text) mHtml += '<br><span style="color:var(--gris)">' + r.text + '</span>';
+            mHtml += '</div>';
+          });
+          mHtml += '</div>';
+        }
+      }
+    } catch(e) {}
+    mentionsContent.innerHTML = mHtml;
   }
   if (mentionsFooter && p && p.nom) {
     var foot = '<strong>' + ((p.prenom||'') + ' ' + (p.nom||'')).trim() + '</strong>';
@@ -5363,6 +5467,16 @@ window.addEventListener('afterprint', function() {
         <textarea id="pMentions" rows="4" placeholder="Inscrit à l'ORIAS sous le n°..." oninput="saveProfil()"></textarea>
       </div>
     </div>
+    <div class="profil-row full">
+      <div class="profil-fg">
+        <label>URL Trustpilot (avis clients — inclus dans le PDF)</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="url" id="pTrustpilot" placeholder="https://fr.trustpilot.com/review/monsite.fr" oninput="saveProfil()" style="flex:1">
+          <button onclick="fetchTrustpilotReviews()" style="padding:6px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--gris-f)">Charger avis</button>
+        </div>
+        <div id="trustpilotPreview" style="margin-top:6px;font-size:11px;color:var(--gris)"></div>
+      </div>
+    </div>
     <div class="profil-row">
       <div class="profil-fg">
         <label>Couleur principale</label>
@@ -5372,6 +5486,9 @@ window.addEventListener('afterprint', function() {
         <label>Couleur secondaire</label>
         <input type="color" id="pColor2" value="#181614" oninput="applyColors()" style="width:100%;height:36px;border:1px solid var(--bord);border-radius:6px;cursor:pointer">
       </div>
+    </div>
+    <div style="margin-bottom:6px">
+      <button onclick="resetColors()" style="padding:5px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris)">Reinitialiser les couleurs</button>
     </div>
     <div class="profil-row full">
       <div class="profil-fg">
