@@ -232,11 +232,10 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .step-btn:hover{background:rgba(0,0,0,0.06)}
 .step-btn.active{background:var(--o-dim);color:var(--orange);font-weight:600}
 .step-btn.done{color:var(--noir)}
-.step-dot{width:10px;height:10px;border-radius:50%;background:#C0392B;border:2px solid #C0392B;flex-shrink:0;transition:all 0.2s;position:relative}
-.step-btn.active .step-dot{background:#D4622A;border-color:#D4622A;box-shadow:0 0 0 3px rgba(212,98,42,0.2)}
-.step-btn.pending .step-dot{background:#C0392B;border-color:#C0392B}
-.step-btn.done .step-dot{background:#2D7A5B;border-color:#2D7A5B}
-.step-btn.done .step-dot::after{content:'\2713';position:absolute;top:-2px;left:0.5px;font-size:7px;color:#fff;font-weight:700;line-height:10px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bord);flex-shrink:0;transition:all 0.2s}
+.step-btn.active .step-dot{background:#D4622A;box-shadow:0 0 0 2px rgba(212,98,42,0.25)}
+.step-btn.pending .step-dot{background:#D4622A;opacity:0.5}
+.step-btn.done .step-dot{background:#2D7A5B}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
 .client-mini{background:rgba(0,0,0,0.07);border-radius:8px;padding:12px;margin-top:auto}
 .client-mini-name{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:2px}
@@ -287,13 +286,13 @@ to{opacity:1;transform:translateY(0)}}
 /* ── FORM ── */
 select.span2{grid-column:span 2}
 
-/* ── PYRAMID (forme trapeze empile) ── */
-.pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px}
-.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:relative;border:none;border-bottom:2px solid #fff}
-.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c);color:#fff;border-radius:8px 8px 0 0;width:55%}
-.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a);color:#fff;width:72%}
-.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7);color:#fff;width:88%}
-.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74);color:#fff;border-radius:0 0 8px 8px;width:100%}
+/* ── PYRAMID (forme trapeze bisautee 3D) ── */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:14px;padding:0 10px}
+.pyr-lv{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:relative;border:none;color:#fff}
+.pyr-lv.lt{background:linear-gradient(135deg,#C0392B,#e74c3c);width:40%;clip-path:polygon(8% 0%,92% 0%,100% 100%,0% 100%);margin-bottom:-1px}
+.pyr-lv.mt{background:linear-gradient(135deg,#D4622A,#e8834a);width:60%;clip-path:polygon(6% 0%,94% 0%,100% 100%,0% 100%);margin-bottom:-1px}
+.pyr-lv.ct{background:linear-gradient(135deg,#2B5EA7,#4a7ec7);width:80%;clip-path:polygon(5% 0%,95% 0%,100% 100%,0% 100%);margin-bottom:-1px}
+.pyr-lv.ep{background:linear-gradient(135deg,#2D7A5B,#3d9b74);width:100%;clip-path:polygon(3% 0%,97% 0%,100% 100%,0% 100%)}
 .pyr-name{font-size:12px;font-weight:700;color:#fff}
 .pyr-desc{font-size:10px;color:rgba(255,255,255,0.7)}
 .pyr-amt{font-family:var(--sans);font-size:15px;font-weight:700;color:#fff;text-align:right}
@@ -509,6 +508,9 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
+  <div class="sidebar-lbl" style="margin-top:8px">PDF</div>
+  <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
+  <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions &amp; Avis</button>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
@@ -689,10 +691,10 @@ select.span2{grid-column:span 2}
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Pyramide du patrimoine</div>
       <div class="pyramid" id="pyramideEl">
-        <div class="pyr-lv lt"><div><div class="pyr-name">🏔 Long terme</div><div class="pyr-desc">+15 ans · Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
-        <div class="pyr-lv mt"><div><div class="pyr-name">📈 Moyen terme</div><div class="pyr-desc">5 à 15 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
-        <div class="pyr-lv ct"><div><div class="pyr-name">💧 Court terme</div><div class="pyr-desc">Disponible &lt; 5 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
-        <div class="pyr-lv ep"><div><div class="pyr-name">🛡 Épargne de précaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
+        <div class="pyr-lv lt"><div><div class="pyr-name">Long terme</div><div class="pyr-desc">+15 ans · Retraite, transmission</div></div><div><div class="pyr-amt" id="pyrLT">0 €</div><div class="pyr-pct" id="pyrLTp">0%</div></div></div>
+        <div class="pyr-lv mt"><div><div class="pyr-name">Moyen terme</div><div class="pyr-desc">5 a 15 ans</div></div><div><div class="pyr-amt" id="pyrMT">0 €</div><div class="pyr-pct" id="pyrMTp">0%</div></div></div>
+        <div class="pyr-lv ct"><div><div class="pyr-name">Court terme</div><div class="pyr-desc">Disponible &lt; 5 ans</div></div><div><div class="pyr-amt" id="pyrCT">0 €</div><div class="pyr-pct" id="pyrCTp">0%</div></div></div>
+        <div class="pyr-lv ep"><div><div class="pyr-name">Epargne de precaution</div><div class="pyr-desc">Cible : <span id="pyrEpCible">0 €</span></div></div><div><div class="pyr-amt" id="pyrEP">—</div><div class="pyr-pct" id="pyrEPst"></div></div></div>
       </div>
     </div>
     <div class="chart-box">
@@ -878,15 +880,35 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 06</div><div class="sec-h1">Préconisations Patrimoniales</div></div>
   </div>
 
-  <!-- Avant / Après -->
+  <!-- Leviers disponibles + Situation visee -->
   <div class="preco-avant-apres" style="margin-bottom:18px">
-    <div class="preco-panel avant">
-      <div class="preco-panel-title">📍 Situation actuelle</div>
-      <div id="precoAvant" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
+    <div class="preco-panel avant" style="border-color:rgba(43,94,167,0.2);background:#FAFCFF">
+      <div class="preco-panel-title" style="color:var(--blue)">Leviers disponibles</div>
+      <div id="precoLeviers" style="font-size:13px;line-height:1.8;color:var(--gris-f)">—</div>
     </div>
     <div class="preco-panel apres">
-      <div class="preco-panel-title">🎯 Situation visée après préconisations</div>
-      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Décrivez la situation patrimoniale cible, les bénéfices attendus pour le client…"></div>
+      <div class="preco-panel-title">Situation visee apres preconisations</div>
+      <div class="ed-block" id="precoApres" contenteditable="true" data-placeholder="Decrivez la situation patrimoniale cible, les benefices attendus pour le client..."></div>
+    </div>
+  </div>
+
+  <!-- Epargne financiere — vue conseiller (editable) + vue client -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title"><span class="dot"></span>Epargne financiere preconisee</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--gris)">Patrimoine financier total (hors immobilier)</div>
+      <div id="precoFinTotal" style="font-size:16px;font-weight:700;color:var(--noir)">0 &euro;</div>
+    </div>
+    <div id="precoEpargneTable" style="margin-bottom:14px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;background:var(--gris-l);border-radius:10px">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a conserver</div>
+        <div id="precoConserver" style="font-size:18px;font-weight:700;color:var(--noir)">0 &euro;</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:4px">Epargne a reorienter</div>
+        <div id="precoReorienter" style="font-size:18px;font-weight:700;color:var(--orange)">0 &euro;</div>
+      </div>
     </div>
   </div>
 
@@ -998,6 +1020,72 @@ select.span2{grid-column:span 2}
     <button class="btn btn-success" onclick="exportPDF()">↓ Exporter PDF complet</button>
   </div>
 </div><!-- /sec-synthese -->
+
+<!-- ════════════════════════════════════════
+     8 — PAGE DE GARDE
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-pagegarde">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Page de garde</div><div class="sec-sub">Premiere page du PDF — logo, nom client, coordonnees</div></div>
+  </div>
+
+  <div style="border:2px dashed var(--bord);border-radius:16px;padding:40px;background:#fff;min-height:500px;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center;max-width:500px">
+      <div id="gardeLogoPreview" style="margin-bottom:24px"></div>
+      <div style="font-family:var(--sans);font-size:28px;font-weight:700;color:var(--noir);margin-bottom:8px">Etude de Dossier</div>
+      <div id="gardeClientPreview" style="font-family:var(--sans);font-size:18px;color:var(--gris-f);margin-bottom:20px">Nom du client</div>
+      <div id="gardeDatePreview" style="font-size:13px;color:var(--gris);margin-bottom:28px"></div>
+      <div style="width:60px;height:2px;background:var(--orange);margin:0 auto 28px"></div>
+      <div id="gardeConseillerPreview" style="font-size:13px;color:var(--gris-f);line-height:1.8"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:10px 14px;background:var(--ambre-l);border-radius:8px;font-size:11px;color:var(--gris-f);line-height:1.5">
+    Pour modifier le logo et les coordonnees, ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong>.
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('synthese')">&#8592; Synthese</button>
+    <button class="btn btn-secondary" onclick="goTo('mentions')">Mentions &amp; Avis &#8594;</button>
+  </div>
+</div><!-- /sec-pagegarde -->
+
+<!-- ════════════════════════════════════════
+     9 — MENTIONS LÉGALES & AVIS
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-mentions">
+  <div class="sec-header">
+    <div><div class="sec-tag">PDF</div><div class="sec-h1">Mentions legales &amp; Avis clients</div><div class="sec-sub">Derniere page du PDF</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Mentions legales</div>
+    <div id="mentionsPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Avis clients Trustpilot</div>
+    <div id="trustpilotSectionPreview" style="font-size:12px;color:var(--gris-f);line-height:1.8;min-height:60px">
+      <em style="color:var(--gris)">Aucun avis charge — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> et entrez votre URL Trustpilot.</em>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--gris-l);border-color:transparent">
+    <div style="font-size:10px;color:var(--gris);line-height:1.7;font-style:italic">
+      Les simulations presentees dans ce document ne constituent en aucun cas une promesse de rendement.
+      Les performances passees ne prejugent pas des performances futures.
+      Tout investissement comporte des risques, y compris de perte en capital.
+      Ce document est strictement confidentiel et destine uniquement a l'usage du client designe.
+    </div>
+  </div>
+
+  <div class="row-btns" style="margin-top:18px">
+    <button class="btn btn-secondary" onclick="goTo('pagegarde')">&#8592; Page de garde</button>
+    <button class="btn btn-success" onclick="exportPDF()">&#11015; Exporter PDF complet</button>
+  </div>
+</div><!-- /sec-mentions -->
 
 </main>
 </div><!-- /app -->
@@ -2746,6 +2834,8 @@ function renderSection(sec){
   else if(sec==='transmission')rTransmission();
   else if(sec==='preconisations')rPreconisations();
   else if(sec==='synthese')rSynthese();
+  else if(sec==='pagegarde')rPageGarde();
+  else if(sec==='mentions')rMentions();
 }
 
 
@@ -3118,15 +3208,19 @@ function rSituation(){
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
     sit+='</div>';
   } else {
-    sit+='<div class="card" style="margin-bottom:12px;padding:12px">';
+    sit+='<div style="padding:12px;background:var(--gris-l);border-radius:8px;margin-bottom:12px">';
+    sit+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Declarant</div>';
     sit+='<strong>'+n1+'</strong>'+(a1?' — '+a1+' ans':'')+'<br>';
-    sit+=(ED.c1.profession||ED.c1.sitpro||'—');
+    sit+=(ED.c1.profession||ED.c1.sitpro||'—')+'<br>';
+    sit+='<span style="font-size:12px;color:var(--gris)">Revenus : '+fmt(ED.revenus.sal1||ED.revenus.c1||0)+' &euro;/an</span>';
     if(ED.logement) sit+='<br><span style="font-size:11px;color:var(--gris)">&#127968; '+ED.logement+'</span>';
     sit+='</div>';
+    sit+='<div style="padding:12px;border-top:1px solid var(--bord)">';
     sit+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:6px">';
-    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br>'+ED.sitmat+'</div>';
+    sit+='<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Situation</span><br><strong>'+ED.sitmat+'</strong></div>';
     sit+='</div>';
     if(enfDisplay) sit+='<div style="margin-top:6px"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris)">Enfants</span><br><span style="font-weight:600;color:var(--gris-f)">'+enfDisplay+'</span></div>';
+    sit+='</div>';
   }
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple — Communauté':'Couple — Séparation de biens';
@@ -3145,7 +3239,7 @@ function rSituation(){
   if(epWrap){
     var isC=ED.type!=='seul';
     if(!ED.epMens2) ED.epMens2=0;
-    var inputStyle='width:70px;padding:5px 8px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:15px;font-weight:700;color:var(--ink);text-align:center;outline:none';
+    var inputStyle='width:100px;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);text-align:center;outline:none';
     var epH='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">';
     epH+='<span style="font-size:13px;font-weight:700;color:var(--noir)">Épargne mensuelle <span style="font-weight:400;font-size:11px;color:var(--gris)">(saisie R1)</span></span>';
     if(isC){
@@ -3222,7 +3316,7 @@ function rPatrimoine(){
   pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
     type:'doughnut',
     data:{labels:['Long terme','Moyen terme','Court terme'],
-      datasets:[{data:[lt,mt,ct],backgroundColor:['rgba(192,57,43,0.2)','rgba(212,98,42,0.25)','rgba(43,94,167,0.2)'],borderColor:['#C0392B','#D4622A','#2B5EA7'],borderWidth:2}]},
+      datasets:[{data:[lt,mt,ct],backgroundColor:['#C0392B','#D4622A','#2B5EA7'],borderColor:['#fff','#fff','#fff'],borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:12}}}}
   });
 
@@ -3598,14 +3692,13 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--gris)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--blue)'}];
   var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
   effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
-  // Résumé manque par personne
   tblHtml+='</tbody></table>';
-  var n1Lbl=(ED.c1.prenom||'C1').split(' ')[0];
-  var resumeH='<div style="margin-top:14px;padding:14px;background:var(--gris-l);border-radius:8px">';
-  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:10px">Résumé des manques à combler</div>';
-  resumeH+='<div class="fiscal-row"><span class="fr-l">'+n1Lbl+' — pension estimée</span><span class="fr-v">'+fmt(pensM0)+' €/mois</span></div>';
-  resumeH+='<div class="fiscal-row"><span class="fr-l">'+n1Lbl+' — pension souhaitée</span><span class="fr-v">'+fmt(c1cl.pension)+' €/mois</span></div>';
-  resumeH+='<div class="fiscal-row" style="border-top:1.5px solid var(--bord);padding-top:6px"><span class="fr-l" style="font-weight:700">'+n1Lbl+' — manque mensuel</span><span class="fr-v" style="color:var(--red);font-weight:700">'+(gap0>0?fmt(gap0)+' €/mois':'Couvert')+'</span></div>';
+  // Bloc manque total compact
+  var gapFoyer=gap0;
+  var espVie1=getEspVie(ED.c1.civ||'M.',c1cl.retAge||64);
+  var retAge1=c1cl.retAge||64;
+  var espVieMin=espVie1,espVieMax=espVie1;
+  var retAgeMin=retAge1,retAgeMax=retAge1;
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){
     var n2Lbl=(ED.c2.prenom||'C2').split(' ')[0];
     var age2=ageFrom(ED.c2.dob)||40;
@@ -3614,16 +3707,31 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
     var tx2=(TAUX[cspKey2tab]||TAUX['Sal. cadre'])[ageI2];
     var pensM2=Math.floor(((ED.revenus.sal2||ED.revenus.c2||0)+foncC2)/12*tx2/100);
     var gap2=Math.max(0,(ED.retraite.pension2||2000)-pensM2);
-    resumeH+='<div style="margin-top:10px"></div>';
-    resumeH+='<div class="fiscal-row"><span class="fr-l">'+n2Lbl+' — pension estimée</span><span class="fr-v">'+fmt(pensM2)+' €/mois</span></div>';
-    resumeH+='<div class="fiscal-row"><span class="fr-l">'+n2Lbl+' — pension souhaitée</span><span class="fr-v">'+fmt(ED.retraite.pension2||2000)+' €/mois</span></div>';
-    resumeH+='<div class="fiscal-row" style="border-top:1.5px solid var(--bord);padding-top:6px"><span class="fr-l" style="font-weight:700">'+n2Lbl+' — manque mensuel</span><span class="fr-v" style="color:var(--red);font-weight:700">'+(gap2>0?fmt(gap2)+' €/mois':'Couvert')+'</span></div>';
-    if(gap0>0||gap2>0){
-      var gapTotal=gap0+(gap2||0);
-      resumeH+='<div class="fiscal-row" style="margin-top:10px;padding:8px 10px;background:var(--ink);border-radius:6px"><span class="fr-l" style="color:#fff;font-weight:700">Manque total du foyer</span><span class="fr-v" style="color:var(--red);font-weight:700;font-size:15px">'+fmt(gapTotal)+' €/mois</span></div>';
-    }
+    gapFoyer+=gap2;
+    var retAge2=ED.retraite.age2||64;
+    var espVie2=getEspVie(ED.c2.civ||'Mme',retAge2);
+    espVieMin=Math.min(espVie1,espVie2);espVieMax=Math.max(espVie1,espVie2);
+    retAgeMin=Math.min(retAge1,retAge2);retAgeMax=Math.max(retAge1,retAge2);
+  }
+  var impactMin=gapFoyer*espVieMin;
+  var impactMax=gapFoyer*espVieMax;
+  var resumeH='<div style="margin-top:14px;padding:16px;background:var(--ink);border-radius:10px;color:#fff">';
+  resumeH+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">';
+  resumeH+='<div>';
+  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px">Manque total du foyer</div>';
+  resumeH+='<div style="font-size:22px;font-weight:700;color:'+(gapFoyer>0?'#e74c3c':'#2ecc71')+'">'+fmt(gapFoyer)+' &euro;/mois</div>';
+  resumeH+='</div>';
+  resumeH+='<div style="text-align:right">';
+  resumeH+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px">Impact sur la duree</div>';
+  if(espVieMin===espVieMax){
+    resumeH+='<div style="font-size:18px;font-weight:700;color:#e74c3c">'+fmt(Math.abs(impactMin))+' &euro;</div>';
+    resumeH+='<div style="font-size:11px;color:rgba(255,255,255,0.5)">'+Math.round(espVieMin/12)+' ans (depart '+retAge1+' ans)</div>';
+  } else {
+    resumeH+='<div style="font-size:18px;font-weight:700;color:#e74c3c">'+fmt(Math.abs(impactMin))+' a '+fmt(Math.abs(impactMax))+' &euro;</div>';
+    resumeH+='<div style="font-size:11px;color:rgba(255,255,255,0.5)">'+Math.round(espVieMin/12)+' a '+Math.round(espVieMax/12)+' ans (depart '+retAgeMin+(retAgeMin!==retAgeMax?' a '+retAgeMax:'')+' ans)</div>';
   }
   resumeH+='</div>';
+  resumeH+='</div></div>';
   tblHtml+=resumeH;
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
   var leg=document.getElementById('retSimuLegend');
@@ -3725,7 +3833,7 @@ var COPERNIC = {
   'Prévoyance individuelle':{cat:'prevoyance',   levier:'protection',  icon:'&#128737;',
     desc:'Garantie arrêt de travail, invalidité, décès pour les TNS et indépendants — revenus de remplacement en cas d’incapacité',
     fiscal:'Cotisations déductibles (TNS)',sri:'N/A',horizon:'Annuel'},
-  'Prévoyance pro':         {cat:'prevoyance',   levier:'protection',  icon:'&#128737;',
+  'Prévoyance pro':         {cat:'prevoyance',   levier:'entreprise',  icon:'&#128737;',
     desc:'Protection de l’associé gérant, garantie homme-clé, assurance croisée entre associés',
     fiscal:'Cotisations déductibles entreprise',sri:'N/A',horizon:'Annuel'},
 
@@ -3738,7 +3846,7 @@ var COPERNIC = {
     fiscal:'Hors plafond des niches — spécifique Outre-Mer',sri:'N/A',horizon:'1-2 ans',horizonAns:1},
 
   // ─── ÉPARGNE SALARIALE ─────────────────────────────────────────
-  'Plan Épargne Entreprise': {cat:'epargne-sal', levier:'epargne',    icon:'&#127968;',
+  'Plan Épargne Entreprise': {cat:'epargne-sal', levier:'entreprise', icon:'&#127968;',
     desc:'Épargne salariale avec abondement employeur, blocage 5 ans, sortie exonérée d’IR',
     fiscal:'Exonération IR (PS 17,2 % restants)',sri:'2-5',horizon:'5 ans',horizonAns:5},
   'PERECO/PERECOI':         {cat:'epargne-sal',  levier:'fiscal',      icon:'&#127969;',
@@ -3746,10 +3854,7 @@ var COPERNIC = {
     fiscal:'Déductible + abondement exonéré',sri:'2-6',horizon:'Retraite',horizonAns:20},
 
   // ─── DIVERSIFICATION ───────────────────────────────────────────
-  'Fonds Usufruit (NOVAXIA…)':{cat:'diversification',levier:'epargne',icon:'&#128200;',
-    desc:'Acquisition d’usufruit temporaire de parts de fonds immobiliers — rendement boosté, capital non récupéré',
-    fiscal:'Revenus fonciers ou financiers selon structure',sri:'4-5',horizon:'5-10 ans',horizonAns:7},
-  'FCPR / FPCI':            {cat:'diversification',levier:'epargne',   icon:'&#128200;',
+    'FCPR / FPCI':            {cat:'diversification',levier:'epargne',   icon:'&#128200;',
     desc:'Fonds commun de placement à risque ou professionnel : capital-investissement non coté, rendement potentiellement élevé',
     fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
 
@@ -3759,20 +3864,34 @@ var COPERNIC = {
     fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
   'Donation au dernier vivant':{cat:'transmission',levier:'transmission',icon:'&#128141;',
     desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',
-    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'}
+    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'},
+
+  // ─── ENTREPRISE ──────────────────────────────────────────────
+  'Apport-cession 150-0 B ter':{cat:'entreprise',levier:'entreprise',icon:'&#127981;',
+    desc:'Report d\'imposition de la plus-value lors de l\'apport de titres a une holding controlee. Reinvestissement de 60% du produit dans des activites eligibles sous 2 ans',
+    fiscal:'Report d\'imposition PV — reinvestissement 60% obligatoire',sri:'6-7',horizon:'5-10 ans',horizonAns:7},
+  'FCPR/FPCI (remploi 150-0 B ter)':{cat:'entreprise',levier:'entreprise',icon:'&#128200;',
+    desc:'Fonds de capital-investissement eligible au remploi 150-0 B ter : maintien du report d\'imposition, diversification du patrimoine du dirigeant',
+    fiscal:'Eligible remploi 150-0 B ter + exoneration PV apres 5 ans',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
+  'Contrat de capitalisation PM':{cat:'entreprise',levier:'entreprise',icon:'&#128196;',
+    desc:'Contrat de capitalisation souscrit par une personne morale (holding, SCI IS) : capitalisation a fiscalite reduite, tresorerie d\'entreprise optimisee',
+    fiscal:'IS sur base forfaitaire (105% TME) — pas sur gains reels',sri:'1-7',horizon:'8 ans+',horizonAns:10},
+  'SCI a l\'IS':{cat:'entreprise',levier:'entreprise',icon:'&#127968;',
+    desc:'Societe civile immobiliere a l\'IS : amortissement du bien, reinvestissement facilite, transmission optimisee via donation de parts avec decote',
+    fiscal:'IS 15-25% + flat tax sur dividendes, amortissement deductible',sri:'5',horizon:'15 ans+',horizonAns:15}
 };
 var OBJ_SOLUTIONS = {
-  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI'],
+  'Faire fructifier un capital':        ['Assurance vie','SCPI de rendement','Contrat de capitalisation','PEA Assurance','FCPR / FPCI','Contrat de capitalisation PM','FCPR/FPCI (remploi 150-0 B ter)'],
   'Préparer sa retraite':               ['PER','PERIN','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
-  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP'],
+  'Optimiser son IR':                   ['PER','PERIN','SCPI fiscale','Capital Investissement (FPCI/FCPR)','Girardin industriel','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
-  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété'],
+  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l’IS','LLI','Denormandie','LMNP'],
   'Protéger son conjoint':              ['Assurance vie','PER','Prévoyance individuelle','Prévoyance pro','Donation au dernier vivant'],
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de capitalisation'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de capitalisation'],
   'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
-  'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement']
+  'Créer un patrimoine immobilier':     ['SCPI financée','LMNP','Denormandie','LLI','Loi fiscale (Pinel, Jean Brun…)','SCPI de rendement','SCI a l\'IS']
 };
 var solsSelectionnees=[];
 
@@ -3788,38 +3907,128 @@ function togglePanneauConseiller(){
   chev.style.transform=isOpen?'rotate(-90deg)':'rotate(0deg)';
 }
 
+// Store conseilled amounts for epargne reorientation
+if(!window._precoConseille)window._precoConseille={};
+
 function rPreconisations(){
   var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
   var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
-  var endett=revM>0?(chrCredit/revM*100).toFixed(1):'—';
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
   var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
-  var av=document.getElementById('precoAvant');
-  if(av){
-    var rows=[
-      ['Patrimoine brut',    fmt(aSum)+' €', false],
-      ['Passifs (CRD)',      fmt(pSum)+' €', false],
-      ['Patrimoine net',     fmt(aSum-pSum)+' €', true],
-      ['Revenus nets / mois',fmt(revM)+' €', false],
-      ['Taux endettement',   endett+' %', false],
-      ['Impôt annuel',       fmt(impot)+' € — TMI '+(ED.fiscal.tmi||'—')+'%', false],
-      ['Épargne mensuelle',  fmt(ED.epMens||0)+' €', false],
-    ];
-    if(plafondPER>0) rows.push(['Plafond PER', fmt(plafondPER)+' € → éco. '+fmt(economiePER)+' €', false]);
-    av.innerHTML=rows.map(function(r){
-      return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bord)">'
-        +'<span style="font-size:12px;color:var(--gris)">'+r[0]+'</span>'
-        +'<span style="font-size:12px;font-weight:'+(r[2]?'700':'600')+';color:'+(r[2]?'var(--noir)':'var(--gris-f)')+'">'+r[1]+'</span>'
-        +'</div>';
-    }).join('');
+
+  // ── Leviers disponibles ──
+  var levEl=document.getElementById('precoLeviers');
+  if(levEl){
+    var levH='';
+    var leviers=[];
+    if(ED.epMens>0||aSum>5000)leviers.push({icon:'&#128176;',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' &euro;/mois'});
+    if(impot>=2000)leviers.push({icon:'&#128200;',label:'Fiscal',desc:'IR '+fmt(impot)+' &euro; — TMI '+(ED.fiscal.tmi||0)+'%'+(plafondPER>0?' — PER dispo '+fmt(plafondPER)+' &euro;':'')});
+    if(capa>200)leviers.push({icon:'&#127968;',label:'Financement',desc:'Capacite emprunt ~'+fmt(Math.round(capa))+' &euro;/mois'});
+    leviers.push({icon:'&#127981;',label:'Entreprise',desc:'SCI, holding, 150-0 B ter'});
+    leviers.forEach(function(l){
+      levH+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bord)">';
+      levH+='<span style="font-size:18px">'+l.icon+'</span>';
+      levH+='<div><div style="font-weight:700;font-size:12px;color:var(--noir)">'+l.label+'</div>';
+      levH+='<div style="font-size:11px;color:var(--gris)">'+l.desc+'</div></div>';
+      levH+='</div>';
+    });
+    levEl.innerHTML=levH;
   }
+
+  // ── Epargne financiere (hors immo) — tableau editable ──
+  var finActifs=[];
+  (ED.actifs||[]).forEach(function(a){
+    var cfg=getActifConfig(a.label||a.nom||'');
+    if(cfg.immo)return; // exclure immobilier
+    var h=a.horizon||cfg.h||'CT';
+    var hLabel=h==='ct'||h==='CT'?'Court terme':h==='mt'||h==='MT'?'Moyen terme':'Long terme';
+    var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
+    finActifs.push({nom:a.label||a.nom||'Actif',montant:a.montant||0,horizon:hKey,horizonLabel:hLabel,titulaire:a.titulaire||'C1'});
+  });
+
+  var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
+  var ftEl=document.getElementById('precoFinTotal');
+  if(ftEl)ftEl.textContent=fmt(finTotal)+' \u20ac';
+
+  var tEl=document.getElementById('precoEpargneTable');
+  if(tEl){
+    var groups={lt:[],mt:[],ct:[]};
+    finActifs.forEach(function(a){(groups[a.horizon]||groups.ct).push(a);});
+    var horizons=[
+      {key:'lt',label:'Long terme',color:'#C0392B',bg:'rgba(192,57,43,0.06)'},
+      {key:'mt',label:'Moyen terme',color:'#D4622A',bg:'rgba(212,98,42,0.06)'},
+      {key:'ct',label:'Court terme',color:'#2B5EA7',bg:'rgba(43,94,167,0.06)'}
+    ];
+    var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    h+='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">';
+    h+='<th style="text-align:left;padding:6px 8px">Actif</th>';
+    h+='<th style="text-align:right;padding:6px 8px">Actuel</th>';
+    h+='<th style="text-align:right;padding:6px 8px;color:var(--orange)">Conseille</th>';
+    h+='</tr></thead><tbody>';
+
+    horizons.forEach(function(hz){
+      var items=groups[hz.key];
+      if(!items.length)return;
+      var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
+      h+='<tr style="background:'+hz.bg+'"><td colspan="3" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' &euro;</td></tr>';
+      items.forEach(function(a,i){
+        var uid=hz.key+'_'+i;
+        var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
+        h+='<tr style="border-bottom:1px solid var(--bord)">';
+        h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
+        h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir)">'+fmt(a.montant)+' &euro;</td>';
+        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:90px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"></td>';
+        h+='</tr>';
+      });
+    });
+    h+='</tbody></table>';
+    tEl.innerHTML=h;
+  }
+
+  updatePrecoTotals();
   buildMatriceObjSol(impot,capa,aSum);
   renderSolsRetenues();
   renderFichesClient();
+}
+
+function updatePrecoTotals(){
+  var finActifs=[];
+  (ED.actifs||[]).forEach(function(a){
+    var cfg=getActifConfig(a.label||a.nom||'');
+    if(cfg.immo)return;
+    var h=a.horizon||cfg.h||'CT';
+    var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
+    finActifs.push({montant:a.montant||0,horizon:hKey});
+  });
+  var totalActuel=0,totalConseille=0;
+  finActifs.forEach(function(a,i){
+    var hzKeys=['lt','mt','ct'];
+    // Reconstruct uid
+    var counts={lt:0,mt:0,ct:0};
+    var uid='';
+    (ED.actifs||[]).forEach(function(act){
+      var cfg=getActifConfig(act.label||act.nom||'');
+      if(cfg.immo)return;
+      var hh=act.horizon||cfg.h||'CT';
+      var hk=hh==='ct'||hh==='CT'?'ct':hh==='mt'||hh==='MT'?'mt':'lt';
+      if(act===arguments)return; // skip
+    });
+  });
+  // Simpler approach: iterate all inputs
+  var inputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
+  var consTot=0;
+  inputs.forEach(function(inp){consTot+=+(inp.value||0);});
+  var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
+  var reorienter=finTotal-consTot;
+
+  var cEl=document.getElementById('precoConserver');
+  var rEl=document.getElementById('precoReorienter');
+  if(cEl)cEl.textContent=fmt(consTot)+' \u20ac';
+  if(rEl)rEl.textContent=fmt(Math.max(0,reorienter))+' \u20ac';
 }
 
 
@@ -3835,7 +4044,7 @@ var LEVIER_CATEGORIES = [
   {key:'financement', label:'Financement', icon:'&#127968;', color:'#2D7A5B', bg:'#EAF5EF',
    match:['financement']},
   {key:'entreprise',  label:'Entreprise',  icon:'&#127981;', color:'#7B5EA7', bg:'#F3EDF9',
-   match:['entreprise']}
+   match:['entreprise','protection']}
 ];
 
 function getLevierCategory(levier){
@@ -4374,7 +4583,7 @@ function rSynthese(){
         labels:['Court terme','Moyen terme','Long terme'],
         datasets:[{
           data:[ct,mt,lt],
-          backgroundColor:['rgba(43,94,167,0.7)','rgba(212,98,42,0.7)','rgba(192,57,43,0.7)'],
+          backgroundColor:['#2B5EA7','#D4622A','#C0392B'],
           borderWidth:2,borderColor:'#fff'
         }]
       },
@@ -4767,29 +4976,48 @@ function markDone(){
   updateProgress();
 }
 // ── Couleurs personnalisées ──
-// Applique les couleurs perso UNIQUEMENT sur titres, sous-titres et dots
-// Les boutons, badges, cards et nav restent dans le style CGP Skool
+// Applique les couleurs perso sur le CONTENU (pas la navigation sidebar)
 function applyColors(){
   var c1=document.getElementById('pColor1');
   var c2=document.getElementById('pColor2');
   if(!c1||!c2)return;
   var color1=c1.value||'#D4622A';
   var color2=c2.value||'#181614';
-  // Appliquer via custom properties scopees
-  document.documentElement.style.setProperty('--custom-accent',color1);
-  document.documentElement.style.setProperty('--custom-ink',color2);
-  // Injecter ou mettre a jour le style scope
+  var c1dim=color1+'1a';
+  var c1mid=color1+'40';
   var styleId='customColorStyle';
   var st=document.getElementById(styleId);
   if(!st){st=document.createElement('style');st.id=styleId;document.head.appendChild(st);}
   st.textContent=
+    // Titres et sous-titres
     '.sec-h1{color:'+color2+'!important}'+
     '.sec-tag{color:'+color1+'!important}'+
     '.sec-sub{color:'+color2+'88!important}'+
+    // Dots des cards (pas sidebar)
     '.card-title .dot{background:'+color1+'!important}'+
-    '.step-dot{background:'+color1+'!important}'+
+    // Accents et bordures contenu
+    '.card{border-color:'+color2+'12!important}'+
+    '.kpi{border-bottom-color:'+color1+'!important}'+
+    '.badge-amber{background:'+c1dim+'!important;color:'+color1+'!important}'+
+    // Liens et textes d accent
+    '.ed:focus{border-bottom-color:'+color1+'!important;background:'+c1dim+'!important}'+
+    '.ed:hover{border-bottom-color:'+c1mid+'!important}'+
+    '.ed-block:focus{border-color:'+color1+'!important;background:'+c1dim+'!important}'+
+    // Boutons primaires du contenu (pas nav)
+    '.main .btn-primary{background:'+color1+'!important}'+
+    '.main .btn-secondary:hover{border-color:'+color1+'!important;color:'+color1+'!important}'+
+    // Preco panels
+    '.preco-panel.avant .preco-panel-title{color:'+color1+'!important}'+
+    // PDF header
     '.pdf-page-header-nom{color:'+color2+'!important}'+
-    '.preco-panel.avant .preco-panel-title{color:'+color1+'!important}';
+    '.pdf-cover-title{color:'+color2+'!important}'+
+    // Progress bar
+    '#progressFill{background:'+color1+'!important}'+
+    // Comment zone focus
+    '.comment-zone textarea:focus{border-color:'+color1+'!important}'+
+    // Sol card accent
+    '.sol-card{border-left-color:'+color1+'!important}'+
+    '.sol-type-tag{background:'+c1dim+'!important;color:'+color1+'!important}';
   saveProfil();
 }
 function loadColors(){
@@ -5277,7 +5505,84 @@ function extractPdfText(file, callback) {
 
 
 // ══════════════════════════════════════════════════════════════
-// EXPORT PDF — conversion canvas + en-tête dynamique
+// PAGE DE GARDE & MENTIONS — rendu ecran
+// ══════════════════════════════════════════════════════════════
+
+function rPageGarde(){
+  var p=loadProfil?loadProfil():{};
+  var nom=ED.c1.prenom?(ED.c1.prenom+' '+(ED.c1.nom||'')):'Nom du client';
+  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom)nom+=' & '+ED.c2.prenom+' '+(ED.c2.nom||'');
+  var dateStr=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+
+  var cl=document.getElementById('gardeClientPreview');
+  if(cl)cl.textContent=nom.trim();
+  var dt=document.getElementById('gardeDatePreview');
+  if(dt)dt.textContent=dateStr;
+
+  var cons=document.getElementById('gardeConseillerPreview');
+  if(cons&&p&&p.nom){
+    var lines=[];
+    lines.push(((p.prenom||'')+' '+(p.nom||'')).trim());
+    if(p.cabinet)lines.push(p.cabinet);
+    if(p.tel)lines.push(p.tel);
+    if(p.email)lines.push(p.email);
+    cons.innerHTML=lines.join('<br>');
+  }
+
+  var logo=document.getElementById('gardeLogoPreview');
+  if(logo){
+    try{
+      var dataUrl=localStorage.getItem('cgpskool_logo');
+      if(dataUrl)logo.innerHTML='<img src="'+dataUrl+'" style="max-height:60px;max-width:200px">';
+      else logo.innerHTML='<div style="color:var(--gris);font-size:12px">Aucun logo — configurez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil</strong></div>';
+    }catch(e){}
+  }
+}
+
+function rMentions(){
+  var p=loadProfil?loadProfil():{};
+
+  // Mentions legales
+  var mel=document.getElementById('mentionsPreview');
+  if(mel){
+    if(p&&p.mentions){
+      mel.innerHTML=p.mentions.replace(/\n/g,'<br>');
+    } else {
+      mel.innerHTML='<em style="color:var(--gris)">Aucune mention configuree — ouvrez votre <strong style="cursor:pointer;color:var(--orange)" onclick="openProfil()">profil conseiller</strong> pour les renseigner.</em>';
+    }
+  }
+
+  // Trustpilot
+  var tEl=document.getElementById('trustpilotSectionPreview');
+  if(tEl){
+    try{
+      var raw=localStorage.getItem('cgpskool_trustpilot');
+      if(raw){
+        var reviews=JSON.parse(raw);
+        if(reviews.length){
+          var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+          h+='<span style="font-size:20px">&#11088;</span>';
+          h+='<strong>'+reviews.length+' avis clients</strong>';
+          if(p&&p.trustpilot)h+=' — <a href="'+p.trustpilot+'" target="_blank" style="color:var(--orange);font-size:11px">Voir sur Trustpilot</a>';
+          h+='</div>';
+          reviews.forEach(function(r){
+            h+='<div style="padding:8px 0;border-bottom:1px solid var(--bord)">';
+            h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+            h+='<strong style="font-size:13px">'+r.name+'</strong>';
+            if(r.stars)h+='<span style="color:var(--orange);font-weight:700">'+r.stars+'/5</span>';
+            h+='</div>';
+            if(r.text)h+='<div style="font-size:12px;color:var(--gris-f);margin-top:4px;line-height:1.6">'+r.text+'</div>';
+            h+='</div>';
+          });
+          tEl.innerHTML=h;
+        }
+      }
+    }catch(e){}
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT PDF — conversion canvas + en-tete dynamique
 // ══════════════════════════════════════════════════════════════
 
 function exportPDF() {
