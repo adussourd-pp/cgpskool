@@ -3680,25 +3680,21 @@ function rPatrimoine(){
     return 'lt';
   }
   
-  function buildHorizonSection(label, badgeCls, items){
+  function buildHorizonSection(label, badgeCls, items, hzColor){
     if(!items.length) return '';
     var sorted=items.slice().sort(function(a,b){return (b.montant||0)-(a.montant||0);});
     var total=sorted.reduce(function(s,a){return s+(a.montant||0);},0);
+    var bgMap={'badge-red':'rgba(192,57,43,0.06)','badge-amber':'rgba(212,98,42,0.06)','badge-blue':'rgba(43,94,167,0.06)'};
+    var colorMap={'badge-red':'#C0392B','badge-amber':'#D4622A','badge-blue':'#2B5EA7'};
+    var bg=bgMap[badgeCls]||'var(--gris-l)';
+    var color=colorMap[badgeCls]||'var(--gris-f)';
     var rows=sorted.map(function(a){
-      var t=getAssetType(a.nom);
-      var tag='<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:'+t.bg+';color:'+t.color+'">'+t.label+'</span>';
-      return '<tr>'
-        +'<td>'+titLabel(a.titulaire)+'</td>'
-        +'<td class="bold">'+a.nom+'</td>'
-        +'<td>'+tag+'</td>'
-        +'<td class="right gold">'+fmt(a.montant)+' €</td>'
+      return '<tr style="border-bottom:1px solid var(--bord)">'
+        +'<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>'
+        +'<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">'+fmt(a.montant)+' \u20ac</td>'
         +'</tr>';
     }).join('');
-    return '<tr class="section-header-row" style="background:var(--gris-l)">'
-      +'<td colspan="3" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris-f)">'
-      +'<span class="badge '+badgeCls+'" style="margin-right:6px">'+label+'</span></td>'
-      +'<td class="right" style="padding-right:12px"><span class="badge '+badgeCls+'" style="font-size:11px;font-weight:700">'+fmt(total)+' \u20ac</span></td>'
-      +'</tr>'+rows;
+    return '<tr style="background:'+bg+'"><td colspan="2" style="padding:6px 8px;font-weight:700;color:'+color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+label+' : '+fmt(total)+' \u20ac</td></tr>'+rows;
   }
   var ctItems=ED.actifs.filter(function(a){return a.horizon==='ct';});
   var mtItems=ED.actifs.filter(function(a){return a.horizon==='mt';});
@@ -3706,13 +3702,12 @@ function rPatrimoine(){
   var allRows=buildHorizonSection('Long terme','badge-red',ltItems)
              +buildHorizonSection('Moyen terme','badge-amber',mtItems)
              +buildHorizonSection('Court terme','badge-blue',ctItems);
-  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr><th>Titulaire</th><th>Désignation</th><th>Type</th><th class="right">Montant</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td colspan="3">TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' €</td></tr></tbody>';
+  var at=document.getElementById('actifsTbl');if(at)at.innerHTML='<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Actif</th><th style="text-align:right;padding:6px 8px">\u20ac actuel</th></tr></thead><tbody>'+allRows+'<tr class="total-row"><td>TOTAL ACTIFS BRUTS</td><td class="right">'+fmt(aSum)+' \u20ac</td></tr></tbody>';
 
-  const prows=ED.passifs.map(p=>`<tr>
-    <td>${titLabel(p.titulaire)}</td><td class="bold">${p.nom}</td>
-    <td class="right">${fmt(p.echeance)} €</td>
-    <td class="right red">${fmt(p.crd)} €</td></tr>`).join('');
-  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr><th>Titulaire</th><th>Désignation</th><th>Échéance /an</th><th>CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="4" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td colspan="3">TOTAL PASSIFS</td><td class="right">${fmt(pSum)} €</td></tr></tbody>`;
+  const prows=ED.passifs.map(p=>`<tr style="border-bottom:1px solid var(--bord)">
+    <td style="padding:5px 8px;color:var(--gris-f)">${p.nom}</td>
+    <td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">${fmt(p.crd)} \u20ac</td></tr>`).join('');
+  var pt=document.getElementById('passifsTbl');if(pt)pt.innerHTML=`<thead><tr style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)"><th style="text-align:left;padding:6px 8px">Passif</th><th style="text-align:right;padding:6px 8px">CRD</th></tr></thead><tbody>${prows||'<tr><td colspan="2" style="color:var(--gris);text-align:center;padding:16px">Aucun passif</td></tr>'}<tr class="total-row"><td>TOTAL PASSIFS</td><td class="right">${fmt(pSum)} \u20ac</td></tr></tbody>`;
   // Levier placement badge
   var epMens=ED.epMens||0;
   var capEpargne = Math.max(0, revMens() - ED.chargesCredit - Math.round((ED.charges||0)));
@@ -4246,8 +4241,8 @@ function rPreconisations(){
     var entAct=isEntrepriseActive();
     var allLeviers=[
       {key:'placement',label:'Placement',desc:'Epargne mensuelle '+fmt(ED.epMens||0)+' \u20ac/mois',active:ED.epMens>0||aSum>5000,color:'#2B5EA7'},
-      {key:'fiscal',label:'Imp\u00f4ts',desc:'IR '+fmt(impot)+' \u20ac \u2014 TMI '+(ED.fiscal.tmi||0)+'%',active:impot>=2000,color:'#D4622A'},
-      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois \u2014 Endettement '+endett+'%',active:capa>200,color:'#2D7A5B'}
+      {key:'fiscal',label:'Imp\u00f4ts',desc:'IR '+fmt(impot)+' \u20ac<br>TMI '+(ED.fiscal.tmi||0)+' %',active:impot>=2000,color:'#D4622A'},
+      {key:'financement',label:'Financement',desc:'Capacit\u00e9 emprunt ~'+fmt(Math.round(capa))+' \u20ac/mois<br>Endettement '+endett+' %',active:capa>200,color:'#2D7A5B'}
     ];
     if(entAct)allLeviers.push({key:'entreprise',label:'Entreprise',desc:'SCI, holding, 150-0 B ter',active:true,color:'#7B5EA7'});
     allLeviers.forEach(function(l){
