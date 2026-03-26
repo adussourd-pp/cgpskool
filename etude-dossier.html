@@ -4855,29 +4855,48 @@ function markDone(){
   updateProgress();
 }
 // ── Couleurs personnalisées ──
-// Applique les couleurs perso UNIQUEMENT sur titres, sous-titres et dots
-// Les boutons, badges, cards et nav restent dans le style CGP Skool
+// Applique les couleurs perso sur le CONTENU (pas la navigation sidebar)
 function applyColors(){
   var c1=document.getElementById('pColor1');
   var c2=document.getElementById('pColor2');
   if(!c1||!c2)return;
   var color1=c1.value||'#D4622A';
   var color2=c2.value||'#181614';
-  // Appliquer via custom properties scopees
-  document.documentElement.style.setProperty('--custom-accent',color1);
-  document.documentElement.style.setProperty('--custom-ink',color2);
-  // Injecter ou mettre a jour le style scope
+  var c1dim=color1+'1a';
+  var c1mid=color1+'40';
   var styleId='customColorStyle';
   var st=document.getElementById(styleId);
   if(!st){st=document.createElement('style');st.id=styleId;document.head.appendChild(st);}
   st.textContent=
+    // Titres et sous-titres
     '.sec-h1{color:'+color2+'!important}'+
     '.sec-tag{color:'+color1+'!important}'+
     '.sec-sub{color:'+color2+'88!important}'+
+    // Dots des cards (pas sidebar)
     '.card-title .dot{background:'+color1+'!important}'+
-    '.step-dot{background:'+color1+'!important}'+
+    // Accents et bordures contenu
+    '.card{border-color:'+color2+'12!important}'+
+    '.kpi{border-bottom-color:'+color1+'!important}'+
+    '.badge-amber{background:'+c1dim+'!important;color:'+color1+'!important}'+
+    // Liens et textes d accent
+    '.ed:focus{border-bottom-color:'+color1+'!important;background:'+c1dim+'!important}'+
+    '.ed:hover{border-bottom-color:'+c1mid+'!important}'+
+    '.ed-block:focus{border-color:'+color1+'!important;background:'+c1dim+'!important}'+
+    // Boutons primaires du contenu (pas nav)
+    '.main .btn-primary{background:'+color1+'!important}'+
+    '.main .btn-secondary:hover{border-color:'+color1+'!important;color:'+color1+'!important}'+
+    // Preco panels
+    '.preco-panel.avant .preco-panel-title{color:'+color1+'!important}'+
+    // PDF header
     '.pdf-page-header-nom{color:'+color2+'!important}'+
-    '.preco-panel.avant .preco-panel-title{color:'+color1+'!important}';
+    '.pdf-cover-title{color:'+color2+'!important}'+
+    // Progress bar
+    '#progressFill{background:'+color1+'!important}'+
+    // Comment zone focus
+    '.comment-zone textarea:focus{border-color:'+color1+'!important}'+
+    // Sol card accent
+    '.sol-card{border-left-color:'+color1+'!important}'+
+    '.sol-type-tag{background:'+c1dim+'!important;color:'+color1+'!important}';
   saveProfil();
 }
 function loadColors(){
