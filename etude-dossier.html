@@ -649,9 +649,6 @@ select.span2{grid-column:span 2}
   <!-- Situation personnelle : 2 colonnes couple ou 1 colonne seul -->
   <div id="sitDisplay" style="margin-bottom:16px">—</div>
 
-  <!-- Revenus par personne (style Financement) -->
-  <div id="revenuCards" style="margin-bottom:16px"></div>
-
   <!-- Chiffres clés du foyer (commun) -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Chiffres clés du foyer</div>
@@ -3336,34 +3333,7 @@ function rSituation(){
   var sd=document.getElementById('sitDisplay');if(sd)sd.innerHTML=sit;
   document.getElementById('badgeType').textContent=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple \u2014 Communaut\u00e9':'Couple \u2014 S\u00e9paration de biens';
 
-  // Revenus par personne (style Financement)
-  var rcEl=document.getElementById('revenuCards');
-  if(rcEl){
-    var p1=ED.c1.prenom||'C1';
-    var sal1=ED.revenus.sal1||ED.revenus.c1||0;
-    var mens1=Math.round(sal1/12);
-    var ep1=ED.epMens||0;
-    var rcH='<div style="display:grid;grid-template-columns:'+(isCoupleSit?'1fr 1fr':'1fr')+';gap:16px">';
-    function revCard(prenom,salAn,salMois,epMens){
-      var c='<div class="card" style="margin-bottom:0;padding:16px">';
-      c+='<div class="card-title" style="margin-bottom:10px"><span class="dot"></span>'+prenom+'</div>';
-      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--blue)">Revenus annuels</span><span class="fr-v" style="font-weight:700">'+fmt(salAn)+' \u20ac</span></div>';
-      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--blue)">Revenus mensuels</span><span class="fr-v" style="font-weight:700">'+fmt(salMois)+' \u20ac/mois</span></div>';
-      c+='<div class="fiscal-row"><span class="fr-l" style="color:var(--orange)">\u00c9pargne mensuelle</span><span class="fr-v" style="font-weight:700;color:var(--orange)">'+fmt(epMens)+' \u20ac/mois</span></div>';
-      c+='</div>';
-      return c;
-    }
-    rcH+=revCard(p1,sal1,mens1,ep1);
-    if(isCoupleSit){
-      var p2=ED.c2.prenom||'C2';
-      var sal2=ED.revenus.sal2||ED.revenus.c2||0;
-      var mens2=Math.round(sal2/12);
-      var ep2=ED.epMens2||0;
-      rcH+=revCard(p2,sal2,mens2,ep2);
-    }
-    rcH+='</div>';
-    rcEl.innerHTML=rcH;
-  }
+
 
   const objH=ED.objectifs.length
     ? ED.objectifs.map((o,i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span></div>`).join('')
