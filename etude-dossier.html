@@ -613,32 +613,31 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <div class="kpi-row">
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Épargne mensuelle <span style="font-size:8px;font-weight:400;color:var(--gris)">(saisie R1)</span></div><div class="kpi-val" id="kSit1Wrap"></div></div>
-    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kSit2">0 €</div></div>
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Taux d'endettement</div><div class="kpi-val" id="kSit3">—</div></div>
-    <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Reste à vivre /mois</div><div class="kpi-val" id="kSit4">0 €</div></div>
+  <!-- Situation personnelle : 2 colonnes couple ou 1 colonne seul -->
+  <div id="sitDisplay" style="margin-bottom:16px">—</div>
+
+  <!-- Chiffres clés du foyer (commun) -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Chiffres clés du foyer</div>
+    <div class="kpi-row" id="kpiSitRow">
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Revenus nets /mois</div><div class="kpi-val" id="kSit2">0 €</div></div>
+      <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Taux d'endettement</div><div class="kpi-val" id="kSit3">—</div></div>
+      <div class="kpi" style="--kc:var(--red)"><div class="kpi-label">Reste à vivre /mois</div><div class="kpi-val" id="kSit4">0 €</div></div>
+    </div>
+    <!-- Épargne mensuelle par personne -->
+    <div id="kSit1Wrap" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)"></div>
   </div>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="card-title"><span class="dot"></span>Votre situation</div>
-      <div id="sitDisplay" style="font-size:13px;line-height:2;color:var(--gris-f)">—</div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span>Vos objectifs patrimoniaux</div>
-      <div id="objDisplay" style="font-size:13px;color:var(--gris-f)">—</div>
-    </div>
+  <!-- Objectifs (commun, pleine largeur) -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><span class="dot"></span>Objectifs patrimoniaux</div>
+    <div id="objDisplay" style="font-size:13px;color:var(--gris-f)">—</div>
   </div>
 
+  <!-- Note conseiller -->
   <div class="card">
     <div class="card-title"><span class="dot"></span>Note du consultant</div>
     <div class="ed-block" id="noteConsultant" contenteditable="true" data-placeholder="Vos observations sur la situation client…"></div>
-  </div>
-
-  <div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('import')">&#8592; Import</button>
-    <button class="btn btn-primary" onclick="goTo('patrimoine')">Patrimoine &#8594;</button>
   </div>
 </div><!-- /sec-situation -->
 
@@ -695,10 +694,6 @@ select.span2{grid-column:span 2}
     <textarea id="commentPatrimoine" placeholder="Vos observations sur le patrimoine (points forts, points d'attention, structuration)..." rows="2"></textarea>
   </div>
 
-<div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('situation')">&#8592; Situation</button>
-    <button class="btn btn-primary" onclick="goTo('fiscal')">Fiscal &#8594;</button>
-  </div>
 </div><!-- /sec-patrimoine -->
 
 <!-- ════════════════════════════════════════
@@ -761,10 +756,6 @@ select.span2{grid-column:span 2}
     <textarea id="commentFiscal" placeholder="Leviers identifies : PER, reductions d'impot, niches fiscales a mobiliser..." rows="2"></textarea>
   </div>
 
-<div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('patrimoine')">&#8592; Patrimoine</button>
-    <button class="btn btn-primary" onclick="goTo('financement')">Financement &#8594;</button>
-  </div>
 </div><!-- /sec-fiscal -->
 
 <!-- ════════════════════════════════════════
@@ -817,10 +808,6 @@ select.span2{grid-column:span 2}
     <textarea id="commentFinancement" placeholder="Observations sur la capacite d'emprunt, l'epargne mobilisable, les projets en cours..." rows="2"></textarea>
   </div>
 
-<div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('fiscal')">&#8592; Fiscal</button>
-    <button class="btn btn-primary" onclick="goTo('retraite')">Retraite &#8594;</button>
-  </div>
 </div><!-- /sec-financement -->
 
 <!-- ════════════════════════════════════════
@@ -862,10 +849,6 @@ select.span2{grid-column:span 2}
     <textarea id="commentRetraite" placeholder="Ecart de retraite a combler, solutions recommandees, horizon de depart souhaite..." rows="2"></textarea>
   </div>
 
-<div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('financement')">&#8592; Financement</button>
-    <button class="btn btn-primary" onclick="goTo('transmission')">Transmission &#8594;</button>
-  </div>
 </div><!-- /sec-retraite -->
 
 <!-- ════════════════════════════════════════
@@ -901,10 +884,6 @@ select.span2{grid-column:span 2}
   <div class="card">
     <div class="card-title"><span class="dot"></span>Note transmission</div>
     <div class="ed-block" id="noteTrans" contenteditable="true" data-placeholder="Analyse successorale : AV, donations, clause beneficiaire, SCI..."></div>
-  </div>
-  <div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('retraite')">&#8592; Retraite</button>
-    <button class="btn btn-primary" onclick="goTo('preconisations')">Préconisations &#8594;</button>
   </div>
 </div><!-- /sec-transmission -->
 
@@ -967,10 +946,6 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="notePreco" contenteditable="true" data-placeholder="Vos observations…"></div>
   </div>
 
-  <div class="row-btns">
-    <button class="btn btn-secondary" onclick="goTo('transmission')">← Transmission</button>
-    <button class="btn btn-primary" onclick="goTo('synthese')">Synthèse →</button>
-  </div>
 </div><!-- /sec-preconisations -->
 
 <!-- ════════════════════════════════════════
@@ -3172,23 +3147,25 @@ function rSituation(){
   const chrCr=ED.chargesCredit||0;
   const endett=chrCr>0&&revM>0?chrCr/revM*100:0;
   const rav=revM-chrCr;
-  // Épargne mensuelle : 1 input si seul, 2 si couple
+  // Épargne mensuelle — saisie R1
   var epWrap=document.getElementById('kSit1Wrap');
   if(epWrap){
     var isC=ED.type!=='seul';
     if(!ED.epMens2) ED.epMens2=0;
-    var inputStyle='width:60px;border:none;border-bottom:1.5px solid var(--ambre-m);background:transparent;font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);text-align:center;outline:none;padding:2px 0';
+    var inputStyle='width:70px;padding:5px 8px;border:1.5px solid var(--ambre-m);border-radius:6px;background:var(--ambre-l);font-family:var(--sans);font-size:14px;font-weight:700;color:var(--ambre-d);text-align:center;outline:none';
+    var epH='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">';
+    epH+='<span style="font-size:11px;font-weight:600;color:var(--gris)">Épargne mensuelle <span style="font-weight:400">(saisie R1)</span></span>';
     if(isC){
       var lbl1=(ED.c1.prenom||'C1').split(' ')[0];
       var lbl2=(ED.c2.prenom||'C2').split(' ')[0];
-      epWrap.innerHTML='<div style="display:flex;flex-direction:column;gap:4px">'
-        +'<div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--gris);width:50px">'+lbl1+'</span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:11px;color:var(--gris)">€</span></div>'
-        +'<div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--gris);width:50px">'+lbl2+'</span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens2=+this.value"><span style="font-size:11px;color:var(--gris)">€</span></div>'
-        +'<div style="font-size:10px;color:var(--ambre-d);font-weight:600;margin-top:2px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</div>'
-        +'</div>';
+      epH+='<span style="font-size:12px;color:var(--gris-f)">'+lbl1+' </span><input type="number" id="kSit1C1" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span style="font-size:12px;color:var(--gris-f);margin-left:8px">'+lbl2+' </span><input type="number" id="kSit1C2" value="'+(ED.epMens2||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens2=+this.value"><span style="font-size:11px;color:var(--gris)"> €</span>';
+      epH+='<span style="font-size:12px;font-weight:700;color:var(--orange);margin-left:8px">Total : '+fmt((ED.epMens||0)+(ED.epMens2||0))+' €/mois</span>';
     } else {
-      epWrap.innerHTML='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+';font-size:17px" onchange="ED.epMens=+this.value"> <span style="font-size:13px;font-weight:400;color:var(--gris)">€/mois</span>';
+      epH+='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:12px;color:var(--gris)"> €/mois</span>';
     }
+    epH+='</div>';
+    epWrap.innerHTML=epH;
   }
   set('kSit2',fmt(revM)+' €/mois');
   const ke=document.getElementById('kSit3');
