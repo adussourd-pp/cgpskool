@@ -4545,8 +4545,6 @@ function buildMatriceObjSol(impot,capa,aSum){
       html+='<div style="width:16px;height:16px;border-radius:4px;border:1.5px solid '+(isSelected?'#2D7A5B':'var(--bord)')+';background:'+(isSelected?'#2D7A5B':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff">'+(isSelected?'&#10003;':'')+'</div>';
       html+='</div>';
       html+='<div style="font-size:10px;color:var(--gris);line-height:1.5;margin-bottom:6px">'+cp.desc.substring(0,60)+(cp.desc.length>60?'...':'')+'</div>';
-      if(objPills) html+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">'+objPills+'</div>';
-      if(!isMatched&&!isSelected) html+='<div style="font-size:9px;color:var(--gris);font-style:italic;margin-bottom:4px">Non recommande — activable manuellement</div>';
       var catLabels={'epargne-fin':'Placement','epargne-immo':'SCPI','epargne-ret':'Retraite','epargne-sal':'Entreprise','immobilier':'Immobilier','immo-fisc':'Immobilier','capital-invest':'Capital invest.','diversification':'Diversification','transmission':'Transmission','prevoyance':'Pr\u00e9voyance','entreprise':'Entreprise','fiscal-outremer':'Fiscal'};
       var catLabel=catLabels[cp.cat]||cp.cat;
       html+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
@@ -4566,9 +4564,16 @@ function buildMatriceObjSol(impot,capa,aSum){
 // ║  SOLUTIONS                                                     ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function toggleSolution(produit){
-  // Toujours ajouter une nouvelle instance (permet plusieurs du même produit pour différents titulaires)
   var cp=COPERNIC[produit];var hAns=cp?(cp.horizonAns||(parseInt(cp.horizon)||10)):10;
-  solsSelectionnees.push({produit:produit,levier:cp?cp.levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:hAns+' ans',horizonLabel:cp?cp.horizon:'10 ans',objectifs:[],etape:solsSelectionnees.length+1,objectifsValides:[]});
+  // Pré-cocher les objectifs du client qui matchent ce produit
+  var preChecked=[];
+  var clientObjs=ED.objectifs||[];
+  if(clientObjs.length&&window.OBJ_SOLUTIONS){
+    clientObjs.forEach(function(obj){
+      if(OBJ_SOLUTIONS[obj]&&OBJ_SOLUTIONS[obj].indexOf(produit)>=0)preChecked.push(obj);
+    });
+  }
+  solsSelectionnees.push({produit:produit,levier:cp?cp.levier:'epargne',titulaire:'C1',vi:0,vp:0,horizon:hAns+' ans',horizonLabel:cp?cp.horizon:'10 ans',objectifs:[],etape:solsSelectionnees.length+1,objectifsValides:preChecked});
   _refreshSolUI(produit);
 }
 function removeSol(idx){
