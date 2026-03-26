@@ -4772,7 +4772,6 @@ function renderFichesClient(){
           html+='<span style="font-size:11px;font-weight:600;color:'+meta.titleBg+';padding:3px 10px;border-radius:20px;background:rgba(0,0,0,0.05)">\u2713 '+o+'</span>';
         });
       }
-      html+='<span style="margin-left:auto;font-size:11px;color:var(--gris)">'+(parseInt(firstSol.horizon)||10)+'\u00a0ans</span>';
       html+='</div>';
 
       // Ligne par contrat/titulaire
@@ -4804,8 +4803,9 @@ function renderFichesClient(){
         if(sol.vi>0&&sol.vp>0)html+='<span style="color:var(--gris)">+</span>';
         if(sol.vp>0)html+='<span style="font-size:13px;color:var(--noir)"><strong>'+fmt(sol.vp)+'\u00a0\u20ac/mois</strong></span>';
         if(!sol.vi&&!sol.vp)html+='<span style="font-size:12px;color:var(--gris);font-style:italic">Montants \u00e0 d\u00e9finir</span>';
-        if(capitalFinal2>0)html+='<span style="margin-left:auto;font-size:12px;color:var(--gris-f)">\u2192 <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong></span>';
+        if(capitalFinal2>0)html+='<span style="font-size:12px;color:var(--gris-f)">\u2192 <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong></span>';
         if(economieFisc2>0)html+='<span style="font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-l);padding:2px 8px;border-radius:12px">\u25c6 '+fmt(economieFisc2)+'\u00a0\u20ac/an</span>';
+        html+='<span style="margin-left:auto;font-size:11px;color:var(--gris);white-space:nowrap">'+h2+'\u00a0ans</span>';
         html+='</div>';
       });
 
