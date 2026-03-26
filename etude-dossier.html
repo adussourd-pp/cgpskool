@@ -4155,7 +4155,7 @@ var COPERNIC = {
   'Nue-propri\u00e9t\u00e9 immo':     {cat:'immobilier',   levier:'financement',icon:'&#127968;',
     desc:'Achat en nue-propriété d\'un bien, décote à l\'achat, aucun revenu ni IFI, revalorisation à terme',
     fiscal:'Aucun revenu = aucun IR pendant la période',sri:'5',horizon:'15 ans+',horizonAns:15},
-  'LLI':                    {cat:'immobilier',   levier:'fiscal',      icon:'&#127968;',
+  'LLI':                    {cat:'immobilier',   levier:'financement',      icon:'&#127968;',
     desc:'TVA réduite 10 % + remboursement taxe foncière, loyers libres, engagement 20 ans',
     fiscal:'Avantage TVA 10 % + remboursement taxe foncière',sri:'6',horizon:'20 ans',horizonAns:20},
   'Immobilier d\u00e9fiscalisant': {cat:'immobilier',levier:'financement',icon:'&#127968;',
@@ -4912,7 +4912,8 @@ function renderFichesClient(){
       pg.sols.forEach(function(sol){
         var r2=(cfg&&cfg.rendement)||cp.rendement||meta.rate||0.025;
         var h2=parseInt(sol.horizon)||10;
-        var isSCPI2=/scpi/i.test(sol.produit||'');
+        var isSCPI2=(sol.produit==='SCPI de rendement');
+        var isGirardin=/girardin/i.test(sol.produit||'');
         var capitalFinal2,rente2;
         if(isSCPI2){
           var rDist2=0.045;
@@ -4927,6 +4928,7 @@ function renderFichesClient(){
         var prodLC2=(sol.produit||'').toLowerCase();
         if(prodLC2.indexOf('per')>=0&&sol.vp>0)economieFisc2=Math.round(sol.vp*12*tmi2/100);
         else if(prodLC2.indexOf('fip')>=0||prodLC2.indexOf('fcpi')>=0||prodLC2.indexOf('g3f')>=0)economieFisc2=Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
+        else if(prodLC2.indexOf('girardin')>=0)economieFisc2=Math.round((sol.vi||0)*1.10);
 
         var tit2=sol.titulaire==='C1'?n1:(sol.titulaire==='C2'?n2:sol.titulaire==='Commun'?(n1&&n2?n1+' & '+n2:(n1||'Commun')):(function(){var em=sol.titulaire.match(/^E(\d+)$/);if(em){var ei3=+em[1]-1;return(ED.enfants&&ED.enfants[ei3]&&ED.enfants[ei3].prenom)?ED.enfants[ei3].prenom:'Enfant '+em[1];}return sol.titulaire;})());
 
@@ -4972,11 +4974,11 @@ function renderFichesClient(){
             var renteBas=Math.round(capBas*0.04/12);
             var renteHaut=Math.round(capHaut*0.04/12);
             html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
-            if(isSCPI2){
-              var loyer2=Math.round(capitalFinal2*0.045/12);
-              html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='le capital estim\u00e9 serait de <strong>'+fmt(capitalFinal2)+'\u00a0\u20ac</strong>';
-              html+=loyer2>0?' avec des loyers potentiels de <strong>~'+fmt(loyer2)+'\u00a0\u20ac/mois</strong>.':'.';
+            if(isGirardin){
+              // Girardin : one-shot, économie impôt = 110% du VI
+              var ecoGir=Math.round((sol.vi||0)*1.10);
+              html+='Investissement one-shot de <strong>'+fmt(sol.vi||0)+'\u00a0\u20ac</strong>.';
+              html+='<br>\u00c9conomie d\'imp\u00f4t l\'ann\u00e9e suivante : <strong>'+fmt(ecoGir)+'\u00a0\u20ac</strong> (110\u00a0% du montant investi).';
             } else if(isSCPI2){
               var scpiMode3=sol._scpiMode||'pp';
               var US_PCT_TBL={3:0.15,4:0.18,5:0.24,6:0.27,7:0.29,8:0.32,9:0.34,10:0.37,11:0.39,12:0.42,13:0.44,14:0.47,15:0.50,16:0.52,17:0.54,18:0.56,19:0.58,20:0.60};
@@ -5100,7 +5102,8 @@ function rSynthese(){
     var prodLC=(sol.produit||'').toLowerCase();
     var tmi=ED.fiscal.tmi||0;
     if(prodLC.indexOf('per')>=0) return s+Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmi/100);
-    if(prodLC.indexOf('fip')>=0||prodLC.indexOf('fcpi')>=0||prodLC.indexOf('g3f')>=0||prodLC.indexOf('girar')>=0)
+    if(prodLC.indexOf('girar')>=0) return s+Math.round((sol.vi||0)*1.10);
+    if(prodLC.indexOf('fip')>=0||prodLC.indexOf('fcpi')>=0||prodLC.indexOf('g3f')>=0)
       return s+Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
     return s;
   },0);
