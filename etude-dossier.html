@@ -4194,12 +4194,9 @@ var COPERNIC = {
     fiscal:'Exonération plus-values après 5 ans (si FCPR)',sri:'6-7',horizon:'7-10 ans',horizonAns:8},
 
   // ─── TRANSMISSION ──────────────────────────────────────────────
-  'Donation + AV':          {cat:'transmission', levier:'transmission',icon:'&#128141;',
-    desc:'Donation aux héritiers combinée à une AV avec clause nominative, abattement 100 000 €/enf.',
-    fiscal:'Abattement 100 000 € par héritier tous les 15 ans',sri:'N/A',horizon:'Immédiat'},
-  'Donation au dernier vivant':{cat:'transmission',levier:'transmission',icon:'&#128141;',
-    desc:'Protection du conjoint survivant, augmentation de ses droits par acte notarié',
-    fiscal:'Acte notarié obligatoire',sri:'N/A',horizon:'Immédiat'},
+  'Donation':               {cat:'transmission', levier:'transmission',icon:'&#128141;',
+    desc:'Transmission anticip\u00e9e du patrimoine avec optimisation des abattements fiscaux',
+    fiscal:'Abattement 100 000 \u20ac par h\u00e9ritier tous les 15 ans',sri:'N/A',horizon:'Imm\u00e9diat'},
 
   // ─── ENTREPRISE ──────────────────────────────────────────────
   'Apport-cession 150-0 B ter':{cat:'entreprise',levier:'entreprise',icon:'&#127981;',
@@ -4220,9 +4217,9 @@ var OBJ_SOLUTIONS = {
   'Préparer sa retraite':               ['PER','Assurance vie','SCPI de rendement','PERECO/PERECOI','LMNP'],
   'Optimiser son IR':                   ['PER','FIP / FCPI','SCPI fiscale','Girardin industriel','Denormandie','LLI','Immobilier d\u00e9fiscalisant','LMNP','Apport-cession 150-0 B ter'],
   'Optimiser son IFI':                  ['SCPI en nue-propriété','Contrat de capitalisation','Nue-propriété immo'],
-  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation + AV','Donation au dernier vivant','SCPI en nue-propriété','SCI a l\'IS','Apport-cession 150-0 B ter'],
+  'Optimiser la transmission':          ['Assurance vie','Contrat de capitalisation','SCPI en usufruit','Donation','SCPI en nue-propri\u00e9t\u00e9','SCI a l\'IS','Apport-cession 150-0 B ter'],
   'Se créer un complément de revenus':  ['SCPI de rendement','Assurance vie','SCPI via SCI à l\'IS','LLI','Denormandie','LMNP'],
-  'Protéger son conjoint':              ['Assurance vie','PER','Prévoyance individuelle','Prévoyance pro','Donation au dernier vivant'],
+  'Prot\u00e9ger son conjoint':              ['Assurance vie','PER','Pr\u00e9voyance individuelle','Pr\u00e9voyance pro','Donation'],
   'Réorganiser son patrimoine':         ['Assurance vie','Contrat de capitalisation','SCPI de rendement','SCPI de rendement'],
   'Épargne / capitalisation':           ['Assurance vie','Contrat de capitalisation','SCPI de rendement','PER','SCPI de rendement'],
   'Investir via le financement':        ['SCPI financée','LMNP','Denormandie','LLI'],
@@ -4676,6 +4673,66 @@ function renderSolsRetenues(){
       html+='</div>';
     }
 
+    // ── Formulaire Donation custom ──
+    var isDonation=grp.produit==='Donation';
+    if(isDonation){
+      var d=firstSol._don||{montant:0,donataires:1,parente:'enfant',dateDern:'',typeBien:[],avFlechee:false,clauseNom:false,strategies:[],viAV:0,vpAV:0,horizonAV:8};
+      if(!firstSol._don)firstSol._don=d;
+      var abattMap={enfant:100000,'petit-enfant':31865,'neveu-niece':7967,autre:0};
+      var abattUnit=abattMap[d.parente]||0;
+      var abattTotal=abattUnit*(d.donataires||1);
+      var montantTax=Math.max(0,(d.montant||0)-abattTotal);
+      var recharge=(!d.dateDern||(new Date()-new Date(d.dateDern))/(365.25*24*3600000)>=15);
+      var fs='width:100%;padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;outline:none';
+      html+='<div style="margin-top:10px;padding:14px;background:rgba(128,90,200,0.04);border:1.5px solid rgba(128,90,200,0.15);border-radius:10px">';
+      // Ligne 1 : montant + donataires + parenté
+      html+='<div style="display:grid;grid-template-columns:1fr 0.6fr 1fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Montant \u00e0 donner</label><input type="number" value="'+(d.montant||0)+'" min="0" onchange="updDon(\'montant\',+this.value)" style="'+fs+'"></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Donataires</label><input type="number" value="'+(d.donataires||1)+'" min="1" max="20" onchange="updDon(\'donataires\',+this.value)" style="'+fs+'"></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Lien de parent\u00e9</label><select onchange="updDon(\'parente\',this.value)" style="'+fs+'"><option value="enfant"'+(d.parente==='enfant'?' selected':'')+'>Enfant</option><option value="petit-enfant"'+(d.parente==='petit-enfant'?' selected':'')+'>Petit-enfant</option><option value="neveu-niece"'+(d.parente==='neveu-niece'?' selected':'')+'>Neveu-ni\u00e8ce</option><option value="autre"'+(d.parente==='autre'?' selected':'')+'>Autre</option></select></div>';
+      html+='</div>';
+      // Ligne 2 : date dernière donation + type bien
+      html+='<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:10px;margin-bottom:10px">';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Derni\u00e8re donation</label><input type="date" value="'+(d.dateDern||'')+'" onchange="updDon(\'dateDern\',this.value)" style="'+fs+'" placeholder="Vide si 1\u00e8re donation"></div>';
+      html+='<div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Type de bien</label><div style="display:flex;gap:8px;margin-top:4px">';
+      ['Argent','Immobilier','Titres'].forEach(function(tb){
+        var ck=d.typeBien&&d.typeBien.indexOf(tb)>=0;
+        html+='<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--noir);cursor:pointer"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleDonBien(\''+tb+'\',this.checked)" style="accent-color:#7B4FA6">'+tb+'</label>';
+      });
+      html+='</div></div></div>';
+      // Calculs automatiques
+      html+='<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;font-size:11px">';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Abattement / donataire</div><div style="font-weight:700;color:var(--noir)">'+fmt(abattUnit)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Abattement total</div><div style="font-weight:700;color:var(--noir)">'+fmt(abattTotal)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Montant taxable</div><div style="font-weight:700;color:'+(montantTax>0?'var(--red)':'var(--green)')+'">'+fmt(montantTax)+' \u20ac</div></div>';
+      html+='<div><div style="color:var(--gris);margin-bottom:2px">Rechargement</div><div style="font-weight:700;color:'+(recharge?'var(--green)':'var(--orange)')+'">'+( recharge?'\u2705 Recharg\u00e9':'\u26a0\ufe0f Non recharg\u00e9')+'</div></div>';
+      html+='</div>';
+      // Flécher vers AV
+      html+='<div style="margin-bottom:8px"><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--noir);cursor:pointer"><input type="checkbox" '+(d.avFlechee?'checked':'')+' onchange="updDon(\'avFlechee\',this.checked)" style="accent-color:#7B4FA6">Fl\u00e9cher vers une Assurance Vie</label></div>';
+      if(d.avFlechee){
+        html+='<div style="padding:10px 12px;background:rgba(212,98,42,0.04);border-radius:8px;margin-bottom:8px">';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px">';
+        html+='<div><label style="font-size:10px;font-weight:600;color:var(--gris);display:block;margin-bottom:3px">Versement initial AV</label><input type="number" value="'+(d.viAV||0)+'" min="0" onchange="updDon(\'viAV\',+this.value)" style="'+fs+'"></div>';
+        html+='<div><label style="font-size:10px;font-weight:600;color:var(--gris);display:block;margin-bottom:3px">VP mensuel AV</label><input type="number" value="'+(d.vpAV||0)+'" min="0" onchange="updDon(\'vpAV\',+this.value)" style="'+fs+'"></div>';
+        html+='<div><label style="font-size:10px;font-weight:600;color:var(--gris);display:block;margin-bottom:3px">Horizon AV (ans)</label><input type="number" value="'+(d.horizonAV||8)+'" min="1" max="40" onchange="updDon(\'horizonAV\',+this.value)" style="'+fs+'"></div>';
+        html+='</div>';
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer"><input type="checkbox" '+(d.clauseNom?'checked':'')+' onchange="updDon(\'clauseNom\',this.checked)" style="accent-color:#7B4FA6">Clause nominative</label>';
+        if(d.clauseNom)html+='<div style="font-size:11px;color:var(--gris);margin-top:4px;font-style:italic">Permet de d\u00e9signer directement les b\u00e9n\u00e9ficiaires de l\'AV, hors succession.</div>';
+        html+='</div>';
+      }
+      // Stratégies à explorer
+      html+='<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Strat\u00e9gies \u00e0 explorer</div>';
+      var strats=[{k:'partage',l:'Donation-partage (fige les valeurs, \u00e9vite les conflits)'},{k:'demembrement',l:'D\u00e9membrement / r\u00e9serve d\'usufruit'},{k:'donExo',l:'Don exceptionnel exon\u00e9r\u00e9 (31 865 \u20ac suppl.)'},{k:'dutreil',l:'Pacte Dutreil (transmission entreprise, exo 75 %)'}];
+      strats.forEach(function(st){
+        var ck=d.strategies&&d.strategies.indexOf(st.k)>=0;
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--noir);cursor:pointer;margin-bottom:4px"><input type="checkbox" '+(ck?'checked':'')+' onchange="toggleDonStrat(\''+st.k+'\',this.checked)" style="accent-color:#7B4FA6">'+st.l+'</label>';
+      });
+      html+='</div>';
+      // Note fixe
+      html+='<div style="font-size:11px;color:var(--orange);font-weight:600;padding:8px 10px;background:rgba(212,98,42,0.06);border-radius:6px">\u26a0\ufe0f Simulation indicative \u2014 abattements, droits et strat\u00e9gie \u00e0 confirmer obligatoirement avec un notaire.</div>';
+      html+='</div>';
+    }
+
     html+='</div>'; // fin header padding
 
     // ── Contrats (sub-rows) ──
@@ -4776,6 +4833,30 @@ function updateSolNote(produit,val){
     solsSelectionnees.forEach(function(s){if(s.produit===produit){s._noteText=val;s._noteOn=first._noteOn;}});
   }
   renderFichesClient();
+}
+// ── Donation helpers ──
+function updDon(field,val){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Donation';});
+  if(!sol)return;if(!sol._don)sol._don={};
+  sol._don[field]=val;
+  solsSelectionnees.forEach(function(s){if(s.produit==='Donation')s._don=sol._don;});
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleDonBien(type,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Donation';});
+  if(!sol)return;if(!sol._don)sol._don={};if(!sol._don.typeBien)sol._don.typeBien=[];
+  var arr=sol._don.typeBien;
+  if(checked&&arr.indexOf(type)<0)arr.push(type);
+  else if(!checked){var i=arr.indexOf(type);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
+}
+function toggleDonStrat(key,checked){
+  var sol=solsSelectionnees.find(function(s){return s.produit==='Donation';});
+  if(!sol)return;if(!sol._don)sol._don={};if(!sol._don.strategies)sol._don.strategies=[];
+  var arr=sol._don.strategies;
+  if(checked&&arr.indexOf(key)<0)arr.push(key);
+  else if(!checked){var i=arr.indexOf(key);if(i>=0)arr.splice(i,1);}
+  renderSolsRetenues();renderFichesClient();
 }
 function toggleObjValideGroup(produit,obj,checked){
   solsSelectionnees.forEach(function(sol){
@@ -5057,6 +5138,39 @@ function renderFichesClient(){
         }
         html+='</div>';
       });
+
+      // Rendu Donation spécifique
+      if(pg.produit==='Donation'&&firstSol._don){
+        var dd=firstSol._don;
+        var abMap2={enfant:100000,'petit-enfant':31865,'neveu-niece':7967,autre:0};
+        var abU2=abMap2[dd.parente]||0;var abT2=abU2*(dd.donataires||1);
+        var mTax2=Math.max(0,(dd.montant||0)-abT2);
+        var parLabels={enfant:'enfant(s)','petit-enfant':'petit-enfant(s)','neveu-niece':'neveu(x)/ni\u00e8ce(s)',autre:'autre(s)'};
+        html+='<div style="padding:12px 14px;border-top:1px solid rgba(0,0,0,0.05)">';
+        html+='<div style="font-size:12px;color:var(--gris-f);line-height:1.8">';
+        html+='Donation de <strong>'+fmt(dd.montant||0)+' \u20ac</strong>';
+        html+=' \u00e0 <strong>'+(dd.donataires||1)+'</strong> '+(parLabels[dd.parente]||'donataire(s)');
+        if(dd.typeBien&&dd.typeBien.length)html+=' ('+dd.typeBien.join(', ')+')';
+        html+='.<br>Abattement utilis\u00e9 : <strong>'+fmt(abT2)+' \u20ac</strong> \u2014 Montant taxable estim\u00e9 : <strong>'+fmt(mTax2)+' \u20ac</strong>.';
+        html+='</div>';
+        if(dd.avFlechee){
+          html+='<div style="margin-top:8px;font-size:12px;color:var(--gris-f);line-height:1.7">';
+          html+='\u27a4 Fl\u00e9chage vers une Assurance Vie';
+          if(dd.viAV>0)html+=' : <strong>'+fmt(dd.viAV)+' \u20ac</strong> initial';
+          if(dd.vpAV>0)html+=' + <strong>'+fmt(dd.vpAV)+' \u20ac/mois</strong>';
+          if(dd.horizonAV)html+=' sur <strong>'+dd.horizonAV+' ans</strong>';
+          if(dd.clauseNom)html+=' \u2014 <em>clause nominative (hors succession)</em>';
+          html+='.</div>';
+        }
+        if(dd.strategies&&dd.strategies.length){
+          var stratLabels={partage:'Donation-partage',demembrement:'D\u00e9membrement / r\u00e9serve d\'usufruit',donExo:'Don exceptionnel exon\u00e9r\u00e9',dutreil:'Pacte Dutreil'};
+          html+='<div style="margin-top:8px;font-size:11px;color:var(--gris)">';
+          html+='Strat\u00e9gies \u00e0 explorer : '+dd.strategies.map(function(k){return stratLabels[k]||k;}).join(', ');
+          html+='</div>';
+        }
+        html+='<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:600">\u26a0\ufe0f Simulation indicative \u2014 \u00e0 confirmer avec un notaire.</div>';
+        html+='</div>';
+      }
 
       // Note client par produit (si switch ON et texte non vide)
       if(firstSol._noteOn&&firstSol._noteText&&firstSol._noteText.trim()){
