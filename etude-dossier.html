@@ -8282,47 +8282,68 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // S'assurer que les charts sont rendus : forcer le render retraite
-  try{renderSection('retraite');}catch(e3){}
-  // Rendre TOUTES les sections print-visible temporairement visibles pour toDataURL
-  document.querySelectorAll('.section-page.print-visible').forEach(function(el){
-    el.style.display='block';el.style.position='absolute';el.style.left='-9999px';el.style.visibility='hidden';
-  });
+  // Convertir les charts via canvas off-screen (fiable même si section cachée)
+  convertChartsOffscreen();
+  window.print();
   setTimeout(function(){
-    // Capturer les canvas
-    convertChartsToImg(function(){
-      // Remettre les sections normales
-      document.querySelectorAll('.section-page').forEach(function(el){
-        el.style.display='';el.style.position='';el.style.left='';el.style.visibility='';
-      });
-      window.print();
-      setTimeout(function(){
-        restoreCharts();
-        document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
-        if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
-      },2000);
-    });
-  },400);
+    restoreCharts();
+    document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+    if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
+  },2000);
 }
 
 var _chartImgBackups = [];
 
-function convertChartsToImg(callback) {
-  _chartImgBackups = [];
-  var canvases = document.querySelectorAll('canvas');
-  canvases.forEach(function(canvas) {
-    try {
-      var dataUrl = canvas.toDataURL('image/png');
-      var img = document.createElement('img');
-      img.src = dataUrl;
-      img.style.cssText = 'width:100%;max-width:100%;height:auto;display:block';
-      img.className = 'chart-img-backup';
-      canvas.parentNode.insertBefore(img, canvas);
-      _chartImgBackups.push({canvas: canvas, img: img, parent: canvas.parentNode});
-      canvas.style.display = 'none';
-    } catch(e) { /* canvas vide ou cross-origin */ }
+function chartToOffscreenImg(chartInst,w,h){
+  if(!chartInst)return null;
+  try{
+    var off=document.createElement('canvas');
+    off.width=w||794;off.height=h||400;
+    off.style.cssText='position:fixed;left:-9999px;top:-9999px';
+    document.body.appendChild(off);
+    var cfg={type:chartInst.config.type,data:JSON.parse(JSON.stringify(chartInst.config.data)),
+      options:JSON.parse(JSON.stringify(chartInst.config.options))};
+    cfg.options.animation=false;cfg.options.responsive=false;cfg.options.devicePixelRatio=2;
+    // Supprimer les plugins custom (clientTagPlugin) qui ne sont pas sérialisables
+    delete cfg.options.plugins;
+    var tmp=new Chart(off.getContext('2d'),cfg);
+    var url=off.toDataURL('image/png');
+    tmp.destroy();document.body.removeChild(off);
+    return url;
+  }catch(e){return null;}
+}
+
+function convertChartsOffscreen(){
+  _chartImgBackups=[];
+  // Chart retraite
+  if(window.retChartInst){
+    var canvas=document.getElementById('retChart');
+    if(canvas){
+      var url=chartToOffscreenImg(window.retChartInst,794,350);
+      if(url){
+        var img=document.createElement('img');img.src=url;
+        img.style.cssText='width:100%;max-width:100%;height:auto;display:block';
+        img.className='chart-img-backup';
+        canvas.parentNode.insertBefore(img,canvas);
+        _chartImgBackups.push({canvas:canvas,img:img});
+        canvas.style.display='none';
+      }
+    }
+  }
+  // Autres canvas (pyramide, etc.) — méthode classique pour ceux qui sont visibles
+  document.querySelectorAll('canvas:not(#retChart)').forEach(function(canvas){
+    try{
+      if(canvas.width>0&&canvas.height>0){
+        var url2=canvas.toDataURL('image/png');
+        var img2=document.createElement('img');img2.src=url2;
+        img2.style.cssText='width:100%;max-width:100%;height:auto;display:block';
+        img2.className='chart-img-backup';
+        canvas.parentNode.insertBefore(img2,canvas);
+        _chartImgBackups.push({canvas:canvas,img:img2});
+        canvas.style.display='none';
+      }
+    }catch(e){}
   });
-  if (callback) callback();
 }
 
 function restoreCharts() {
