@@ -1176,7 +1176,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-transmission">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 06</div><div class="sec-h1">Transmission</div></div>
+    <div><div class="sec-tag">Section 06b</div><div class="sec-h1">Transmission</div></div>
   </div>
 
   <!-- Saisie situation successorale -->
@@ -1235,7 +1235,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-entreprise">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 06b</div><div class="sec-h1">Entreprise</div></div>
+    <div><div class="sec-tag">Section 06ter</div><div class="sec-h1">Entreprise</div></div>
   </div>
 
   <!-- Saisie hypothèses (visible écran + PDF) -->
@@ -2477,8 +2477,8 @@ function goTo(sec){
   var secNames={import:'Import / Saisie',situation:'Section 01 — Situation & Objectifs',
     patrimoine:'Section 02 — Patrimoine',fiscal:'Section 03 — Impôts',
     financement:'Section 04 — Financement',
-    retraite:'Section 05 \u2014 Retraite',transmission:'Section 06 \u2014 Transmission',
-    entreprise:'Section 06b \u2014 Entreprise',
+    retraite:'Section 05 \u2014 Retraite',transmission:'Section 06b \u2014 Transmission',
+    entreprise:'Section 06ter \u2014 Entreprise',
     preconisations:'Section 07 \u2014 Pr\u00e9conisations',synthese:'Section 08 \u2014 Synth\u00e8se',
     pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions légales',avis:'Avis clients'};
   var headerNom=document.getElementById('pdfHeaderNom');
@@ -2748,7 +2748,7 @@ function parseTextRI(txt){
   }
   function mapCSP(s){
     s = (s||'').toLowerCase();
-    if(s.indexOf('227')>=0||s.indexOf('indép')>=0||s.indexOf('indep')>=0||s.indexOf('presta')>=0) return "Chef d'entreprise";
+    if(s.indexOf('227')>=0||s.indexOf('ind\u00e9p')>=0||s.indexOf('indep')>=0||s.indexOf('presta')>=0) return 'TNS comer.';
     if(s.indexOf('38')>=0||s.indexOf('ingénieur')>=0||(s.indexOf('cadre')>=0&&s.indexOf('sup')<0)) return 'Sal. cadre';
     if(s.indexOf('cadre sup')>=0) return 'Sal. cadre';
     if(s.indexOf('salarié')>=0||s.indexOf('salarie')>=0) return 'Sal. non cadre';
@@ -3111,7 +3111,10 @@ function parseTextRI(txt){
     ED.fiscal.rfr        = fiscNum('Revenu fiscal de r.f.rence');
     ED.fiscal.credits    = fiscNum('Total des cr.dits d.imp.t');
     ED.fiscal.reductions = fiscNum('Total des r.ductions d.imp.t');
-    ED.fiscal.plafondPER = fiscNum('Plafond .pargne retraite non utilis');
+    // Plafond PER : sommer les 2 déclarants
+    var perMatches=[];var perRe=/Plafond[^:]*retraite[^:]*:\s*([\d\s]+)/gi;var perM;
+    while((perM=perRe.exec(s05))!==null){var pv=parseInt((perM[1]||'').replace(/\s/g,''));if(pv>0)perMatches.push(pv);}
+    ED.fiscal.plafondPER=perMatches.length?perMatches.reduce(function(a,b){return a+b;},0):fiscNum('Plafond .pargne retraite non utilis');
     ED.fiscal.csgDed     = fiscNum('CSG d.ductible');
     ED.fiscal.deductions = fiscNum('Charges d.ductibles du revenu global');
     var partsM = s05.match(/Nombre de parts fiscales\s*[:\*\s]+([0-9,\.]+)/i);
@@ -7348,9 +7351,9 @@ function rPageGarde(){
     ];
     // Optionnels
     var cbTrans=document.getElementById('checkTransmission');
-    if(cbTrans&&cbTrans.checked)items.push({num:'06',label:'Transmission'});
+    if(cbTrans&&cbTrans.checked)items.push({num:'06b',label:'Transmission'});
     var cbEnt=document.getElementById('checkEntreprise');
-    if(cbEnt&&cbEnt.checked)items.push({num:'06b',label:'Entreprise'});
+    if(cbEnt&&cbEnt.checked)items.push({num:'06ter',label:'Entreprise'});
     items.push({num:'07',label:'Pr\u00e9conisations'});
     items.push({num:'08',label:'Synth\u00e8se'});
     items.push({num:'',label:'Mentions l\u00e9gales'});
