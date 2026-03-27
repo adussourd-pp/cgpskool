@@ -535,7 +535,6 @@ select.span2{grid-column:span 2}
   <button class="step-btn active" data-sec="import" onclick="goTo('import')"><span class="step-dot"></span>Import / Saisie</button>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
   <button class="step-btn" data-sec="sommaire" onclick="goTo('sommaire')"><span class="step-dot"></span>Sommaire</button>
-  <div class="sidebar-lbl" style="margin-top:8px">Analyse</div>
   <button class="step-btn" data-sec="situation" onclick="goTo('situation')"><span class="step-dot"></span>Situation &amp; Objectifs</button>
   <button class="step-btn" data-sec="patrimoine" onclick="goTo('patrimoine')"><span class="step-dot"></span>Patrimoine</button>
   <button class="step-btn" data-sec="fiscal" onclick="goTo('fiscal')"><span class="step-dot"></span>Imp&#244;ts</button>
@@ -559,7 +558,6 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
-  <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Pr&#233;conisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synth&#232;se</button>
   <button class="step-btn" data-sec="mentions" onclick="goTo('mentions')"><span class="step-dot"></span>Mentions l&#233;gales</button>
@@ -2485,7 +2483,7 @@ function goTo(sec){
   var headerRight=document.getElementById('pdfHeaderRight');
   if(headerRight)headerRight.textContent='Étude de Dossier';
   updatePageNumbers();
-  try{renderNavButtons(sec);}catch(e){}
+  try{renderNavBtns(sec);}catch(e){}
   // Marquer les sauts de page A4 après le rendu
   // Page break markers désactivés
   // Afficher/masquer les panneaux conseiller selon la section active
@@ -2498,6 +2496,36 @@ function goTo(sec){
 }
 
 // ── NUMÉROTATION DYNAMIQUE DES PAGES ─────────────────────────────
+// ── BOUTONS SUIVANT / PRÉCÉDENT ──
+var NAV_ORDER=['import','pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite','transmission','entreprise','preconisations','synthese','mentions','avis','compterendu'];
+function renderNavBtns(sec){
+  try{
+    var active=NAV_ORDER.filter(function(s){
+      if(s==='transmission'){var cb=document.getElementById('checkTransmission');return cb&&cb.checked;}
+      if(s==='entreprise'){var cb2=document.getElementById('checkEntreprise');return cb2&&cb2.checked;}
+      if(s==='avis'){var cb3=document.getElementById('checkAvis');return cb3&&cb3.checked;}
+      return true;
+    });
+    var idx=active.indexOf(sec);
+    var prev=idx>0?active[idx-1]:null;
+    var next=idx<active.length-1?active[idx+1]:null;
+    var secEl=document.getElementById('sec-'+sec);
+    if(!secEl)return;
+    var navEl=secEl.querySelector('.page-nav-btns');
+    if(!navEl)return;
+    var h='<div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid var(--bord)">';
+    if(prev)h+='<button class="btn btn-secondary" onclick="goTo(\''+prev+'\')" style="font-size:12px;padding:8px 16px">\u2190 Pr\u00e9c\u00e9dent</button>';
+    else h+='<div></div>';
+    if(next)h+='<button class="btn btn-primary" onclick="validateAndGoTo(\''+next+'\')" style="font-size:12px;padding:8px 16px">Suivant \u2192</button>';
+    else h+='<div></div>';
+    h+='</div>';
+    navEl.innerHTML=h;
+  }catch(e){}
+}
+function validateAndGoTo(sec){
+  if(currentSection&&currentSection!=='import')validateSection(currentSection);
+  goTo(sec);
+}
 function updatePageNumbers(){
   // Ordre PDF : page de garde (1), sommaire (2), sections métier, mentions (dernière), avis (si activé, avant mentions)
   var sectionIds=['pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite',
@@ -6437,41 +6465,6 @@ function renderSteps(){
 }
 function toggleStep(i){if(steps[i])steps[i].done=!steps[i].done;renderSteps();}
 var NAV_ORDER=['import','situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'];
-function renderNavButtons(sec){
-  try{
-    // Supprimer l'ancien nav bar
-    var old=document.getElementById('navBarFloat');if(old)old.remove();
-    var idx=NAV_ORDER.indexOf(sec);if(idx<0)return;
-    var prev=idx>0?NAV_ORDER[idx-1]:null;
-    var next=idx<NAV_ORDER.length-1?NAV_ORDER[idx+1]:null;
-    if(!prev&&!next)return;
-    var secEl=document.getElementById('sec-'+sec);if(!secEl)return;
-    var bar=document.createElement('div');
-    bar.id='navBarFloat';
-    bar.className='panneau-interne';
-    bar.style.cssText='display:flex;justify-content:space-between;align-items:center;max-width:794px;margin:12px auto;padding:10px 20px';
-    if(prev){
-      var bp=document.createElement('button');
-      bp.className='btn btn-secondary';
-      bp.style.cssText='font-size:12px;padding:8px 20px';
-      bp.textContent='\u2190 Pr\u00e9c\u00e9dent';
-      bp.onclick=function(){goTo(prev);};
-      bar.appendChild(bp);
-    } else {bar.appendChild(document.createElement('div'));}
-    if(next){
-      var bn=document.createElement('button');
-      bn.className='btn btn-primary';
-      bn.style.cssText='font-size:12px;padding:8px 20px';
-      bn.textContent='Suivant \u2192';
-      bn.onclick=function(){validateSection(sec);goTo(next);};
-      bar.appendChild(bn);
-    } else {bar.appendChild(document.createElement('div'));}
-    var ins=secEl.nextSibling;
-    while(ins&&ins.nodeType===1&&(ins.className||'').indexOf('comment-zone')>=0)ins=ins.nextSibling;
-    while(ins&&ins.nodeType===1&&(ins.className||'').indexOf('panneau-interne')>=0)ins=ins.nextSibling;
-    secEl.parentNode.insertBefore(bar,ins);
-  }catch(e){}
-}
 function addStep(){
   var nsi=document.getElementById('newStepInput');
   var v=nsi?nsi.value.trim():'';
