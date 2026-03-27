@@ -1513,39 +1513,96 @@ select.span2{grid-column:span 2}
 
 <!-- ── ONBOARDING ── -->
 <div id="onboardingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 12px 48px rgba(0,0,0,0.25)">
+  <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 12px 48px rgba(0,0,0,0.25)">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:32px;margin-bottom:8px">&#128203;</div>
       <div style="font-family:var(--serif);font-size:24px;font-weight:600;color:var(--noir)">Bienvenue sur l'&#201;tude de Dossier</div>
       <div style="font-size:13px;color:var(--gris);margin-top:6px">Voici comment utiliser l'outil en 5 &#233;tapes</div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px">
-      <div style="display:flex;gap:14px;align-items:flex-start">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</div>
-        <div><div style="font-weight:700;font-size:14px;color:var(--noir)">Importer le recueil</div><div style="font-size:12px;color:var(--gris-f);margin-top:2px">Copie-colle le contenu du Word (RI ou RIO pr&#233;alable). Le parser extrait les donn&#233;es automatiquement.</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Importer le recueil</div><div style="font-size:11px;color:var(--gris)">Copie-colle le contenu du Word</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          <strong>3 zones d'import dans la page :</strong><br>
+          &#8226; <strong>Recueil d'informations (RI)</strong> : ouvre le Word, Ctrl+A puis Ctrl+C, colle dans la zone et clique Valider. Le parser extrait identit&#233;, revenus, patrimoine, objectifs.<br>
+          &#8226; <strong>Fiche l&#233;gale (DER)</strong> : m&#234;me principe, colle ton Document d'Entr&#233;e en Relation. Les habilitations ORIAS sont d&#233;tect&#233;es automatiquement.<br>
+          &#8226; <strong>Avis d'imposition</strong> : importe le PDF. TMI, IR net et plafond PER sont extraits.
+        </div>
       </div>
-      <div style="display:flex;gap:14px;align-items:flex-start">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</div>
-        <div><div style="font-weight:700;font-size:14px;color:var(--noir)">V&#233;rifier &amp; compl&#233;ter</div><div style="font-size:12px;color:var(--gris-f);margin-top:2px">Le volet de v&#233;rification s'ouvre apr&#232;s l'import. Corrige les erreurs, compl&#232;te ce qui manque, puis clique "Appliquer".</div></div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">V&#233;rifier &amp; compl&#233;ter</div><div style="font-size:11px;color:var(--gris)">Corrige les erreurs du parser</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          Apr&#232;s chaque import, un volet de v&#233;rification s'ouvre avec tous les champs pr&#233;-remplis. <strong>C'est la source de v&#233;rit&#233;</strong> : ce que tu valides ici alimente toute l'&#233;tude.<br><br>
+          &#8226; V&#233;rifie l'identit&#233;, la CSP, les revenus de chaque d&#233;clarant<br>
+          &#8226; Ajoute ou supprime des actifs / passifs<br>
+          &#8226; Coche les objectifs du client<br>
+          &#8226; Renseigne l'&#233;pargne mensuelle et l'&#233;pargne de pr&#233;caution<br>
+          &#8226; Puis clique <strong>"Appliquer les modifications"</strong>
+        </div>
       </div>
-      <div style="display:flex;gap:14px;align-items:flex-start">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</div>
-        <div><div style="font-weight:700;font-size:14px;color:var(--noir)">Parcourir l'analyse</div><div style="font-size:12px;color:var(--gris-f);margin-top:2px">Navigue section par section avec les boutons Suivant / Pr&#233;c&#233;dent. Chaque section se remplit automatiquement.</div></div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Parcourir l'analyse</div><div style="font-size:11px;color:var(--gris)">Chaque section se remplit automatiquement</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          Navigue avec les boutons <strong>Suivant / Pr&#233;c&#233;dent</strong> en bas de chaque page ou via la sidebar. L'ordre suit la pagination PDF :<br><br>
+          Page de garde &#8594; Sommaire &#8594; Situation &#8594; Patrimoine &#8594; Imp&#244;ts &#8594; Financement &#8594; Retraite &#8594; Pr&#233;conisations &#8594; Synth&#232;se &#8594; Mentions l&#233;gales<br><br>
+          Les sections <strong>Transmission</strong>, <strong>Entreprise</strong> et <strong>Avis clients</strong> sont optionnelles (activ&#233;es par une case &#224; cocher).
+        </div>
       </div>
-      <div style="display:flex;gap:14px;align-items:flex-start">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</div>
-        <div><div style="font-weight:700;font-size:14px;color:var(--noir)">S&#233;lectionner les solutions</div><div style="font-size:12px;color:var(--gris-f);margin-top:2px">Dans Pr&#233;conisations, coche les solutions dans la matrice. Param&#232;tre les montants, ajoute des contrats pour chaque titulaire.</div></div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">S&#233;lectionner les solutions</div><div style="font-size:11px;color:var(--gris)">Coche, param&#232;tre, duplique</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          Dans la section <strong>Pr&#233;conisations</strong>, le panneau conseiller propose toutes les solutions (Copernic). Pour chaque solution :<br><br>
+          &#8226; <strong>Cliquer</strong> = ajouter. Re-cliquer = retirer (si aucun montant saisi)<br>
+          &#8226; <strong>"+ Ajouter un contrat"</strong> pour cr&#233;er un 2e contrat pour un autre titulaire<br>
+          &#8226; Renseigner les montants (VI, VP, horizon)<br>
+          &#8226; Le <strong>libell&#233; PDF</strong> est modifiable (ce que le client voit)<br>
+          &#8226; Les <strong>recommandations</strong> coch&#233;es apparaissent en "Points de vigilance" dans le PDF<br>
+          &#8226; La <strong>note client</strong> (switch) s'affiche sous la solution dans le PDF si activ&#233;e
+        </div>
       </div>
-      <div style="display:flex;gap:14px;align-items:flex-start">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</div>
-        <div><div style="font-weight:700;font-size:14px;color:var(--noir)">Exporter &amp; sauvegarder</div><div style="font-size:12px;color:var(--gris-f);margin-top:2px">Exporte en PDF, sauvegarde l'&#233;tude en JSON pour la reprendre plus tard. G&#233;n&#232;re un compte rendu mail en un clic.</div></div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Exporter, sauvegarder &amp; compte rendu</div><div style="font-size:11px;color:var(--gris)">PDF, JSON, mails</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          &#8226; <strong>Exporter PDF</strong> : g&#233;n&#232;re l'&#233;tude compl&#232;te. Apr&#232;s l'export, un popup propose de sauvegarder.<br>
+          &#8226; <strong>Sauvegarder l'&#233;tude</strong> : t&#233;l&#233;charge un fichier JSON. <strong>Archive-le bien</strong> (Drive, Notion, dossier client) &#8212; c'est lui qui permet de reprendre l'&#233;tude plus tard.<br>
+          &#8226; <strong>Charger une &#233;tude</strong> : s&#233;lectionne un JSON pr&#233;c&#233;demment sauvegard&#233;. Tout est restaur&#233; : donn&#233;es, solutions, notes.<br>
+          &#8226; <strong>Compte rendu</strong> : 3 templates de mails (R1 Audit, R2 Pr&#233;sentation, R3 Confirmation) pr&#233;-remplis avec les donn&#233;es du client. Copie en un clic.
+        </div>
       </div>
+
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f)">
-      <div><strong>&#128161; Astuce :</strong> Tu peux charger une &#233;tude pr&#233;c&#233;dente via "&#128194; Charger une &#233;tude" dans la sidebar.</div>
-      <div><strong>&#128161; Astuce :</strong> Les mentions l&#233;gales et l'avis d'imposition ont aussi leur propre zone de copier-coller + v&#233;rification.</div>
+    <div style="padding:14px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f);line-height:1.7">
+      <strong>Astuces :</strong><br>
+      &#8226; Le fichier JSON sauvegard&#233; contient TOUTE l'&#233;tude. Conserve-le pr&#233;cieusement pour pouvoir la reprendre 3, 6 ou 12 mois plus tard.<br>
+      &#8226; Les mentions l&#233;gales et l'avis d'imposition ont chacun leur propre zone de copier-coller + v&#233;rification dans Import / Saisie.<br>
+      &#8226; Tu peux revoir ce guide &#224; tout moment via "&#128214; Revoir le guide" en bas de la sidebar.
     </div>
 
     <div style="text-align:center">
