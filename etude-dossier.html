@@ -8222,15 +8222,22 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
+  // Rendre toutes les sections visibles temporairement pour les canvas
+  document.querySelectorAll('.section-page.print-visible').forEach(function(el){el.style.display='block';});
+  // Re-render les charts si nécessaire
+  try{if(window.retChartInst)window.retChartInst.update();}catch(e3){}
   // Convertir tous les canvas Chart.js en img PNG
-  convertChartsToImg(function() {
-    window.print();
-    // Remettre les canvas et nettoyer les classes après impression
-    setTimeout(function(){
-      restoreCharts();
-      document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
-    }, 2000);
-  });
+  setTimeout(function(){
+    convertChartsToImg(function() {
+      // Remettre le display normal
+      document.querySelectorAll('.section-page').forEach(function(el){el.style.display='';});
+      window.print();
+      setTimeout(function(){
+        restoreCharts();
+        document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+      }, 2000);
+    });
+  },100);
 }
 
 var _chartImgBackups = [];
