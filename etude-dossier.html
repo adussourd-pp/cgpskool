@@ -528,7 +528,10 @@ select.span2{grid-column:span 2}
 <aside class="sidebar">
   <div class="sidebar-lbl" style="display:flex;align-items:center;justify-content:space-between">
     <span>&#201;tude de dossier</span>
-    <label class="cz-switch" style="transform:scale(0.85)"><input type="checkbox" checked onchange="var w=document.getElementById('edNavWrap');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button onclick="if(confirm('R\u00e9initialiser ?'))resetAll()" style="border:none;background:none;color:var(--gris);cursor:pointer;font-size:11px;padding:2px 6px;border-radius:4px" title="R&#233;initialiser l'&#233;tude">&#8635;</button>
+      <label class="cz-switch" style="transform:scale(0.85)"><input type="checkbox" checked onchange="var w=document.getElementById('edNavWrap');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
+    </div>
   </div>
   <div id="edNavWrap">
   <div id="progressBar" style="padding:0 10px 8px">
@@ -804,50 +807,7 @@ select.span2{grid-column:span 2}
       </div>
     </div>
 
-    <!-- ── BLOC AVIS D'IMPOSITION ── -->
-    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px;margin-bottom:18px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">&#128202; Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
-          <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
-        </div>
-        <label id="avisDropzone" class="btn btn-primary" style="cursor:pointer;flex-shrink:0;margin-left:16px" ondragover="event.preventDefault()" ondrop="handleAvisDrop(event)">
-          &#9654; Importer PDF
-          <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
-        </label>
-      </div>
-      <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
-      <!-- Vérif avis imposition (dans la même bulle) -->
-      <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierFiscBody');b.style.display=b.style.display==='none'?'':'none'">
-        <span style="font-size:13px;font-weight:600;color:var(--orange)">V&#233;rifier les donn&#233;es fiscales</span>
-        <span style="color:var(--orange);font-size:14px">&#9660;</span>
-      </div>
-      <div id="verifierFiscBody" style="display:none;padding:16px 20px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-          <div><label style="font-size:10px;color:var(--gris)">Ann&#233;e</label><input class="fi" id="vF2Annee"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Revenu brut global</label><input class="fi" type="number" id="vF2RBG"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Revenu imposable</label><input class="fi" type="number" id="vF2RevImp"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Nb parts</label><input class="fi" type="number" id="vF2Parts" step="0.5"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-          <div><label style="font-size:10px;color:var(--gris)">TMI (%)</label><input class="fi" type="number" id="vF2TMI"></div>
-          <div><label style="font-size:10px;color:var(--gris)">IR net</label><input class="fi" type="number" id="vF2IRNet"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Pr&#233;l. sociaux</label><input class="fi" type="number" id="vF2PS"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Plafond PER</label><input class="fi" type="number" id="vF2PER"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><label style="font-size:10px;color:var(--gris)">IR bar&#232;me</label><input class="fi" type="number" id="vF2IRBareme"></div>
-          <div><label style="font-size:10px;color:var(--gris)">R&#233;ductions</label><input class="fi" type="number" id="vF2Reduc"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Cr&#233;dits</label><input class="fi" type="number" id="vF2Credits"></div>
-        </div>
-        <button class="btn btn-primary" onclick="appliquerVerifFisc()" style="padding:10px 28px;font-size:13px">Appliquer les modifications</button>
-      </div>
-    </div>
 
-    <!-- Réinitialiser -->
-    <div style="text-align:right;margin-top:14px">
-      <button class="btn btn-secondary" onclick="if(confirm('R\u00e9initialiser toute l\'\u00e9tude ?'))resetAll()">R&#233;initialiser</button>
-    </div>
 
   </div>
 </div><!-- /sec-import -->
