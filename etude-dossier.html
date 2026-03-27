@@ -523,7 +523,11 @@ select.span2{grid-column:span 2}
 <div class="app">
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
-  <div class="sidebar-lbl">Navigation</div>
+  <div class="sidebar-lbl" style="display:flex;align-items:center;justify-content:space-between">
+    <span>&#201;tude de dossier</span>
+    <label class="cz-switch" style="transform:scale(0.85)"><input type="checkbox" checked onchange="var w=document.getElementById('edNavWrap');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
+  </div>
+  <div id="edNavWrap">
   <div id="progressBar" style="padding:0 10px 8px">
     <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-bottom:4px"><span id="progressLbl">0 / 8</span><span id="progressPct">0%</span></div>
     <div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div id="progressFill" style="height:100%;width:0%;border-radius:2px;transition:width 0.4s;background:var(--blue)"></div></div>
@@ -569,11 +573,19 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
+  </div><!-- /edNavWrap -->
   <div style="padding:8px 10px;margin-top:8px;display:flex;flex-direction:column;gap:6px">
     <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:10px;font-size:13px">&#11015; Exporter PDF</button>
     <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
     <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128194; Charger une &#233;tude</button>
     <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
+    <select id="crTypeSelect" class="fi" style="width:100%;font-size:12px;padding:6px">
+      <option value="r1">CR R1 &#8212; Audit</option>
+      <option value="r2">CR R2 &#8212; Pr&#233;sentation</option>
+      <option value="r3">CR R3 &#8212; Signature</option>
+      <option value="post">CR Post-signature</option>
+    </select>
+    <button class="btn btn-secondary" onclick="genererCR()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; G&#233;n&#233;rer un CR</button>
     <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center"></div>
   </div>
   <div class="sidebar-divider"></div>
@@ -585,15 +597,6 @@ select.span2{grid-column:span 2}
     <div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">Configuration</div>
     <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">Configuration</div>
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
-  </div>
-  <div style="padding:8px 10px;margin-top:8px">
-    <select id="crTypeSelect" class="fi" style="width:100%;margin-bottom:6px;font-size:12px;padding:6px">
-      <option value="r1">CR R1 &#8212; Audit</option>
-      <option value="r2">CR R2 &#8212; Pr&#233;sentation</option>
-      <option value="r3">CR R3 &#8212; Signature</option>
-      <option value="post">CR Post-signature</option>
-    </select>
-    <button class="btn btn-secondary" onclick="genererCR()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; G&#233;n&#233;rer un CR</button>
   </div>
 </aside>
 
