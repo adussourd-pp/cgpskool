@@ -8359,23 +8359,28 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Forcer le render de rRetraite pour que le chart soit créé
-  // (visibility:hidden permet à Chart.js de dessiner dans un canvas dimensionné)
-  try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
-  // Attendre que Chart.js dessine les courbes
+  // Forcer le rendu du chart retraite si jamais visité
+  var retCanvas=document.getElementById('retChart');
+  var needsRetRender=!retCanvas||retCanvas.width===0;
+  var secRet=document.getElementById('sec-retraite');
+  if(needsRetRender&&secRet){
+    // Rendre la section temporairement active pour que Chart.js ait des dimensions
+    secRet.classList.add('active');
+    try{renderSection('retraite');}catch(e3){}
+  }
+  // Attendre que le chart se dessine (800ms si premier rendu, 200ms sinon)
   setTimeout(function(){
-    try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}}catch(e4){}
-    // 2ème attente pour le rendu complet puis capture
+    // Retirer active de sec-retraite si on l'avait ajouté
+    if(needsRetRender&&secRet)secRet.classList.remove('active');
+    // Capturer tous les canvas
+    convertChartsDirectCapture();
+    window.print();
     setTimeout(function(){
-      convertChartsDirectCapture();
-      window.print();
-      setTimeout(function(){
-        restoreCharts();
-        document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
-        if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
-      },2000);
-    },500);
-  },500);
+      restoreCharts();
+      document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+      if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
+    },2000);
+  },needsRetRender?800:200);
 }
 
 var _chartImgBackups = [];
@@ -8493,7 +8498,6 @@ function updatePdfHeader() {
 // Déclencher exportPDF sur Ctrl+P aussi
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
-  convertChartsToImg(function(){});
 });
 window.addEventListener('afterprint', function() {
   restoreCharts();
