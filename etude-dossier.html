@@ -3998,20 +3998,6 @@ function rPatrimoine(){
     return{label:'Autre',bg:GRIS.bg,color:GRIS.color};
   }
 
-  // ── Horizon selon nomenclature Excel V12 exacte ────────────────────
-  function getHorizonFromNom(nom){
-    var n=(nom||'').toLowerCase();
-    // Court terme : A19-A25
-    if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|livret d.[\u00e9e]pargne pop|\bcel\b|compte [\u00e9e]pargne logement/.test(n)) return 'ct';
-    if(/\blivret\b/.test(n) && !/pel/.test(n)) return 'ct';
-    // Moyen terme : A27-A29 (PEL, CAT, Autre liquidité)
-    // Long terme  : A31-A37 (AV, Capi, PEP, CTO, PEA) ← Excel dit Long terme
-    // Retraite    : A39-A44 (PER, PERP, PEE, PERCO...) ← mappé lt
-    if(/\bpel\b|plan d.[\u00e9e]pargne logement|\bcat\b|compte [\u00e0a] terme|assurance[- ]vie|capitalisation|\bcto\b|compte[- ]titre|\bpea\b|\bpee\b/.test(n)) return 'mt';
-    // Tout le reste = long terme (immo, AV, Capi, PEA, CTO, PER, sociétés…)
-    return 'lt';
-  }
-  
   function buildHorizonSection(label, badgeCls, items){
     if(!items.length) return '';
     var sorted=items.slice().sort(function(a,b){return (b.montant||0)-(a.montant||0);});
@@ -6451,7 +6437,10 @@ function renderNavButtons(sec){
       bn.onclick=function(){validateSection(sec);goTo(next);};
       bar.appendChild(bn);
     } else {bar.appendChild(document.createElement('div'));}
-    secEl.parentNode.insertBefore(bar,secEl.nextSibling);
+    var ins=secEl.nextSibling;
+    while(ins&&ins.nodeType===1&&(ins.className||'').indexOf('comment-zone')>=0)ins=ins.nextSibling;
+    while(ins&&ins.nodeType===1&&(ins.className||'').indexOf('panneau-interne')>=0)ins=ins.nextSibling;
+    secEl.parentNode.insertBefore(bar,ins);
   }catch(e){}
 }
 function addStep(){
