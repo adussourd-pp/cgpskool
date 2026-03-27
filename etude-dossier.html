@@ -578,8 +578,12 @@ select.span2{grid-column:span 2}
       onclick="event.stopPropagation()"
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
-  <div style="padding:8px 10px;margin-top:8px">
+  <div style="padding:8px 10px;margin-top:8px;display:flex;flex-direction:column;gap:6px">
     <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:10px;font-size:13px">&#11015; Exporter PDF</button>
+    <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128194; Charger une &#233;tude</button>
+    <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
+    <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center"></div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
@@ -708,8 +712,9 @@ select.span2{grid-column:span 2}
     <!-- Pied de page (bas) -->
     <div style="border-top:1px solid var(--bord);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Date d'établissement</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Date d'&#233;tablissement</div>
         <div id="gardeDatePreview" style="font-size:13px;font-weight:600;color:var(--noir)"></div>
+        <div id="gardeDateMAJ" style="font-size:11px;color:var(--gris);margin-top:4px"></div>
       </div>
       <div>
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Conseiller référent</div>
@@ -7055,6 +7060,8 @@ function rPageGarde(){
   if(cl)cl.textContent=nom.trim();
   var dt=document.getElementById('gardeDatePreview');
   if(dt)dt.textContent=dateStr;
+  var majEl=document.getElementById('gardeDateMAJ');
+  if(majEl&&ED._dateMAJ)majEl.textContent='Mise \u00e0 jour : '+ED._dateMAJ;
 
   // Cabinet name header
   var cabName=document.getElementById('gardeCabinetName');
@@ -7204,6 +7211,102 @@ function calcProjectionFin(){
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
 }
+// ── SAUVEGARDE / CHARGEMENT ÉTUDE ──
+function sauvegarderEtude(){
+  try{
+    var now=new Date();
+    var dateStr=now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    // Collecter les commentaires de chaque section
+    var commentIds=['noteConsultant','commentPatrimoine','commentFiscal','commentFinancement','commentRetraite','commentPreconisations','noteSynthese','noteTrans','noteEntreprise'];
+    var comments={};
+    commentIds.forEach(function(id){var el=document.getElementById(id);if(el)comments[id]=el.value||el.textContent||'';});
+    // Collecter les switches commentaires
+    var commentSwitches={};
+    document.querySelectorAll('.comment-zone .cz-switch input').forEach(function(sw){
+      var zone=sw.closest('.comment-zone');
+      if(zone){var sec=zone.getAttribute('data-sec');if(sec)commentSwitches[sec]=sw.checked;}
+    });
+    var data={
+      version:2,
+      dateCreation:ED._dateCreation||dateStr,
+      dateMAJ:dateStr,
+      ED:JSON.parse(JSON.stringify(ED)),
+      solsSelectionnees:JSON.parse(JSON.stringify(solsSelectionnees)),
+      comments:comments,
+      commentSwitches:commentSwitches
+    };
+    // Stocker la date de création si première sauvegarde
+    if(!ED._dateCreation)ED._dateCreation=dateStr;
+    ED._dateMAJ=dateStr;
+    var nom=((ED.c1.prenom||'')+'_'+(ED.c1.nom||'')).trim().replace(/\s+/g,'_')||'client';
+    var dateFile=now.toISOString().slice(0,10);
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='etude_'+nom+'_'+dateFile+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    // Mettre à jour l'affichage
+    var lbl=document.getElementById('etudeLastSave');
+    if(lbl)lbl.textContent='Sauvegard\u00e9 '+dateStr;
+    var majEl=document.getElementById('gardeDateMAJ');
+    if(majEl)majEl.textContent='Mise \u00e0 jour : '+dateStr;
+    showNotif('Etude sauvegard\u00e9e');
+  }catch(e){console.warn('Sauvegarde erreur:',e);showNotif('Erreur sauvegarde');}
+}
+
+function chargerEtude(input){
+  try{
+    if(!input.files||!input.files[0])return;
+    var reader=new FileReader();
+    reader.onload=function(evt){
+      try{
+        var data=JSON.parse(evt.target.result);
+        if(!data.ED){showNotif('Fichier invalide');return;}
+        // Restaurer ED
+        Object.keys(data.ED).forEach(function(k){ED[k]=data.ED[k];});
+        // Restaurer solutions
+        if(data.solsSelectionnees){
+          solsSelectionnees.length=0;
+          data.solsSelectionnees.forEach(function(s){solsSelectionnees.push(s);});
+        }
+        // Restaurer commentaires
+        if(data.comments){
+          Object.keys(data.comments).forEach(function(id){
+            var el=document.getElementById(id);
+            if(el){
+              if(el.tagName==='TEXTAREA')el.value=data.comments[id];
+              else el.textContent=data.comments[id];
+            }
+          });
+        }
+        // Restaurer switches
+        if(data.commentSwitches){
+          Object.keys(data.commentSwitches).forEach(function(sec){
+            var zone=document.querySelector('.comment-zone[data-sec="'+sec+'"]');
+            if(zone){
+              var sw=zone.querySelector('.cz-switch input');
+              if(sw){sw.checked=data.commentSwitches[sec];zone.classList.toggle('comment-off',!sw.checked);}
+            }
+          });
+        }
+        // Dates
+        ED._dateCreation=data.dateCreation||'';
+        ED._dateMAJ=data.dateMAJ||'';
+        var lbl=document.getElementById('etudeLastSave');
+        if(lbl&&data.dateMAJ)lbl.textContent='Charg\u00e9 \u2014 derni\u00e8re MAJ '+data.dateMAJ;
+        // Re-render la section active
+        var sec=currentSection||'situation';
+        if(sec!=='import')renderSection(sec);
+        goTo(sec);
+        showNotif('\u00c9tude charg\u00e9e \u2014 '+((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim());
+      }catch(e2){console.warn('Chargement erreur parse:',e2);showNotif('Erreur lecture fichier');}
+    };
+    reader.readAsText(input.files[0]);
+    input.value='';
+  }catch(e){console.warn('Chargement erreur:',e);showNotif('Erreur chargement');}
+}
+
 function updEntreprise(){
   var v=function(id){var e=document.getElementById(id);return e?e.value:'';};
   var n=function(id){return +(v(id))||0;};
