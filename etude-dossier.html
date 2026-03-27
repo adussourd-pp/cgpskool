@@ -2572,6 +2572,8 @@ let pieInst=null, solCount=0, steps=[];
 var currentSection='import';
 var sectionEnteredAt=0;
 function goTo(sec){
+  // Nettoyer les images chart résiduelles du print
+  try{restoreCharts();}catch(e){}
   // Valider la section qu'on quitte seulement si on y est resté > 3s
   var elapsed=Date.now()-sectionEnteredAt;
   if(currentSection&&currentSection!=='import'&&elapsed>3000&&validatedSections!==undefined)validateSection(currentSection);
@@ -4386,6 +4388,8 @@ function updateRetraiteCalc(){
 }
 
 function rRetraite(){
+  // Nettoyer les images de print résiduelles
+  try{restoreCharts();}catch(e){}
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
 
   // ── Panneau paramètres manuels ──────────────────────────────
