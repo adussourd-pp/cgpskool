@@ -659,21 +659,6 @@ select.span2{grid-column:span 2}
       </div>
     </div>
 
-    <!-- ── BLOC AVIS D'IMPOSITION ── -->
-    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
-          <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
-        </div>
-        <label id="avisDropzone" class="btn btn-primary" style="cursor:pointer;flex-shrink:0;margin-left:16px" ondragover="event.preventDefault()" ondrop="handleAvisDrop(event)">
-          &#9654; Importer PDF
-          <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
-        </label>
-      </div>
-      <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
-    </div>
-
     <!-- Vérifier & compléter les données -->
     <div style="margin-top:18px;background:#fff;border:2px solid var(--orange);border-radius:14px;overflow:hidden">
       <div style="padding:12px 20px;background:rgba(212,98,42,0.06);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierBody');b.style.display=b.style.display==='none'?'':'none'">
@@ -755,6 +740,21 @@ select.span2{grid-column:span 2}
         <button class="btn btn-primary" onclick="appliquerVerification()" style="width:100%;padding:12px;font-size:14px;margin-top:10px">Appliquer les modifications</button>
       </div>
     </div>
+    <!-- ── BLOC AVIS D'IMPOSITION ── -->
+    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
+          <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
+        </div>
+        <label id="avisDropzone" class="btn btn-primary" style="cursor:pointer;flex-shrink:0;margin-left:16px" ondragover="event.preventDefault()" ondrop="handleAvisDrop(event)">
+          &#9654; Importer PDF
+          <input type="file" id="avisFileInput" accept=".pdf" style="display:none" onchange="handleAvisFile(this.files[0])">
+        </label>
+      </div>
+      <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
+    </div>
+
 
   </div>
 </div><!-- /sec-import -->
@@ -7361,45 +7361,67 @@ function renderVerifObjectifs(){
 }
 function appliquerVerification(){
   try{
-    var v=function(id){var el=document.getElementById(id);return el?(el.tagName==='SELECT'?el.options[el.selectedIndex].text:el.value):'';};
-    var n=function(id){return +(v(id))||0;};
+    var v=function(id){var el=document.getElementById(id);if(!el)return '';if(el.tagName==='SELECT')return el.value||el.options[el.selectedIndex].text;return el.value||'';};
+    var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
     // C1
-    ED.c1.civ=v('vC1Civ');ED.c1.prenom=v('vC1Prenom');ED.c1.nom=v('vC1Nom');ED.c1.dob=v('vC1Dob');
-    ED.c1.sitpro=v('vC1CSP');ED.c1.profession=v('vC1Prof');ED.c1.societe=v('vC1Societe');
-    ED.revenus.sal1=n('vC1Sal');ED.revenus.c1=n('vC1Sal');
+    ED.c1.civ=v('vC1Civ');ED.c1.prenom=v('vC1Prenom').trim();ED.c1.nom=v('vC1Nom').trim();ED.c1.dob=v('vC1Dob').trim();
+    var csp1=v('vC1CSP');ED.c1.sitpro=csp1;
+    ED.c1.profession=v('vC1Prof').trim();ED.c1.societe=v('vC1Societe').trim();
+    var sal1=n('vC1Sal');ED.revenus.sal1=sal1;ED.revenus.c1=sal1;
     // Couple
     var isC2=document.getElementById('vCouple')&&document.getElementById('vCouple').checked;
     ED.type=isC2?'couple':'seul';
     if(isC2){
-      ED.c2.civ=v('vC2Civ');ED.c2.prenom=v('vC2Prenom');ED.c2.nom=v('vC2Nom');ED.c2.dob=v('vC2Dob');
-      ED.c2.sitpro=v('vC2CSP');ED.c2.profession=v('vC2Prof');ED.c2.societe=v('vC2Societe');
-      ED.revenus.sal2=n('vC2Sal');ED.revenus.c2=n('vC2Sal');
+      ED.c2.civ=v('vC2Civ');ED.c2.prenom=v('vC2Prenom').trim();ED.c2.nom=v('vC2Nom').trim();ED.c2.dob=v('vC2Dob').trim();
+      ED.c2.sitpro=v('vC2CSP');ED.c2.profession=v('vC2Prof').trim();ED.c2.societe=v('vC2Societe').trim();
+      var sal2=n('vC2Sal');ED.revenus.sal2=sal2;ED.revenus.c2=sal2;
+    } else {
+      ED.c2={civ:'Mme',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''};
+      ED.revenus.sal2=0;ED.revenus.c2=0;
     }
     // Situation
-    ED.sitmat=v('vSitmat');ED.convention=v('vRegime');ED.logement=v('vLogement');ED.adresse=v('vAdresse');
+    ED.sitmat=v('vSitmat');ED.convention=v('vRegime');ED.logement=v('vLogement');ED.adresse=v('vAdresse').trim();
     ED.nbEnfants=n('vNbEnfants');
     // Enfants
     ED.enfants=[];
     for(var i=0;i<ED.nbEnfants;i++){
-      var nom=v('vEnf'+i+'Nom'),dob=v('vEnf'+i+'Dob');
-      if(nom)ED.enfants.push({prenom:nom,nom:nom,dob:dob});
+      var enom=v('vEnf'+i+'Nom').trim(),edob=v('vEnf'+i+'Dob').trim();
+      if(enom)ED.enfants.push({prenom:enom,nom:enom,dob:edob});
     }
     // Revenus
     ED.revenus.fonc=n('vFonc');ED.revenus.bic=n('vBIC');ED.revenus.compl=n('vAutres');
-    // Actifs
-    ED.actifs=[];
-    var actEls=document.querySelectorAll('[id^="vAct"][id$="Nom"]');
-    actEls.forEach(function(el,i){
-      var nom=el.value,tit=v('vAct'+i+'Tit'),mt=n('vAct'+i+'Mt');
-      if(nom&&mt>0)ED.actifs.push({nom:nom,label:nom,montant:mt,titulaire:tit,horizon:getHorizonFromNom?getHorizonFromNom(nom):'lt'});
+    // Actifs — lire directement depuis les inputs du DOM
+    var newActifs=[];
+    var actNoms=document.querySelectorAll('[id^="vAct"][id$="Nom"]');
+    actNoms.forEach(function(el){
+      var idx=el.id.replace('vAct','').replace('Nom','');
+      var nom=el.value.trim();
+      var titEl=document.getElementById('vAct'+idx+'Tit');
+      var mtEl=document.getElementById('vAct'+idx+'Mt');
+      var tit=titEl?(titEl.value||titEl.options[titEl.selectedIndex].text):'C1';
+      var mt=mtEl?+(mtEl.value)||0:0;
+      if(nom){
+        var hz='lt';
+        try{if(typeof getHorizonFromNom==='function')hz=getHorizonFromNom(nom);}catch(e2){}
+        newActifs.push({nom:nom,label:nom,montant:mt,titulaire:tit,horizon:hz});
+      }
     });
+    ED.actifs=newActifs;
     // Passifs
-    ED.passifs=[];
-    var pasEls=document.querySelectorAll('[id^="vPas"][id$="Nom"]');
-    pasEls.forEach(function(el,i){
-      var nom=el.value,tit=v('vPas'+i+'Tit'),ech=n('vPas'+i+'Ech'),crd=n('vPas'+i+'Crd');
-      if(nom)ED.passifs.push({nom:nom,titulaire:tit,echeance:ech,crd:crd});
+    var newPassifs=[];
+    var pasNoms=document.querySelectorAll('[id^="vPas"][id$="Nom"]');
+    pasNoms.forEach(function(el){
+      var idx=el.id.replace('vPas','').replace('Nom','');
+      var nom=el.value.trim();
+      var titEl=document.getElementById('vPas'+idx+'Tit');
+      var echEl=document.getElementById('vPas'+idx+'Ech');
+      var crdEl=document.getElementById('vPas'+idx+'Crd');
+      var tit=titEl?(titEl.value||titEl.options[titEl.selectedIndex].text):'Commun';
+      var ech=echEl?+(echEl.value)||0:0;
+      var crd=crdEl?+(crdEl.value)||0:0;
+      if(nom)newPassifs.push({nom:nom,titulaire:tit,echeance:ech,crd:crd});
     });
+    ED.passifs=newPassifs;
     // Charges credit
     ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
     // Objectifs
