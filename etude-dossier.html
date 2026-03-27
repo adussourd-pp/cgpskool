@@ -397,7 +397,10 @@ select.span2{grid-column:span 2}
   .section-page{display:none!important}
   .section-page.print-visible{display:block!important;page-break-before:always;
     border:none!important;box-shadow:none!important;border-radius:0!important;
-    padding:30px 40px!important;max-width:100%!important;min-height:auto!important;margin:0!important;font-size:10pt}
+    padding:10px 0!important;max-width:100%!important;min-height:auto!important;margin:0!important;font-size:9pt}
+  .section-page.print-visible .card{padding:10px 14px!important;margin-bottom:8px!important}
+  .section-page.print-visible .kpi-row{margin-bottom:8px!important}
+  .section-page.print-visible .sec-header{margin-bottom:10px!important}
   .section-page.print-visible:first-of-type{page-break-before:auto}
   .sec-header{margin-bottom:16pt}
   .sec-tag{font-size:8pt;letter-spacing:0.12em;opacity:0.6}
@@ -433,7 +436,7 @@ select.span2{grid-column:span 2}
   #projFinCard{display:none!important}
   .proj-fin-print #projFinCard{display:block!important}
   /* ── FORMAT A4 ── */
-  @page{size:A4 portrait;margin:1.5cm 1.5cm 1.5cm 1.5cm}
+  @page{size:A4 portrait;margin:10mm 10mm 15mm 10mm}
 }
 /* Dropdown SCPI */
 .nav-dropdown:hover .nav-dropdown-item.active{color:#D4622A;background:rgba(212,98,42,0.08)}
@@ -2500,6 +2503,8 @@ function goTo(sec){
 var NAV_ORDER=['import','pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite','transmission','entreprise','preconisations','synthese','mentions','avis','compterendu'];
 function renderNavBtns(sec){
   try{
+    // Supprimer l'ancien
+    var old=document.getElementById('navBtnsFloat');if(old)old.remove();
     var active=NAV_ORDER.filter(function(s){
       if(s==='transmission'){var cb=document.getElementById('checkTransmission');return cb&&cb.checked;}
       if(s==='entreprise'){var cb2=document.getElementById('checkEntreprise');return cb2&&cb2.checked;}
@@ -2509,17 +2514,23 @@ function renderNavBtns(sec){
     var idx=active.indexOf(sec);
     var prev=idx>0?active[idx-1]:null;
     var next=idx<active.length-1?active[idx+1]:null;
+    if(!prev&&!next)return;
     var secEl=document.getElementById('sec-'+sec);
     if(!secEl)return;
-    var navEl=secEl.querySelector('.page-nav-btns');
-    if(!navEl)return;
-    var h='<div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid var(--bord)">';
-    if(prev)h+='<button class="btn btn-secondary" onclick="goTo(\''+prev+'\')" style="font-size:12px;padding:8px 16px">\u2190 Pr\u00e9c\u00e9dent</button>';
-    else h+='<div></div>';
-    if(next)h+='<button class="btn btn-primary" onclick="validateAndGoTo(\''+next+'\')" style="font-size:12px;padding:8px 16px">Suivant \u2192</button>';
-    else h+='<div></div>';
-    h+='</div>';
-    navEl.innerHTML=h;
+    var bar=document.createElement('div');
+    bar.id='navBtnsFloat';
+    bar.className='panneau-interne';
+    bar.style.cssText='display:flex;justify-content:space-between;align-items:center;max-width:794px;margin:12px auto;padding:10px 20px';
+    if(prev){
+      var bp=document.createElement('button');bp.className='btn btn-secondary';bp.style.cssText='font-size:12px;padding:8px 20px';bp.textContent='\u2190 Pr\u00e9c\u00e9dent';bp.onclick=function(){goTo(prev);};bar.appendChild(bp);
+    } else {bar.appendChild(document.createElement('div'));}
+    if(next){
+      var bn=document.createElement('button');bn.className='btn btn-primary';bn.style.cssText='font-size:12px;padding:8px 20px';bn.textContent='Suivant \u2192';bn.onclick=function(){validateAndGoTo(next);};bar.appendChild(bn);
+    } else {bar.appendChild(document.createElement('div'));}
+    // Insérer après la section et ses panneaux
+    var ins=secEl.nextSibling;
+    while(ins&&ins.nodeType===1&&((ins.className||'').indexOf('comment-zone')>=0||(ins.className||'').indexOf('panneau-interne')>=0))ins=ins.nextSibling;
+    secEl.parentNode.insertBefore(bar,ins);
   }catch(e){}
 }
 function validateAndGoTo(sec){
