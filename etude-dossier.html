@@ -736,8 +736,29 @@ select.span2{grid-column:span 2}
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Objectifs</div>
         <div id="vObjectifsBlock" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px"></div>
 
+        <!-- Impôts -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Imp&#244;ts</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">Ann&#233;e</label><input class="fi" id="vFiscAnnee"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Revenu brut global</label><input class="fi" type="number" id="vFiscRBG"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Revenu imposable</label><input class="fi" type="number" id="vFiscRevImp"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Nb parts</label><input class="fi" type="number" id="vFiscParts" step="0.5"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">TMI (%)</label><input class="fi" type="number" id="vFiscTMI"></div>
+          <div><label style="font-size:10px;color:var(--gris)">IR net</label><input class="fi" type="number" id="vFiscIRNet"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Pr&#233;l&#232;vements sociaux</label><input class="fi" type="number" id="vFiscPS"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo</label><input class="fi" type="number" id="vFiscPER"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">IR soumis au bar&#232;me</label><input class="fi" type="number" id="vFiscIRBareme"></div>
+          <div><label style="font-size:10px;color:var(--gris)">R&#233;ductions</label><input class="fi" type="number" id="vFiscReduc"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Cr&#233;dits d'imp&#244;t</label><input class="fi" type="number" id="vFiscCredits"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne pr&#233;caution</label><input class="fi" type="number" id="vEpPrec"></div>
+        </div>
+
         <!-- Bouton appliquer -->
-        <button class="btn btn-primary" onclick="appliquerVerification()" style="width:100%;padding:12px;font-size:14px;margin-top:10px">Appliquer les modifications</button>
+        <button class="btn btn-primary" onclick="appliquerVerification()" style="padding:10px 28px;font-size:13px;margin-top:10px">Appliquer les modifications</button>
       </div>
     </div>
     <!-- ── BLOC AVIS D'IMPOSITION ── -->
@@ -3270,8 +3291,9 @@ function launch(){
   const pasBr=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   const typeL=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple Comm.':'Couple Sep.';
   const banner=document.getElementById('importBanner');
-  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' — Étude en cours</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' · '+ED.actifs.length+' actifs · Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> € · Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> €/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
-  goTo('situation');
+  if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">&#9989;</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n+(n2||'')+' \u2014 V\u00e9rifiez les donn\u00e9es ci-dessous</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+typeL+' \u00b7 '+ED.actifs.length+' actifs \u00b7 Patrimoine net : <strong>'+fmt(actBr-pasBr)+'</strong> \u20ac \u00b7 Revenus : <strong>'+fmt(ED.revenus.c1+ED.revenus.c2+ED.revenus.compl)+'</strong> \u20ac/an</div></div></div><button class="btn btn-secondary" onclick="resetAll()" style="font-size:11px;padding:5px 12px">Nouveau</button></div>';
+  var vBody=document.getElementById('verifierBody');
+  if(vBody){vBody.style.display='';setTimeout(function(){vBody.scrollIntoView({behavior:'smooth',block:'start'});},200);}
   showNotif('Étude ouverte !');
 }
 
@@ -7300,6 +7322,12 @@ function remplirVerification(){
     s('vSitmat',ED.sitmat);s('vRegime',ED.convention);s('vLogement',ED.logement);s('vAdresse',ED.adresse);s('vNbEnfants',ED.nbEnfants||0);
     s('vFonc',ED.revenus.fonc||'');s('vBIC',ED.revenus.bic||'');s('vAutres',ED.revenus.compl||'');
     renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifObjectifs();
+    // Impôts
+    s('vFiscAnnee',ED.fiscal.annee);s('vFiscRBG',ED.fiscal.rbg||'');s('vFiscRevImp',ED.fiscal.revImposable||'');
+    s('vFiscParts',ED.fiscal.parts||'');s('vFiscTMI',ED.fiscal.tmi||'');s('vFiscIRNet',ED.fiscal.irnet||'');
+    s('vFiscPS',ED.fiscal.ps||'');s('vFiscPER',ED.fiscal.plafondPER||'');s('vFiscIRBareme',ED.fiscal.irBareme||'');
+    s('vFiscReduc',ED.fiscal.reductions||'');s('vFiscCredits',ED.fiscal.credits||'');
+    s('vEpPrec',ED.epPrec||'');
     document.getElementById('verifierBody').style.display='';
   }catch(e){console.warn('remplirVerification:',e);}
 }
@@ -7424,6 +7452,14 @@ function appliquerVerification(){
     ED.passifs=newPassifs;
     // Charges credit
     ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    // Impôts
+    ED.fiscal.annee=v('vFiscAnnee');ED.fiscal.rbg=n('vFiscRBG');ED.fiscal.revImposable=n('vFiscRevImp');
+    ED.fiscal.parts=+(document.getElementById('vFiscParts')?document.getElementById('vFiscParts').value:1)||1;
+    ED.fiscal.tmi=n('vFiscTMI');ED.fiscal.irnet=n('vFiscIRNet');ED.fiscal.ps=n('vFiscPS');
+    ED.fiscal.plafondPER=n('vFiscPER');ED.fiscal.irBareme=n('vFiscIRBareme');
+    ED.fiscal.reductions=n('vFiscReduc');ED.fiscal.credits=n('vFiscCredits');
+    // Épargne précaution
+    ED.epPrec=n('vEpPrec');
     // Objectifs
     ED.objectifs=[];
     document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
