@@ -7376,11 +7376,17 @@ function calcProjectionFin(){
     var revM=revMens();
     var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
     var capaRestante=Math.max(0,Math.round(revM*0.35-chrCredit));
-    // Montant max empruntable depuis la capacité restante
+    // Montant max : mensTotale = capaRestante
+    // mensTotale = mensCredit + mensAssur
+    // mensCredit = montant × r / (1-(1+r)^-n)
+    // mensAssur = montant × assur / 12
+    // Donc : capaRestante = montant × (r/(1-(1+r)^-n) + assur/12)
+    // montant = capaRestante / (r/(1-(1+r)^-n) + assur/12)
     var montantMax=0;
     if(tauxM>0&&capaRestante>0){
-      var mensMaxHorsAssur=capaRestante/(1+assur/tauxM*(1-1/Math.pow(1+tauxM,nbMois)));
-      montantMax=Math.round(mensMaxHorsAssur*(1-Math.pow(1+tauxM,-nbMois))/tauxM);
+      var coefCredit=tauxM/(1-Math.pow(1+tauxM,-nbMois));
+      var coefAssur=assur/12;
+      montantMax=Math.round(capaRestante/(coefCredit+coefAssur));
     }
     var mensualite=tauxM>0&&montantMax>0?Math.round(montantMax*tauxM/(1-Math.pow(1+tauxM,-nbMois))):0;
     var mensAssur=Math.round(montantMax*assur/12);
