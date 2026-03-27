@@ -8362,11 +8362,11 @@ function exportPDF() {
   // Rendre la section retraite visible pour capturer le canvas
   var savedSec=currentSection;
   var secRet=document.getElementById('sec-retraite');
-  // Rendre visible AVANT le render (le chart a besoin d'un conteneur visible)
-  if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
+  // Rendre visible dans le flux normal (pas fixed/absolute — Chart.js a besoin du layout)
+  if(secRet){secRet.style.display='block';secRet.style.marginLeft='-9999px';secRet.style.height='auto';secRet.style.overflow='visible';}
   // Forcer le render maintenant que la section est visible
   try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
-  // Attendre que Chart.js dessine (besoin de temps pour le canvas)
+  // Attendre que Chart.js dessine
   setTimeout(function(){
     try{
       if(window.retChartInst){
@@ -8374,12 +8374,11 @@ function exportPDF() {
         window.retChartInst.update('none');
       }
     }catch(e4){}
-    // Deuxième attente pour le rendu complet
     setTimeout(function(){
       // Capturer TOUS les canvas
       convertChartsDirectCapture();
       // Remettre la section invisible
-      if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
+      if(secRet){secRet.style.display='';secRet.style.marginLeft='';secRet.style.height='';secRet.style.overflow='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
       window.print();
