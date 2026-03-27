@@ -1133,7 +1133,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-retraite">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05</div><div class="sec-h1">Bilan Retraite</div><div class="sec-sub">Taux de remplacement &amp; effort d'épargne</div></div>
+    <div><div class="sec-tag">Section 05</div><div class="sec-h1">Retraite</div><div class="sec-sub">Taux de remplacement &amp; effort d'épargne</div></div>
   </div>
   <!-- Paramètres manuels retraite -->
   <div class="card" style="margin-bottom:18px">
@@ -1176,7 +1176,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-transmission">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b</div><div class="sec-h1">Transmission</div></div>
+    <div><div class="sec-tag">Section 06</div><div class="sec-h1">Transmission</div></div>
   </div>
 
   <!-- Saisie situation successorale -->
@@ -1235,7 +1235,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-entreprise">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 05b &#8212; Optionnel</div><div class="sec-h1">Analyse Entreprise</div></div>
+    <div><div class="sec-tag">Section 06b</div><div class="sec-h1">Entreprise</div></div>
   </div>
 
   <!-- Saisie hypothèses (visible écran + PDF) -->
@@ -1314,7 +1314,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-preconisations">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 06</div><div class="sec-h1">Pr&#233;conisations</div></div>
+    <div><div class="sec-tag">Section 07</div><div class="sec-h1">Pr&#233;conisations</div></div>
   </div>
 
   <!-- Leviers disponibles + Objectifs client -->
@@ -1372,7 +1372,7 @@ select.span2{grid-column:span 2}
 ════════════════════════════════════════ -->
 <div class="section-page" id="sec-synthese">
   <div class="sec-header">
-    <div><div class="sec-tag">Section 07</div><div class="sec-h1">Synthèse & Étapes</div></div>
+    <div><div class="sec-tag">Section 08</div><div class="sec-h1">Synthèse & Étapes</div></div>
   </div>
 
   <!-- ── AVANT / APRÈS PAR LEVIER ── -->
@@ -2477,9 +2477,9 @@ function goTo(sec){
   var secNames={import:'Import / Saisie',situation:'Section 01 — Situation & Objectifs',
     patrimoine:'Section 02 — Patrimoine',fiscal:'Section 03 — Impôts',
     financement:'Section 04 — Financement',
-    retraite:'Section 05 — Retraite',transmission:'Section 05b — Transmission',
-    entreprise:'Section 05b — Entreprise',
-    preconisations:'Section 06 — Préconisations',synthese:'Section 07 — Synthèse',
+    retraite:'Section 05 \u2014 Retraite',transmission:'Section 06 \u2014 Transmission',
+    entreprise:'Section 06b \u2014 Entreprise',
+    preconisations:'Section 07 \u2014 Pr\u00e9conisations',synthese:'Section 08 \u2014 Synth\u00e8se',
     pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions légales',avis:'Avis clients'};
   var headerNom=document.getElementById('pdfHeaderNom');
   if(headerNom)headerNom.textContent=secNames[sec]||sec;
@@ -7348,12 +7348,12 @@ function rPageGarde(){
     ];
     // Optionnels
     var cbTrans=document.getElementById('checkTransmission');
-    if(cbTrans&&cbTrans.checked)items.push({num:'05b',label:'Transmission'});
+    if(cbTrans&&cbTrans.checked)items.push({num:'06',label:'Transmission'});
     var cbEnt=document.getElementById('checkEntreprise');
-    if(cbEnt&&cbEnt.checked)items.push({num:'05c',label:'Entreprise'});
-    items.push({num:'06',label:'Pr\u00e9conisations Patrimoniales'});
-    items.push({num:'07',label:'Synth\u00e8se & Feuille de route'});
-    items.push({num:'08',label:'Mentions l\u00e9gales'});
+    if(cbEnt&&cbEnt.checked)items.push({num:'06b',label:'Entreprise'});
+    items.push({num:'07',label:'Pr\u00e9conisations'});
+    items.push({num:'08',label:'Synth\u00e8se'});
+    items.push({num:'',label:'Mentions l\u00e9gales'});
     var cbAvis=document.getElementById('checkAvis');
     if(cbAvis&&cbAvis.checked)items.push({num:'',label:'Avis clients'});
 
@@ -8227,14 +8227,19 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Rendre les sections retraite visible pour re-render le chart
-  var secRet=document.getElementById('sec-retraite');
-  if(secRet){secRet.style.display='block';secRet.style.visibility='hidden';secRet.style.position='absolute';secRet.style.left='-9999px';}
-  try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update();}}catch(e3){}
+  // S'assurer que les charts sont rendus : forcer le render retraite
+  try{renderSection('retraite');}catch(e3){}
+  // Rendre TOUTES les sections print-visible temporairement visibles pour toDataURL
+  document.querySelectorAll('.section-page.print-visible').forEach(function(el){
+    el.style.display='block';el.style.position='absolute';el.style.left='-9999px';el.style.visibility='hidden';
+  });
   setTimeout(function(){
-    // Remettre en place
-    if(secRet){secRet.style.display='';secRet.style.visibility='';secRet.style.position='';secRet.style.left='';}
+    // Capturer les canvas
     convertChartsToImg(function(){
+      // Remettre les sections normales
+      document.querySelectorAll('.section-page').forEach(function(el){
+        el.style.display='';el.style.position='';el.style.left='';el.style.visibility='';
+      });
       window.print();
       setTimeout(function(){
         restoreCharts();
@@ -8242,7 +8247,7 @@ function exportPDF() {
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
       },2000);
     });
-  },300);
+  },400);
 }
 
 var _chartImgBackups = [];
