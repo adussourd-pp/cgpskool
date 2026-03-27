@@ -7328,7 +7328,7 @@ function rPageGarde(){
 
 function initProjectionIR(){
   try{
-    var e=function(id,v){var el=document.getElementById(id);if(el&&!el.value)el.value=v||'';};
+    var e=function(id,v){var el=document.getElementById(id);if(el)el.value=v||'';};
     e('projSal1',ED.revenus.sal1||ED.revenus.c1||'');
     e('projSal2',ED.revenus.sal2||ED.revenus.c2||'');
     e('projAutres',(ED.revenus.fonc||0)+(ED.revenus.bic||0)||'');
@@ -7341,7 +7341,7 @@ function initProjectionIR(){
       else sm.value='celibataire';
     }
     var enf=document.getElementById('projEnfants');
-    if(enf&&!+enf.value)enf.value=ED.nbEnfants||0;
+    if(enf)enf.value=ED.nbEnfants||0;
     calcProjectionIR();
   }catch(e2){}
 }
