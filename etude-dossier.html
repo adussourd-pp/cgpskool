@@ -1460,18 +1460,18 @@ select.span2{grid-column:span 2}
   </div>
 
   <!-- Tuiles -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px">
-    <div onclick="document.getElementById('crR2Config').style.display='none';genererCR('r1')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px" id="crTuiles">
+    <div id="crTileR1" onclick="selectCRTile('r1');document.getElementById('crR2Config').style.display='none';genererCR('r1')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s">
       <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R1</div>
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Audit</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Premier rendez-vous</div>
     </div>
-    <div onclick="showR2Config()" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+    <div id="crTileR2" onclick="selectCRTile('r2');showR2Config()" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s">
       <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R2</div>
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Pr&#233;sentation</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Solutions pr&#233;conis&#233;es</div>
     </div>
-    <div onclick="document.getElementById('crR2Config').style.display='none';genererCR('r3')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+    <div id="crTileR3" onclick="selectCRTile('r3');document.getElementById('crR2Config').style.display='none';genererCR('r3')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s">
       <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R3</div>
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Confirmation</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Souscription valid&#233;e</div>
@@ -7407,6 +7407,15 @@ function calcProjectionIR(){
   }catch(e){console.warn('calcProjectionIR error:',e);}
 }
 // ── GÉNÉRATION COMPTE RENDU ──
+function selectCRTile(type){
+  ['R1','R2','R3'].forEach(function(t){
+    var el=document.getElementById('crTile'+t);
+    if(!el)return;
+    var active=t.toLowerCase()===type;
+    el.style.borderColor=active?'var(--orange)':'var(--bord)';
+    el.style.background=active?'rgba(212,98,42,0.06)':'#fff';
+  });
+}
 function showR2Config(){
   var cfg=document.getElementById('crR2Config');
   var list=document.getElementById('crR2SolList');
