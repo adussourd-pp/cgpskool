@@ -8397,18 +8397,24 @@ function exportPDF() {
   // Rendre la section retraite visible pour capturer le canvas
   var savedSec=currentSection;
   var secRet=document.getElementById('sec-retraite');
-  // Forcer le render si pas encore fait
-  try{renderSection('retraite');}catch(e3){}
-  // Rendre visible temporairement pour toDataURL
-  if(secRet){secRet.classList.add('active');secRet.style.display='block';}
-  // Attendre le rendu complet du chart
+  // Rendre visible AVANT le render (le chart a besoin d'un conteneur visible)
+  if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
+  // Forcer le render maintenant que la section est visible
+  try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
+  // Attendre que Chart.js dessine (besoin de temps pour le canvas)
   setTimeout(function(){
-    try{if(window.retChartInst)window.retChartInst.update();}catch(e4){}
+    try{
+      if(window.retChartInst){
+        window.retChartInst.resize();
+        window.retChartInst.update('none');
+      }
+    }catch(e4){}
+    // Deuxième attente pour le rendu complet
     setTimeout(function(){
-      // Capturer TOUS les canvas visibles
+      // Capturer TOUS les canvas
       convertChartsDirectCapture();
-      // Remettre la section originale
-      if(secRet){secRet.classList.remove('active');secRet.style.display='';}
+      // Remettre la section invisible
+      if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
       window.print();
@@ -8417,8 +8423,8 @@ function exportPDF() {
         document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
       },2000);
-    },200);
-  },300);
+    },500);
+  },500);
 }
 
 var _chartImgBackups = [];
