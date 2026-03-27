@@ -874,11 +874,11 @@ select.span2{grid-column:span 2}
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:48px 32px">
       <div style="text-align:center;max-width:500px">
         <div style="font-family:var(--serif);font-size:36px;font-weight:400;color:var(--noir);line-height:1.2">Bilan</div>
-        <div style="font-family:var(--serif);font-size:36px;font-weight:400;font-style:italic;color:var(--orange);line-height:1.2;margin-bottom:8px">Patrimonial</div>
+        <div class="pdf-accent" style="font-family:var(--serif);font-size:36px;font-weight:400;font-style:italic;color:var(--orange);line-height:1.2;margin-bottom:8px">Patrimonial</div>
         <div style="font-family:var(--serif);font-size:14px;font-style:italic;color:var(--gris);margin-bottom:32px">Analyse &amp; préconisations</div>
         <div style="width:40px;height:2px;background:var(--noir);margin:0 auto 32px"></div>
         <div style="border:1px solid var(--bord);border-radius:4px;padding:16px 24px;text-align:left;background:var(--gris-l)">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:6px">Établi pour</div>
+          <div class="pdf-accent" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:6px">&#201;tabli pour</div>
           <div id="gardeClientPreview" style="font-family:var(--sans);font-size:20px;font-weight:400;color:var(--noir)">Nom du client</div>
         </div>
       </div>
@@ -887,12 +887,12 @@ select.span2{grid-column:span 2}
     <!-- Pied de page (bas) -->
     <div style="border-top:1px solid var(--bord);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Date d'&#233;tablissement</div>
+        <div class="pdf-accent" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Date d'&#233;tablissement</div>
         <div id="gardeDatePreview" style="font-size:13px;font-weight:600;color:var(--noir)"></div>
         <div id="gardeDateMAJ" style="font-size:11px;color:var(--gris);margin-top:4px"></div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Conseiller r&#233;f&#233;rent</div>
+        <div class="pdf-accent" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px">Conseiller r&#233;f&#233;rent</div>
         <div id="gardeConseillerPreview" style="font-size:13px;font-weight:600;color:var(--noir)"></div>
       </div>
     </div>
@@ -6828,7 +6828,21 @@ function applyColors(){
     // Mentions légales : bulle ORIAS + tags habilitations
     '#mentionsPreview span[style*="border-radius:20px"]{color:'+color1+'!important;border-color:'+c1mid+'!important;background:'+c1dim+'!important}'+
     // Sommaire numéros
-    '#gardeSommaire .som-num{color:'+color1+'!important}';
+    '#gardeSommaire .som-num{color:'+color1+'!important}'+
+    // Classe générique pour tous les accents PDF
+    '.pdf-accent{color:'+color1+'!important}'+
+    // Override var(--orange) dans les section-page (inline styles)
+    '.section-page [style*="color:var(--orange)"]{color:'+color1+'!important}'+
+    '.section-page [style*="color: var(--orange)"]{color:'+color1+'!important}'+
+    '.section-page [style*="background:var(--orange)"]{background:'+color1+'!important}'+
+    // Mentions légales : email + tags + ORIAS
+    '#mentionsPreview [style*="color:var(--orange)"]{color:'+color1+'!important}'+
+    '#mentionsPreview [style*="border-color:var(--orange)"]{border-color:'+color1+'!important}'+
+    '#mentionsPreview [style*="background:rgba(212,98,42"]{background:'+c1dim+'!important}'+
+    // Épargne réorienter
+    '#precoReorienter{color:'+color1+'!important}'+
+    // Header € Conseillé
+    '.tbl th[style*="color:var(--orange)"]{color:'+color1+'!important}';
   saveProfil();
 }
 function loadColors(){
