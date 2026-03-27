@@ -788,7 +788,7 @@ select.span2{grid-column:span 2}
           <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlCIF" style="accent-color:var(--orange)">AGENT LI&#201; (CIF)</label>
         </div>
         <div><label style="font-size:10px;color:var(--gris)">N&#176; CPI</label><input class="fi" id="vMlCPI" style="margin-bottom:10px"></div>
-        <button class="btn btn-primary" onclick="appliquerVerifMentions()" style="padding:8px 20px;font-size:13px">Appliquer</button>
+        <button class="btn btn-primary" onclick="appliquerVerifMentions()" style="padding:10px 28px;font-size:13px">Appliquer les modifications</button>
       </div>
     </div>
 
@@ -828,7 +828,7 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">R&#233;ductions</label><input class="fi" type="number" id="vF2Reduc"></div>
           <div><label style="font-size:10px;color:var(--gris)">Cr&#233;dits</label><input class="fi" type="number" id="vF2Credits"></div>
         </div>
-        <button class="btn btn-primary" onclick="appliquerVerifFisc()" style="padding:8px 20px;font-size:13px">Appliquer</button>
+        <button class="btn btn-primary" onclick="appliquerVerifFisc()" style="padding:10px 28px;font-size:13px">Appliquer les modifications</button>
       </div>
     </div>
 
@@ -7375,7 +7375,7 @@ function remplirVerifMentions(){
   }catch(e){console.warn('remplirVerifMentions:',e);}
 }
 function appliquerVerifMentions(){
-  try{saveMentionsDirect();showNotif('Mentions appliqu\u00e9es');}catch(e){}
+  try{saveMentionsDirect();showNotif('Mentions l\u00e9gales appliqu\u00e9es');}catch(e){}
 }
 // ── VÉRIF AVIS IMPOSITION ──
 function remplirVerifFisc(){
@@ -7397,6 +7397,8 @@ function appliquerVerifFisc(){
     ED.fiscal.tmi=n('vF2TMI');ED.fiscal.irnet=n('vF2IRNet');ED.fiscal.ps=n('vF2PS');
     ED.fiscal.plafondPER=n('vF2PER');ED.fiscal.irBareme=n('vF2IRBareme');
     ED.fiscal.reductions=n('vF2Reduc');ED.fiscal.credits=n('vF2Credits');
+    // Render fiscal si on est dessus
+    try{if(currentSection==='fiscal')rFiscal();}catch(e2){}
     showNotif('Donn\u00e9es fiscales appliqu\u00e9es');
   }catch(e){console.warn('appliquerVerifFisc:',e);}
 }
@@ -7560,10 +7562,20 @@ function appliquerVerification(){
     var revM=revMens();
     if(!ED.epMens)ED.epMens=Math.max(0,Math.round(revM*0.20));
     if(!ED.epPrec)ED.epPrec=Math.round(revM*3);
-    // Render
+    // Render — re-render toutes les sections visitables
     markDone();
+    // Mettre à jour le client mini
+    var n1=((ED.c1.civ||'')+' '+(ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim();
+    var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?' & '+((ED.c2.civ||'')+' '+(ED.c2.prenom||'')+' '+(ED.c2.nom||'')).trim():'';
+    var navEl=document.getElementById('navClient');
+    if(navEl)navEl.innerHTML='<strong>'+n1+n2+'</strong>';
+    // Mettre à jour le banner import
+    var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
+    var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
+    var banner=document.getElementById('importBanner');
+    if(banner)banner.innerHTML='<div style="background:var(--green-l);border:1.5px solid rgba(45,122,91,0.25);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="font-size:18px">\u2705</span><div><div style="font-family:var(--sans);font-weight:700;color:var(--green);font-size:14px">'+n1+n2+' \u2014 Donn\u00e9es valid\u00e9es</div><div style="font-size:12px;color:var(--gris);margin-top:1px">'+ED.actifs.length+' actifs \u00b7 Patrimoine net : <strong>'+fmt(aSum-pSum)+'</strong> \u20ac</div></div></div>';
     goTo('situation');
-    showNotif('Donn\u00e9es appliqu\u00e9es \u2014 '+((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim());
+    showNotif('Donn\u00e9es appliqu\u00e9es \u2014 '+(n1||'Client'));
   }catch(e){console.warn('appliquerVerification:',e);showNotif('Erreur application');}
 }
 // ── SAUVEGARDE / CHARGEMENT ÉTUDE ──
