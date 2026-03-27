@@ -243,8 +243,8 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 
 /* ── MAIN ── */
 .main{padding:28px 32px;overflow-y:auto;max-width:1160px;background:#ECEAE6}
-.section-page{display:none}
-.section-page.active{display:block;animation:fadeUp 0.25s ease}
+.section-page{visibility:hidden;position:absolute;left:-9999px;width:100%;pointer-events:none}
+.section-page.active{visibility:visible;position:relative;left:auto;pointer-events:auto;animation:fadeUp 0.25s ease}
 /* Cadre A4 sur les sections (sauf import) */
 .section-page:not(#sec-import){background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px 40px 70px;max-width:794px;margin:0 auto;min-height:1045px;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative}
 /* Marqueurs de saut de page — désactivés */
@@ -394,8 +394,8 @@ select.span2{grid-column:span 2}
   .main{padding:0!important;max-width:100%!important;background:#fff!important}
   body{background:#fff!important;font-size:11pt}
   /* ── SECTIONS : seules les pages cochées sont visibles ── */
-  .section-page{display:none!important}
-  .section-page.print-visible{display:block!important;page-break-before:always;
+  .section-page{display:none!important;visibility:hidden!important;position:absolute!important}
+  .section-page.print-visible{display:block!important;visibility:visible!important;position:relative!important;left:auto!important;page-break-before:always;
     border:none!important;box-shadow:none!important;border-radius:0!important;
     padding:10px 0!important;max-width:100%!important;min-height:auto!important;margin:0!important;font-size:9pt}
   .section-page.print-visible .card{padding:10px 14px!important;margin-bottom:8px!important}
@@ -8359,26 +8359,12 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Rendre la section retraite visible pour capturer le canvas
-  var savedSec=currentSection;
-  var secRet=document.getElementById('sec-retraite');
-  // Rendre visible dans le flux normal (pas fixed/absolute — Chart.js a besoin du layout)
-  if(secRet){secRet.style.display='block';secRet.style.marginLeft='-9999px';secRet.style.height='auto';secRet.style.overflow='visible';}
-  // Forcer le render maintenant que la section est visible
-  try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
-  // Attendre que Chart.js dessine
+  // Les sections utilisent visibility:hidden — Chart.js a déjà pu dessiner
+  // Forcer un update du chart retraite si il existe
+  try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}}catch(e3){}
+  // Capturer tous les canvas après un court délai
   setTimeout(function(){
-    try{
-      if(window.retChartInst){
-        window.retChartInst.resize();
-        window.retChartInst.update('none');
-      }
-    }catch(e4){}
-    setTimeout(function(){
-      // Capturer TOUS les canvas
-      convertChartsDirectCapture();
-      // Remettre la section invisible
-      if(secRet){secRet.style.display='';secRet.style.marginLeft='';secRet.style.height='';secRet.style.overflow='';}
+    convertChartsDirectCapture();
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
       window.print();
