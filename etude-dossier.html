@@ -586,7 +586,32 @@ select.span2{grid-column:span 2}
     <div id="sidebarProfilNom" style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir)">Configuration</div>
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
   </div>
+  <div style="padding:8px 10px;margin-top:8px">
+    <select id="crTypeSelect" class="fi" style="width:100%;margin-bottom:6px;font-size:12px;padding:6px">
+      <option value="r1">CR R1 &#8212; Audit</option>
+      <option value="r2">CR R2 &#8212; Pr&#233;sentation</option>
+      <option value="r3">CR R3 &#8212; Signature</option>
+      <option value="post">CR Post-signature</option>
+    </select>
+    <button class="btn btn-secondary" onclick="genererCR()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; G&#233;n&#233;rer un CR</button>
+  </div>
 </aside>
+
+<!-- Modale CR -->
+<div id="crModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:700px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir);margin:0" id="crModalTitle">Compte rendu</h2>
+      <button onclick="document.getElementById('crModal').style.display='none'" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gris)">&times;</button>
+    </div>
+    <div id="crModalSubject" style="font-size:12px;color:var(--orange);font-weight:600;margin-bottom:12px;padding:8px 12px;background:rgba(212,98,42,0.06);border-radius:8px"></div>
+    <textarea id="crModalBody" rows="20" style="width:100%;padding:14px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);line-height:1.7;resize:vertical;outline:none"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('crModalBody').value);showNotif('Copi\u00e9 !')" style="padding:10px 20px">&#128203; Copier le texte</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('crModal').style.display='none'">Fermer</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── MAIN ── -->
 <main class="main">
@@ -7362,6 +7387,101 @@ function calcProjectionIR(){
     h+='<div class="fiscal-row" style="border-top:2px solid rgba(45,122,91,0.3);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">\u00c9cart vs actuel</span><span class="fr-v" style="font-size:16px;font-weight:700;color:'+(diff>0?'var(--red)':diff<0?'var(--green)':'var(--gris)')+'">'+(diff>0?'+':'')+fmt(diff)+' \u20ac</span></div>';
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionIR error:',e);}
+}
+// ── GÉNÉRATION COMPTE RENDU ──
+function genererCR(){
+  try{
+    var type=(document.getElementById('crTypeSelect')?document.getElementById('crTypeSelect').value:'r1');
+    var n1=((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim()||'Client';
+    var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?((ED.c2.prenom||'')+' '+(ED.c2.nom||'')).trim():'';
+    var noms=n1+(n2?' et '+n2:'');
+    var prenoms=(ED.c1.prenom||'')+(n2?' et '+(ED.c2.prenom||''):'');
+    var dateJ=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+    var objs=(ED.objectifs||[]).filter(function(o){return o&&o!=='Objectifs \u00e0 compl\u00e9ter';});
+    var epPrec=fmt((ED.epPrec||0)+(ED.epPrec2||0))+' \u20ac';
+    var epMens=fmt((ED.epMens||0)+(ED.epMens2||0))+' \u20ac/mois';
+    var ageRet=(ED.retraite?ED.retraite.age1:64)||64;
+    var pensRet=fmt((ED.retraite?ED.retraite.pension1:2500)||2500)+' \u20ac';
+    var subject='',body='';
+    if(type==='r1'){
+      subject='RDV patrimoine - Compte rendu R1 - '+noms;
+      body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
+      body+='Suite \u00e0 notre \u00e9change du '+dateJ+',\n\n';
+      body+='je vous joins les \u00e9l\u00e9ments relatifs \u00e0 votre situation actuelle, en tenant compte de vos souhaits et de vos projets :\n\n';
+      body+='1/ Situation personnelle\n';
+      body+='Vous allez recevoir, en parall\u00e8le de ce mail, une demande de signature \u00e9lectronique via Signature Service (noreply@universign.eu), qui reprend tous les points dont nous avons parl\u00e9 lors de notre RDV. Merci de signer ces documents en amont afin que je puisse mener mon \u00e9tude patrimoniale.\n\n';
+      body+='2/ Souhaits et projets\n';
+      objs.forEach(function(o,i){body+=(i+1)+'. '+o+'\n';});
+      body+='\nCeci tenant compte des \u00e9l\u00e9ments suivants :\n';
+      body+='- \u00c9pargne de pr\u00e9caution : '+epPrec+'\n';
+      body+='- Montant d\'\u00e9pargne mensuelle : '+epMens+'\n';
+      body+='- \u00c2ge et montant souhait\u00e9 \u00e0 la retraite : d\u00e9part souhait\u00e9 \u00e0 '+ageRet+' ans en disposant d\'un revenu d\'environ '+pensRet+'/mois\n';
+      body+='- Profil investisseur : \u00e0 pr\u00e9ciser\n\n';
+      body+='\u00c9pargne \u00e0 r\u00e9orienter en premi\u00e8re approche :\n';
+      body+='- Moyen terme : \u00e0 d\u00e9finir\n';
+      body+='- Long terme : \u00e0 d\u00e9finir\n\n';
+      body+='3/ Informations compl\u00e9mentaires \u00e0 fournir\nsans objet\n\n';
+      body+='4/ Mise en relation\nComme vous le savez, je me d\u00e9veloppe exclusivement gr\u00e2ce \u00e0 la mise en relation.\nSi vous avez appr\u00e9ci\u00e9 ma d\u00e9marche et pour vous aider \u00e0 parler de moi \u00e0 votre entourage voici ce que vous pouvez leur envoyer :\n';
+      body+='"J\'ai rencontr\u00e9 une personne qui m\'accompagne dans l\'organisation de mon \u00e9pargne, la pr\u00e9paration de ma retraite, la r\u00e9duction de mes imp\u00f4ts et la protection de ma famille. Si cela t\'int\u00e9resse, je lui communique tes coordonn\u00e9es. Elle t\'expliquera ce qu\'elle fait et tu verras si cela peut te correspondre\u2026 En plus, elle ne facture pas d\'honoraires !"\n\n';
+      body+='Nous aurons l\'occasion d\'en reparler lors de notre prochain RDV.\n\n';
+      body+='5/ Prochaine rencontre\nNotre prochaine rencontre est pr\u00e9vue le [DATE, HEURE] \u00e0/en [LIEU].\nIl faudra compter environ 1h30.\n\n';
+      body+='Respectueusement,';
+    } else if(type==='r2'){
+      subject='RDV patrimoine - Compte rendu R2 - '+noms;
+      body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
+      body+='Suite \u00e0 notre rendez-vous du '+dateJ+', voici le r\u00e9capitulatif des solutions pr\u00e9sent\u00e9es :\n\n';
+      if(solsSelectionnees&&solsSelectionnees.length){
+        var seen={};
+        solsSelectionnees.forEach(function(sol){
+          if(seen[sol.produit])return;seen[sol.produit]=true;
+          body+='- '+sol.produit+(sol.vi>0||sol.vp>0?' ('+fmt(sol.vi)+' \u20ac initial'+(sol.vp>0?' + '+fmt(sol.vp)+' \u20ac/mois':'')+')'  :'')+'\n';
+        });
+      } else {body+='[Solutions \u00e0 pr\u00e9ciser]\n';}
+      body+='\nJe reste \u00e0 votre disposition pour toute question.\n\n';
+      body+='Prochaine \u00e9tape : validation et mise en place.\n\n';
+      body+='Respectueusement,';
+    } else if(type==='r3'){
+      subject='RDV patrimoine - Validation & signature - '+noms;
+      body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
+      body+='Suite \u00e0 notre \u00e9change, voici les solutions valid\u00e9es et les prochaines \u00e9tapes :\n\n';
+      body+='Solutions valid\u00e9es :\n';
+      if(solsSelectionnees&&solsSelectionnees.length){
+        var seen2={};
+        solsSelectionnees.forEach(function(sol){
+          if(seen2[sol.produit])return;seen2[sol.produit]=true;
+          body+='- '+sol.produit+'\n';
+        });
+      }
+      body+='\nProchaines \u00e9tapes :\n';
+      body+='1. R\u00e9ception des documents de souscription\n';
+      body+='2. Signature \u00e9lectronique\n';
+      body+='3. Versement initial\n';
+      body+='4. Mise en place des versements programm\u00e9s\n\n';
+      body+='Respectueusement,';
+    } else {
+      subject='Confirmation de mise en place - '+noms;
+      body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
+      body+='Je vous confirme que les solutions suivantes ont \u00e9t\u00e9 mises en place :\n\n';
+      if(solsSelectionnees&&solsSelectionnees.length){
+        var seen3={};
+        solsSelectionnees.forEach(function(sol){
+          if(seen3[sol.produit])return;seen3[sol.produit]=true;
+          body+='- '+sol.produit+'\n';
+        });
+      }
+      body+='\nProchaine \u00e9tape : suivi p\u00e9riodique de votre situation.\nJe reviendrai vers vous dans les prochains mois pour faire le point.\n\n';
+      body+='Respectueusement,';
+    }
+    // Afficher la modale
+    var modal=document.getElementById('crModal');
+    var titleEl=document.getElementById('crModalTitle');
+    var subEl=document.getElementById('crModalSubject');
+    var bodyEl=document.getElementById('crModalBody');
+    if(titleEl)titleEl.textContent={'r1':'CR R1 \u2014 Audit','r2':'CR R2 \u2014 Pr\u00e9sentation','r3':'CR R3 \u2014 Signature','post':'Post-signature'}[type]||'CR';
+    if(subEl)subEl.textContent='Objet : '+subject;
+    if(bodyEl)bodyEl.value=body;
+    if(modal)modal.style.display='flex';
+  }catch(e){console.warn('genererCR:',e);showNotif('Erreur g\u00e9n\u00e9ration CR');}
 }
 function initProjectionFin(){
   try{calcProjectionFin();}catch(e){}
