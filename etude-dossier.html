@@ -7312,7 +7312,7 @@ function calcProjectionFin(){
 // ── VÉRIFICATION & COMPLÉTION DES DONNÉES ──
 function remplirVerification(){
   try{
-    var s=function(id,v){var el=document.getElementById(id);if(el){if(el.tagName==='SELECT'){for(var i=0;i<el.options.length;i++){if(el.options[i].text.toLowerCase().indexOf((v||'').toLowerCase())>=0){el.selectedIndex=i;break;}}}else el.value=v||'';}};
+    var s=function(id,v){var el=document.getElementById(id);if(!el||!v)return;if(el.tagName==='SELECT'){var vl=(v||'').toLowerCase();var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].text.toLowerCase()===vl||el.options[i].value.toLowerCase()===vl){el.selectedIndex=i;found=true;break;}}if(!found){for(var j=0;j<el.options.length;j++){if(el.options[j].text.toLowerCase().indexOf(vl)>=0){el.selectedIndex=j;break;}}}}else el.value=v||'';};
     s('vC1Civ',ED.c1.civ);s('vC1Prenom',ED.c1.prenom);s('vC1Nom',ED.c1.nom);s('vC1Dob',ED.c1.dob);
     s('vC1CSP',ED.c1.sitpro);s('vC1Prof',ED.c1.profession);s('vC1Societe',ED.c1.societe);
     s('vC1Sal',ED.revenus.sal1||ED.revenus.c1||'');
