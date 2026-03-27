@@ -936,10 +936,13 @@ select.span2{grid-column:span 2}
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>&#201;pargne &amp; Projets</div>
     <div id="kSit1Wrap" style="padding:10px 14px"></div>
-    <div style="padding:10px 14px;border-top:1px solid var(--bord);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <span style="font-size:13px;font-weight:700;color:var(--noir)">&#201;pargne de pr&#233;caution souhait&#233;e</span>
-      <input type="number" id="epPrecInput" value="0" min="0" step="1000" style="width:120px;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);text-align:center;outline:none" onchange="ED.epPrec=+this.value">
-      <span style="font-size:12px;color:var(--gris)">&#8364;</span>
+    <div style="padding:10px 14px;border-top:1px solid var(--bord)">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--noir)">&#201;pargne de pr&#233;caution souhait&#233;e</span>
+        <input type="number" id="epPrecInput" value="0" min="0" step="1000" style="width:120px;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);text-align:center;outline:none" onchange="ED.epPrec=+this.value">
+        <span style="font-size:12px;color:var(--gris)">&#8364;</span>
+      </div>
+      <div id="epPrecGauge"></div>
     </div>
     <!-- Projets court terme -->
     <div style="padding:10px 14px;border-top:1px solid var(--bord)">
@@ -2862,14 +2865,15 @@ function parseTextRI(txt){
     }
     if(!ED.objectifs.length) ED.objectifs = ['Objectifs à compléter'];
 
-    // Épargne de précaution souhaitée
+    // Épargne de précaution souhaitée (C1 + C2)
     var kv02 = kvMap(s02);
-    var epPrecVal = kv02['épargne de précaution souhaitée'] || kv02['epargne de precaution souhaitee'] || '';
-    if(epPrecVal) ED.epPrec = pEur(epPrecVal);
+    var epPrecVal = kv02['\u00e9pargne de pr\u00e9caution souhait\u00e9e'] || kv02['epargne de precaution souhaitee'] || '';
+    if(epPrecVal){var epNums=epPrecVal.match(/[\d\s]+/g);if(epNums&&epNums.length>=2){ED.epPrec=pEur(epNums[0]);ED.epPrec2=pEur(epNums[1]);}else{ED.epPrec=pEur(epPrecVal);}}
     if(!ED.epPrec){
       objRows02.forEach(function(cols){
-        if(/épargne de précaution|epargne de precaution/i.test(cols[0])){
-          ED.epPrec = pEur(cols[1]) || pEur(cols[2]) || 0;
+        if(/\u00e9pargne de pr\u00e9caution|epargne de precaution/i.test(cols[0])){
+          ED.epPrec = pEur(cols[1]) || 0;
+          if(cols[2])ED.epPrec2 = pEur(cols[2]) || 0;
         }
       });
     }
@@ -3268,7 +3272,10 @@ function parseTextRI(txt){
   if(!ED.fiscal.tmi&&ED.fiscal.rbg)ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);
   if(!ED.fiscal.irnet&&ED.fiscal.rbg){var c2=calcIR(ED.fiscal.rbg,ED.fiscal.parts);ED.fiscal.irnet=c2.ir;if(!ED.fiscal.tmi)ED.fiscal.tmi=c2.tmi;}
   var revM2=revMens();
-  ED.epMens=Math.max(0,Math.round(revM2*0.20));
+  var salC1=(ED.revenus.sal1||ED.revenus.c1||0);
+  var salC2=(ED.revenus.sal2||ED.revenus.c2||0);
+  ED.epMens=Math.max(0,Math.round(salC1/12*0.20));
+  ED.epMens2=Math.max(0,Math.round(salC2/12*0.20));
   launch();
 }
 
@@ -3824,21 +3831,19 @@ function rSituation(){
     var epCible=Math.round(revMep*0.20);
     var epPct=epCible>0?Math.min(100,Math.round(epTotal/epCible*100)):0;
     var epColor=epPct>=100?'#2D7A5B':epPct>=50?'#D4622A':'#C0392B';
-    epH+='<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epTotal)+' \u20ac/mois</span><span>Cible 20% : '+fmt(epCible)+' \u20ac</span></div>';
-    epH+='<div style="height:6px;background:var(--bord);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+epPct+'%;background:'+epColor+';border-radius:3px"></div></div></div>';
+    epH+='<div style="margin-top:10px;max-width:400px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epTotal)+' \u20ac/mois</span><span>Cible 20% : '+fmt(epCible)+' \u20ac</span></div>';
+    epH+='<div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+epPct+'%;background:'+epColor+';border-radius:2px"></div></div></div>';
     epWrap.innerHTML=epH;
   }
   // Épargne de précaution + jauge
   var epPrecIn=document.getElementById('epPrecInput');
-  if(epPrecIn)epPrecIn.value=ED.epPrec||0;
-  var epPrecWrap=document.getElementById('epPrecInput');
-  if(epPrecWrap&&epPrecWrap.parentNode){
-    var revMep2=revMens();var epPrecCible=Math.round(revMep2*3);var epPrecVal=ED.epPrec||0;
-    var epPrecPct=epPrecCible>0?Math.min(100,Math.round(epPrecVal/epPrecCible*100)):0;
+  if(epPrecIn)epPrecIn.value=(ED.epPrec||0)+(ED.epPrec2||0);
+  var epPrecGauge=document.getElementById('epPrecGauge');
+  if(epPrecGauge){
+    var revMep2=revMens();var epPrecCible=Math.round(revMep2*3);var epPrecTot=(ED.epPrec||0)+(ED.epPrec2||0);
+    var epPrecPct=epPrecCible>0?Math.min(100,Math.round(epPrecTot/epPrecCible*100)):0;
     var epPrecColor=epPrecPct>=100?'#2D7A5B':epPrecPct>=50?'#D4622A':'#C0392B';
-    var gaugeEl=document.getElementById('epPrecGauge');
-    if(!gaugeEl){gaugeEl=document.createElement('div');gaugeEl.id='epPrecGauge';epPrecWrap.parentNode.appendChild(gaugeEl);}
-    gaugeEl.innerHTML='<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epPrecVal)+' \u20ac</span><span>Cible 3 mois : '+fmt(epPrecCible)+' \u20ac</span></div><div style="height:6px;background:var(--bord);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+epPrecPct+'%;background:'+epPrecColor+';border-radius:3px"></div></div></div>';
+    epPrecGauge.innerHTML='<div style="max-width:400px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epPrecTot)+' \u20ac souhait\u00e9</span><span>Cible 3 mois : '+fmt(epPrecCible)+' \u20ac</span></div><div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+epPrecPct+'%;background:'+epPrecColor+';border-radius:2px"></div></div></div>';
   }
   // Projets
   if(ED.projets&&ED.projets.length){
@@ -3873,6 +3878,14 @@ function renderLevierBadge(containerId, items){
   });
   h+='</div></div>';
   el.innerHTML=h;
+}
+// Horizon global (accessible partout)
+function getHorizonFromNom(nom){
+  var n=(nom||'').toLowerCase();
+  if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|livret d.[\u00e9e]pargne pop|\bcel\b|compte [\u00e9e]pargne logement/.test(n)) return 'ct';
+  if(/\blivret\b/.test(n) && !/pel/.test(n)) return 'ct';
+  if(/\bpel\b|plan d.[\u00e9e]pargne logement|\bcat\b|compte [\u00e0a] terme|assurance[- ]vie|capitalisation|\bcto\b|compte[- ]titre|\bpea\b|\bpee\b/.test(n)) return 'mt';
+  return 'lt';
 }
 function rPatrimoine(){
   const aSum=ED.actifs.reduce((s,a)=>s+(a.montant||0),0);
@@ -7612,7 +7625,8 @@ function appliquerVerification(){
     document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
     // Épargne
     var revM=revMens();
-    if(!ED.epMens)ED.epMens=Math.max(0,Math.round(revM*0.20));
+    if(!ED.epMens)ED.epMens=Math.max(0,Math.round((ED.revenus.sal1||ED.revenus.c1||0)/12*0.20));
+    if(!ED.epMens2)ED.epMens2=Math.max(0,Math.round((ED.revenus.sal2||ED.revenus.c2||0)/12*0.20));
     if(!ED.epPrec)ED.epPrec=Math.round(revM*3);
     // Render — re-render toutes les sections visitables
     markDone();
