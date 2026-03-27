@@ -412,6 +412,7 @@ select.span2{grid-column:span 2}
   .note-print{break-inside:avoid}
   /* ── PIED DE PAGE : masquer les .page-number inline ── */
   .page-number{display:none!important}
+  .page-nav-btns{display:none!important}
   /* ── GRAPHIQUES : éviter la coupure ── */
   canvas{max-width:100%!important}
   .synthese-step{break-inside:avoid}
@@ -643,12 +644,10 @@ select.span2{grid-column:span 2}
       </div>
 
 
-    </div>
 
-    <!-- Vérifier & compléter les données -->
-    <div style="margin-top:0;background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden">
-      <div style="padding:12px 20px;background:rgba(212,98,42,0.06);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierBody');b.style.display=b.style.display==='none'?'':'none'">
-        <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">V&#233;rifier &amp; compl&#233;ter les donn&#233;es</div>
+      <!-- Vérifier & compléter les données (dans la même bulle) -->
+      <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierBody');b.style.display=b.style.display==='none'?'':'none'">
+        <div style="font-family:var(--sans);font-weight:600;font-size:13px;color:var(--orange)">V&#233;rifier &amp; compl&#233;ter les donn&#233;es</div>
         <span style="color:var(--orange);font-size:14px">&#9660;</span>
       </div>
       <div id="verifierBody" style="display:none;padding:20px">
@@ -769,11 +768,9 @@ select.span2{grid-column:span 2}
         <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
         <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
       </div>
-    </div>
-    <!-- Vérif mentions légales -->
-    <div style="background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:18px">
-      <div style="padding:10px 20px;background:rgba(212,98,42,0.06);cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="var b=document.getElementById('verifierMentionsBody');b.style.display=b.style.display==='none'?'':'none'">
-        <span style="font-size:13px;font-weight:600;color:var(--noir)">V&#233;rifier les mentions l&#233;gales</span>
+      <!-- Vérif mentions légales (dans la même bulle) -->
+      <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierMentionsBody');b.style.display=b.style.display==='none'?'':'none'">
+        <span style="font-size:13px;font-weight:600;color:var(--orange)">V&#233;rifier les mentions l&#233;gales</span>
         <span style="color:var(--orange);font-size:14px">&#9660;</span>
       </div>
       <div id="verifierMentionsBody" style="display:none;padding:16px 20px">
@@ -796,7 +793,7 @@ select.span2{grid-column:span 2}
     </div>
 
     <!-- ── BLOC AVIS D'IMPOSITION ── -->
-    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px 14px 0 0;padding:20px">
+    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px;margin-bottom:18px">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">&#128202; Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
@@ -808,11 +805,9 @@ select.span2{grid-column:span 2}
         </label>
       </div>
       <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
-    </div>
-    <!-- Vérif avis imposition -->
-    <div style="background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:18px">
-      <div style="padding:10px 20px;background:rgba(212,98,42,0.06);cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="var b=document.getElementById('verifierFiscBody');b.style.display=b.style.display==='none'?'':'none'">
-        <span style="font-size:13px;font-weight:600;color:var(--noir)">V&#233;rifier les donn&#233;es fiscales</span>
+      <!-- Vérif avis imposition (dans la même bulle) -->
+      <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierFiscBody');b.style.display=b.style.display==='none'?'':'none'">
+        <span style="font-size:13px;font-weight:600;color:var(--orange)">V&#233;rifier les donn&#233;es fiscales</span>
         <span style="color:var(--orange);font-size:14px">&#9660;</span>
       </div>
       <div id="verifierFiscBody" style="display:none;padding:16px 20px">
@@ -893,7 +888,7 @@ select.span2{grid-column:span 2}
 
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
   <!-- Cache le footer PDF sur la page de garde -->
   <div class="garde-footer-mask" style="display:none"></div>
 </div><!-- /sec-pagegarde -->
@@ -915,7 +910,7 @@ select.span2{grid-column:span 2}
     Ce document est strictement confidentiel et destiné uniquement à l'usage du client désigné.
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-sommaire -->
 
 
@@ -965,7 +960,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-situation" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-situation -->
 <div class="comment-zone comment-off panneau-interne" data-sec="situation" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1011,7 +1006,7 @@ select.span2{grid-column:span 2}
   <div id="levierPat" style="margin-bottom:10px"></div>
   <div class="note-print" id="notePrint-patrimoine" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-patrimoine -->
 <div class="comment-zone comment-off panneau-interne" data-sec="patrimoine" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1074,7 +1069,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-fiscal" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-fiscal -->
 <div class="comment-zone comment-off panneau-interne" data-sec="fiscal" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1115,7 +1110,7 @@ select.span2{grid-column:span 2}
   <div id="levierFin" style="margin-bottom:10px"></div>
   <div class="note-print" id="notePrint-financement" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-financement -->
 <div class="comment-zone comment-off panneau-interne" data-sec="financement" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1158,7 +1153,7 @@ select.span2{grid-column:span 2}
   </div>
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-retraite -->
 <div class="comment-zone comment-off panneau-interne" data-sec="retraite" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1222,7 +1217,7 @@ select.span2{grid-column:span 2}
 
   <div style="font-size:11px;color:var(--orange);font-weight:600;padding:10px 14px;background:rgba(212,98,42,0.06);border-radius:8px;margin-bottom:10px">&#9888;&#65039; Simulations simplifi&#233;es et non contractuelles. &#192; affiner et valider aupr&#232;s d'un notaire. Hors frais de notaire.</div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-transmission -->
 
 <!-- ════════════════════════════════════════
@@ -1276,7 +1271,7 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tr&#233;sorerie PM, PEE..."></div>
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-entreprise -->
 
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
@@ -1353,7 +1348,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-preconisations" style="display:none"></div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-preconisations -->
 <div class="comment-zone comment-off panneau-interne" data-sec="preconisations" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1393,7 +1388,7 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteSynthese" contenteditable="true" data-placeholder="Résumé de l'étude, logique de la stratégie préconisée, points clés pour le client…"></div>
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-synthese -->
 
 
@@ -1412,7 +1407,7 @@ select.span2{grid-column:span 2}
     <em style="color:var(--gris)">Collez votre fiche d'informations légales ci-dessus.</em>
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-mentions -->
 
 <!-- ── ZONE CONSEILLER AVIS (hors section-page) ── -->
@@ -1444,7 +1439,7 @@ select.span2{grid-column:span 2}
     <em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>
   </div>
 
-  <div class="page-number"></div>
+  <div class="page-nav-btns"></div><div class="page-number"></div>
 </div><!-- /sec-avis -->
 
 <!-- ── FOOTER PDF (fixe, répété sur chaque page imprimée) ── -->
