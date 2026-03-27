@@ -1028,6 +1028,8 @@ select.span2{grid-column:span 2}
     <div class="card" style="margin-bottom:0">
       <div class="card-title"><span class="dot"></span>Imposition actuelle</div>
       <div class="fiscal-row"><span class="fr-l">Ann&#233;e d'imposition</span><span class="fr-v ed" id="fiAnnee" contenteditable="true">&#8212;</span></div>
+      <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v" id="fiSal1">&#8212;</span></div>
+      <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v" id="fiSal2">&#8212;</span></div>
       <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Revenu brut global</span><span class="fr-v ed" id="fiRbg" contenteditable="true" style="font-size:16px;font-weight:700;color:var(--noir)">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Revenu imposable</span><span class="fr-v" id="fiRevImp">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">&#8212;</span></div>
@@ -4030,7 +4032,9 @@ function rPatrimoine(){
 // ╚══════════════════════════════════════════════════════════════════╝
 function rFiscal(){
   const f=ED.fiscal;
-  setEd('fiAnnee',f.annee||'—');setEd('fiRbg',f.rbg?fmt(f.rbg)+' €':'—');setEd('fiParts',f.parts||1);
+  setEd('fiAnnee',f.annee||'\u2014');setEd('fiRbg',f.rbg?fmt(f.rbg)+' \u20ac':'\u2014');setEd('fiParts',f.parts||1);
+  set('fiSal1',(ED.revenus.sal1||ED.revenus.c1)?fmt(ED.revenus.sal1||ED.revenus.c1)+' \u20ac':'\u2014');
+  set('fiSal2',(ED.revenus.sal2||ED.revenus.c2)?fmt(ED.revenus.sal2||ED.revenus.c2)+' \u20ac':'\u2014');
   const tmiEl=document.getElementById('fiTMI');
   var irCalc=calcIR(f.rbg||0,f.parts||1);
   var tmiDisplay=f.tmi||irCalc.tmi||0;
@@ -4337,7 +4341,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
         impactFoyer+=impactTotal;
         var revMensClient=Math.round(cl.rev/12);var gapColor=gap>0?'var(--red)':'var(--green)';cardsHtml+='<div class="card" style="margin-bottom:0"><div class="card-title" style="margin-bottom:12px"><span class="dot"></span>'+name+'</div><div class="fiscal-row"><span class="fr-l">Age actuel</span><span class="fr-v">'+age+' ans</span></div><div class="fiscal-row"><span class="fr-l">Catégorie</span><span class="fr-v" style="font-size:12px">'+cl.csp+'</span></div><div class="fiscal-row"><span class="fr-l">Revenu actuel considéré</span><span class="fr-v">'+fmt(revMensClient)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Taux remplacement</span><span class="fr-v" style="font-weight:700">'+tx+' %</span></div><div class="fiscal-row"><span class="fr-l">Horizon retraite</span><span class="fr-v">'+horizon+' ans</span></div><div class="fiscal-row"><span class="fr-l">Pension estimée</span><span class="fr-v">'+fmt(pensM)+' €/mois</span></div><div class="fiscal-row"><span class="fr-l">Pension souhaitée</span><span class="fr-v ed" contenteditable="true">'+cl.pension+' €/mois</span></div><div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Manque mensuel</span><span class="fr-v" style="color:'+gapColor+';font-weight:700">'+(gap>0?'+'+fmt(gap)+' €/mois':'Couvert')+'</span></div>'
         +'<div class="fiscal-row"><span class="fr-l">Espérance de vie</span><span class="fr-v">'+espVie+' mois</span></div>'
-        +'<div class="fiscal-row" style="border-top:1px solid var(--bord);padding-top:6px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+gapColor+';font-weight:700">- '+fmt(Math.abs(impactTotal))+' €</span></div>'
+        +'<div class="fiscal-row" style="border-top:1px solid var(--bord);padding-top:6px;margin-top:4px"><span class="fr-l" style="font-weight:700">Impact individuel</span><span class="fr-v" style="color:'+gapColor+';font-weight:700">'+(impactTotal>0?'-'+fmt(impactTotal):'+'+fmt(Math.abs(impactTotal)))+' \u20ac</span></div>'
         +'</div>';});
   // Impact total foyer (somme des impacts individuels)
   // Impact foyer séparé (dans son propre div, pleine largeur)
@@ -4346,7 +4350,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   var ifEl=document.getElementById('retraiteImpactFoyer');
   if(ifEl){
     var impColor=impactFoyer>0?'var(--red)':'var(--green)';
-    ifEl.innerHTML='<div class="card" style="margin-bottom:0"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impColor+';font-weight:700;font-size:16px">- '+fmt(Math.abs(impactFoyer))+' €</span></div></div>';
+    ifEl.innerHTML='<div class="card" style="margin-bottom:0"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impColor+';font-weight:700;font-size:16px">'+(impactFoyer>0?'-'+fmt(impactFoyer):'+'+fmt(Math.abs(impactFoyer)))+' \u20ac</span></div></div>';
   }
   var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
   var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--noir)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--noir)'}];
