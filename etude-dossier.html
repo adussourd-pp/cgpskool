@@ -7778,6 +7778,7 @@ function remplirVerifMentions(){
     cb('vMlIAS',/ASSURANCE[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw));
     cb('vMlCIF',/INSTRUMENTS FINANCIERS[\s\S]*?Agent li\u00e9[\s\S]*?:\s*OUI/i.test(raw));
     document.getElementById('verifierMentionsBody').style.display='';
+    highlightEmptyFields('verifierMentionsBody');
   }catch(e){console.warn('remplirVerifMentions:',e);}
 }
 function appliquerVerifMentions(){
@@ -7792,6 +7793,7 @@ function remplirVerifFisc(){
     s('vF2PS',ED.fiscal.ps||'');s('vF2PER',ED.fiscal.plafondPER||'');s('vF2IRBareme',ED.fiscal.irBareme||'');
     s('vF2Reduc',ED.fiscal.reductions||'');s('vF2Credits',ED.fiscal.credits||'');
     document.getElementById('verifierFiscBody').style.display='';
+    highlightEmptyFields('verifierFiscBody');
   }catch(e){console.warn('remplirVerifFisc:',e);}
 }
 function appliquerVerifFisc(){
@@ -7829,7 +7831,29 @@ function remplirVerification(){
     s('vEpMens1',ED.epMens||'');s('vEpMens2',ED.epMens2||'');
     s('vEpPrec1',ED.epPrec||'');s('vEpPrec2',ED.epPrec2||'');
     document.getElementById('verifierBody').style.display='';
+    highlightEmptyFields('verifierBody');
   }catch(e){console.warn('remplirVerification:',e);}
+}
+function highlightEmptyFields(containerId){
+  try{
+    var container=document.getElementById(containerId);
+    if(!container)return;
+    container.querySelectorAll('input,select').forEach(function(el){
+      if(el.type==='checkbox'||el.type==='file'||el.type==='hidden')return;
+      var empty=!el.value||el.value==='0'||el.value.trim()==='';
+      el.style.background=empty?'#FFF8E1':'';
+      el.style.borderColor=empty?'#FFE082':'';
+      // Mettre à jour en live quand l'user tape
+      if(!el._hlBound){
+        el._hlBound=true;
+        el.addEventListener('input',function(){
+          var e2=!this.value||this.value==='0'||this.value.trim()==='';
+          this.style.background=e2?'#FFF8E1':'';
+          this.style.borderColor=e2?'#FFE082':'';
+        });
+      }
+    });
+  }catch(e){}
 }
 function renderVerifEnfants(){
   var el=document.getElementById('vEnfantsBlock');if(!el)return;
