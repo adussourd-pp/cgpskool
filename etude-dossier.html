@@ -890,7 +890,7 @@ select.span2{grid-column:span 2}
 
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
   <!-- Cache le footer PDF sur la page de garde -->
   <div class="garde-footer-mask" style="display:none"></div>
 </div><!-- /sec-pagegarde -->
@@ -912,7 +912,7 @@ select.span2{grid-column:span 2}
     Ce document est strictement confidentiel et destiné uniquement à l'usage du client désigné.
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-sommaire -->
 
 
@@ -962,7 +962,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-situation" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-situation -->
 <div class="comment-zone comment-off panneau-interne" data-sec="situation" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1008,7 +1008,7 @@ select.span2{grid-column:span 2}
   <div id="levierPat" style="margin-bottom:10px"></div>
   <div class="note-print" id="notePrint-patrimoine" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-patrimoine -->
 <div class="comment-zone comment-off panneau-interne" data-sec="patrimoine" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1073,7 +1073,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-fiscal" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-fiscal -->
 <div class="comment-zone comment-off panneau-interne" data-sec="fiscal" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1089,12 +1089,11 @@ select.span2{grid-column:span 2}
     <div><div class="sec-tag">Section 04</div><div class="sec-h1">Financement</div></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-    <!-- Analyse par personne -->
-    <div id="finAnalyseBlock"></div>
+  <!-- Analyse par personne -->
+  <div id="finAnalyseBlock" style="margin-bottom:18px"></div>
 
-    <!-- Projection financement -->
-    <div class="card" id="projFinCard" style="margin-bottom:0;background:#FAFFFE;border-color:rgba(45,122,91,0.2)">
+  <!-- Projection financement -->
+  <div class="card" id="projFinCard" style="margin-bottom:18px;background:#FAFFFE;border-color:rgba(45,122,91,0.2)">
       <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
         <span><span class="dot" style="background:var(--green)"></span>Projection</span>
         <div style="display:flex;align-items:center;gap:6px">
@@ -1102,19 +1101,19 @@ select.span2{grid-column:span 2}
           <label class="cz-switch"><input type="checkbox" id="projFinPrint" onchange="var c=document.getElementById('projFinCard');var l=document.getElementById('projFinPDFLabel');if(c)c.classList.toggle('proj-fin-print',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
         </div>
       </div>
-      <div class="fiscal-row"><span class="fr-l">Montant emprunt&#233;</span><span class="fr-v"><input class="fi" type="number" id="projFinMontant" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Taux nominal (%)</span><span class="fr-v"><input class="fi" type="number" id="projFinTaux" step="0.01" value="3.5" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Dur&#233;e (ans)</span><span class="fr-v"><input class="fi" type="number" id="projFinDuree" value="20" min="1" max="30" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Assurance (%)</span><span class="fr-v"><input class="fi" type="number" id="projFinAssur" step="0.01" value="0.30" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Apport</span><span class="fr-v"><input class="fi" type="number" id="projFinApport" oninput="calcProjectionFin()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div id="projFinCapaInfo" style="margin-bottom:10px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Taux nominal (%)</label><input class="fi" type="number" id="projFinTaux" step="0.01" value="3.5" oninput="calcProjectionFin()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dur&#233;e (ans)</label><input class="fi" type="number" id="projFinDuree" value="20" min="1" max="30" oninput="calcProjectionFin()"></div>
+        <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Assurance (%)</label><input class="fi" type="number" id="projFinAssur" step="0.01" value="0.30" oninput="calcProjectionFin()"></div>
+      </div>
       <div id="projFinResultat"></div>
     </div>
-  </div>
 
   <div id="levierFin" style="margin-bottom:10px"></div>
   <div class="note-print" id="notePrint-financement" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-financement -->
 <div class="comment-zone comment-off panneau-interne" data-sec="financement" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1157,7 +1156,7 @@ select.span2{grid-column:span 2}
   </div>
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-retraite -->
 <div class="comment-zone comment-off panneau-interne" data-sec="retraite" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1221,7 +1220,7 @@ select.span2{grid-column:span 2}
 
   <div style="font-size:11px;color:var(--orange);font-weight:600;padding:10px 14px;background:rgba(212,98,42,0.06);border-radius:8px;margin-bottom:10px">&#9888;&#65039; Simulations simplifi&#233;es et non contractuelles. &#192; affiner et valider aupr&#232;s d'un notaire. Hors frais de notaire.</div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-transmission -->
 
 <!-- ════════════════════════════════════════
@@ -1275,7 +1274,7 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteEntreprise" contenteditable="true" data-placeholder="Analyse entreprise : structure holding, apport-cession, tr&#233;sorerie PM, PEE..."></div>
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-entreprise -->
 
 <!-- ── PANNEAU CONSEILLER (hors section-page) ── -->
@@ -1352,7 +1351,7 @@ select.span2{grid-column:span 2}
 
   <div class="note-print" id="notePrint-preconisations" style="display:none"></div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-preconisations -->
 <div class="comment-zone comment-off panneau-interne" data-sec="preconisations" style="display:none">
   <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
@@ -1392,7 +1391,7 @@ select.span2{grid-column:span 2}
     <div class="ed-block" id="noteSynthese" contenteditable="true" data-placeholder="Résumé de l'étude, logique de la stratégie préconisée, points clés pour le client…"></div>
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-synthese -->
 
 
@@ -1411,7 +1410,7 @@ select.span2{grid-column:span 2}
     <em style="color:var(--gris)">Collez votre fiche d'informations légales ci-dessus.</em>
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-mentions -->
 
 <!-- ── ZONE CONSEILLER AVIS (hors section-page) ── -->
@@ -1443,7 +1442,7 @@ select.span2{grid-column:span 2}
     <em style="color:var(--gris)">Aucun avis. Ajoutez des avis ci-dessus.</em>
   </div>
 
-  <div class="page-nav-btns"></div><div class="page-number"></div>
+  <div class="page-number"></div>
 </div><!-- /sec-avis -->
 
 <!-- ── FOOTER PDF (fixe, répété sur chaque page imprimée) ── -->
@@ -6390,17 +6389,34 @@ function toggleStep(i){if(steps[i])steps[i].done=!steps[i].done;renderSteps();}
 var NAV_ORDER=['import','situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'];
 function renderNavButtons(sec){
   try{
-    var secEl=document.getElementById('sec-'+sec);if(!secEl)return;
-    var navDiv=secEl.querySelector('.page-nav-btns');if(!navDiv)return;
-    var idx=NAV_ORDER.indexOf(sec);if(idx<0){navDiv.innerHTML='';return;}
+    // Supprimer l'ancien nav bar
+    var old=document.getElementById('navBarFloat');if(old)old.remove();
+    var idx=NAV_ORDER.indexOf(sec);if(idx<0)return;
     var prev=idx>0?NAV_ORDER[idx-1]:null;
     var next=idx<NAV_ORDER.length-1?NAV_ORDER[idx+1]:null;
-    var h='<div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid var(--bord)">';
-    if(prev)h+='<button class="btn btn-secondary" onclick="goTo(\''+prev+'\')" style="font-size:12px;padding:8px 20px">\u2190 Pr\u00e9c\u00e9dent</button>';
-    else h+='<div></div>';
-    if(next)h+='<button class="btn btn-primary" onclick="goTo(\''+next+'\')" style="font-size:12px;padding:8px 20px">Suivant \u2192</button>';
-    else h+='<div></div>';
-    h+='</div>';navDiv.innerHTML=h;
+    if(!prev&&!next)return;
+    var secEl=document.getElementById('sec-'+sec);if(!secEl)return;
+    var bar=document.createElement('div');
+    bar.id='navBarFloat';
+    bar.className='panneau-interne';
+    bar.style.cssText='display:flex;justify-content:space-between;align-items:center;max-width:794px;margin:12px auto;padding:10px 20px';
+    if(prev){
+      var bp=document.createElement('button');
+      bp.className='btn btn-secondary';
+      bp.style.cssText='font-size:12px;padding:8px 20px';
+      bp.textContent='\u2190 Pr\u00e9c\u00e9dent';
+      bp.onclick=function(){goTo(prev);};
+      bar.appendChild(bp);
+    } else {bar.appendChild(document.createElement('div'));}
+    if(next){
+      var bn=document.createElement('button');
+      bn.className='btn btn-primary';
+      bn.style.cssText='font-size:12px;padding:8px 20px';
+      bn.textContent='Suivant \u2192';
+      bn.onclick=function(){validateSection(sec);goTo(next);};
+      bar.appendChild(bn);
+    } else {bar.appendChild(document.createElement('div'));}
+    secEl.parentNode.insertBefore(bar,secEl.nextSibling);
   }catch(e){}
 }
 function addStep(){
@@ -7345,50 +7361,41 @@ function calcProjectionIR(){
   }catch(e){console.warn('calcProjectionIR error:',e);}
 }
 function initProjectionFin(){
-  try{
-    var revM=revMens();
-    var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-    var capaMsg=Math.max(0,Math.round(revM*0.35-chrCredit));
-    // Calculer montant max empruntable à partir de la capacité restante
-    var taux=0.035,duree=20,assur=0.003;
-    var tauxM=taux/12;
-    var nbMois=duree*12;
-    var mensMaxHorsAssur=capaMsg/(1+assur*12/12/tauxM*(1-Math.pow(1+tauxM,-nbMois)));
-    // Formule inverse : montant = mensualité × (1-(1+r)^-n) / r
-    var montantMax=tauxM>0?Math.round(capaMsg/(tauxM/(1-Math.pow(1+tauxM,-nbMois))+assur/12)):0;
-    var el=document.getElementById('projFinMontant');
-    if(el&&!+el.value&&montantMax>0)el.value=montantMax;
-    calcProjectionFin();
-  }catch(e){}
+  try{calcProjectionFin();}catch(e){}
 }
 function calcProjectionFin(){
   try{
     var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
-    var montant=n('projFinMontant'),taux=n('projFinTaux')/100,duree=n('projFinDuree'),assur=n('projFinAssur')/100,apport=n('projFinApport');
+    var taux=n('projFinTaux')/100,duree=n('projFinDuree'),assur=n('projFinAssur')/100;
     if(!duree)return;
     var nbMois=duree*12;
     var tauxM=taux/12;
-    var mensualite=tauxM>0?Math.round(montant*tauxM/(1-Math.pow(1+tauxM,-nbMois))):Math.round(montant/nbMois);
-    var mensAssur=Math.round(montant*assur/12);
-    var mensTotale=mensualite+mensAssur;
-    var coutTotal=mensTotale*nbMois-montant;
     var revM=revMens();
     var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
     var capaRestante=Math.max(0,Math.round(revM*0.35-chrCredit));
-    var nouvEndett=revM>0?((chrCredit+mensTotale)/revM*100).toFixed(1):'0';
-    var nouvRAV=revM-chrCredit-mensTotale;
+    // Montant max empruntable depuis la capacité restante
+    var montantMax=0;
+    if(tauxM>0&&capaRestante>0){
+      var mensMaxHorsAssur=capaRestante/(1+assur/tauxM*(1-1/Math.pow(1+tauxM,nbMois)));
+      montantMax=Math.round(mensMaxHorsAssur*(1-Math.pow(1+tauxM,-nbMois))/tauxM);
+    }
+    var mensualite=tauxM>0&&montantMax>0?Math.round(montantMax*tauxM/(1-Math.pow(1+tauxM,-nbMois))):0;
+    var mensAssur=Math.round(montantMax*assur/12);
+    var mensTotale=mensualite+mensAssur;
+    var coutTotal=mensTotale*nbMois-montantMax;
+    // Capacité info
+    var capEl=document.getElementById('projFinCapaInfo');
+    if(capEl){
+      capEl.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:rgba(45,122,91,0.06);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Participation restante (35%)</div><div style="font-size:16px;font-weight:700;color:var(--green)">'+fmt(capaRestante)+' \u20ac/mois</div></div><div style="background:var(--gris-l);border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--gris)">Montant max empruntable</div><div style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(montantMax)+' \u20ac</div></div></div>';
+    }
     var el=document.getElementById('projFinResultat');
     if(!el)return;
-    var endColor=+nouvEndett>35?'var(--red)':+nouvEndett>28?'var(--orange)':'var(--green)';
     var h='';
-    h+='<div class="fiscal-row" style="background:rgba(45,122,91,0.06);margin:6px -20px;padding:6px 20px"><span class="fr-l" style="font-weight:600;color:var(--green)">Capacit\u00e9 restante</span><span class="fr-v" style="font-weight:700;color:var(--green)">'+fmt(capaRestante)+' \u20ac/mois</span></div>';
-    if(montant>0){
-      h+='<div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Mensualit\u00e9 totale</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(mensTotale)+' \u20ac/mois</span></div>';
+    if(montantMax>0){
+      h+='<div class="fiscal-row" style="margin-top:10px"><span class="fr-l">Mensualit\u00e9 totale</span><span class="fr-v" style="font-weight:700">'+fmt(mensTotale)+' \u20ac/mois</span></div>';
       h+='<div class="fiscal-row"><span class="fr-l">Dont cr\u00e9dit</span><span class="fr-v">'+fmt(mensualite)+' \u20ac</span></div>';
       h+='<div class="fiscal-row"><span class="fr-l">Dont assurance</span><span class="fr-v">'+fmt(mensAssur)+' \u20ac</span></div>';
       h+='<div class="fiscal-row"><span class="fr-l">Co\u00fbt total cr\u00e9dit</span><span class="fr-v" style="color:var(--red)">'+fmt(coutTotal)+' \u20ac</span></div>';
-      h+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:8px;margin-top:4px"><span class="fr-l" style="font-weight:600">Nouvel endettement</span><span class="fr-v" style="font-weight:700;color:'+endColor+'">'+nouvEndett+' %</span></div>';
-      h+='<div class="fiscal-row"><span class="fr-l">Nouveau reste \u00e0 vivre</span><span class="fr-v" style="font-weight:700;color:'+(nouvRAV<0?'var(--red)':'var(--green)')+'">'+fmt(nouvRAV)+' \u20ac/mois</span></div>';
     }
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
@@ -7600,7 +7607,6 @@ function appliquerVerification(){
     // Épargne
     ED.epMens=n('vEpMens1');ED.epMens2=n('vEpMens2');
     ED.epPrec=n('vEpPrec1')+(n('vEpPrec2')||0);
-    if(epMensV>0)ED.epMens=epMensV;
     // Objectifs
     ED.objectifs=[];
     document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
