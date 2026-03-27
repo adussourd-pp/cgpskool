@@ -765,8 +765,8 @@ select.span2{grid-column:span 2}
         style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
         oninput="saveMentionsDirect()"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Valider</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
+        <button class="btn btn-primary" onclick="saveMentionsDirect()">&#9654; Valider</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()">Effacer</button>
       </div>
       <!-- Vérif mentions légales (dans la même bulle) -->
       <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierMentionsBody');b.style.display=b.style.display==='none'?'':'none'">
@@ -6354,7 +6354,7 @@ function renderSteps(){
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;border:1.5px solid '+border+';background:'+bg+';margin-bottom:6px">'
       +tick
       +'<div style="flex:1"><div style="font-size:13px;font-weight:700;color:'+color+'">'+s.label+'</div>'
-      +'<div style="font-size:10px;color:var(--gris);margin-top:2px">'+(({'R1':'Audit','R2':'Bilan patrimonial','R3':'Signature','RX':'Suivi'})[s.rdv||'']||'')+(s.date?' \u2014 '+s.date:'')+'</div>'
+      +'<div style="font-size:10px;color:var(--gris);margin-top:2px">'+(({'R1':'Audit','R2':'Pr\u00e9sentation de solutions','R3':'Signature','RX':'Suivi'})[s.rdv||'']||'')+'</div>'
       +'</div>'
       +'<select style="font-size:10px;font-weight:700;border:1.5px solid var(--bord);border-radius:6px;padding:3px 6px;color:var(--orange);font-family:var(--sans);width:52px;text-align:center;background:#fff" onchange="steps['+i+'].rdv=this.value;renderSteps()" title="Type de RDV"><option value="R1"'+(s.rdv==='R1'?' selected':'')+'>R1</option><option value="R2"'+(s.rdv==='R2'?' selected':'')+'>R2</option><option value="R3"'+(s.rdv==='R3'?' selected':'')+'>R3</option><option value="RX"'+(s.rdv==='RX'?' selected':'')+'>RX</option></select>'
       +'<input type="date" value="'+(s.date||'')+'" style="font-size:11px;border:1px solid var(--bord);border-radius:6px;padding:4px 8px;color:var(--gris-f);font-family:var(--sans);width:130px" onchange="steps['+i+'].date=this.value;renderSteps()" title="Date pr\u00e9vue">'
