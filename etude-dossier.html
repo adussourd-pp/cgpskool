@@ -8325,6 +8325,16 @@ function renderAvisPreview(){
 // ══════════════════════════════════════════════════════════════
 
 function exportPDF() {
+  // Valider toutes les sections (render + dots verts)
+  try{
+    ['situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'].forEach(function(sec){
+      try{renderSection(sec);validateSection(sec);}catch(e){}
+    });
+    var cb1=document.getElementById('checkTransmission');if(cb1&&cb1.checked){try{renderSection('transmission');validateSection('transmission');}catch(e){}}
+    var cb2=document.getElementById('checkEntreprise');if(cb2&&cb2.checked){try{renderSection('entreprise');}catch(e){}}
+    try{rPageGarde();}catch(e){}
+    try{rMentions();}catch(e){}
+  }catch(e){console.warn('exportPDF render all:',e);}
   // Mettre à jour l'en-tête PDF avant impression
   updatePdfHeader();
   // Déterminer les sections à imprimer (ordre PDF)
