@@ -6141,24 +6141,16 @@ function rSynthese(){
 
 function resetSteps(){
   steps=[];
-  // Étape 1 : bilan réalisé
-  steps.push({label:'Bilan patrimonial réalisé', done:true});
-  // Étape 2 : présentation du bilan
-  steps.push({label:'Présentation du bilan', done:false});
-  // Étapes suivantes : solutions validées dans les préconisations
+  steps.push({label:'Audit patrimonial', done:true, rdv:'R1'});
+  steps.push({label:'Pr\u00e9sentation du bilan', done:false, rdv:'R2'});
   if(solsSelectionnees&&solsSelectionnees.length){
     var sorted=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
     sorted.forEach(function(sol,i){
-      var cp=COPERNIC&&COPERNIC[sol.produit];
       var label=sol.produit||'Solution '+(i+1);
-      var sub=[];
-      if(cp&&cp.horizon) sub.push(cp.horizon);
-      if(sol.objectifsValides&&sol.objectifsValides.length) sub.push(sol.objectifsValides.join(', '));
-      steps.push({label:label, sub:sub.join(' · '), done:false, date:''});
+      steps.push({label:label, done:false, date:'', rdv:'R3'});
     });
   }
-  // Étape finale : suivi
-  steps.push({label:'Suivi & révision annuelle', done:false});
+  steps.push({label:'Suivi & r\u00e9vision annuelle', done:false, rdv:'RX'});
   renderSteps();
 }
 
@@ -6214,8 +6206,9 @@ function renderSteps(){
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;border:1.5px solid '+border+';background:'+bg+';margin-bottom:6px">'
       +tick
       +'<div style="flex:1"><div style="font-size:13px;font-weight:700;color:'+color+'">'+s.label+'</div>'
-      +(s.date?'<div style="font-size:11px;color:var(--gris);margin-top:2px">'+s.date+'</div>':'')
+      +'<div style="font-size:10px;color:var(--gris);margin-top:2px">'+(({'R1':'Audit','R2':'Bilan patrimonial','R3':'Signature','RX':'Suivi'})[s.rdv||'']||'')+(s.date?' \u2014 '+s.date:'')+'</div>'
       +'</div>'
+      +'<select style="font-size:10px;font-weight:700;border:1.5px solid var(--bord);border-radius:6px;padding:3px 6px;color:var(--orange);font-family:var(--sans);width:52px;text-align:center;background:#fff" onchange="steps['+i+'].rdv=this.value;renderSteps()" title="Type de RDV"><option value="R1"'+(s.rdv==='R1'?' selected':'')+'>R1</option><option value="R2"'+(s.rdv==='R2'?' selected':'')+'>R2</option><option value="R3"'+(s.rdv==='R3'?' selected':'')+'>R3</option><option value="RX"'+(s.rdv==='RX'?' selected':'')+'>RX</option></select>'
       +'<input type="date" value="'+(s.date||'')+'" style="font-size:11px;border:1px solid var(--bord);border-radius:6px;padding:4px 8px;color:var(--gris-f);font-family:var(--sans);width:130px" onchange="steps['+i+'].date=this.value;renderSteps()" title="Date pr\u00e9vue">'
       +'<button onclick="removeStep('+i+')" style="background:none;border:none;font-size:16px;color:var(--gris);cursor:pointer;line-height:1">&times;</button>'
       +'</div>';
