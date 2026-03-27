@@ -579,13 +579,7 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
     <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128194; Charger une &#233;tude</button>
     <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
-    <select id="crTypeSelect" class="fi" style="width:100%;font-size:12px;padding:6px">
-      <option value="r1">CR R1 &#8212; Audit</option>
-      <option value="r2">CR R2 &#8212; Pr&#233;sentation</option>
-      <option value="r3">CR R3 &#8212; Signature</option>
-      <option value="post">CR Post-signature</option>
-    </select>
-    <button class="btn btn-secondary" onclick="genererCR()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; G&#233;n&#233;rer un CR</button>
+    <button class="btn btn-secondary" onclick="goTo('compterendu')" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; Compte rendu</button>
     <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center"></div>
   </div>
   <div class="sidebar-divider"></div>
@@ -599,22 +593,6 @@ select.span2{grid-column:span 2}
     <div id="sidebarProfilDetail" style="font-size:10px;color:var(--gris);margin-top:2px">Affiché sur le PDF</div>
   </div>
 </aside>
-
-<!-- Modale CR -->
-<div id="crModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:700px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h2 style="font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir);margin:0" id="crModalTitle">Compte rendu</h2>
-      <button onclick="document.getElementById('crModal').style.display='none'" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gris)">&times;</button>
-    </div>
-    <div id="crModalSubject" style="font-size:12px;color:var(--orange);font-weight:600;margin-bottom:12px;padding:8px 12px;background:rgba(212,98,42,0.06);border-radius:8px"></div>
-    <textarea id="crModalBody" rows="20" style="width:100%;padding:14px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);line-height:1.7;resize:vertical;outline:none"></textarea>
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('crModalBody').value);showNotif('Copi\u00e9 !')" style="padding:10px 20px">&#128203; Copier le texte</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('crModal').style.display='none'">Fermer</button>
-    </div>
-  </div>
-</div>
 
 <!-- ── MAIN ── -->
 <main class="main">
@@ -1472,6 +1450,49 @@ select.span2{grid-column:span 2}
 
   <div class="page-number"></div>
 </div><!-- /sec-avis -->
+
+<!-- ════════════════════════════════════════
+     COMPTE RENDU
+════════════════════════════════════════ -->
+<div class="section-page" id="sec-compterendu" style="background:transparent;border:none;box-shadow:none;padding:20px 0;max-width:100%">
+  <div class="sec-header">
+    <div><div class="sec-h1">Compte rendu</div></div>
+  </div>
+
+  <!-- Tuiles -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:24px">
+    <div onclick="genererCR('r1')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+      <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R1</div>
+      <div style="font-size:13px;font-weight:600;color:var(--noir)">Audit</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:4px">Premier rendez-vous</div>
+    </div>
+    <div onclick="genererCR('r2')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+      <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R2</div>
+      <div style="font-size:13px;font-weight:600;color:var(--noir)">Pr&#233;sentation</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:4px">Solutions pr&#233;conis&#233;es</div>
+    </div>
+    <div onclick="genererCR('r3')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+      <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R3</div>
+      <div style="font-size:13px;font-weight:600;color:var(--noir)">Signature</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:4px">Validation &amp; docs</div>
+    </div>
+    <div onclick="genererCR('post')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+      <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">Post</div>
+      <div style="font-size:13px;font-weight:600;color:var(--noir)">Suivi</div>
+      <div style="font-size:11px;color:var(--gris);margin-top:4px">Confirmation mise en place</div>
+    </div>
+  </div>
+
+  <!-- Zone résultat -->
+  <div id="crResultZone" style="display:none">
+    <div id="crSubjectLine" style="font-size:12px;color:var(--orange);font-weight:600;margin-bottom:10px;padding:10px 14px;background:rgba(212,98,42,0.06);border-radius:8px"></div>
+    <textarea id="crBodyArea" rows="25" style="width:100%;padding:16px;border:1.5px solid var(--bord);border-radius:12px;font-family:var(--sans);font-size:13px;color:var(--noir);line-height:1.7;resize:vertical;outline:none;background:#fff"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('crBodyArea').value);showNotif('Copi\u00e9 !')">&#128203; Copier le texte</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('crResultZone').style.display='none'">Masquer</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── FOOTER PDF (fixe, répété sur chaque page imprimée) ── -->
 <div class="pdf-print-footer" id="pdfPrintFooter">
@@ -7381,9 +7402,9 @@ function calcProjectionIR(){
   }catch(e){console.warn('calcProjectionIR error:',e);}
 }
 // ── GÉNÉRATION COMPTE RENDU ──
-function genererCR(){
+function genererCR(type){
   try{
-    var type=(document.getElementById('crTypeSelect')?document.getElementById('crTypeSelect').value:'r1');
+    if(!type)type='r1';
     var n1=((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim()||'Client';
     var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?((ED.c2.prenom||'')+' '+(ED.c2.nom||'')).trim():'';
     var noms=n1+(n2?' et '+n2:'');
@@ -7419,19 +7440,51 @@ function genererCR(){
       body+='5/ Prochaine rencontre\nNotre prochaine rencontre est pr\u00e9vue le [DATE, HEURE] \u00e0/en [LIEU].\nIl faudra compter environ 1h30.\n\n';
       body+='Respectueusement,';
     } else if(type==='r2'){
-      subject='RDV patrimoine - Compte rendu R2 - '+noms;
-      body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
-      body+='Suite \u00e0 notre rendez-vous du '+dateJ+', voici le r\u00e9capitulatif des solutions pr\u00e9sent\u00e9es :\n\n';
-      if(solsSelectionnees&&solsSelectionnees.length){
-        var seen={};
-        solsSelectionnees.forEach(function(sol){
-          if(seen[sol.produit])return;seen[sol.produit]=true;
-          body+='- '+sol.produit+(sol.vi>0||sol.vp>0?' ('+fmt(sol.vi)+' \u20ac initial'+(sol.vp>0?' + '+fmt(sol.vp)+' \u20ac/mois':'')+')'  :'')+'\n';
-        });
-      } else {body+='[Solutions \u00e0 pr\u00e9ciser]\n';}
-      body+='\nJe reste \u00e0 votre disposition pour toute question.\n\n';
-      body+='Prochaine \u00e9tape : validation et mise en place.\n\n';
-      body+='Respectueusement,';
+      // Déterminer les solutions par type
+      var solTypes={};
+      (solsSelectionnees||[]).forEach(function(sol){
+        var p=(sol.produit||'').toLowerCase();
+        if(p.indexOf('assurance vie')>=0)solTypes.av=sol;
+        else if(p.indexOf('per')>=0&&p.indexOf('fcpr')<0&&p.indexOf('pereco')<0)solTypes.per=sol;
+        else if(p.indexOf('scpi')>=0&&(p.indexOf('financ')>=0||p.indexOf('cr\u00e9dit')>=0))solTypes.scpicredit=sol;
+        else if(p.indexOf('scpi')>=0)solTypes.scpicash=sol;
+        else if(p.indexOf('lmnp')>=0||p.indexOf('denormandie')>=0||p.indexOf('jeanbrun')>=0||p.indexOf('lli')>=0||p.indexOf('immo')>=0)solTypes.immo=sol;
+        if(!solTypes.first)solTypes.first=sol;
+      });
+      var solNames=[];(solsSelectionnees||[]).forEach(function(s){if(solNames.indexOf(s.produit)<0)solNames.push(s.produit);});
+      subject='Pr\u00e9conisation '+(solNames.length?solNames.join(' + '):'\u00e0 compl\u00e9ter')+' \u2014 '+noms;
+      body='Bonjour '+prenoms+',\n\n';
+      body+='Je fais suite \u00e0 notre rendez-vous du '+dateJ+'.\n';
+      body+='Tu trouveras en pi\u00e8ce jointe ton \u00e9tude patrimoniale.\n\n';
+      body+='1/ Bilan et pr\u00e9conisations\n\n';
+      // Bloc AV
+      if(solTypes.av){var s=solTypes.av;body+='ASSURANCE VIE\nPour compl\u00e9ter ta strat\u00e9gie et faire travailler ton \u00e9pargne, je te pr\u00e9conise l\'ouverture d\'une assurance vie. Tu b\u00e9n\u00e9ficieras d\'une fiscalit\u00e9 avantageuse apr\u00e8s 8 ans, d\'une disponibilit\u00e9 des fonds \u00e0 tout moment et d\'une transmission optimis\u00e9e.\n\n';body+='- Versement initial = '+fmt(s.vi||0)+' \u20ac\n- Versement programm\u00e9 = '+fmt(s.vp||0)+' \u20ac/mois\n- Allocation : {{fonds}} \u2014 contrat {{assureur}}\n\n';}
+      // Bloc PER
+      if(solTypes.per){var sp=solTypes.per;var tmiV=ED.fiscal.tmi||0;var ecoV=Math.round(((sp.vi||0)+(sp.vp||0)*12)*tmiV/100);body+='PER (Plan d\'\u00c9pargne Retraite)\nPour r\u00e9duire tes imp\u00f4ts d\u00e8s cette ann\u00e9e tout en pr\u00e9parant ta retraite, je te pr\u00e9conise l\'ouverture d\'un PER. Les versements sont d\u00e9ductibles de ton revenu imposable \u2014 \u00e0 ta TMI de '+tmiV+'%, chaque euro vers\u00e9 te g\u00e9n\u00e8re une \u00e9conomie d\'imp\u00f4t imm\u00e9diate.\n\n';body+='- Versement initial = '+fmt(sp.vi||0)+' \u20ac\n- Versement programm\u00e9 = '+fmt(sp.vp||0)+' \u20ac/mois\n- Plafond disponible = '+fmt(ED.fiscal.plafondPER||0)+' \u20ac\n- \u00c9conomie d\'imp\u00f4t estim\u00e9e = '+fmt(ecoV)+' \u20ac\n\n';}
+      // Bloc SCPI cash
+      if(solTypes.scpicash){var ss=solTypes.scpicash;body+='SCPI\nPour g\u00e9n\u00e9rer des revenus compl\u00e9mentaires r\u00e9guliers sans contrainte de gestion, je te pr\u00e9conise un investissement en SCPI. De l\'immobilier g\u00e9r\u00e9 par des professionnels : aucune gestion locative, mutualisation des risques, revenus trimestriels.\n\n';body+='- Montant investi = '+fmt(ss.vi||0)+' \u20ac\n- SCPI(s) pr\u00e9conis\u00e9e(s) = {{noms SCPI}}\n\n';}
+      // Bloc SCPI crédit
+      if(solTypes.scpicredit){var sc=solTypes.scpicredit;var h2c=parseInt(sc.horizon)||15;body+='SCPI \u00c0 CR\u00c9DIT\nAvec ton taux d\'endettement actuel, tu as la capacit\u00e9 d\'emprunter pour acqu\u00e9rir des SCPI sur '+h2c+' ans. Les loyers per\u00e7us remboursent une partie des mensualit\u00e9s \u2014 tu construis un patrimoine immobilier avec un effort r\u00e9duit.\n\n';body+='- Montant emprunt\u00e9 = '+fmt(sc.vi||0)+' \u20ac\n- Dur\u00e9e = '+h2c+' ans\n- SCPI(s) = {{noms}}\n\n';}
+      // Bloc Immo
+      if(solTypes.immo){var si=solTypes.immo;body+='IMMOBILIER LOCATIF\nPour construire un patrimoine immobilier tangible g\u00e9n\u00e9rateur de revenus, je te pr\u00e9conise un investissement locatif.\n\n';body+='- Apport = '+fmt(si.vi||0)+' \u20ac\n- \u00c9pargne mensuelle = '+fmt(si.vp||0)+' \u20ac/mois\n- Dispositif = '+(si.produit||'{{dispositif}}')+'\n\n';}
+      if(!solNames.length)body+='{{Solutions \u00e0 pr\u00e9ciser}}\n\n';
+      // Prochaines étapes
+      body+='2/ Les prochaines \u00e9tapes\n';
+      body+='1. Signer les documents r\u00e9glementaires re\u00e7us via "Signature Service"\n';
+      body+='2. Confirmer les montants\n';
+      body+='3. M\'envoyer :\n';
+      body+='   - Pi\u00e8ce d\'identit\u00e9 valide\n';
+      body+='   - RIB en PDF avec logo de la banque\n';
+      body+='   - Justificatif de domicile de moins de 3 mois\n';
+      if(solTypes.per)body+='   - Dernier avis d\'imposition (si non transmis)\n';
+      if(solTypes.scpicredit||solTypes.immo){body+='   - 2 derniers avis d\'imposition\n   - 3 derniers bulletins de salaire\n   - Relev\u00e9s de compte des 3 derniers mois\n';}
+      body+='L\'ensemble du process se fait en signature \u00e9lectronique.\n\n';
+      // MEP
+      body+='3/ Mise en relation\n';
+      body+='Comme tu le sais, je d\u00e9veloppe mon activit\u00e9 exclusivement par la mise en relation. Si dans ton entourage des proches souhaitent mieux valoriser leur \u00e9pargne, obtenir des revenus compl\u00e9mentaires ou r\u00e9duire leurs imp\u00f4ts, je t\'invite \u00e0 me transmettre leurs coordonn\u00e9es.\n\n';
+      // Prochaine rencontre
+      body+='4/ Prochaine rencontre\nNotre prochain rendez-vous est pr\u00e9vu le {{date R3}} en {{lieu}}.\nIl faudra compter environ 1h.\n\n';
+      body+='Reste \u00e0 ta disposition pour toute question.\n\u00c0 tr\u00e8s vite,';
     } else if(type==='r3'){
       subject='RDV patrimoine - Validation & signature - '+noms;
       body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
@@ -7464,15 +7517,13 @@ function genererCR(){
       body+='\nProchaine \u00e9tape : suivi p\u00e9riodique de votre situation.\nJe reviendrai vers vous dans les prochains mois pour faire le point.\n\n';
       body+='Respectueusement,';
     }
-    // Afficher la modale
-    var modal=document.getElementById('crModal');
-    var titleEl=document.getElementById('crModalTitle');
-    var subEl=document.getElementById('crModalSubject');
-    var bodyEl=document.getElementById('crModalBody');
-    if(titleEl)titleEl.textContent={'r1':'CR R1 \u2014 Audit','r2':'CR R2 \u2014 Pr\u00e9sentation','r3':'CR R3 \u2014 Signature','post':'Post-signature'}[type]||'CR';
+    // Afficher dans la zone résultat de la page
+    var zone=document.getElementById('crResultZone');
+    var subEl=document.getElementById('crSubjectLine');
+    var bodyEl=document.getElementById('crBodyArea');
     if(subEl)subEl.textContent='Objet : '+subject;
     if(bodyEl)bodyEl.value=body;
-    if(modal)modal.style.display='flex';
+    if(zone){zone.style.display='';zone.scrollIntoView({behavior:'smooth',block:'start'});}
   }catch(e){console.warn('genererCR:',e);showNotif('Erreur g\u00e9n\u00e9ration CR');}
 }
 function initProjectionFin(){
