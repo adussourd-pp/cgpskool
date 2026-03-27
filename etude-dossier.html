@@ -6475,7 +6475,6 @@ function renderSteps(){
   }).join('');
 }
 function toggleStep(i){if(steps[i])steps[i].done=!steps[i].done;renderSteps();}
-var NAV_ORDER=['import','situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'];
 function addStep(){
   var nsi=document.getElementById('newStepInput');
   var v=nsi?nsi.value.trim():'';
@@ -8228,27 +8227,22 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Rendre toutes les sections visibles temporairement pour les canvas
-  document.querySelectorAll('.section-page.print-visible').forEach(function(el){el.style.display='block';});
-  // Re-render TOUS les charts (forcer resize + redraw)
-  try{
-    if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update();}
-    if(window._pyramideChart){window._pyramideChart.resize();window._pyramideChart.update();}
-  }catch(e3){}
-  // Convertir tous les canvas Chart.js en img PNG (délai 500ms pour le redraw)
+  // Rendre les sections retraite visible pour re-render le chart
+  var secRet=document.getElementById('sec-retraite');
+  if(secRet){secRet.style.display='block';secRet.style.visibility='hidden';secRet.style.position='absolute';secRet.style.left='-9999px';}
+  try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update();}}catch(e3){}
   setTimeout(function(){
-    convertChartsToImg(function() {
-      // Remettre le display normal
-      document.querySelectorAll('.section-page').forEach(function(el){el.style.display='';});
+    // Remettre en place
+    if(secRet){secRet.style.display='';secRet.style.visibility='';secRet.style.position='';secRet.style.left='';}
+    convertChartsToImg(function(){
       window.print();
       setTimeout(function(){
         restoreCharts();
         document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
-        // Proposer la sauvegarde après export
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
-      }, 2000);
+      },2000);
     });
-  },500);
+  },300);
 }
 
 var _chartImgBackups = [];
