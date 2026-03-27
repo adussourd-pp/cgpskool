@@ -555,16 +555,6 @@ select.span2{grid-column:span 2}
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
   <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
   <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
-  <div class="sidebar-lbl" style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
-    <span>Projections financi&#232;res</span>
-    <label class="cz-switch" style="transform:scale(0.85)"><input type="checkbox" id="toggleProjections" onchange="var w=document.getElementById('projLinksWrap');if(w)w.style.display=this.checked?'':'none'"><span class="cz-slider"></span></label>
-  </div>
-  <div id="projLinksWrap" style="display:none">
-    <a href="scpi-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Cash</a>
-    <a href="scpi-financement.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>SCPI Financement</a>
-    <a href="per-vs-av.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>PER vs AV</a>
-    <a href="immo-simulator.html" target="_blank" class="step-btn" style="text-decoration:none;color:var(--gris-f)"><span style="font-size:12px;margin-right:4px">&#8599;</span>Immobilier locatif</a>
-  </div>
   <div class="sidebar-lbl" style="margin-top:8px">Mise en page</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
   <button class="step-btn" data-sec="sommaire" onclick="goTo('sommaire')"><span class="step-dot"></span>Sommaire</button>
@@ -653,14 +643,10 @@ select.span2{grid-column:span 2}
       </div>
 
 
-      <!-- Réinitialiser -->
-      <div style="margin-top:14px;text-align:right">
-        <button class="btn btn-secondary" onclick="if(confirm('Réinitialiser toute l\'étude ?'))resetAll()">Réinitialiser</button>
-      </div>
     </div>
 
     <!-- Vérifier & compléter les données -->
-    <div style="margin-top:18px;background:#fff;border:2px solid var(--orange);border-radius:14px;overflow:hidden">
+    <div style="margin-top:0;background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden">
       <div style="padding:12px 20px;background:rgba(212,98,42,0.06);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierBody');b.style.display=b.style.display==='none'?'':'none'">
         <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">V&#233;rifier &amp; compl&#233;ter les donn&#233;es</div>
         <span style="color:var(--orange);font-size:14px">&#9660;</span>
@@ -784,12 +770,36 @@ select.span2{grid-column:span 2}
         <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()" style="padding:8px 18px;font-size:13px">Effacer</button>
       </div>
     </div>
+    <!-- Vérif mentions légales -->
+    <div style="background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:18px">
+      <div style="padding:10px 20px;background:rgba(212,98,42,0.06);cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="var b=document.getElementById('verifierMentionsBody');b.style.display=b.style.display==='none'?'':'none'">
+        <span style="font-size:13px;font-weight:600;color:var(--noir)">V&#233;rifier les mentions l&#233;gales</span>
+        <span style="color:var(--orange);font-size:14px">&#9660;</span>
+      </div>
+      <div id="verifierMentionsBody" style="display:none;padding:16px 20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><label style="font-size:10px;color:var(--gris)">Nom / Pr&#233;nom</label><input class="fi" id="vMlNom"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Email</label><input class="fi" id="vMlEmail"></div>
+          <div><label style="font-size:10px;color:var(--gris)">T&#233;l&#233;phone</label><input class="fi" id="vMlTel"></div>
+          <div><label style="font-size:10px;color:var(--gris)">N&#176; ORIAS</label><input class="fi" id="vMlOrias"></div>
+        </div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--gris);margin-bottom:6px">Habilitations d&#233;tect&#233;es</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlImmo" style="accent-color:var(--orange)">TRANSACTION (Immobilier)</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlIOBSP" style="accent-color:var(--orange)">IOBSP (Financement)</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlIAS" style="accent-color:var(--orange)">IAS (Assurance)</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlCIF" style="accent-color:var(--orange)">AGENT LI&#201; (CIF)</label>
+        </div>
+        <div><label style="font-size:10px;color:var(--gris)">N&#176; CPI</label><input class="fi" id="vMlCPI" style="margin-bottom:10px"></div>
+        <button class="btn btn-primary" onclick="appliquerVerifMentions()" style="padding:8px 20px;font-size:13px">Appliquer</button>
+      </div>
+    </div>
 
     <!-- ── BLOC AVIS D'IMPOSITION ── -->
-    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px">
+    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px 14px 0 0;padding:20px">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">📊 Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
+          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">&#128202; Avis d'imposition <span style="font-size:11px;font-weight:400;color:var(--gris)">(optionnel)</span></div>
           <div style="font-size:12px;color:var(--gris);margin-top:3px">Enrichit automatiquement TMI, IR net et plafond PER</div>
         </div>
         <label id="avisDropzone" class="btn btn-primary" style="cursor:pointer;flex-shrink:0;margin-left:16px" ondragover="event.preventDefault()" ondrop="handleAvisDrop(event)">
@@ -799,7 +809,38 @@ select.span2{grid-column:span 2}
       </div>
       <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
     </div>
+    <!-- Vérif avis imposition -->
+    <div style="background:#fff;border:2px solid var(--orange);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:18px">
+      <div style="padding:10px 20px;background:rgba(212,98,42,0.06);cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="var b=document.getElementById('verifierFiscBody');b.style.display=b.style.display==='none'?'':'none'">
+        <span style="font-size:13px;font-weight:600;color:var(--noir)">V&#233;rifier les donn&#233;es fiscales</span>
+        <span style="color:var(--orange);font-size:14px">&#9660;</span>
+      </div>
+      <div id="verifierFiscBody" style="display:none;padding:16px 20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">Ann&#233;e</label><input class="fi" id="vF2Annee"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Revenu brut global</label><input class="fi" type="number" id="vF2RBG"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Revenu imposable</label><input class="fi" type="number" id="vF2RevImp"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Nb parts</label><input class="fi" type="number" id="vF2Parts" step="0.5"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">TMI (%)</label><input class="fi" type="number" id="vF2TMI"></div>
+          <div><label style="font-size:10px;color:var(--gris)">IR net</label><input class="fi" type="number" id="vF2IRNet"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Pr&#233;l. sociaux</label><input class="fi" type="number" id="vF2PS"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER</label><input class="fi" type="number" id="vF2PER"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><label style="font-size:10px;color:var(--gris)">IR bar&#232;me</label><input class="fi" type="number" id="vF2IRBareme"></div>
+          <div><label style="font-size:10px;color:var(--gris)">R&#233;ductions</label><input class="fi" type="number" id="vF2Reduc"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Cr&#233;dits</label><input class="fi" type="number" id="vF2Credits"></div>
+        </div>
+        <button class="btn btn-primary" onclick="appliquerVerifFisc()" style="padding:8px 20px;font-size:13px">Appliquer</button>
+      </div>
+    </div>
 
+    <!-- Réinitialiser -->
+    <div style="text-align:right;margin-top:14px">
+      <button class="btn btn-secondary" onclick="if(confirm('R\u00e9initialiser toute l\'\u00e9tude ?'))resetAll()">R&#233;initialiser</button>
+    </div>
 
   </div>
 </div><!-- /sec-import -->
@@ -7068,7 +7109,8 @@ function handleAvisFile(file) {
           savedEl.value = txt;
         }
         parseAvisIR();
-        if (status) status.innerHTML = '<span style="color:var(--green)">✅ ' + file.name + ' analysé</span>';
+        try{remplirVerifFisc();}catch(e3){}
+        if (status) status.innerHTML = '<span style="color:var(--green)">\u2705 ' + file.name + ' analys\u00e9</span>';
       } else {
         if (status) status.innerHTML = '<span style="color:var(--ambre-d)">⚠️ Extraction limitée — assurez-vous que le PDF est numérique (pas scanné)</span>';
       }
@@ -7315,6 +7357,53 @@ function calcProjectionFin(){
     }
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
+}
+// ── VÉRIF MENTIONS LÉGALES ──
+function remplirVerifMentions(){
+  try{
+    var raw=(document.getElementById('mentionsDirectInput')?document.getElementById('mentionsDirectInput').value:'')||'';
+    var mNom=raw.match(/(?:Par|Nom\s*\/\s*Pr[e\u00e9]nom)\s*[:\-]\s*([^\n]+)/im);
+    var mMail=raw.match(/E-mail\s*[:\t]\s*([^\s\n]+@[^\s\n]+)/im);
+    var mTel=raw.match(/Tel[.\s]*Portable\s*[:\t]\s*([\d\s+]+)/im);
+    var mOrias=raw.match(/N[\u00b0o]\s*:\s*(\d[\d\s\-]*\d)/m);
+    var mCPI=raw.match(/CPI\s+([\d\s]+\d)/m);
+    var s=function(id,v){var el=document.getElementById(id);if(el&&v)el.value=String(v).trim();};
+    s('vMlNom',mNom?mNom[1]:'');s('vMlEmail',mMail?mMail[1]:'');
+    s('vMlTel',mTel?mTel[1]:'');s('vMlOrias',mOrias?mOrias[1].replace(/[\s\-]/g,''):'');
+    s('vMlCPI',mCPI?mCPI[1]:'');
+    var cb=function(id,test){var el=document.getElementById(id);if(el)el.checked=test;};
+    cb('vMlImmo',/IMMOBILIER[\s\S]*?agent commercial[\s\S]*?:\s*OUI/i.test(raw));
+    cb('vMlIOBSP',/FINANCEMENT[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw));
+    cb('vMlIAS',/ASSURANCE[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw));
+    cb('vMlCIF',/INSTRUMENTS FINANCIERS[\s\S]*?Agent li\u00e9[\s\S]*?:\s*OUI/i.test(raw));
+    document.getElementById('verifierMentionsBody').style.display='';
+  }catch(e){console.warn('remplirVerifMentions:',e);}
+}
+function appliquerVerifMentions(){
+  try{saveMentionsDirect();showNotif('Mentions appliqu\u00e9es');}catch(e){}
+}
+// ── VÉRIF AVIS IMPOSITION ──
+function remplirVerifFisc(){
+  try{
+    var s=function(id,v){var el=document.getElementById(id);if(el&&(v||v===0))el.value=String(v);};
+    s('vF2Annee',ED.fiscal.annee);s('vF2RBG',ED.fiscal.rbg||'');s('vF2RevImp',ED.fiscal.revImposable||'');
+    s('vF2Parts',ED.fiscal.parts||'');s('vF2TMI',ED.fiscal.tmi||'');s('vF2IRNet',ED.fiscal.irnet||'');
+    s('vF2PS',ED.fiscal.ps||'');s('vF2PER',ED.fiscal.plafondPER||'');s('vF2IRBareme',ED.fiscal.irBareme||'');
+    s('vF2Reduc',ED.fiscal.reductions||'');s('vF2Credits',ED.fiscal.credits||'');
+    document.getElementById('verifierFiscBody').style.display='';
+  }catch(e){console.warn('remplirVerifFisc:',e);}
+}
+function appliquerVerifFisc(){
+  try{
+    var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+    var v=function(id){return (document.getElementById(id)?document.getElementById(id).value:'')||'';};
+    ED.fiscal.annee=v('vF2Annee');ED.fiscal.rbg=n('vF2RBG');ED.fiscal.revImposable=n('vF2RevImp');
+    ED.fiscal.parts=+(document.getElementById('vF2Parts')?document.getElementById('vF2Parts').value:1)||1;
+    ED.fiscal.tmi=n('vF2TMI');ED.fiscal.irnet=n('vF2IRNet');ED.fiscal.ps=n('vF2PS');
+    ED.fiscal.plafondPER=n('vF2PER');ED.fiscal.irBareme=n('vF2IRBareme');
+    ED.fiscal.reductions=n('vF2Reduc');ED.fiscal.credits=n('vF2Credits');
+    showNotif('Donn\u00e9es fiscales appliqu\u00e9es');
+  }catch(e){console.warn('appliquerVerifFisc:',e);}
 }
 // ── VÉRIFICATION & COMPLÉTION DES DONNÉES ──
 function remplirVerification(){
@@ -7705,6 +7794,7 @@ function saveMentionsDirect(){
   h+='</div>';
   h+='</div>';
   mel.innerHTML=h;
+  try{remplirVerifMentions();}catch(e2){}
   }catch(e){console.warn('saveMentionsDirect error:',e);}
 }
 
