@@ -8359,14 +8359,15 @@ function exportPDF() {
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Les sections utilisent visibility:hidden — Chart.js a déjà pu dessiner
-  // Forcer un update du chart retraite si il existe
-  try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}}catch(e3){}
-  // Capturer tous les canvas après un court délai
+  // Forcer le render de rRetraite pour que le chart soit créé
+  // (visibility:hidden permet à Chart.js de dessiner dans un canvas dimensionné)
+  try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
+  // Attendre que Chart.js dessine les courbes
   setTimeout(function(){
-    convertChartsDirectCapture();
-      var origSec=document.getElementById('sec-'+savedSec);
-      if(origSec)origSec.classList.add('active');
+    try{if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}}catch(e4){}
+    // 2ème attente pour le rendu complet puis capture
+    setTimeout(function(){
+      convertChartsDirectCapture();
       window.print();
       setTimeout(function(){
         restoreCharts();
@@ -8381,12 +8382,14 @@ var _chartImgBackups = [];
 
 function convertChartsDirectCapture(){
   _chartImgBackups=[];
-  // Capturer TOUS les canvas qui ont du contenu
+  // Rendre toutes les sections visibles temporairement pour la capture
+  document.querySelectorAll('.section-page').forEach(function(s){s.style.visibility='visible';s.style.position='relative';s.style.left='auto';});
+  // Capturer TOUS les canvas
   document.querySelectorAll('canvas').forEach(function(canvas){
     try{
+      console.log('Canvas capture:',canvas.id,'w='+canvas.width,'h='+canvas.height);
       if(canvas.width>0&&canvas.height>0){
         var url=canvas.toDataURL('image/png');
-        // Vérifier que l'image n'est pas vide (transparent)
         if(url&&url.length>100){
           var img=document.createElement('img');img.src=url;
           img.style.cssText='width:100%;max-width:100%;height:auto;display:block';
@@ -8396,8 +8399,10 @@ function convertChartsDirectCapture(){
           canvas.style.display='none';
         }
       }
-    }catch(e){}
+    }catch(e){console.warn('Canvas capture error:',e);}
   });
+  // Remettre les sections invisibles
+  document.querySelectorAll('.section-page:not(.active)').forEach(function(s){s.style.visibility='';s.style.position='';s.style.left='';});
 }
 
 function restoreCharts() {
