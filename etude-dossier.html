@@ -674,6 +674,88 @@ select.span2{grid-column:span 2}
       <div id="avisIRStatus" style="font-size:12px;margin-top:10px;color:var(--gris);min-height:16px"></div>
     </div>
 
+    <!-- Vérifier & compléter les données -->
+    <div style="margin-top:18px;background:#fff;border:2px solid var(--orange);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 20px;background:rgba(212,98,42,0.06);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierBody');b.style.display=b.style.display==='none'?'':'none'">
+        <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">V&#233;rifier &amp; compl&#233;ter les donn&#233;es</div>
+        <span style="color:var(--orange);font-size:14px">&#9660;</span>
+      </div>
+      <div id="verifierBody" style="display:none;padding:20px">
+        <div style="font-size:11px;color:var(--gris);margin-bottom:14px;font-style:italic">Les champs ci-dessous sont pr&#233;-remplis depuis l'import. Corrigez ou compl&#233;tez, puis cliquez "Appliquer".</div>
+
+        <!-- Déclarant 1 -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">D&#233;clarant 1</div>
+        <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">Civ.</label><select class="fi" id="vC1Civ"><option>M.</option><option>Mme</option></select></div>
+          <div><label style="font-size:10px;color:var(--gris)">Pr&#233;nom</label><input class="fi" id="vC1Prenom"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Nom</label><input class="fi" id="vC1Nom"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Date naissance</label><input class="fi" id="vC1Dob" placeholder="JJ/MM/AAAA"></div>
+          <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC1CSP"><option>Sal. cadre</option><option>Sal. cadre sup.</option><option>Sal. non cadre</option><option>Fonctionnaire</option><option>TNS lib.</option><option>TNS comer.</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">Profession</label><input class="fi" id="vC1Prof"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Soci&#233;t&#233;</label><input class="fi" id="vC1Societe"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Salaires annuels</label><input class="fi" type="number" id="vC1Sal"></div>
+        </div>
+
+        <!-- Couple toggle + Déclarant 2 -->
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--noir);margin-bottom:10px;cursor:pointer"><input type="checkbox" id="vCouple" onchange="document.getElementById('vC2Block').style.display=this.checked?'':'none'" style="accent-color:var(--orange)">Couple (D&#233;clarant 2)</label>
+        <div id="vC2Block" style="display:none">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">D&#233;clarant 2</div>
+          <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div><label style="font-size:10px;color:var(--gris)">Civ.</label><select class="fi" id="vC2Civ"><option>Mme</option><option>M.</option></select></div>
+            <div><label style="font-size:10px;color:var(--gris)">Pr&#233;nom</label><input class="fi" id="vC2Prenom"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Nom</label><input class="fi" id="vC2Nom"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Date naissance</label><input class="fi" id="vC2Dob" placeholder="JJ/MM/AAAA"></div>
+            <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC2CSP"><option>Sal. cadre</option><option>Sal. cadre sup.</option><option>Sal. non cadre</option><option>Fonctionnaire</option><option>TNS lib.</option><option>TNS comer.</option></select></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div><label style="font-size:10px;color:var(--gris)">Profession</label><input class="fi" id="vC2Prof"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Soci&#233;t&#233;</label><input class="fi" id="vC2Societe"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Salaires annuels</label><input class="fi" type="number" id="vC2Sal"></div>
+          </div>
+        </div>
+
+        <!-- Situation -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Situation</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 0.5fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">R&#233;gime</label><select class="fi" id="vRegime"><option>Communaut&#233; r&#233;duite aux acqu&#234;ts</option><option>S&#233;paration de biens</option><option>Communaut&#233; universelle</option><option>Participation aux acqu&#234;ts</option></select></div>
+          <div><label style="font-size:10px;color:var(--gris)">Sit. matrimoniale</label><select class="fi" id="vSitmat"><option>Mari&#233;(e)</option><option>Pacs&#233;(e)</option><option>C&#233;libataire</option><option>Divorc&#233;(e)</option><option>Veuf(ve)</option><option>Concubinage</option></select></div>
+          <div><label style="font-size:10px;color:var(--gris)">Logement</label><select class="fi" id="vLogement"><option>Propri&#233;taire</option><option>Locataire</option><option>H&#233;berg&#233;</option></select></div>
+          <div><label style="font-size:10px;color:var(--gris)">Enfants</label><input class="fi" type="number" id="vNbEnfants" min="0" value="0" oninput="renderVerifEnfants()"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Adresse</label><input class="fi" id="vAdresse"></div>
+        </div>
+
+        <!-- Enfants dynamiques -->
+        <div id="vEnfantsBlock" style="margin-bottom:14px"></div>
+
+        <!-- Revenus complémentaires -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Revenus compl&#233;mentaires (annuels)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">Fonciers</label><input class="fi" type="number" id="vFonc"></div>
+          <div><label style="font-size:10px;color:var(--gris)">BIC / BNC</label><input class="fi" type="number" id="vBIC"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Autres</label><input class="fi" type="number" id="vAutres"></div>
+        </div>
+
+        <!-- Actifs -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Actifs</div>
+        <div id="vActifsBlock" style="margin-bottom:8px"></div>
+        <button onclick="addVerifActif()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter un actif</button>
+
+        <!-- Passifs -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Passifs</div>
+        <div id="vPassifsBlock" style="margin-bottom:8px"></div>
+        <button onclick="addVerifPassif()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter un passif</button>
+
+        <!-- Objectifs -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Objectifs</div>
+        <div id="vObjectifsBlock" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px"></div>
+
+        <!-- Bouton appliquer -->
+        <button class="btn btn-primary" onclick="appliquerVerification()" style="width:100%;padding:12px;font-size:14px;margin-top:10px">Appliquer les modifications</button>
+      </div>
+    </div>
+
   </div>
 </div><!-- /sec-import -->
 
@@ -3183,6 +3265,7 @@ function launch(){
   const el=document.getElementById('navClient');
   if(el&&n)el.innerHTML='<strong>'+n+(n2||'')+'</strong>';
   markDone();
+  try{remplirVerification();}catch(e){}
   const actBr=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
   const pasBr=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   const typeL=ED.type==='seul'?'Seul':ED.type==='comm'?'Couple Comm.':'Couple Sep.';
@@ -7203,6 +7286,134 @@ function calcProjectionFin(){
     }
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
+}
+// ── VÉRIFICATION & COMPLÉTION DES DONNÉES ──
+function remplirVerification(){
+  try{
+    var s=function(id,v){var el=document.getElementById(id);if(el){if(el.tagName==='SELECT'){for(var i=0;i<el.options.length;i++){if(el.options[i].text.toLowerCase().indexOf((v||'').toLowerCase())>=0){el.selectedIndex=i;break;}}}else el.value=v||'';}};
+    s('vC1Civ',ED.c1.civ);s('vC1Prenom',ED.c1.prenom);s('vC1Nom',ED.c1.nom);s('vC1Dob',ED.c1.dob);
+    s('vC1CSP',ED.c1.sitpro);s('vC1Prof',ED.c1.profession);s('vC1Societe',ED.c1.societe);
+    s('vC1Sal',ED.revenus.sal1||ED.revenus.c1||'');
+    var isC=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
+    var cb=document.getElementById('vCouple');if(cb){cb.checked=isC;document.getElementById('vC2Block').style.display=isC?'':'none';}
+    if(isC){s('vC2Civ',ED.c2.civ);s('vC2Prenom',ED.c2.prenom);s('vC2Nom',ED.c2.nom);s('vC2Dob',ED.c2.dob);s('vC2CSP',ED.c2.sitpro);s('vC2Prof',ED.c2.profession);s('vC2Societe',ED.c2.societe);s('vC2Sal',ED.revenus.sal2||ED.revenus.c2||'');}
+    s('vSitmat',ED.sitmat);s('vRegime',ED.convention);s('vLogement',ED.logement);s('vAdresse',ED.adresse);s('vNbEnfants',ED.nbEnfants||0);
+    s('vFonc',ED.revenus.fonc||'');s('vBIC',ED.revenus.bic||'');s('vAutres',ED.revenus.compl||'');
+    renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifObjectifs();
+    document.getElementById('verifierBody').style.display='';
+  }catch(e){console.warn('remplirVerification:',e);}
+}
+function renderVerifEnfants(){
+  var el=document.getElementById('vEnfantsBlock');if(!el)return;
+  var nb=+(document.getElementById('vNbEnfants')?document.getElementById('vNbEnfants').value:0)||0;
+  if(!nb){el.innerHTML='';return;}
+  var h='';
+  for(var i=0;i<nb;i++){
+    var enf=ED.enfants&&ED.enfants[i]?ED.enfants[i]:{nom:'',dob:''};
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px"><input class="fi" id="vEnf'+i+'Nom" value="'+(enf.prenom||enf.nom||'')+'" placeholder="Pr\u00e9nom"><input class="fi" id="vEnf'+i+'Dob" value="'+(enf.dob||'')+'" placeholder="Date naissance"></div>';
+  }
+  el.innerHTML=h;
+}
+function renderVerifActifs(){
+  var el=document.getElementById('vActifsBlock');if(!el)return;
+  var h='';
+  (ED.actifs||[]).forEach(function(a,i){
+    h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
+    h+='<input class="fi" id="vAct'+i+'Nom" value="'+((a.nom||a.label||'').replace(/"/g,'&quot;'))+'">';
+    h+='<select class="fi" id="vAct'+i+'Tit"><option'+(a.titulaire==='C1'?' selected':'')+'>C1</option><option'+(a.titulaire==='C2'?' selected':'')+'>C2</option><option'+(a.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<input class="fi" type="number" id="vAct'+i+'Mt" value="'+(a.montant||0)+'">';
+    h+='<button onclick="ED.actifs.splice('+i+',1);renderVerifActifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+function addVerifActif(){
+  ED.actifs.push({nom:'',montant:0,titulaire:'C1',horizon:'ct'});
+  renderVerifActifs();
+}
+function renderVerifPassifs(){
+  var el=document.getElementById('vPassifsBlock');if(!el)return;
+  var h='';
+  (ED.passifs||[]).forEach(function(p,i){
+    h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
+    h+='<input class="fi" id="vPas'+i+'Nom" value="'+((p.nom||'').replace(/"/g,'&quot;'))+'">';
+    h+='<select class="fi" id="vPas'+i+'Tit"><option'+(p.titulaire==='C1'?' selected':'')+'>C1</option><option'+(p.titulaire==='C2'?' selected':'')+'>C2</option><option'+(p.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<input class="fi" type="number" id="vPas'+i+'Ech" value="'+(p.echeance||0)+'" placeholder="\u00c9ch/an">';
+    h+='<input class="fi" type="number" id="vPas'+i+'Crd" value="'+(p.crd||0)+'" placeholder="CRD">';
+    h+='<button onclick="ED.passifs.splice('+i+',1);renderVerifPassifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+function addVerifPassif(){
+  ED.passifs.push({nom:'',crd:0,echeance:0,titulaire:'Commun'});
+  renderVerifPassifs();
+}
+function renderVerifObjectifs(){
+  var el=document.getElementById('vObjectifsBlock');if(!el)return;
+  var allObjs=['Faire fructifier un capital','Pr\u00e9parer sa retraite','Optimiser son IR','Se cr\u00e9er un compl\u00e9ment de revenus','Prot\u00e9ger son conjoint','R\u00e9organiser son patrimoine','Cr\u00e9er un patrimoine immobilier','Optimiser la transmission','Investir via le financement','\u00c9pargne / capitalisation'];
+  var h='';
+  allObjs.forEach(function(o){
+    var ck=ED.objectifs&&ED.objectifs.indexOf(o)>=0;
+    h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="vObjCheck" value="'+o+'" '+(ck?'checked':'')+' style="accent-color:var(--orange)">'+o+'</label>';
+  });
+  el.innerHTML=h;
+}
+function appliquerVerification(){
+  try{
+    var v=function(id){var el=document.getElementById(id);return el?(el.tagName==='SELECT'?el.options[el.selectedIndex].text:el.value):'';};
+    var n=function(id){return +(v(id))||0;};
+    // C1
+    ED.c1.civ=v('vC1Civ');ED.c1.prenom=v('vC1Prenom');ED.c1.nom=v('vC1Nom');ED.c1.dob=v('vC1Dob');
+    ED.c1.sitpro=v('vC1CSP');ED.c1.profession=v('vC1Prof');ED.c1.societe=v('vC1Societe');
+    ED.revenus.sal1=n('vC1Sal');ED.revenus.c1=n('vC1Sal');
+    // Couple
+    var isC2=document.getElementById('vCouple')&&document.getElementById('vCouple').checked;
+    ED.type=isC2?'couple':'seul';
+    if(isC2){
+      ED.c2.civ=v('vC2Civ');ED.c2.prenom=v('vC2Prenom');ED.c2.nom=v('vC2Nom');ED.c2.dob=v('vC2Dob');
+      ED.c2.sitpro=v('vC2CSP');ED.c2.profession=v('vC2Prof');ED.c2.societe=v('vC2Societe');
+      ED.revenus.sal2=n('vC2Sal');ED.revenus.c2=n('vC2Sal');
+    }
+    // Situation
+    ED.sitmat=v('vSitmat');ED.convention=v('vRegime');ED.logement=v('vLogement');ED.adresse=v('vAdresse');
+    ED.nbEnfants=n('vNbEnfants');
+    // Enfants
+    ED.enfants=[];
+    for(var i=0;i<ED.nbEnfants;i++){
+      var nom=v('vEnf'+i+'Nom'),dob=v('vEnf'+i+'Dob');
+      if(nom)ED.enfants.push({prenom:nom,nom:nom,dob:dob});
+    }
+    // Revenus
+    ED.revenus.fonc=n('vFonc');ED.revenus.bic=n('vBIC');ED.revenus.compl=n('vAutres');
+    // Actifs
+    ED.actifs=[];
+    var actEls=document.querySelectorAll('[id^="vAct"][id$="Nom"]');
+    actEls.forEach(function(el,i){
+      var nom=el.value,tit=v('vAct'+i+'Tit'),mt=n('vAct'+i+'Mt');
+      if(nom&&mt>0)ED.actifs.push({nom:nom,label:nom,montant:mt,titulaire:tit,horizon:getHorizonFromNom?getHorizonFromNom(nom):'lt'});
+    });
+    // Passifs
+    ED.passifs=[];
+    var pasEls=document.querySelectorAll('[id^="vPas"][id$="Nom"]');
+    pasEls.forEach(function(el,i){
+      var nom=el.value,tit=v('vPas'+i+'Tit'),ech=n('vPas'+i+'Ech'),crd=n('vPas'+i+'Crd');
+      if(nom)ED.passifs.push({nom:nom,titulaire:tit,echeance:ech,crd:crd});
+    });
+    // Charges credit
+    ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    // Objectifs
+    ED.objectifs=[];
+    document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
+    // Épargne
+    var revM=revMens();
+    if(!ED.epMens)ED.epMens=Math.max(0,Math.round(revM*0.20));
+    if(!ED.epPrec)ED.epPrec=Math.round(revM*3);
+    // Render
+    markDone();
+    goTo('situation');
+    showNotif('Donn\u00e9es appliqu\u00e9es \u2014 '+((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim());
+  }catch(e){console.warn('appliquerVerification:',e);showNotif('Erreur application');}
 }
 // ── SAUVEGARDE / CHARGEMENT ÉTUDE ──
 function sauvegarderEtude(){
