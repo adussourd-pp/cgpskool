@@ -939,18 +939,11 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- Épargne & Projets -->
+  <!-- Épargne (lecture seule) & Projets -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>&#201;pargne &amp; Projets</div>
     <div id="kSit1Wrap" style="padding:10px 14px"></div>
-    <div style="padding:10px 14px;border-top:1px solid var(--bord)">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:700;color:var(--noir)">&#201;pargne de pr&#233;caution souhait&#233;e</span>
-        <input type="number" id="epPrecInput" value="0" min="0" step="1000" style="width:120px;padding:6px 10px;border:1.5px solid var(--bord);border-radius:6px;background:#fff;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);text-align:center;outline:none" onchange="ED.epPrec=+this.value">
-        <span style="font-size:12px;color:var(--gris)">&#8364;</span>
-      </div>
-      <div id="epPrecGauge"></div>
-    </div>
+    <div id="epPrecDisplay" style="padding:10px 14px;border-top:1px solid var(--bord)"></div>
     <!-- Projets court terme -->
     <div style="padding:10px 14px;border-top:1px solid var(--bord)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -2480,7 +2473,7 @@ function goTo(sec){
     retraite:'Section 05 \u2014 Retraite',transmission:'Section 06b \u2014 Transmission',
     entreprise:'Section 06ter \u2014 Entreprise',
     preconisations:'Section 07 \u2014 Pr\u00e9conisations',synthese:'Section 08 \u2014 Synth\u00e8se',
-    pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions légales',avis:'Avis clients'};
+    pagegarde:'Page de garde',sommaire:'Sommaire',mentions:'Mentions l\u00e9gales',avis:'Avis clients',compterendu:'Compte rendu'};
   var headerNom=document.getElementById('pdfHeaderNom');
   if(headerNom)headerNom.textContent=secNames[sec]||sec;
   var headerRight=document.getElementById('pdfHeaderRight');
@@ -3931,14 +3924,10 @@ function rSituation(){
     epWrap.innerHTML=epH;
   }
   // Épargne de précaution + jauge
-  var epPrecIn=document.getElementById('epPrecInput');
-  if(epPrecIn)epPrecIn.value=(ED.epPrec||0)+(ED.epPrec2||0);
-  var epPrecGauge=document.getElementById('epPrecGauge');
-  if(epPrecGauge){
-    var revMep2=revMens();var epPrecCible=Math.round(revMep2*3);var epPrecTot=(ED.epPrec||0)+(ED.epPrec2||0);
-    var epPrecPct=epPrecCible>0?Math.min(100,Math.round(epPrecTot/epPrecCible*100)):0;
-    var epPrecColor=epPrecPct>=100?'#2D7A5B':epPrecPct>=50?'#D4622A':'#C0392B';
-    epPrecGauge.innerHTML='<div style="max-width:400px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epPrecTot)+' \u20ac souhait\u00e9</span><span>Cible 3 mois : '+fmt(epPrecCible)+' \u20ac</span></div><div style="height:4px;background:var(--bord);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+epPrecPct+'%;background:'+epPrecColor+';border-radius:2px"></div></div></div>';
+  var epPrecDisp=document.getElementById('epPrecDisplay');
+  if(epPrecDisp){
+    var epPrecTot=(ED.epPrec||0)+(ED.epPrec2||0);
+    epPrecDisp.innerHTML='<div class="fiscal-row"><span class="fr-l" style="font-weight:600">\u00c9pargne de pr\u00e9caution souhait\u00e9e</span><span class="fr-v" style="font-weight:700">'+fmt(epPrecTot)+' \u20ac</span></div>';
   }
   // Projets
   if(ED.projets&&ED.projets.length){
