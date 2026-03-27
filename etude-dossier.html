@@ -709,9 +709,11 @@ select.span2{grid-column:span 2}
 
         <!-- Épargne -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">&#201;pargne</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mensuelle (&#8364;/mois)</label><input class="fi" type="number" id="vEpMens"></div>
-          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne de pr&#233;caution souhait&#233;e</label><input class="fi" type="number" id="vEpPrec"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C1</label><input class="fi" type="number" id="vEpMens1"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C2</label><input class="fi" type="number" id="vEpMens2"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;p. pr&#233;caution C1</label><input class="fi" type="number" id="vEpPrec1"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;p. pr&#233;caution C2</label><input class="fi" type="number" id="vEpPrec2"></div>
         </div>
 
         <!-- Actifs -->
@@ -2426,6 +2428,7 @@ function goTo(sec){
   var headerRight=document.getElementById('pdfHeaderRight');
   if(headerRight)headerRight.textContent='Étude de Dossier';
   updatePageNumbers();
+  try{renderNavButtons(sec);}catch(e){}
   // Marquer les sauts de page A4 après le rendu
   // Page break markers désactivés
   // Afficher/masquer les panneaux conseiller selon la section active
@@ -3814,11 +3817,28 @@ function rSituation(){
       epH+='<input type="number" id="kSit1Input" value="'+(ED.epMens||0)+'" min="0" step="50" style="'+inputStyle+'" onchange="ED.epMens=+this.value"><span style="font-size:12px;color:var(--gris)"> €/mois</span>';
     }
     epH+='</div>';
+    // Jauge épargne mensuelle vs 20% revenus
+    var revMep=revMens();
+    var epTotal=(ED.epMens||0)+(ED.epMens2||0);
+    var epCible=Math.round(revMep*0.20);
+    var epPct=epCible>0?Math.min(100,Math.round(epTotal/epCible*100)):0;
+    var epColor=epPct>=100?'#2D7A5B':epPct>=50?'#D4622A':'#C0392B';
+    epH+='<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epTotal)+' \u20ac/mois</span><span>Cible 20% : '+fmt(epCible)+' \u20ac</span></div>';
+    epH+='<div style="height:6px;background:var(--bord);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+epPct+'%;background:'+epColor+';border-radius:3px"></div></div></div>';
     epWrap.innerHTML=epH;
   }
-  // Épargne de précaution
+  // Épargne de précaution + jauge
   var epPrecIn=document.getElementById('epPrecInput');
   if(epPrecIn)epPrecIn.value=ED.epPrec||0;
+  var epPrecWrap=document.getElementById('epPrecInput');
+  if(epPrecWrap&&epPrecWrap.parentNode){
+    var revMep2=revMens();var epPrecCible=Math.round(revMep2*3);var epPrecVal=ED.epPrec||0;
+    var epPrecPct=epPrecCible>0?Math.min(100,Math.round(epPrecVal/epPrecCible*100)):0;
+    var epPrecColor=epPrecPct>=100?'#2D7A5B':epPrecPct>=50?'#D4622A':'#C0392B';
+    var gaugeEl=document.getElementById('epPrecGauge');
+    if(!gaugeEl){gaugeEl=document.createElement('div');gaugeEl.id='epPrecGauge';epPrecWrap.parentNode.appendChild(gaugeEl);}
+    gaugeEl.innerHTML='<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:3px"><span>'+fmt(epPrecVal)+' \u20ac</span><span>Cible 3 mois : '+fmt(epPrecCible)+' \u20ac</span></div><div style="height:6px;background:var(--bord);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+epPrecPct+'%;background:'+epPrecColor+';border-radius:3px"></div></div></div>';
+  }
   // Projets
   if(ED.projets&&ED.projets.length){
     var sw=document.getElementById('projetsSwitch');if(sw)sw.checked=true;
@@ -6363,6 +6383,22 @@ function renderSteps(){
   }).join('');
 }
 function toggleStep(i){if(steps[i])steps[i].done=!steps[i].done;renderSteps();}
+var NAV_ORDER=['import','situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'];
+function renderNavButtons(sec){
+  try{
+    var secEl=document.getElementById('sec-'+sec);if(!secEl)return;
+    var navDiv=secEl.querySelector('.page-nav-btns');if(!navDiv)return;
+    var idx=NAV_ORDER.indexOf(sec);if(idx<0){navDiv.innerHTML='';return;}
+    var prev=idx>0?NAV_ORDER[idx-1]:null;
+    var next=idx<NAV_ORDER.length-1?NAV_ORDER[idx+1]:null;
+    var h='<div style="display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid var(--bord)">';
+    if(prev)h+='<button class="btn btn-secondary" onclick="goTo(\''+prev+'\')" style="font-size:12px;padding:8px 20px">\u2190 Pr\u00e9c\u00e9dent</button>';
+    else h+='<div></div>';
+    if(next)h+='<button class="btn btn-primary" onclick="goTo(\''+next+'\')" style="font-size:12px;padding:8px 20px">Suivant \u2192</button>';
+    else h+='<div></div>';
+    h+='</div>';navDiv.innerHTML=h;
+  }catch(e){}
+}
 function addStep(){
   var nsi=document.getElementById('newStepInput');
   var v=nsi?nsi.value.trim():'';
@@ -7420,7 +7456,8 @@ function remplirVerification(){
     s('vFiscParts',ED.fiscal.parts||'');s('vFiscTMI',ED.fiscal.tmi||'');s('vFiscIRNet',ED.fiscal.irnet||'');
     s('vFiscPS',ED.fiscal.ps||'');s('vFiscPER',ED.fiscal.plafondPER||'');s('vFiscIRBareme',ED.fiscal.irBareme||'');
     s('vFiscReduc',ED.fiscal.reductions||'');s('vFiscCredits',ED.fiscal.credits||'');
-    s('vEpMens',ED.epMens||'');s('vEpPrec',ED.epPrec||'');
+    s('vEpMens1',ED.epMens||'');s('vEpMens2',ED.epMens2||'');
+    s('vEpPrec1',ED.epPrec||'');s('vEpPrec2',ED.epPrec2||'');
     document.getElementById('verifierBody').style.display='';
   }catch(e){console.warn('remplirVerification:',e);}
 }
@@ -7473,9 +7510,14 @@ function addVerifPassif(){
 function renderVerifObjectifs(){
   var el=document.getElementById('vObjectifsBlock');if(!el)return;
   var allObjs=['Faire fructifier un capital','Pr\u00e9parer sa retraite','Optimiser son IR','Se cr\u00e9er un compl\u00e9ment de revenus','Prot\u00e9ger son conjoint','R\u00e9organiser son patrimoine','Cr\u00e9er un patrimoine immobilier','Optimiser la transmission','Investir via le financement','\u00c9pargne / capitalisation'];
+  // Mapper les objectifs du RI vers les objectifs Copernic
+  var objMap={'se constituer un patrimoine immobilier':'Cr\u00e9er un patrimoine immobilier','pr\u00e9parer votre retraite':'Pr\u00e9parer sa retraite','optimiser la fiscalit\u00e9 de vos revenus':'Optimiser son IR','optimiser la rentabilit\u00e9 de vos placements financiers':'Faire fructifier un capital','optimiser la rentabilit\u00e9 de votre patrimoine':'R\u00e9organiser son patrimoine','optimiser la rentabilit\u00e9 de votre patrimoine immobilier locatif':'R\u00e9organiser son patrimoine','compl\u00e9ter vos revenus r\u00e9guli\u00e8rement':'Se cr\u00e9er un compl\u00e9ment de revenus','disposer de revenus ponctuellement':'Se cr\u00e9er un compl\u00e9ment de revenus','transmettre votre patrimoine':'Optimiser la transmission','optimiser la fiscalit\u00e9 de la transmission':'Optimiser la transmission','prot\u00e9ger votre conjoint survivant':'Prot\u00e9ger son conjoint','prot\u00e9ger vos proches':'Prot\u00e9ger son conjoint','se constituer une \u00e9pargne financi\u00e8re':'\u00c9pargne / capitalisation','diversifier votre patrimoine':'R\u00e9organiser son patrimoine','accompagner vos enfants':'Prot\u00e9ger son conjoint','se pr\u00e9munir contre les accidents de la vie':'Prot\u00e9ger son conjoint','r\u00e9organiser votre patrimoine':'R\u00e9organiser son patrimoine'};
+  // Mapper ED.objectifs
+  var mapped=[];
+  (ED.objectifs||[]).forEach(function(o){var m=objMap[o.toLowerCase()]||o;if(mapped.indexOf(m)<0)mapped.push(m);});
   var h='';
   allObjs.forEach(function(o){
-    var ck=ED.objectifs&&ED.objectifs.indexOf(o)>=0;
+    var ck=mapped.indexOf(o)>=0;
     h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="vObjCheck" value="'+o+'" '+(ck?'checked':'')+' style="accent-color:var(--orange)">'+o+'</label>';
   });
   el.innerHTML=h;
@@ -7552,9 +7594,9 @@ function appliquerVerification(){
     ED.fiscal.plafondPER=n('vFiscPER');ED.fiscal.irBareme=n('vFiscIRBareme');
     ED.fiscal.reductions=n('vFiscReduc');ED.fiscal.credits=n('vFiscCredits');
     // Épargne
-    var epMensV=n('vEpMens');
+    ED.epMens=n('vEpMens1');ED.epMens2=n('vEpMens2');
+    ED.epPrec=n('vEpPrec1')+(n('vEpPrec2')||0);
     if(epMensV>0)ED.epMens=epMensV;
-    ED.epPrec=n('vEpPrec');
     // Objectifs
     ED.objectifs=[];
     document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
