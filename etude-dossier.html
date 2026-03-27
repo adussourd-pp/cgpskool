@@ -558,8 +558,9 @@ select.span2{grid-column:span 2}
       style="width:14px;height:14px;accent-color:var(--ambre);cursor:pointer;flex-shrink:0;pointer-events:all">
   </button>
   <div class="sidebar-lbl" style="margin-top:8px">Conseil</div>
-  <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Préconisations</button>
-  <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synthèse</button>
+  <button class="step-btn" data-sec="preconisations" onclick="goTo('preconisations')"><span class="step-dot"></span>Pr&#233;conisations</button>
+  <button class="step-btn" data-sec="synthese" onclick="goTo('synthese')"><span class="step-dot"></span>Synth&#232;se</button>
+  <button class="step-btn" data-sec="compterendu" onclick="goTo('compterendu')"><span class="step-dot"></span>Compte rendu</button>
   <div class="sidebar-lbl" style="margin-top:8px">Mise en page</div>
   <button class="step-btn" data-sec="pagegarde" onclick="goTo('pagegarde')"><span class="step-dot"></span>Page de garde</button>
   <button class="step-btn" data-sec="sommaire" onclick="goTo('sommaire')"><span class="step-dot"></span>Sommaire</button>
@@ -579,7 +580,6 @@ select.span2{grid-column:span 2}
     <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
     <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128194; Charger une &#233;tude</button>
     <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
-    <button class="btn btn-secondary" onclick="goTo('compterendu')" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#9993; Compte rendu</button>
     <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center"></div>
   </div>
   <div class="sidebar-divider"></div>
@@ -1466,7 +1466,7 @@ select.span2{grid-column:span 2}
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Audit</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Premier rendez-vous</div>
     </div>
-    <div onclick="genererCR('r2')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
+    <div onclick="showR2Config()" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)'">
       <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">R2</div>
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Pr&#233;sentation</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Solutions pr&#233;conis&#233;es</div>
@@ -1480,6 +1480,19 @@ select.span2{grid-column:span 2}
       <div style="font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px">Post</div>
       <div style="font-size:13px;font-weight:600;color:var(--noir)">Suivi</div>
       <div style="font-size:11px;color:var(--gris);margin-top:4px">Confirmation mise en place</div>
+    </div>
+  </div>
+
+  <!-- Config R2 -->
+  <div id="crR2Config" style="display:none;margin-bottom:20px">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Configuration du CR R2</div>
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:8px">Solutions &#224; inclure</div>
+      <div id="crR2SolList" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px"></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--noir);cursor:pointer"><input type="checkbox" id="crR2Etude" checked style="accent-color:var(--orange)">Joindre l'&#233;tude patrimoniale</label>
+      </div>
+      <button class="btn btn-primary" onclick="genererCR('r2')" style="padding:10px 28px">G&#233;n&#233;rer le CR R2</button>
     </div>
   </div>
 
@@ -7400,6 +7413,20 @@ function calcProjectionIR(){
   }catch(e){console.warn('calcProjectionIR error:',e);}
 }
 // ── GÉNÉRATION COMPTE RENDU ──
+function showR2Config(){
+  var cfg=document.getElementById('crR2Config');
+  var list=document.getElementById('crR2SolList');
+  if(!cfg||!list)return;
+  var seen={};var h='';
+  (solsSelectionnees||[]).forEach(function(sol){
+    if(seen[sol.produit])return;seen[sol.produit]=true;
+    h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="crR2SolCheck" value="'+sol.produit.replace(/"/g,'&quot;')+'" checked style="accent-color:var(--orange)">'+sol.produit+'</label>';
+  });
+  if(!h)h='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune solution s\u00e9lectionn\u00e9e dans Pr\u00e9conisations</div>';
+  list.innerHTML=h;
+  cfg.style.display='';
+  cfg.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function genererCR(type){
   try{
     if(!type)type='r1';
@@ -7438,9 +7465,13 @@ function genererCR(type){
       body+='5/ Prochaine rencontre\nNotre prochaine rencontre est pr\u00e9vue le [DATE, HEURE] \u00e0/en [LIEU].\nIl faudra compter environ 1h30.\n\n';
       body+='Respectueusement,';
     } else if(type==='r2'){
+      // Solutions cochées dans la config
+      var r2Checked=[];
+      document.querySelectorAll('.crR2SolCheck:checked').forEach(function(cb){r2Checked.push(cb.value);});
+      var inclureEtude=document.getElementById('crR2Etude')&&document.getElementById('crR2Etude').checked;
       // Déterminer les solutions par type
       var solTypes={};
-      (solsSelectionnees||[]).forEach(function(sol){
+      (solsSelectionnees||[]).filter(function(sol){return !r2Checked.length||r2Checked.indexOf(sol.produit)>=0;}).forEach(function(sol){
         var p=(sol.produit||'').toLowerCase();
         if(p.indexOf('assurance vie')>=0)solTypes.av=sol;
         else if(p.indexOf('per')>=0&&p.indexOf('fcpr')<0&&p.indexOf('pereco')<0)solTypes.per=sol;
@@ -7453,7 +7484,8 @@ function genererCR(type){
       subject='Pr\u00e9conisation '+(solNames.length?solNames.join(' + '):'\u00e0 compl\u00e9ter')+' \u2014 '+noms;
       body='Bonjour '+prenoms+',\n\n';
       body+='Je fais suite \u00e0 notre rendez-vous du '+dateJ+'.\n';
-      body+='Tu trouveras en pi\u00e8ce jointe ton \u00e9tude patrimoniale.\n\n';
+      if(inclureEtude)body+='Tu trouveras en pi\u00e8ce jointe ton \u00e9tude patrimoniale.\n';
+      body+='\n';
       body+='1/ Bilan et pr\u00e9conisations\n\n';
       // Bloc AV
       if(solTypes.av){var s=solTypes.av;body+='ASSURANCE VIE\nPour compl\u00e9ter ta strat\u00e9gie et faire travailler ton \u00e9pargne, je te pr\u00e9conise l\'ouverture d\'une assurance vie. Tu b\u00e9n\u00e9ficieras d\'une fiscalit\u00e9 avantageuse apr\u00e8s 8 ans, d\'une disponibilit\u00e9 des fonds \u00e0 tout moment et d\'une transmission optimis\u00e9e.\n\n';body+='- Versement initial = '+fmt(s.vi||0)+' \u20ac\n- Versement programm\u00e9 = '+fmt(s.vp||0)+' \u20ac/mois\n- Allocation : {{fonds}} \u2014 contrat {{assureur}}\n\n';}
