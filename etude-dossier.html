@@ -8230,9 +8230,12 @@ function exportPDF() {
   }
   // Rendre toutes les sections visibles temporairement pour les canvas
   document.querySelectorAll('.section-page.print-visible').forEach(function(el){el.style.display='block';});
-  // Re-render les charts si nécessaire
-  try{if(window.retChartInst)window.retChartInst.update();}catch(e3){}
-  // Convertir tous les canvas Chart.js en img PNG
+  // Re-render TOUS les charts (forcer resize + redraw)
+  try{
+    if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update();}
+    if(window._pyramideChart){window._pyramideChart.resize();window._pyramideChart.update();}
+  }catch(e3){}
+  // Convertir tous les canvas Chart.js en img PNG (délai 500ms pour le redraw)
   setTimeout(function(){
     convertChartsToImg(function() {
       // Remettre le display normal
@@ -8245,7 +8248,7 @@ function exportPDF() {
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
       }, 2000);
     });
-  },100);
+  },500);
 }
 
 var _chartImgBackups = [];
