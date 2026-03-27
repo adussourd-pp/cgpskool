@@ -2077,16 +2077,15 @@ function _calcIR_impl(rbg, sitmat, nbEnfants, vivantSeul, reductions, credits) {
   // L'abattement est deja integre dans le RBG du RI (c'est le revenu NET imposable)
   var rbi = rbg;
 
-  // Calcul par tranches progressives sur quotient familial
-  var qf    = rbi / nbParts;
+  // Calcul par tranches progressives (seuils déjà ajustés au nb parts)
   var irBrut = 0;
   var tmi    = 0;
 
   for (var i = 0; i < taux.length; i++) {
     var bas  = seuils[i];
     var haut = (seuils[i+1] !== undefined) ? seuils[i+1] : Infinity;
-    if (qf > bas) {
-      var taxable = (Math.min(qf, haut) - bas) * taux[i] * nbParts;
+    if (rbi > bas) {
+      var taxable = (Math.min(rbi, haut) - bas) * taux[i];
       irBrut += taxable;
       if (taux[i] > 0) tmi = Math.round(taux[i] * 100);
     }
