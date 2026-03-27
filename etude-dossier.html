@@ -1054,9 +1054,7 @@ select.span2{grid-column:span 2}
           <label class="cz-switch"><input type="checkbox" id="projFiscPrint" onchange="var c=document.getElementById('projFiscCard');var l=document.getElementById('projFiscPDFLabel');if(c)c.classList.toggle('proj-print-visible',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
         </div>
       </div>
-      <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Autres revenus</span><span class="fr-v"><input class="fi" type="number" id="projAutres" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
       <div class="fiscal-row"><span class="fr-l">D&#233;ductions</span><span class="fr-v"><input class="fi" type="number" id="projDeduc" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:100px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233;</option></select></span></div>
       <div class="fiscal-row"><span class="fr-l">Nb enfants</span><span class="fr-v"><input class="fi" type="number" id="projEnfants" min="0" value="0" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
@@ -4215,9 +4213,9 @@ function rRetraite(){
       parHtml+='<div style="font-family:var(--sans);font-weight:700;font-size:12px;color:var(--noir);margin-bottom:10px">'+cl.lbl+'</div>';
       parHtml+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Âge de départ souhaité</label>';
-      parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" oninput="ED.retraite.age'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
+      parHtml+='<input type="number" class="fi" min="50" max="75" value="'+(ED.retraite['age'+cl.key]||64)+'" onchange="ED.retraite.age'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
       parHtml+='<div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);display:block;margin-bottom:3px">Pension souhaitée (€/mois)</label>';
-      parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" oninput="ED.retraite.pension'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
+      parHtml+='<input type="number" class="fi" min="500" max="20000" step="100" value="'+(ED.retraite['pension'+cl.key]||2500)+'" onchange="ED.retraite.pension'+cl.key+'=+this.value;updateRetraiteCalc()" style="font-size:13px"></div>';
       parHtml+='</div>';
       // Age actuel info
       parHtml+='<div style="font-size:11px;color:var(--gris);margin-top:8px">Âge actuel : <strong>'+cl.age+' ans</strong> — horizon retraite : <strong>'+Math.max(0,(ED.retraite['age'+cl.key]||64)-cl.age)+' ans</strong></div>';
@@ -7328,9 +7326,7 @@ function rPageGarde(){
 function initProjectionIR(){
   try{
     var e=function(id,v){var el=document.getElementById(id);if(el)el.value=v||'';};
-    e('projSal1',ED.revenus.sal1||ED.revenus.c1||'');
-    e('projSal2',ED.revenus.sal2||ED.revenus.c2||'');
-    e('projAutres',(ED.revenus.fonc||0)+(ED.revenus.bic||0)||'');
+    e('projRBG',ED.fiscal.rbg||'');
     e('projDeduc',ED.fiscal.deductions||'');
     e('projReduc',(ED.fiscal.reductions||0)+(ED.fiscal.credits||0)||'');
     var sm=document.getElementById('projSitmat');
@@ -7347,16 +7343,11 @@ function initProjectionIR(){
 function calcProjectionIR(){
   try{
     var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
-    var sal1=n('projSal1'),sal2=n('projSal2'),autres=n('projAutres'),deduc=n('projDeduc');
+    var rbg=n('projRBG')-n('projDeduc');
+    if(rbg<0)rbg=0;
     var reduc=n('projReduc');
     var sitmat=document.getElementById('projSitmat')?document.getElementById('projSitmat').value:'marie';
     var nbEnf=n('projEnfants');
-    // Abattement 10% sur salaires (min 495, max 14171 par personne)
-    var abatt1=Math.min(14171,Math.max(495,Math.round(sal1*0.10)));
-    var abatt2=Math.min(14171,Math.max(495,Math.round(sal2*0.10)));
-    if(!sal1)abatt1=0;if(!sal2)abatt2=0;
-    var rbg=sal1-abatt1+sal2-abatt2+autres-deduc;
-    if(rbg<0)rbg=0;
     var res=calcIR(rbg,sitmat,nbEnf,false,reduc,0);
     var el=document.getElementById('projFiscResultat');
     if(!el)return;
