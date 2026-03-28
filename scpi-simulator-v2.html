@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool — Simulateur SCPI</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0f0e0d;--bg-2:#161412;
+  --paper:#F6F3EE;--paper-2:#EDEAE3;
+  --orange:#D4622A;--orange-lt:#E8855A;
+  --o-dim:rgba(212,98,42,0.13);--o-glow:rgba(212,98,42,0.07);
+  --white:#FFFFFF;
+  --fog:rgba(255,255,255,0.58);--fog-2:rgba(255,255,255,0.30);--fog-3:rgba(255,255,255,0.08);
+  --rule-d:rgba(255,255,255,0.07);--rule-l:rgba(24,22,20,0.08);
+  --ink:#181614;--ink-60:rgba(24,22,20,0.60);--ink-30:rgba(24,22,20,0.30);
+  --serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,sans-serif;
+  /* Alias compat */
+  --ambre:var(--orange);--ambre-d:#b8501f;--ambre-l:var(--o-dim);--ambre-m:rgba(212,98,42,0.30);
+  --noir:var(--ink);--blanc:var(--white);--gris:var(--ink-60);--gris-f:var(--ink-60);
+  --gris-l:var(--paper);--bord:var(--rule-l);
+  --green:#2D7A5B;--green-l:#EAF5EF;--blue:#185FA5;--blue-l:#EDF2FB;
+  --red:#C0392B;--red-l:#FCEBEB;
+}
+body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
+.nav-inner{max-width:1380px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--blanc);text-decoration:none;letter-spacing:0.01em}
+.nav-logo span{color:var(--ambre)}
+.nav-center{display:flex;gap:3px}
+.nav-tab{font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 14px;border-radius:5px;transition:all 0.2s;cursor:pointer;border:none;background:transparent;font-family:var(--sans)}
+.nav-tab:hover{color:var(--blanc);background:rgba(255,255,255,0.06)}
+.nav-tab.active{color:var(--ambre);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-btn{background:var(--ambre);color:var(--noir);font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 18px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s}
+.nav-btn:hover{background:var(--ambre-d);color:var(--blanc)}
+.nav-btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6)}
+.nav-btn.outline:hover{border-color:var(--ambre);color:var(--ambre);background:transparent}
+
+/* ── LAYOUT ── */
+.app-shell{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 64px);width:100%}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--gris-l);border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:360px;min-width:360px;max-width:360px;box-sizing:border-box}
+.sidebar-section{margin-bottom:2px;border-radius:8px;overflow:hidden}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:7px;cursor:pointer;padding:10px 12px;user-select:none;transition:background 0.15s,color 0.15s;border-radius:8px}
+.sidebar-label:hover{background:var(--bord);color:var(--gris-f)}
+.sidebar-label::after{display:none}
+.sidebar-label .acc-arrow{font-size:8px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
+.sidebar-label.open .acc-arrow{transform:rotate(90deg)}
+.sidebar-body{overflow:hidden;transition:max-height 0.3s ease,opacity 0.25s ease;max-height:0;opacity:0;padding:0 4px}
+.sidebar-body.open{max-height:700px;opacity:1;padding:4px 4px 12px}
+
+/* MODE TABS */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
+.mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;background:var(--blanc);color:var(--gris);font-size:11px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--ambre);color:var(--ambre-d);background:var(--ambre-l);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--ambre-m);color:var(--gris-f);background:var(--blanc)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
+
+/* SCPI SEARCH */
+.scpi-search{width:100%;background:var(--blanc);border:1.5px solid var(--bord);border-radius:8px;padding:10px 14px;color:var(--noir);font-family:var(--sans);font-size:13px;outline:none;transition:border-color 0.2s}
+.scpi-search:focus{border-color:var(--ambre)}
+.scpi-search::placeholder{color:var(--gris)}
+
+/* SCPI LIST */
+.scpi-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.scpi-card{padding:12px 14px;border:1.5px solid var(--bord);border-radius:10px;cursor:pointer;transition:all 0.2s;background:var(--blanc)}
+.scpi-card:hover{border-color:var(--ambre-m);background:var(--ambre-l)}
+.scpi-card.selected{border-color:var(--ambre);background:var(--ambre-l);box-shadow:0 0 0 2px rgba(240,167,56,0.15)}
+.scpi-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.scpi-card-name{font-size:13px;font-weight:600;color:var(--noir)}
+.scpi-card-yield{font-size:14px;font-weight:600;color:var(--ambre-d)}
+.scpi-card-manager{font-size:11px;color:var(--gris);margin-bottom:6px}
+.scpi-card-tags{display:flex;gap:4px;flex-wrap:wrap}
+.stag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--gris-l);color:var(--gris);border:1px solid var(--bord)}
+.stag.warn{background:var(--red-l);color:var(--red);border-color:rgba(192,57,43,0.15)}
+.stag.ok{background:var(--green-l);color:var(--green);border-color:rgba(45,122,91,0.15)}
+.stag.blue{background:var(--blue-l);color:var(--blue);border-color:rgba(43,94,167,0.15)}
+
+/* INPUTS */
+.input-group{margin-bottom:16px}
+.input-label{font-size:12px;font-weight:500;color:var(--gris-f);margin-bottom:7px;display:block}
+.input-row{display:flex;align-items:center;background:var(--blanc);border:1.5px solid var(--bord);border-radius:8px;overflow:hidden;transition:border-color 0.2s}
+.input-row:focus-within{border-color:var(--ambre)}
+.input-row input{flex:1;background:transparent;border:none;outline:none;padding:10px 13px;color:var(--noir);font-family:var(--sans);font-size:15px;font-weight:500}
+.input-unit{padding:10px 13px;font-size:12px;color:var(--gris);border-left:1px solid var(--bord);font-weight:500}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:rgba(212,98,42,0.25);border-radius:2px;outline:none;margin:8px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,0.12)}
+.slider-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:4px}
+.slider-labs{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-30);margin-top:2px}
+/* Boutons TMI */
+.tmi-pill{flex:1;padding:8px 4px;font-family:var(--sans);font-size:12px;font-weight:600;
+  border:1px solid var(--rule-l);background:#fff;color:var(--ink-60);
+  cursor:pointer;transition:all 0.15s;text-align:center}
+.tmi-pill:hover{border-color:var(--orange);color:var(--orange)}
+.tmi-pill.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* CTA */
+.sim-btn{width:100%;padding:14px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:4px}
+.sim-btn:hover{background:var(--ambre-d);color:var(--blanc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,131,42,0.25)}
+.divider{height:1px;background:var(--bord);margin:20px 0}
+
+/* ── MAIN CONTENT ── */
+.main-content{padding:28px 32px;background:#ECEAE6;min-height:calc(100vh - 64px);min-width:0;display:flex;flex-direction:column;align-items:center}
+#results{background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px;max-width:794px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.06);box-sizing:border-box}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:12px}
+.empty-icon{font-size:48px;opacity:0.18}
+.empty-title{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-0.01em;color:var(--ink)}
+.empty-sub{font-size:13px;color:var(--ink-60);max-width:300px;line-height:1.8;font-weight:300}
+
+/* SCPI HEADER BAR */
+.scpi-header{background:var(--noir);border-radius:14px;padding:20px 28px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.scpi-header-name{font-family:var(--sans);font-size:20px;font-weight:700;color:var(--blanc);margin-right:auto}
+.scpi-header-name span{color:var(--ambre)}
+.sh-item{display:flex;flex-direction:column;gap:2px}
+.sh-label{font-size:9px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+.sh-val{font-size:14px;font-weight:600;color:var(--blanc);font-family:var(--sans)}
+.sh-val.gold{color:var(--ambre)}
+.sh-val.gre{color:#5EC99A}
+.sh-val.red{color:#E07070}
+.sh-val.orn{color:var(--ambre-m)}
+
+/* KPI CARDS */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--blanc);border:1.5px solid var(--bord);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;transition:all 0.2s}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--ambre);opacity:0;transition:opacity 0.2s}
+.kpi-card:hover{border-color:var(--ambre-m);transform:translateY(-2px);box-shadow:0 6px 24px rgba(240,167,56,0.1)}
+.kpi-card:hover::after{opacity:1}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:10px}
+.kpi-val{font-family:var(--sans);font-size:26px;font-weight:700;color:var(--noir);line-height:1;margin-bottom:5px}
+.kpi-sub{font-size:11px;color:var(--gris);font-weight:300}
+.kpi-card.featured{background:var(--ambre);border-color:var(--ambre)}
+.kpi-card.featured .kpi-label{color:rgba(13,13,13,0.5)}
+.kpi-card.featured .kpi-val{color:var(--noir)}
+.kpi-card.featured .kpi-sub{color:rgba(13,13,13,0.55)}
+.kpi-card.featured::after{display:none}
+.kpi-card.green-card{border-color:rgba(45,122,91,0.2);background:var(--green-l)}
+.kpi-card.green-card .kpi-val{color:var(--green)}
+
+/* CHART */
+.chart-box{background:var(--blanc);border:1.5px solid var(--bord);border-radius:14px;padding:24px;margin-bottom:24px}
+.chart-box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.chart-box-title{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir)}
+.chart-legend{display:flex;gap:16px;font-size:11px;color:var(--gris)}
+.leg-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.chart-wrap{height:230px}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.stat-block{background:var(--blanc);border:1.5px solid var(--bord);border-radius:14px;padding:20px}
+.stat-block-title{font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--gris);margin-bottom:14px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bord)}
+.stat-row:last-child{border-bottom:none}
+.stat-l{font-size:12px;font-weight:300;color:var(--gris)}
+.stat-v{font-size:13px;font-weight:600;color:var(--noir)}
+.prog-wrap{margin-bottom:7px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:4px}
+.prog-bar{height:5px;background:var(--bord);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+
+/* TABLE */
+.table-box{background:var(--blanc);border:1.5px solid var(--bord);border-radius:14px;overflow:hidden;margin-bottom:24px}
+.table-box-header{padding:18px 22px;border-bottom:1px solid var(--bord);display:flex;align-items:center;gap:12px}
+.table-box-title{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir)}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 18px;text-align:right;font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--bord);transition:background 0.15s}
+tbody tr:hover{background:var(--ambre-l)}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:10px 18px;text-align:right;font-size:12px;color:var(--gris);font-weight:400}
+tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
+.td-gold{color:var(--ambre-d)!important;font-weight:600!important}
+.td-green{color:var(--green)!important;font-weight:600!important}
+.td-red{color:var(--red)!important}
+
+/* ── ENTERPRISE LAYOUT ── */
+.ent-hero{background:var(--noir);border-radius:14px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.ent-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:var(--ambre);opacity:0.06;border-radius:50%}
+.ent-hero-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--ambre);margin-bottom:12px;display:block}
+.ent-hero-title{font-family:var(--sans);font-size:24px;font-weight:600;color:var(--blanc);margin-bottom:6px}
+.ent-hero-sub{font-size:13px;font-weight:300;color:rgba(255,255,255,0.4)}
+
+.ent-flow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.ent-block{border-radius:14px;padding:22px;border:1.5px solid}
+.ent-block.us{background:var(--ambre-l);border-color:var(--ambre-m)}
+.ent-block.np{background:var(--gris-l);border-color:var(--bord)}
+.ent-block-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.badge-us{background:var(--ambre);color:var(--noir)}
+.badge-np{background:var(--noir);color:var(--blanc)}
+.ent-block h4{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);margin-bottom:14px}
+.ent-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.ent-row:last-child{border-bottom:none}
+.ent-row-label{font-size:12px;font-weight:300;color:var(--gris-f);line-height:1.4}
+.ent-row-val{font-size:13px;font-weight:700;color:var(--noir);text-align:right;margin-left:12px;flex-shrink:0}
+.ent-row-val.gold{color:var(--ambre-d)}
+.ent-row-val.green{color:var(--green)}
+.ent-row-val.red{color:var(--red)}
+.ent-row.highlight{background:rgba(240,167,56,0.08);border-radius:6px;padding:10px 10px;margin:4px -10px;border-bottom:none}
+
+.ent-gain-box{background:linear-gradient(135deg,var(--noir) 0%,var(--gris-f) 100%);border-radius:14px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
+.ent-gain-left{}
+.ent-gain-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--ambre);margin-bottom:8px}
+.ent-gain-title{font-family:var(--sans);font-size:28px;font-weight:700;color:var(--blanc)}
+.ent-gain-sub{font-size:13px;font-weight:300;color:rgba(255,255,255,0.4);margin-top:6px}
+.ent-gain-right{text-align:right}
+.ent-gain-roi{font-family:var(--sans);font-size:48px;font-weight:600;color:var(--ambre);line-height:1}
+.ent-gain-roi-label{font-size:12px;color:rgba(255,255,255,0.35);margin-top:4px}
+
+.ent-is-box{background:var(--gris-l);border:1.5px solid var(--bord);border-radius:14px;padding:22px 24px;margin-bottom:24px}
+.ent-is-title{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--noir);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.is-pill{background:var(--ambre);color:var(--noir);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:3px 10px;border-radius:20px}
+.is-calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.is-calc-item{background:var(--blanc);border:1px solid var(--bord);border-radius:10px;padding:14px 16px;text-align:center}
+.is-calc-label{font-size:10px;font-weight:500;color:var(--gris);margin-bottom:6px;line-height:1.4}
+.is-calc-val{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)}
+.is-calc-val.gold{color:var(--ambre-d)}
+.is-calc-val.green{color:var(--green)}
+.is-calc-val.red{color:var(--red)}
+
+/* NP CARDS */
+.np-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.np-card{border-radius:14px;padding:24px;border:1.5px solid}
+.np-card.you{background:var(--ambre-l);border-color:var(--ambre-m)}
+.np-card.other{background:var(--gris-l);border-color:var(--bord)}
+.np-badge{display:inline-flex;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.np-badge.you{background:var(--ambre);color:var(--noir)}
+.np-badge.other{background:var(--gris-f);color:var(--blanc)}
+.np-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.07)}
+.np-row:last-child{border-bottom:none}
+.np-row-l{font-size:12px;font-weight:300;color:var(--gris-f)}
+.np-row-v{font-size:13px;font-weight:700;color:var(--noir)}
+.np-row-v.gold{color:var(--ambre-d)}
+.np-row-v.gre{color:var(--green)}
+.np-row-v.red{color:var(--red)}
+
+/* ── SOURCE TOGGLE ── */
+.source-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--blanc);border:1.5px solid var(--bord);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.src-btn{padding:9px 10px;border:none;background:transparent;color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px}
+.src-btn.active{background:var(--ambre);color:var(--noir);font-weight:700}
+.src-btn:not(.active):hover{background:var(--ambre-l);color:var(--ambre-d)}
+.src-btn:first-child{border-right:1px solid var(--bord)}
+
+/* CUSTOM RATE PANEL */
+.custom-rate-panel{background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:10px;padding:16px;margin-bottom:0}
+.custom-rate-panel .input-label{color:var(--ambre-d);font-weight:600}
+.custom-rate-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.custom-rate-hint{font-size:11px;color:var(--gris);margin-top:8px;line-height:1.5;font-style:italic}
+.custom-badge{display:inline-flex;align-items:center;gap:5px;background:var(--ambre);color:var(--noir);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+
+.fade-in{animation:fadeUp 0.4s ease forwards}
+.fade-in-1{animation:fadeUp 0.4s 0.05s ease both}
+.fade-in-2{animation:fadeUp 0.4s 0.10s ease both}
+.fade-in-3{animation:fadeUp 0.4s 0.15s ease both}
+.fade-in-4{animation:fadeUp 0.4s 0.20s ease both}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
+
+@media print{
+  .sidebar,nav,.sim-btn,.nav-right,.source-toggle{display:none!important}
+  .app-shell{display:block!important}
+  .main-content{background:#fff!important;padding:0!important}
+  #results{border:none!important;box-shadow:none!important;border-radius:0!important;padding:20px!important;max-width:100%!important}
+  body{background:#fff!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  @page{size:A4 portrait;margin:1.5cm}
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
+    </div>
+  </div>
+</nav>
+
+<!-- CSS dropdown pour nav-dropdown dans cs-nav -->
+<style>
+.nav-dropdown{position:relative}
+.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
+.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
+.nav-dropdown:hover .arr{transform:rotate(180deg)}
+.nav-dropdown-menu{
+  position:absolute;top:calc(100% + 4px);left:0;
+  background:rgba(15,14,13,0.97);
+  border:1px solid var(--rule-d);
+  padding:6px;min-width:190px;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:all 0.18s;backdrop-filter:blur(20px);
+  z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.nav-dropdown-item{
+  display:block;font-family:var(--sans);font-size:13px;font-weight:400;
+  color:rgba(255,255,255,0.55);text-decoration:none;
+  padding:8px 12px;transition:color 0.15s;white-space:nowrap;
+}
+.nav-dropdown-item:hover{color:#fff}
+.nav-dropdown-item.active{color:var(--orange)}
+.nav-dropdown-sep{height:1px;background:var(--rule-d);margin:4px 0}
+</style>
+
+<div class="app-shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+  <div class="sidebar-section">
+    <div class="sidebar-label open" onclick="toggleAcc(this)">Type de projection<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">📈</span>Plan Retraite SCPI</div>
+      <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">🔀</span>Nue-propriété</div>
+      <div class="mode-tab" onclick="setMode('entreprise',this)"><span class="mode-icon">🏢</span>Montage Entreprise</div>
+    </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label open" onclick="toggleAcc(this)">SCPI<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
+    <div class="source-toggle">
+      <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
+      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux personnalisé</button>
+    </div>
+    <div id="scpiPickerPanel">
+      <input class="scpi-search" type="text" placeholder="Rechercher par nom, société…" oninput="filterSCPI(this.value)">
+      <div class="scpi-list" id="scpiList"></div>
+    </div>
+    <div id="customRatePanel" style="display:none">
+      <div class="custom-rate-panel">
+        <div class="custom-badge">✏️ Taux personnalisé</div>
+        <div class="input-group" style="margin-bottom:8px">
+          <span class="input-label">Taux de distribution</span>
+          <div class="input-row">
+            <input type="number" id="custom-gross" value="6.00" min="0.1" max="20" step="0.1">
+            <span class="input-unit">%</span>
+          </div>
+        </div>
+        <div class="input-group" style="margin-bottom:0">
+          <span class="input-label">Libellé (optionnel)</span>
+          <div class="input-row">
+            <input type="text" id="custom-name" placeholder="Ex : SCPI hypothétique" style="font-size:13px;font-family:var(--sans)">
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label open" onclick="toggleAcc(this)">Plan d'investissement<span class="acc-arrow">▶</span></div>
+    <div class="sidebar-body open">
+
+    <!-- RETRAITE -->
+    <div id="inputs-retraite">
+      <div class="input-group">
+        <span class="input-label">Investissement initial</span>
+        <div class="input-row"><input type="number" id="ret-init" value="10000" min="0" step="1000"><span class="input-unit">€</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Versement mensuel</span>
+        <div class="input-row"><input type="number" id="ret-monthly" value="200" min="0" step="50"><span class="input-unit">€ / mois</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">% Dividendes réinvestis</span>
+        <div class="slider-val" id="ret-reinvest-val">0 %</div>
+        <input type="range" id="ret-reinvest" min="0" max="100" value="0" step="5" oninput="document.getElementById('ret-reinvest-val').textContent=this.value+' %'">
+        <div class="slider-labs"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Horizon de temps</span>
+        <div class="slider-val" id="ret-horizon-val">20 ans</div>
+        <input type="range" id="ret-horizon" min="3" max="40" value="20" step="1" oninput="document.getElementById('ret-horizon-val').textContent=this.value+' ans'">
+        <div class="slider-labs"><span>3 ans</span><span>20 ans</span><span>40 ans</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Votre TMI (calcul rente nette)</span>
+        <!-- Champ caché pour compatibilité JS existant -->
+        <input type="hidden" id="ret-tmi" value="30">
+        <div style="display:flex;gap:5px;margin-top:6px" id="tmiBtns">
+          <button class="tmi-pill" onclick="setScpiTMI(0,this)">0 %</button>
+          <button class="tmi-pill" onclick="setScpiTMI(11,this)">11 %</button>
+          <button class="tmi-pill active" onclick="setScpiTMI(30,this)">30 %</button>
+          <button class="tmi-pill" onclick="setScpiTMI(41,this)">41 %</button>
+          <button class="tmi-pill" onclick="setScpiTMI(45,this)">45 %</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NP -->
+    <div id="inputs-np" style="display:none">
+      <div class="input-group">
+        <span class="input-label">Montant investi (en NP)</span>
+        <div class="input-row"><input type="number" id="np-init" value="20000" min="0" step="1000"><span class="input-unit">€</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Durée du démembrement</span>
+        <div class="slider-val" id="np-dur-val">7 ans</div>
+        <input type="range" id="np-duration" min="3" max="20" value="7" step="1" oninput="document.getElementById('np-dur-val').textContent=this.value+' ans'">
+        <div class="slider-labs"><span>3 ans</span><span>10 ans</span><span>20 ans</span></div>
+      </div>
+    </div>
+
+    <!-- ENTREPRISE -->
+    <div id="inputs-entreprise" style="display:none">
+      <div class="input-group">
+        <span class="input-label">Cash société → Usufruit</span>
+        <div class="input-row"><input type="number" id="ent-invest" value="100000" min="0" step="5000"><span class="input-unit">€</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Cash perso → Nue-propriété (optionnel)</span>
+        <div class="input-row"><input type="number" id="ent-invest-np" value="0" min="0" step="5000"><span class="input-unit">€</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Durée de l'usufruit</span>
+        <div class="slider-val" id="ent-dur-val">5 ans</div>
+        <input type="range" id="ent-duration" min="3" max="20" value="5" step="1" oninput="updateEntDur(this.value)">
+        <div class="slider-labs"><span>3 ans</span><span>10 ans</span><span>20 ans</span></div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Taux d'IS de la société</span>
+        <div class="input-row"><input type="number" id="ent-is" value="25" min="15" max="33" step="1"><span class="input-unit">%</span></div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+
+  <button class="sim-btn" onclick="runSimulation()">Lancer la projection &#8594;</button>
+  <button class="sim-btn" onclick="window.print()" style="background:var(--green);margin-top:8px">&#11015; Exporter PDF</button>
+</aside>
+<div class="main-content" id="mainContent">
+  <div class="empty-state" id="emptyState" style="max-width:794px;width:100%">
+    <div class="empty-icon" style="font-size:56px;opacity:0.5">🧑‍🚀</div>
+    <div class="empty-title">Prêt pour le décollage ?</div>
+    <div class="empty-sub">Sélectionnez une SCPI de la gamme ou saisissez un taux, configurez les paramètres et lancez la projection.</div>
+  </div>
+
+  <div id="results" style="display:none">
+    <div id="scpiHeaderBar"></div>
+    <div id="kpiRow" class="kpi-row"></div>
+    <div id="chartBox" class="chart-box">
+      <div class="chart-box-header">
+        <div class="chart-box-title" id="chartTitle">Projection</div>
+        <div class="chart-legend" id="chartLegend"></div>
+      </div>
+      <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+    </div>
+    <div id="extraContent"></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ─── SCPI DATA ────────────────────────────────────────────────────
+const SCPI_DATA=[
+{id:'eurovalys',name:'Eurovalys',manager:'ADVENIS',theme:'Bureaux',geo:'Allemagne',price:960,yieldGross:0.055,yieldNet:0.04125,capi:950.97,collecteNet2025:0,retraits2025:16.78,partsAttente:6.14,tof:0.901,leverage:0.3592,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:749.03,valeurReconstitution:961.23,decote:-0.0013,assets:36,tenants:195,sqm:454450,geography:{'Allemagne':1.0},assetTypes:{'Bureaux':0.84,'Commerces':0.02,'Production':0.09,'Autres':0.03}},
+{id:'activimmo',name:'Activimmo',manager:'ALDÉRAN',theme:'Logistique',geo:'International',price:610,yieldGross:0.0552,yieldNet:0.0414,capi:1400,collecteNet2025:95.1,retraits2025:21.79,partsAttente:0,tof:0.781,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:508.08,valeurReconstitution:610.67,decote:null,assets:179,tenants:372,sqm:1392833,geography:{'France':0.78,'Espagne':0.14,'Italie':0.04,'Pays-Bas':0.02,'Portugal':0.01,'Autres':0.01},assetTypes:{"Loc. d'activités":0.32,'Entrepôts':0.51,'Logistique':0.09,'Transports':0.07}},
+{id:'comete',name:'Comète',manager:'ALDÉRAN',theme:'Diversifié',geo:'International',price:250,yieldGross:0.1118,yieldNet:0.08385,capi:519.6,collecteNet2025:398.9,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:219.03,valeurReconstitution:253.53,decote:null,assets:27,tenants:72,sqm:232858,geography:{'Espagne':0.154,'Italie':0.124,'Pays-Bas':0.103,'Royaume-Uni':0.465,'Autres':0.154},assetTypes:{'Bureaux':0.14,'Loisirs':0.06,'Hôtellerie':0.16,'Logistique':0.24,'Commerce':0.28,'Éducation':0.12}},
+{id:'altaconv',name:'Alta Convictions',manager:'ALTAREA IM',theme:'Diversifié',geo:'France',price:308,yieldGross:0.065,yieldNet:0.03432,capi:105.9,collecteNet2025:42.3,retraits2025:0,partsAttente:0,tof:0.96,leverage:0.14,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:281.63,valeurReconstitution:333.68,decote:-0.077,assets:16,tenants:29,sqm:58773,geography:{'France':0.80,'International':0.10,'Espagne':0.10},assetTypes:{'Commerces':0.68,'Logistique':0.23,"Locaux d'activité":0.09}},
+{id:'epe',name:'Epargne Pierre Europe',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'Europe',price:200,yieldGross:0.0675,yieldNet:0.050625,capi:559,collecteNet2025:291.6,retraits2025:0.96,partsAttente:0,tof:1.0,leverage:0,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:172.14,valeurReconstitution:205.4,decote:-0.026,assets:27,tenants:54,sqm:null,geography:{'Espagne':0.34,'Pays-Bas':0.10,'Irlande':0.29,'Allemagne':0.27},assetTypes:{'Bureaux':0.23,'Commerces':0.20,'Hôtels':0.32,'Locaux activité':0.19,'Santé':0.05}},
+{id:'ep',name:'Epargne Pierre',manager:'ATLAND VOISIN',theme:'Diversifié',geo:'France',price:208,yieldGross:0.0528,yieldNet:0.0278784,capi:2803,collecteNet2025:69.99,retraits2025:43.81,partsAttente:0,tof:0.9445,leverage:0.112,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:168.1,valeurReconstitution:207.22,decote:0.004,assets:414,tenants:1020,sqm:1151069,geography:{'Rég. parisienne':0.27,'Province':0.73},assetTypes:{'Bureaux':0.47,'Commerces':0.29,"Loc. d'activités":0.08,'Hôtels':0.10,'Santé':0.06}},
+{id:'atream',name:'Atream Hôtels',manager:'ATREAM',theme:'Hôtellerie',geo:'Europe',price:1000,yieldGross:0.065,yieldNet:0.04875,capi:320.3,collecteNet2025:21.04,retraits2025:5.9,partsAttente:0,tof:1.0,leverage:0.2487,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:874.7,valeurReconstitution:1064.31,decote:-0.060,assets:22,tenants:null,sqm:null,geography:{'France':0.33,'Pays-Bas':0.14,'Allemagne':0.30,'Belgique':0.23},assetTypes:{'Hôtels':0.71,'Hébergements':0.29}},
+{id:'te',name:'Transitions Europe',manager:'ARKEA REIM',theme:'Diversifié',geo:'Europe',price:202,yieldGross:0.0825,yieldNet:0.061875,capi:1100,collecteNet2025:557.96,retraits2025:1.38,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:177.87,valeurReconstitution:207.49,decote:-0.026,assets:54,tenants:313,sqm:null,geography:{'Espagne':0.36,'Pays-Bas':0.15,'Allemagne':0.21,'Irlande':0.09,'Italie':0.13,'Autres':0.06},assetTypes:{'Bureaux':0.31,'Commerces':0.27,'Logistique':0.16,'Life Science':0.12,'Autres':0.14}},
+{id:'ceurion',name:'Corum Eurion',manager:'CORUM',theme:'Diversifié',geo:'Europe',price:215,yieldGross:0.065,yieldNet:0.04875,capi:1477,collecteNet2025:149.43,retraits2025:16.27,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:184.76,valeurReconstitution:229.29,decote:-0.062,assets:49,tenants:107,sqm:486537,geography:{'Pays-Bas':0.23,'Italie':0.14,'Irlande':0.22,'Espagne':0.07,'Portugal':0.09,'Autres':0.25},assetTypes:{'Bureaux':0.74,'Commerces':0.06,'Hôtels':0.10,'Activité':0.08,'Santé':0.02}},
+{id:'corigin',name:'Corum Origin',manager:'CORUM',theme:'Diversifié',geo:'Europe',price:1135,yieldGross:0.073,yieldNet:0.05475,capi:3794,collecteNet2025:530.43,retraits2025:51.97,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:164,tenants:401,sqm:1638679,geography:{'Pays-Bas':0.27,'Italie':0.15,'Finlande':0.09,'Irlande':0.13,'Espagne':0.09,'Autres':0.27},assetTypes:{'Bureaux':0.58,'Commerces':0.26,'Hôtels':0.08,'Activité':0.06,'Santé':0.02}},
+{id:'lfsante',name:'LF Avenir Santé',manager:'LA FRANÇAISE',theme:'Santé',geo:'France & Europe',price:300,yieldGross:0.0933,yieldNet:0.069975,capi:259.9,collecteNet2025:36.6,retraits2025:1.9,partsAttente:0,tof:1.0,leverage:0.2621,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:244.18,valeurReconstitution:302.3,decote:-0.008,assets:32,tenants:null,sqm:56104,geography:{'France':0.52,'Belgique':0.10,'Irlande':0.08,'Autres':0.30},assetTypes:{'Santé':1.0}},
+{id:'osmo',name:'Osmo Energie',manager:'MATA CAPITAL',theme:'Diversifié',geo:'Europe',price:300,yieldGross:0.0933,yieldNet:0.069975,capi:79,collecteNet2025:47.39,retraits2025:0,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 9',valeurRealisation:246.78,valeurReconstitution:303.67,decote:-0.012,assets:23,tenants:35,sqm:42790,geography:{'Royaume-Uni':0.42,'France':0.33,'Pays-Bas':0.08,'Irlande':0.11,'Allemagne':0.06},assetTypes:{'Bureaux':0.39,'Commerces':0.43,'Activité & Log.':0.18}},
+{id:'ncap',name:'NCAP Régions',manager:'NORMA CAPITAL',theme:'Diversifié',geo:'France',price:682,yieldGross:0.0601,yieldNet:0.0317328,capi:1084,collecteNet2025:87.2,retraits2025:21,partsAttente:0,tof:0.917,leverage:0.20,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:570.66,valeurReconstitution:698.29,decote:-0.023,assets:178,tenants:430,sqm:506400,geography:{'Province':0.72,'Rég. parisienne':0.26,'Outre-mer':0.02},assetTypes:{'Bureaux':0.56,'Commerces':0.30,"Locaux activité":0.14}},
+{id:'perial',name:'Perial Opportunités Europe',manager:'PERIAL',theme:'Diversifié',geo:'France & Europe',price:44,yieldGross:0.055,yieldNet:0.04125,capi:788,collecteNet2025:10.22,retraits2025:26.68,partsAttente:0,tof:null,leverage:null,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:33.56,valeurReconstitution:42.93,decote:null,assets:128,tenants:309,sqm:371968,geography:{'France':0.59,'Pays-Bas':0.14,'Allemagne':0.13,'Espagne':0.13,'Italie':0.02},assetTypes:{'Bureaux':0.48,'Commerces':0.19,'Hôtels':0.27,'Activité':0.02,'Santé':0.05}},
+{id:'immorente',name:'Immorente',manager:'SOFIDY',theme:'Diversifié',geo:'International',price:340,yieldGross:0.0572,yieldNet:0.0429,capi:4391,collecteNet2025:5.92,retraits2025:60.96,partsAttente:88.6,tof:null,leverage:null,isr:true,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:994,tenants:3227,sqm:null,geography:{'Paris':0.23,'Rég. parisienne':0.24,'Province':0.32,'International':0.21},assetTypes:{'Bureaux':0.35,'Commerces':0.52,'Hôtels':0.10,'Autres':0.03}},
+{id:'sofidy',name:'Sofidy Europe Invest',manager:'SOFIDY',theme:'Diversifié',geo:'Europe',price:235,yieldGross:0.065,yieldNet:0.04875,capi:406,collecteNet2025:35.52,retraits2025:2.43,partsAttente:0,tof:null,leverage:0.21,isr:false,sri:3,durabilite:'Article 8',valeurRealisation:null,valeurReconstitution:null,decote:null,assets:36,tenants:null,sqm:null,geography:{'Espagne':0.29,'Pays-Bas':0.35,'Allemagne':0.14,'Irlande':0.10,'Belgique':0.02,'Royaume-Uni':0.10},assetTypes:{'Bureaux':0.36,'Commerces':0.19,'Hôtels':0.20,'MSP':0.21,'Logistique':0.05}}
+];
+
+// NP keys by duration (US% / NP%)
+const US_PCT={3:0.15,4:0.18,5:0.24,6:0.27,7:0.29,8:0.32,9:0.34,10:0.37,11:0.39,12:0.42,13:0.44,14:0.47,15:0.50,16:0.52,17:0.54,18:0.56,19:0.58,20:0.60};
+function getNPpct(dur){return 1-(US_PCT[Math.min(dur,20)]||0.37)}
+
+let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi';
+
+// ─── INIT ─────────────────────────────────────────────────────────
+
+function toggleAcc(label){
+  label.classList.toggle('open');
+  const body=label.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function init(){renderSCPIList(SCPI_DATA)}
+
+function renderSCPIList(list){
+  document.getElementById('scpiList').innerHTML=list.map(s=>`
+    <div class="scpi-card${selectedSCPI&&selectedSCPI.id===s.id?' selected':''}" id="scpi-${s.id}" onclick="selectSCPI('${s.id}')">
+      <div class="scpi-card-top"><div class="scpi-card-name">${s.name}</div><div class="scpi-card-yield">${(s.yieldGross*100).toFixed(2)}%</div></div>
+      <div class="scpi-card-manager">${s.manager}</div>
+      <div class="scpi-card-tags">
+        <span class="stag">${s.price} €</span>
+        <span class="stag blue">SRI ${s.sri}</span>
+        ${s.isr?'<span class="stag ok">ISR</span>':''}
+        <span class="stag">${s.capi}M€</span>
+        ${s.partsAttente>0?'<span class="stag warn">⚠ Attente</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+function filterSCPI(q){renderSCPIList(SCPI_DATA.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.manager.toLowerCase().includes(q.toLowerCase())||s.theme.toLowerCase().includes(q.toLowerCase())))}
+
+function selectSCPI(id){
+  selectedSCPI=SCPI_DATA.find(s=>s.id===id);
+  document.querySelectorAll('.scpi-card').forEach(c=>c.classList.remove('selected'));
+  const el=document.getElementById('scpi-'+id);
+  if(el)el.classList.add('selected');
+}
+
+function setSource(mode){
+  sourceMode=mode;
+  document.getElementById('srcBtnSCPI').className='src-btn'+(mode==='scpi'?' active':'');
+  document.getElementById('srcBtnCustom').className='src-btn'+(mode==='custom'?' active':'');
+  document.getElementById('scpiPickerPanel').style.display=mode==='scpi'?'block':'none';
+  document.getElementById('customRatePanel').style.display=mode==='custom'?'block':'none';
+}
+
+function getActiveScpi(){
+  if(sourceMode==='custom'){
+    const gross=+document.getElementById('custom-gross').value/100;
+    const net=gross*0.75;
+    const label=document.getElementById('custom-name').value.trim()||'Projection financière';
+    return{
+      id:'custom',name:label,manager:'—',theme:'—',geo:'—',
+      price:null,yieldGross:gross,yieldNet:net,
+      capi:null,collecteNet2025:null,retraits2025:null,partsAttente:0,
+      tof:null,leverage:null,isr:false,sri:null,
+      durabilite:'—',valeurRealisation:null,valeurReconstitution:null,decote:null,
+      assets:null,tenants:null,sqm:null,geography:{},assetTypes:{},
+      isCustom:true
+    };
+  }
+  return selectedSCPI;
+}
+
+function setMode(mode,el){
+  currentMode=mode;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['retraite','np','entreprise'].forEach(m=>document.getElementById('inputs-'+m).style.display=m===mode?'block':'none');
+}
+
+function updateEntDur(v){document.getElementById('ent-dur-val').textContent=v+' ans';}
+
+function switchModule(mod,btn){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(mod!=='scpi')alert('Module '+mod+' — bientôt disponible');
+}
+
+// ─── CALCULATIONS ─────────────────────────────────────────────────
+
+function calcRetraite(scpi,init,monthly,reinvestPct,horizon,tmi){
+  const r=scpi.yieldGross,rows=[];
+  let p=init;
+  for(let y=1;y<=horizon;y++){
+    const div=p*r,reinv=div*(reinvestPct/100),perc=div*(1-reinvestPct/100),add=monthly*12,np=p+reinv+add;
+    rows.push({year:y,before:p,monthly:add,reinvested:reinv,perceived:perc,after:np});
+    p=np;
+  }
+  const tmiRate=(tmi||30)/100;
+  const renteGross=p*r/12;
+  const renteNet=renteGross*(1-tmiRate-0.172);
+  return{rows,totalVerse:init+monthly*12*horizon,patrimoineTerme:p,renteGross,renteNet,tmi:tmi||30};
+}
+
+function calcNP(scpi,initValue,duration){
+  const usPct=US_PCT[Math.min(duration,20)]||0.37,npPct=1-usPct;
+  const priceNP=scpi.price*npPct,nbParts=Math.floor(initValue/priceNP),actual=nbParts*priceNP;
+  const ppVal=nbParts*scpi.price,gain=ppVal-actual;
+  return{nbParts,actual,usPct,npPct,priceNP,ppVal,gain,renteGross:ppVal*scpi.yieldGross/12,renteNet:ppVal*scpi.yieldNet/12,duration};
+}
+
+function calcEntreprise(scpi,investUS,duration,isTaxPct,investNPperso){
+  const usPct=US_PCT[Math.min(duration,20)]||0.37,npPct=1-usPct;
+  const ppVal=investUS/usPct;
+  const investNPneeded=ppVal*npPct;
+  const npCoverage=investNPperso>0?Math.min(investNPperso/investNPneeded,1):null;
+  const revenusAnnuels=ppVal*scpi.yieldGross;
+  const amortissement=investUS/duration;
+  const resultatNet=revenusAnnuels-amortissement;
+  const fiscalite=resultatNet*isTaxPct;
+  const revenusNets=revenusAnnuels-fiscalite;
+  const cumulNets=revenusNets*duration;
+  const gainNet=cumulNets-investUS;
+  const roi=(gainNet/investUS)*100;
+  const renteTermeGross=ppVal*scpi.yieldGross/12;
+  const renteTermeNet=renteTermeGross*(1-0.172-0.30);
+  return{investUS,investNPperso:investNPperso||0,investNPneeded,npCoverage,usPct,npPct,ppVal,duration,isTaxPct,revenusAnnuels,amortissement,resultatNet,fiscalite,revenusNets,cumulNets,gainNet,roi,investNP:investNPneeded,renteTermeNet,renteTermeGross};
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────
+
+function runSimulation(){
+  const active=getActiveScpi();
+  if(!active){alert('Veuillez sélectionner une SCPI ou saisir un taux');return}
+  if(sourceMode==='scpi'&&!selectedSCPI){alert('Veuillez sélectionner une SCPI dans la liste');return}
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('results').style.display='block';
+  const btn=document.getElementById('exportBtn');if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  renderSCPIHeader();
+  if(currentMode==='retraite')renderRetraite();
+  else if(currentMode==='np')renderNP();
+  else renderEntreprise();
+}
+
+function renderSCPIHeader(){
+  const s=getActiveScpi();
+  const decStr='';
+  const tofStr=s.tof?`<div class="sh-item"><div class="sh-label">TOF</div><div class="sh-val ${s.tof<0.9?'red':'gre'}">${(s.tof*100).toFixed(1)}%</div></div>`:'';
+  const attenteStr=s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:'';
+  const priceStr=s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:'';
+  const capiStr=s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:'';
+  document.getElementById('scpiHeaderBar').innerHTML=`
+    <div class="scpi-header fade-in">
+      <div class="scpi-header-name">${s.name}${s.isCustom?'':` <span>— ${s.manager}</span>`}</div>
+      ${s.isCustom?'':`${priceStr}`}
+      <div class="sh-item"><div class="sh-label">Taux de distribution</div><div class="sh-val gold">${(s.yieldGross*100).toFixed(2)}%</div></div>
+      ${s.isCustom?'':`${capiStr}${decStr}${tofStr}${attenteStr}`}
+      ${s.isCustom?'':s.isr?'<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>':''}
+      ${s.isCustom?'':`<div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>`}
+    </div>`;
+}
+
+function renderRetraite(){
+  const s=getActiveScpi();
+  const init=+document.getElementById('ret-init').value,monthly=+document.getElementById('ret-monthly').value;
+  const reinvest=+document.getElementById('ret-reinvest').value,horizon=+document.getElementById('ret-horizon').value;
+  const tmi=+document.getElementById('ret-tmi').value;
+  const res=calcRetraite(s,init,monthly,reinvest,horizon,tmi);
+
+  document.getElementById('kpiRow').innerHTML=[
+    {label:'Total versé',val:fmt(res.totalVerse)+' €',sub:"Capital investi",cls:''},
+    {label:'Patrimoine à terme',val:fmt(res.patrimoineTerme)+' €',sub:'Après '+horizon+' ans',cls:'featured'},
+    {label:'Rente mensuelle brute',val:fmt(res.renteGross)+' €',sub:'Avant fiscalité',cls:'green-card'},
+    {label:'Rente mensuelle nette',val:fmt(res.renteNet)+' €',sub:`Après IR ${res.tmi}% + PS 17.2%`,cls:'green-card'}
+  ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  document.getElementById('chartTitle').textContent='Évolution du patrimoine sur '+horizon+' ans';
+  renderChart(res.rows.map(r=>'An '+r.year),[
+    {label:'Patrimoine constitué',data:res.rows.map(r=>Math.round(r.after)),color:'#C8832A'},
+    {label:'Capital versé',data:res.rows.map((_,i)=>Math.round(init+monthly*12*(i+1))),color:'#2D7A5B'}
+  ]);
+
+  // Extra: stats + table
+  document.getElementById('extraContent').innerHTML=`
+    ${renderStatsGridHTML(s)}
+    <div class="table-box fade-in">
+      <div class="table-box-header"><div class="table-box-title">Détail année par année</div></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Année</th><th>Patrimoine N-1</th><th>Versements</th><th>Div. réinvestis</th><th>Div. perçus</th><th>Patrimoine</th></tr></thead>
+          <tbody>${res.rows.map(r=>`<tr>
+            <td>${r.year}</td>
+            <td>${fmt(r.before)} €</td>
+            <td>${fmt(r.monthly)} €</td>
+            <td class="td-gold">${fmt(r.reinvested)} €</td>
+            <td>${fmt(r.perceived)} €</td>
+            <td class="td-green">${fmt(r.after)} €</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderNP(){
+  const s=getActiveScpi();
+  const init=+document.getElementById('np-init').value,duration=+document.getElementById('np-duration').value;
+  const res=calcNP(s,init,duration);
+
+  document.getElementById('kpiRow').innerHTML=[
+    {label:'Investissement NP',val:fmt(res.actual)+' €',sub:res.nbParts+' parts × '+fmt(res.priceNP)+' €',cls:''},
+    {label:'Valeur PP au terme',val:fmt(res.ppVal)+' €',sub:'Pleine propriété après '+duration+' ans',cls:'featured'},
+    {label:'Plus-value latente',val:fmt(res.gain)+' €',sub:'+'+Math.round(res.gain/res.actual*100)+'% sur le capital investi',cls:'green-card'},
+    {label:'Rente nette / mois',val:fmt(res.renteNet)+' €',sub:'Au terme du démembrement',cls:'green-card'}
+  ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  document.getElementById('chartTitle').textContent='Répartition NP / US sur la PP';
+  renderBarNP(res);
+
+  document.getElementById('extraContent').innerHTML=`
+    <div class="np-grid fade-in">
+      <div class="np-card you">
+        <div class="np-badge you">Nue-propriétaire — Vous</div>
+        ${nprow("Clé NP",Math.round(res.npPct*100)+' %')}
+        ${nprow("Prix part en NP",fmt(res.priceNP)+' €')}
+        ${nprow("Investissement total",fmt(res.actual)+' €')}
+        ${nprow("Pendant "+duration+" ans","Aucun revenu ❌",null,'red')}
+        ${nprow("Au terme","Pleine propriété ✅",null,'gre')}
+        ${nprow("Valeur récupérée",fmt(res.ppVal)+' €',null,'gold')}
+        ${nprow("Plus-value nette",fmt(res.gain)+' €',null,'gre')}
+        ${nprow("Rente mensuelle nette",fmt(res.renteNet)+' €/mois',null,'gold')}
+      </div>
+      <div class="np-card other">
+        <div class="np-badge other">Usufruitier</div>
+        ${nprow("Clé usufruit",Math.round(res.usPct*100)+' %')}
+        ${nprow("Pendant "+duration+" ans","Perçoit tous les loyers ✅",null,'gre')}
+        ${nprow("Rente brute annuelle",fmt(res.ppVal*s.yieldGross)+' €')}
+        ${nprow("Total perçu sur "+duration+" ans",fmt(res.ppVal*s.yieldGross*duration)+' €',null,'gold')}
+        ${nprow("Au terme","Extinction de l'usufruit ❌",null,'red')}
+        ${nprow("Capital récupéré","0 € ❌",null,'red')}
+      </div>
+    </div>
+    ${renderStatsGridHTML(s)}`;
+}
+
+function renderEntreprise(){
+  const s=getActiveScpi();
+  const investUS=+document.getElementById('ent-invest').value;
+  const investNPperso=+document.getElementById('ent-invest-np').value||0;
+  const duration=+document.getElementById('ent-duration').value;
+  const isTaxPct=(+document.getElementById('ent-is').value)/100;
+  const res=calcEntreprise(s,investUS,duration,isTaxPct,investNPperso);
+
+  document.getElementById('kpiRow').innerHTML=[
+    {label:"Investissement société (US)",val:fmt(res.investUS)+' €',sub:`Usufruit ${Math.round(res.usPct*100)}% — ${duration} ans`,cls:''},
+    {label:"Revenus annuels bruts",val:fmt(res.revenusAnnuels)+' €',sub:'Rendement '+s.yieldGross*100+'% sur la PP',cls:'featured'},
+    {label:"Revenus nets d'IS cumulés",val:fmt(res.cumulNets)+' €',sub:'Sur '+duration+' ans après IS à '+(isTaxPct*100)+'%',cls:'green-card'},
+    {label:"Gain net de l'opération",val:fmt(res.gainNet)+' €',sub:'ROI : +'+res.roi.toFixed(1)+'%',cls:res.gainNet>=0?'green-card':''}
+  ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  document.getElementById('chartTitle').textContent='Revenus cumulés nets vs investissement';
+  const years=Array.from({length:duration},(_,i)=>i+1);
+  renderChart(years.map(y=>'An '+y),[
+    {label:"Revenus cumulés nets d'IS",data:years.map(y=>Math.round(res.revenusNets*y)),color:'#2D7A5B'},
+    {label:"Investissement initial",data:years.map(()=>res.investUS),color:'#C8832A'}
+  ]);
+
+  document.getElementById('extraContent').innerHTML=`
+    <!-- HERO OPERATION -->
+    <div class="ent-hero fade-in">
+      <span class="ent-hero-label">Détail de l'opération</span>
+      <div class="ent-hero-title">Investissement de ${fmt(res.investUS)} € — Usufruit ${duration} ans</div>
+      <div class="ent-hero-sub">${s.name} · Barème : ${Math.round(res.usPct*100)}% US / ${Math.round(res.npPct*100)}% NP · IS à ${Math.round(isTaxPct*100)}%</div>
+    </div>
+
+    <!-- FLOW US / NP -->
+    <div class="ent-flow fade-in">
+      <div class="ent-block us">
+        <div class="ent-block-badge badge-us">🏢 Société — Usufruit</div>
+        <h4>Détail du calcul annuel</h4>
+        ${er("Barème usufruit sur "+duration+" ans",Math.round(res.usPct*100)+' %')}
+        ${er("PP reconstituée",fmt(res.ppVal)+' €')}
+        ${er("Revenus bruts /an",fmt(res.revenusAnnuels)+' €','gold')}
+        ${er("Amortissement /an","− "+fmt(res.amortissement)+' €')}
+        ${er("Résultat imposable /an",fmt(res.resultatNet)+' €',res.resultatNet>=0?'green':'red',true)}
+        ${er("IS "+Math.round(isTaxPct*100)+"% /an","− "+fmt(res.fiscalite)+' €','red')}
+        ${er("Revenus nets d'IS /an",fmt(res.revenusNets)+' €','green',true)}
+        ${er("Cumul net sur "+duration+" ans",fmt(res.cumulNets)+' €','gold',true)}
+      </div>
+      <div class="ent-block np">
+        <div class="ent-block-badge badge-np">👤 Vous — Nue-propriété</div>
+        <h4>Votre position</h4>
+        ${er("Clé NP — "+duration+" ans",Math.round(res.npPct*100)+' %')}
+        ${er("NP nécessaire",fmt(res.investNPneeded)+' €')}
+        ${res.investNPperso>0?er("Votre apport perso",fmt(res.investNPperso)+' €',res.investNPperso>=res.investNPneeded?'green':'gold',true):'<div class="ent-row" style="font-size:11px;color:var(--gris);font-style:italic;padding:6px 0">Renseignez votre cash perso à gauche pour calculer votre couverture NP</div>'}
+        ${res.npCoverage!==null&&res.npCoverage<1?er("Couverture NP",Math.round(res.npCoverage*100)+'%','red',false):''}
+        ${res.npCoverage===1?er("NP 100% financée","✅ Opération complète",'green',true):''}
+        ${er("Pendant "+duration+" ans","Aucun revenu — pas de fiscalité ❌")}
+        ${er("Au terme","Récupère la PP ✅",null)}
+        ${er("Valeur PP",fmt(res.ppVal)+' €','gold',true)}
+        ${er("Rente brute /mois",fmt(res.renteTermeGross)+' €/mois')}
+        ${er("Rente nette estimée /mois",fmt(res.renteTermeNet)+' €/mois','green',true)}
+      </div>
+    </div>
+
+    <!-- GAIN BOX -->
+    <div class="ent-gain-box fade-in">
+      <div class="ent-gain-left">
+        <div class="ent-gain-label">Gain net de l'opération (société)</div>
+        <div class="ent-gain-title">${fmt(res.cumulNets)} € cumulés − ${fmt(res.investUS)} € investis</div>
+        <div class="ent-gain-sub">Revenus nets d'IS sur ${duration} ans : ${fmt(res.revenusNets)} €/an</div>
+      </div>
+      <div class="ent-gain-right">
+        <div class="ent-gain-roi" style="color:${res.gainNet>=0?'var(--ambre)':'#E07070'}">${res.gainNet>=0?'+':''}${fmt(res.gainNet)} €</div>
+        <div class="ent-gain-roi-label">ROI : ${res.gainNet>=0?'+':''}${res.roi.toFixed(1)} % sur ${duration} ans</div>
+      </div>
+    </div>
+
+    <!-- IS BREAKDOWN -->
+    <div class="ent-is-box fade-in">
+      <div class="ent-is-title">Synthèse IS <span class="is-pill">IS ${Math.round(isTaxPct*100)}%</span></div>
+      <div class="is-calc-grid">
+        <div class="is-calc-item"><div class="is-calc-label">Revenus bruts annuels</div><div class="is-calc-val gold">${fmt(res.revenusAnnuels)} €</div></div>
+        <div class="is-calc-item"><div class="is-calc-label">Amortissement annuel</div><div class="is-calc-val">${fmt(res.amortissement)} €</div></div>
+        <div class="is-calc-item"><div class="is-calc-label">Résultat imposable /an</div><div class="is-calc-val ${res.resultatNet>=0?'gold':'red'}">${res.resultatNet>=0?'+':''}${fmt(res.resultatNet)} €</div></div>
+        <div class="is-calc-item"><div class="is-calc-label">IS supplémentaire /an</div><div class="is-calc-val red">${fmt(res.fiscalite)} €</div></div>
+        <div class="is-calc-item"><div class="is-calc-label">Revenus nets d'IS /an</div><div class="is-calc-val green">${fmt(res.revenusNets)} €</div></div>
+        <div class="is-calc-item"><div class="is-calc-label">Total net sur ${duration} ans</div><div class="is-calc-val green">${fmt(res.cumulNets)} €</div></div>
+      </div>
+    </div>
+
+    ${renderStatsGridHTML(s)}`;
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────
+
+function er(label,val,col,highlight){
+  const colorClass=col?` class="ent-row-val ${col}"`:'class="ent-row-val"';
+  return `<div class="ent-row${highlight?' highlight':''}"><span class="ent-row-label">${label}</span><span ${colorClass}>${val}</span></div>`;
+}
+
+function nprow(label,val,extra,col){
+  const vc=col?` class="np-row-v ${col}"`:' class="np-row-v"';
+  return`<div class="np-row"><span class="np-row-l">${label}</span><span${vc}>${val}</span></div>`;
+}
+
+function sr(label,val,col){
+  return`<div class="stat-row"><span class="stat-l">${label}</span><span class="stat-v" ${col?`style="color:${col}"`:''}>${val}</span></div>`;
+}
+
+function renderStatsGridHTML(s){
+  if(s.isCustom) return `<div class="stat-block" style="grid-column:span 2;background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:14px;padding:20px 24px"><div class="stat-block-title" style="color:var(--ambre-d)">Mode taux personnalisé</div><p style="font-size:13px;color:var(--gris-f);font-weight:300;line-height:1.7">Vous utilisez un taux de distribution manuel. Les statistiques détaillées (valorisation, TOF, géographie) ne sont pas disponibles en mode taux manuel. Sélectionnez une SCPI de la gamme pour accéder aux données complètes.</p></div>`;
+  const assetBars=Object.entries(s.assetTypes).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--ambre)"></div></div></div>`).join('');
+  const geoBars=Object.entries(s.geography).slice(0,6).map(([n,p])=>`<div class="prog-wrap"><div class="prog-label"><span>${n}</span><span>${Math.round(p*100)}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${p*100}%;background:var(--blue)"></div></div></div>`).join('');
+  return`<div class="stats-grid fade-in">
+    <div class="stat-block">
+      <div class="stat-block-title">Chiffres clés 2025</div>
+      ${sr('Capitalisation',s.capi+'M€')}
+      ${sr('Collecte nette 2025',s.collecteNet2025+'M€',s.collecteNet2025<0?'var(--red)':null)}
+      ${sr('Retraits 2025',s.retraits2025+'M€',s.retraits2025>40?'var(--red)':null)}
+      ${sr('Parts en attente',s.partsAttente+'M€',s.partsAttente>0?'var(--red)':'var(--green)')}
+      ${s.tof?sr('TOF',(s.tof*100).toFixed(1)+'%',s.tof<0.9?'var(--red)':'var(--green)'):sr('TOF','N/D')}
+      ${s.leverage?sr('Effet de levier',(s.leverage*100).toFixed(1)+'%'):sr('Effet de levier','N/D')}
+      ${sr('Nombre d\'actifs',s.assets||'N/D')}
+      ${s.tenants?sr('Locataires',s.tenants.toLocaleString('fr-FR')):sr('Locataires','N/D')}
+      ${s.sqm?sr('Surface',s.sqm.toLocaleString('fr-FR')+' m²'):sr('Surface','N/D')}
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-title">Valorisation</div>
+      ${s.valeurRealisation?sr('Val. de réalisation',fmt(s.valeurRealisation)+' €'):sr('Val. de réalisation','N/D')}
+      ${s.valeurReconstitution?sr('Val. de reconstitution',fmt(s.valeurReconstitution)+' €'):sr('Val. de reconstitution','N/D')}
+      ${s.decote!=null?sr('Décote / Surcote',(s.decote>=0?'+':'')+(s.decote*100).toFixed(1)+'%',s.decote>=0?'var(--green)':'var(--red)'):sr('Décote / Surcote','N/D')}
+      ${sr('Prix de retrait',fmt(s.price*0.9)+' €')}
+      ${sr('Catégorie',s.theme)}
+      ${sr('Durabilité',s.durabilite)}
+      ${sr('SRI',s.sri+' / 7')}
+      ${s.isr?sr('Label ISR','✓ Labellisée','var(--green)'):sr('Label ISR','Non')}
+    </div>
+    <div class="stat-block"><div class="stat-block-title">Répartition des actifs</div>${assetBars}</div>
+    <div class="stat-block"><div class="stat-block-title">Répartition géographique</div>${geoBars}</div>
+  </div>`;
+}
+
+function renderBarNP(res){
+  if(chartInstance)chartInstance.destroy();
+  const ctx=document.getElementById('mainChart').getContext('2d');
+  chartInstance=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Pleine Propriété — '+fmt(res.ppVal)+' €'],
+      datasets:[
+        {label:'Nue-Propriété '+Math.round(res.npPct*100)+'% — '+fmt(res.actual)+' €',data:[res.actual],backgroundColor:'#F0A738',borderRadius:6,borderSkipped:false},
+        {label:'Usufruit '+Math.round(res.usPct*100)+'% — '+fmt(res.ppVal-res.actual)+' €',data:[res.ppVal-res.actual],backgroundColor:'#EDE8DF',borderRadius:6,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:'Inter',size:11},padding:14}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label}}
+      },
+      scales:{
+        x:{stacked:true,min:0,ticks:{callback:v=>fmt(v)+' €',font:{family:'Inter',size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{stacked:true,display:false}
+      }
+    }
+  });
+  document.getElementById('chartLegend').innerHTML='';
+}
+
+function renderChart(labels,datasets){
+  if(chartInstance)chartInstance.destroy();
+  chartInstance=new Chart(document.getElementById('mainChart').getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:datasets.map(d=>({label:d.label,data:d.data,borderColor:d.color,backgroundColor:d.color+'18',fill:true,tension:0.4,borderWidth:2.5,pointRadius:3,pointHoverRadius:7,pointBackgroundColor:d.color}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:var_='rgba(13,13,13,0.92)',borderColor:'rgba(240,167,56,0.3)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:12,callbacks:{label:ctx=>ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10},callback:v=>fmt(v)+' €'}}}}
+  });
+  document.getElementById('chartLegend').innerHTML=datasets.map(d=>`<span><span class="leg-dot" style="background:${d.color}"></span>${d.label}</span>`).join('');
+}
+
+function fmt(n){return Math.round(n).toLocaleString('fr-FR')}
+init();
+function setScpiTMI(val, btn) {
+  document.getElementById('ret-tmi').value = val;
+  document.querySelectorAll('.tmi-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
