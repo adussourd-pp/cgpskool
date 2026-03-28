@@ -36,8 +36,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-fi
 .nav-tab:hover{color:var(--blanc);background:rgba(255,255,255,0.06)}
 .nav-tab.active{color:var(--ambre);font-weight:600}
 .nav-right{display:flex;align-items:center;gap:10px}
-.nav-btn{background:var(--ambre);color:var(--noir);font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 18px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s}
-.nav-btn:hover{background:var(--ambre-d);color:var(--blanc)}
+.nav-btn{background:transparent;color:var(--orange);font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 18px;border-radius:5px;border:1px solid var(--orange);cursor:pointer;transition:all 0.2s}
+.nav-btn:hover{background:var(--orange);color:#fff}
 .nav-btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6)}
 .nav-btn.outline:hover{border-color:var(--ambre);color:var(--ambre);background:transparent}
 
@@ -84,7 +84,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-fi
 
 /* INPUTS */
 .input-group{margin-bottom:16px}
-.input-label{font-size:12px;font-weight:500;color:var(--gris-f);margin-bottom:7px;display:block}
+.input-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px;display:block}
 .input-row{display:flex;align-items:center;background:var(--blanc);border:1.5px solid var(--bord);border-radius:8px;overflow:hidden;transition:border-color 0.2s}
 .input-row:focus-within{border-color:var(--ambre)}
 .input-row input{flex:1;background:transparent;border:none;outline:none;padding:10px 13px;color:var(--noir);font-family:var(--sans);font-size:15px;font-weight:500}
@@ -101,8 +101,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .tmi-pill.active{background:var(--orange);color:#fff;border-color:var(--orange)}
 
 /* CTA */
-.sim-btn{width:100%;padding:14px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:4px}
-.sim-btn:hover{background:var(--ambre-d);color:var(--blanc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,131,42,0.25)}
+.sim-btn{width:100%;padding:12px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:4px;box-shadow:0 4px 14px rgba(212,98,42,0.2)}
+.sim-btn:hover{background:var(--orange-hover);color:#fff}
 .divider{height:1px;background:var(--bord);margin:20px 0}
 
 /* ── MAIN CONTENT ── */
@@ -470,6 +470,16 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 </div>
 
 <script>
+// Chart.js : tooltips style light (pas de bulle noire)
+Chart.defaults.plugins.tooltip.backgroundColor='rgba(255,255,255,0.95)';
+Chart.defaults.plugins.tooltip.titleColor='#181614';
+Chart.defaults.plugins.tooltip.bodyColor='#181614';
+Chart.defaults.plugins.tooltip.borderColor='rgba(24,22,20,0.1)';
+Chart.defaults.plugins.tooltip.borderWidth=1;
+Chart.defaults.plugins.tooltip.cornerRadius=8;
+Chart.defaults.plugins.tooltip.padding=10;
+Chart.defaults.plugins.tooltip.titleFont={family:'Inter',size:12,weight:'600'};
+Chart.defaults.plugins.tooltip.bodyFont={family:'Inter',size:11};
 // ─── SCPI DATA ────────────────────────────────────────────────────
 const SCPI_DATA=[
 {id:'eurovalys',name:'Eurovalys',manager:'ADVENIS',theme:'Bureaux',geo:'Allemagne',price:960,yieldGross:0.055,yieldNet:0.04125,capi:950.97,collecteNet2025:0,retraits2025:16.78,partsAttente:6.14,tof:0.901,leverage:0.3592,isr:false,sri:4,durabilite:'Article 8',valeurRealisation:749.03,valeurReconstitution:961.23,decote:-0.0013,assets:36,tenants:195,sqm:454450,geography:{'Allemagne':1.0},assetTypes:{'Bureaux':0.84,'Commerces':0.02,'Production':0.09,'Autres':0.03}},
