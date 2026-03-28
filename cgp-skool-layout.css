@@ -1,0 +1,100 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  CGP SKOOL — LAYOUT PARTAGÉ                                 ║
+ * ║  Sidebar + Page A4 + Boutons + Cards + Print                ║
+ * ║  Usage : <link rel="stylesheet" href="cgp-skool-layout.css">║
+ * ║  Requiert : cgp-skool-theme.css (variables)                 ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
+
+/* ── BODY ── */
+body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-smoothing:antialiased;margin:0}
+
+/* ── NAV ── */
+.cs-nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
+.cs-nav-inner{max-width:1380px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:54px}
+.cs-nav-logo{font-family:var(--sans);font-size:17px;font-weight:700;color:#fff;text-decoration:none;letter-spacing:0.01em}
+.cs-nav-logo span{color:var(--orange)}
+.cs-nav-links{display:flex;gap:3px}
+.cs-nav-link{font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 14px;border-radius:5px;transition:all 0.2s}
+.cs-nav-link:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.cs-nav-link.active{color:var(--orange);font-weight:600}
+
+/* ── APP LAYOUT ── */
+.cs-app{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 54px)}
+
+/* ── SIDEBAR ── */
+.cs-sidebar{background:var(--paper);border-right:1px solid var(--rule-l);padding:24px 20px;overflow-y:auto;position:sticky;top:54px;height:calc(100vh - 54px);box-sizing:border-box;display:flex;flex-direction:column;gap:0}
+.cs-sidebar-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);padding:12px 0 6px}
+.cs-sidebar-section{margin-bottom:14px}
+
+/* ── MAIN (zone A4) ── */
+.cs-main{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:24px}
+.cs-page{background:#fff;border:1px solid var(--rule-l);border-radius:4px;padding:40px;max-width:794px;width:100%;min-height:400px;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative;box-sizing:border-box}
+
+/* ── CARDS ── */
+.cs-card{background:#fff;border:1.5px solid var(--rule-l);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.cs-card-title{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.cs-card-title .cs-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+
+/* ── BOUTONS ── */
+.cs-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 18px;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;text-decoration:none}
+.cs-btn-primary{background:var(--orange);color:#fff;border-color:var(--orange)}
+.cs-btn-primary:hover{background:var(--orange-hover)}
+.cs-btn-secondary{background:#fff;color:var(--ink);border-color:var(--rule-l)}
+.cs-btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.cs-btn-success{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* ── INPUTS ── */
+.cs-input{width:100%;padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;box-sizing:border-box}
+.cs-input:focus{border-color:var(--orange)}
+.cs-select{padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.cs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-60);display:block;margin-bottom:4px}
+
+/* ── TABLES ── */
+.cs-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.cs-tbl thead th{text-align:left;padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-60);background:var(--paper);border-bottom:1px solid var(--rule-l)}
+.cs-tbl tbody tr{border-bottom:1px solid var(--rule-l);transition:background 0.1s}
+.cs-tbl tbody tr:hover{background:var(--o-dim)}
+.cs-tbl td{padding:8px 14px;color:var(--ink-60)}
+.cs-tbl .right{text-align:right}
+.cs-tbl .bold{font-weight:600;color:var(--ink)}
+.cs-tbl .total-row{background:var(--paper);border-top:2px solid var(--rule-l)}
+.cs-tbl .total-row td{font-weight:700;color:var(--ink)}
+
+/* ── FISCAL ROW (label + value) ── */
+.cs-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--rule-l)}
+.cs-row-l{font-size:12px;color:var(--ink-60)}
+.cs-row-v{font-size:12px;font-weight:600;color:var(--ink)}
+
+/* ── BADGES ── */
+.cs-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.05em}
+.cs-badge-orange{background:var(--o-dim);color:var(--orange)}
+.cs-badge-green{background:var(--green-l);color:var(--green)}
+.cs-badge-blue{background:var(--blue-l);color:var(--blue)}
+.cs-badge-red{background:var(--red-l);color:var(--red)}
+.cs-badge-gray{background:var(--paper);color:var(--ink-60)}
+
+/* ── KPI ── */
+.cs-kpi{padding:14px 16px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px}
+.cs-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:4px}
+.cs-kpi-val{font-size:18px;font-weight:700;color:var(--ink)}
+
+/* ── EXPORT PDF ── */
+@media print{
+  body{background:#fff!important}
+  .cs-nav,.cs-sidebar,.cs-btn,.cs-nav-actions{display:none!important}
+  .cs-app{display:block!important}
+  .cs-main{padding:0!important;max-width:100%!important}
+  .cs-page{border:none!important;box-shadow:none!important;border-radius:0!important;padding:20px!important;max-width:100%!important;min-height:auto!important;margin:0!important}
+  .cs-card{break-inside:avoid}
+  canvas{max-width:100%!important}
+  @page{size:A4 portrait;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .cs-app{grid-template-columns:1fr}
+  .cs-sidebar{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--rule-l)}
+}
