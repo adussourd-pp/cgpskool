@@ -63,12 +63,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- NAV -->
 <nav class="cs-nav">
   <div class="cs-nav-inner">
-    <a href="index.html" class="cs-nav-logo">CGP <span>Skool</span></a>
-    <div class="cs-nav-links">
-      <a href="etude-dossier.html" class="cs-nav-link">&#201;tude de dossier</a>
-      <a href="scpi-simulator.html" class="cs-nav-link">SCPI Cash</a>
-      <a href="simulateur-avance-av.html" class="cs-nav-link active">Avance AV</a>
-      <a href="per-vs-av.html" class="cs-nav-link">PER vs AV</a>
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
     </div>
   </div>
 </nav>
@@ -123,8 +124,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   <div id="blocSCPI" style="display:none">
     <div class="cs-card">
       <div class="cs-card-title"><span class="cs-dot"></span>Choix de la SCPI</div>
+      <div style="font-size:11px;color:var(--ink-60);margin-bottom:8px">S&#233;lectionnez une SCPI ou ajustez le rendement manuellement ci-dessous</div>
       <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:10px">
       <div class="scpi-list" id="scpiList"></div>
+      <div style="text-align:center;margin-top:6px"><button onclick="selectedSCPIIdx=-1;renderSCPIList('');calc()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans)">&#10005; D&#233;s&#233;lectionner &#8212; taux personnalis&#233;</button></div>
       <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="slider-group" style="margin-bottom:0">
           <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
