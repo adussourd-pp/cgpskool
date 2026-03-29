@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool &#8212; Avance sur Assurance Vie</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<style>
+.slider-group{margin-bottom:20px}
+.slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.slider-label{font-size:12px;font-weight:600;color:var(--ink)}
+.slider-val{font-size:18px;font-weight:700;color:var(--orange);font-family:var(--sans)}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:rgba(212,98,42,0.2);border-radius:3px;outline:none;margin:8px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.kpi-grid.four{grid-template-columns:repeat(4,1fr)}
+.kpi-box{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:14px 16px;text-align:center}
+.kpi-box-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-60);margin-bottom:4px}
+.kpi-box-val{font-size:20px;font-weight:700;color:var(--ink)}
+.kpi-box-val.green{color:var(--green)}
+.kpi-box-val.red{color:var(--red)}
+.kpi-box-val.orange{color:var(--orange)}
+.toggle-row{display:flex;align-items:center;gap:12px;padding:16px 0;border-top:1px solid var(--rule-l);border-bottom:1px solid var(--rule-l);margin:24px 0}
+.toggle-label{font-size:14px;font-weight:600;color:var(--ink);flex:1}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--rule-l);border-radius:24px;transition:0.2s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s}
+.toggle-switch input:checked+.toggle-slider{background:var(--orange)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(20px)}
+.scpi-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:240px;overflow-y:auto;margin:12px 0}
+.scpi-item{padding:10px 12px;border:1.5px solid var(--rule-l);border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff}
+.scpi-item:hover{border-color:var(--orange)}
+.scpi-item.selected{border-color:var(--orange);background:rgba(212,98,42,0.06)}
+.scpi-item-name{font-size:12px;font-weight:600;color:var(--ink)}
+.scpi-item-mgr{font-size:10px;color:var(--ink-60)}
+.scpi-item-yield{font-size:13px;font-weight:700;color:var(--orange);float:right}
+.pedagogy{background:var(--paper);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:12px 16px;margin:16px 0;font-size:12px;color:var(--ink-60);line-height:1.7}
+.bilan-box{background:rgba(212,98,42,0.04);border:1.5px solid rgba(212,98,42,0.15);border-radius:12px;padding:20px;margin:24px 0}
+.bilan-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:12px}
+.bilan-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+.bilan-row-l{color:var(--ink-60)}
+.bilan-row-v{font-weight:600;color:var(--ink)}
+.bilan-row-v.green{color:var(--green)}
+.bilan-row-v.red{color:var(--red)}
+.bilan-total{border-top:2px solid rgba(212,98,42,0.3);padding-top:10px;margin-top:6px}
+.bilan-total .bilan-row-l{font-weight:700;color:var(--ink)}
+.bilan-total .bilan-row-v{font-size:18px}
+.disclaimer{font-size:11px;color:var(--ink-30);line-height:1.7;margin-top:30px;padding-top:16px;border-top:1px solid var(--rule-l)}
+@media print{
+  .cs-nav,.no-print{display:none!important}
+  body{background:#fff}
+  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
+  @page{size:A4;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+<script>const CTA_URL='https://calendly.com';</script>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a href="index.html" class="cs-nav-logo">CGP <span>Skool</span></a>
+    <div class="cs-nav-links">
+      <a href="etude-dossier.html" class="cs-nav-link">&#201;tude de dossier</a>
+      <a href="scpi-simulator.html" class="cs-nav-link">SCPI Cash</a>
+      <a href="simulateur-avance-av.html" class="cs-nav-link active">Avance AV</a>
+      <a href="per-vs-av.html" class="cs-nav-link">PER vs AV</a>
+    </div>
+  </div>
+</nav>
+
+<div style="padding:28px 32px;display:flex;justify-content:center">
+<div class="cs-page" style="max-width:794px">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:32px">
+    <div style="font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)">Avance sur Assurance Vie</div>
+    <div style="font-size:14px;color:var(--ink-60);margin-top:6px">Obtenez des liquidit&#233;s sans racheter votre contrat</div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="cs-card">
+    <div class="cs-card-title"><span class="cs-dot"></span>Votre contrat</div>
+
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Valeur du contrat</span><span class="slider-val" id="vContratVal">40 000 &#8364;</span></div>
+      <input type="range" id="vContrat" min="10000" max="500000" step="5000" value="40000" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Rendement AV</span><span class="slider-val" id="vRendAVVal">4.5%</span></div>
+      <input type="range" id="vRendAV" min="1.5" max="9" step="0.5" value="4.5" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Taux avance estim&#233;</span><span class="slider-val" id="vTauxAvVal">3%</span></div>
+      <input type="range" id="vTauxAv" min="2" max="4" step="0.25" value="3" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Dur&#233;e souhait&#233;e</span><span class="slider-val" id="vDureeVal">3 ans</span></div>
+      <input type="range" id="vDuree" min="1" max="6" step="1" value="3" oninput="calc()">
+    </div>
+  </div>
+
+  <!-- RESULTATS AVANCE SEULE -->
+  <div class="kpi-grid" id="kpiAvance">
+    <div class="kpi-box"><div class="kpi-box-label">Avance disponible</div><div class="kpi-box-val orange" id="kAvance">0 &#8364;</div></div>
+    <div class="kpi-box"><div class="kpi-box-label">Int&#233;r&#234;ts cumul&#233;s</div><div class="kpi-box-val red" id="kInterets">0 &#8364;</div></div>
+    <div class="kpi-box"><div class="kpi-box-label">Contrat r&#233;siduel</div><div class="kpi-box-val green" id="kResiduel">0 &#8364;</div></div>
+  </div>
+
+  <div class="pedagogy">Vous n'avez rien &#224; rembourser activement. &#192; l'&#233;ch&#233;ance, l'assureur d&#233;duit la dette directement de votre contrat. Votre contrat continue de fructifier pendant toute la dur&#233;e de l'avance.</div>
+
+  <!-- TOGGLE SCPI -->
+  <div class="toggle-row">
+    <span class="toggle-label">Je veux que l'avance s'autofinance via des SCPI</span>
+    <label class="toggle-switch"><input type="checkbox" id="toggleSCPI" onchange="calc()"><span class="toggle-slider"></span></label>
+  </div>
+
+  <!-- BLOC SCPI -->
+  <div id="blocSCPI" style="display:none">
+    <div class="cs-card">
+      <div class="cs-card-title"><span class="cs-dot"></span>Choix de la SCPI</div>
+      <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:10px">
+      <div class="scpi-list" id="scpiList"></div>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="slider-group" style="margin-bottom:0">
+          <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
+          <input type="range" id="vRendSCPI" min="4" max="10" step="0.5" value="6" oninput="calc()">
+        </div>
+        <div class="slider-group" style="margin-bottom:0">
+          <div class="slider-header"><span class="slider-label">Revalorisation parts</span><span class="slider-val" id="vRevaloVal">1%</span></div>
+          <input type="range" id="vRevalo" min="0" max="3" step="0.5" value="1" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-grid four" id="kpiSCPI">
+      <div class="kpi-box"><div class="kpi-box-label">SCPI achet&#233;es</div><div class="kpi-box-val orange" id="kSCPI">0 &#8364;</div></div>
+      <div class="kpi-box"><div class="kpi-box-label">Loyers /mois</div><div class="kpi-box-val" id="kLoyers">0 &#8364;</div></div>
+      <div class="kpi-box"><div class="kpi-box-label">Loyers cumul&#233;s</div><div class="kpi-box-val" id="kLoyersCum">0 &#8364;</div></div>
+      <div class="kpi-box"><div class="kpi-box-label">Gain net</div><div class="kpi-box-val green" id="kGain">0 &#8364;</div></div>
+    </div>
+
+    <div class="pedagogy">Les loyers SCPI couvrent partiellement ou totalement le co&#251;t de l'avance. La revalorisation des parts SCPI augmente votre patrimoine dans le temps. Votre avance est ainsi auto-financ&#233;e.</div>
+  </div>
+
+  <!-- BILAN -->
+  <div class="bilan-box" id="bilanBox"></div>
+
+  <!-- TABLEAU -->
+  <div style="margin:24px 0;overflow-x:auto">
+    <table class="cs-tbl" id="tableau">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;padding:24px 0;border-top:1px solid var(--rule-l)">
+    <div style="font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:12px">Vous souhaitez &#233;tudier cette strat&#233;gie ?</div>
+    <a class="cs-btn cs-btn-primary" onclick="window.open(CTA_URL,'_blank')" style="padding:12px 32px;font-size:14px;cursor:pointer">Prendre rendez-vous &#8594;</a>
+  </div>
+
+  <!-- BOUTON EXPORT -->
+  <div class="no-print" style="text-align:center;margin-top:16px">
+    <button class="cs-btn cs-btn-success" onclick="window.print()">&#11015; Exporter PDF</button>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">Ce simulateur est fourni &#224; titre informatif et p&#233;dagogique uniquement. Il ne constitue pas un conseil en investissement. Les rendements pass&#233;s ne pr&#233;jugent pas des rendements futurs. Consultez un conseiller patrimonial pour une analyse personnalis&#233;e.</div>
+
+</div>
+</div>
+
+<script>
+var SCPI_DATA=[
+{name:'Eurovalys',manager:'ADVENIS',yieldGross:0.055,price:960,theme:'Bureaux'},
+{name:'Activimmo',manager:'ALD\u00c9RAN',yieldGross:0.0552,price:610,theme:'Logistique'},
+{name:'Com\u00e8te',manager:'ALD\u00c9RAN',yieldGross:0.1118,price:250,theme:'Diversifi\u00e9'},
+{name:'Alta Convictions',manager:'ALTAREA IM',yieldGross:0.065,price:308,theme:'Diversifi\u00e9'},
+{name:'Epargne Pierre Europe',manager:'ATLAND VOISIN',yieldGross:0.0675,price:200,theme:'Europe'},
+{name:'Epargne Pierre',manager:'ATLAND VOISIN',yieldGross:0.0528,price:208,theme:'France'},
+{name:'Atream H\u00f4tels',manager:'ATREAM',yieldGross:0.065,price:1000,theme:'H\u00f4tellerie'},
+{name:'Transitions Europe',manager:'ARKEA REIM',yieldGross:0.0825,price:202,theme:'Diversifi\u00e9'},
+{name:'Corum Eurion',manager:'CORUM',yieldGross:0.065,price:215,theme:'Europe'},
+{name:'Corum Origin',manager:'CORUM',yieldGross:0.073,price:1135,theme:'Europe'},
+{name:'LF Avenir Sant\u00e9',manager:'LA FRAN\u00c7AISE',yieldGross:0.0933,price:300,theme:'Sant\u00e9'},
+{name:'Osmo Energie',manager:'MATA CAPITAL',yieldGross:0.0933,price:300,theme:'Diversifi\u00e9'},
+{name:'NCAP R\u00e9gions',manager:'NORMA CAPITAL',yieldGross:0.0601,price:682,theme:'France'},
+{name:'Immorente',manager:'SOFIDY',yieldGross:0.0572,price:340,theme:'Diversifi\u00e9'},
+{name:'Sofidy Europe Invest',manager:'SOFIDY',yieldGross:0.065,price:235,theme:'Europe'}
+];
+var selectedSCPIIdx=-1;
+
+function fmt(n){return Math.round(n).toLocaleString('fr-FR');}
+
+function renderSCPIList(filter){
+  var el=document.getElementById('scpiList');
+  var h='';
+  SCPI_DATA.forEach(function(s,i){
+    if(filter&&s.name.toLowerCase().indexOf(filter.toLowerCase())<0&&s.manager.toLowerCase().indexOf(filter.toLowerCase())<0)return;
+    var sel=i===selectedSCPIIdx;
+    h+='<div class="scpi-item'+(sel?' selected':'')+'" onclick="selectSCPI('+i+')">';
+    h+='<span class="scpi-item-yield">'+(s.yieldGross*100).toFixed(2)+'%</span>';
+    h+='<div class="scpi-item-name">'+s.name+'</div>';
+    h+='<div class="scpi-item-mgr">'+s.manager+' \u2014 '+s.theme+'</div>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+function filterSCPI(v){renderSCPIList(v);}
+function selectSCPI(i){
+  selectedSCPIIdx=i;
+  document.getElementById('vRendSCPI').value=(SCPI_DATA[i].yieldGross*100).toFixed(1);
+  renderSCPIList('');
+  calc();
+}
+
+function calc(){
+  var contrat=+document.getElementById('vContrat').value;
+  var rendAV=+document.getElementById('vRendAV').value/100;
+  var tauxAv=+document.getElementById('vTauxAv').value/100;
+  var duree=+document.getElementById('vDuree').value;
+  var scpiOn=document.getElementById('toggleSCPI').checked;
+  var rendSCPI=+document.getElementById('vRendSCPI').value/100;
+  var revalo=+document.getElementById('vRevalo').value/100;
+
+  // Affichage valeurs sliders
+  document.getElementById('vContratVal').textContent=fmt(contrat)+' \u20ac';
+  document.getElementById('vRendAVVal').textContent=(rendAV*100).toFixed(1)+'%';
+  document.getElementById('vTauxAvVal').textContent=(tauxAv*100).toFixed(2)+'%';
+  document.getElementById('vDureeVal').textContent=duree+' an'+(duree>1?'s':'');
+  document.getElementById('vRendSCPIVal').textContent=(rendSCPI*100).toFixed(1)+'%';
+  document.getElementById('vRevaloVal').textContent=(revalo*100).toFixed(1)+'%';
+
+  // Calculs
+  var avance=Math.round(contrat*0.60);
+  var detteTerm=Math.round(avance*Math.pow(1+tauxAv,duree));
+  var interets=detteTerm-avance;
+  var contratTerm=Math.round(contrat*Math.pow(1+rendAV,duree));
+  var residuel=contratTerm-detteTerm;
+
+  // KPI avance
+  document.getElementById('kAvance').textContent=fmt(avance)+' \u20ac';
+  document.getElementById('kInterets').textContent=fmt(interets)+' \u20ac';
+  document.getElementById('kResiduel').textContent=fmt(residuel)+' \u20ac';
+  document.getElementById('kResiduel').className='kpi-box-val '+(residuel>=0?'green':'red');
+
+  // SCPI
+  document.getElementById('blocSCPI').style.display=scpiOn?'':'none';
+  var loyersAn=Math.round(avance*rendSCPI);
+  var loyersMois=Math.round(loyersAn/12);
+  var loyersCum=loyersAn*duree;
+  var scpiTerm=Math.round(avance*Math.pow(1+revalo,duree));
+  var gainNet=loyersCum-interets;
+  var gainPatrimonial=residuel+scpiTerm+loyersCum-contrat;
+
+  if(scpiOn){
+    document.getElementById('kSCPI').textContent=fmt(avance)+' \u20ac';
+    document.getElementById('kLoyers').textContent=fmt(loyersMois)+' \u20ac';
+    document.getElementById('kLoyersCum').textContent=fmt(loyersCum)+' \u20ac';
+    document.getElementById('kGain').textContent=fmt(gainNet)+' \u20ac';
+    document.getElementById('kGain').className='kpi-box-val '+(gainNet>=0?'green':'red');
+  }
+
+  // Bilan
+  var bh='<div class="bilan-title">Bilan \u00e0 '+duree+' an'+(duree>1?'s':'')+'</div>';
+  bh+='<div class="bilan-row"><span class="bilan-row-l">Valeur contrat \u00e0 terme</span><span class="bilan-row-v">'+fmt(contratTerm)+' \u20ac</span></div>';
+  bh+='<div class="bilan-row"><span class="bilan-row-l">Dette \u00e0 rembourser</span><span class="bilan-row-v red">-'+fmt(detteTerm)+' \u20ac</span></div>';
+  bh+='<div class="bilan-row"><span class="bilan-row-l">Contrat r\u00e9siduel</span><span class="bilan-row-v '+(residuel>=0?'green':'red')+'">'+fmt(residuel)+' \u20ac</span></div>';
+  if(scpiOn){
+    bh+='<div style="border-top:1px solid var(--rule-l);margin:8px 0"></div>';
+    bh+='<div class="bilan-row"><span class="bilan-row-l">Valeur SCPI \u00e0 terme</span><span class="bilan-row-v">'+fmt(scpiTerm)+' \u20ac</span></div>';
+    bh+='<div class="bilan-row"><span class="bilan-row-l">Loyers cumul\u00e9s</span><span class="bilan-row-v green">+'+fmt(loyersCum)+' \u20ac</span></div>';
+    bh+='<div class="bilan-row"><span class="bilan-row-l">Int\u00e9r\u00eats avance</span><span class="bilan-row-v red">-'+fmt(interets)+' \u20ac</span></div>';
+    bh+='<div class="bilan-total"><div class="bilan-row"><span class="bilan-row-l">Gain patrimonial total</span><span class="bilan-row-v '+(gainPatrimonial>=0?'green':'red')+'">'+( gainPatrimonial>=0?'+':'')+fmt(gainPatrimonial)+' \u20ac</span></div></div>';
+  } else {
+    bh+='<div class="bilan-total"><div class="bilan-row"><span class="bilan-row-l">Croissance du contrat</span><span class="bilan-row-v green">+'+fmt(contratTerm-contrat-interets)+' \u20ac</span></div></div>';
+  }
+  document.getElementById('bilanBox').innerHTML=bh;
+
+  // Tableau ann\u00e9e par ann\u00e9e
+  var thead='<tr><th>Ann\u00e9e</th><th class="right">Valeur contrat</th><th class="right">Dette cumul\u00e9e</th><th class="right">R\u00e9siduel</th>';
+  if(scpiOn)thead+='<th class="right">Valeur SCPI</th><th class="right">Loyers cumul\u00e9s</th><th class="right">Gain net</th>';
+  thead+='</tr>';
+  var tbody='';
+  for(var y=1;y<=duree;y++){
+    var vc=Math.round(contrat*Math.pow(1+rendAV,y));
+    var dc=Math.round(avance*Math.pow(1+tauxAv,y));
+    var res=vc-dc;
+    tbody+='<tr><td>'+y+'</td><td class="right bold">'+fmt(vc)+' \u20ac</td><td class="right" style="color:var(--red)">'+fmt(dc)+' \u20ac</td><td class="right" style="color:'+(res>=0?'var(--green)':'var(--red)')+'">'+fmt(res)+' \u20ac</td>';
+    if(scpiOn){
+      var vs=Math.round(avance*Math.pow(1+revalo,y));
+      var lc=loyersAn*y;
+      var gn=lc-(dc-avance);
+      tbody+='<td class="right">'+fmt(vs)+' \u20ac</td><td class="right" style="color:var(--green)">'+fmt(lc)+' \u20ac</td><td class="right" style="color:'+(gn>=0?'var(--green)':'var(--red)')+'">'+fmt(gn)+' \u20ac</td>';
+    }
+    tbody+='</tr>';
+  }
+  document.getElementById('tableau').querySelector('thead').innerHTML=thead;
+  document.getElementById('tableau').querySelector('tbody').innerHTML=tbody;
+}
+
+// Init
+renderSCPIList('');
+calc();
+</script>
+</body>
+</html>
