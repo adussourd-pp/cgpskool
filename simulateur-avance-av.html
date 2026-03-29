@@ -161,15 +161,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     </table>
   </div>
 
-  <!-- CTA -->
-  <div style="text-align:center;padding:24px 0;border-top:1px solid var(--rule-l)">
-    <div style="font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:12px">Vous souhaitez &#233;tudier cette strat&#233;gie ?</div>
-    <a class="cs-btn cs-btn-primary" onclick="window.open(CTA_URL,'_blank')" style="padding:12px 32px;font-size:14px;cursor:pointer">Prendre rendez-vous &#8594;</a>
-  </div>
-
-  <!-- BOUTON EXPORT -->
-  <div class="no-print" style="text-align:center;margin-top:16px">
+  <!-- ACTIONS -->
+  <div class="no-print" style="display:flex;gap:10px;justify-content:center;padding:24px 0;border-top:1px solid var(--rule-l)">
     <button class="cs-btn cs-btn-success" onclick="window.print()">&#11015; Exporter PDF</button>
+    <button class="cs-btn cs-btn-primary" onclick="sauvegarderSimu()">&#128190; Sauvegarder</button>
+    <label class="cs-btn cs-btn-secondary" style="cursor:pointer">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="chargerSimu(this)"></label>
   </div>
 
   <!-- DISCLAIMER -->
@@ -305,6 +301,45 @@ function calc(){
   }
   document.getElementById('tableau').querySelector('thead').innerHTML=thead;
   document.getElementById('tableau').querySelector('tbody').innerHTML=tbody;
+}
+
+function sauvegarderSimu(){
+  var data={
+    contrat:+document.getElementById('vContrat').value,
+    rendAV:+document.getElementById('vRendAV').value,
+    tauxAv:+document.getElementById('vTauxAv').value,
+    duree:+document.getElementById('vDuree').value,
+    scpiOn:document.getElementById('toggleSCPI').checked,
+    rendSCPI:+document.getElementById('vRendSCPI').value,
+    revalo:+document.getElementById('vRevalo').value,
+    selectedSCPI:selectedSCPIIdx,
+    date:new Date().toLocaleDateString('fr-FR')
+  };
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='avance-av_'+data.date.replace(/\//g,'-')+'.json';
+  a.click();
+}
+function chargerSimu(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      if(d.contrat)document.getElementById('vContrat').value=d.contrat;
+      if(d.rendAV)document.getElementById('vRendAV').value=d.rendAV;
+      if(d.tauxAv)document.getElementById('vTauxAv').value=d.tauxAv;
+      if(d.duree)document.getElementById('vDuree').value=d.duree;
+      if(d.scpiOn)document.getElementById('toggleSCPI').checked=true;
+      if(d.rendSCPI)document.getElementById('vRendSCPI').value=d.rendSCPI;
+      if(d.revalo!==undefined)document.getElementById('vRevalo').value=d.revalo;
+      if(d.selectedSCPI>=0){selectedSCPIIdx=d.selectedSCPI;renderSCPIList('');}
+      calc();
+    }catch(err){}
+  };
+  reader.readAsText(input.files[0]);
+  input.value='';
 }
 
 // Init
