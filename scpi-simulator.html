@@ -24,7 +24,7 @@
   --green:#2D7A5B;--green-l:#EAF5EF;--blue:#185FA5;--blue-l:#EDF2FB;
   --red:#C0392B;--red-l:#FCEBEB;
 }
-body{font-family:var(--sans);color:var(--noir);background:var(--blanc);-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
 
 /* ── NAV ── */
 nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
@@ -42,10 +42,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-fi
 .nav-btn.outline:hover{border-color:var(--ambre);color:var(--ambre);background:transparent}
 
 /* ── LAYOUT ── */
-.app-shell{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 64px);width:100%}
+.app-shell{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 64px);width:100%}
 
 /* ── SIDEBAR ── */
-.sidebar{background:var(--gris-l);border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:360px;min-width:360px;max-width:360px;box-sizing:border-box}
+.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:300px;min-width:300px;max-width:300px;box-sizing:border-box}
 .sidebar-section{margin-bottom:2px;border-radius:8px;overflow:hidden}
 .sidebar-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:7px;cursor:pointer;padding:10px 12px;user-select:none;transition:background 0.15s,color 0.15s;border-radius:8px}
 .sidebar-label:hover{background:var(--bord);color:var(--gris-f)}
@@ -101,12 +101,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .tmi-pill.active{background:var(--orange);color:#fff;border-color:var(--orange)}
 
 /* CTA */
-.sim-btn{width:100%;padding:14px;background:var(--ambre);color:var(--noir);border:none;border-radius:8px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:4px}
-.sim-btn:hover{background:var(--ambre-d);color:var(--blanc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,131,42,0.25)}
+.sim-btn{width:100%;padding:14px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.02em;margin-top:4px}
+.sim-btn:hover{opacity:0.85}
 .divider{height:1px;background:var(--bord);margin:20px 0}
 
 /* ── MAIN CONTENT ── */
-.main-content{padding:32px 40px;background:var(--blanc);min-height:calc(100vh - 64px);min-width:0}
+.main-content{padding:28px 32px;background:#ECEAE6;min-height:calc(100vh - 64px);min-width:0;display:flex;flex-direction:column;align-items:center}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:12px}
 .empty-icon{font-size:48px;opacity:0.18}
 .empty-title{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-0.01em;color:var(--ink)}
@@ -263,8 +263,11 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 ::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
 
 @media print{
-  .sidebar,nav,.sim-btn,.nav-right{display:none!important}
-  .app-shell{grid-template-columns:1fr}
+  .sidebar,nav,.cs-nav,.sim-btn,.nav-right,.no-print{display:none!important}
+  .app-shell{display:block}
+  .main-content{padding:0}
+  @page{size:A4;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
 
@@ -441,10 +444,11 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
   <button class="sim-btn" onclick="runSimulation()">Lancer la projection →</button>
 </aside>
 <div class="main-content" id="mainContent">
+<div style="background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px;max-width:794px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative">
   <div class="empty-state" id="emptyState">
-    <div class="empty-icon" style="font-size:56px;opacity:0.5">🧑‍🚀</div>
-    <div class="empty-title">Prêt pour le décollage ?</div>
-    <div class="empty-sub">Sélectionnez une SCPI de la gamme ou saisissez un taux, configurez les paramètres et lancez la projection.</div>
+    <div class="empty-icon" style="font-size:56px;opacity:0.5">&#129489;&#8205;&#128640;</div>
+    <div class="empty-title">Pr&#234;t pour le d&#233;collage ?</div>
+    <div class="empty-sub">S&#233;lectionnez une SCPI de la gamme ou saisissez un taux, configurez les param&#232;tres et lancez la projection.</div>
   </div>
 
   <div id="results" style="display:none">
@@ -459,6 +463,22 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
     <div id="extraContent"></div>
   </div>
+
+  <!-- Pied de page conseiller -->
+  <div id="conseillerBlock" style="display:none;background:#F2F1EE;padding:20px 40px;margin:28px -40px -40px -40px">
+    <div style="display:flex;align-items:center;gap:20px">
+      <div style="flex:1">
+        <div style="font-size:16px;font-weight:700;color:var(--noir)" id="cpNom"></div>
+        <div style="font-size:11px;color:var(--gris);margin-top:2px" id="cpCabinet"></div>
+        <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--gris)" id="cpTelRow">&#9742; <span id="cpTel"></span></span>
+          <span style="font-size:11px;color:var(--gris)" id="cpEmailRow">&#9993; <span id="cpEmail"></span></span>
+        </div>
+      </div>
+      <div id="cpLogo" style="flex-shrink:0;display:flex;align-items:center"></div>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 
@@ -902,6 +922,26 @@ function setScpiTMI(val, btn) {
   document.querySelectorAll('.tmi-pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
+
+// Profil conseiller
+(function(){
+  try{
+    var raw=localStorage.getItem('cgpskool_profil_v1');
+    if(!raw)return;
+    var p=JSON.parse(raw);
+    var nom=((p.pPrenom||'')+' '+(p.pNom||'')).trim();
+    if(!nom)return;
+    document.getElementById('cpNom').textContent=nom;
+    document.getElementById('cpCabinet').textContent=p.pCabinet||'';
+    document.getElementById('cpTel').textContent=p.pTel||'';
+    document.getElementById('cpEmail').textContent=p.pEmail||'';
+    if(!p.pTel)document.getElementById('cpTelRow').style.display='none';
+    if(!p.pEmail)document.getElementById('cpEmailRow').style.display='none';
+    var logo=localStorage.getItem('cgpskool_logo');
+    if(logo)document.getElementById('cpLogo').innerHTML='<img src="'+logo+'" style="width:52px;height:52px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;border:1.5px solid var(--bord)">';
+    document.getElementById('conseillerBlock').style.display='block';
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

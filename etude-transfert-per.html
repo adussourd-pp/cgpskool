@@ -94,6 +94,8 @@
   .app{display:block}
   .main-area{padding:0}
   .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
+  .compare-card,.fee-summary,.kpi-box,.chart-box,.breakeven{border:none!important;box-shadow:none!important}
+  .compare-card.future{border:none!important}
   @page{size:A4;margin:1.5cm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
@@ -123,15 +125,27 @@
     <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
 
     <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Contrats</div>
-    <div class="sf"><label>Contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
+    <div class="sidebar-lbl">Contrat &#224; transf&#233;rer</div>
+    <div class="sf"><label>Type de contrat</label>
+      <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
+        <option value="per">PER</option>
+        <option value="perp">PERP</option>
+        <option value="madelin">Loi Madelin</option>
+        <option value="permadelin">PER "Madelin" (Art. 154 bis)</option>
+        <option value="perco">PERCO / PERCOL / PERECO</option>
+        <option value="art83">Article 83 / PERE / PERO / PEROB</option>
+        <option value="prefon">PREFON / COREM</option>
+      </select>
+    </div>
+    <div class="sf"><label>Nom du contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
     <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
 
     <div class="sidebar-divider"></div>
     <div class="sidebar-lbl">Capital &amp; Frais</div>
     <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
-    <div class="sf"><label>Anciennet&#233; du PER (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
-    <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none">&#10003; PER &gt; 5 ans : frais de transfert = 0%</div>
+    <div class="sf"><label>Anciennet&#233; du contrat (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
+    <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
+    <div id="typeInfo" style="padding:0 8px;font-size:9px;color:var(--orange);margin-bottom:6px;display:none"></div>
     <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
     <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
     <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
@@ -297,21 +311,53 @@ function getAllocB(){
 }
 function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
 
+// Matrice des types de contrats
+var TYPE_RULES={
+  per:       {label:'PER',         fraisMax:1, seuilAns:5,  note:'PER individuel ou collectif'},
+  perp:      {label:'PERP',        fraisMax:5, seuilAns:10, note:'Sortie 100% en capital possible'},
+  madelin:   {label:'Loi Madelin', fraisMax:5, seuilAns:10, note:'Attention : table de mortalit\u00e9 utilis\u00e9e'},
+  permadelin:{label:'PER Madelin', fraisMax:1, seuilAns:5,  note:'Art. 154 bis du CGI'},
+  perco:     {label:'PERCO',       fraisMax:1, seuilAns:5,  note:'Transfert tous les 3 ans sans cl\u00f4ture du plan'},
+  art83:     {label:'Article 83',  fraisMax:1, seuilAns:5,  note:'Uniquement apr\u00e8s d\u00e9part de la soci\u00e9t\u00e9'},
+  prefon:    {label:'PREFON',      fraisMax:1, seuilAns:5,  note:'Conversion points/\u20ac possible'}
+};
+
+function onTypeChange(){
+  var type=V('pTypePER').value;
+  var rule=TYPE_RULES[type]||TYPE_RULES.per;
+  // Ajuster le slider frais transfert max
+  V('pFraisTransfert').max=rule.fraisMax;
+  if(num('pFraisTransfert')>rule.fraisMax){
+    V('pFraisTransfert').value=rule.fraisMax;
+  }
+  // Afficher note du type
+  if(rule.note){
+    V('typeInfo').textContent=rule.label+' \u2014 '+rule.note;
+    V('typeInfo').style.display='block';
+  }else{
+    V('typeInfo').style.display='none';
+  }
+}
+
 function update(){
   var capital=num('pCapital');
   var anciennete=num('pAnciennete');
   var fraisT=num('pFraisTransfert');
   var fraisE=num('pFraisEntree');
+  var type=V('pTypePER').value;
+  var rule=TYPE_RULES[type]||TYPE_RULES.per;
 
-  // PER > 5 ans : frais de transfert ne s'appliquent plus
-  if(anciennete>5){
+  // Anciennete > seuil : frais de transfert ne s'appliquent plus
+  if(anciennete>rule.seuilAns){
     fraisT=0;
     V('pFraisTransfert').value='0';
     V('pFraisTransfert').disabled=true;
+    V('ancienneteInfo').textContent='\u2713 '+rule.label+' > '+rule.seuilAns+' ans : frais de transfert = 0%';
     V('ancienneteInfo').style.display='block';
   }else{
     V('pFraisTransfert').disabled=false;
-    V('ancienneteInfo').style.display='none';
+    V('ancienneteInfo').textContent='Frais max '+rule.fraisMax+'% si < '+rule.seuilAns+' ans';
+    V('ancienneteInfo').style.display='block';
   }
 
   var horizon=parseInt(V('pHorizon').value)||10;

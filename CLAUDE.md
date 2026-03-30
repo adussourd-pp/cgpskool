@@ -134,6 +134,81 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 ---
 
+## Format "One-Page" — Standard pour les modules outils
+
+Chaque module outil (simulateur, étude) doit suivre ce format :
+
+### Structure
+
+```
+┌─────────────────────────────────────────────────────┐
+│  <nav class="cs-nav"> — barre noire, logo C, Accueil│
+├───────────┬─────────────────────────────────────────┤
+│ sidebar   │  .main-area (fond beige #ECEAE6)        │
+│ 260px     │  └─ .cs-page (page A4, fond blanc)      │
+│ #F2F1EE   │     ├─ Header (tag orange + titre gras) │
+│ sticky    │     ├─ Contenu (cards, KPIs, charts)     │
+│           │     ├─ Disclaimer                        │
+│ labels    │     └─ Pied de page conseiller           │
+│ uppercase │        (fond beige, pleine largeur,      │
+│ inputs    │         margin négatif -40px)             │
+│ blancs    │                                          │
+│           │                                          │
+│ Bouton    │                                          │
+│ Exporter  │                                          │
+│ vert      │                                          │
+│ #2D7A5B   │                                          │
+│ carré     │                                          │
+└───────────┴─────────────────────────────────────────┘
+```
+
+### CSS requis
+
+- `<link rel="stylesheet" href="cgp-skool-theme.css">`
+- `<link rel="stylesheet" href="cgp-skool-layout.css">`
+- Sidebar : `.sidebar` fond `#F2F1EE`, labels `.sidebar-lbl` (9px uppercase), inputs `.sf` (fond blanc, bordure `var(--bord)`)
+- Sliders : `.sf-range` avec `accent-color:var(--orange)`, valeur `.sf-range-val` orange bold
+- Main : `.main-area` fond `#ECEAE6`, contenu dans `.cs-page` (blanc, padding 40px, max-width 794px)
+- Bouton Exporter : carré (pas de border-radius), fond `#2D7A5B`, couleur blanche, `font-size:13px`
+
+### Header page A4
+
+```html
+<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">NOM DU MODULE</div>
+<div style="font-family:var(--sans);font-size:24px;font-weight:700;color:var(--noir)" id="hClient">Client</div>
+<div style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300" id="hDate">30/03/2026</div>
+```
+
+### Pied de page conseiller
+
+- Fond beige `#F2F1EE`, pleine largeur via `margin: 28px -40px -40px -40px`
+- Gauche : nom (16px bold), cabinet (11px gris), tel + email en ligne (11px gris, icônes ☎ ✉)
+- Droite : logo cabinet dans un rond (52px, fond blanc, bordure, `border-radius:50%`)
+- Données chargées depuis `localStorage('cgpskool_profil_v1')` + `localStorage('cgpskool_logo')`
+
+### Profil conseiller (localStorage)
+
+| Clé localStorage | Contenu |
+|---|---|
+| `cgpskool_profil_v1` | JSON : pPrenom, pNom, pCabinet, pOrias, pTel, pEmail, pAdresse, pCp, pVille, pMentions, hImmo, hIobsp, hIas, hAgent, hCif |
+| `cgpskool_logo` | Base64 data URL du logo cabinet |
+| `cgpskool_photo` | Base64 data URL de la photo profil |
+
+### Print CSS
+
+```css
+@media print{
+  .sidebar,.cs-nav,.no-print{display:none!important}
+  .app{display:block}
+  .main-area{padding:0}
+  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
+  @page{size:A4;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+```
+
+---
+
 ## Git — Branches et workflow
 
 ### Branches
