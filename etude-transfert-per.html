@@ -255,18 +255,18 @@
       </div>
 
       <!-- Conseiller -->
-      <div id="conseillerBlock" style="display:none;margin-top:24px;padding:16px 20px;background:rgba(212,98,42,0.04);border:1px solid rgba(212,98,42,0.12);border-radius:10px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div id="cpPhoto" style="flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:15px;font-weight:700;color:var(--noir)" id="cpNom"></div>
-            <div style="font-size:12px;color:var(--orange);margin-top:1px" id="cpEmail"></div>
-            <div style="font-size:12px;color:var(--gris);margin-top:1px" id="cpTel"></div>
+      <div id="conseillerBlock" style="display:none;margin-top:24px;background:#fff;border:1px solid var(--bord);border-radius:14px;overflow:hidden">
+        <div style="display:flex">
+          <div style="flex:1;padding:22px 24px">
+            <div style="font-size:20px;font-weight:700;color:var(--noir);line-height:1.2" id="cpNom"></div>
+            <div style="font-size:12px;color:var(--gris);margin-top:4px" id="cpCabinet">Votre consultant patrimonial</div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gris)" id="cpTelRow"><span style="font-size:14px">&#9742;</span> <span id="cpTel"></span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gris)" id="cpEmailRow"><span style="font-size:13px">&#9993;</span> <span id="cpEmail"></span></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gris)" id="cpWebRow"><span style="font-size:13px">&#127760;</span> <span id="cpWeb"></span></div>
+            </div>
           </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div id="cpOrias" style="display:inline-block;font-size:10px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.1);padding:4px 12px;border-radius:20px"></div>
-            <div style="font-size:10px;color:var(--gris);margin-top:4px"><a href="https://www.orias.fr" target="_blank" style="color:var(--gris);text-decoration:none">www.orias.fr</a></div>
-          </div>
+          <div id="cpPhoto" style="flex-shrink:0;width:130px;min-height:130px;background:var(--paper);display:flex;align-items:center;justify-content:center;overflow:hidden"></div>
         </div>
       </div>
 
@@ -475,19 +475,19 @@ function loadProfil(){
     var nom=(p.pPrenom||'')+' '+(p.pNom||'');
     if(nom.trim()){
       V('cpNom').textContent=nom.trim();
-      V('cpEmail').textContent=p.pEmail||'';
+      V('cpCabinet').textContent=p.pCabinet||'Votre consultant patrimonial';
       V('cpTel').textContent=p.pTel||'';
-      V('cpOrias').textContent=p.pOrias?'ORIAS n\u00b0 '+p.pOrias:'';
-      if(!p.pOrias)V('cpOrias').style.display='none';
-      // Photo de profil
+      V('cpEmail').textContent=p.pEmail||'';
+      if(!p.pTel)V('cpTelRow').style.display='none';
+      if(!p.pEmail)V('cpEmailRow').style.display='none';
+      // Web = site ou orias
+      var web=p.pOrias?'www.orias.fr':'';
+      V('cpWeb').textContent=web;
+      if(!web)V('cpWebRow').style.display='none';
+      // Photo de profil — carr&#233;e, pas ronde
       var photo=localStorage.getItem('cgpskool_photo');
       if(photo){
-        V('cpPhoto').innerHTML='<img src="'+photo+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--bord)">';
-      }
-      // Logo cabinet
-      var logo=localStorage.getItem('cgpskool_logo');
-      if(logo){
-        V('cpLogo').innerHTML='<img src="'+logo+'" style="max-height:36px;max-width:140px">';
+        V('cpPhoto').innerHTML='<img src="'+photo+'" style="width:130px;height:130px;object-fit:cover;display:block">';
       }
       V('conseillerBlock').style.display='block';
     }
