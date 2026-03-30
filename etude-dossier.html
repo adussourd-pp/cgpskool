@@ -1589,9 +1589,6 @@ function closeOnboarding(){
 }
 </script>
 
-<!-- etude-dossier gere sa propre conversion canvas (exportPDF + beforeprint) -->
-<script>if(typeof CGP!=='undefined'&&CGP.pdf)CGP.pdf.customHandler=true;</script>
-
 <!-- ── data.js + calculs.js inline (standalone) ─────────────── -->
 <script>
 /**
@@ -8327,7 +8324,7 @@ function renderAvisPreview(){
 // ══════════════════════════════════════════════════════════════
 
 function exportPDF() {
-  // Valider toutes les sections (render + dots verts)
+  // 1. Valider toutes les sections (render + dots verts)
   try{
     ['situation','patrimoine','fiscal','financement','retraite','preconisations','synthese'].forEach(function(sec){
       try{renderSection(sec);validateSection(sec);}catch(e){}
@@ -8337,13 +8334,14 @@ function exportPDF() {
     try{rPageGarde();}catch(e){}
     try{rMentions();}catch(e){}
   }catch(e){console.warn('exportPDF render all:',e);}
-  // Mettre à jour l'en-tête PDF avant impression
+
+  // 2. En-tete PDF
   updatePdfHeader();
-  // Déterminer les sections à imprimer (ordre PDF)
+
+  // 3. Marquer les sections visibles pour l'impression
   var printOrder=['pagegarde','sommaire','situation','patrimoine','fiscal','financement','retraite',
     'transmission','entreprise','preconisations','synthese','avis','mentions'];
   var checkMap={transmission:'checkTransmission',entreprise:'checkEntreprise',avis:'checkAvis'};
-  // Marquer les sections visibles pour l'impression
   document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
   printOrder.forEach(function(id){
     var checkId=checkMap[id];
@@ -8351,7 +8349,8 @@ function exportPDF() {
     var sec=document.getElementById('sec-'+id);
     if(sec&&sec.id!=='sec-import')sec.classList.add('print-visible');
   });
-  // Remplir le footer PDF
+
+  // 4. Footer PDF
   var profil=loadProfil();
   var footLeft=document.getElementById('pdfFootLeft');
   if(footLeft){
@@ -8360,38 +8359,32 @@ function exportPDF() {
     if(profil.orias)parts.push('ORIAS n\u00b0 '+profil.orias);
     footLeft.textContent=parts.join(' \u2014 ')||'';
   }
-  // Pagination : compter les sections visibles
   var footRight=document.getElementById('pdfFootRight');
   if(footRight){
     var nbPages=document.querySelectorAll('.section-page.print-visible').length;
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
-  // Rendre la section retraite visible pour capturer le canvas
+
+  // 5. Rendre la section retraite visible pour dessiner le chart
   var savedSec=currentSection;
   var secRet=document.getElementById('sec-retraite');
-  // Rendre visible AVANT le render (le chart a besoin d'un conteneur visible)
   if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
-  // Forcer le render maintenant que la section est visible
   try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
-  // Attendre que Chart.js dessine (besoin de temps pour le canvas)
+
+  // 6. Attendre que Chart.js dessine, puis imprimer
   setTimeout(function(){
     try{
-      if(window.retChartInst){
-        window.retChartInst.resize();
-        window.retChartInst.update('none');
-      }
+      if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
     }catch(e4){}
-    // Deuxième attente pour le rendu complet
     setTimeout(function(){
-      // Capturer TOUS les canvas
-      convertChartsDirectCapture();
-      // Remettre la section invisible
+      // Remettre la section en place (sera visible via .print-visible en print)
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
+      // Imprimer — beforeprint de core.js convertit les canvas automatiquement
       window.print();
+      // Apres impression, nettoyer
       setTimeout(function(){
-        restoreCharts();
         document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
       },2000);
@@ -8399,35 +8392,8 @@ function exportPDF() {
   },500);
 }
 
-var _chartImgBackups = [];
-
-function convertChartsDirectCapture(){
-  _chartImgBackups=[];
-  // Capturer TOUS les canvas qui ont du contenu
-  document.querySelectorAll('canvas').forEach(function(canvas){
-    try{
-      if(canvas.width>0&&canvas.height>0){
-        var url=canvas.toDataURL('image/png');
-        // Vérifier que l'image n'est pas vide (transparent)
-        if(url&&url.length>100){
-          var img=document.createElement('img');img.src=url;
-          img.style.cssText='width:100%;max-width:100%;height:auto;display:none';
-          img.className='cgp-chart-print-img';
-          canvas.parentNode.insertBefore(img,canvas.nextSibling);
-          _chartImgBackups.push({canvas:canvas,img:img});
-        }
-      }
-    }catch(e){}
-  });
-}
-
-function restoreCharts() {
-  _chartImgBackups.forEach(function(b) {
-    b.canvas.style.display = '';
-    if (b.img && b.img.parentNode) b.img.parentNode.removeChild(b.img);
-  });
-  _chartImgBackups = [];
-}
+// convertChartsDirectCapture et restoreCharts supprimes
+// → gere automatiquement par CGP.pdf (beforeprint/afterprint dans cgp-skool-core.js)
 
 function updatePdfHeader() {
   var p = loadProfil ? loadProfil() : {};
@@ -8506,14 +8472,9 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : convertir les canvas en PNG (seulement si exportPDF n'a pas deja fait la conversion)
+// Ctrl+P : mettre a jour l'en-tete (canvas geres par core.js beforeprint)
 window.addEventListener('beforeprint', function() {
-  if (_chartImgBackups.length > 0) return; // deja converti par exportPDF()
   updatePdfHeader();
-  convertChartsDirectCapture();
-});
-window.addEventListener('afterprint', function() {
-  restoreCharts();
 });
 
 </script>
