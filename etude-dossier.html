@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGP Skool — Étude de Dossier</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <style id="cgp-skool-inline">
 /* ═══════════════════════════════════════════════════════════════════
    CGP SKOOL — Feuille de style commune
@@ -517,12 +520,12 @@ select.span2{grid-column:span 2}
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
-    </div>
   </div>
 </nav>
 
+<div class="cgp-app">
+<nav id="cgp-nav-slot"></nav>
+<div class="cgp-module">
 <div class="app">
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
@@ -7073,7 +7076,12 @@ function saveProfil() {
     var el = document.getElementById(f.id);
     if (el) p[f.key] = el.value.trim();
   });
-  try { localStorage.setItem(PROFIL_KEY, JSON.stringify(p)); } catch(e) {}
+  // Double format: ecrire aussi les cles prefixees pour compatibilite cross-modules
+  if (typeof CGP !== 'undefined' && CGP.profil && CGP.profil.save) {
+    CGP.profil.save(p);
+  } else {
+    try { localStorage.setItem(PROFIL_KEY, JSON.stringify(p)); } catch(e) {}
+  }
   updateProfilBadge(p);
   injectProfilIntoED(p);
   updatePdfFooter(p);
@@ -7140,18 +7148,11 @@ function updatePdfFooter(p) {
 }
 
 function openProfil() {
-  var p = loadProfil();
-  PROFIL_FIELDS.forEach(function(f) {
-    var el = document.getElementById(f.id);
-    if (el) el.value = p[f.key] || '';
-  });
-  var ov = document.getElementById('profilOverlay');
-  if (ov) ov.style.display = 'flex';
+  window.location.href = 'index.html?openProfil=1';
 }
 
 function closeProfil() {
-  var ov = document.getElementById('profilOverlay');
-  if (ov) ov.style.display = 'none';
+  // no-op: modal supprime, profil gere depuis index.html
 }
 
 function clearProfil() {
@@ -8514,61 +8515,13 @@ window.addEventListener('afterprint', function() {
 <!-- ══════════════════════════════════════════
      MODALE PROFIL CONSEILLER
 ══════════════════════════════════════════ -->
-<div class="profil-overlay" id="profilOverlay" style="display:none" onclick="if(event.target===this)closeProfil()">
-  <div class="profil-modal">
-    <h2>Configuration</h2>
-    <p class="sub">Personnalisez votre outil — sauvegardé localement.</p>
-
-    <div class="profil-row full">
-      <div class="profil-fg">
-        <label>Nom du cabinet</label>
-        <input type="text" id="pCabinet" placeholder="Peak Patrimoine" oninput="saveProfil()">
-      </div>
-    </div>
-
-    <div class="profil-row">
-      <div class="profil-fg">
-        <label>Logo du cabinet</label>
-        <input type="file" id="pLogo" accept="image/*" onchange="handleLogoUpload(this)" style="font-size:12px">
-        <div id="logoPreview" style="margin-top:6px"></div>
-      </div>
-      <div class="profil-fg">
-        <label>Photo de profil</label>
-        <input type="file" id="pPhoto" accept="image/*" onchange="handlePhotoUpload(this)" style="font-size:12px">
-        <div id="photoPreview" style="margin-top:6px"></div>
-      </div>
-    </div>
-
-    <div class="profil-row">
-      <div class="profil-fg">
-        <label>Couleur principale</label>
-        <input type="color" id="pColor1" value="#D4622A" oninput="applyColors()" style="width:100%;height:36px;border:1px solid var(--bord);border-radius:6px;cursor:pointer">
-      </div>
-      <div class="profil-fg">
-        <label>Couleur secondaire</label>
-        <input type="color" id="pColor2" value="#181614" oninput="applyColors()" style="width:100%;height:36px;border:1px solid var(--bord);border-radius:6px;cursor:pointer">
-      </div>
-    </div>
-    <div style="margin-bottom:6px">
-      <button onclick="resetColors()" style="padding:5px 12px;border:1.5px solid var(--bord);border-radius:7px;background:#fff;font-family:var(--sans);font-size:11px;cursor:pointer;color:var(--gris)">Reinitialiser les couleurs</button>
-    </div>
-
-    <!-- Champs caches pour compat (utilises par d autres fonctions) -->
-    <input type="hidden" id="pPrenom"><input type="hidden" id="pNom">
-    <input type="hidden" id="pOrias"><input type="hidden" id="pTel">
-    <input type="hidden" id="pEmail"><input type="hidden" id="pAdresse">
-    <input type="hidden" id="pCP"><input type="hidden" id="pVille">
-
-    <div style="margin-top:12px;padding:10px 12px;background:var(--gris-l);border-radius:8px;font-size:11px;color:var(--gris);line-height:1.5">
-      Stocké localement sur votre appareil. Aucune donnée envoyée sur internet.
-    </div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-primary" onclick="saveProfil();closeProfil()">Valider</button>
-      <button class="btn btn-secondary" onclick="closeProfil()">Fermer</button>
-      <button class="btn btn-secondary" onclick="clearProfil()" style="margin-left:auto;color:var(--red)">Tout effacer</button>
-    </div>
-  </div>
-</div>
+<!-- Modal profil supprime — gere depuis index.html -->
+<!-- Champs caches pour compat (utilises par d autres fonctions) -->
+<input type="hidden" id="pCabinet"><input type="hidden" id="pPrenom"><input type="hidden" id="pNom">
+<input type="hidden" id="pOrias"><input type="hidden" id="pTel">
+<input type="hidden" id="pEmail"><input type="hidden" id="pAdresse">
+<input type="hidden" id="pCP"><input type="hidden" id="pVille">
+<input type="hidden" id="pColor1"><input type="hidden" id="pColor2">
 
 <!-- Zone pied de page PDF (cachée en écran, visible à l'impression) -->
 <div id="pdfConseillerFooter" class="pdf-conseiller-footer"></div>
@@ -8588,5 +8541,7 @@ window.addEventListener('afterprint', function() {
   </div>
 </div>
 
+</div><!-- /cgp-module -->
+</div><!-- /cgp-app -->
 </body>
 </html>
