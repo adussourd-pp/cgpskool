@@ -214,6 +214,22 @@
         <div style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300" id="hDate"></div>
       </div>
 
+      <!-- Type de PER info -->
+      <div id="typeBlock" style="background:var(--paper);border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span id="tbBadge" style="font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;background:var(--orange);color:#fff;border-radius:3px">PER</span>
+            <span style="font-size:13px;font-weight:600;color:var(--noir)" id="tbLabel">Transfert PER vers PER</span>
+          </div>
+          <div style="font-size:11px;color:var(--gris);line-height:1.6" id="tbDetails"></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:10px;color:var(--gris);margin-bottom:2px">Frais de transfert</div>
+          <div style="font-size:18px;font-weight:700;color:var(--orange)" id="tbFraisMax">1% max</div>
+          <div style="font-size:10px;color:#2da064;margin-top:2px" id="tbSeuil">0% apr&#232;s 5 ans</div>
+        </div>
+      </div>
+
       <!-- Comparison -->
       <div class="compare-grid">
         <div class="compare-card current">
@@ -329,13 +345,13 @@ function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
 
 // Matrice des types de contrats
 var TYPE_RULES={
-  per:       {label:'PER',         fraisMax:1, seuilAns:5,  note:'PER individuel ou collectif'},
-  perp:      {label:'PERP',        fraisMax:5, seuilAns:10, note:'Sortie 100% en capital possible'},
-  madelin:   {label:'Loi Madelin', fraisMax:5, seuilAns:10, note:'Attention : table de mortalit\u00e9 utilis\u00e9e'},
-  permadelin:{label:'PER Madelin', fraisMax:1, seuilAns:5,  note:'Art. 154 bis du CGI'},
-  perco:     {label:'PERCO',       fraisMax:1, seuilAns:5,  note:'Transfert tous les 3 ans sans cl\u00f4ture du plan'},
-  art83:     {label:'Article 83',  fraisMax:1, seuilAns:5,  note:'Uniquement apr\u00e8s d\u00e9part de la soci\u00e9t\u00e9'},
-  prefon:    {label:'PREFON',      fraisMax:1, seuilAns:5,  note:'Conversion points/\u20ac possible'}
+  per:       {label:'PER',         badge:'PER',     fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert', details:'Transfert vers un nouveau PER individuel. Gestion libre avec acc\u00e8s \u00e0 une allocation diversifi\u00e9e.'},
+  perp:      {label:'PERP',        badge:'PERP',    fraisMax:5, seuilAns:10, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Frais de transfert \u00e9lev\u00e9s (5% max si < 10 ans)', details:'Le PERP peut \u00eatre transf\u00e9r\u00e9 sur un PER. Int\u00e9r\u00eat principal : possibilit\u00e9 de sortie 100% en capital au lieu de la rente viag\u00e8re.'},
+  madelin:   {label:'Loi Madelin', badge:'MADELIN',  fraisMax:5, seuilAns:10, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Anciennet\u00e9 contrat, table de mortalit\u00e9', details:'Contrat Madelin TNS. Le transfert permet la sortie en capital (impossible sur Madelin). Attention aux frais \u00e9lev\u00e9s si contrat < 10 ans.'},
+  permadelin:{label:'PER Madelin', badge:'ART.154',  fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert', details:'PER issu de l\'article 154 bis du CGI. M\u00eames r\u00e8gles qu\'un PER classique pour le transfert.'},
+  perco:     {label:'PERCO',       badge:'PERCO',    fraisMax:1, seuilAns:5,  transfert:'Oui, tous les 3 ans', interet:'Clause b\u00e9n\u00e9ficiaire, gestion libre', attention:'Transfert sans cl\u00f4ture du plan', details:'PERCO/PERCOL/PERECO. Transfert possible tous les 3 ans sans cl\u00f4turer le plan. Permet d\'acc\u00e9der \u00e0 une gestion libre optimis\u00e9e.'},
+  art83:     {label:'Article 83',  badge:'ART.83',   fraisMax:1, seuilAns:5,  transfert:'Apr\u00e8s d\u00e9part soci\u00e9t\u00e9', interet:'Gestion libre optimis\u00e9e', attention:'Certificat de travail obligatoire', details:'Article 83 / PERE / PERO / PEROB. Transfert uniquement apr\u00e8s avoir quitt\u00e9 l\'entreprise. N\u00e9cessite un certificat de travail.'},
+  prefon:    {label:'PREFON',      badge:'PREFON',   fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre, conversion points/\u20ac', attention:'Frais de transfert', details:'PREFON ou COREM. Le transfert permet de passer d\'un syst\u00e8me \u00e0 points vers une gestion libre en euros.'}
 };
 
 function onTypeChange(){
@@ -411,6 +427,17 @@ function update(){
 
   V('hClient').textContent=client||'Client';
   V('hDate').textContent=dateEtude;
+
+  // Type PER block
+  V('tbBadge').textContent=rule.badge;
+  V('tbLabel').textContent='Transfert '+rule.label+' vers PER';
+  V('tbFraisMax').textContent=rule.fraisMax+'% max';
+  V('tbSeuil').textContent='0% apr\u00e8s '+rule.seuilAns+' ans';
+  var det=[];
+  det.push('\u2022 Transf\u00e9rable : '+rule.transfert);
+  det.push('\u2022 Int\u00e9r\u00eat : '+rule.interet);
+  if(rule.attention)det.push('\u2022 Attention : '+rule.attention);
+  V('tbDetails').innerHTML=det.join('<br>');
 
   V('ccNameA').textContent=nomA;
   V('ccNameB').textContent=nomB;
