@@ -1589,6 +1589,9 @@ function closeOnboarding(){
 }
 </script>
 
+<!-- etude-dossier gere sa propre conversion canvas (exportPDF + beforeprint) -->
+<script>if(typeof CGP!=='undefined'&&CGP.pdf)CGP.pdf.customHandler=true;</script>
+
 <!-- ── data.js + calculs.js inline (standalone) ─────────────── -->
 <script>
 /**
@@ -8504,10 +8507,10 @@ function updatePdfHeader() {
   }
 }
 
-// Déclencher exportPDF sur Ctrl+P aussi
+// Ctrl+P : convertir les canvas en PNG (meme logique que exportPDF)
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
-  convertChartsToImg(function(){});
+  convertChartsDirectCapture();
 });
 window.addEventListener('afterprint', function() {
   restoreCharts();

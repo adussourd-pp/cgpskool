@@ -305,10 +305,15 @@ CGP.pdf.print = function() {
 /**
  * Auto-convert canvases on Ctrl+P / system print.
  * Works even without clicking the "Exporter PDF" button.
+ * Skips if the module handles its own canvas conversion (CGP.pdf.customHandler = true).
  */
 window.addEventListener('beforeprint', function() {
-  CGP.pdf._convertCanvases();
+  if (!CGP.pdf.customHandler) {
+    CGP.pdf._convertCanvases();
+  }
 });
 window.addEventListener('afterprint', function() {
-  CGP.pdf._restoreCanvases();
+  if (!CGP.pdf.customHandler) {
+    CGP.pdf._restoreCanvases();
+  }
 });

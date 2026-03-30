@@ -194,18 +194,88 @@ Chaque module outil (simulateur, étude) doit suivre ce format :
 | `cgpskool_logo` | Base64 data URL du logo cabinet |
 | `cgpskool_photo` | Base64 data URL de la photo profil |
 
-### Print CSS
+### Print CSS — Règles critiques
 
+**R23 — JAMAIS `* { print-color-adjust: exact }` sur le sélecteur universel.**
+Ça rend le texte flou sur Chrome/Edge (désactive l'anti-aliasing).
+Appliquer `print-color-adjust: exact` UNIQUEMENT sur les éléments avec des fonds colorés :
 ```css
-@media print{
-  .sidebar,.cs-nav,.no-print{display:none!important}
-  .app{display:block}
-  .main-area{padding:0}
-  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
-  @page{size:A4;margin:1.5cm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
+/* BON — ciblé */
+.badge,.kpi,.card,[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+
+/* MAUVAIS — rend le texte flou */
+*{-webkit-print-color-adjust:exact!important}
 ```
+
+**R24 — Les graphiques Chart.js (canvas) ne s'impriment PAS.**
+Les `<canvas>` apparaissent vides/blancs en impression. Solution :
+- `cgp-skool-core.js` convertit automatiquement les canvas en images PNG via `beforeprint`/`afterprint`
+- Pour le bouton d'export : appeler `CGP.pdf.print()` (conversion + `window.print()` + restauration)
+- Pour les modules avec leur propre logique d'export (ex: `etude-dossier.html`) : déclarer `CGP.pdf.customHandler = true` pour empêcher le double traitement
+- Ne JAMAIS appeler `window.print()` directement dans un module avec des graphiques
+
+**Print CSS partagé** : géré dans `cgp-skool-layout.css` (ne pas dupliquer dans les modules).
+
+---
+
+## Architecture partagée (fichiers communs)
+
+### 4 fichiers = infrastructure complète
+
+| Fichier | Rôle |
+|---|---|
+| `cgp-skool-theme.css` | Tokens design (couleurs, polices, composants de base) |
+| `cgp-skool-layout.css` | Layout (grille, sidebar, page A4, print CSS, responsive) |
+| `cgp-skool-core.js` | Profil (`CGP.profil`), utils (`CGP.fmt`), footer, export/import JSON, PDF |
+| `cgp-skool-nav.js` | Sidebar navigation injectée automatiquement |
+
+### Template module
+
+Chaque nouveau module doit inclure :
+```html
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
+```
+
+Structure HTML :
+```html
+<nav class="cs-nav">...</nav>
+<div class="cgp-app">
+  <nav id="cgp-nav-slot"></nav>
+  <div class="cgp-module">
+    <!-- contenu du module -->
+    <div id="conseillerFooter"></div>
+  </div>
+</div>
+```
+
+En fin de script :
+```javascript
+CGP.footer.render(document.getElementById('conseillerFooter'));
+```
+
+### Ajouter un module à la navigation
+
+Ajouter une entrée dans le tableau `MODULES` de `cgp-skool-nav.js` :
+```javascript
+{ id: 'mon-module', icon: '\uD83D\uDCCB', name: 'Mon Module', href: 'mon-module.html' }
+```
+
+### Profil conseiller
+
+- Édité uniquement dans `index.html` (modal profil)
+- Lu partout via `CGP.profil.load()` (retourne les 2 formats : `prenom` + `pPrenom`)
+- Sauvé via `CGP.profil.save(data)` (écrit les 2 formats)
+- `index.html?openProfil=1` ouvre automatiquement le modal
+
+### Export/Import projet JSON
+
+- `CGP.project.registerModule(id, {getState, setState})` : enregistre un module
+- `CGP.project.autoSave(id)` : sauvegarde l'état dans localStorage (appeler après `calc()`)
+- `CGP.project.exportAll()` : exporte profil + tous les modules en JSON
+- `CGP.project.importAll(file)` : restaure tout depuis un fichier JSON
 
 ---
 

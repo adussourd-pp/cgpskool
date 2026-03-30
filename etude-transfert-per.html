@@ -610,39 +610,9 @@ function loadProfil(){
   update();
 })();
 
-// Export PDF — meme systeme que etude-dossier
-var _chartBackups=[];
+// Export PDF — utilise CGP.pdf.print() (canvas→PNG automatique via core.js)
 function exportPDF(){
-  // 1. Convertir tous les canvas en images PNG
-  _chartBackups=[];
-  document.querySelectorAll('canvas').forEach(function(canvas){
-    try{
-      if(canvas.width>0&&canvas.height>0){
-        var url=canvas.toDataURL('image/png');
-        if(url&&url.length>100){
-          var img=document.createElement('img');
-          img.src=url;
-          img.style.cssText='width:100%;max-width:100%;height:auto;display:block';
-          img.className='chart-img-print';
-          canvas.parentNode.insertBefore(img,canvas);
-          _chartBackups.push({canvas:canvas,img:img});
-          canvas.style.display='none';
-        }
-      }
-    }catch(e){}
-  });
-  // 2. Imprimer
-  setTimeout(function(){
-    window.print();
-    // 3. Restaurer les canvas
-    setTimeout(function(){
-      _chartBackups.forEach(function(b){
-        b.canvas.style.display='';
-        if(b.img&&b.img.parentNode)b.img.parentNode.removeChild(b.img);
-      });
-      _chartBackups=[];
-    },1000);
-  },300);
+  CGP.pdf.print();
 }
 </script>
 </body>
