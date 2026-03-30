@@ -266,7 +266,7 @@
               <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gris)" id="cpWebRow"><span style="font-size:13px">&#127760;</span> <span id="cpWeb"></span></div>
             </div>
           </div>
-          <div id="cpPhoto" style="flex-shrink:0;width:130px;min-height:130px;background:var(--paper);display:flex;align-items:center;justify-content:center;overflow:hidden"></div>
+          <div id="cpLogo" style="flex-shrink:0;padding:20px;display:flex;align-items:center;justify-content:center"></div>
         </div>
       </div>
 
@@ -484,10 +484,10 @@ function loadProfil(){
       var web=p.pOrias?'www.orias.fr':'';
       V('cpWeb').textContent=web;
       if(!web)V('cpWebRow').style.display='none';
-      // Photo de profil — carr&#233;e, pas ronde
-      var photo=localStorage.getItem('cgpskool_photo');
-      if(photo){
-        V('cpPhoto').innerHTML='<img src="'+photo+'" style="width:130px;height:130px;object-fit:cover;display:block">';
+      // Logo cabinet
+      var logo=localStorage.getItem('cgpskool_logo');
+      if(logo){
+        V('cpLogo').innerHTML='<img src="'+logo+'" style="max-height:60px;max-width:160px">';
       }
       V('conseillerBlock').style.display='block';
     }
