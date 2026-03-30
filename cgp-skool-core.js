@@ -268,24 +268,27 @@ CGP.pdf._convertCanvases = function() {
     try {
       if (canvas.width > 0 && canvas.height > 0) {
         var url = canvas.toDataURL('image/png');
-        var img = document.createElement('img');
-        img.src = url;
-        img.className = 'cgp-chart-print-img';
-        img.style.cssText = 'max-width:100%;height:auto';
-        canvas.parentNode.insertBefore(img, canvas);
-        canvas.style.display = 'none';
-        CGP.pdf._backups.push({ canvas: canvas, img: img });
+        if (url && url.length > 100) {
+          var img = document.createElement('img');
+          img.src = url;
+          img.className = 'cgp-chart-print-img';
+          img.style.cssText = 'max-width:100%;height:auto';
+          // Insert AFTER canvas (not before) to avoid layout shift
+          canvas.parentNode.insertBefore(img, canvas.nextSibling);
+          CGP.pdf._backups.push({ canvas: canvas, img: img });
+        }
       }
     } catch(e) {}
   });
+  // Canvas hidden via CSS @media print { canvas{display:none!important} }
+  // Images visible via CSS @media print { .cgp-chart-print-img{display:block!important} }
 };
 
 /**
- * Restore canvases after printing.
+ * Restore after printing: remove temporary images.
  */
 CGP.pdf._restoreCanvases = function() {
   CGP.pdf._backups.forEach(function(b) {
-    b.canvas.style.display = '';
     if (b.img && b.img.parentNode) b.img.parentNode.removeChild(b.img);
   });
   CGP.pdf._backups = [];
