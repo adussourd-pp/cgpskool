@@ -8,52 +8,51 @@
 <link rel="stylesheet" href="cgp-skool-layout.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Sidebar dark override */
-.cs-sidebar{background:#1a1916;border-right:1px solid rgba(255,255,255,0.06);color:#fff}
-.cs-sidebar .sb-title{font-family:var(--serif);font-size:20px;color:#fff;margin-bottom:2px}
-.cs-sidebar .sb-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:24px}
-.sb-section{margin-bottom:18px}
-.sb-section h3{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:700}
-.sb-row{margin-bottom:10px}
-.sb-row label{display:block;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:3px}
-.sb-row input[type="text"],.sb-row input[type="number"]{
-  width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:7px;color:#fff;padding:9px 12px;font-family:var(--sans);font-size:13px;outline:none
+/* Sidebar light — same style as etude-dossier */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
+.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 14px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px}
+.sidebar-lbl:first-child{margin-top:0}
+.sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
+.sf{padding:0 8px;margin-bottom:8px}
+.sf label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:3px}
+.sf input[type="text"],.sf input[type="number"]{
+  width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;
+  font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none
 }
-.sb-row input::placeholder{color:rgba(255,255,255,0.25)}
-.sb-row input:focus{border-color:rgba(255,255,255,0.25)}
-.sb-range-wrap{display:flex;align-items:center;gap:10px}
-.sb-range-wrap input[type="range"]{flex:1;accent-color:var(--orange);height:5px;-webkit-appearance:none;background:rgba(255,255,255,0.12);border-radius:3px}
-.sb-range-wrap input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--orange);cursor:pointer}
-.sb-range-val{font-size:13px;font-weight:600;min-width:48px;text-align:right;color:#fff}
-.alloc-grid{display:grid;grid-template-columns:1fr 54px 54px;gap:5px;align-items:center;font-size:11px}
-.alloc-grid .hdr{color:rgba(255,255,255,0.3);font-size:9px;text-transform:uppercase}
-.alloc-grid input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#fff;padding:6px 7px;font-size:11px;font-family:var(--sans)}
-.alloc-alert{font-size:10px;color:#ef4444;margin-top:3px;min-height:14px}
-.sb-actions{margin-top:20px;display:flex;gap:8px}
-.sb-actions button{padding:9px 16px;border:none;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(255,255,255,0.08);color:#fff}
-.sb-actions button:hover{background:rgba(255,255,255,0.14)}
+.sf input:focus{border-color:var(--orange)}
+.sf-range{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:8px}
+.sf-range input[type="range"]{flex:1;accent-color:var(--orange);height:4px;-webkit-appearance:none;background:rgba(0,0,0,0.08);border-radius:2px}
+.sf-range input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--orange);cursor:pointer}
+.sf-range-val{font-size:12px;font-weight:700;color:var(--orange);min-width:42px;text-align:right}
+.alloc-grid{display:grid;grid-template-columns:1fr 46px 46px;gap:4px;align-items:center;font-size:10px;padding:0 8px;margin-bottom:4px}
+.alloc-grid .hdr{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600}
+.alloc-grid input{border:1.5px solid var(--bord);border-radius:5px;padding:5px 6px;font-size:10px;font-family:var(--sans);color:var(--noir);background:#fff}
+.alloc-grid input:focus{border-color:var(--orange)}
+.alloc-alert{font-size:9px;color:#dc2626;padding:0 8px;min-height:14px}
+.sidebar-btn{display:block;width:100%;padding:10px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;margin-top:auto}
+.sidebar-btn:hover{background:var(--orange-hover)}
 
-/* Main content overrides for A4 page */
-.cs-main{background:#ECEAE6}
+/* Main A4 content */
+.main-area{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:24px;background:#ECEAE6}
 
 /* Comparison cards */
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
-.compare-card{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:20px 22px;position:relative}
+.compare-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:20px 22px;position:relative}
 .compare-card.future{border-color:#2da064;border-width:2px}
 .badge-reco{position:absolute;top:-9px;right:14px;background:#2da064;color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:16px;text-transform:uppercase;letter-spacing:0.5px}
-.cc-name{font-family:var(--serif);font-size:15px;margin-bottom:10px;color:var(--ink)}
-.cc-capital{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:12px}
-.cc-capital small{font-size:12px;font-weight:400;color:var(--ink-60)}
+.cc-name{font-family:var(--serif);font-size:15px;margin-bottom:10px;color:var(--noir)}
+.cc-capital{font-size:22px;font-weight:700;color:var(--noir);margin-bottom:12px}
+.cc-capital small{font-size:12px;font-weight:400;color:var(--gris)}
 .alloc-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:6px}
 .alloc-bar span{display:block;height:100%}
 .alloc-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.alloc-legend span{font-size:10px;display:flex;align-items:center;gap:3px;color:var(--ink-60)}
+.alloc-legend span{font-size:10px;display:flex;align-items:center;gap:3px;color:var(--gris)}
 .alloc-legend span i{width:7px;height:7px;border-radius:2px;display:inline-block}
-.cc-yield{font-size:12px;color:var(--ink-60)}
-.cc-yield b{color:var(--ink);font-size:13px}
-.cc-proj{font-size:12px;color:var(--ink-60);margin-top:4px}
-.cc-proj b{color:var(--ink);font-size:13px}
+.cc-yield{font-size:12px;color:var(--gris)}
+.cc-yield b{color:var(--noir);font-size:13px}
+.cc-proj{font-size:12px;color:var(--gris);margin-top:4px}
+.cc-proj b{color:var(--noir);font-size:13px}
 
 /* Fee summary */
 .fee-summary{background:rgba(220,38,38,0.04);border:1px solid rgba(220,38,38,0.15);border-radius:10px;padding:16px 22px;margin-bottom:18px;display:flex;gap:28px;flex-wrap:wrap}
@@ -62,10 +61,10 @@
 
 /* KPI grid */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.kpi-box{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:14px 16px;text-align:center}
-.kpi-box .kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-60);margin-bottom:4px;font-weight:600}
+.kpi-box{background:var(--paper);border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;text-align:center}
+.kpi-box .kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--gris);margin-bottom:4px;font-weight:600}
 .kpi-box .kpi-val{font-size:18px;font-weight:700}
-.kpi-box .kpi-sub{font-size:10px;color:var(--ink-60);margin-top:2px}
+.kpi-box .kpi-sub{font-size:10px;color:var(--gris);margin-top:2px}
 .kpi-box.red .kpi-val{color:#dc2626}
 .kpi-box.blue .kpi-val{color:#2563eb}
 .kpi-box.amber .kpi-val{color:#d97706}
@@ -73,8 +72,8 @@
 
 /* Charts */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-box{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:18px 20px}
-.chart-box h3{font-family:var(--serif);font-size:13px;margin-bottom:12px;color:var(--ink)}
+.chart-box{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:18px 20px}
+.chart-box h3{font-family:var(--serif);font-size:13px;margin-bottom:12px;color:var(--noir)}
 .chart-wrap{position:relative;height:220px}
 
 /* Breakeven */
@@ -82,13 +81,12 @@
 .breakeven .be-months{font-size:30px;font-weight:700;color:#2da064}
 .breakeven .be-label{font-size:13px;color:#166534;margin-top:3px}
 
-/* Footer note */
-.disclaimer{font-size:10px;color:var(--ink-30);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--rule-l)}
+.disclaimer{font-size:10px;color:var(--gris);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--bord)}
 
 @media print{
-  .cs-sidebar,.cs-nav,.no-print{display:none!important}
-  .cs-app{display:block}
-  .cs-main{padding:0}
+  .sidebar,.cs-nav,.no-print{display:none!important}
+  .app{display:block}
+  .main-area{padding:0}
   .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
   @page{size:A4;margin:1.5cm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -111,92 +109,74 @@
   </div>
 </nav>
 
-<div class="cs-app">
+<div class="app">
   <!-- SIDEBAR -->
-  <aside class="cs-sidebar" id="sidebar">
-    <div class="sb-title">Transfert PER</div>
-    <div class="sb-sub">Param&#232;tres de l'&#233;tude</div>
+  <aside class="sidebar">
+    <div class="sidebar-lbl">Client</div>
+    <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
+    <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
 
-    <div class="sb-section">
-      <h3>Client</h3>
-      <div class="sb-row"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
-      <div class="sb-row"><label>Date de l'&#233;tude</label><input type="text" id="pDate" oninput="update()"></div>
-    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl">Contrats</div>
+    <div class="sf"><label>Contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
+    <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
 
-    <div class="sb-section">
-      <h3>Contrats</h3>
-      <div class="sb-row"><label>Contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
-      <div class="sb-row"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl">Capital &amp; Frais</div>
+    <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
+    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
+    <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
+    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
+    <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="10" step="0.1" value="0" oninput="update()"><span class="sf-range-val" id="vFraisEntree">0.0%</span></div>
 
-    <div class="sb-section">
-      <h3>Capital &amp; Frais</h3>
-      <div class="sb-row"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
-      <div class="sb-row">
-        <label>Frais de transfert (%)</label>
-        <div class="sb-range-wrap"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sb-range-val" id="vFraisTransfert">1.0%</span></div>
-      </div>
-      <div class="sb-row">
-        <label>Frais d'entr&#233;e (%)</label>
-        <div class="sb-range-wrap"><input type="range" id="pFraisEntree" min="0" max="10" step="0.1" value="0" oninput="update()"><span class="sb-range-val" id="vFraisEntree">0.0%</span></div>
-      </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl">Allocation actuelle</div>
+    <div class="alloc-grid">
+      <span class="hdr">Support</span><span class="hdr">%</span><span class="hdr">Rdt</span>
+      <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
+      <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
+      <input type="number" id="aA0r" value="2" min="0" max="30" step="0.1" oninput="update()">
+      <input type="text" id="aA1n" value="Actions CM" oninput="update()">
+      <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
+      <input type="number" id="aA1r" value="3" min="0" max="30" step="0.1" oninput="update()">
     </div>
+    <div class="alloc-alert" id="alertAllocA"></div>
 
-    <div class="sb-section">
-      <h3>Allocation actuelle</h3>
-      <div class="alloc-grid">
-        <span class="hdr">Support</span><span class="hdr">Part %</span><span class="hdr">Rdt %</span>
-        <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
-        <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
-        <input type="number" id="aA0r" value="2" min="0" max="30" step="0.1" oninput="update()">
-        <input type="text" id="aA1n" value="Actions CM" oninput="update()">
-        <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
-        <input type="number" id="aA1r" value="3" min="0" max="30" step="0.1" oninput="update()">
-      </div>
-      <div class="alloc-alert" id="alertAllocA"></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl">Nouvelle allocation</div>
+    <div class="alloc-grid">
+      <span class="hdr">Support</span><span class="hdr">%</span><span class="hdr">Rdt</span>
+      <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
+      <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
+      <input type="number" id="aB0r" value="9.5" min="0" max="30" step="0.1" oninput="update()">
+      <input type="text" id="aB1n" value="Private equity" oninput="update()">
+      <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
+      <input type="number" id="aB1r" value="6" min="0" max="30" step="0.1" oninput="update()">
+      <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
+      <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
+      <input type="number" id="aB2r" value="4" min="0" max="30" step="0.1" oninput="update()">
+      <input type="text" id="aB3n" value="Obligataire" oninput="update()">
+      <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
+      <input type="number" id="aB3r" value="5" min="0" max="30" step="0.1" oninput="update()">
     </div>
+    <div class="alloc-alert" id="alertAllocB"></div>
 
-    <div class="sb-section">
-      <h3>Nouvelle allocation</h3>
-      <div class="alloc-grid">
-        <span class="hdr">Support</span><span class="hdr">Part %</span><span class="hdr">Rdt %</span>
-        <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
-        <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
-        <input type="number" id="aB0r" value="9.5" min="0" max="30" step="0.1" oninput="update()">
-        <input type="text" id="aB1n" value="Private equity" oninput="update()">
-        <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
-        <input type="number" id="aB1r" value="6" min="0" max="30" step="0.1" oninput="update()">
-        <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
-        <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
-        <input type="number" id="aB2r" value="4" min="0" max="30" step="0.1" oninput="update()">
-        <input type="text" id="aB3n" value="Obligataire" oninput="update()">
-        <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
-        <input type="number" id="aB3r" value="5" min="0" max="30" step="0.1" oninput="update()">
-      </div>
-      <div class="alloc-alert" id="alertAllocB"></div>
-    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl">Horizon</div>
+    <div class="sf-range"><input type="range" id="pHorizon" min="1" max="20" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
 
-    <div class="sb-section">
-      <h3>Horizon de projection</h3>
-      <div class="sb-row">
-        <div class="sb-range-wrap"><input type="range" id="pHorizon" min="1" max="20" step="1" value="10" oninput="update()"><span class="sb-range-val" id="vHorizon">10 ans</span></div>
-      </div>
-    </div>
-
-    <div class="sb-actions">
-      <button onclick="window.print()">&#128424; Exporter PDF</button>
-    </div>
+    <button class="sidebar-btn" onclick="window.print()">&#128424; Exporter PDF</button>
   </aside>
 
   <!-- MAIN -->
-  <div class="cs-main">
+  <div class="main-area">
     <div class="cs-page">
 
       <!-- Header -->
       <div style="margin-bottom:28px">
-        <div style="font-family:var(--serif);font-size:26px;color:var(--ink)" id="hClient">Client</div>
-        <div style="font-size:13px;color:var(--ink-60);margin-top:4px" id="hSubtitle">&#201;tude de transfert &#8212; PER</div>
-        <div style="font-size:12px;color:var(--ink-30);margin-top:2px" id="hDate"></div>
+        <div style="font-family:var(--serif);font-size:26px;color:var(--noir)" id="hClient">Client</div>
+        <div style="font-size:13px;color:var(--gris);margin-top:4px">&#201;tude de transfert &#8212; PER</div>
+        <div style="font-size:12px;color:var(--gris);margin-top:2px" id="hDate"></div>
       </div>
 
       <!-- Comparison -->
@@ -274,9 +254,9 @@
         Les projections sont r&#233;alis&#233;es &#224; titre indicatif, sur la base des rendements hypoth&#233;tiques indiqu&#233;s. Les performances pass&#233;es ne pr&#233;jugent pas des performances futures.
       </div>
 
-    </div><!-- .cs-page -->
-  </div><!-- .cs-main -->
-</div><!-- .cs-app -->
+    </div>
+  </div>
+</div>
 
 <script>
 var chartRecovery=null, chartProjection=null;
@@ -396,9 +376,7 @@ function renderAllocBar(barId,legId,alloc,colors){
 function calcBreakeven(capA,capB,yA,yB){
   var mA=yA/100/12;var mB=yB/100/12;
   for(var m=1;m<=240;m++){
-    var vA=capA*Math.pow(1+mA,m);
-    var vB=capB*Math.pow(1+mB,m);
-    if(vB>=vA)return m;
+    if(capB*Math.pow(1+mB,m)>=capA*Math.pow(1+mA,m))return m;
   }
   return null;
 }

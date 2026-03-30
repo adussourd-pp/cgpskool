@@ -7,74 +7,98 @@
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
 <style>
-.team-header{margin-bottom:28px}
+.team-header{margin-bottom:28px;text-align:center}
 .team-header h1{font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:4px}
 .team-header p{font-size:13px;color:var(--ink-60);line-height:1.6}
 
-/* Member card */
-.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.member-card{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:18px 20px;position:relative;transition:border-color 0.2s}
-.member-card:hover{border-color:rgba(212,98,42,0.3)}
-.member-card.leader{border-color:var(--orange);border-width:2px}
-.member-avatar{width:44px;height:44px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--orange);margin-bottom:10px;font-family:var(--sans)}
-.member-card.leader .member-avatar{background:var(--o-dim)}
-.member-name{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.member-role{font-size:11px;color:var(--ink-60);margin-bottom:8px}
-.member-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-right:4px}
-.badge-qual{background:var(--o-dim);color:var(--orange)}
-.badge-status{background:rgba(45,160,100,0.1);color:#2da064}
-.badge-prospect{background:rgba(37,99,235,0.1);color:#2563eb}
-.member-meta{font-size:11px;color:var(--ink-30);margin-top:8px}
-.member-actions{position:absolute;top:14px;right:14px;display:flex;gap:4px}
-.member-actions button{background:transparent;border:1px solid var(--rule-l);border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--ink-60);display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.member-actions button:hover{border-color:var(--orange);color:var(--orange)}
-.member-actions button.del:hover{border-color:#dc2626;color:#dc2626}
+/* Stats bar */
+.stats-bar{display:flex;gap:12px;justify-content:center;margin-bottom:28px;flex-wrap:wrap}
+.stat-pill{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--ink-60);font-weight:500}
+.stat-pill b{color:var(--ink);font-weight:700}
+.stat-pill.orange b{color:var(--orange)}
 
-/* Stats */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat-box{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:14px 16px;text-align:center}
-.stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:3px}
-.stat-val{font-size:20px;font-weight:700;color:var(--ink)}
-.stat-val.orange{color:var(--orange)}
+/* Tree container */
+.tree-wrap{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px 0}
 
-/* Organigramme */
-.org-section{margin-top:28px;padding-top:20px;border-top:1px solid var(--rule-l)}
-.org-title{font-family:var(--serif);font-size:16px;color:var(--ink);margin-bottom:16px}
-.org-tree{display:flex;flex-direction:column;align-items:center;gap:0}
-.org-node{background:#fff;border:1.5px solid var(--rule-l);border-radius:8px;padding:10px 18px;text-align:center;position:relative}
-.org-node.leader{border-color:var(--orange);background:rgba(212,98,42,0.03)}
-.org-node .on-name{font-size:13px;font-weight:600;color:var(--ink)}
-.org-node .on-role{font-size:10px;color:var(--ink-60)}
-.org-connector{width:2px;height:20px;background:var(--rule-l);margin:0 auto}
-.org-level{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative}
-.org-level::before{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:calc(100% - 60px);height:1px;background:var(--rule-l)}
-.org-branch{display:flex;flex-direction:column;align-items:center}
-.org-branch .org-connector{height:20px}
+/* Node */
+.node-group{display:flex;flex-direction:column;align-items:center}
+.node-bubble{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:10px 16px;cursor:default;transition:all 0.2s;min-width:160px}
+.node-bubble:hover{border-color:rgba(212,98,42,0.35)}
+.node-bubble.depth-0{border-color:var(--orange);border-width:2px;background:rgba(212,98,42,0.03)}
+.node-bubble.depth-1{border-color:rgba(37,99,235,0.4)}
+.node-bubble.depth-2{border-color:rgba(45,160,100,0.4)}
+.node-bubble.depth-3{border-color:rgba(123,79,166,0.4)}
+.node-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
+.depth-0 .node-avatar{background:var(--orange)}
+.depth-1 .node-avatar{background:#2563eb}
+.depth-2 .node-avatar{background:#2da064}
+.depth-3 .node-avatar{background:#7B4FA6}
+.depth-4 .node-avatar{background:#d97706}
+.node-info{display:flex;flex-direction:column;gap:1px}
+.node-name{font-size:13px;font-weight:600;color:var(--ink)}
+.node-level{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+.depth-0 .node-level{color:var(--orange)}
+.depth-1 .node-level{color:#2563eb}
+.depth-2 .node-level{color:#2da064}
+.depth-3 .node-level{color:#7B4FA6}
+.depth-4 .node-level{color:#d97706}
+.node-count{font-size:9px;color:var(--ink-30)}
 
-/* Add form */
-.add-form{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:20px;margin-bottom:20px}
-.add-form h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:14px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-grid.three{grid-template-columns:1fr 1fr 1fr}
-.fg{margin-bottom:0}
-.fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-30);margin-bottom:3px}
-.fg input,.fg select{width:100%;padding:9px 12px;border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none}
-.fg input:focus,.fg select:focus{border-color:var(--orange)}
-.form-actions{display:flex;gap:8px;margin-top:14px}
-.btn-add{padding:10px 22px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
-.btn-add:hover{background:var(--orange-hover)}
-.btn-cancel{padding:10px 18px;background:transparent;border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--ink-60);cursor:pointer}
+/* Node actions */
+.node-actions{position:absolute;right:-8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:3px;opacity:0;transition:opacity 0.15s}
+.node-bubble:hover .node-actions{opacity:1}
+.node-act{width:22px;height:22px;border-radius:50%;border:1px solid var(--rule-l);background:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--ink-60);transition:all 0.15s}
+.node-act:hover{border-color:var(--orange);color:var(--orange)}
+.node-act.del:hover{border-color:#dc2626;color:#dc2626}
 
-/* Empty state */
-.empty-state{text-align:center;padding:40px 20px;color:var(--ink-30)}
-.empty-state .empty-icon{font-size:40px;margin-bottom:12px}
-.empty-state p{font-size:13px;line-height:1.7}
+/* Connector lines */
+.connector-v{width:2px;height:20px;background:var(--rule-l);margin:0 auto}
+.children-wrap{display:flex;gap:24px;justify-content:center;position:relative;padding-top:0}
+.children-wrap::before{content:'';position:absolute;top:0;left:calc(50% - 1px);width:2px;height:20px;display:none}
+.child-branch{display:flex;flex-direction:column;align-items:center}
+.child-branch .connector-v{height:20px}
+
+/* Horizontal connector for multiple children */
+.h-line{position:relative;height:20px;display:flex;align-items:flex-end;justify-content:center}
+.h-line::before{content:'';position:absolute;bottom:0;height:2px;background:var(--rule-l)}
+
+/* Add button inline */
+.add-child-btn{width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--rule-l);background:#fff;cursor:pointer;font-size:18px;color:var(--ink-30);display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:4px}
+.add-child-btn:hover{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.04)}
+
+/* Add modal */
+.add-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.add-modal.open{display:flex}
+.add-box{background:var(--paper);padding:28px 32px;width:100%;max-width:360px;border-radius:12px;text-align:center}
+.add-box h3{font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:4px}
+.add-box .add-sub{font-size:12px;color:var(--ink-60);margin-bottom:20px}
+.add-box input{width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px}
+.add-box input:focus{border-color:var(--orange)}
+.add-box .add-actions{display:flex;gap:8px;margin-top:14px}
+.add-box .add-actions button{flex:1;padding:10px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:none}
+.btn-confirm{background:var(--orange);color:#fff}
+.btn-confirm:hover{background:var(--orange-hover)}
+.btn-dismiss{background:#fff;color:var(--ink-60);border:1.5px solid var(--rule-l)!important}
+
+/* Start state */
+.start-state{text-align:center;padding:60px 20px}
+.start-state .start-icon{font-size:48px;margin-bottom:16px}
+.start-state p{font-size:14px;color:var(--ink-60);margin-bottom:20px;line-height:1.7}
+.start-form{display:flex;gap:8px;max-width:340px;margin:0 auto}
+.start-form input{flex:1;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none}
+.start-form input:focus{border-color:var(--orange)}
+.start-form button{padding:10px 20px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+
+/* Legend */
+.legend{display:flex;gap:16px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-60)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
 
 @media print{
-  .cs-nav,.no-print,.add-form,.member-actions{display:none!important}
+  .cs-nav,.no-print,.node-actions,.add-child-btn{display:none!important}
   body{background:#fff}
   .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
-  @page{size:A4;margin:1.5cm}
+  @page{size:A4 landscape;margin:1.5cm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
@@ -96,235 +120,276 @@
 </nav>
 
 <div style="padding:28px 32px;display:flex;justify-content:center">
-<div class="cs-page" style="max-width:794px">
+<div class="cs-page" style="max-width:900px">
 
   <div class="team-header">
     <h1>Construire son &#233;quipe</h1>
-    <p>G&#233;rez votre organisation, suivez vos collaborateurs et visualisez votre &#233;quipe.</p>
+    <p>Visualisez votre arborescence et la profondeur de votre organisation.</p>
   </div>
 
   <!-- Stats -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-box"><div class="stat-label">Membres</div><div class="stat-val" id="statTotal">0</div></div>
-    <div class="stat-box"><div class="stat-label">Actifs</div><div class="stat-val orange" id="statActifs">0</div></div>
-    <div class="stat-box"><div class="stat-label">En formation</div><div class="stat-val" id="statFormation">0</div></div>
-    <div class="stat-box"><div class="stat-label">Prospects</div><div class="stat-val" id="statProspects">0</div></div>
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-pill orange">Membres : <b id="statTotal">0</b></div>
+    <div class="stat-pill">Profondeur : <b id="statDepth">0</b> niveaux</div>
+    <div class="stat-pill">Directs : <b id="statDirects">0</b></div>
   </div>
 
-  <!-- Add form -->
-  <div class="add-form no-print" id="addForm">
-    <h3>Ajouter un membre</h3>
-    <div class="form-grid">
-      <div class="fg"><label>Pr&#233;nom</label><input type="text" id="fPrenom" placeholder="Alexandre"></div>
-      <div class="fg"><label>Nom</label><input type="text" id="fNom" placeholder="DUSSOURD"></div>
-    </div>
-    <div class="form-grid three" style="margin-top:10px">
-      <div class="fg"><label>R&#244;le / Fonction</label>
-        <select id="fRole">
-          <option value="Consultant">Consultant</option>
-          <option value="Manager">Manager</option>
-          <option value="Directeur">Directeur</option>
-          <option value="Parrain">Parrain / Marraine</option>
-          <option value="Autre">Autre</option>
-        </select>
-      </div>
-      <div class="fg"><label>Statut</label>
-        <select id="fStatut">
-          <option value="Actif">Actif</option>
-          <option value="En formation">En formation</option>
-          <option value="Prospect">Prospect</option>
-          <option value="Inactif">Inactif</option>
-        </select>
-      </div>
-      <div class="fg"><label>Qualification</label>
-        <select id="fQualif">
-          <option value="">Aucune</option>
-          <option value="D&#233;marrage">D&#233;marrage</option>
-          <option value="Expansion">Expansion</option>
-          <option value="D&#233;veloppement">D&#233;veloppement</option>
-          <option value="Performance">Performance</option>
-          <option value="Excellence">Excellence</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-grid" style="margin-top:10px">
-      <div class="fg"><label>T&#233;l&#233;phone</label><input type="text" id="fTel" placeholder="06 XX XX XX XX"></div>
-      <div class="fg"><label>Email</label><input type="text" id="fEmail" placeholder="email@exemple.fr"></div>
-    </div>
-    <div class="form-grid" style="margin-top:10px">
-      <div class="fg"><label>Date d'entr&#233;e</label><input type="date" id="fDateEntree"></div>
-      <div class="fg"><label>Notes</label><input type="text" id="fNotes" placeholder="Commentaire libre"></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-add" onclick="addMember()">Ajouter</button>
-      <button class="btn-cancel" onclick="resetForm()">Annuler</button>
+  <!-- Start state -->
+  <div id="startState" class="start-state">
+    <div class="start-icon">&#128101;</div>
+    <p>Commencez par vous ajouter.<br>Ensuite, construisez votre arborescence en ajoutant des membres sous chaque personne.</p>
+    <div class="start-form">
+      <input type="text" id="startPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('startNom').focus()">
+      <input type="text" id="startNom" placeholder="Nom" onkeydown="if(event.key==='Enter')createRoot()">
+      <button onclick="createRoot()">C'est moi</button>
     </div>
   </div>
 
-  <!-- Members grid -->
-  <div id="membersGrid" class="member-grid"></div>
-  <div id="emptyState" class="empty-state" style="display:none">
-    <div class="empty-icon">&#128101;</div>
-    <p>Aucun membre dans votre &#233;quipe.<br>Commencez par ajouter votre premier collaborateur.</p>
-  </div>
+  <!-- Tree -->
+  <div class="tree-wrap" id="treeWrap" style="display:none"></div>
 
-  <!-- Organigramme -->
-  <div class="org-section" id="orgSection" style="display:none">
-    <div class="org-title">Organigramme</div>
-    <div class="org-tree" id="orgTree"></div>
+  <!-- Legend -->
+  <div class="legend" id="legend" style="display:none">
+    <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Vous (N0)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Manager (N1)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>Plan&#232;te (N2)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Galaxie (N3)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>N4+</div>
   </div>
 
   <!-- Actions -->
-  <div style="display:flex;gap:8px;margin-top:24px" class="no-print">
-    <button class="btn-add" onclick="window.print()">&#128424; Exporter PDF</button>
-    <button class="btn-cancel" onclick="exportJSON()">&#128190; Sauvegarder JSON</button>
-    <button class="btn-cancel" onclick="V('importFile').click()">&#128194; Charger JSON</button>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:24px" class="no-print" id="actionsBar" style="display:none">
+    <button onclick="window.print()" style="padding:9px 18px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128424; Exporter PDF</button>
+    <button onclick="exportJSON()" style="padding:9px 18px;background:#fff;color:var(--ink-60);border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer">&#128190; Sauvegarder</button>
+    <button onclick="document.getElementById('importFile').click()" style="padding:9px 18px;background:#fff;color:var(--ink-60);border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer">&#128194; Charger</button>
+    <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" style="padding:9px 18px;background:#fff;color:#dc2626;border:1.5px solid rgba(220,38,38,0.2);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer">Effacer</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
   </div>
 
 </div>
 </div>
 
+<!-- Add modal -->
+<div class="add-modal" id="addModal" onclick="if(event.target===this)closeModal()">
+  <div class="add-box">
+    <h3 id="modalTitle">Ajouter un membre</h3>
+    <div class="add-sub" id="modalSub">sous Alexandre DUSSOURD</div>
+    <input type="text" id="modalPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('modalNom').focus()">
+    <input type="text" id="modalNom" placeholder="Nom" onkeydown="if(event.key==='Enter')confirmAdd()">
+    <div class="add-actions">
+      <button class="btn-dismiss" onclick="closeModal()">Annuler</button>
+      <button class="btn-confirm" onclick="confirmAdd()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
 <script>
-var STORAGE_KEY='cgpskool_equipe_v1';
-var team=[];
-var editingIdx=-1;
+var STORAGE_KEY='cgpskool_equipe_v2';
+var tree=null; // {prenom,nom,children:[...]}
+var addTarget=null; // path array to parent node
+var editTarget=null; // path for editing
+
+var LEVELS=['Vous','Manager','Plan\u00e8te','Galaxie','N4','N5','N6','N7'];
 
 function V(id){return document.getElementById(id)}
 
-function loadTeam(){
-  try{var raw=localStorage.getItem(STORAGE_KEY);if(raw)team=JSON.parse(raw);}catch(e){}
+function loadTree(){
+  try{var raw=localStorage.getItem(STORAGE_KEY);if(raw)tree=JSON.parse(raw);}catch(e){}
   render();
 }
 
-function saveTeam(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(team));}catch(e){}
+function saveTree(){
+  try{if(tree)localStorage.setItem(STORAGE_KEY,JSON.stringify(tree));else localStorage.removeItem(STORAGE_KEY);}catch(e){}
 }
 
-function addMember(){
-  var prenom=V('fPrenom').value.trim();
-  var nom=V('fNom').value.trim();
-  if(!prenom&&!nom){V('fPrenom').focus();return}
-  var m={
-    prenom:prenom,
-    nom:nom,
-    role:V('fRole').value,
-    statut:V('fStatut').value,
-    qualif:V('fQualif').value,
-    tel:V('fTel').value.trim(),
-    email:V('fEmail').value.trim(),
-    dateEntree:V('fDateEntree').value,
-    notes:V('fNotes').value.trim(),
-    id:Date.now()
-  };
-  if(editingIdx>=0){
-    m.id=team[editingIdx].id;
-    team[editingIdx]=m;
-    editingIdx=-1;
-  }else{
-    team.push(m);
+function createRoot(){
+  var p=V('startPrenom').value.trim();
+  var n=V('startNom').value.trim();
+  if(!p&&!n){V('startPrenom').focus();return}
+  tree={prenom:p,nom:n,children:[]};
+  saveTree();render();
+}
+
+function getNode(path){
+  if(!tree)return null;
+  var node=tree;
+  for(var i=0;i<path.length;i++){
+    if(!node.children||!node.children[path[i]])return null;
+    node=node.children[path[i]];
   }
-  saveTeam();
-  resetForm();
-  render();
+  return node;
 }
 
-function resetForm(){
-  V('fPrenom').value='';V('fNom').value='';V('fRole').value='Consultant';
-  V('fStatut').value='Actif';V('fQualif').value='';V('fTel').value='';
-  V('fEmail').value='';V('fDateEntree').value='';V('fNotes').value='';
-  editingIdx=-1;
+function openAdd(path){
+  var parent=getNode(path);
+  if(!parent)return;
+  addTarget=path;
+  editTarget=null;
+  V('modalTitle').textContent='Ajouter un membre';
+  V('modalSub').textContent='sous '+parent.prenom+' '+parent.nom;
+  V('modalPrenom').value='';
+  V('modalNom').value='';
+  V('addModal').classList.add('open');
+  setTimeout(function(){V('modalPrenom').focus()},100);
 }
 
-function editMember(idx){
-  var m=team[idx];if(!m)return;
-  V('fPrenom').value=m.prenom;V('fNom').value=m.nom;
-  V('fRole').value=m.role||'Consultant';V('fStatut').value=m.statut||'Actif';
-  V('fQualif').value=m.qualif||'';V('fTel').value=m.tel||'';
-  V('fEmail').value=m.email||'';V('fDateEntree').value=m.dateEntree||'';
-  V('fNotes').value=m.notes||'';
-  editingIdx=idx;
-  V('fPrenom').focus();
-  window.scrollTo({top:0,behavior:'smooth'});
+function openEdit(path){
+  var node=getNode(path);
+  if(!node)return;
+  editTarget=path;
+  addTarget=null;
+  V('modalTitle').textContent='Modifier';
+  V('modalSub').textContent='';
+  V('modalPrenom').value=node.prenom;
+  V('modalNom').value=node.nom;
+  V('addModal').classList.add('open');
+  setTimeout(function(){V('modalPrenom').focus()},100);
 }
 
-function removeMember(idx){
-  if(!confirm('Supprimer '+team[idx].prenom+' '+team[idx].nom+' ?'))return;
-  team.splice(idx,1);
-  saveTeam();render();
+function closeModal(){
+  V('addModal').classList.remove('open');
+  addTarget=null;editTarget=null;
 }
 
-function getInitials(m){
-  var p=m.prenom?m.prenom.charAt(0).toUpperCase():'';
-  var n=m.nom?m.nom.charAt(0).toUpperCase():'';
+function confirmAdd(){
+  var p=V('modalPrenom').value.trim();
+  var n=V('modalNom').value.trim();
+  if(!p&&!n){V('modalPrenom').focus();return}
+
+  if(editTarget!==null){
+    var node=getNode(editTarget);
+    if(node){node.prenom=p;node.nom=n;}
+  } else if(addTarget!==null){
+    var parent=getNode(addTarget);
+    if(parent){
+      if(!parent.children)parent.children=[];
+      parent.children.push({prenom:p,nom:n,children:[]});
+    }
+  }
+  saveTree();closeModal();render();
+}
+
+function removeNode(path){
+  if(path.length===0){
+    if(!confirm('Supprimer toute l\'arborescence ?'))return;
+    tree=null;saveTree();render();return;
+  }
+  var parentPath=path.slice(0,-1);
+  var idx=path[path.length-1];
+  var parent=getNode(parentPath);
+  if(!parent||!parent.children)return;
+  var node=parent.children[idx];
+  var count=countNodes(node);
+  var msg='Supprimer '+node.prenom+' '+node.nom;
+  if(count>1)msg+=' et ses '+String(count-1)+' filleul(s)';
+  msg+=' ?';
+  if(!confirm(msg))return;
+  parent.children.splice(idx,1);
+  saveTree();render();
+}
+
+function countNodes(node){
+  var c=1;
+  if(node.children)node.children.forEach(function(ch){c+=countNodes(ch)});
+  return c;
+}
+
+function maxDepth(node,d){
+  var m=d;
+  if(node.children)node.children.forEach(function(ch){m=Math.max(m,maxDepth(ch,d+1))});
+  return m;
+}
+
+function getInitials(node){
+  var p=node.prenom?node.prenom.charAt(0).toUpperCase():'';
+  var n=node.nom?node.nom.charAt(0).toUpperCase():'';
   return p+n;
-}
-
-function render(){
-  var grid=V('membersGrid');
-  var empty=V('emptyState');
-  if(team.length===0){grid.innerHTML='';empty.style.display='block';V('orgSection').style.display='none';updateStats();return}
-  empty.style.display='none';
-  var html='';
-  team.forEach(function(m,i){
-    var isLeader=m.role==='Manager'||m.role==='Directeur';
-    html+='<div class="member-card'+(isLeader?' leader':'')+'">';
-    html+='<div class="member-actions"><button title="Modifier" onclick="editMember('+i+')">&#9998;</button><button class="del" title="Supprimer" onclick="removeMember('+i+')">&#10005;</button></div>';
-    html+='<div class="member-avatar">'+getInitials(m)+'</div>';
-    html+='<div class="member-name">'+esc(m.prenom)+' '+esc(m.nom)+'</div>';
-    html+='<div class="member-role">'+esc(m.role)+'</div>';
-    if(m.qualif)html+='<span class="member-badge badge-qual">'+esc(m.qualif)+'</span>';
-    var statCls=m.statut==='Actif'?'badge-status':m.statut==='Prospect'?'badge-prospect':'badge-qual';
-    html+='<span class="member-badge '+statCls+'">'+esc(m.statut)+'</span>';
-    var meta=[];
-    if(m.tel)meta.push(esc(m.tel));
-    if(m.email)meta.push(esc(m.email));
-    if(m.dateEntree)meta.push('Entr\u00e9e : '+esc(m.dateEntree));
-    if(meta.length)html+='<div class="member-meta">'+meta.join(' &middot; ')+'</div>';
-    if(m.notes)html+='<div class="member-meta" style="color:var(--ink-60);font-style:italic;margin-top:4px">'+esc(m.notes)+'</div>';
-    html+='</div>';
-  });
-  grid.innerHTML=html;
-  updateStats();
-  renderOrg();
-}
-
-function updateStats(){
-  V('statTotal').textContent=team.length;
-  V('statActifs').textContent=team.filter(function(m){return m.statut==='Actif'}).length;
-  V('statFormation').textContent=team.filter(function(m){return m.statut==='En formation'}).length;
-  V('statProspects').textContent=team.filter(function(m){return m.statut==='Prospect'}).length;
-}
-
-function renderOrg(){
-  var sec=V('orgSection');
-  if(team.length<2){sec.style.display='none';return}
-  sec.style.display='block';
-  var tree=V('orgTree');
-  var leaders=team.filter(function(m){return m.role==='Manager'||m.role==='Directeur'});
-  var others=team.filter(function(m){return m.role!=='Manager'&&m.role!=='Directeur'});
-
-  var html='';
-  if(leaders.length>0){
-    leaders.forEach(function(l){
-      html+='<div class="org-node leader"><div class="on-name">'+esc(l.prenom)+' '+esc(l.nom)+'</div><div class="on-role">'+esc(l.role)+'</div></div>';
-    });
-    if(others.length>0)html+='<div class="org-connector"></div>';
-  }
-  if(others.length>0){
-    html+='<div class="org-level">';
-    others.forEach(function(m){
-      html+='<div class="org-branch"><div class="org-connector"></div><div class="org-node"><div class="on-name">'+esc(m.prenom)+' '+esc(m.nom)+'</div><div class="on-role">'+esc(m.role)+'</div></div></div>';
-    });
-    html+='</div>';
-  }
-  tree.innerHTML=html;
 }
 
 function esc(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
+function renderNode(node,path,depth){
+  var depthClass='depth-'+Math.min(depth,4);
+  var level=LEVELS[Math.min(depth,LEVELS.length-1)];
+  var childCount=countNodes(node)-1;
+  var pathStr=JSON.stringify(path);
+
+  var html='<div class="node-group">';
+  html+='<div class="node-bubble '+depthClass+'">';
+  html+='<div class="node-avatar">'+getInitials(node)+'</div>';
+  html+='<div class="node-info">';
+  html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+'</div>';
+  html+='<div class="node-level">'+level+'</div>';
+  if(childCount>0)html+='<div class="node-count">'+childCount+' filleul'+(childCount>1?'s':'')+'</div>';
+  html+='</div>';
+  html+='<div class="node-actions">';
+  html+='<button class="node-act" title="Modifier" onclick="event.stopPropagation();openEdit('+pathStr+')">&#9998;</button>';
+  html+='<button class="node-act del" title="Supprimer" onclick="event.stopPropagation();removeNode('+pathStr+')">&#10005;</button>';
+  html+='</div>';
+  html+='</div>';
+
+  // Add button
+  html+='<div class="connector-v"></div>';
+  html+='<button class="add-child-btn no-print" title="Ajouter sous '+esc(node.prenom)+'" onclick="openAdd('+pathStr+')">+</button>';
+
+  // Children
+  if(node.children&&node.children.length>0){
+    html+='<div class="connector-v"></div>';
+    if(node.children.length===1){
+      html+=renderNode(node.children[0],path.concat([0]),depth+1);
+    }else{
+      html+='<div class="children-wrap">';
+      node.children.forEach(function(ch,i){
+        html+='<div class="child-branch">';
+        html+='<div class="connector-v"></div>';
+        html+=renderNode(ch,path.concat([i]),depth+1);
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+  }
+
+  html+='</div>';
+  return html;
+}
+
+function render(){
+  var wrap=V('treeWrap');
+  var start=V('startState');
+  var stats=V('statsBar');
+  var leg=V('legend');
+  var acts=V('actionsBar');
+
+  if(!tree){
+    start.style.display='block';
+    wrap.style.display='none';
+    stats.style.display='none';
+    leg.style.display='none';
+    acts.style.display='none';
+    return;
+  }
+
+  start.style.display='none';
+  wrap.style.display='flex';
+  stats.style.display='flex';
+  leg.style.display='flex';
+  acts.style.display='flex';
+
+  // Stats
+  var total=countNodes(tree);
+  var depth=maxDepth(tree,0);
+  var directs=tree.children?tree.children.length:0;
+  V('statTotal').textContent=total;
+  V('statDepth').textContent=depth;
+  V('statDirects').textContent=directs;
+
+  // Tree
+  wrap.innerHTML=renderNode(tree,[],0);
+}
+
 function exportJSON(){
-  var blob=new Blob([JSON.stringify(team,null,2)],{type:'application/json'});
+  if(!tree)return;
+  var blob=new Blob([JSON.stringify(tree,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download='equipe-cgpskool.json';
@@ -337,14 +402,14 @@ function importJSON(e){
   reader.onload=function(ev){
     try{
       var data=JSON.parse(ev.target.result);
-      if(Array.isArray(data)){team=data;saveTeam();render()}
+      if(data&&data.prenom!==undefined){tree=data;saveTree();render()}
     }catch(err){alert('Fichier invalide')}
   };
   reader.readAsText(file);
   e.target.value='';
 }
 
-loadTeam();
+loadTree();
 </script>
 </body>
 </html>
