@@ -80,21 +80,96 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 .cs-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:4px}
 .cs-kpi-val{font-size:18px;font-weight:700;color:var(--ink)}
 
-/* ── EXPORT PDF ── */
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION PARTAGEE (.cgp-app)
+   Grille : [nav partagee 220px] [contenu module]
+   ══════════════════════════════════════════════════════════════ */
+.cgp-app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 54px)}
+
+/* ── Nav sidebar (injectee par cgp-skool-nav.js) ── */
+.cgp-nav-sidebar{background:#181614;border-right:1px solid rgba(255,255,255,0.06);padding:20px 0;overflow-y:auto;position:sticky;top:54px;height:calc(100vh - 54px);box-sizing:border-box;display:flex;flex-direction:column}
+.cgp-nav-category{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:18px 20px 6px}
+.cgp-nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;font-weight:400;color:rgba(255,255,255,0.5);text-decoration:none;transition:all 0.15s;border-left:2px solid transparent}
+.cgp-nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.04)}
+.cgp-nav-item.active{color:#fff;font-weight:600;border-left-color:#D4622A;background:rgba(212,98,42,0.08)}
+.cgp-nav-item .nav-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.cgp-nav-spacer{flex:1}
+.cgp-nav-actions{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:6px}
+.cgp-nav-action{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);background:none;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left}
+.cgp-nav-action:hover{color:#fff;border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.04)}
+.cgp-nav-action .nav-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+/* Import file input hidden inside action button */
+.cgp-nav-action input[type=file]{position:absolute;opacity:0;width:0;height:0}
+.cgp-nav-action{position:relative}
+
+/* Module content area inside .cgp-app */
+.cgp-module{min-width:0}
+
+/* ══════════════════════════════════════════════════════════════
+   PRINT — REGLES ROBUSTES POUR TOUS LES MODULES
+   Calibre : couleurs exactes, anti-coupure, tailles, marges A4
+   ══════════════════════════════════════════════════════════════ */
 @media print{
-  body{background:#fff!important}
-  .cs-nav,.cs-sidebar,.cs-btn,.cs-nav-actions{display:none!important}
+  /* ── 1. COULEURS : forcer l'impression des fonds ── */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+
+  /* ── 2. MASQUER : tout ce qui n'est pas contenu ── */
+  .cs-nav,.cgp-nav-sidebar,.cs-sidebar,.cs-nav-actions,
+  .cgp-nav-actions,.no-print,
+  button:not(.print-keep),input[type=file],
+  .cs-btn,.sidebar-btn{display:none!important}
+
+  /* ── 3. LAYOUT : pleine largeur, fond blanc ── */
+  body{background:#fff!important;font-size:11pt!important}
+  .cgp-app{display:block!important}
   .cs-app{display:block!important}
-  .cs-main{padding:0!important;max-width:100%!important}
-  .cs-page{border:none!important;box-shadow:none!important;border-radius:0!important;padding:20px!important;max-width:100%!important;min-height:auto!important;margin:0!important}
-  .cs-card{break-inside:avoid}
+  .cgp-module{display:block!important}
+  .cs-main,.main-area{padding:0!important;max-width:100%!important;display:block!important}
+
+  /* ── 4. PAGE A4 : bordures, ombres, marges ── */
+  .cs-page{
+    border:none!important;box-shadow:none!important;border-radius:0!important;
+    padding:20px!important;max-width:100%!important;min-height:auto!important;margin:0!important
+  }
+
+  /* ── 5. ANTI-COUPURE : cards, KPI, charts, tableaux ── */
+  .cs-card,.cs-kpi,.kpi-box,.kpi-grid,
+  .bilan-box,.breakeven,.fee-summary,
+  .compare-card,.chart-box,.pedagogy,
+  .disclaimer,tr{break-inside:avoid}
+
+  /* ── 6. GRAPHIQUES : respecter la largeur ── */
   canvas{max-width:100%!important}
-  @page{size:A4 portrait;margin:1.5cm}
-  .cs-badge,.cs-kpi,.breakeven,.fee-summary,.compare-card.future{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .chart-wrap{height:auto!important}
+  .chart-wrap img,.cgp-chart-print-img{max-width:100%!important;height:auto!important;display:block!important}
+
+  /* ── 7. TABLEAUX : lisibles ── */
+  .cs-tbl{font-size:10pt!important}
+  .cs-tbl thead th{background:#f5f5f5!important;font-size:8pt!important}
+  .cs-tbl td{padding:6px 10px!important}
+
+  /* ── 8. BADGES / KPI : couleurs preservees ── */
+  .cs-badge,.cs-badge-orange,.cs-badge-green,.cs-badge-blue,.cs-badge-red,
+  .cs-kpi,.kpi-box,.bilan-box,.breakeven,
+  .compare-card.future{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+
+  /* ── 9. FOOTER CONSEILLER : visible en print ── */
+  .cgp-footer-conseiller{display:block!important}
+
+  /* ── 10. FORMAT A4 ── */
+  @page{size:A4 portrait;margin:10mm 10mm 15mm 10mm}
 }
 
-/* ── RESPONSIVE ── */
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
 @media(max-width:900px){
+  .cgp-app{grid-template-columns:1fr}
+  .cgp-nav-sidebar{position:fixed;left:-260px;top:54px;width:220px;height:calc(100vh - 54px);z-index:90;transition:left 0.25s ease}
+  .cgp-nav-sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+  .cgp-nav-toggle{display:flex!important}
   .cs-app{grid-template-columns:1fr}
   .cs-sidebar{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--rule-l)}
 }
+/* Hamburger toggle (hidden on desktop, shown on mobile) */
+.cgp-nav-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:none;border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;margin-right:12px}

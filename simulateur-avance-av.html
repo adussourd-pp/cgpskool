@@ -6,6 +6,8 @@
 <title>CGP Skool &#8212; Avance sur Assurance Vie</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <style>
 .slider-group{margin-bottom:20px}
 .slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
@@ -48,17 +50,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .bilan-total .bilan-row-l{font-weight:700;color:var(--ink)}
 .bilan-total .bilan-row-v{font-size:18px}
 .disclaimer{font-size:11px;color:var(--ink-30);line-height:1.7;margin-top:30px;padding-top:16px;border-top:1px solid var(--rule-l)}
-@media print{
-  .cs-nav,.no-print{display:none!important}
-  body{background:#fff}
-  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
-  @page{size:A4;margin:1.5cm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
 </style>
 </head>
 <body>
-<script>const CTA_URL='https://calendly.com';</script>
 
 <!-- NAV -->
 <nav class="cs-nav">
@@ -68,110 +62,111 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
-    </div>
   </div>
 </nav>
 
-<div style="padding:28px 32px;display:flex;justify-content:center">
-<div class="cs-page" style="max-width:794px">
+<!-- APP LAYOUT : nav partagee + contenu module -->
+<div class="cgp-app">
+  <nav id="cgp-nav-slot"></nav>
+  <div class="cgp-module">
 
-  <!-- HEADER -->
-  <div style="margin-bottom:32px">
-    <div style="font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)">Avance sur Assurance Vie</div>
-    <div style="font-size:14px;color:var(--ink-60);margin-top:6px">Obtenez des liquidit&#233;s sans racheter votre contrat</div>
-  </div>
+    <div style="padding:28px 32px;display:flex;justify-content:center">
+    <div class="cs-page" style="max-width:794px">
 
-  <!-- INPUTS -->
-  <div class="cs-card">
-    <div class="cs-card-title"><span class="cs-dot"></span>Votre contrat</div>
+      <!-- HEADER -->
+      <div style="margin-bottom:32px">
+        <div style="font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)">Avance sur Assurance Vie</div>
+        <div style="font-size:14px;color:var(--ink-60);margin-top:6px">Obtenez des liquidit&#233;s sans racheter votre contrat</div>
+      </div>
 
-    <div class="slider-group">
-      <div class="slider-header"><span class="slider-label">Valeur du contrat</span><span class="slider-val" id="vContratVal">40 000 &#8364;</span></div>
-      <input type="range" id="vContrat" min="10000" max="500000" step="5000" value="40000" oninput="calc()">
-    </div>
-    <div class="slider-group">
-      <div class="slider-header"><span class="slider-label">Rendement AV</span><span class="slider-val" id="vRendAVVal">4.5%</span></div>
-      <input type="range" id="vRendAV" min="1.5" max="9" step="0.5" value="4.5" oninput="calc()">
-    </div>
-    <div class="slider-group">
-      <div class="slider-header"><span class="slider-label">Taux avance estim&#233;</span><span class="slider-val" id="vTauxAvVal">3%</span></div>
-      <input type="range" id="vTauxAv" min="2" max="4" step="0.25" value="3" oninput="calc()">
-    </div>
-    <div class="slider-group">
-      <div class="slider-header"><span class="slider-label">Dur&#233;e souhait&#233;e</span><span class="slider-val" id="vDureeVal">3 ans</span></div>
-      <input type="range" id="vDuree" min="1" max="6" step="1" value="3" oninput="calc()">
-    </div>
-  </div>
+      <!-- INPUTS -->
+      <div class="cs-card">
+        <div class="cs-card-title"><span class="cs-dot"></span>Votre contrat</div>
 
-  <!-- RESULTATS AVANCE SEULE -->
-  <div class="kpi-grid" id="kpiAvance">
-    <div class="kpi-box"><div class="kpi-box-label">Avance disponible</div><div class="kpi-box-val orange" id="kAvance">0 &#8364;</div></div>
-    <div class="kpi-box"><div class="kpi-box-label">Int&#233;r&#234;ts cumul&#233;s</div><div class="kpi-box-val red" id="kInterets">0 &#8364;</div></div>
-    <div class="kpi-box"><div class="kpi-box-label">Contrat r&#233;siduel</div><div class="kpi-box-val green" id="kResiduel">0 &#8364;</div></div>
-  </div>
-
-  <div class="pedagogy">Vous n'avez rien &#224; rembourser activement. &#192; l'&#233;ch&#233;ance, l'assureur d&#233;duit la dette directement de votre contrat. Votre contrat continue de fructifier pendant toute la dur&#233;e de l'avance.</div>
-
-  <!-- TOGGLE SCPI -->
-  <div class="toggle-row">
-    <span class="toggle-label">Je veux que l'avance s'autofinance via des SCPI</span>
-    <label class="toggle-switch"><input type="checkbox" id="toggleSCPI" onchange="calc()"><span class="toggle-slider"></span></label>
-  </div>
-
-  <!-- BLOC SCPI -->
-  <div id="blocSCPI" style="display:none">
-    <div class="cs-card">
-      <div class="cs-card-title"><span class="cs-dot"></span>Choix de la SCPI</div>
-      <div style="font-size:11px;color:var(--ink-60);margin-bottom:8px">S&#233;lectionnez une SCPI ou ajustez le rendement manuellement ci-dessous</div>
-      <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:10px">
-      <div class="scpi-list" id="scpiList"></div>
-      <div style="text-align:center;margin-top:6px"><button onclick="selectedSCPIIdx=-1;renderSCPIList('');calc()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans)">&#10005; D&#233;s&#233;lectionner &#8212; taux personnalis&#233;</button></div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="slider-group" style="margin-bottom:0">
-          <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
-          <input type="range" id="vRendSCPI" min="4" max="10" step="0.5" value="6" oninput="calc()">
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Valeur du contrat</span><span class="slider-val" id="vContratVal">40 000 &#8364;</span></div>
+          <input type="range" id="vContrat" min="10000" max="500000" step="5000" value="40000" oninput="calc()">
         </div>
-        <div class="slider-group" style="margin-bottom:0">
-          <div class="slider-header"><span class="slider-label">Revalorisation parts</span><span class="slider-val" id="vRevaloVal">1%</span></div>
-          <input type="range" id="vRevalo" min="0" max="3" step="0.5" value="1" oninput="calc()">
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Rendement AV</span><span class="slider-val" id="vRendAVVal">4.5%</span></div>
+          <input type="range" id="vRendAV" min="1.5" max="9" step="0.5" value="4.5" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Taux avance estim&#233;</span><span class="slider-val" id="vTauxAvVal">3%</span></div>
+          <input type="range" id="vTauxAv" min="2" max="4" step="0.25" value="3" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><span class="slider-label">Dur&#233;e souhait&#233;e</span><span class="slider-val" id="vDureeVal">3 ans</span></div>
+          <input type="range" id="vDuree" min="1" max="6" step="1" value="3" oninput="calc()">
         </div>
       </div>
+
+      <!-- RESULTATS AVANCE SEULE -->
+      <div class="kpi-grid" id="kpiAvance">
+        <div class="kpi-box"><div class="kpi-box-label">Avance disponible</div><div class="kpi-box-val orange" id="kAvance">0 &#8364;</div></div>
+        <div class="kpi-box"><div class="kpi-box-label">Int&#233;r&#234;ts cumul&#233;s</div><div class="kpi-box-val red" id="kInterets">0 &#8364;</div></div>
+        <div class="kpi-box"><div class="kpi-box-label">Contrat r&#233;siduel</div><div class="kpi-box-val green" id="kResiduel">0 &#8364;</div></div>
+      </div>
+
+      <div class="pedagogy">Vous n'avez rien &#224; rembourser activement. &#192; l'&#233;ch&#233;ance, l'assureur d&#233;duit la dette directement de votre contrat. Votre contrat continue de fructifier pendant toute la dur&#233;e de l'avance.</div>
+
+      <!-- TOGGLE SCPI -->
+      <div class="toggle-row">
+        <span class="toggle-label">Je veux que l'avance s'autofinance via des SCPI</span>
+        <label class="toggle-switch"><input type="checkbox" id="toggleSCPI" onchange="calc()"><span class="toggle-slider"></span></label>
+      </div>
+
+      <!-- BLOC SCPI -->
+      <div id="blocSCPI" style="display:none">
+        <div class="cs-card">
+          <div class="cs-card-title"><span class="cs-dot"></span>Choix de la SCPI</div>
+          <div style="font-size:11px;color:var(--ink-60);margin-bottom:8px">S&#233;lectionnez une SCPI ou ajustez le rendement manuellement ci-dessous</div>
+          <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:10px">
+          <div class="scpi-list" id="scpiList"></div>
+          <div style="text-align:center;margin-top:6px"><button onclick="selectedSCPIIdx=-1;renderSCPIList('');calc()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans)">&#10005; D&#233;s&#233;lectionner &#8212; taux personnalis&#233;</button></div>
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="slider-group" style="margin-bottom:0">
+              <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
+              <input type="range" id="vRendSCPI" min="4" max="10" step="0.5" value="6" oninput="calc()">
+            </div>
+            <div class="slider-group" style="margin-bottom:0">
+              <div class="slider-header"><span class="slider-label">Revalorisation parts</span><span class="slider-val" id="vRevaloVal">1%</span></div>
+              <input type="range" id="vRevalo" min="0" max="3" step="0.5" value="1" oninput="calc()">
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-grid four" id="kpiSCPI">
+          <div class="kpi-box"><div class="kpi-box-label">SCPI achet&#233;es</div><div class="kpi-box-val orange" id="kSCPI">0 &#8364;</div></div>
+          <div class="kpi-box"><div class="kpi-box-label">Loyers /mois</div><div class="kpi-box-val" id="kLoyers">0 &#8364;</div></div>
+          <div class="kpi-box"><div class="kpi-box-label">Loyers cumul&#233;s</div><div class="kpi-box-val" id="kLoyersCum">0 &#8364;</div></div>
+          <div class="kpi-box"><div class="kpi-box-label">Gain net</div><div class="kpi-box-val green" id="kGain">0 &#8364;</div></div>
+        </div>
+
+        <div class="pedagogy">Les loyers SCPI couvrent partiellement ou totalement le co&#251;t de l'avance. La revalorisation des parts SCPI augmente votre patrimoine dans le temps. Votre avance est ainsi auto-financ&#233;e.</div>
+      </div>
+
+      <!-- BILAN -->
+      <div class="bilan-box" id="bilanBox"></div>
+
+      <!-- TABLEAU -->
+      <div style="margin:24px 0;overflow-x:auto">
+        <table class="cs-tbl" id="tableau">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="disclaimer">Ce simulateur est fourni &#224; titre informatif et p&#233;dagogique uniquement. Il ne constitue pas un conseil en investissement. Les rendements pass&#233;s ne pr&#233;jugent pas des rendements futurs. Consultez un conseiller patrimonial pour une analyse personnalis&#233;e.</div>
+
+      <!-- FOOTER CONSEILLER (visible en print) -->
+      <div id="conseillerFooter"></div>
+
+    </div>
     </div>
 
-    <div class="kpi-grid four" id="kpiSCPI">
-      <div class="kpi-box"><div class="kpi-box-label">SCPI achet&#233;es</div><div class="kpi-box-val orange" id="kSCPI">0 &#8364;</div></div>
-      <div class="kpi-box"><div class="kpi-box-label">Loyers /mois</div><div class="kpi-box-val" id="kLoyers">0 &#8364;</div></div>
-      <div class="kpi-box"><div class="kpi-box-label">Loyers cumul&#233;s</div><div class="kpi-box-val" id="kLoyersCum">0 &#8364;</div></div>
-      <div class="kpi-box"><div class="kpi-box-label">Gain net</div><div class="kpi-box-val green" id="kGain">0 &#8364;</div></div>
-    </div>
-
-    <div class="pedagogy">Les loyers SCPI couvrent partiellement ou totalement le co&#251;t de l'avance. La revalorisation des parts SCPI augmente votre patrimoine dans le temps. Votre avance est ainsi auto-financ&#233;e.</div>
   </div>
-
-  <!-- BILAN -->
-  <div class="bilan-box" id="bilanBox"></div>
-
-  <!-- TABLEAU -->
-  <div style="margin:24px 0;overflow-x:auto">
-    <table class="cs-tbl" id="tableau">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- ACTIONS -->
-  <div class="no-print" style="display:flex;gap:10px;justify-content:center;padding:24px 0;border-top:1px solid var(--rule-l)">
-    <button class="cs-btn cs-btn-success" onclick="window.print()">&#11015; Exporter PDF</button>
-    <button class="cs-btn cs-btn-primary" onclick="sauvegarderSimu()">&#128190; Sauvegarder</button>
-    <label class="cs-btn cs-btn-secondary" style="cursor:pointer">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="chargerSimu(this)"></label>
-  </div>
-
-  <!-- DISCLAIMER -->
-  <div class="disclaimer">Ce simulateur est fourni &#224; titre informatif et p&#233;dagogique uniquement. Il ne constitue pas un conseil en investissement. Les rendements pass&#233;s ne pr&#233;jugent pas des rendements futurs. Consultez un conseiller patrimonial pour une analyse personnalis&#233;e.</div>
-
-</div>
 </div>
 
 <script>
@@ -235,7 +230,7 @@ function calc(){
   document.getElementById('vRendSCPIVal').textContent=(rendSCPI*100).toFixed(1)+'%';
   document.getElementById('vRevaloVal').textContent=(revalo*100).toFixed(1)+'%';
 
-  // Calculs
+  // Calculs — 100% inchanges
   var avance=Math.round(contrat*0.60);
   var detteTerm=Math.round(avance*Math.pow(1+tauxAv,duree));
   var interets=detteTerm-avance;
@@ -281,7 +276,7 @@ function calc(){
   }
   document.getElementById('bilanBox').innerHTML=bh;
 
-  // Tableau ann\u00e9e par ann\u00e9e
+  // Tableau annee par annee
   var thead='<tr><th>Ann\u00e9e</th><th class="right">Valeur contrat</th><th class="right">Dette cumul\u00e9e</th><th class="right">R\u00e9siduel</th>';
   if(scpiOn)thead+='<th class="right">Valeur SCPI</th><th class="right">Loyers cumul\u00e9s</th><th class="right">Gain net</th>';
   thead+='</tr>';
@@ -301,50 +296,42 @@ function calc(){
   }
   document.getElementById('tableau').querySelector('thead').innerHTML=thead;
   document.getElementById('tableau').querySelector('tbody').innerHTML=tbody;
+
+  // Auto-save state
+  CGP.project.autoSave('simulateur-avance-av');
 }
 
-function sauvegarderSimu(){
-  var data={
-    contrat:+document.getElementById('vContrat').value,
-    rendAV:+document.getElementById('vRendAV').value,
-    tauxAv:+document.getElementById('vTauxAv').value,
-    duree:+document.getElementById('vDuree').value,
-    scpiOn:document.getElementById('toggleSCPI').checked,
-    rendSCPI:+document.getElementById('vRendSCPI').value,
-    revalo:+document.getElementById('vRevalo').value,
-    selectedSCPI:selectedSCPIIdx,
-    date:new Date().toLocaleDateString('fr-FR')
-  };
-  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='avance-av_'+data.date.replace(/\//g,'-')+'.json';
-  a.click();
-}
-function chargerSimu(input){
-  if(!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var d=JSON.parse(e.target.result);
-      if(d.contrat)document.getElementById('vContrat').value=d.contrat;
-      if(d.rendAV)document.getElementById('vRendAV').value=d.rendAV;
-      if(d.tauxAv)document.getElementById('vTauxAv').value=d.tauxAv;
-      if(d.duree)document.getElementById('vDuree').value=d.duree;
-      if(d.scpiOn)document.getElementById('toggleSCPI').checked=true;
-      if(d.rendSCPI)document.getElementById('vRendSCPI').value=d.rendSCPI;
-      if(d.revalo!==undefined)document.getElementById('vRevalo').value=d.revalo;
-      if(d.selectedSCPI>=0){selectedSCPIIdx=d.selectedSCPI;renderSCPIList('');}
-      calc();
-    }catch(err){}
-  };
-  reader.readAsText(input.files[0]);
-  input.value='';
-}
+// ── Module registration for project export/import ──
+CGP.project.registerModule('simulateur-avance-av', {
+  getState: function() {
+    return {
+      contrat: +document.getElementById('vContrat').value,
+      rendAV: +document.getElementById('vRendAV').value,
+      tauxAv: +document.getElementById('vTauxAv').value,
+      duree: +document.getElementById('vDuree').value,
+      scpiOn: document.getElementById('toggleSCPI').checked,
+      rendSCPI: +document.getElementById('vRendSCPI').value,
+      revalo: +document.getElementById('vRevalo').value,
+      selectedSCPI: selectedSCPIIdx
+    };
+  },
+  setState: function(d) {
+    if (d.contrat) document.getElementById('vContrat').value = d.contrat;
+    if (d.rendAV) document.getElementById('vRendAV').value = d.rendAV;
+    if (d.tauxAv) document.getElementById('vTauxAv').value = d.tauxAv;
+    if (d.duree) document.getElementById('vDuree').value = d.duree;
+    if (d.scpiOn) document.getElementById('toggleSCPI').checked = true;
+    if (d.rendSCPI) document.getElementById('vRendSCPI').value = d.rendSCPI;
+    if (d.revalo !== undefined) document.getElementById('vRevalo').value = d.revalo;
+    if (d.selectedSCPI >= 0) { selectedSCPIIdx = d.selectedSCPI; renderSCPIList(''); }
+    calc();
+  }
+});
 
-// Init
+// ── Init ──
 renderSCPIList('');
 calc();
+CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
 </body>
 </html>

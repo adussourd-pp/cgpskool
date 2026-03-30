@@ -395,7 +395,7 @@ p.hero-desc {
 var PROFIL_KEY='cgpskool_profil_v1';
 var FIELDS=['pPrenom','pNom','pCabinet','pOrias','pTel','pEmail','pAdresse','pCp','pVille','pMentions'];
 var HABILS=['hImmo','hIobsp','hIas','hAgent','hCif'];
-function saveProfil(){var p={};FIELDS.forEach(function(id){p[id]=document.getElementById(id).value;});HABILS.forEach(function(id){p[id]=document.getElementById(id).checked;});localStorage.setItem(PROFIL_KEY,JSON.stringify(p));updateProfilBtn();}
+function saveProfil(){var p={};FIELDS.forEach(function(id){p[id]=document.getElementById(id).value;});HABILS.forEach(function(id){p[id]=document.getElementById(id).checked;});var MAP={pPrenom:'prenom',pNom:'nom',pCabinet:'cabinet',pOrias:'orias',pTel:'tel',pEmail:'email',pAdresse:'adresse',pCp:'cp',pVille:'ville',pMentions:'mentions'};Object.keys(MAP).forEach(function(k){if(p[k]!==undefined)p[MAP[k]]=p[k];});localStorage.setItem(PROFIL_KEY,JSON.stringify(p));updateProfilBtn();}
 function loadProfil(){try{var raw=localStorage.getItem(PROFIL_KEY);if(!raw)return;var p=JSON.parse(raw);FIELDS.forEach(function(id){if(p[id])document.getElementById(id).value=p[id];});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=!!p[id];});}catch(e){}updateProfilBtn();}
 function clearProfil(){localStorage.removeItem(PROFIL_KEY);FIELDS.forEach(function(id){document.getElementById(id).value='';});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});updateProfilBtn();}
 function updateProfilBtn(){
