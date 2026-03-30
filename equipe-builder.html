@@ -24,24 +24,10 @@
 .node-group{display:flex;flex-direction:column;align-items:center}
 .node-bubble{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:10px 16px;cursor:default;transition:all 0.2s;min-width:160px}
 .node-bubble:hover{border-color:rgba(212,98,42,0.35)}
-.node-bubble.depth-0{border-color:var(--orange);border-width:2px;background:rgba(212,98,42,0.03)}
-.node-bubble.depth-1{border-color:rgba(37,99,235,0.4)}
-.node-bubble.depth-2{border-color:rgba(45,160,100,0.4)}
-.node-bubble.depth-3{border-color:rgba(123,79,166,0.4)}
 .node-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
-.depth-0 .node-avatar{background:var(--orange)}
-.depth-1 .node-avatar{background:#2563eb}
-.depth-2 .node-avatar{background:#2da064}
-.depth-3 .node-avatar{background:#7B4FA6}
-.depth-4 .node-avatar{background:#d97706}
 .node-info{display:flex;flex-direction:column;gap:1px}
 .node-name{font-size:13px;font-weight:600;color:var(--ink)}
 .node-level{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
-.depth-0 .node-level{color:var(--orange)}
-.depth-1 .node-level{color:#2563eb}
-.depth-2 .node-level{color:#2da064}
-.depth-3 .node-level{color:#7B4FA6}
-.depth-4 .node-level{color:#d97706}
 .node-count{font-size:9px;color:var(--ink-30)}
 
 /* Node actions */
@@ -132,6 +118,8 @@
     <div class="stat-pill orange">Membres : <b id="statTotal">0</b></div>
     <div class="stat-pill">Profondeur : <b id="statDepth">0</b> niveaux</div>
     <div class="stat-pill">Directs : <b id="statDirects">0</b></div>
+    <div class="stat-pill">Branches actives : <b id="statBranches">0</b></div>
+    <div class="stat-pill orange">Qualif : <b id="statQualif">Consultant</b></div>
   </div>
 
   <!-- Start state -->
@@ -150,11 +138,12 @@
 
   <!-- Legend -->
   <div class="legend" id="legend" style="display:none">
-    <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Vous (N0)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Manager (N1)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>Plan&#232;te (N2)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Galaxie (N3)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>N4+</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--ink-60)"></div>Consultant</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Manager</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te (1 branche)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile (2)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation (3)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie (4+)</div>
   </div>
 
   <!-- Actions -->
@@ -189,7 +178,29 @@ var tree=null; // {prenom,nom,children:[...]}
 var addTarget=null; // path array to parent node
 var editTarget=null; // path for editing
 
-var LEVELS=['Vous','Manager','Plan\u00e8te','Galaxie','N4','N5','N6','N7'];
+// Qualification Prodemial : basee sur le nombre de branches actives
+// Branche active = filleul direct (N1) qui a lui-meme au moins 1 filleul
+function getQualif(node){
+  if(!node.children||node.children.length===0) return {label:'Consultant',code:'consultant'};
+  var branchesActives=0;
+  node.children.forEach(function(ch){
+    if(ch.children&&ch.children.length>0) branchesActives++;
+  });
+  if(branchesActives>=4) return {label:'Manager Galaxie',code:'galaxie'};
+  if(branchesActives===3) return {label:'Manager Constellation',code:'constellation'};
+  if(branchesActives===2) return {label:'Manager \u00c9toile',code:'etoile'};
+  if(branchesActives===1) return {label:'Manager Plan\u00e8te',code:'planete'};
+  return {label:'Manager',code:'manager'};
+}
+
+var QUALIF_COLORS={
+  consultant:'var(--ink-60)',
+  manager:'var(--orange)',
+  planete:'#2563eb',
+  etoile:'#2da064',
+  constellation:'#7B4FA6',
+  galaxie:'#d97706'
+};
 
 function V(id){return document.getElementById(id)}
 
@@ -309,18 +320,26 @@ function getInitials(node){
 function esc(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
 function renderNode(node,path,depth){
-  var depthClass='depth-'+Math.min(depth,4);
-  var level=LEVELS[Math.min(depth,LEVELS.length-1)];
+  var q=getQualif(node);
+  var qColor=QUALIF_COLORS[q.code]||'var(--ink-60)';
   var childCount=countNodes(node)-1;
+  var directs=node.children?node.children.length:0;
+  var branchesActives=0;
+  if(node.children)node.children.forEach(function(ch){if(ch.children&&ch.children.length>0)branchesActives++});
   var pathStr=JSON.stringify(path);
+  var isRoot=path.length===0;
 
   var html='<div class="node-group">';
-  html+='<div class="node-bubble '+depthClass+'">';
-  html+='<div class="node-avatar">'+getInitials(node)+'</div>';
+  html+='<div class="node-bubble" style="border-color:'+qColor+';'+(isRoot?'border-width:2px':'border-width:1.5px')+'">';
+  html+='<div class="node-avatar" style="background:'+qColor+'">'+getInitials(node)+'</div>';
   html+='<div class="node-info">';
   html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+'</div>';
-  html+='<div class="node-level">'+level+'</div>';
-  if(childCount>0)html+='<div class="node-count">'+childCount+' filleul'+(childCount>1?'s':'')+'</div>';
+  html+='<div class="node-level" style="color:'+qColor+'">'+q.label+'</div>';
+  var meta=[];
+  if(directs>0)meta.push(directs+' direct'+(directs>1?'s':''));
+  if(branchesActives>0)meta.push(branchesActives+' branche'+(branchesActives>1?'s':'')+' active'+(branchesActives>1?'s':''));
+  if(childCount>0)meta.push(childCount+' total');
+  if(meta.length)html+='<div class="node-count">'+meta.join(' \u00b7 ')+'</div>';
   html+='</div>';
   html+='<div class="node-actions">';
   html+='<button class="node-act" title="Modifier" onclick="event.stopPropagation();openEdit('+pathStr+')">&#9998;</button>';
@@ -379,9 +398,14 @@ function render(){
   var total=countNodes(tree);
   var depth=maxDepth(tree,0);
   var directs=tree.children?tree.children.length:0;
+  var branchesActives=0;
+  if(tree.children)tree.children.forEach(function(ch){if(ch.children&&ch.children.length>0)branchesActives++});
+  var rootQ=getQualif(tree);
   V('statTotal').textContent=total;
   V('statDepth').textContent=depth;
   V('statDirects').textContent=directs;
+  V('statBranches').textContent=branchesActives;
+  V('statQualif').textContent=rootQ.label;
 
   // Tree
   wrap.innerHTML=renderNode(tree,[],0);
