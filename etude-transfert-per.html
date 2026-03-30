@@ -26,6 +26,7 @@
 .sf-range input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--orange);cursor:pointer}
 .sf-range-val{font-size:12px;font-weight:700;color:var(--orange);min-width:42px;text-align:right}
 .alloc-grid{display:grid;grid-template-columns:1fr 40px 40px;gap:4px;align-items:center;font-size:10px;padding:0 8px 0 8px;margin-bottom:4px;margin-right:6px}
+.alloc-grid-simple{display:grid;grid-template-columns:1fr 46px;gap:4px;align-items:center;font-size:10px;padding:0 8px;margin-bottom:4px;margin-right:6px}
 .alloc-grid .hdr{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600}
 .alloc-grid input{border:1.5px solid var(--bord);border-radius:5px;padding:5px 6px;font-size:10px;font-family:var(--sans);color:var(--noir);background:#fff}
 .alloc-grid input:focus{border-color:var(--orange)}
@@ -133,36 +134,33 @@
 
     <div class="sidebar-divider"></div>
     <div class="sidebar-lbl">Allocation actuelle</div>
-    <div class="alloc-grid">
-      <span class="hdr">Support</span><span class="hdr">%</span><span class="hdr">Rdt</span>
+    <div class="alloc-grid-simple">
+      <span class="hdr">Support</span><span class="hdr">%</span>
       <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
       <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
-      <input type="number" id="aA0r" value="2" min="0" max="30" step="0.1" oninput="update()">
       <input type="text" id="aA1n" value="Actions CM" oninput="update()">
       <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
-      <input type="number" id="aA1r" value="3" min="0" max="30" step="0.1" oninput="update()">
     </div>
     <div class="alloc-alert" id="alertAllocA"></div>
+    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
+    <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
 
     <div class="sidebar-divider"></div>
     <div class="sidebar-lbl">Nouvelle allocation</div>
-    <div class="alloc-grid">
-      <span class="hdr">Support</span><span class="hdr">%</span><span class="hdr">Rdt</span>
+    <div class="alloc-grid-simple">
+      <span class="hdr">Support</span><span class="hdr">%</span>
       <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
       <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
-      <input type="number" id="aB0r" value="9.5" min="0" max="30" step="0.1" oninput="update()">
       <input type="text" id="aB1n" value="Private equity" oninput="update()">
       <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
-      <input type="number" id="aB1r" value="6" min="0" max="30" step="0.1" oninput="update()">
       <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
       <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
-      <input type="number" id="aB2r" value="4" min="0" max="30" step="0.1" oninput="update()">
       <input type="text" id="aB3n" value="Obligataire" oninput="update()">
       <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
-      <input type="number" id="aB3r" value="5" min="0" max="30" step="0.1" oninput="update()">
     </div>
     <div class="alloc-alert" id="alertAllocB"></div>
-
+    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
+    <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-lbl">Horizon</div>
     <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
@@ -273,20 +271,15 @@ function fmtD(n,d){return n.toFixed(d)}
 
 function getAllocA(){
   var a=[];
-  for(var i=0;i<2;i++) a.push({name:txt('aA'+i+'n'),pct:num('aA'+i+'p'),rdt:num('aA'+i+'r')});
+  for(var i=0;i<2;i++) a.push({name:txt('aA'+i+'n'),pct:num('aA'+i+'p')});
   return a;
 }
 function getAllocB(){
   var a=[];
-  for(var i=0;i<4;i++) a.push({name:txt('aB'+i+'n'),pct:num('aB'+i+'p'),rdt:num('aB'+i+'r')});
+  for(var i=0;i<4;i++) a.push({name:txt('aB'+i+'n'),pct:num('aB'+i+'p')});
   return a;
 }
 function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
-function weightedYield(arr){
-  var s=0,t=0;
-  arr.forEach(function(x){s+=x.pct*x.rdt;t+=x.pct});
-  return t>0?s/t:0;
-}
 
 function update(){
   var capital=num('pCapital');
@@ -315,6 +308,11 @@ function update(){
   V('vFraisEntree').textContent=fmtD(fraisE,1)+'%';
   V('vHorizon').textContent=horizon+' ans';
 
+  var yieldA=num('pRdtA');
+  var yieldB=num('pRdtB');
+  V('vRdtA').textContent=fmtD(yieldA,1)+'%';
+  V('vRdtB').textContent=fmtD(yieldB,1)+'%';
+
   var allocA=getAllocA();
   var allocB=getAllocB();
   var sumA=sumPct(allocA);
@@ -322,8 +320,6 @@ function update(){
   V('alertAllocA').textContent=Math.abs(sumA-100)>0.01?'Total : '+fmtD(sumA,0)+'% (doit \u00eatre 100%)':'';
   V('alertAllocB').textContent=Math.abs(sumB-100)>0.01?'Total : '+fmtD(sumB,0)+'% (doit \u00eatre 100%)':'';
 
-  var yieldA=weightedYield(allocA);
-  var yieldB=weightedYield(allocB);
 
   var montantTransfert=capital*fraisT/100;
   var capitalApresTransfert=capital-montantTransfert;
@@ -369,10 +365,7 @@ function update(){
 
   renderCharts(capital,capitalNet,yieldA,yieldB,horizon,nomA,nomB);
 
-  var yields=[];
-  allocA.forEach(function(x){if(x.pct>0)yields.push(x.name+' '+fmtD(x.rdt,1)+'%')});
-  allocB.forEach(function(x){if(x.pct>0)yields.push(x.name+' '+fmtD(x.rdt,1)+'%')});
-  V('footerNote').textContent='Projections indicatives bas\u00e9es sur les rendements hypoth\u00e9tiques suivants : '+yields.join(', ')+'. Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.';
+  V('footerNote').textContent='Projections indicatives bas\u00e9es sur des rendements hypoth\u00e9tiques de '+fmtD(yieldA,1)+'% (contrat actuel) et '+fmtD(yieldB,1)+'% (contrat recommand\u00e9). Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.';
 }
 
 function renderAllocBar(barId,legId,alloc,colors){

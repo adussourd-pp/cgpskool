@@ -138,12 +138,13 @@
 
   <!-- Legend -->
   <div class="legend" id="legend" style="display:none">
+    <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Junior</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--ink-60)"></div>Consultant</div>
     <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Manager</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te (1 branche)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile (2)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation (3)</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie (4+)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie</div>
   </div>
 
   <!-- Actions -->
@@ -165,6 +166,16 @@
     <div class="add-sub" id="modalSub">sous Alexandre DUSSOURD</div>
     <input type="text" id="modalPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('modalNom').focus()">
     <input type="text" id="modalNom" placeholder="Nom" onkeydown="if(event.key==='Enter')confirmAdd()">
+    <select id="modalQualif" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
+      <option value="">Qualification auto (selon branches)</option>
+      <option value="junior">Consultant Junior</option>
+      <option value="consultant">Consultant</option>
+      <option value="manager">Manager</option>
+      <option value="planete">Manager Plan&#232;te</option>
+      <option value="etoile">Manager &#201;toile</option>
+      <option value="constellation">Manager Constellation</option>
+      <option value="galaxie">Manager Galaxie</option>
+    </select>
     <div class="add-actions">
       <button class="btn-dismiss" onclick="closeModal()">Annuler</button>
       <button class="btn-confirm" onclick="confirmAdd()">Ajouter</button>
@@ -178,22 +189,39 @@ var tree=null; // {prenom,nom,children:[...]}
 var addTarget=null; // path array to parent node
 var editTarget=null; // path for editing
 
-// Qualification Prodemial : basee sur le nombre de branches actives
-// Branche active = filleul direct (N1) qui a lui-meme au moins 1 filleul
+// Qualifications Prodemial
+var QUALIFS=[
+  {code:'junior',label:'Consultant Junior'},
+  {code:'consultant',label:'Consultant'},
+  {code:'manager',label:'Manager'},
+  {code:'planete',label:'Manager Plan\u00e8te'},
+  {code:'etoile',label:'Manager \u00c9toile'},
+  {code:'constellation',label:'Manager Constellation'},
+  {code:'galaxie',label:'Manager Galaxie'}
+];
+
 function getQualif(node){
-  if(!node.children||node.children.length===0) return {label:'Consultant',code:'consultant'};
+  // Si qualif manuelle, on l'utilise
+  if(node.qualif){
+    for(var i=0;i<QUALIFS.length;i++){
+      if(QUALIFS[i].code===node.qualif) return QUALIFS[i];
+    }
+  }
+  // Sinon auto : basee sur branches actives
+  if(!node.children||node.children.length===0) return QUALIFS[1]; // Consultant
   var branchesActives=0;
   node.children.forEach(function(ch){
     if(ch.children&&ch.children.length>0) branchesActives++;
   });
-  if(branchesActives>=4) return {label:'Manager Galaxie',code:'galaxie'};
-  if(branchesActives===3) return {label:'Manager Constellation',code:'constellation'};
-  if(branchesActives===2) return {label:'Manager \u00c9toile',code:'etoile'};
-  if(branchesActives===1) return {label:'Manager Plan\u00e8te',code:'planete'};
-  return {label:'Manager',code:'manager'};
+  if(branchesActives>=4) return QUALIFS[6]; // Galaxie
+  if(branchesActives===3) return QUALIFS[5]; // Constellation
+  if(branchesActives===2) return QUALIFS[4]; // Etoile
+  if(branchesActives===1) return QUALIFS[3]; // Planete
+  return QUALIFS[2]; // Manager
 }
 
 var QUALIF_COLORS={
+  junior:'#9ca3af',
   consultant:'var(--ink-60)',
   manager:'var(--orange)',
   planete:'#2563eb',
@@ -240,6 +268,7 @@ function openAdd(path){
   V('modalSub').textContent='sous '+parent.prenom+' '+parent.nom;
   V('modalPrenom').value='';
   V('modalNom').value='';
+  V('modalQualif').value='';
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -253,6 +282,7 @@ function openEdit(path){
   V('modalSub').textContent='';
   V('modalPrenom').value=node.prenom;
   V('modalNom').value=node.nom;
+  V('modalQualif').value=node.qualif||'';
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -267,14 +297,17 @@ function confirmAdd(){
   var n=V('modalNom').value.trim();
   if(!p&&!n){V('modalPrenom').focus();return}
 
+  var qualif=V('modalQualif').value||'';
   if(editTarget!==null){
     var node=getNode(editTarget);
-    if(node){node.prenom=p;node.nom=n;}
+    if(node){node.prenom=p;node.nom=n;node.qualif=qualif||undefined;}
   } else if(addTarget!==null){
     var parent=getNode(addTarget);
     if(parent){
       if(!parent.children)parent.children=[];
-      parent.children.push({prenom:p,nom:n,children:[]});
+      var newNode={prenom:p,nom:n,children:[]};
+      if(qualif)newNode.qualif=qualif;
+      parent.children.push(newNode);
     }
   }
   saveTree();closeModal();render();
