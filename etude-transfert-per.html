@@ -272,6 +272,7 @@
             <div style="font-size:10px;color:var(--gris);margin-top:2px" id="cpAdresse"></div>
           </div>
         </div>
+        <div id="cpHabilitations" style="display:none;margin-top:10px;display:flex;gap:5px;flex-wrap:wrap"></div>
       </div>
 
       <!-- Footer note -->
@@ -501,6 +502,20 @@ function loadProfil(){
       var logo=localStorage.getItem('cgpskool_logo');
       if(logo){
         V('cpLogo').innerHTML='<img src="'+logo+'" style="max-height:36px;max-width:140px">';
+      }
+      // Habilitations
+      var habils=[];
+      var HAB_LABELS={hImmo:'Immobilier',hIobsp:'IOBSP',hIas:'IAS',hAgent:'Agent li\u00e9',hCif:'CIF'};
+      var HAB_KEYS=['hImmo','hIobsp','hIas','hAgent','hCif'];
+      HAB_KEYS.forEach(function(k){
+        if(p[k])habils.push(HAB_LABELS[k]);
+      });
+      if(habils.length>0){
+        var hEl=V('cpHabilitations');
+        hEl.style.display='flex';
+        hEl.innerHTML=habils.map(function(h){
+          return '<span style="font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;background:rgba(212,98,42,0.1);color:var(--orange);border-radius:3px">'+h+'</span>';
+        }).join('');
       }
       V('conseillerBlock').style.display='block';
     }
