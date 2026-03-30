@@ -11,8 +11,13 @@
 /* Sidebar light — same style as etude-dossier */
 .app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
 .sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 14px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px}
+.sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.sidebar-lbl:hover{color:var(--noir)}
 .sidebar-lbl:first-child{margin-top:0}
+.sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open{max-height:800px;opacity:1}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
 .sf{padding:0 8px;margin-bottom:8px}
 .sf label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:3px}
@@ -136,69 +141,82 @@
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-lbl">Client</div>
-    <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
-    <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
-
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Contrat &#224; transf&#233;rer</div>
-    <div class="sf"><label>Type de contrat</label>
-      <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
-        <option value="per">PER</option>
-        <option value="perp">PERP</option>
-        <option value="madelin">Loi Madelin</option>
-        <option value="permadelin">PER "Madelin" (Art. 154 bis)</option>
-        <option value="perco">PERCO / PERCOL / PERECO</option>
-        <option value="art83">Article 83 / PERE / PERO / PEROB</option>
-        <option value="prefon">PREFON / COREM</option>
-      </select>
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open">
+      <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
+      <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
     </div>
-    <div class="sf"><label>Nom du contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
-    <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
 
     <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Capital &amp; Frais</div>
-    <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
-    <div class="sf"><label>Anciennet&#233; du contrat (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
-    <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
-    <div id="typeInfo" style="padding:0 8px;font-size:9px;color:var(--orange);margin-bottom:6px;display:none"></div>
-    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
-    <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
-    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
-    <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
-
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Allocation actuelle</div>
-    <div class="alloc-grid-simple">
-      <span class="hdr">Support</span><span class="hdr">%</span>
-      <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
-      <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
-      <input type="text" id="aA1n" value="Actions CM" oninput="update()">
-      <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Contrat &#224; transf&#233;rer</div>
+    <div class="sb-body open">
+      <div class="sf"><label>Type de contrat</label>
+        <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
+          <option value="per">PER</option>
+          <option value="perp">PERP</option>
+          <option value="madelin">Loi Madelin</option>
+          <option value="permadelin">PER "Madelin" (Art. 154 bis)</option>
+          <option value="perco">PERCO / PERCOL / PERECO</option>
+          <option value="art83">Article 83 / PERE / PERO / PEROB</option>
+          <option value="prefon">PREFON / COREM</option>
+        </select>
+      </div>
+      <div class="sf"><label>Nom du contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
+      <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
     </div>
-    <div class="alloc-alert" id="alertAllocA"></div>
-    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
-    <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
 
     <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Nouvelle allocation</div>
-    <div class="alloc-grid-simple">
-      <span class="hdr">Support</span><span class="hdr">%</span>
-      <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
-      <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
-      <input type="text" id="aB1n" value="Private equity" oninput="update()">
-      <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
-      <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
-      <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
-      <input type="text" id="aB3n" value="Obligataire" oninput="update()">
-      <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Capital &amp; Frais</div>
+    <div class="sb-body open">
+      <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
+      <div class="sf"><label>Anciennet&#233; du contrat (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
+      <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
+      <div id="typeInfo" style="padding:0 8px;font-size:9px;color:var(--orange);margin-bottom:6px;display:none"></div>
+      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
+      <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
+      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
+      <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
     </div>
-    <div class="alloc-alert" id="alertAllocB"></div>
-    <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
-    <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
+
     <div class="sidebar-divider"></div>
-    <div class="sidebar-lbl">Horizon</div>
-    <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Allocation actuelle</div>
+    <div class="sb-body open">
+      <div class="alloc-grid-simple">
+        <span class="hdr">Support</span><span class="hdr">%</span>
+        <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
+        <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
+        <input type="text" id="aA1n" value="Actions CM" oninput="update()">
+        <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
+      </div>
+      <div class="alloc-alert" id="alertAllocA"></div>
+      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
+      <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Nouvelle allocation</div>
+    <div class="sb-body open">
+      <div class="alloc-grid-simple">
+        <span class="hdr">Support</span><span class="hdr">%</span>
+        <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
+        <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
+        <input type="text" id="aB1n" value="Private equity" oninput="update()">
+        <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
+        <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
+        <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
+        <input type="text" id="aB3n" value="Obligataire" oninput="update()">
+        <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
+      </div>
+      <div class="alloc-alert" id="alertAllocB"></div>
+      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
+      <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Horizon</div>
+    <div class="sb-body open">
+      <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+    </div>
 
     <button class="sidebar-btn" onclick="window.print()">&#11015; Exporter PDF</button>
   </aside>
@@ -314,6 +332,12 @@
 var chartRecovery=null, chartProjection=null;
 var COLORS_A=['#60a5fa','#93c5fd'];
 var COLORS_B=['#4ade80','#86efac','#bbf7d0','#d9f99d'];
+
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 
 function V(id){return document.getElementById(id)}
 function num(id){return parseFloat(V(id).value)||0}
