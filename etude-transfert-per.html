@@ -98,12 +98,15 @@
   .sidebar,.cs-nav,.no-print{display:none!important}
   .app{display:block!important}
   .main-area{padding:0!important;display:block!important}
-  .cs-page{border:none!important;box-shadow:none!important;max-width:100%!important;padding:24px 28px!important;min-height:auto!important}
-  .charts-row{display:none!important}
+  .cs-page{border:none!important;box-shadow:none!important;border-radius:0!important;max-width:100%!important;padding:24px 28px!important;min-height:auto!important}
+  .chart-wrap{height:180px!important}
+  .chart-box{padding:10px 12px}
   .compare-card.future{border:2px solid #2da064!important}
   #conseillerBlock{margin:20px -28px -24px -28px!important}
+  /* Texte net en print */
+  *{-webkit-font-smoothing:subpixel-antialiased!important;-moz-osx-font-smoothing:auto!important;text-rendering:optimizeSpeed!important}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   @page{size:A4;margin:1cm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
 </head>
@@ -195,7 +198,7 @@
       <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
     </div>
 
-    <button class="sidebar-btn" onclick="window.print()">&#11015; Exporter PDF</button>
+    <button class="sidebar-btn" onclick="exportPDF()">&#11015; Exporter PDF</button>
   </aside>
 
   <!-- MAIN -->
@@ -613,6 +616,41 @@ function loadProfil(){
   updateTypeEncart();
   update();
 })();
+
+// Export PDF — meme systeme que etude-dossier
+var _chartBackups=[];
+function exportPDF(){
+  // 1. Convertir tous les canvas en images PNG
+  _chartBackups=[];
+  document.querySelectorAll('canvas').forEach(function(canvas){
+    try{
+      if(canvas.width>0&&canvas.height>0){
+        var url=canvas.toDataURL('image/png');
+        if(url&&url.length>100){
+          var img=document.createElement('img');
+          img.src=url;
+          img.style.cssText='width:100%;max-width:100%;height:auto;display:block';
+          img.className='chart-img-print';
+          canvas.parentNode.insertBefore(img,canvas);
+          _chartBackups.push({canvas:canvas,img:img});
+          canvas.style.display='none';
+        }
+      }
+    }catch(e){}
+  });
+  // 2. Imprimer
+  setTimeout(function(){
+    window.print();
+    // 3. Restaurer les canvas
+    setTimeout(function(){
+      _chartBackups.forEach(function(b){
+        b.canvas.style.display='';
+        if(b.img&&b.img.parentNode)b.img.parentNode.removeChild(b.img);
+      });
+      _chartBackups=[];
+    },1000);
+  },300);
+}
 </script>
 </body>
 </html>
