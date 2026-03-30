@@ -2533,8 +2533,8 @@ let pieInst=null, solCount=0, steps=[];
 var currentSection='import';
 var sectionEnteredAt=0;
 function goTo(sec){
-  // Nettoyer les images chart résiduelles du print
-  try{restoreCharts();}catch(e){}
+  // Nettoyer les images chart residuelles du print
+  try{CGP.pdf._restoreCanvases();}catch(e){}
   // Valider la section qu'on quitte seulement si on y est resté > 3s
   var elapsed=Date.now()-sectionEnteredAt;
   if(currentSection&&currentSection!=='import'&&elapsed>3000&&validatedSections!==undefined)validateSection(currentSection);
@@ -4349,8 +4349,8 @@ function updateRetraiteCalc(){
 }
 
 function rRetraite(){
-  // Nettoyer les images de print résiduelles
-  try{restoreCharts();}catch(e){}
+  // Nettoyer les images de print residuelles
+  try{CGP.pdf._restoreCanvases();}catch(e){}
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
 
   // ── Panneau paramètres manuels ──────────────────────────────
@@ -8371,20 +8371,27 @@ function exportPDF() {
   if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
   try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
 
-  // 6. Attendre que Chart.js dessine, puis imprimer
+  // 6. Attendre que Chart.js dessine
   setTimeout(function(){
     try{
       if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
     }catch(e4){}
     setTimeout(function(){
-      // Remettre la section en place (sera visible via .print-visible en print)
+      // 7. Capturer les canvas MAINTENANT (section encore visible)
+      // Le beforeprint de core.js verra _backups.length > 0 et ne doublonnera pas
+      CGP.pdf._convertCanvases();
+
+      // 8. Remettre la section en place (sera visible via .print-visible en print)
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
-      // Imprimer — beforeprint de core.js convertit les canvas automatiquement
+
+      // 9. Imprimer (canvas deja captures, beforeprint skip)
       window.print();
-      // Apres impression, nettoyer
+
+      // 10. Nettoyer apres impression
       setTimeout(function(){
+        CGP.pdf._restoreCanvases();
         document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
         if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
       },2000);
