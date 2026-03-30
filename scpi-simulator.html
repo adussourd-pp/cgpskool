@@ -26,34 +26,18 @@
 }
 body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
 
-/* ── NAV ── */
-nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.12)}
-.nav-inner{max-width:1380px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px}
-.nav-logo{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--blanc);text-decoration:none;letter-spacing:0.01em}
-.nav-logo span{color:var(--ambre)}
-.nav-center{display:flex;gap:3px}
-.nav-tab{font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 14px;border-radius:5px;transition:all 0.2s;cursor:pointer;border:none;background:transparent;font-family:var(--sans)}
-.nav-tab:hover{color:var(--blanc);background:rgba(255,255,255,0.06)}
-.nav-tab.active{color:var(--ambre);font-weight:600}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-btn{background:var(--ambre);color:var(--noir);font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 18px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s}
-.nav-btn:hover{background:var(--ambre-d);color:var(--blanc)}
-.nav-btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6)}
-.nav-btn.outline:hover{border-color:var(--ambre);color:var(--ambre);background:transparent}
-
 /* ── LAYOUT ── */
-.app-shell{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 64px);width:100%}
+.app-shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 64px);width:100%}
 
 /* ── SIDEBAR ── */
-.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:28px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:300px;min-width:300px;max-width:300px;box-sizing:border-box}
-.sidebar-section{margin-bottom:2px;border-radius:8px;overflow:hidden}
-.sidebar-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:7px;cursor:pointer;padding:10px 12px;user-select:none;transition:background 0.15s,color 0.15s;border-radius:8px}
-.sidebar-label:hover{background:var(--bord);color:var(--gris-f)}
-.sidebar-label::after{display:none}
-.sidebar-label .acc-arrow{font-size:8px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
+.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:280px;min-width:280px;max-width:280px;box-sizing:border-box}
+.sidebar-section{margin-bottom:0}
+.sidebar-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 8px 6px;user-select:none;transition:color 0.15s}
+.sidebar-label:hover{color:var(--noir)}
+.sidebar-label .acc-arrow{font-size:7px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
 .sidebar-label.open .acc-arrow{transform:rotate(90deg)}
 .sidebar-body{overflow:hidden;transition:max-height 0.3s ease,opacity 0.25s ease;max-height:0;opacity:0;padding:0 4px}
-.sidebar-body.open{max-height:700px;opacity:1;padding:4px 4px 12px}
+.sidebar-body.open{max-height:800px;opacity:1;padding:4px 4px 8px}
 
 /* MODE TABS */
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
@@ -101,12 +85,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .tmi-pill.active{background:var(--orange);color:#fff;border-color:var(--orange)}
 
 /* CTA */
-.sim-btn{width:100%;padding:14px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.02em;margin-top:4px}
+.sim-btn{width:100%;padding:12px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.02em;margin-top:auto}
 .sim-btn:hover{opacity:0.85}
 .divider{height:1px;background:var(--bord);margin:20px 0}
 
 /* ── MAIN CONTENT ── */
-.main-content{padding:28px 32px;background:#ECEAE6;min-height:calc(100vh - 64px);min-width:0;display:flex;flex-direction:column;align-items:center}
+.main-content{padding:28px 32px;background:#ECEAE6;min-height:calc(100vh - 64px);min-width:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:12px}
 .empty-icon{font-size:48px;opacity:0.18}
 .empty-title{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-0.01em;color:var(--ink)}
@@ -263,10 +247,12 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 ::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
 
 @media print{
-  .sidebar,nav,.cs-nav,.sim-btn,.nav-right,.no-print{display:none!important}
-  .app-shell{display:block}
-  .main-content{padding:0}
-  @page{size:A4;margin:1.5cm}
+  .sidebar,.cs-nav,.sim-btn,.no-print{display:none!important}
+  .app-shell{display:block!important}
+  .main-content{padding:0!important;display:block!important}
+  .main-content>div{border:none!important;box-shadow:none!important;max-width:100%!important;padding:24px!important}
+  #conseillerBlock{margin:20px -24px -24px -24px!important}
+  @page{size:A4;margin:1cm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
@@ -441,7 +427,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
   </div>
 
-  <button class="sim-btn" onclick="runSimulation()">Lancer la projection →</button>
+  <button class="sim-btn" onclick="runSimulation()" style="background:var(--orange);margin-top:8px">Lancer la projection &#8594;</button>
+  <button class="sim-btn" onclick="window.print()" style="margin-top:6px">&#11015; Exporter PDF</button>
 </aside>
 <div class="main-content" id="mainContent">
 <div style="background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px;max-width:794px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative">
