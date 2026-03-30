@@ -234,7 +234,7 @@
       <!-- Charts -->
       <div class="charts-row">
         <div class="chart-box">
-          <h3>R&#233;cup&#233;ration des frais (24 mois)</h3>
+          <h3>R&#233;cup&#233;ration des frais</h3>
           <div class="chart-wrap"><canvas id="chartRecovery"></canvas></div>
         </div>
         <div class="chart-box">
@@ -361,7 +361,7 @@ function update(){
 
   var beMonths=calcBreakeven(capital,capitalNet,yieldA,yieldB);
   V('beMonths').textContent=beMonths===null?'N/A':beMonths;
-  V('beLabel').textContent=beMonths===null?'Le transfert ne se rentabilise pas sur 24 mois':'mois pour r\u00e9cup\u00e9rer les frais de transfert';
+  V('beLabel').textContent=beMonths===null?'Le transfert ne se rentabilise pas sur l\'horizon choisi':'mois pour r\u00e9cup\u00e9rer les frais de transfert';
 
   renderCharts(capital,capitalNet,yieldA,yieldB,horizon,nomA,nomB);
 
@@ -390,9 +390,13 @@ function calcBreakeven(capA,capB,yA,yB){
 }
 
 function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
+  // Abscisse dynamique : breakeven + 50% marge, min 12, max horizon*12
+  var be=calcBreakeven(capA,capB,yA,yB);
+  var maxM=be?Math.min(Math.ceil(be*1.5),horizon*12):Math.min(horizon*12,60);
+  if(maxM<12)maxM=12;
   var labelsR=[];var dataRA=[];var dataRB=[];
   var mA=yA/100/12;var mB=yB/100/12;
-  for(var m=0;m<=24;m++){
+  for(var m=0;m<=maxM;m++){
     labelsR.push(m);
     dataRA.push(Math.round(capA*Math.pow(1+mA,m)));
     dataRB.push(Math.round(capB*Math.pow(1+mB,m)));
