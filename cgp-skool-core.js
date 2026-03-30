@@ -272,7 +272,7 @@ CGP.pdf._convertCanvases = function() {
           var img = document.createElement('img');
           img.src = url;
           img.className = 'cgp-chart-print-img';
-          img.style.cssText = 'max-width:100%;height:auto';
+          img.style.cssText = 'max-width:100%;height:auto;display:none';
           // Insert AFTER canvas (not before) to avoid layout shift
           canvas.parentNode.insertBefore(img, canvas.nextSibling);
           CGP.pdf._backups.push({ canvas: canvas, img: img });
@@ -295,14 +295,11 @@ CGP.pdf._restoreCanvases = function() {
 };
 
 /**
- * Button handler: convert canvases, print, restore.
+ * Button handler: just trigger window.print().
+ * beforeprint/afterprint events handle canvas conversion automatically.
  */
 CGP.pdf.print = function() {
-  CGP.pdf._convertCanvases();
-  setTimeout(function() {
-    window.print();
-    setTimeout(CGP.pdf._restoreCanvases, 500);
-  }, 100);
+  window.print();
 };
 
 /**
