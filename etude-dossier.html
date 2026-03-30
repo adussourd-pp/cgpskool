@@ -379,8 +379,10 @@ select.span2{grid-column:span 2}
 
 /* ── PRINT ── */
 @media print{
-  /* ── COULEURS DE FOND : forcer l'impression ── */
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  /* ── COULEURS DE FOND : cibler uniquement les fonds (pas * qui rend le texte flou) ── */
+  .card,.kpi,.kpi-row,.preco-panel,.sol-card,.badge,.tag,.sec-tag,
+  .synthese-step,.note-print,.pdf-print-footer,
+  [style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   /* ── MASQUER : navigation, sidebar, boutons, zones conseiller ── */
   nav,.sidebar,.nav-actions,.row-btns,.add-row-btn,.add-sol-btn,.add-sol-bar,
   .sol-del,.mode-toggle,.import-zone,.btn,.ed:hover,.ed-block:hover,
