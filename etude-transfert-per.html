@@ -6,6 +6,8 @@
 <title>CGP Skool &#8212; &#201;tude de transfert Plan &#201;pargne Retraite</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* Sidebar light — same style as etude-dossier */
@@ -94,18 +96,6 @@
 
 .disclaimer{font-size:10px;color:var(--gris);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--bord)}
 
-@media print{
-  .sidebar,.cs-nav,.no-print{display:none!important}
-  .app{display:block!important}
-  body{background:#fff!important}
-  .main-area{padding:0!important;display:block!important}
-  .cs-page{border:none!important;box-shadow:none!important;border-radius:0!important;max-width:100%!important;padding:24px 28px!important;min-height:auto!important}
-  .compare-card.future{border:2px solid #2da064!important}
-  .chart-wrap{height:auto!important}
-  .chart-wrap img{max-width:100%;height:auto}
-  #conseillerBlock{margin:20px -28px -24px -28px!important}
-  @page{size:A4;margin:1cm}
-}
 </style>
 </head>
 <body>
@@ -118,12 +108,12 @@
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
-    </div>
   </div>
 </nav>
 
+<div class="cgp-app">
+<nav id="cgp-nav-slot"></nav>
+<div class="cgp-module">
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -309,6 +299,8 @@
     </div>
   </div>
 </div>
+</div><!-- /.cgp-module -->
+</div><!-- /.cgp-app -->
 
 <!-- Modale tableau synthese -->
 <div id="recapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center" onclick="if(event.target===this)closeRecap()">
@@ -611,6 +603,9 @@ function loadProfil(){
   var mm=String(today.getMonth()+1).padStart(2,'0');
   V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
   loadProfil();
+  if(typeof CGP!=='undefined'&&CGP.footer&&CGP.footer.render){
+    CGP.footer.render(document.getElementById('conseillerBlock'));
+  }
   updateTypeEncart();
   update();
 })();

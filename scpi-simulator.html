@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGP Skool — Simulateur SCPI</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
@@ -246,16 +249,6 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--ambre-m);border-radius:3px}
 
-@media print{
-  .sidebar,.cs-nav,.sim-btn,.no-print{display:none!important}
-  .app-shell{display:block!important}
-  .main-content{padding:0!important;display:block!important}
-  .main-content>div{border:none!important;box-shadow:none!important;max-width:100%!important;padding:24px!important}
-  #conseillerBlock{margin:20px -24px -24px -24px!important}
-  @page{size:A4;margin:1cm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
-
 
 </style>
 </head>
@@ -269,37 +262,13 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
-    </div>
   </div>
 </nav>
 
-<!-- CSS dropdown pour nav-dropdown dans cs-nav -->
-<style>
-.nav-dropdown{position:relative}
-.nav-dropdown-btn{display:flex;align-items:center;gap:4px}
-.nav-dropdown-btn .arr{font-size:9px;opacity:0.5;transition:transform 0.15s}
-.nav-dropdown:hover .arr{transform:rotate(180deg)}
-.nav-dropdown-menu{
-  position:absolute;top:calc(100% + 4px);left:0;
-  background:rgba(15,14,13,0.97);
-  border:1px solid var(--rule-d);
-  padding:6px;min-width:190px;
-  opacity:0;visibility:hidden;transform:translateY(-6px);
-  transition:all 0.18s;backdrop-filter:blur(20px);
-  z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.5);
-}
-.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}
-.nav-dropdown-item{
-  display:block;font-family:var(--sans);font-size:13px;font-weight:400;
-  color:rgba(255,255,255,0.55);text-decoration:none;
-  padding:8px 12px;transition:color 0.15s;white-space:nowrap;
-}
-.nav-dropdown-item:hover{color:#fff}
-.nav-dropdown-item.active{color:var(--orange)}
-.nav-dropdown-sep{height:1px;background:var(--rule-d);margin:4px 0}
-</style>
+<!-- APP LAYOUT : nav partagee + contenu module -->
+<div class="cgp-app">
+  <nav id="cgp-nav-slot"></nav>
+  <div class="cgp-module">
 
 <div class="app-shell">
 <!-- SIDEBAR -->
@@ -468,6 +437,9 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 </div>
 </div>
 </div>
+
+  </div><!-- /.cgp-module -->
+</div><!-- /.cgp-app -->
 
 <script>
 // ─── SCPI DATA ────────────────────────────────────────────────────
@@ -929,6 +901,9 @@ function setScpiTMI(val, btn) {
     document.getElementById('conseillerBlock').style.display='block';
   }catch(e){}
 })();
+
+// Footer conseiller
+CGP.footer.render(document.getElementById('conseillerBlock'));
 </script>
 </body>
 </html>

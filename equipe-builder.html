@@ -6,6 +6,8 @@
 <title>CGP Skool &#8212; Construire son &#233;quipe</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <style>
 .team-header{margin-bottom:28px;text-align:center}
 .team-header h1{font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:4px}
@@ -80,18 +82,15 @@
 .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-60)}
 .legend-dot{width:10px;height:10px;border-radius:50%}
 
-@media print{
-  .cs-nav,.no-print,.node-actions,.add-child-btn{display:none!important}
-  body{background:#fff}
-  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
-  @page{size:A4 landscape;margin:1.5cm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
+<div class="cgp-app">
+<nav id="cgp-nav-slot"></nav>
+<div class="cgp-module">
+
 <nav class="cs-nav">
   <div class="cs-nav-inner">
     <a class="cs-logo" href="index.html">
@@ -99,9 +98,6 @@
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
-    </div>
   </div>
 </nav>
 
@@ -155,6 +151,8 @@
     <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" style="padding:9px 18px;background:#fff;color:#dc2626;border:1.5px solid rgba(220,38,38,0.2);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer">Effacer</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
   </div>
+
+  <div id="conseillerFooter"></div>
 
 </div>
 </div>
@@ -467,6 +465,9 @@ function importJSON(e){
 }
 
 loadTree();
+CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
+</div><!-- /cgp-module -->
+</div><!-- /cgp-app -->
 </body>
 </html>

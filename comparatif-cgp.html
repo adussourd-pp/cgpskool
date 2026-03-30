@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <style>
 :root{
   --bg:#0f0e0d;--bg2:#161412;--bg3:#1c1917;
@@ -248,6 +251,10 @@ function checkGate(){
 try{if(sessionStorage.getItem('cgpskool_gate')==='ok')document.getElementById('gateOverlay').style.display='none';}catch(e){}
 </script>
 
+<div class="cgp-app">
+<nav id="cgp-nav-slot"></nav>
+<div class="cgp-module">
+
 <!-- NAV -->
 <nav class="cs-nav">
   <div class="cs-nav-inner">
@@ -256,9 +263,6 @@ try{if(sessionStorage.getItem('cgpskool_gate')==='ok')document.getElementById('g
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">← Accueil</a>
-    </div>
   </div>
 </nav>
 
@@ -985,6 +989,8 @@ try{if(sessionStorage.getItem('cgpskool_gate')==='ok')document.getElementById('g
 </div>
 </div>
 
+<div id="conseillerFooter"></div>
+
 <!-- FOOTNOTES -->
 <div class="fns">
   <div class="fns-in">
@@ -1385,6 +1391,10 @@ function drawDonut(){
   ctx.fillText('Rémunération',cx,cy+7);
 }
 window.addEventListener('load',drawDonut);
+
+CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
+</div><!-- .cgp-module -->
+</div><!-- .cgp-app -->
 </body>
 </html>
