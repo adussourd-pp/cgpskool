@@ -8506,8 +8506,9 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : convertir les canvas en PNG (meme logique que exportPDF)
+// Ctrl+P : convertir les canvas en PNG (seulement si exportPDF n'a pas deja fait la conversion)
 window.addEventListener('beforeprint', function() {
+  if (_chartImgBackups.length > 0) return; // deja converti par exportPDF()
   updatePdfHeader();
   convertChartsDirectCapture();
 });
