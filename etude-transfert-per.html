@@ -146,6 +146,16 @@
           <option value="prefon">PREFON / COREM</option>
         </select>
       </div>
+      <!-- Encart info type -->
+      <div id="typeEncart" style="margin:6px 8px 10px;padding:10px 12px;background:#fff;border:1.5px solid var(--bord);border-radius:7px;font-size:10px;line-height:1.6;color:var(--gris)">
+        <div style="font-weight:700;color:var(--noir);margin-bottom:4px" id="teTitle">PER</div>
+        <div id="teCanDo" style="color:#2da064"></div>
+        <div id="teCantDo" style="color:#dc2626;margin-top:2px"></div>
+        <div id="teFrais" style="color:var(--orange);margin-top:2px"></div>
+      </div>
+      <div style="padding:0 8px;margin-bottom:8px">
+        <button onclick="openRecap()" style="width:100%;padding:7px;background:transparent;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:10px;color:var(--gris);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)';this.style.color='var(--gris)'">&#128203; Tableau synth&#232;se des transferts</button>
+      </div>
       <div class="sf"><label>Nom du contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
     </div>
@@ -156,7 +166,6 @@
       <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
       <div class="sf"><label>Anciennet&#233; du contrat (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
       <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
-      <div id="typeInfo" style="padding:0 8px;font-size:9px;color:var(--orange);margin-bottom:6px;display:none"></div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
       <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
@@ -317,10 +326,59 @@
   </div>
 </div>
 
+<!-- Modale tableau synthese -->
+<div id="recapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center" onclick="if(event.target===this)closeRecap()">
+  <div style="background:#fff;padding:28px 32px;max-width:820px;width:95%;max-height:90vh;overflow-y:auto;border-radius:12px;position:relative">
+    <button onclick="closeRecap()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:20px;color:var(--gris);cursor:pointer">&times;</button>
+    <div style="font-family:var(--serif);font-size:20px;color:var(--noir);margin-bottom:4px">Les transferts en synth&#232;se</div>
+    <div style="font-size:12px;color:var(--gris);margin-bottom:16px">Tous les contrats transf&#233;rables vers un PER</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead>
+        <tr style="background:var(--paper);border-bottom:2px solid var(--bord)">
+          <th style="text-align:left;padding:10px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Support</th>
+          <th style="text-align:left;padding:10px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Transf&#233;rable ?</th>
+          <th style="text-align:left;padding:10px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Int&#233;r&#234;t</th>
+          <th style="text-align:left;padding:10px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Attention</th>
+          <th style="text-align:left;padding:10px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Frais</th>
+        </tr>
+      </thead>
+      <tbody id="recapBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <script>
 var chartRecovery=null, chartProjection=null;
 var COLORS_A=['#60a5fa','#93c5fd'];
 var COLORS_B=['#4ade80','#86efac','#bbf7d0','#d9f99d'];
+
+function openRecap(){
+  var body=V('recapBody');
+  var html='';
+  var keys=['per','perp','madelin','permadelin','perco','art83','prefon'];
+  keys.forEach(function(k){
+    var r=TYPE_RULES[k];
+    html+='<tr style="border-bottom:1px solid var(--bord)">';
+    html+='<td style="padding:8px 12px;font-weight:600;color:var(--noir)">'+r.label+'</td>';
+    html+='<td style="padding:8px 12px;color:var(--gris)">'+r.transfert+'</td>';
+    html+='<td style="padding:8px 12px;color:#2da064">'+r.interet+'</td>';
+    html+='<td style="padding:8px 12px;color:#dc2626;font-size:10px">'+r.attention+'</td>';
+    html+='<td style="padding:8px 12px;white-space:nowrap">'+r.fraisMax+'% <span style="color:var(--gris);font-size:9px">/ 0% apr\u00e8s '+r.seuilAns+' ans</span></td>';
+    html+='</tr>';
+  });
+  body.innerHTML=html;
+  V('recapModal').style.display='flex';
+}
+function closeRecap(){V('recapModal').style.display='none'}
+
+function updateTypeEncart(){
+  var type=V('pTypePER').value;
+  var r=TYPE_RULES[type]||TYPE_RULES.per;
+  V('teTitle').textContent=r.label;
+  V('teCanDo').innerHTML='\u2713 '+r.transfert+'<br>\u2713 '+r.interet;
+  V('teCantDo').textContent=r.attention?'\u26a0 '+r.attention:'';
+  V('teFrais').textContent='Frais : '+r.fraisMax+'% max, 0% apr\u00e8s '+r.seuilAns+' ans';
+}
 
 function toggleAcc(lbl){
   lbl.classList.toggle('open');
@@ -360,18 +418,11 @@ var TYPE_RULES={
 function onTypeChange(){
   var type=V('pTypePER').value;
   var rule=TYPE_RULES[type]||TYPE_RULES.per;
-  // Ajuster le slider frais transfert max
   V('pFraisTransfert').max=rule.fraisMax;
   if(num('pFraisTransfert')>rule.fraisMax){
     V('pFraisTransfert').value=rule.fraisMax;
   }
-  // Afficher note du type
-  if(rule.note){
-    V('typeInfo').textContent=rule.label+' \u2014 '+rule.note;
-    V('typeInfo').style.display='block';
-  }else{
-    V('typeInfo').style.display='none';
-  }
+  updateTypeEncart();
 }
 
 function update(){
@@ -576,6 +627,7 @@ function loadProfil(){
   var mm=String(today.getMonth()+1).padStart(2,'0');
   V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
   loadProfil();
+  updateTypeEncart();
   update();
 })();
 </script>
