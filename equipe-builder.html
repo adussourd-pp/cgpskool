@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool &#8212; Construire son &#233;quipe</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<style>
+.team-header{margin-bottom:28px}
+.team-header h1{font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:4px}
+.team-header p{font-size:13px;color:var(--ink-60);line-height:1.6}
+
+/* Member card */
+.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.member-card{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:18px 20px;position:relative;transition:border-color 0.2s}
+.member-card:hover{border-color:rgba(212,98,42,0.3)}
+.member-card.leader{border-color:var(--orange);border-width:2px}
+.member-avatar{width:44px;height:44px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--orange);margin-bottom:10px;font-family:var(--sans)}
+.member-card.leader .member-avatar{background:var(--o-dim)}
+.member-name{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.member-role{font-size:11px;color:var(--ink-60);margin-bottom:8px}
+.member-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-right:4px}
+.badge-qual{background:var(--o-dim);color:var(--orange)}
+.badge-status{background:rgba(45,160,100,0.1);color:#2da064}
+.badge-prospect{background:rgba(37,99,235,0.1);color:#2563eb}
+.member-meta{font-size:11px;color:var(--ink-30);margin-top:8px}
+.member-actions{position:absolute;top:14px;right:14px;display:flex;gap:4px}
+.member-actions button{background:transparent;border:1px solid var(--rule-l);border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--ink-60);display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.member-actions button:hover{border-color:var(--orange);color:var(--orange)}
+.member-actions button.del:hover{border-color:#dc2626;color:#dc2626}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-box{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:14px 16px;text-align:center}
+.stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:3px}
+.stat-val{font-size:20px;font-weight:700;color:var(--ink)}
+.stat-val.orange{color:var(--orange)}
+
+/* Organigramme */
+.org-section{margin-top:28px;padding-top:20px;border-top:1px solid var(--rule-l)}
+.org-title{font-family:var(--serif);font-size:16px;color:var(--ink);margin-bottom:16px}
+.org-tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.org-node{background:#fff;border:1.5px solid var(--rule-l);border-radius:8px;padding:10px 18px;text-align:center;position:relative}
+.org-node.leader{border-color:var(--orange);background:rgba(212,98,42,0.03)}
+.org-node .on-name{font-size:13px;font-weight:600;color:var(--ink)}
+.org-node .on-role{font-size:10px;color:var(--ink-60)}
+.org-connector{width:2px;height:20px;background:var(--rule-l);margin:0 auto}
+.org-level{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative}
+.org-level::before{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:calc(100% - 60px);height:1px;background:var(--rule-l)}
+.org-branch{display:flex;flex-direction:column;align-items:center}
+.org-branch .org-connector{height:20px}
+
+/* Add form */
+.add-form{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:20px;margin-bottom:20px}
+.add-form h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.fg{margin-bottom:0}
+.fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-30);margin-bottom:3px}
+.fg input,.fg select{width:100%;padding:9px 12px;border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none}
+.fg input:focus,.fg select:focus{border-color:var(--orange)}
+.form-actions{display:flex;gap:8px;margin-top:14px}
+.btn-add{padding:10px 22px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+.btn-add:hover{background:var(--orange-hover)}
+.btn-cancel{padding:10px 18px;background:transparent;border:1.5px solid var(--rule-l);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--ink-60);cursor:pointer}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px 20px;color:var(--ink-30)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px}
+.empty-state p{font-size:13px;line-height:1.7}
+
+@media print{
+  .cs-nav,.no-print,.add-form,.member-actions{display:none!important}
+  body{background:#fff}
+  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
+  @page{size:A4;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
+    </div>
+  </div>
+</nav>
+
+<div style="padding:28px 32px;display:flex;justify-content:center">
+<div class="cs-page" style="max-width:794px">
+
+  <div class="team-header">
+    <h1>Construire son &#233;quipe</h1>
+    <p>G&#233;rez votre organisation, suivez vos collaborateurs et visualisez votre &#233;quipe.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box"><div class="stat-label">Membres</div><div class="stat-val" id="statTotal">0</div></div>
+    <div class="stat-box"><div class="stat-label">Actifs</div><div class="stat-val orange" id="statActifs">0</div></div>
+    <div class="stat-box"><div class="stat-label">En formation</div><div class="stat-val" id="statFormation">0</div></div>
+    <div class="stat-box"><div class="stat-label">Prospects</div><div class="stat-val" id="statProspects">0</div></div>
+  </div>
+
+  <!-- Add form -->
+  <div class="add-form no-print" id="addForm">
+    <h3>Ajouter un membre</h3>
+    <div class="form-grid">
+      <div class="fg"><label>Pr&#233;nom</label><input type="text" id="fPrenom" placeholder="Alexandre"></div>
+      <div class="fg"><label>Nom</label><input type="text" id="fNom" placeholder="DUSSOURD"></div>
+    </div>
+    <div class="form-grid three" style="margin-top:10px">
+      <div class="fg"><label>R&#244;le / Fonction</label>
+        <select id="fRole">
+          <option value="Consultant">Consultant</option>
+          <option value="Manager">Manager</option>
+          <option value="Directeur">Directeur</option>
+          <option value="Parrain">Parrain / Marraine</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="fg"><label>Statut</label>
+        <select id="fStatut">
+          <option value="Actif">Actif</option>
+          <option value="En formation">En formation</option>
+          <option value="Prospect">Prospect</option>
+          <option value="Inactif">Inactif</option>
+        </select>
+      </div>
+      <div class="fg"><label>Qualification</label>
+        <select id="fQualif">
+          <option value="">Aucune</option>
+          <option value="D&#233;marrage">D&#233;marrage</option>
+          <option value="Expansion">Expansion</option>
+          <option value="D&#233;veloppement">D&#233;veloppement</option>
+          <option value="Performance">Performance</option>
+          <option value="Excellence">Excellence</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-top:10px">
+      <div class="fg"><label>T&#233;l&#233;phone</label><input type="text" id="fTel" placeholder="06 XX XX XX XX"></div>
+      <div class="fg"><label>Email</label><input type="text" id="fEmail" placeholder="email@exemple.fr"></div>
+    </div>
+    <div class="form-grid" style="margin-top:10px">
+      <div class="fg"><label>Date d'entr&#233;e</label><input type="date" id="fDateEntree"></div>
+      <div class="fg"><label>Notes</label><input type="text" id="fNotes" placeholder="Commentaire libre"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-add" onclick="addMember()">Ajouter</button>
+      <button class="btn-cancel" onclick="resetForm()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Members grid -->
+  <div id="membersGrid" class="member-grid"></div>
+  <div id="emptyState" class="empty-state" style="display:none">
+    <div class="empty-icon">&#128101;</div>
+    <p>Aucun membre dans votre &#233;quipe.<br>Commencez par ajouter votre premier collaborateur.</p>
+  </div>
+
+  <!-- Organigramme -->
+  <div class="org-section" id="orgSection" style="display:none">
+    <div class="org-title">Organigramme</div>
+    <div class="org-tree" id="orgTree"></div>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:8px;margin-top:24px" class="no-print">
+    <button class="btn-add" onclick="window.print()">&#128424; Exporter PDF</button>
+    <button class="btn-cancel" onclick="exportJSON()">&#128190; Sauvegarder JSON</button>
+    <button class="btn-cancel" onclick="V('importFile').click()">&#128194; Charger JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+  </div>
+
+</div>
+</div>
+
+<script>
+var STORAGE_KEY='cgpskool_equipe_v1';
+var team=[];
+var editingIdx=-1;
+
+function V(id){return document.getElementById(id)}
+
+function loadTeam(){
+  try{var raw=localStorage.getItem(STORAGE_KEY);if(raw)team=JSON.parse(raw);}catch(e){}
+  render();
+}
+
+function saveTeam(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(team));}catch(e){}
+}
+
+function addMember(){
+  var prenom=V('fPrenom').value.trim();
+  var nom=V('fNom').value.trim();
+  if(!prenom&&!nom){V('fPrenom').focus();return}
+  var m={
+    prenom:prenom,
+    nom:nom,
+    role:V('fRole').value,
+    statut:V('fStatut').value,
+    qualif:V('fQualif').value,
+    tel:V('fTel').value.trim(),
+    email:V('fEmail').value.trim(),
+    dateEntree:V('fDateEntree').value,
+    notes:V('fNotes').value.trim(),
+    id:Date.now()
+  };
+  if(editingIdx>=0){
+    m.id=team[editingIdx].id;
+    team[editingIdx]=m;
+    editingIdx=-1;
+  }else{
+    team.push(m);
+  }
+  saveTeam();
+  resetForm();
+  render();
+}
+
+function resetForm(){
+  V('fPrenom').value='';V('fNom').value='';V('fRole').value='Consultant';
+  V('fStatut').value='Actif';V('fQualif').value='';V('fTel').value='';
+  V('fEmail').value='';V('fDateEntree').value='';V('fNotes').value='';
+  editingIdx=-1;
+}
+
+function editMember(idx){
+  var m=team[idx];if(!m)return;
+  V('fPrenom').value=m.prenom;V('fNom').value=m.nom;
+  V('fRole').value=m.role||'Consultant';V('fStatut').value=m.statut||'Actif';
+  V('fQualif').value=m.qualif||'';V('fTel').value=m.tel||'';
+  V('fEmail').value=m.email||'';V('fDateEntree').value=m.dateEntree||'';
+  V('fNotes').value=m.notes||'';
+  editingIdx=idx;
+  V('fPrenom').focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function removeMember(idx){
+  if(!confirm('Supprimer '+team[idx].prenom+' '+team[idx].nom+' ?'))return;
+  team.splice(idx,1);
+  saveTeam();render();
+}
+
+function getInitials(m){
+  var p=m.prenom?m.prenom.charAt(0).toUpperCase():'';
+  var n=m.nom?m.nom.charAt(0).toUpperCase():'';
+  return p+n;
+}
+
+function render(){
+  var grid=V('membersGrid');
+  var empty=V('emptyState');
+  if(team.length===0){grid.innerHTML='';empty.style.display='block';V('orgSection').style.display='none';updateStats();return}
+  empty.style.display='none';
+  var html='';
+  team.forEach(function(m,i){
+    var isLeader=m.role==='Manager'||m.role==='Directeur';
+    html+='<div class="member-card'+(isLeader?' leader':'')+'">';
+    html+='<div class="member-actions"><button title="Modifier" onclick="editMember('+i+')">&#9998;</button><button class="del" title="Supprimer" onclick="removeMember('+i+')">&#10005;</button></div>';
+    html+='<div class="member-avatar">'+getInitials(m)+'</div>';
+    html+='<div class="member-name">'+esc(m.prenom)+' '+esc(m.nom)+'</div>';
+    html+='<div class="member-role">'+esc(m.role)+'</div>';
+    if(m.qualif)html+='<span class="member-badge badge-qual">'+esc(m.qualif)+'</span>';
+    var statCls=m.statut==='Actif'?'badge-status':m.statut==='Prospect'?'badge-prospect':'badge-qual';
+    html+='<span class="member-badge '+statCls+'">'+esc(m.statut)+'</span>';
+    var meta=[];
+    if(m.tel)meta.push(esc(m.tel));
+    if(m.email)meta.push(esc(m.email));
+    if(m.dateEntree)meta.push('Entr\u00e9e : '+esc(m.dateEntree));
+    if(meta.length)html+='<div class="member-meta">'+meta.join(' &middot; ')+'</div>';
+    if(m.notes)html+='<div class="member-meta" style="color:var(--ink-60);font-style:italic;margin-top:4px">'+esc(m.notes)+'</div>';
+    html+='</div>';
+  });
+  grid.innerHTML=html;
+  updateStats();
+  renderOrg();
+}
+
+function updateStats(){
+  V('statTotal').textContent=team.length;
+  V('statActifs').textContent=team.filter(function(m){return m.statut==='Actif'}).length;
+  V('statFormation').textContent=team.filter(function(m){return m.statut==='En formation'}).length;
+  V('statProspects').textContent=team.filter(function(m){return m.statut==='Prospect'}).length;
+}
+
+function renderOrg(){
+  var sec=V('orgSection');
+  if(team.length<2){sec.style.display='none';return}
+  sec.style.display='block';
+  var tree=V('orgTree');
+  var leaders=team.filter(function(m){return m.role==='Manager'||m.role==='Directeur'});
+  var others=team.filter(function(m){return m.role!=='Manager'&&m.role!=='Directeur'});
+
+  var html='';
+  if(leaders.length>0){
+    leaders.forEach(function(l){
+      html+='<div class="org-node leader"><div class="on-name">'+esc(l.prenom)+' '+esc(l.nom)+'</div><div class="on-role">'+esc(l.role)+'</div></div>';
+    });
+    if(others.length>0)html+='<div class="org-connector"></div>';
+  }
+  if(others.length>0){
+    html+='<div class="org-level">';
+    others.forEach(function(m){
+      html+='<div class="org-branch"><div class="org-connector"></div><div class="org-node"><div class="on-name">'+esc(m.prenom)+' '+esc(m.nom)+'</div><div class="on-role">'+esc(m.role)+'</div></div></div>';
+    });
+    html+='</div>';
+  }
+  tree.innerHTML=html;
+}
+
+function esc(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function exportJSON(){
+  var blob=new Blob([JSON.stringify(team,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='equipe-cgpskool.json';
+  a.click();
+}
+
+function importJSON(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(Array.isArray(data)){team=data;saveTeam();render()}
+    }catch(err){alert('Fichier invalide')}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+loadTeam();
+</script>
+</body>
+</html>

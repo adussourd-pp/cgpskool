@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool &#8212; &#201;tude de transfert PER</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* Sidebar dark override */
+.cs-sidebar{background:#1a1916;border-right:1px solid rgba(255,255,255,0.06);color:#fff}
+.cs-sidebar .sb-title{font-family:var(--serif);font-size:20px;color:#fff;margin-bottom:2px}
+.cs-sidebar .sb-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:24px}
+.sb-section{margin-bottom:18px}
+.sb-section h3{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:700}
+.sb-row{margin-bottom:10px}
+.sb-row label{display:block;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:3px}
+.sb-row input[type="text"],.sb-row input[type="number"]{
+  width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:7px;color:#fff;padding:9px 12px;font-family:var(--sans);font-size:13px;outline:none
+}
+.sb-row input::placeholder{color:rgba(255,255,255,0.25)}
+.sb-row input:focus{border-color:rgba(255,255,255,0.25)}
+.sb-range-wrap{display:flex;align-items:center;gap:10px}
+.sb-range-wrap input[type="range"]{flex:1;accent-color:var(--orange);height:5px;-webkit-appearance:none;background:rgba(255,255,255,0.12);border-radius:3px}
+.sb-range-wrap input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--orange);cursor:pointer}
+.sb-range-val{font-size:13px;font-weight:600;min-width:48px;text-align:right;color:#fff}
+.alloc-grid{display:grid;grid-template-columns:1fr 54px 54px;gap:5px;align-items:center;font-size:11px}
+.alloc-grid .hdr{color:rgba(255,255,255,0.3);font-size:9px;text-transform:uppercase}
+.alloc-grid input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:#fff;padding:6px 7px;font-size:11px;font-family:var(--sans)}
+.alloc-alert{font-size:10px;color:#ef4444;margin-top:3px;min-height:14px}
+.sb-actions{margin-top:20px;display:flex;gap:8px}
+.sb-actions button{padding:9px 16px;border:none;border-radius:7px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;background:rgba(255,255,255,0.08);color:#fff}
+.sb-actions button:hover{background:rgba(255,255,255,0.14)}
+
+/* Main content overrides for A4 page */
+.cs-main{background:#ECEAE6}
+
+/* Comparison cards */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.compare-card{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:20px 22px;position:relative}
+.compare-card.future{border-color:#2da064;border-width:2px}
+.badge-reco{position:absolute;top:-9px;right:14px;background:#2da064;color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:16px;text-transform:uppercase;letter-spacing:0.5px}
+.cc-name{font-family:var(--serif);font-size:15px;margin-bottom:10px;color:var(--ink)}
+.cc-capital{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.cc-capital small{font-size:12px;font-weight:400;color:var(--ink-60)}
+.alloc-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:6px}
+.alloc-bar span{display:block;height:100%}
+.alloc-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.alloc-legend span{font-size:10px;display:flex;align-items:center;gap:3px;color:var(--ink-60)}
+.alloc-legend span i{width:7px;height:7px;border-radius:2px;display:inline-block}
+.cc-yield{font-size:12px;color:var(--ink-60)}
+.cc-yield b{color:var(--ink);font-size:13px}
+.cc-proj{font-size:12px;color:var(--ink-60);margin-top:4px}
+.cc-proj b{color:var(--ink);font-size:13px}
+
+/* Fee summary */
+.fee-summary{background:rgba(220,38,38,0.04);border:1px solid rgba(220,38,38,0.15);border-radius:10px;padding:16px 22px;margin-bottom:18px;display:flex;gap:28px;flex-wrap:wrap}
+.fee-item{font-size:12px;color:rgba(153,27,27,0.7)}
+.fee-item b{display:block;font-size:16px;color:#dc2626;font-weight:700}
+
+/* KPI grid */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-box{background:var(--paper);border:1.5px solid var(--rule-l);border-radius:10px;padding:14px 16px;text-align:center}
+.kpi-box .kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-60);margin-bottom:4px;font-weight:600}
+.kpi-box .kpi-val{font-size:18px;font-weight:700}
+.kpi-box .kpi-sub{font-size:10px;color:var(--ink-60);margin-top:2px}
+.kpi-box.red .kpi-val{color:#dc2626}
+.kpi-box.blue .kpi-val{color:#2563eb}
+.kpi-box.amber .kpi-val{color:#d97706}
+.kpi-box.green .kpi-val{color:#2da064}
+
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:18px 20px}
+.chart-box h3{font-family:var(--serif);font-size:13px;margin-bottom:12px;color:var(--ink)}
+.chart-wrap{position:relative;height:220px}
+
+/* Breakeven */
+.breakeven{background:rgba(45,160,100,0.06);border:1.5px solid rgba(45,160,100,0.2);border-radius:10px;padding:20px 24px;margin-bottom:20px;text-align:center}
+.breakeven .be-months{font-size:30px;font-weight:700;color:#2da064}
+.breakeven .be-label{font-size:13px;color:#166534;margin-top:3px}
+
+/* Footer note */
+.disclaimer{font-size:10px;color:var(--ink-30);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--rule-l)}
+
+@media print{
+  .cs-sidebar,.cs-nav,.no-print{display:none!important}
+  .cs-app{display:block}
+  .cs-main{padding:0}
+  .cs-page{border:none;box-shadow:none;max-width:100%;padding:20px}
+  @page{size:A4;margin:1.5cm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
+    </div>
+  </div>
+</nav>
+
+<div class="cs-app">
+  <!-- SIDEBAR -->
+  <aside class="cs-sidebar" id="sidebar">
+    <div class="sb-title">Transfert PER</div>
+    <div class="sb-sub">Param&#232;tres de l'&#233;tude</div>
+
+    <div class="sb-section">
+      <h3>Client</h3>
+      <div class="sb-row"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
+      <div class="sb-row"><label>Date de l'&#233;tude</label><input type="text" id="pDate" oninput="update()"></div>
+    </div>
+
+    <div class="sb-section">
+      <h3>Contrats</h3>
+      <div class="sb-row"><label>Contrat actuel</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
+      <div class="sb-row"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
+    </div>
+
+    <div class="sb-section">
+      <h3>Capital &amp; Frais</h3>
+      <div class="sb-row"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
+      <div class="sb-row">
+        <label>Frais de transfert (%)</label>
+        <div class="sb-range-wrap"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sb-range-val" id="vFraisTransfert">1.0%</span></div>
+      </div>
+      <div class="sb-row">
+        <label>Frais d'entr&#233;e (%)</label>
+        <div class="sb-range-wrap"><input type="range" id="pFraisEntree" min="0" max="10" step="0.1" value="0" oninput="update()"><span class="sb-range-val" id="vFraisEntree">0.0%</span></div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <h3>Allocation actuelle</h3>
+      <div class="alloc-grid">
+        <span class="hdr">Support</span><span class="hdr">Part %</span><span class="hdr">Rdt %</span>
+        <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
+        <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
+        <input type="number" id="aA0r" value="2" min="0" max="30" step="0.1" oninput="update()">
+        <input type="text" id="aA1n" value="Actions CM" oninput="update()">
+        <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
+        <input type="number" id="aA1r" value="3" min="0" max="30" step="0.1" oninput="update()">
+      </div>
+      <div class="alloc-alert" id="alertAllocA"></div>
+    </div>
+
+    <div class="sb-section">
+      <h3>Nouvelle allocation</h3>
+      <div class="alloc-grid">
+        <span class="hdr">Support</span><span class="hdr">Part %</span><span class="hdr">Rdt %</span>
+        <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
+        <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
+        <input type="number" id="aB0r" value="9.5" min="0" max="30" step="0.1" oninput="update()">
+        <input type="text" id="aB1n" value="Private equity" oninput="update()">
+        <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
+        <input type="number" id="aB1r" value="6" min="0" max="30" step="0.1" oninput="update()">
+        <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
+        <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
+        <input type="number" id="aB2r" value="4" min="0" max="30" step="0.1" oninput="update()">
+        <input type="text" id="aB3n" value="Obligataire" oninput="update()">
+        <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
+        <input type="number" id="aB3r" value="5" min="0" max="30" step="0.1" oninput="update()">
+      </div>
+      <div class="alloc-alert" id="alertAllocB"></div>
+    </div>
+
+    <div class="sb-section">
+      <h3>Horizon de projection</h3>
+      <div class="sb-row">
+        <div class="sb-range-wrap"><input type="range" id="pHorizon" min="1" max="20" step="1" value="10" oninput="update()"><span class="sb-range-val" id="vHorizon">10 ans</span></div>
+      </div>
+    </div>
+
+    <div class="sb-actions">
+      <button onclick="window.print()">&#128424; Exporter PDF</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <!-- Header -->
+      <div style="margin-bottom:28px">
+        <div style="font-family:var(--serif);font-size:26px;color:var(--ink)" id="hClient">Client</div>
+        <div style="font-size:13px;color:var(--ink-60);margin-top:4px" id="hSubtitle">&#201;tude de transfert &#8212; PER</div>
+        <div style="font-size:12px;color:var(--ink-30);margin-top:2px" id="hDate"></div>
+      </div>
+
+      <!-- Comparison -->
+      <div class="compare-grid">
+        <div class="compare-card current">
+          <div class="cc-name" id="ccNameA">PER Ancien</div>
+          <div class="cc-capital" id="ccCapA">50 000 &#8364;</div>
+          <div class="alloc-bar" id="allocBarA"></div>
+          <div class="alloc-legend" id="allocLegA"></div>
+          <div class="cc-yield">Rendement moyen pond&#233;r&#233; : <b id="ccYieldA">2.30%</b></div>
+          <div class="cc-proj">Projection &#224; <span class="horizon-span">10</span> ans : <b id="ccProjA">0 &#8364;</b></div>
+        </div>
+        <div class="compare-card future">
+          <span class="badge-reco">Recommand&#233;</span>
+          <div class="cc-name" id="ccNameB">PER Recommand&#233;</div>
+          <div class="cc-capital" id="ccCapB">49 500 &#8364; <small>net de frais</small></div>
+          <div class="alloc-bar" id="allocBarB"></div>
+          <div class="alloc-legend" id="allocLegB"></div>
+          <div class="cc-yield">Rendement moyen pond&#233;r&#233; : <b id="ccYieldB">6.85%</b></div>
+          <div class="cc-proj">Projection &#224; <span class="horizon-span">10</span> ans : <b id="ccProjB">0 &#8364;</b></div>
+        </div>
+      </div>
+
+      <!-- Fee summary -->
+      <div class="fee-summary">
+        <div class="fee-item">Frais de transfert<b id="feeTransfert">500 &#8364;</b></div>
+        <div class="fee-item">Frais d'entr&#233;e<b id="feeEntree">0 &#8364;</b></div>
+        <div class="fee-item">Co&#251;t total<b id="feeTotal">500 &#8364;</b></div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi-box red">
+          <div class="kpi-label">Frais totaux</div>
+          <div class="kpi-val" id="kpiFrais">500 &#8364;</div>
+          <div class="kpi-sub" id="kpiFraisPct">1.0% du capital</div>
+        </div>
+        <div class="kpi-box blue">
+          <div class="kpi-label">Capital net investi</div>
+          <div class="kpi-val" id="kpiNet">49 500 &#8364;</div>
+          <div class="kpi-sub">apr&#232;s frais</div>
+        </div>
+        <div class="kpi-box amber">
+          <div class="kpi-label">Gain rendement</div>
+          <div class="kpi-val" id="kpiGainRdt">+4.55 pts</div>
+          <div class="kpi-sub">par an</div>
+        </div>
+        <div class="kpi-box green">
+          <div class="kpi-label">Gain total</div>
+          <div class="kpi-val" id="kpiGainTotal">0 &#8364;</div>
+          <div class="kpi-sub" id="kpiGainSub">&#224; 10 ans vs actuel</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-box">
+          <h3>R&#233;cup&#233;ration des frais (24 mois)</h3>
+          <div class="chart-wrap"><canvas id="chartRecovery"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <h3>Projection compar&#233;e</h3>
+          <div class="chart-wrap"><canvas id="chartProjection"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Breakeven -->
+      <div class="breakeven">
+        <div class="be-months" id="beMonths">6</div>
+        <div class="be-label" id="beLabel">mois pour r&#233;cup&#233;rer les frais de transfert</div>
+      </div>
+
+      <!-- Footer note -->
+      <div class="disclaimer" id="footerNote">
+        Les projections sont r&#233;alis&#233;es &#224; titre indicatif, sur la base des rendements hypoth&#233;tiques indiqu&#233;s. Les performances pass&#233;es ne pr&#233;jugent pas des performances futures.
+      </div>
+
+    </div><!-- .cs-page -->
+  </div><!-- .cs-main -->
+</div><!-- .cs-app -->
+
+<script>
+var chartRecovery=null, chartProjection=null;
+var COLORS_A=['#60a5fa','#93c5fd'];
+var COLORS_B=['#4ade80','#86efac','#bbf7d0','#d9f99d'];
+
+function V(id){return document.getElementById(id)}
+function num(id){return parseFloat(V(id).value)||0}
+function txt(id){return V(id).value||''}
+function fmt(n){return Math.round(n).toLocaleString('fr-FR')}
+function fmtD(n,d){return n.toFixed(d)}
+
+function getAllocA(){
+  var a=[];
+  for(var i=0;i<2;i++) a.push({name:txt('aA'+i+'n'),pct:num('aA'+i+'p'),rdt:num('aA'+i+'r')});
+  return a;
+}
+function getAllocB(){
+  var a=[];
+  for(var i=0;i<4;i++) a.push({name:txt('aB'+i+'n'),pct:num('aB'+i+'p'),rdt:num('aB'+i+'r')});
+  return a;
+}
+function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
+function weightedYield(arr){
+  var s=0,t=0;
+  arr.forEach(function(x){s+=x.pct*x.rdt;t+=x.pct});
+  return t>0?s/t:0;
+}
+
+function update(){
+  var capital=num('pCapital');
+  var fraisT=num('pFraisTransfert');
+  var fraisE=num('pFraisEntree');
+  var horizon=parseInt(V('pHorizon').value)||10;
+  var nomA=txt('pContratA');
+  var nomB=txt('pContratB');
+  var client=txt('pClient');
+  var dateEtude=txt('pDate');
+
+  V('vFraisTransfert').textContent=fmtD(fraisT,1)+'%';
+  V('vFraisEntree').textContent=fmtD(fraisE,1)+'%';
+  V('vHorizon').textContent=horizon+' ans';
+
+  var allocA=getAllocA();
+  var allocB=getAllocB();
+  var sumA=sumPct(allocA);
+  var sumB=sumPct(allocB);
+  V('alertAllocA').textContent=Math.abs(sumA-100)>0.01?'Total : '+fmtD(sumA,0)+'% (doit \u00eatre 100%)':'';
+  V('alertAllocB').textContent=Math.abs(sumB-100)>0.01?'Total : '+fmtD(sumB,0)+'% (doit \u00eatre 100%)':'';
+
+  var yieldA=weightedYield(allocA);
+  var yieldB=weightedYield(allocB);
+
+  var montantTransfert=capital*fraisT/100;
+  var capitalApresTransfert=capital-montantTransfert;
+  var montantEntree=capitalApresTransfert*fraisE/100;
+  var capitalNet=capitalApresTransfert-montantEntree;
+  var fraisTotal=montantTransfert+montantEntree;
+
+  var projA=capital*Math.pow(1+yieldA/100,horizon);
+  var projB=capitalNet*Math.pow(1+yieldB/100,horizon);
+  var gainTotal=projB-projA;
+
+  V('hClient').textContent=client||'Client';
+  V('hDate').textContent=dateEtude;
+
+  V('ccNameA').textContent=nomA;
+  V('ccNameB').textContent=nomB;
+  V('ccCapA').textContent=fmt(capital)+' \u20ac';
+  V('ccCapB').innerHTML=fmt(capitalNet)+' \u20ac <small>net de frais</small>';
+  V('ccYieldA').textContent=fmtD(yieldA,2)+'%';
+  V('ccYieldB').textContent=fmtD(yieldB,2)+'%';
+  V('ccProjA').textContent=fmt(projA)+' \u20ac';
+  V('ccProjB').textContent=fmt(projB)+' \u20ac';
+
+  document.querySelectorAll('.horizon-span').forEach(function(el){el.textContent=horizon});
+
+  renderAllocBar('allocBarA','allocLegA',allocA,COLORS_A);
+  renderAllocBar('allocBarB','allocLegB',allocB,COLORS_B);
+
+  V('feeTransfert').textContent=fmt(montantTransfert)+' \u20ac';
+  V('feeEntree').textContent=fmt(montantEntree)+' \u20ac';
+  V('feeTotal').textContent=fmt(fraisTotal)+' \u20ac';
+
+  V('kpiFrais').textContent=fmt(fraisTotal)+' \u20ac';
+  V('kpiFraisPct').textContent=fmtD(capital>0?fraisTotal/capital*100:0,1)+'% du capital';
+  V('kpiNet').textContent=fmt(capitalNet)+' \u20ac';
+  V('kpiGainRdt').textContent=(yieldB-yieldA>=0?'+':'')+fmtD(yieldB-yieldA,2)+' pts';
+  V('kpiGainTotal').textContent=(gainTotal>=0?'+':'')+fmt(gainTotal)+' \u20ac';
+  V('kpiGainSub').textContent='\u00e0 '+horizon+' ans vs actuel';
+
+  var beMonths=calcBreakeven(capital,capitalNet,yieldA,yieldB);
+  V('beMonths').textContent=beMonths===null?'N/A':beMonths;
+  V('beLabel').textContent=beMonths===null?'Le transfert ne se rentabilise pas sur 24 mois':'mois pour r\u00e9cup\u00e9rer les frais de transfert';
+
+  renderCharts(capital,capitalNet,yieldA,yieldB,horizon,nomA,nomB);
+
+  var yields=[];
+  allocA.forEach(function(x){if(x.pct>0)yields.push(x.name+' '+fmtD(x.rdt,1)+'%')});
+  allocB.forEach(function(x){if(x.pct>0)yields.push(x.name+' '+fmtD(x.rdt,1)+'%')});
+  V('footerNote').textContent='Projections indicatives bas\u00e9es sur les rendements hypoth\u00e9tiques suivants : '+yields.join(', ')+'. Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.';
+}
+
+function renderAllocBar(barId,legId,alloc,colors){
+  var barEl=V(barId);var legEl=V(legId);
+  barEl.innerHTML='';legEl.innerHTML='';
+  alloc.forEach(function(x,i){
+    if(x.pct<=0)return;
+    var sp=document.createElement('span');
+    sp.style.width=x.pct+'%';
+    sp.style.background=colors[i%colors.length];
+    barEl.appendChild(sp);
+    legEl.innerHTML+='<span><i style="background:'+colors[i%colors.length]+'"></i>'+x.name+' ('+fmtD(x.pct,0)+'%)</span>';
+  });
+}
+
+function calcBreakeven(capA,capB,yA,yB){
+  var mA=yA/100/12;var mB=yB/100/12;
+  for(var m=1;m<=240;m++){
+    var vA=capA*Math.pow(1+mA,m);
+    var vB=capB*Math.pow(1+mB,m);
+    if(vB>=vA)return m;
+  }
+  return null;
+}
+
+function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
+  var labelsR=[];var dataRA=[];var dataRB=[];
+  var mA=yA/100/12;var mB=yB/100/12;
+  for(var m=0;m<=24;m++){
+    labelsR.push(m);
+    dataRA.push(Math.round(capA*Math.pow(1+mA,m)));
+    dataRB.push(Math.round(capB*Math.pow(1+mB,m)));
+  }
+  if(chartRecovery)chartRecovery.destroy();
+  chartRecovery=new Chart(V('chartRecovery'),{
+    type:'line',
+    data:{labels:labelsR,datasets:[
+      {label:nomA,data:dataRA,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',borderWidth:2,fill:true,tension:0.3,pointRadius:0},
+      {label:nomB,data:dataRB,borderColor:'#2da064',backgroundColor:'rgba(45,160,100,0.08)',borderWidth:2,fill:true,tension:0.3,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Mois',font:{family:'Inter',size:10}},ticks:{font:{family:'Inter',size:9}}},
+        y:{ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'},font:{family:'Inter',size:9}}}
+      }
+    }
+  });
+
+  var labelsP=[];var dataPA=[];var dataPB=[];
+  var step=horizon<=5?1:horizon<=10?2:Math.ceil(horizon/5);
+  for(var y=0;y<=horizon;y+=step){
+    labelsP.push('An '+y);
+    dataPA.push(Math.round(capA*Math.pow(1+yA/100,y)));
+    dataPB.push(Math.round(capB*Math.pow(1+yB/100,y)));
+  }
+  if(labelsP[labelsP.length-1]!=='An '+horizon){
+    labelsP.push('An '+horizon);
+    dataPA.push(Math.round(capA*Math.pow(1+yA/100,horizon)));
+    dataPB.push(Math.round(capB*Math.pow(1+yB/100,horizon)));
+  }
+  if(chartProjection)chartProjection.destroy();
+  chartProjection=new Chart(V('chartProjection'),{
+    type:'bar',
+    data:{labels:labelsP,datasets:[
+      {label:nomA,data:dataPA,backgroundColor:'#93c5fd',borderRadius:4},
+      {label:nomB,data:dataPB,backgroundColor:'#4ade80',borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10}}}},
+      scales:{
+        x:{ticks:{font:{family:'Inter',size:9}}},
+        y:{ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'},font:{family:'Inter',size:9}}}
+      }
+    }
+  });
+}
+
+(function(){
+  var today=new Date();
+  var dd=String(today.getDate()).padStart(2,'0');
+  var mm=String(today.getMonth()+1).padStart(2,'0');
+  V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
+  update();
+})();
+</script>
+</body>
+</html>
