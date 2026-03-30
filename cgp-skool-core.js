@@ -256,8 +256,14 @@ CGP.pdf = {};
 /**
  * Convert all canvas to PNG images, print, then restore.
  */
-CGP.pdf.print = function() {
-  var backups = [];
+CGP.pdf._backups = [];
+
+/**
+ * Convert all canvas to PNG images (used before printing).
+ * Called automatically by beforeprint event OR manually by CGP.pdf.print().
+ */
+CGP.pdf._convertCanvases = function() {
+  if (CGP.pdf._backups.length > 0) return; // already converted
   document.querySelectorAll('canvas').forEach(function(canvas) {
     try {
       if (canvas.width > 0 && canvas.height > 0) {
@@ -265,24 +271,44 @@ CGP.pdf.print = function() {
         var img = document.createElement('img');
         img.src = url;
         img.className = 'cgp-chart-print-img';
-        img.style.cssText = 'max-width:100%;height:auto;display:none';
+        img.style.cssText = 'max-width:100%;height:auto';
         canvas.parentNode.insertBefore(img, canvas);
-        backups.push({ canvas: canvas, img: img });
+        canvas.style.display = 'none';
+        CGP.pdf._backups.push({ canvas: canvas, img: img });
       }
     } catch(e) {}
   });
-  // Show images, hide canvases for print
-  backups.forEach(function(b) {
-    b.img.style.display = '';
-    b.canvas.style.display = 'none';
+};
+
+/**
+ * Restore canvases after printing.
+ */
+CGP.pdf._restoreCanvases = function() {
+  CGP.pdf._backups.forEach(function(b) {
+    b.canvas.style.display = '';
+    if (b.img && b.img.parentNode) b.img.parentNode.removeChild(b.img);
   });
+  CGP.pdf._backups = [];
+};
+
+/**
+ * Button handler: convert canvases, print, restore.
+ */
+CGP.pdf.print = function() {
+  CGP.pdf._convertCanvases();
   setTimeout(function() {
     window.print();
-    setTimeout(function() {
-      backups.forEach(function(b) {
-        b.canvas.style.display = '';
-        b.img.remove();
-      });
-    }, 200);
+    setTimeout(CGP.pdf._restoreCanvases, 500);
   }, 100);
 };
+
+/**
+ * Auto-convert canvases on Ctrl+P / system print.
+ * Works even without clicking the "Exporter PDF" button.
+ */
+window.addEventListener('beforeprint', function() {
+  CGP.pdf._convertCanvases();
+});
+window.addEventListener('afterprint', function() {
+  CGP.pdf._restoreCanvases();
+});
