@@ -214,20 +214,10 @@
         <div style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300" id="hDate"></div>
       </div>
 
-      <!-- Type de PER info -->
-      <div id="typeBlock" style="background:var(--paper);border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span id="tbBadge" style="font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;background:var(--orange);color:#fff;border-radius:3px">PER</span>
-            <span style="font-size:13px;font-weight:600;color:var(--noir)" id="tbLabel">Transfert PER vers PER</span>
-          </div>
-          <div style="font-size:11px;color:var(--gris);line-height:1.6" id="tbDetails"></div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:10px;color:var(--gris);margin-bottom:2px">Frais de transfert</div>
-          <div style="font-size:18px;font-weight:700;color:var(--orange)" id="tbFraisMax">1% max</div>
-          <div style="font-size:10px;color:#2da064;margin-top:2px" id="tbSeuil">0% apr&#232;s 5 ans</div>
-        </div>
+      <!-- Type de PER -->
+      <div id="typeBlock" style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+        <span id="tbBadge" style="font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;background:var(--orange);color:#fff;border-radius:3px">PER</span>
+        <span style="font-size:13px;font-weight:600;color:var(--noir)" id="tbLabel">Transfert PER vers PER</span>
       </div>
 
       <!-- Comparison -->
@@ -431,13 +421,6 @@ function update(){
   // Type PER block
   V('tbBadge').textContent=rule.badge;
   V('tbLabel').textContent='Transfert '+rule.label+' vers PER';
-  V('tbFraisMax').textContent=rule.fraisMax+'% max';
-  V('tbSeuil').textContent='0% apr\u00e8s '+rule.seuilAns+' ans';
-  var det=[];
-  det.push('\u2022 Transf\u00e9rable : '+rule.transfert);
-  det.push('\u2022 Int\u00e9r\u00eat : '+rule.interet);
-  if(rule.attention)det.push('\u2022 Attention : '+rule.attention);
-  V('tbDetails').innerHTML=det.join('<br>');
 
   V('ccNameA').textContent=nomA;
   V('ccNameB').textContent=nomB;
