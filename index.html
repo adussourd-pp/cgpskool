@@ -358,6 +358,24 @@ p.hero-desc {
       <div class="fg"><label>Code postal</label><input class="fi" id="pCp" placeholder="06000" oninput="saveProfil()"></div>
       <div class="fg"><label>Ville</label><input class="fi" id="pVille" placeholder="Nice" oninput="saveProfil()"></div>
     </div>
+    <div class="grid2">
+      <div class="fg"><label>Photo de profil</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="photoPreview" style="width:48px;height:48px;border-radius:50%;background:var(--rule-l);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="font-size:10px;color:var(--ink-30)">Photo</span></div>
+          <label style="cursor:pointer;padding:6px 12px;border:1px solid var(--rule-l);font-size:11px;color:var(--ink-60);text-transform:none;letter-spacing:0">
+            Choisir<input type="file" accept="image/*" onchange="handlePhotoUpload(this)" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="fg"><label>Logo cabinet</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="logoPreview" style="height:48px;display:flex;align-items:center;overflow:hidden"><span style="font-size:10px;color:var(--ink-30)">Logo</span></div>
+          <label style="cursor:pointer;padding:6px 12px;border:1px solid var(--rule-l);font-size:11px;color:var(--ink-60);text-transform:none;letter-spacing:0">
+            Choisir<input type="file" accept="image/*" onchange="handleLogoUpload(this)" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
     <div class="fg"><label>Mentions légales (pied de page PDF)</label>
       <textarea class="fi" id="pMentions" rows="3" placeholder="Conseiller en Gestion de Patrimoine — ORIAS…" oninput="saveProfil()" style="resize:vertical"></textarea>
     </div>
@@ -381,7 +399,37 @@ function updateProfilBtn(){
   btn.textContent=has?('⚙ '+(p.pPrenom||p.pNom||'Mon profil')):'⚙ Mon profil';
   btn.className='cs-btn-ghost '+(has?'ok':'missing');
 }
-function openProfil(){document.getElementById('modalProfil').classList.add('open');loadProfil();}
+function handlePhotoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{localStorage.setItem('cgpskool_photo',e.target.result);}catch(err){}
+    showPhotoPreview(e.target.result);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showPhotoPreview(url){
+  var el=document.getElementById('photoPreview');
+  if(el&&url)el.innerHTML='<img src="'+url+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover">';
+}
+function handleLogoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{localStorage.setItem('cgpskool_logo',e.target.result);}catch(err){}
+    showLogoPreview(e.target.result);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showLogoPreview(url){
+  var el=document.getElementById('logoPreview');
+  if(el&&url)el.innerHTML='<img src="'+url+'" style="max-height:40px;max-width:140px">';
+}
+function loadImages(){
+  try{var p=localStorage.getItem('cgpskool_photo');if(p)showPhotoPreview(p);}catch(e){}
+  try{var l=localStorage.getItem('cgpskool_logo');if(l)showLogoPreview(l);}catch(e){}
+}
+function openProfil(){document.getElementById('modalProfil').classList.add('open');loadProfil();loadImages();}
 function closeProfil(){document.getElementById('modalProfil').classList.remove('open');}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeProfil();});
 document.addEventListener('DOMContentLoaded',function(){loadProfil();});
