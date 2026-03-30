@@ -8411,11 +8411,10 @@ function convertChartsDirectCapture(){
         // Vérifier que l'image n'est pas vide (transparent)
         if(url&&url.length>100){
           var img=document.createElement('img');img.src=url;
-          img.style.cssText='width:100%;max-width:100%;height:auto;display:block';
-          img.className='chart-img-backup';
-          canvas.parentNode.insertBefore(img,canvas);
+          img.style.cssText='width:100%;max-width:100%;height:auto;display:none';
+          img.className='cgp-chart-print-img';
+          canvas.parentNode.insertBefore(img,canvas.nextSibling);
           _chartImgBackups.push({canvas:canvas,img:img});
-          canvas.style.display='none';
         }
       }
     }catch(e){}
