@@ -38,42 +38,16 @@
 .sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
 .sb-body.open{max-height:2000px;opacity:1;overflow:visible}
 
-.param-row {
-  margin-bottom: 14px;
-}
-.param-label {
-  font-size: 11px; font-weight: 500; color: var(--ink-60);
-  margin-bottom: 5px; display: flex; align-items: center;
-  justify-content: space-between;
-}
-.param-label small {
-  font-size: 9px; color: var(--ink-30); font-weight: 400;
-  letter-spacing: 0.05em;
-}
-
-/* Input avec unité */
-.input-with-unit {
-  display: flex; align-items: stretch;
-  border: 1.5px solid var(--rule-l); border-radius: 8px;
-  background: #fff; overflow: hidden;
-  transition: border-color 0.2s;
-}
-.input-with-unit:focus-within { border-color: var(--orange); }
-.input-with-unit input {
-  flex: 1; padding: 9px 12px;
-  border: none !important; border-radius: 0 !important; background: transparent;
-  font-family: var(--sans); font-size: 13px; font-weight: 500;
-  color: var(--ink); outline: none;
-  min-width: 0;
-}
-.input-unit {
-  padding: 0 12px;
-  display: flex; align-items: center;
-  font-size: 12px; font-weight: 600; color: var(--ink-30);
-  background: var(--paper);
-  border-left: 1px solid var(--rule-l);
-  flex-shrink: 0;
-}
+.fg{margin-bottom:14px}
+.fg>label{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500;color:var(--ink-60);margin-bottom:5px}
+.fg>label small{font-size:9px;color:var(--ink-30);font-weight:400;letter-spacing:0.05em}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--rule-l);border-radius:8px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--orange)}
+.fi-row input{flex:1;background:transparent;border:none!important;border-radius:0!important;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--ink);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--ink-60);border-left:1px solid var(--rule-l);white-space:nowrap;flex-shrink:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid2 .fi,.grid2 select.fi,.grid2 .fi-row{font-size:12px}
+.grid2 .fi-row input{font-size:12px;padding:7px 8px}
 
 /* Toggle fréquence */
 .freq-row { display: flex; gap: 4px; }
@@ -285,23 +259,12 @@
     <!-- Capital & versements -->
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Capital & versements</div>
     <div class="sb-body open">
-      <div class="param-row">
-        <div class="param-label">Capital initial</div>
-        <div class="input-with-unit">
-          <input type="number" id="capital" value="10000" min="0" step="1000" oninput="recalc()">
-          <div class="input-unit">€</div>
-        </div>
+      <div class="fg"><label>Capital initial</label>
+        <div class="fi-row"><input type="number" id="capital" value="10000" min="0" step="1000" oninput="recalc()"><span class="fi-unit">€</span></div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">
-          Versement périodique
-          <small>fréquence →</small>
-        </div>
-        <div class="input-with-unit" style="margin-bottom:6px">
-          <input type="number" id="versement" value="200" min="0" step="50" oninput="recalc()">
-          <div class="input-unit">€</div>
-        </div>
+      <div class="fg"><label>Versement périodique <small>fréquence →</small></label>
+        <div class="fi-row" style="margin-bottom:6px"><input type="number" id="versement" value="200" min="0" step="50" oninput="recalc()"><span class="fi-unit">€</span></div>
         <div class="freq-row" id="freqRow">
           <button class="freq-btn active" onclick="setFreq('mensuel',this)">Mensuel</button>
           <button class="freq-btn" onclick="setFreq('trimestriel',this)">Trim.</button>
@@ -309,28 +272,19 @@
         </div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Durée</div>
-        <div class="input-with-unit">
-          <input type="number" id="duree" value="20" min="1" max="50" step="1" oninput="recalc()">
-          <div class="input-unit">ans</div>
-        </div>
+      <div class="fg"><label>Durée</label>
+        <div class="fi-row"><input type="number" id="duree" value="20" min="1" max="50" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div>
       </div>
     </div>
 
     <!-- Rendement -->
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Rendement</div>
     <div class="sb-body open">
-      <div class="param-row">
-        <div class="param-label">Taux annuel brut</div>
-        <div class="input-with-unit">
-          <input type="number" id="taux" value="5" min="0" max="20" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
-        </div>
+      <div class="fg"><label>Taux annuel brut</label>
+        <div class="fi-row"><input type="number" id="taux" value="5" min="0" max="20" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Capitalisation</div>
+      <div class="fg"><label>Capitalisation</label>
         <div class="toggle-row" id="capitRow">
           <button class="toggle-opt active" onclick="setCapit('annuelle',this)">Annuelle</button>
           <button class="toggle-opt" onclick="setCapit('mensuelle',this)">Mensuelle</button>
@@ -341,67 +295,42 @@
     <!-- Frais -->
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Frais</div>
     <div class="sb-body open">
-      <div class="param-row">
+      <div class="fg">
         <div class="frais-toggle open" id="fraisToggle" onclick="toggleFrais()">
           <span>Taux de revalorisation nets de frais</span>
           <span class="arr">▾</span>
         </div>
         <div class="frais-body open" id="fraisBody">
-          <div class="param-row">
-            <div class="param-label">Taux fonds euros (net frais)</div>
-            <div class="input-with-unit">
-              <input type="number" id="tauxFE" value="1.1" min="0" max="10" step="0.1" oninput="recalc()">
-              <div class="input-unit">%</div>
-            </div>
+          <div class="fg"><label>Taux fonds euros (net frais)</label>
+            <div class="fi-row"><input type="number" id="tauxFE" value="1.1" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
           </div>
-          <div class="param-row">
-            <div class="param-label">Taux unités de compte (net frais)</div>
-            <div class="input-with-unit">
-              <input type="number" id="tauxUC" value="3.5" min="0" max="15" step="0.1" oninput="recalc()">
-              <div class="input-unit">%</div>
-            </div>
+          <div class="fg"><label>Taux unités de compte (net frais)</label>
+            <div class="fi-row"><input type="number" id="tauxUC" value="3.5" min="0" max="15" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
           </div>
         </div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Frais de gestion annuels</div>
-        <div class="input-with-unit">
-          <input type="number" id="fraisGestion" value="1" min="0" max="5" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
-        </div>
+      <div class="fg"><label>Frais de gestion annuels</label>
+        <div class="fi-row"><input type="number" id="fraisGestion" value="1" min="0" max="5" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Frais sur versement initial <small>★ obligatoires</small></div>
-        <div class="input-with-unit">
-          <input type="number" id="fraisVersInit" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
-        </div>
+      <div class="fg"><label>Frais sur versement initial <small>★ obligatoires</small></label>
+        <div class="fi-row"><input type="number" id="fraisVersInit" value="4.8" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Frais sur versements périodiques <small>★ obligatoires</small></div>
-        <div class="input-with-unit">
-          <input type="number" id="fraisVersPer" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
-        </div>
+      <div class="fg"><label>Frais sur versements périodiques <small>★ obligatoires</small></label>
+        <div class="fi-row"><input type="number" id="fraisVersPer" value="4.8" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
 
-      <div class="param-row">
-        <div class="param-label">Frais sur versements exceptionnels <small>★ obligatoires</small></div>
-        <div class="input-with-unit">
-          <input type="number" id="fraisVersExc" value="4.8" min="0" max="10" step="0.1" oninput="recalc()">
-          <div class="input-unit">%</div>
-        </div>
+      <div class="fg"><label>Frais sur versements exceptionnels <small>★ obligatoires</small></label>
+        <div class="fi-row"><input type="number" id="fraisVersExc" value="4.8" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
     </div>
 
     <!-- Fiscalité -->
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Fiscalite a la sortie</div>
     <div class="sb-body open">
-      <div class="param-row">
-        <div class="param-label">Mode d'imposition</div>
+      <div class="fg"><label>Mode d'imposition</label>
         <div class="toggle-row" id="fiscRow">
           <button class="toggle-opt active" onclick="setFisc('pfu',this)">Flat tax</button>
           <button class="toggle-opt" onclick="setFisc('bareme',this)">Barème IR</button>
@@ -411,20 +340,12 @@
 
       <!-- Flat tax scindée IR + PS -->
       <div id="pfuRow">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="param-row" style="margin-bottom:0">
-            <div class="param-label">IR sur plus-values</div>
-            <div class="input-with-unit">
-              <input type="number" id="irPfu" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
-              <div class="input-unit">%</div>
-            </div>
+        <div class="grid2">
+          <div class="fg" style="margin-bottom:0"><label>IR sur plus-values</label>
+            <div class="fi-row"><input type="number" id="irPfu" value="12.8" min="0" max="30" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
           </div>
-          <div class="param-row" style="margin-bottom:0">
-            <div class="param-label">Prélèvements sociaux</div>
-            <div class="input-with-unit">
-              <input type="number" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
-              <div class="input-unit">%</div>
-            </div>
+          <div class="fg" style="margin-bottom:0"><label>Prelevements sociaux</label>
+            <div class="fi-row"><input type="number" id="ps" value="17.2" min="0" max="25" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
           </div>
         </div>
         <div style="margin-top:7px;padding:7px 10px;background:rgba(43,94,167,0.07);font-size:11px;color:#185FA5">
@@ -433,20 +354,17 @@
       </div>
 
       <!-- Barème IR -->
-      <div class="param-row" id="tmiRow" style="display:none">
-        <div class="param-label">TMI applicable</div>
+      <div class="fg" id="tmiRow" style="display:none">
+        <label>TMI applicable</label>
         <div class="toggle-row" id="tmiToggle">
           <button class="freq-btn active" onclick="setTMI(0.11,this)">11%</button>
           <button class="freq-btn" onclick="setTMI(0.30,this)">30%</button>
           <button class="freq-btn" onclick="setTMI(0.41,this)">41%</button>
           <button class="freq-btn" onclick="setTMI(0.45,this)">45%</button>
         </div>
-        <div class="param-row" style="margin-top:10px;margin-bottom:0">
-          <div class="param-label">Prélèvements sociaux (barème)</div>
-          <div class="input-with-unit">
-            <input type="number" id="psBareme" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
-            <div class="input-unit">%</div>
-          </div>
+        <div class="fg" style="margin-top:10px;margin-bottom:0">
+          <label>Prelevements sociaux (bareme)</label>
+          <div class="fi-row"><input type="number" id="psBareme" value="17.2" min="0" max="25" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
         </div>
       </div>
     </div>
