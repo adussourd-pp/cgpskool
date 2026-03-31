@@ -743,6 +743,7 @@ function runSim(){
   const curEligib=eligib.find(e=>e.id===bank)||eligib[0];
 
   render({b,scpis,mont,emp,frais,apport,dur,dif,typD,tx,rdtMoy,divM,divNet,mA,mD,part,tab,tL,tP,tI,tADI,effort,rev,tmi,eAvt,eApr,eligib,curEligib});
+  CGP.project.autoSave('scpi-financement');
 }
 
 function render(d){
@@ -925,6 +926,101 @@ function showFmt(input, targetId){
 }
 
 if(typeof CGP!=='undefined'&&CGP.footer){CGP.footer.render(document.getElementById('conseillerFooter'));}
+
+// ── Project save/restore ──
+CGP.project.registerModule('scpi-financement', {
+  getState: function() {
+    var scpiRows = [];
+    document.querySelectorAll('.scpi-row').forEach(function(r) {
+      var sel = r.querySelector('.scpi-sel');
+      if (!sel) return;
+      var row = {
+        scpiId: sel.value,
+        parts: +r.querySelector('.sp').value || 0
+      };
+      if (sel.value === 'custom') {
+        var cp = r.querySelector('.scpi-custom-prix');
+        var cr = r.querySelector('.scpi-custom-rdt');
+        row.customPrix = cp ? +cp.value : 0;
+        row.customRdt = cr ? +cr.value : 6;
+      }
+      scpiRows.push(row);
+    });
+    return {
+      invMode: invMode,
+      bank: bank,
+      fProfil: document.getElementById('fProfil').value,
+      fRev: +document.getElementById('fRev').value,
+      fLImmo: +document.getElementById('fLImmo').value,
+      fLScpi: +document.getElementById('fLScpi').value,
+      fCrd: +document.getElementById('fCrd').value,
+      fLRP: +document.getElementById('fLRP').value,
+      fTMI: +document.getElementById('fTMI').value,
+      sDur: +document.getElementById('sDur').value,
+      fDif: +document.getElementById('fDif').value,
+      fTDif: document.getElementById('fTDif').value,
+      fTaux: +document.getElementById('fTaux').value,
+      fA1: +document.getElementById('fA1').value,
+      fQ1: +document.getElementById('fQ1').value,
+      fA2: document.getElementById('fA2').value,
+      fQ2: +document.getElementById('fQ2').value,
+      fADI: +document.getElementById('fADI').value,
+      fBADI: document.getElementById('fBADI').value,
+      fReval: +document.getElementById('fReval').value,
+      scpiRows: scpiRows
+    };
+  },
+  setState: function(d) {
+    if (d.invMode !== undefined) setInvMode(d.invMode);
+    if (d.bank !== undefined) setBank(d.bank);
+    if (d.fProfil !== undefined) document.getElementById('fProfil').value = d.fProfil;
+    if (d.fRev !== undefined) document.getElementById('fRev').value = d.fRev;
+    if (d.fLImmo !== undefined) document.getElementById('fLImmo').value = d.fLImmo;
+    if (d.fLScpi !== undefined) document.getElementById('fLScpi').value = d.fLScpi;
+    if (d.fCrd !== undefined) document.getElementById('fCrd').value = d.fCrd;
+    if (d.fLRP !== undefined) document.getElementById('fLRP').value = d.fLRP;
+    if (d.fTMI !== undefined) setTMI(+d.fTMI);
+    if (d.sDur !== undefined) {
+      document.getElementById('sDur').value = d.sDur;
+      onDur(d.sDur);
+    }
+    if (d.fDif !== undefined) document.getElementById('fDif').value = d.fDif;
+    if (d.fTDif !== undefined) document.getElementById('fTDif').value = d.fTDif;
+    if (d.fTaux !== undefined) document.getElementById('fTaux').value = d.fTaux;
+    if (d.fA1 !== undefined) document.getElementById('fA1').value = d.fA1;
+    if (d.fQ1 !== undefined) document.getElementById('fQ1').value = d.fQ1;
+    if (d.fA2 !== undefined) document.getElementById('fA2').value = d.fA2;
+    if (d.fQ2 !== undefined) document.getElementById('fQ2').value = d.fQ2;
+    if (d.fADI !== undefined) document.getElementById('fADI').value = d.fADI;
+    if (d.fBADI !== undefined) document.getElementById('fBADI').value = d.fBADI;
+    if (d.fReval !== undefined) document.getElementById('fReval').value = d.fReval;
+    if (d.scpiRows && d.scpiRows.length) {
+      document.getElementById('scpiList').innerHTML = '';
+      sc = 0;
+      d.scpiRows.forEach(function(row) {
+        addSCPI();
+        var lastRow = document.querySelectorAll('.scpi-row');
+        var r = lastRow[lastRow.length - 1];
+        if (!r) return;
+        var sel = r.querySelector('.scpi-sel');
+        if (sel) sel.value = row.scpiId;
+        var sp = r.querySelector('.sp');
+        if (sp) sp.value = row.parts;
+        if (row.scpiId === 'custom') {
+          var cp = r.querySelector('.scpi-custom-prix');
+          var cr = r.querySelector('.scpi-custom-rdt');
+          if (cp) cp.value = row.customPrix || 0;
+          if (cr) cr.value = row.customRdt || 6;
+        }
+        updateScpiMontant(r.id);
+      });
+    }
+    calcEndett();
+    onProfil();
+    autoADI();
+    runSim();
+  }
+});
 </script>
 </body>
 </html>

@@ -566,6 +566,7 @@ function recalc() {
   renderMatrix(p);
   renderDetail(p);
   renderEvolutionChart(p);
+  CGP.project.autoSave('per-vs-av');
 }
 
 // ── Matrice ──
@@ -742,6 +743,44 @@ document.addEventListener('DOMContentLoaded', function() { recalc(); });
 
 // Footer conseiller
 CGP.footer.render(document.getElementById('conseillerFooter'));
+
+// ── Project save/restore ──
+CGP.project.registerModule('per-vs-av', {
+  getState: function() {
+    return {
+      montantBrut: +document.getElementById('montantBrut').value,
+      rendement: +document.getElementById('rendement').value,
+      irAv: +document.getElementById('irAv').value,
+      psAv: +document.getElementById('psAv').value,
+      irPer: +document.getElementById('irPer').value,
+      psPer: +document.getElementById('psPer').value,
+      tmiEntree: tmiEntree,
+      tmiSortie: tmiSortie,
+      duree: duree
+    };
+  },
+  setState: function(d) {
+    if (d.montantBrut !== undefined) document.getElementById('montantBrut').value = d.montantBrut;
+    if (d.rendement !== undefined) document.getElementById('rendement').value = d.rendement;
+    if (d.irAv !== undefined) document.getElementById('irAv').value = d.irAv;
+    if (d.psAv !== undefined) document.getElementById('psAv').value = d.psAv;
+    if (d.irPer !== undefined) document.getElementById('irPer').value = d.irPer;
+    if (d.psPer !== undefined) document.getElementById('psPer').value = d.psPer;
+    if (d.tmiEntree !== undefined) tmiEntree = d.tmiEntree;
+    if (d.tmiSortie !== undefined) tmiSortie = d.tmiSortie;
+    if (d.duree !== undefined) duree = d.duree;
+    // Restore TMI button states
+    document.querySelectorAll('#tmiEntreeRow .tmi-btn').forEach(function(b) {
+      var val = parseFloat(b.textContent) / 100;
+      b.classList.toggle('active', Math.abs(val - tmiEntree) < 0.001);
+    });
+    document.querySelectorAll('#tmiSortieRow .tmi-btn').forEach(function(b) {
+      var val = parseFloat(b.textContent) / 100;
+      b.classList.toggle('active', Math.abs(val - tmiSortie) < 0.001);
+    });
+    recalc();
+  }
+});
 </script>
 </body>
 </html>

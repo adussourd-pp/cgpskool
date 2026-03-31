@@ -440,6 +440,8 @@ function render(){
 
   // Tree
   wrap.innerHTML=renderNode(tree,[],0);
+
+  CGP.project.autoSave('equipe-builder');
 }
 
 function exportJSON(){
@@ -466,6 +468,19 @@ function importJSON(e){
 
 loadTree();
 CGP.footer.render(document.getElementById('conseillerFooter'));
+
+CGP.project.registerModule('equipe-builder', {
+  getState: function() {
+    return { tree: tree };
+  },
+  setState: function(d) {
+    if (d.tree !== undefined) {
+      tree = d.tree;
+      saveTree();
+      render();
+    }
+  }
+});
 </script>
 </div><!-- /cgp-module -->
 </div><!-- /cgp-app -->

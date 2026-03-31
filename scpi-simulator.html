@@ -581,6 +581,7 @@ function runSimulation(){
   if(currentMode==='retraite')renderRetraite();
   else if(currentMode==='np')renderNP();
   else renderEntreprise();
+  CGP.project.autoSave('scpi-simulator');
 }
 
 function renderSCPIHeader(){
@@ -868,6 +869,75 @@ function setScpiTMI(val, btn) {
 
 // Footer conseiller (gere par CGP.profil.load() dans core.js)
 CGP.footer.render(document.getElementById('conseillerBlock'));
+
+// ── Project save/restore ──
+CGP.project.registerModule('scpi-simulator', {
+  getState: function() {
+    return {
+      currentMode: currentMode,
+      sourceMode: sourceMode,
+      selectedSCPIid: selectedSCPI ? selectedSCPI.id : null,
+      customGross: +document.getElementById('custom-gross').value,
+      customName: document.getElementById('custom-name').value,
+      retInit: +document.getElementById('ret-init').value,
+      retMonthly: +document.getElementById('ret-monthly').value,
+      retReinvest: +document.getElementById('ret-reinvest').value,
+      retHorizon: +document.getElementById('ret-horizon').value,
+      retTmi: +document.getElementById('ret-tmi').value,
+      npInit: +document.getElementById('np-init').value,
+      npDuration: +document.getElementById('np-duration').value,
+      entInvest: +document.getElementById('ent-invest').value,
+      entInvestNp: +document.getElementById('ent-invest-np').value,
+      entDuration: +document.getElementById('ent-duration').value,
+      entIs: +document.getElementById('ent-is').value
+    };
+  },
+  setState: function(d) {
+    if (d.sourceMode !== undefined) setSource(d.sourceMode);
+    if (d.customGross !== undefined) document.getElementById('custom-gross').value = d.customGross;
+    if (d.customName !== undefined) document.getElementById('custom-name').value = d.customName;
+    if (d.selectedSCPIid !== undefined && d.selectedSCPIid !== null) selectSCPI(d.selectedSCPIid);
+    if (d.retInit !== undefined) document.getElementById('ret-init').value = d.retInit;
+    if (d.retMonthly !== undefined) document.getElementById('ret-monthly').value = d.retMonthly;
+    if (d.retReinvest !== undefined) {
+      document.getElementById('ret-reinvest').value = d.retReinvest;
+      document.getElementById('ret-reinvest-val').textContent = d.retReinvest + ' %';
+    }
+    if (d.retHorizon !== undefined) {
+      document.getElementById('ret-horizon').value = d.retHorizon;
+      document.getElementById('ret-horizon-val').textContent = d.retHorizon + ' ans';
+    }
+    if (d.retTmi !== undefined) {
+      document.getElementById('ret-tmi').value = d.retTmi;
+      document.querySelectorAll('.tmi-pill').forEach(function(b) {
+        b.classList.toggle('active', +b.textContent.replace(/[^0-9]/g, '') === d.retTmi);
+      });
+    }
+    if (d.npInit !== undefined) document.getElementById('np-init').value = d.npInit;
+    if (d.npDuration !== undefined) {
+      document.getElementById('np-duration').value = d.npDuration;
+      document.getElementById('np-dur-val').textContent = d.npDuration + ' ans';
+    }
+    if (d.entInvest !== undefined) document.getElementById('ent-invest').value = d.entInvest;
+    if (d.entInvestNp !== undefined) document.getElementById('ent-invest-np').value = d.entInvestNp;
+    if (d.entDuration !== undefined) {
+      document.getElementById('ent-duration').value = d.entDuration;
+      document.getElementById('ent-dur-val').textContent = d.entDuration + ' ans';
+    }
+    if (d.entIs !== undefined) document.getElementById('ent-is').value = d.entIs;
+    if (d.currentMode !== undefined) {
+      var tab = document.querySelectorAll('.mode-tab');
+      tab.forEach(function(t) { t.classList.remove('active'); });
+      var modes = ['retraite', 'np', 'entreprise'];
+      modes.forEach(function(m, i) {
+        document.getElementById('inputs-' + m).style.display = m === d.currentMode ? 'block' : 'none';
+        if (m === d.currentMode && tab[i]) tab[i].classList.add('active');
+      });
+      currentMode = d.currentMode;
+    }
+    runSimulation();
+  }
+});
 </script>
 </body>
 </html>

@@ -877,6 +877,7 @@ function recalc() {
     (fiscMode === 'exonere' ? 'Fiscalité : exonéré.' :
      fiscMode === 'pfu' ? `Fiscalité : flat tax 30% (IR 12,8% + PS ${fmtPct(ps*100)}) sur les plus-values.` :
      `Fiscalité : barème IR ${fmtPct(tmiBareme*100)} + PS ${fmtPct(ps*100)} sur les plus-values.`);
+  CGP.project.autoSave('interets-composes');
 }
 
 // Init auto
@@ -886,6 +887,50 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fraisBody').classList.add('open');
   recalc();
   CGP.footer.render(document.getElementById('conseillerFooter'));
+});
+
+CGP.project.registerModule('interets-composes', {
+  getState: function() {
+    return {
+      capital: +document.getElementById('capital').value,
+      versement: +document.getElementById('versement').value,
+      duree: +document.getElementById('duree').value,
+      taux: +document.getElementById('taux').value,
+      tauxFE: +document.getElementById('tauxFE').value,
+      tauxUC: +document.getElementById('tauxUC').value,
+      fraisGestion: +document.getElementById('fraisGestion').value,
+      fraisVersInit: +document.getElementById('fraisVersInit').value,
+      fraisVersPer: +document.getElementById('fraisVersPer').value,
+      fraisVersExc: +document.getElementById('fraisVersExc').value,
+      irPfu: +document.getElementById('irPfu').value,
+      ps: +document.getElementById('ps').value,
+      psBareme: +document.getElementById('psBareme').value,
+      freq: freq,
+      capit: capit,
+      fiscMode: fiscMode,
+      tmiBareme: tmiBareme
+    };
+  },
+  setState: function(d) {
+    if (d.capital !== undefined) document.getElementById('capital').value = d.capital;
+    if (d.versement !== undefined) document.getElementById('versement').value = d.versement;
+    if (d.duree !== undefined) document.getElementById('duree').value = d.duree;
+    if (d.taux !== undefined) document.getElementById('taux').value = d.taux;
+    if (d.tauxFE !== undefined) document.getElementById('tauxFE').value = d.tauxFE;
+    if (d.tauxUC !== undefined) document.getElementById('tauxUC').value = d.tauxUC;
+    if (d.fraisGestion !== undefined) document.getElementById('fraisGestion').value = d.fraisGestion;
+    if (d.fraisVersInit !== undefined) document.getElementById('fraisVersInit').value = d.fraisVersInit;
+    if (d.fraisVersPer !== undefined) document.getElementById('fraisVersPer').value = d.fraisVersPer;
+    if (d.fraisVersExc !== undefined) document.getElementById('fraisVersExc').value = d.fraisVersExc;
+    if (d.irPfu !== undefined) document.getElementById('irPfu').value = d.irPfu;
+    if (d.ps !== undefined) document.getElementById('ps').value = d.ps;
+    if (d.psBareme !== undefined) document.getElementById('psBareme').value = d.psBareme;
+    if (d.freq !== undefined) freq = d.freq;
+    if (d.capit !== undefined) capit = d.capit;
+    if (d.fiscMode !== undefined) fiscMode = d.fiscMode;
+    if (d.tmiBareme !== undefined) tmiBareme = d.tmiBareme;
+    recalc();
+  }
 });
 </script>
 </body>

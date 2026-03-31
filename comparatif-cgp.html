@@ -1337,6 +1337,8 @@ function updateSim(){
       '</div>'+
       '</div>';
   }).join('');
+
+  CGP.project.autoSave('comparatif-cgp');
 }
 
 /* ── NAV SCROLL ── */
@@ -1393,6 +1395,27 @@ function drawDonut(){
 window.addEventListener('load',drawDonut);
 
 CGP.footer.render(document.getElementById('conseillerFooter'));
+
+CGP.project.registerModule('comparatif-cgp', {
+  getState: function() {
+    return {
+      amtSlider: +document.getElementById('amt-slider').value,
+      rend: +document.getElementById('rend').value,
+      simDur: simDur,
+      hybridCSP: hybridCSP
+    };
+  },
+  setState: function(d) {
+    if (d.amtSlider !== undefined) {
+      document.getElementById('amt-slider').value = d.amtSlider;
+      setAmtSlider(d.amtSlider);
+    }
+    if (d.rend !== undefined) document.getElementById('rend').value = d.rend;
+    if (d.simDur !== undefined) setDur(d.simDur);
+    if (d.hybridCSP !== undefined && d.hybridCSP !== hybridCSP) toggleCSP();
+    updateSim();
+  }
+});
 </script>
 </div><!-- .cgp-module -->
 </div><!-- .cgp-app -->

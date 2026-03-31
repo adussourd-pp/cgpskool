@@ -488,6 +488,8 @@ function update(){
   renderCharts(capital,capitalNet,yieldA,yieldB,horizon,nomA,nomB);
 
   V('footerNote').textContent='Projections indicatives. Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.';
+
+  CGP.project.autoSave('etude-transfert-per');
 }
 
 function renderAllocBar(barId,legId,alloc,colors){
@@ -584,6 +586,65 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
 function exportPDF(){
   CGP.pdf.print();
 }
+
+CGP.project.registerModule('etude-transfert-per', {
+  getState: function() {
+    return {
+      pClient: V('pClient').value,
+      pDate: V('pDate').value,
+      pTypePER: V('pTypePER').value,
+      pContratA: V('pContratA').value,
+      aA0n: V('aA0n').value,
+      aA0p: +V('aA0p').value,
+      aA1n: V('aA1n').value,
+      aA1p: +V('aA1p').value,
+      pRdtA: +V('pRdtA').value,
+      pCapital: +V('pCapital').value,
+      pAnciennete: +V('pAnciennete').value,
+      pContratB: V('pContratB').value,
+      pFraisTransfert: +V('pFraisTransfert').value,
+      pFraisEntree: +V('pFraisEntree').value,
+      aB0n: V('aB0n').value,
+      aB0p: +V('aB0p').value,
+      aB1n: V('aB1n').value,
+      aB1p: +V('aB1p').value,
+      aB2n: V('aB2n').value,
+      aB2p: +V('aB2p').value,
+      aB3n: V('aB3n').value,
+      aB3p: +V('aB3p').value,
+      pRdtB: +V('pRdtB').value,
+      pHorizon: +V('pHorizon').value
+    };
+  },
+  setState: function(d) {
+    if (d.pClient !== undefined) V('pClient').value = d.pClient;
+    if (d.pDate !== undefined) V('pDate').value = d.pDate;
+    if (d.pTypePER !== undefined) V('pTypePER').value = d.pTypePER;
+    if (d.pContratA !== undefined) V('pContratA').value = d.pContratA;
+    if (d.aA0n !== undefined) V('aA0n').value = d.aA0n;
+    if (d.aA0p !== undefined) V('aA0p').value = d.aA0p;
+    if (d.aA1n !== undefined) V('aA1n').value = d.aA1n;
+    if (d.aA1p !== undefined) V('aA1p').value = d.aA1p;
+    if (d.pRdtA !== undefined) V('pRdtA').value = d.pRdtA;
+    if (d.pCapital !== undefined) V('pCapital').value = d.pCapital;
+    if (d.pAnciennete !== undefined) V('pAnciennete').value = d.pAnciennete;
+    if (d.pContratB !== undefined) V('pContratB').value = d.pContratB;
+    if (d.pFraisTransfert !== undefined) V('pFraisTransfert').value = d.pFraisTransfert;
+    if (d.pFraisEntree !== undefined) V('pFraisEntree').value = d.pFraisEntree;
+    if (d.aB0n !== undefined) V('aB0n').value = d.aB0n;
+    if (d.aB0p !== undefined) V('aB0p').value = d.aB0p;
+    if (d.aB1n !== undefined) V('aB1n').value = d.aB1n;
+    if (d.aB1p !== undefined) V('aB1p').value = d.aB1p;
+    if (d.aB2n !== undefined) V('aB2n').value = d.aB2n;
+    if (d.aB2p !== undefined) V('aB2p').value = d.aB2p;
+    if (d.aB3n !== undefined) V('aB3n').value = d.aB3n;
+    if (d.aB3p !== undefined) V('aB3p').value = d.aB3p;
+    if (d.pRdtB !== undefined) V('pRdtB').value = d.pRdtB;
+    if (d.pHorizon !== undefined) V('pHorizon').value = d.pHorizon;
+    onTypeChange();
+    update();
+  }
+});
 </script>
 </body>
 </html>

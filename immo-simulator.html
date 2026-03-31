@@ -838,6 +838,7 @@ function recalc() {
 
   var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP Résidence de Services';
   setHTML('simNote', 'Simulation à titre indicatif — non contractuelle. Mode : '+modeLabel+'. Taux : '+fmtPct(p.tauxN*100)+'%, durée '+p.dureePret+' ans, différé '+p.differe+' mois. Amortissement : immo '+p.durAmI+' ans, mobilier '+p.durAmM+' ans. Hypothèse simplificatrice : participation calculée sur la mensualité constante après différé. Aucune fiscalité supplémentaire due tant que la réserve d\'amortissement n\'est pas épuisée.');
+  CGP.project.autoSave('immo-simulator');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -849,6 +850,100 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Footer conseiller
 CGP.footer.render(document.getElementById('conseillerFooter'));
+
+CGP.project.registerModule('immo-simulator', {
+  getState: function() {
+    return {
+      mode: mode,
+      prixTotal: +document.getElementById('prixTotal').value,
+      partFoncier: +document.getElementById('partFoncier').value,
+      fraisNotaire: +document.getElementById('fraisNotaire').value,
+      prixMobilier: +document.getElementById('prixMobilier').value,
+      prixFAI: +document.getElementById('prixFAI').value,
+      fraisNotaireC: +document.getElementById('fraisNotaireC').value,
+      travaux: +document.getElementById('travaux').value,
+      qaVA: +document.getElementById('qaVA').value,
+      mobilierC: +document.getElementById('mobilierC').value,
+      ingenierieC: +document.getElementById('ingenierieC').value,
+      nbChambres: +document.getElementById('nbChambres').value,
+      prixTotalR: +document.getElementById('prixTotalR').value,
+      prixFoncierR: +document.getElementById('prixFoncierR').value,
+      prixImmoHT: +document.getElementById('prixImmoHT').value,
+      prixMobilierR: +document.getElementById('prixMobilierR').value,
+      tvaRec: +document.getElementById('tvaRec').value,
+      fraisNotaireR: +document.getElementById('fraisNotaireR').value,
+      loyerM: +document.getElementById('loyerM').value,
+      tauxCNR: +document.getElementById('tauxCNR').value,
+      loyerAHT: +document.getElementById('loyerAHT').value,
+      tauxCNRR: +document.getElementById('tauxCNRR').value,
+      loyerCh: +document.getElementById('loyerCh').value,
+      tauxRpl: +document.getElementById('tauxRpl').value,
+      revaloL: +document.getElementById('revaloL').value,
+      revaloV: +document.getElementById('revaloV').value,
+      cCopro: +document.getElementById('cCopro').value,
+      cTF: +document.getElementById('cTF').value,
+      cGest: +document.getElementById('cGest').value,
+      cMEL: +document.getElementById('cMEL').value,
+      cPNO: +document.getElementById('cPNO').value,
+      cGar: +document.getElementById('cGar').value,
+      cCompta: +document.getElementById('cCompta').value,
+      cCFE: +document.getElementById('cCFE').value,
+      durAmI: +document.getElementById('durAmI').value,
+      durAmM: +document.getElementById('durAmM').value,
+      apport: +document.getElementById('apport').value,
+      fDoss: +document.getElementById('fDoss').value,
+      fHypo: +document.getElementById('fHypo').value,
+      tauxN: +document.getElementById('tauxN').value,
+      dureePret: +document.getElementById('dureePret').value,
+      differe: +document.getElementById('differe').value
+    };
+  },
+  setState: function(d) {
+    if (d.mode !== undefined) { mode = d.mode; document.querySelectorAll('.mode-tab').forEach(function(b){ b.classList.remove('active'); }); document.querySelectorAll('.mode-tab').forEach(function(b){ if (b.textContent.toLowerCase().indexOf(d.mode) !== -1 || (d.mode === 'mono' && b.textContent.indexOf('Sans') !== -1) || (d.mode === 'coloc' && b.textContent.indexOf('Colocation') !== -1) || (d.mode === 'resid' && b.textContent.indexOf('Services') !== -1)) b.classList.add('active'); }); }
+    if (d.prixTotal !== undefined) document.getElementById('prixTotal').value = d.prixTotal;
+    if (d.partFoncier !== undefined) document.getElementById('partFoncier').value = d.partFoncier;
+    if (d.fraisNotaire !== undefined) document.getElementById('fraisNotaire').value = d.fraisNotaire;
+    if (d.prixMobilier !== undefined) document.getElementById('prixMobilier').value = d.prixMobilier;
+    if (d.prixFAI !== undefined) document.getElementById('prixFAI').value = d.prixFAI;
+    if (d.fraisNotaireC !== undefined) document.getElementById('fraisNotaireC').value = d.fraisNotaireC;
+    if (d.travaux !== undefined) document.getElementById('travaux').value = d.travaux;
+    if (d.qaVA !== undefined) document.getElementById('qaVA').value = d.qaVA;
+    if (d.mobilierC !== undefined) document.getElementById('mobilierC').value = d.mobilierC;
+    if (d.ingenierieC !== undefined) document.getElementById('ingenierieC').value = d.ingenierieC;
+    if (d.nbChambres !== undefined) document.getElementById('nbChambres').value = d.nbChambres;
+    if (d.prixTotalR !== undefined) document.getElementById('prixTotalR').value = d.prixTotalR;
+    if (d.prixFoncierR !== undefined) document.getElementById('prixFoncierR').value = d.prixFoncierR;
+    if (d.prixImmoHT !== undefined) document.getElementById('prixImmoHT').value = d.prixImmoHT;
+    if (d.prixMobilierR !== undefined) document.getElementById('prixMobilierR').value = d.prixMobilierR;
+    if (d.tvaRec !== undefined) document.getElementById('tvaRec').value = d.tvaRec;
+    if (d.fraisNotaireR !== undefined) document.getElementById('fraisNotaireR').value = d.fraisNotaireR;
+    if (d.loyerM !== undefined) document.getElementById('loyerM').value = d.loyerM;
+    if (d.tauxCNR !== undefined) document.getElementById('tauxCNR').value = d.tauxCNR;
+    if (d.loyerAHT !== undefined) document.getElementById('loyerAHT').value = d.loyerAHT;
+    if (d.tauxCNRR !== undefined) document.getElementById('tauxCNRR').value = d.tauxCNRR;
+    if (d.loyerCh !== undefined) document.getElementById('loyerCh').value = d.loyerCh;
+    if (d.tauxRpl !== undefined) document.getElementById('tauxRpl').value = d.tauxRpl;
+    if (d.revaloL !== undefined) document.getElementById('revaloL').value = d.revaloL;
+    if (d.revaloV !== undefined) document.getElementById('revaloV').value = d.revaloV;
+    if (d.cCopro !== undefined) document.getElementById('cCopro').value = d.cCopro;
+    if (d.cTF !== undefined) document.getElementById('cTF').value = d.cTF;
+    if (d.cGest !== undefined) document.getElementById('cGest').value = d.cGest;
+    if (d.cMEL !== undefined) document.getElementById('cMEL').value = d.cMEL;
+    if (d.cPNO !== undefined) document.getElementById('cPNO').value = d.cPNO;
+    if (d.cGar !== undefined) document.getElementById('cGar').value = d.cGar;
+    if (d.cCompta !== undefined) document.getElementById('cCompta').value = d.cCompta;
+    if (d.cCFE !== undefined) document.getElementById('cCFE').value = d.cCFE;
+    if (d.durAmI !== undefined) document.getElementById('durAmI').value = d.durAmI;
+    if (d.durAmM !== undefined) document.getElementById('durAmM').value = d.durAmM;
+    if (d.apport !== undefined) document.getElementById('apport').value = d.apport;
+    if (d.fDoss !== undefined) document.getElementById('fDoss').value = d.fDoss;
+    if (d.fHypo !== undefined) document.getElementById('fHypo').value = d.fHypo;
+    if (d.tauxN !== undefined) document.getElementById('tauxN').value = d.tauxN;
+    if (d.dureePret !== undefined) document.getElementById('dureePret').value = d.dureePret;
+    if (d.differe !== undefined) document.getElementById('differe').value = d.differe;
+    recalc();
+  }
+});
 </script>
 </body>
 </html>

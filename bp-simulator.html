@@ -818,7 +818,62 @@ function recalc() {
 
   var last = rows[rows.length-1];
   setHTML('simNote', 'Projection indicative — hypothèses PMR Prodémial. TPC : 5% → 8% selon qualification. La qualification et les titres sont des conséquences du volume réalisé. Commission démarrage : 2% sur VA équipe niv.1. Commission expansion : 1% sur VA équipe managers niv.1. Commission développement : 0,5% sur VA niv.2+. Manager à partir de 50k€ VAVC perso (~18-20 mois en moyenne selon les mails experts). VA Manager actif moyen : '+fmtE(gv('vaManagerActif',700000))+' (source : équipe Payraudeau S12/2026). Taux parrainage 1,5/actif/an = top performers réseau Forman (Darmaillacq 8, Van Ledeghem 7, Geraud 7 filleuls sur l\'exercice). Taux moyen réseau : ~0,5/actif/an. Taux d\'actifs 62% validé (équipe Payraudeau : 658/1010 = 65%). CA total an '+dureePlan+' projeté : '+fmtE(last.caTotal)+'. Projections non contractuelles.');
+  CGP.project.autoSave('bp-simulator');
 }
+
+CGP.project.registerModule('bp-simulator', {
+  getState: function() {
+    return {
+      va0actuel: +document.getElementById('va0actuel').value,
+      niv1Actuel: +document.getElementById('niv1Actuel').value,
+      niv1ActifsActuel: +document.getElementById('niv1ActifsActuel').value,
+      niv2Actuel: +document.getElementById('niv2Actuel').value,
+      niv2ActifsActuel: +document.getElementById('niv2ActifsActuel').value,
+      encoursCumuleActuel: +document.getElementById('encoursCumuleActuel').value,
+      qualifActuelle: document.getElementById('qualifActuelle').value,
+      titreActuel: document.getElementById('titreActuel').value,
+      va0: +document.getElementById('va0').value,
+      croissVA: +document.getElementById('croissVA').value,
+      pvPerso: +document.getElementById('pvPerso').value,
+      inscNiv1: +document.getElementById('inscNiv1').value,
+      tauxParrainage: +document.getElementById('tauxParrainage').value,
+      tauxActifs: +document.getElementById('tauxActifs').value,
+      vaNiv1: +document.getElementById('vaNiv1').value,
+      pvNiv1: +document.getElementById('pvNiv1').value,
+      vaNiv2: +document.getElementById('vaNiv2').value,
+      pvNiv2: +document.getElementById('pvNiv2').value,
+      dureePlan: +document.getElementById('duréePlan').value,
+      vaManagerActif: +document.getElementById('vaManagerActif').value,
+      tauxRec: +document.getElementById('tauxRec').value,
+      encoursClient: +document.getElementById('encoursClient').value
+    };
+  },
+  setState: function(d) {
+    if (d.va0actuel !== undefined) document.getElementById('va0actuel').value = d.va0actuel;
+    if (d.niv1Actuel !== undefined) document.getElementById('niv1Actuel').value = d.niv1Actuel;
+    if (d.niv1ActifsActuel !== undefined) document.getElementById('niv1ActifsActuel').value = d.niv1ActifsActuel;
+    if (d.niv2Actuel !== undefined) document.getElementById('niv2Actuel').value = d.niv2Actuel;
+    if (d.niv2ActifsActuel !== undefined) document.getElementById('niv2ActifsActuel').value = d.niv2ActifsActuel;
+    if (d.encoursCumuleActuel !== undefined) document.getElementById('encoursCumuleActuel').value = d.encoursCumuleActuel;
+    if (d.qualifActuelle !== undefined) document.getElementById('qualifActuelle').value = d.qualifActuelle;
+    if (d.titreActuel !== undefined) document.getElementById('titreActuel').value = d.titreActuel;
+    if (d.va0 !== undefined) document.getElementById('va0').value = d.va0;
+    if (d.croissVA !== undefined) document.getElementById('croissVA').value = d.croissVA;
+    if (d.pvPerso !== undefined) document.getElementById('pvPerso').value = d.pvPerso;
+    if (d.inscNiv1 !== undefined) document.getElementById('inscNiv1').value = d.inscNiv1;
+    if (d.tauxParrainage !== undefined) document.getElementById('tauxParrainage').value = d.tauxParrainage;
+    if (d.tauxActifs !== undefined) document.getElementById('tauxActifs').value = d.tauxActifs;
+    if (d.vaNiv1 !== undefined) document.getElementById('vaNiv1').value = d.vaNiv1;
+    if (d.pvNiv1 !== undefined) document.getElementById('pvNiv1').value = d.pvNiv1;
+    if (d.vaNiv2 !== undefined) document.getElementById('vaNiv2').value = d.vaNiv2;
+    if (d.pvNiv2 !== undefined) document.getElementById('pvNiv2').value = d.pvNiv2;
+    if (d.dureePlan !== undefined) document.getElementById('duréePlan').value = d.dureePlan;
+    if (d.vaManagerActif !== undefined) document.getElementById('vaManagerActif').value = d.vaManagerActif;
+    if (d.tauxRec !== undefined) document.getElementById('tauxRec').value = d.tauxRec;
+    if (d.encoursClient !== undefined) document.getElementById('encoursClient').value = d.encoursClient;
+    recalc();
+  }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   recalc();
