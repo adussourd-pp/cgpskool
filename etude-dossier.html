@@ -206,10 +206,10 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .nav-dropdown:hover .nav-btn:disabled{opacity:0.3;cursor:not-allowed}
 
 /* ── APP SHELL ── */
-.cs-app{grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);background:#fff}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);background:#fff}
 
 /* ── SIDEBAR ── */
-.cs-sidebar{padding:16px 12px;gap:2px}
+.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 12px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 10px 6px;margin-top:6px}
 .sidebar-lbl:first-child{margin-top:0}
 .step-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;font-family:var(--sans);font-size:13px;color:var(--gris-f);transition:all 0.15s}
@@ -226,7 +226,7 @@ body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-s
 .client-mini-detail{font-size:11px;color:var(--gris);line-height:1.5}
 
 /* ── MAIN ── */
-.cs-main{background:#ECEAE6;align-items:stretch;padding:28px 32px}
+.main{padding:28px 32px;overflow-y:auto;max-width:100%;background:#ECEAE6}
 .section-page{display:none}
 .section-page.active{display:block;animation:fadeUp 0.25s ease}
 /* Cadre A4 sur les sections (sauf import) */
@@ -376,8 +376,8 @@ select.span2{grid-column:span 2}
   #syntheseConseillerBadge,#sec-import,
   #solContainer,#matriceObjSol,#solsRetenues{display:none!important}
   /* ── LAYOUT : pleine largeur ── */
-  .cs-app{display:block!important}
-  .cs-main{padding:0!important;max-width:100%!important;background:#fff!important}
+  .app{display:block!important}
+  .main{padding:0!important;max-width:100%!important;background:#fff!important}
   body{background:#fff!important;font-size:11pt}
   /* ── SECTIONS : seules les pages cochées sont visibles ── */
   .section-page{display:none!important}
@@ -507,9 +507,9 @@ select.span2{grid-column:span 2}
   </div>
 </nav>
 
-<div class="cs-app">
+<div class="app">
 <!-- ── SIDEBAR ── -->
-<div class="cs-sidebar">
+<aside class="sidebar">
   <div class="sidebar-lbl" style="display:flex;align-items:center;justify-content:space-between">
     <span>&#201;tude de dossier</span>
     <button onclick="if(confirm('R\u00e9initialiser toute l\'\u00e9tude ?'))resetAll()" style="border:1px solid var(--bord);background:#fff;color:var(--red);cursor:pointer;font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;font-family:var(--sans)" title="R&#233;initialiser l'&#233;tude">R&#233;init.</button>
@@ -572,10 +572,10 @@ select.span2{grid-column:span 2}
     <div class="client-mini-name" id="cmName">&#8212;</div>
     <div class="client-mini-detail" id="cmDetail">&#8212;</div>
   </div>
-</div><!-- /cs-sidebar -->
+</aside>
 
 <!-- ── MAIN ── -->
-<div class="cs-main">
+<main class="main">
 
 <!-- ════════════════════════════════════════
      0 — IMPORT / SAISIE
@@ -1439,7 +1439,7 @@ select.span2{grid-column:span 2}
   <span class="pf-right" id="pdfFootRight"></span>
 </div>
 
-</div><!-- /cs-main -->
+</main>
 </div><!-- /app -->
 
 <div class="notif" id="notif"></div>
