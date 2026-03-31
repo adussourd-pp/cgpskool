@@ -13,13 +13,13 @@
 /* ── Sidebar inputs ── */
 .cs-sidebar { padding: 24px 20px 40px; }
 .sb-section { margin-bottom: 18px; }
-.sb-section-title {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-30); margin-bottom: 10px; padding-bottom: 7px;
-  border-bottom: 1px solid var(--rule-l);
-  display: flex; align-items: center; gap: 7px;
-}
-.sb-section-title span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-sidebar-lbl:first-child{margin-top:0}
+.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open{max-height:800px;opacity:1}
 .sb-field { margin-bottom: 10px; }
 .sb-label {
   font-size: 10px; font-weight: 600;
@@ -212,8 +212,8 @@
   <!-- ── SIDEBAR ── -->
   <div class="cs-sidebar">
 
-    <div class="sb-section">
-      <div class="sb-section-title"><span></span>Hypotheses</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses</div>
+    <div class="sb-body open">
       <div class="sb-field">
         <label class="sb-label">Montant disponible avant IR</label>
         <input type="number" class="sb-input" id="montantBrut" value="10000" min="1000" step="1000" oninput="recalc()">
@@ -225,8 +225,8 @@
       </div>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-section-title"><span></span>Assurance Vie — sortie</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Assurance Vie — sortie</div>
+    <div class="sb-body open">
       <div class="sb-row2">
         <div class="sb-field">
           <label class="sb-label">IR sur PV (%)</label>
@@ -242,8 +242,8 @@
       </div>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-section-title"><span></span>PER — sortie</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>PER — sortie</div>
+    <div class="sb-body open">
       <div class="sb-row2">
         <div class="sb-field">
           <label class="sb-label">IR sur PV (%)</label>
@@ -259,8 +259,8 @@
       </div>
     </div>
 
-    <div class="sb-section">
-      <div class="sb-section-title"><span></span>Horizon</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Horizon</div>
+    <div class="sb-body open">
       <div class="dur-tabs" style="margin-bottom:0">
         <button class="dur-tab active" onclick="setDuree(10, this)">10 ans</button>
         <button class="dur-tab" onclick="setDuree(20, this)">20 ans</button>
@@ -456,6 +456,11 @@
 </div><!-- /cs-app -->
 
 <script>
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 // ── État ──
 var duree = 10;
 var tmiEntree = 0.41;
