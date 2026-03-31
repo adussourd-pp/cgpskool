@@ -171,12 +171,17 @@
 
   /* ── BOUTONS SIDEBAR ──────────────────────────── */
   function buildSidebarActions() {
-    var pdfAction = 'typeof exportPDF===\"function\"?exportPDF():CGP.pdf.print()';
+    // Detecter les fonctions custom du module
+    var pdfAction = 'typeof exportPDF==="function"?exportPDF():CGP.pdf.print()';
+    var saveAction = 'typeof sauvegarderEtude==="function"?sauvegarderEtude():CGP.project.exportAll()';
+    var saveLabel = '\uD83D\uDCBE Sauvegarder';
+
     var html = '<div class="cs-sidebar-actions">';
-    html += '<button class="cs-sidebar-btn" onclick="' + pdfAction + '">\uD83D\uDCC4 Exporter PDF</button>';
-    html += '<button class="cs-sidebar-btn" onclick="CGP.project.exportAll()">\uD83D\uDCBE Sauvegarder</button>';
+    html += '<button class="cs-sidebar-btn cs-sidebar-btn-primary" onclick="' + pdfAction + '">\uD83D\uDCC4 Exporter PDF</button>';
+    html += '<button class="cs-sidebar-btn" onclick="' + saveAction + '">' + saveLabel + '</button>';
+    // Charger : detecter chargerEtude (input file specifique) ou CGP.project.importAll
     html += '<label class="cs-sidebar-btn" style="cursor:pointer">\uD83D\uDCC2 Charger'
-          + '<input type="file" accept=".json" onchange="CGP.project.importAll(this.files[0]);this.value=\'\'" style="position:absolute;opacity:0;width:0;height:0">'
+          + '<input type="file" accept=".json" onchange="typeof chargerEtude===\'function\'?chargerEtude(this):CGP.project.importAll(this.files[0]);this.value=\'\'" style="position:absolute;opacity:0;width:0;height:0">'
           + '</label>';
     if (guide) {
       html += '<button class="cs-sidebar-btn cs-sidebar-guide" onclick="CGP.nav.toggleGuide()">\u2753 Guide</button>';
