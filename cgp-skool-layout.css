@@ -81,29 +81,17 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 .cs-kpi-val{font-size:18px;font-weight:700;color:var(--ink)}
 
 /* ══════════════════════════════════════════════════════════════
-   NAVIGATION PARTAGEE (.cgp-app)
-   Grille : [nav partagee 220px] [contenu module]
+   BARRE DE NAVIGATION — Boutons d'action (injectes par nav.js)
    ══════════════════════════════════════════════════════════════ */
-.cgp-app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 54px)}
+.cs-nav-actions{display:flex;align-items:center;gap:4px}
+.cs-nav-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-family:var(--sans);font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);background:none;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.15s;text-decoration:none;position:relative;white-space:nowrap}
+.cs-nav-btn:hover{color:#fff;border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.05)}
+.cs-nav-guide{color:var(--orange);border-color:rgba(212,98,42,0.3)}
+.cs-nav-guide:hover{background:rgba(212,98,42,0.1);border-color:rgba(212,98,42,0.5)}
 
-/* ── Nav sidebar (injectee par cgp-skool-nav.js) ── */
-.cgp-nav-sidebar{background:#181614;border-right:1px solid rgba(255,255,255,0.06);padding:20px 0;overflow-y:auto;position:sticky;top:54px;height:calc(100vh - 54px);box-sizing:border-box;display:flex;flex-direction:column}
-.cgp-nav-category{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:18px 20px 6px}
-.cgp-nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;font-weight:400;color:rgba(255,255,255,0.5);text-decoration:none;transition:all 0.15s;border-left:2px solid transparent}
-.cgp-nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.04)}
-.cgp-nav-item.active{color:#fff;font-weight:600;border-left-color:#D4622A;background:rgba(212,98,42,0.08)}
-.cgp-nav-item .nav-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
-.cgp-nav-spacer{flex:1}
-.cgp-nav-actions{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:6px}
-.cgp-nav-action{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);background:none;border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left}
-.cgp-nav-action:hover{color:#fff;border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.04)}
-.cgp-nav-action .nav-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0}
-/* Import file input hidden inside action button */
-.cgp-nav-action input[type=file]{position:absolute;opacity:0;width:0;height:0}
-.cgp-nav-action{position:relative}
-
-/* Module content area inside .cgp-app */
-.cgp-module{min-width:0}
+/* ── Guide panel ── */
+.cgp-guide-panel{position:fixed;top:54px;right:0;width:360px;max-height:calc(100vh - 54px);overflow-y:auto;background:#fff;border-left:1px solid #EDE8DF;box-shadow:-4px 0 24px rgba(0,0,0,0.08);z-index:90;padding:0}
+.cgp-guide-inner{padding:24px}
 
 /* ══════════════════════════════════════════════════════════════
    PRINT — REGLES ROBUSTES POUR TOUS LES MODULES
@@ -114,8 +102,7 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
   /* NB: * { print-color-adjust:exact } rend le texte flou sur Chrome/Edge — cibler uniquement les fonds */
 
   /* ── 2. MASQUER : navigation, sidebars, boutons d'action ── */
-  .cs-nav,.cgp-nav-sidebar,.cs-nav-actions,
-  .cgp-nav-actions,.no-print,
+  .cs-nav,.cs-nav-actions,.cgp-guide-panel,.no-print,
   input[type=file],
   .cs-btn,.sidebar-btn,.cgp-nav-toggle{display:none!important}
 
@@ -124,8 +111,7 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 
   /* ── 3. LAYOUT : tous les grids/flex → block pleine largeur ── */
   body{background:#fff!important;font-size:11pt!important}
-  .cgp-app,.cs-app,.cgp-module,
-  .app,.app-shell{display:block!important}
+  .cs-app,.app,.app-shell{display:block!important}
   .cs-main,.main-area,.main,.main-content{
     padding:0!important;max-width:100%!important;display:block!important;min-height:auto!important
   }
@@ -180,12 +166,9 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
 @media(max-width:900px){
-  .cgp-app{grid-template-columns:1fr}
-  .cgp-nav-sidebar{position:fixed;left:-260px;top:54px;width:220px;height:calc(100vh - 54px);z-index:90;transition:left 0.25s ease}
-  .cgp-nav-sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
-  .cgp-nav-toggle{display:flex!important}
   .cs-app{grid-template-columns:1fr}
   .cs-sidebar{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--rule-l)}
+  .cs-nav-actions{flex-wrap:wrap;gap:2px}
+  .cs-nav-btn{font-size:10px;padding:5px 8px}
+  .cgp-guide-panel{width:100%;border-left:none}
 }
-/* Hamburger toggle (hidden on desktop, shown on mobile) */
-.cgp-nav-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:none;border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;margin-right:12px}
