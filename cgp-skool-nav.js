@@ -35,8 +35,10 @@
 
   /* ── BOUTONS SIDEBAR ──────────────────────────── */
   function buildSidebarActions() {
+    // Si le module a sa propre fonction exportPDF(), l'utiliser (ex: etude-dossier)
+    var pdfAction = 'typeof exportPDF===\"function\"?exportPDF():CGP.pdf.print()';
     var html = '<div class="cs-sidebar-actions">';
-    html += '<button class="cs-sidebar-btn" onclick="CGP.pdf.print()">\uD83D\uDCC4 Exporter PDF</button>';
+    html += '<button class="cs-sidebar-btn" onclick="' + pdfAction + '">\uD83D\uDCC4 Exporter PDF</button>';
     html += '<button class="cs-sidebar-btn" onclick="CGP.project.exportAll()">\uD83D\uDCBE Sauvegarder</button>';
     html += '<label class="cs-sidebar-btn" style="cursor:pointer">\uD83D\uDCC2 Charger'
           + '<input type="file" accept=".json" onchange="CGP.project.importAll(this.files[0]);this.value=\'\'" style="position:absolute;opacity:0;width:0;height:0">'
