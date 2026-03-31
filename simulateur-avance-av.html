@@ -23,7 +23,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .kpi-box-val.green{color:var(--green)}
 .kpi-box-val.red{color:var(--red)}
 .kpi-box-val.orange{color:var(--orange)}
-.toggle-row{display:flex;align-items:center;gap:12px;padding:16px 0;border-top:1px solid var(--rule-l);border-bottom:1px solid var(--rule-l);margin:24px 0}
+.toggle-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--rule-l);border-bottom:1px solid var(--rule-l);margin:16px 0}
 .toggle-label{font-size:14px;font-weight:600;color:var(--ink);flex:1}
 .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
 .toggle-switch input{opacity:0;width:0;height:0}
@@ -66,35 +66,63 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   </div>
 </nav>
 
-    <div style="padding:28px 32px;display:flex;justify-content:center">
-    <div class="cs-page" style="max-width:794px">
+<div class="cs-app">
+
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+    <div class="cs-sidebar-lbl">Votre contrat</div>
+
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Valeur du contrat</span><span class="slider-val" id="vContratVal">40 000 &#8364;</span></div>
+      <input type="range" id="vContrat" min="10000" max="500000" step="5000" value="40000" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Rendement AV</span><span class="slider-val" id="vRendAVVal">4.5%</span></div>
+      <input type="range" id="vRendAV" min="1.5" max="9" step="0.5" value="4.5" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Taux avance estim&#233;</span><span class="slider-val" id="vTauxAvVal">3%</span></div>
+      <input type="range" id="vTauxAv" min="2" max="4" step="0.25" value="3" oninput="calc()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-header"><span class="slider-label">Dur&#233;e souhait&#233;e</span><span class="slider-val" id="vDureeVal">3 ans</span></div>
+      <input type="range" id="vDuree" min="1" max="6" step="1" value="3" oninput="calc()">
+    </div>
+
+    <!-- TOGGLE SCPI -->
+    <div class="toggle-row">
+      <span class="toggle-label">Autofinancement SCPI</span>
+      <label class="toggle-switch"><input type="checkbox" id="toggleSCPI" onchange="calc()"><span class="toggle-slider"></span></label>
+    </div>
+
+    <!-- BLOC SCPI sidebar -->
+    <div id="blocSCPI_sidebar" style="display:none">
+      <div class="cs-sidebar-lbl" style="margin-top:4px">Choix de la SCPI</div>
+      <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:8px">
+      <div class="scpi-list" id="scpiList" style="grid-template-columns:1fr;max-height:180px"></div>
+      <div style="text-align:center;margin-top:6px"><button onclick="selectedSCPIIdx=-1;renderSCPIList('');calc()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans)">&#10005; D&#233;s&#233;lectionner</button></div>
+      <div class="slider-group" style="margin-top:10px">
+        <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
+        <input type="range" id="vRendSCPI" min="4" max="10" step="0.5" value="6" oninput="calc()">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header"><span class="slider-label">Revalorisation parts</span><span class="slider-val" id="vRevaloVal">1%</span></div>
+        <input type="range" id="vRevalo" min="0" max="3" step="0.5" value="1" oninput="calc()">
+      </div>
+    </div>
+
+    <!-- nav.js injecte les boutons PDF/Save/Load/Guide ici -->
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
 
       <!-- HEADER -->
       <div style="margin-bottom:32px">
+        <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">AVANCE SUR ASSURANCE VIE</div>
         <div style="font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)">Avance sur Assurance Vie</div>
         <div style="font-size:14px;color:var(--ink-60);margin-top:6px">Obtenez des liquidit&#233;s sans racheter votre contrat</div>
-      </div>
-
-      <!-- INPUTS -->
-      <div class="cs-card">
-        <div class="cs-card-title"><span class="cs-dot"></span>Votre contrat</div>
-
-        <div class="slider-group">
-          <div class="slider-header"><span class="slider-label">Valeur du contrat</span><span class="slider-val" id="vContratVal">40 000 &#8364;</span></div>
-          <input type="range" id="vContrat" min="10000" max="500000" step="5000" value="40000" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-header"><span class="slider-label">Rendement AV</span><span class="slider-val" id="vRendAVVal">4.5%</span></div>
-          <input type="range" id="vRendAV" min="1.5" max="9" step="0.5" value="4.5" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-header"><span class="slider-label">Taux avance estim&#233;</span><span class="slider-val" id="vTauxAvVal">3%</span></div>
-          <input type="range" id="vTauxAv" min="2" max="4" step="0.25" value="3" oninput="calc()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-header"><span class="slider-label">Dur&#233;e souhait&#233;e</span><span class="slider-val" id="vDureeVal">3 ans</span></div>
-          <input type="range" id="vDuree" min="1" max="6" step="1" value="3" oninput="calc()">
-        </div>
       </div>
 
       <!-- RESULTATS AVANCE SEULE -->
@@ -106,32 +134,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
       <div class="pedagogy">Vous n'avez rien &#224; rembourser activement. &#192; l'&#233;ch&#233;ance, l'assureur d&#233;duit la dette directement de votre contrat. Votre contrat continue de fructifier pendant toute la dur&#233;e de l'avance.</div>
 
-      <!-- TOGGLE SCPI -->
-      <div class="toggle-row">
-        <span class="toggle-label">Je veux que l'avance s'autofinance via des SCPI</span>
-        <label class="toggle-switch"><input type="checkbox" id="toggleSCPI" onchange="calc()"><span class="toggle-slider"></span></label>
-      </div>
-
-      <!-- BLOC SCPI -->
+      <!-- BLOC SCPI resultats -->
       <div id="blocSCPI" style="display:none">
-        <div class="cs-card">
-          <div class="cs-card-title"><span class="cs-dot"></span>Choix de la SCPI</div>
-          <div style="font-size:11px;color:var(--ink-60);margin-bottom:8px">S&#233;lectionnez une SCPI ou ajustez le rendement manuellement ci-dessous</div>
-          <input type="text" class="cs-input" placeholder="Rechercher une SCPI..." oninput="filterSCPI(this.value)" style="margin-bottom:10px">
-          <div class="scpi-list" id="scpiList"></div>
-          <div style="text-align:center;margin-top:6px"><button onclick="selectedSCPIIdx=-1;renderSCPIList('');calc()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--sans)">&#10005; D&#233;s&#233;lectionner &#8212; taux personnalis&#233;</button></div>
-          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="slider-group" style="margin-bottom:0">
-              <div class="slider-header"><span class="slider-label">Rendement SCPI</span><span class="slider-val" id="vRendSCPIVal">6%</span></div>
-              <input type="range" id="vRendSCPI" min="4" max="10" step="0.5" value="6" oninput="calc()">
-            </div>
-            <div class="slider-group" style="margin-bottom:0">
-              <div class="slider-header"><span class="slider-label">Revalorisation parts</span><span class="slider-val" id="vRevaloVal">1%</span></div>
-              <input type="range" id="vRevalo" min="0" max="3" step="0.5" value="1" oninput="calc()">
-            </div>
-          </div>
-        </div>
-
         <div class="kpi-grid four" id="kpiSCPI">
           <div class="kpi-box"><div class="kpi-box-label">SCPI achet&#233;es</div><div class="kpi-box-val orange" id="kSCPI">0 &#8364;</div></div>
           <div class="kpi-box"><div class="kpi-box-label">Loyers /mois</div><div class="kpi-box-val" id="kLoyers">0 &#8364;</div></div>
@@ -160,7 +164,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <div id="conseillerFooter"></div>
 
     </div>
-    </div>
+  </div>
+</div>
 
 <script>
 var SCPI_DATA=[
@@ -238,6 +243,7 @@ function calc(){
 
   // SCPI
   document.getElementById('blocSCPI').style.display=scpiOn?'':'none';
+  document.getElementById('blocSCPI_sidebar').style.display=scpiOn?'':'none';
   var loyersAn=Math.round(avance*rendSCPI);
   var loyersMois=Math.round(loyersAn/12);
   var loyersCum=loyersAn*duree;

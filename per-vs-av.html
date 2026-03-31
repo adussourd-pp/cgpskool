@@ -10,37 +10,40 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ── Hypothèses ── */
-.hyp-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 32px;
-  background: #fff;
-  border: 1px solid var(--rule-l);
-  padding: 24px;
+/* ── Sidebar inputs ── */
+.cs-sidebar { padding: 24px 20px 40px; }
+.sb-section { margin-bottom: 18px; }
+.sb-section-title {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-30); margin-bottom: 10px; padding-bottom: 7px;
+  border-bottom: 1px solid var(--rule-l);
+  display: flex; align-items: center; gap: 7px;
 }
-.hyp-field { display: flex; flex-direction: column; gap: 5px; }
-.hyp-label {
+.sb-section-title span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+.sb-field { margin-bottom: 10px; }
+.sb-label {
   font-size: 10px; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-30);
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--ink-30); margin-bottom: 4px; display: block;
 }
-.hyp-input {
-  padding: 9px 12px;
-  border: 1px solid var(--rule-l);
-  background: var(--paper);
-  font-family: var(--sans); font-size: 14px; font-weight: 500;
-  color: var(--ink); outline: none;
-  transition: border-color 0.2s;
+.sb-input {
+  width: 100%; padding: 7px 10px; box-sizing: border-box;
+  border: 1px solid var(--rule-l); background: #fff;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  color: var(--ink); outline: none; transition: border-color 0.2s;
 }
-.hyp-input:focus { border-color: var(--orange); background: #fff; }
-.hyp-hint { font-size: 10px; color: var(--ink-30); }
+.sb-input:focus { border-color: var(--orange); }
+.sb-hint { font-size: 9px; color: var(--ink-30); margin-top: 2px; }
+.sb-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sb-note { padding: 8px 10px; font-size: 10px; line-height: 1.5; margin-top: 6px; }
+.sb-note-av { background: rgba(43,94,167,0.06); color: #2B5EA7; }
+.sb-note-per { background: var(--o-dim); color: var(--orange); }
+.sb-dot { width: 8px; height: 8px; display: inline-block; margin-right: 4px; vertical-align: middle; }
 
 /* TMI selector */
-.tmi-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.tmi-row { display: flex; gap: 4px; flex-wrap: wrap; }
 .tmi-btn {
-  padding: 7px 13px; font-size: 12px; font-weight: 600;
+  padding: 5px 9px; font-size: 11px; font-weight: 600;
   border: 1px solid var(--rule-l); background: #fff;
   color: var(--ink-60); cursor: pointer; transition: all 0.15s;
   font-family: var(--sans);
@@ -193,7 +196,6 @@
 
 @media (max-width: 700px) {
   .comparison-grid { grid-template-columns: 1fr; }
-  .hyp-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -211,86 +213,80 @@
   </div>
 </nav>
 
-<div class="cs-main"><div class="cs-page">
+<div class="cs-app">
 
-  <!-- En-tête -->
+  <!-- ── SIDEBAR ── -->
+  <div class="cs-sidebar">
+
+    <div class="sb-section">
+      <div class="sb-section-title"><span></span>Hypotheses</div>
+      <div class="sb-field">
+        <label class="sb-label">Montant disponible avant IR</label>
+        <input type="number" class="sb-input" id="montantBrut" value="10000" min="1000" step="1000" oninput="recalc()">
+        <div class="sb-hint">Le PER deduit ce montant du revenu imposable</div>
+      </div>
+      <div class="sb-field">
+        <label class="sb-label">Rendement annuel net (%)</label>
+        <input type="number" class="sb-input" id="rendement" value="4" min="0.5" max="10" step="0.5" oninput="recalc()">
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title"><span></span>Assurance Vie — sortie</div>
+      <div class="sb-row2">
+        <div class="sb-field">
+          <label class="sb-label">IR sur PV (%)</label>
+          <input type="number" class="sb-input" id="irAv" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
+        </div>
+        <div class="sb-field">
+          <label class="sb-label">PS sur PV (%)</label>
+          <input type="number" class="sb-input" id="psAv" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
+        </div>
+      </div>
+      <div class="sb-note sb-note-av">
+        <span class="sb-dot" style="background:#2B5EA7"></span>Flat tax = <strong id="avFlatTaxTotal">30,0 %</strong> sur les PV
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title"><span></span>PER — sortie</div>
+      <div class="sb-row2">
+        <div class="sb-field">
+          <label class="sb-label">IR sur PV (%)</label>
+          <input type="number" class="sb-input" id="irPer" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
+        </div>
+        <div class="sb-field">
+          <label class="sb-label">PS sur PV (%)</label>
+          <input type="number" class="sb-input" id="psPer" value="18.4" min="0" max="25" step="0.1" oninput="recalc()">
+        </div>
+      </div>
+      <div class="sb-note sb-note-per">
+        <span class="sb-dot" style="background:var(--orange)"></span>IR bareme (TMI sortie) + PS <strong id="perPsDisplay">18,4 %</strong>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title"><span></span>Horizon</div>
+      <div class="dur-tabs" style="margin-bottom:0">
+        <button class="dur-tab active" onclick="setDuree(10, this)">10 ans</button>
+        <button class="dur-tab" onclick="setDuree(20, this)">20 ans</button>
+        <button class="dur-tab" onclick="setDuree(30, this)">30 ans</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="cs-main"><div class="cs-page">
+
+  <!-- En-tete -->
   <div style="margin-bottom:28px;padding-top:8px">
     <div class="cs-kicker">
       <span class="cs-kicker-line"></span>
       <span class="cs-kicker-text">Simulateur patrimonial</span>
     </div>
     <h1 class="cs-h1" style="font-size:32px;margin-bottom:6px">Comparateur <em>PER vs Assurance Vie</em></h1>
-    <p style="font-size:13px;color:var(--ink-60);font-weight:300">Efficacité nette selon la TMI d'entrée (période active) et la TMI de sortie (à la retraite)</p>
-  </div>
-
-  <!-- Hypothèses -->
-  <div class="hyp-grid">
-    <div class="hyp-field" style="grid-column: span 2">
-      <span class="hyp-label">Montant disponible avant IR (€)</span>
-      <input type="number" class="hyp-input" id="montantBrut" value="10000" min="1000" step="1000" oninput="recalc()">
-      <span class="hyp-hint">Le PER déduit ce montant du revenu → l'État co-finance via l'économie d'IR</span>
-    </div>
-    <div class="hyp-field">
-      <span class="hyp-label">Rendement annuel net (%)</span>
-      <input type="number" class="hyp-input" id="rendement" value="4" min="0.5" max="10" step="0.5" oninput="recalc()">
-    </div>
-  </div>
-
-  <!-- Taux fiscaux en 2 colonnes AV / PER -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:24px">
-
-    <!-- AV -->
-    <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 22px">
-      <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#2B5EA7;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-        <span style="width:8px;height:8px;background:#2B5EA7;display:inline-block"></span>
-        Assurance Vie — fiscalité sortie
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="hyp-field">
-          <span class="hyp-label">IR sur plus-values (%)</span>
-          <input type="number" class="hyp-input" id="irAv" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
-          <span class="hyp-hint">Taux IR flat sur les PV</span>
-        </div>
-        <div class="hyp-field">
-          <span class="hyp-label">PS sur plus-values (%)</span>
-          <input type="number" class="hyp-input" id="psAv" value="17.2" min="0" max="25" step="0.1" oninput="recalc()">
-          <span class="hyp-hint">Prélèvements sociaux AV</span>
-        </div>
-      </div>
-      <div style="margin-top:10px;padding:8px 10px;background:rgba(43,94,167,0.06);font-size:11px;color:#2B5EA7">
-        Flat tax totale = IR + PS = <strong id="avFlatTaxTotal">30,0 %</strong> sur les plus-values
-      </div>
-    </div>
-
-    <!-- PER -->
-    <div style="background:#fff;border:1px solid var(--rule-l);padding:18px 22px">
-      <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;display:flex;align-items:center;gap:8px">
-        <span style="width:8px;height:8px;background:var(--orange);display:inline-block"></span>
-        PER Individuel — fiscalité sortie
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="hyp-field">
-          <span class="hyp-label">IR sur plus-values (%)</span>
-          <input type="number" class="hyp-input" id="irPer" value="12.8" min="0" max="30" step="0.1" oninput="recalc()">
-          <span class="hyp-hint">IR PV (même taux que l'AV)</span>
-        </div>
-        <div class="hyp-field">
-          <span class="hyp-label">PS sur plus-values (%)</span>
-          <input type="number" class="hyp-input" id="psPer" value="18.4" min="0" max="25" step="0.1" oninput="recalc()">
-          <span class="hyp-hint">Prélèvements sociaux PER</span>
-        </div>
-      </div>
-      <div style="margin-top:10px;padding:8px 10px;background:var(--o-dim);font-size:11px;color:var(--orange)">
-        IR barème (TMI sortie) sur capital + PS <strong id="perPsDisplay">18,4 %</strong> sur les plus-values
-      </div>
-    </div>
-  </div>
-
-  <!-- Onglets durée -->
-  <div class="dur-tabs">
-    <button class="dur-tab active" onclick="setDuree(10, this)">10 ans</button>
-    <button class="dur-tab" onclick="setDuree(20, this)">20 ans</button>
-    <button class="dur-tab" onclick="setDuree(30, this)">30 ans</button>
+    <p style="font-size:13px;color:var(--ink-60);font-weight:300">Efficacite nette selon la TMI d'entree (periode active) et la TMI de sortie (a la retraite)</p>
   </div>
 
   <!-- Onglets vues -->
@@ -463,6 +459,7 @@
 
   <div id="conseillerFooter"></div>
 </div></div>
+</div><!-- /cs-app -->
 
 <script>
 // ── État ──

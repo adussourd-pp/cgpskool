@@ -97,57 +97,65 @@
   </div>
 </nav>
 
-<div style="padding:28px 32px;display:flex;justify-content:center">
-<div class="cs-page" style="max-width:900px">
-
-  <div class="team-header">
-    <h1>Construire son &#233;quipe</h1>
-    <p>Visualisez votre arborescence et la profondeur de votre organisation.</p>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-bar" id="statsBar" style="display:none">
-    <div class="stat-pill orange">Membres : <b id="statTotal">0</b></div>
-    <div class="stat-pill">Profondeur : <b id="statDepth">0</b> niveaux</div>
-    <div class="stat-pill">Directs : <b id="statDirects">0</b></div>
-    <div class="stat-pill">Branches actives : <b id="statBranches">0</b></div>
-    <div class="stat-pill orange">Qualif : <b id="statQualif">Consultant</b></div>
-  </div>
-
-  <!-- Start state -->
-  <div id="startState" class="start-state">
-    <div class="start-icon">&#128101;</div>
-    <p>Commencez par vous ajouter.<br>Ensuite, construisez votre arborescence en ajoutant des membres sous chaque personne.</p>
-    <div class="start-form">
-      <input type="text" id="startPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('startNom').focus()">
-      <input type="text" id="startNom" placeholder="Nom" onkeydown="if(event.key==='Enter')createRoot()">
-      <button onclick="createRoot()">C'est moi</button>
+<div class="cs-app">
+  <div class="cs-sidebar">
+    <div class="cs-sidebar-lbl">Construire son equipe</div>
+    <div class="cs-sidebar-section">
+      <button onclick="if(tree){openAdd([])}" class="cs-sidebar-btn" style="justify-content:center;color:var(--orange);border-color:rgba(212,98,42,0.2)">+ Ajouter</button>
+      <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" class="cs-sidebar-btn" id="sidebarEffacer" style="justify-content:center;color:#dc2626;border-color:rgba(220,38,38,0.2)">Effacer</button>
     </div>
-  </div>
-
-  <!-- Tree -->
-  <div class="tree-wrap" id="treeWrap" style="display:none"></div>
-
-  <!-- Legend -->
-  <div class="legend" id="legend" style="display:none">
-    <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Junior</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--ink-60)"></div>Consultant</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Manager</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie</div>
-  </div>
-
-  <!-- Actions -->
-  <div style="display:flex;gap:8px;justify-content:center;margin-top:24px" class="no-print" id="actionsBar" style="display:none">
-    <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" style="padding:9px 18px;background:#fff;color:#dc2626;border:1.5px solid rgba(220,38,38,0.2);border-radius:7px;font-family:var(--sans);font-size:12px;cursor:pointer">Effacer</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
   </div>
+  <div class="cs-main">
+    <div class="cs-page" style="max-width:900px">
 
-  <div id="conseillerFooter"></div>
+      <div class="team-header">
+        <h1>Construire son &#233;quipe</h1>
+        <p>Visualisez votre arborescence et la profondeur de votre organisation.</p>
+      </div>
 
-</div>
+      <!-- Stats -->
+      <div class="stats-bar" id="statsBar" style="display:none">
+        <div class="stat-pill orange">Membres : <b id="statTotal">0</b></div>
+        <div class="stat-pill">Profondeur : <b id="statDepth">0</b> niveaux</div>
+        <div class="stat-pill">Directs : <b id="statDirects">0</b></div>
+        <div class="stat-pill">Branches actives : <b id="statBranches">0</b></div>
+        <div class="stat-pill orange">Qualif : <b id="statQualif">Consultant</b></div>
+      </div>
+
+      <!-- Start state -->
+      <div id="startState" class="start-state">
+        <div class="start-icon">&#128101;</div>
+        <p>Commencez par vous ajouter.<br>Ensuite, construisez votre arborescence en ajoutant des membres sous chaque personne.</p>
+        <div class="start-form">
+          <input type="text" id="startPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('startNom').focus()">
+          <input type="text" id="startNom" placeholder="Nom" onkeydown="if(event.key==='Enter')createRoot()">
+          <button onclick="createRoot()">C'est moi</button>
+        </div>
+      </div>
+
+      <!-- Tree -->
+      <div class="tree-wrap" id="treeWrap" style="display:none"></div>
+
+      <!-- Legend -->
+      <div class="legend" id="legend" style="display:none">
+        <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Junior</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--ink-60)"></div>Consultant</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Manager</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie</div>
+      </div>
+
+      <!-- Actions (hidden, kept for ID compatibility) -->
+      <div style="display:none" class="no-print" id="actionsBar">
+      </div>
+
+      <div id="conseillerFooter"></div>
+
+    </div>
+  </div>
 </div>
 
 <!-- Add modal -->

@@ -10,14 +10,14 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Sidebar light — same style as etude-dossier */
-.app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 64px)}
-.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 14px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
-.sidebar-lbl:hover{color:var(--noir)}
-.sidebar-lbl:first-child{margin-top:0}
-.sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.sidebar-lbl.open .acc{transform:rotate(90deg)}
+/* Sidebar — override layout.css pour 260px */
+.cs-app{grid-template-columns:260px 1fr}
+.cs-sidebar{padding:16px 14px}
+.cs-cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-cs-sidebar-lbl:first-child{margin-top:0}
+.cs-cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.cs-cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
 .sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
 .sb-body.open{max-height:800px;opacity:1}
 .sidebar-divider{height:1px;background:var(--bord);margin:10px 0}
@@ -47,7 +47,8 @@
 .sidebar-btn:hover{opacity:0.85}
 
 /* Main A4 content */
-.main-area{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:24px;background:#ECEAE6}
+/* cs-main override */
+.cs-main{background:#ECEAE6}
 
 /* Comparison cards */
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
@@ -112,16 +113,16 @@
   </div>
 </nav>
 
-<div class="app">
+<div class="cs-app">
   <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
+  <div class="cs-sidebar">
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open">
       <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
       <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
     </div>
 
-    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
     <div class="sb-body open">
       <div class="sf"><label>Type de contrat</label>
         <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
@@ -159,7 +160,7 @@
       <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
     </div>
 
-    <div class="sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
@@ -184,10 +185,10 @@
       <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
     </div>
 
-  </aside>
+  </div><!-- /cs-sidebar -->
 
   <!-- MAIN -->
-  <div class="main-area">
+  <div class="cs-main">
     <div class="cs-page">
 
       <!-- Header -->
