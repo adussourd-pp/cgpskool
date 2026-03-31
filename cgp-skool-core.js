@@ -140,6 +140,39 @@ CGP.footer.render = function(el) {
   el.style.display = '';
 };
 
+/* ── HEADER PAGE A4 ─────────────────────────────── */
+CGP.header = {};
+
+/**
+ * Render a standard page header with tag, title, client name and date.
+ * @param {HTMLElement} el - Container element
+ * @param {object} opts - {tag:'MODULE TAG', title:'Titre', subtitle:'Sous-titre'}
+ */
+CGP.header.render = function(el, opts) {
+  if (!el || !opts) return;
+  var today = new Date();
+  var dateStr = today.toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'});
+
+  var left = '<div>'
+    + '<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#D4622A">' + (opts.tag || '') + '</div>'
+    + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:400;color:#0D0D0D;margin-top:4px">' + (opts.title || '') + '</div>';
+  if (opts.subtitle) left += '<div style="font-size:13px;color:#6B6B6B;margin-top:4px;font-weight:300">' + opts.subtitle + '</div>';
+  left += '</div>';
+
+  var right = '<div style="text-align:right">'
+    + '<div style="font-size:16px;font-weight:700;color:#0D0D0D" id="hClient">Client</div>'
+    + '<div style="font-size:12px;color:#6B6B6B;margin-top:2px" id="hDate">' + dateStr + '</div>'
+    + '</div>';
+
+  el.innerHTML = '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px">' + left + right + '</div>';
+
+  // Remplir le nom client depuis la sidebar si possible
+  var clientInput = document.getElementById('pClient') || document.getElementById('clientNom');
+  if (clientInput && clientInput.value) {
+    document.getElementById('hClient').textContent = clientInput.value;
+  }
+};
+
 /* ── PROJECT EXPORT/IMPORT ──────────────────────── */
 CGP.project = {};
 CGP.project._modules = {};
