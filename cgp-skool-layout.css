@@ -25,8 +25,9 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 
 /* ── SIDEBAR ── */
 .cs-sidebar{background:var(--paper);border-right:1px solid var(--rule-l);padding:24px 20px;overflow-y:auto;position:sticky;top:54px;height:calc(100vh - 54px);box-sizing:border-box;display:flex;flex-direction:column;gap:0}
-.cs-sidebar-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);padding:12px 0 6px}
+.cs-sidebar-lbl,.sidebar-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);padding:12px 0 6px}
 .cs-sidebar-section{margin-bottom:14px}
+.cs-sidebar-divider,.sidebar-divider{height:1px;background:var(--rule-l);margin:10px 0}
 
 /* ── MAIN (zone A4) ── */
 .cs-main{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:24px}
@@ -45,11 +46,44 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 .cs-btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 .cs-btn-success{background:var(--green);color:#fff;border-color:var(--green)}
 
-/* ── INPUTS ── */
-.cs-input{width:100%;padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;box-sizing:border-box}
-.cs-input:focus{border-color:var(--orange)}
-.cs-select{padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;width:100%;box-sizing:border-box}
+/* ── FORM GROUP ── */
+.cs-fg{margin-bottom:12px}
 .cs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-60);display:block;margin-bottom:4px}
+
+/* ── INPUTS (text, number, select) ── */
+.cs-input,.fi,.sf input,.sb-input,.iu input,
+.cs-sidebar input[type=text],.cs-sidebar input[type=number],.cs-sidebar select{
+  width:100%;padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;
+  font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;
+  outline:none;transition:border-color 0.2s;box-sizing:border-box
+}
+.cs-input:focus,.fi:focus,.sf input:focus,.sb-input:focus,.iu input:focus,
+.cs-sidebar input:focus,.cs-sidebar select:focus{border-color:var(--orange)}
+.cs-select{padding:8px 12px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;width:100%;box-sizing:border-box}
+
+/* ── RANGE SLIDERS ── */
+.cs-sidebar input[type=range],input[type=range].cs-range{
+  -webkit-appearance:none;width:100%;height:4px;
+  background:rgba(212,98,42,0.2);border-radius:2px;outline:none;margin:8px 0
+}
+.cs-sidebar input[type=range]::-webkit-slider-thumb,input[type=range].cs-range::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--orange);cursor:pointer;border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.15)
+}
+.cs-sidebar input[type=range]::-moz-range-thumb,input[type=range].cs-range::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--orange);cursor:pointer;border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.15)
+}
+
+/* ── TOGGLE SWITCH ── */
+.cs-toggle{position:relative;width:40px;height:22px;flex-shrink:0;display:inline-block}
+.cs-toggle input{opacity:0;width:0;height:0}
+.cs-toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--rule-l);border-radius:22px;transition:0.2s}
+.cs-toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s}
+.cs-toggle input:checked+.cs-toggle-slider{background:var(--orange)}
+.cs-toggle input:checked+.cs-toggle-slider::before{transform:translateX(18px)}
 
 /* ── TABLES ── */
 .cs-tbl{width:100%;border-collapse:collapse;font-size:13px}
@@ -76,9 +110,14 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 .cs-badge-gray{background:var(--paper);color:var(--ink-60)}
 
 /* ── KPI ── */
-.cs-kpi{padding:14px 16px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px}
-.cs-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:4px}
-.cs-kpi-val{font-size:18px;font-weight:700;color:var(--ink)}
+.cs-kpi,.kpi-box,.kpi-card{padding:14px 16px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;text-align:center}
+.cs-kpi-label,.kpi-box-label,.kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-60);margin-bottom:4px}
+.cs-kpi-val,.kpi-box-val,.kpi-val{font-size:20px;font-weight:700;color:var(--ink)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.kpi-grid.four{grid-template-columns:repeat(4,1fr)}
+.kpi-box-val.green,.cs-kpi-val.green{color:var(--green)}
+.kpi-box-val.red,.cs-kpi-val.red{color:var(--red)}
+.kpi-box-val.orange,.cs-kpi-val.orange{color:var(--orange)}
 
 /* ══════════════════════════════════════════════════════════════
    BARRE DE NAVIGATION — Bouton Accueil (injecte par nav.js)
