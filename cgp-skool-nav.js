@@ -100,7 +100,10 @@
   }
 
   /* ── INJECTION ────────────────────────────────── */
+  var _initialized = false;
   function init() {
+    if (_initialized) return;
+    _initialized = true;
     // 1. Barre du haut : Accueil + Guide
     var navSlot = document.getElementById('cs-nav-actions');
     if (navSlot) {
