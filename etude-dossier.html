@@ -8358,8 +8358,24 @@ function exportPDF() {
       if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
     }catch(e4){}
     setTimeout(function(){
-      // 7. Capturer les canvas MAINTENANT (section encore visible)
-      CGP.pdf._convertCanvases();
+      // 7. Capturer le chart retraite directement depuis l'instance Chart.js
+      var _pdfChartImgs = [];
+      try {
+        if (window.retChartInst) {
+          var c = document.getElementById('retChart');
+          if (c) {
+            var url = window.retChartInst.toBase64Image();
+            if (url && url.length > 100) {
+              var img = document.createElement('img');
+              img.src = url;
+              img.className = 'cgp-chart-print-img';
+              img.style.cssText = 'width:100%;max-width:100%;height:auto;display:none';
+              c.parentNode.insertBefore(img, c.nextSibling);
+              _pdfChartImgs.push(img);
+            }
+          }
+        }
+      } catch(e5) { console.warn('chart capture:', e5); }
 
       // 8. Remettre la section en place
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
@@ -8370,7 +8386,7 @@ function exportPDF() {
       window.print();
 
       // 10. Nettoyer apres impression
-      CGP.pdf._restoreCanvases();
+      _pdfChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
       document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
       if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
     },500);
@@ -8454,47 +8470,33 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P / window.print() : capturer les canvas et mettre a jour l'en-tete
-var _retShownForPrint = false;
+// Ctrl+P : mettre a jour l'en-tete et capturer le chart retraite
+var _ctrlPChartImgs = [];
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
-  // Si exportPDF a deja capture les canvas, ne rien refaire
-  if (CGP.pdf._backups.length > 0) return;
-  // Rendre le chart retraite visible pour capture (Ctrl+P)
-  var secRet = document.getElementById('sec-retraite');
-  if (secRet && !secRet.classList.contains('active')) {
-    _retShownForPrint = true;
-    secRet.style.display = 'block';
-    secRet.style.position = 'fixed';
-    secRet.style.left = '0';
-    secRet.style.top = '0';
-    secRet.style.width = '794px';
-    secRet.style.zIndex = '-1';
-    secRet.style.opacity = '0.01';
-    try {
-      if (!window.retChartInst) { rRetraite(); }
-      if (window.retChartInst) { window.retChartInst.resize(); window.retChartInst.update('none'); }
-    } catch(e) {}
-  }
-  // Capturer tous les canvas en images PNG
-  CGP.pdf._convertCanvases();
+  // Capturer le chart retraite s'il existe
+  if (_ctrlPChartImgs.length > 0) return; // deja capture
+  try {
+    if (window.retChartInst) {
+      var c = document.getElementById('retChart');
+      if (c) {
+        var url = window.retChartInst.toBase64Image();
+        if (url && url.length > 100) {
+          var img = document.createElement('img');
+          img.src = url;
+          img.className = 'cgp-chart-print-img';
+          img.style.cssText = 'width:100%;max-width:100%;height:auto;display:none';
+          c.parentNode.insertBefore(img, c.nextSibling);
+          _ctrlPChartImgs.push(img);
+        }
+      }
+    }
+  } catch(e) {}
 });
 window.addEventListener('afterprint', function() {
-  CGP.pdf._restoreCanvases();
-  // Remettre la section retraite en place si on l'a montree
-  if (_retShownForPrint) {
-    _retShownForPrint = false;
-    var secRet = document.getElementById('sec-retraite');
-    if (secRet && !secRet.classList.contains('active')) {
-      secRet.style.display = '';
-      secRet.style.position = '';
-      secRet.style.left = '';
-      secRet.style.top = '';
-      secRet.style.width = '';
-      secRet.style.zIndex = '';
-      secRet.style.opacity = '';
-    }
-  }
+  // Supprimer les images chart temporaires (Ctrl+P)
+  _ctrlPChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
+  _ctrlPChartImgs = [];
 });
 
 </script>
