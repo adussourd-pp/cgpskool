@@ -568,38 +568,14 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
   });
 }
 
-function loadProfil(){
-  try{
-    var raw=localStorage.getItem('cgpskool_profil_v1');
-    if(!raw)return;
-    var p=JSON.parse(raw);
-    var nom=(p.pPrenom||'')+' '+(p.pNom||'');
-    if(nom.trim()){
-      V('cpNom').textContent=nom.trim();
-      V('cpCabinet').textContent=p.pCabinet||'Votre consultant patrimonial';
-      V('cpTel').textContent=p.pTel||'';
-      V('cpEmail').textContent=p.pEmail||'';
-      if(!p.pTel)V('cpTelRow').style.display='none';
-      if(!p.pEmail)V('cpEmailRow').style.display='none';
-      // Logo cabinet
-      var logo=localStorage.getItem('cgpskool_logo');
-      if(logo){
-        V('cpLogo').innerHTML='<img src="'+logo+'" style="width:52px;height:52px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;border:1.5px solid var(--bord)">';
-      }
-      V('conseillerBlock').style.display='block';
-    }
-  }catch(e){}
-}
+// loadProfil supprime — gere par CGP.footer.render() dans core.js
 
 (function(){
   var today=new Date();
   var dd=String(today.getDate()).padStart(2,'0');
   var mm=String(today.getMonth()+1).padStart(2,'0');
   V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
-  loadProfil();
-  if(typeof CGP!=='undefined'&&CGP.footer&&CGP.footer.render){
-    CGP.footer.render(document.getElementById('conseillerBlock'));
-  }
+  CGP.footer.render(document.getElementById('conseillerBlock'));
   updateTypeEncart();
   update();
 })();
