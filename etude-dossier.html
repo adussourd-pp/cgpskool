@@ -8301,6 +8301,9 @@ function renderAvisPreview(){
 // EXPORT PDF — conversion canvas + en-tete dynamique
 // ══════════════════════════════════════════════════════════════
 
+// etude-dossier gere ses propres canvas (section retraite cachee)
+CGP.pdf.customHandler = true;
+
 function exportPDF() {
   // 1. Valider toutes les sections (render + dots verts)
   try{
@@ -8343,42 +8346,36 @@ function exportPDF() {
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
 
-  // 5. Rendre la section retraite visible pour dessiner le chart
+  // 5. Rendre la section retraite visible hors-ecran pour dessiner le chart
   var savedSec=currentSection;
   var secRet=document.getElementById('sec-retraite');
   if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
   try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
 
-  // 6. Attendre que Chart.js dessine
+  // 6. Attendre que Chart.js dessine, puis capturer et imprimer
   setTimeout(function(){
     try{
       if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
     }catch(e4){}
     setTimeout(function(){
       // 7. Capturer les canvas MAINTENANT (section encore visible)
-      // Le beforeprint de core.js verra _backups.length > 0 et ne doublonnera pas
       CGP.pdf._convertCanvases();
 
-      // 8. Remettre la section en place (sera visible via .print-visible en print)
+      // 8. Remettre la section en place
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
 
-      // 9. Imprimer (canvas deja captures, beforeprint skip)
+      // 9. Imprimer (beforeprint/afterprint de core.js ignores grace a customHandler)
       window.print();
 
       // 10. Nettoyer apres impression
-      setTimeout(function(){
-        CGP.pdf._restoreCanvases();
-        document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
-        if(confirm('PDF export\u00e9. Voulez-vous sauvegarder l\'\u00e9tude ?'))sauvegarderEtude();
-      },2000);
+      CGP.pdf._restoreCanvases();
+      document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
+      if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
     },500);
   },500);
 }
-
-// convertChartsDirectCapture et restoreCharts supprimes
-// → gere automatiquement par CGP.pdf (beforeprint/afterprint dans cgp-skool-core.js)
 
 function updatePdfHeader() {
   var p = loadProfil ? loadProfil() : {};
@@ -8457,9 +8454,47 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : mettre a jour l'en-tete (canvas geres par core.js beforeprint)
+// Ctrl+P / window.print() : capturer les canvas et mettre a jour l'en-tete
+var _retShownForPrint = false;
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
+  // Si exportPDF a deja capture les canvas, ne rien refaire
+  if (CGP.pdf._backups.length > 0) return;
+  // Rendre le chart retraite visible pour capture (Ctrl+P)
+  var secRet = document.getElementById('sec-retraite');
+  if (secRet && !secRet.classList.contains('active')) {
+    _retShownForPrint = true;
+    secRet.style.display = 'block';
+    secRet.style.position = 'fixed';
+    secRet.style.left = '0';
+    secRet.style.top = '0';
+    secRet.style.width = '794px';
+    secRet.style.zIndex = '-1';
+    secRet.style.opacity = '0.01';
+    try {
+      if (!window.retChartInst) { rRetraite(); }
+      if (window.retChartInst) { window.retChartInst.resize(); window.retChartInst.update('none'); }
+    } catch(e) {}
+  }
+  // Capturer tous les canvas en images PNG
+  CGP.pdf._convertCanvases();
+});
+window.addEventListener('afterprint', function() {
+  CGP.pdf._restoreCanvases();
+  // Remettre la section retraite en place si on l'a montree
+  if (_retShownForPrint) {
+    _retShownForPrint = false;
+    var secRet = document.getElementById('sec-retraite');
+    if (secRet && !secRet.classList.contains('active')) {
+      secRet.style.display = '';
+      secRet.style.position = '';
+      secRet.style.left = '';
+      secRet.style.top = '';
+      secRet.style.width = '';
+      secRet.style.zIndex = '';
+      secRet.style.opacity = '';
+    }
+  }
 });
 
 </script>
