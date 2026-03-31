@@ -30,18 +30,13 @@
 .param-section {
   margin-bottom: 28px;
 }
-.param-section-title {
-  font-size: 9px; font-weight: 700;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-30); margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--rule-l);
-  display: flex; align-items: center; gap: 8px;
-}
-.param-section-title span {
-  width: 3px; height: 12px;
-  background: var(--orange); display: inline-block; flex-shrink: 0;
-}
+.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-sidebar-lbl:first-child{margin-top:0}
+.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open{max-height:2000px;opacity:1}
 
 .param-row {
   margin-bottom: 14px;
@@ -288,9 +283,8 @@
   <div class="cs-sidebar">
 
     <!-- Capital & versements -->
-    <div class="param-section">
-      <div class="param-section-title"><span></span>Capital & versements</div>
-
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Capital & versements</div>
+    <div class="sb-body open">
       <div class="param-row">
         <div class="param-label">Capital initial</div>
         <div class="input-with-unit">
@@ -325,9 +319,8 @@
     </div>
 
     <!-- Rendement -->
-    <div class="param-section">
-      <div class="param-section-title"><span></span>Rendement</div>
-
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Rendement</div>
+    <div class="sb-body open">
       <div class="param-row">
         <div class="param-label">Taux annuel brut</div>
         <div class="input-with-unit">
@@ -346,9 +339,8 @@
     </div>
 
     <!-- Frais -->
-    <div class="param-section">
-      <div class="param-section-title"><span></span>Frais</div>
-
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Frais</div>
+    <div class="sb-body open">
       <div class="param-row">
         <div class="frais-toggle open" id="fraisToggle" onclick="toggleFrais()">
           <span>Taux de revalorisation nets de frais</span>
@@ -406,9 +398,8 @@
     </div>
 
     <!-- Fiscalité -->
-    <div class="param-section">
-      <div class="param-section-title"><span></span>Fiscalité à la sortie</div>
-
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Fiscalite a la sortie</div>
+    <div class="sb-body open">
       <div class="param-row">
         <div class="param-label">Mode d'imposition</div>
         <div class="toggle-row" id="fiscRow">
@@ -536,6 +527,11 @@
 
 
 <script>
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 // ── État ──
 var freq = 'mensuel';       // mensuel | trimestriel | annuel
 var capit = 'annuelle';     // annuelle | mensuelle

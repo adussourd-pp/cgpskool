@@ -23,8 +23,13 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
 /* ── Sidebar overrides ── */
 .cs-sidebar { padding: 24px 20px 40px; }
 .ps { margin-bottom: 20px; }
-.ps-title { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 7px; }
-.ps-title span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-sidebar-lbl:first-child{margin-top:0}
+.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open{max-height:2000px;opacity:1}
 .pr { margin-bottom: 10px; }
 .pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
 .pl small { font-size: 9px; color: var(--ink-30); }
@@ -135,8 +140,9 @@ table tr:hover td { background: var(--paper); }
     </div>
 
     <!-- ── AN 0 : SITUATION ACTUELLE ── -->
-    <div class="ps" style="background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);padding:12px 14px;margin-bottom:16px">
-      <div class="ps-title" style="color:var(--orange)"><span></span>Situation actuelle — An 0</div>
+    <div style="background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);padding:12px 14px;margin-bottom:16px">
+      <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)" style="color:var(--orange)"><span class="acc">&#9654;</span>Situation actuelle — An 0</div>
+      <div class="sb-body open">
       <p style="font-size:10px;color:var(--ink-60);margin-bottom:12px;line-height:1.6">Renseignez vos chiffres réels si vous avez déjà une activité. Laissez à 0 si vous démarrez.</p>
       <div class="pr"><div class="pl">VA personnelle actuelle <small>(An 0)</small></div>
         <div class="iu"><input type="number" id="va0actuel" value="0" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
@@ -172,10 +178,11 @@ table tr:hover td { background: var(--paper); }
           </select>
         </div>
       </div>
+      </div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Projection — Activité personnelle</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Projection — Activite personnelle</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">VA cible An 1 <small>(ou base de croissance)</small></div>
         <div class="iu"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
       <div class="pr"><div class="pl">Croissance VA perso / an</div>
@@ -184,8 +191,8 @@ table tr:hover td { background: var(--paper); }
         <div class="iu"><input type="number" id="pvPerso" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Organisation — Niveau 1</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation — Niveau 1</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">Consultants inscrits/an <small>(moyenne)</small></div>
         <div class="iu"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
       <div class="pr"><div class="pl">Taux de parrainage <small>(top performers réseau Forman : 1 à 2)</small></div>
@@ -198,17 +205,16 @@ table tr:hover td { background: var(--paper); }
         <div class="iu"><input type="number" id="pvNiv1" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Organisation — Niveaux 2+</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation — Niveaux 2+</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">VA moyenne / actif niv.2+</div>
         <div class="iu"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
       <div class="pr"><div class="pl">PV moyen équipe niv.2+</div>
         <div class="iu"><input type="number" id="pvNiv2" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
     </div>
 
-
-    <div class="ps">
-      <div class="ps-title"><span></span>Hypothèses PMR</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses PMR</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">Durée du business plan</div>
         <div class="iu"><input type="number" id="duréePlan" value="7" min="3" max="10" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
       <div class="pr"><div class="pl">VA moyenne / actif niv.1 Manager <small>(seuil branche active)</small></div>
@@ -294,6 +300,11 @@ table tr:hover td { background: var(--paper); }
 
 
 <script>
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 var caChartInst = null, encChartInst = null;
 
 function gv(id,def) { var el=document.getElementById(id); return el?(parseFloat(el.value)||0):(def||0); }

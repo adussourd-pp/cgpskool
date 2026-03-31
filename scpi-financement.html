@@ -161,8 +161,8 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <div id="bankBtn_cacf" onclick="setBank('cacf')" style="padding:8px 4px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:10px;font-weight:700;color:var(--gris);line-height:1.3">CACF<br><span style="font-weight:400;opacity:0.8">10K€ min</span></div>
   </div>
 
-  <details open>
-  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> SITUATION DE L'INVESTISSEUR</summary>
+  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Situation de l'investisseur</div>
+  <div class="sb-body open">
   <!-- Investissement solo ou couple -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
     <div id="btnSolo" onclick="setInvMode('solo')" style="padding:9px 6px;border:2px solid var(--ambre);border-radius:8px;text-align:center;cursor:pointer;background:var(--ambre-l);font-size:12px;font-weight:600;color:var(--ambre-d)">👤 Solo</div>
@@ -180,7 +180,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
   </div>
   <div id="profilMsg"></div>
   <div id="bankReco" style="margin-bottom:6px"></div>
-  
+
   <div class="sb-sep" style="margin:10px 0"></div>
 
   <div class="fg"><label>Revenus annuels nets imposables</label>
@@ -225,24 +225,22 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <input type="hidden" id="fTMI" value="30">
   </div>
 
-  </details>
+  </div>
 
   <div class="sb-sep"></div>
-  <details open>
-    <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px">
-      <span class="arr" style="font-size:11px">▸</span> SCPI À FINANCER
-    </summary>
+  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>SCPI a financer</div>
+  <div class="sb-body open">
     <div id="scpiList"></div>
     <button class="scpi-add" onclick="addSCPI()">+ Ajouter une SCPI</button>
     <div id="scpiTotal" style="display:none;background:var(--paper);border:1.5px solid var(--rule-l);border-radius:7px;padding:7px 10px;margin-top:6px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60)">Total investi</span>
       <span id="scpiTotalVal" style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--ambre)">0 €</span>
     </div>
-  </details>
+  </div>
 
   <div class="sb-sep"></div>
-  <details open>
-  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> FINANCEMENT</summary>
+  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Financement</div>
+  <div class="sb-body open">
   <div class="fg"><label>Durée</label>
     <div class="sl-val" id="slDurVal">240 mois (20 ans)</div>
     <input type="range" id="sDur" min="120" max="300" value="240" step="12" oninput="onDur(this.value)">
@@ -259,10 +257,10 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <div class="hint" id="tauxHint"></div>
   </div>
 
-  </details>
+  </div>
   <div class="sb-sep"></div>
-  <details open>
-  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> ÂGES & ASSURANCE (ADI)</summary>
+  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Ages & assurance (ADI)</div>
+  <div class="sb-body open">
   <div class="grid2">
     <div class="fg"><label>Âge emprunteur 1</label><input class="fi" id="fA1" type="number" value="40" min="18" max="70" oninput="autoADI();calcEndett()"></div>
     <div class="fg"><label>Quotité 1 (%)</label><input class="fi" id="fQ1" type="number" value="100" min="0" max="100" step="10" oninput="autoADI()"></div>
@@ -279,15 +277,15 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <select class="fi" id="fBADI"><option value="ce">Capital emprunté (CE)</option><option value="crd">Capital restant dû (CRD)</option></select>
   </div>
 
-  </details>
+  </div>
   <div class="sb-sep"></div>
-  <details>
-  <summary style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris-f);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;margin-bottom:7px"><span class="arr" style="font-size:11px">▸</span> HYPOTHÈSES</summary>
+  <div class="cs-sidebar-lbl" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses</div>
+  <div class="sb-body">
   <div class="fg"><label>Revalorisation des parts /an (%)</label>
     <div class="fi-row"><input type="number" id="fReval" value="0" min="-5" max="10" step="0.5"><span class="fi-unit">%</span></div>
   </div>
 
-  </details>
+  </div>
   <div class="sb-sep"></div>
   <button class="barem-btn" onclick="toggleBarem()">⚙️ Conditions banque</button>
   <div class="barem-panel" id="baremPanel"></div>
@@ -310,6 +308,11 @@ details[open] summary span.arr{transform:rotate(90deg)}
 
 
 <script>
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 const BANKS={
   sofiap:{name:'SOFIAP',color:'#1B4F8A',min:80000,minD:120,maxD:240,difMax:6,difTypes:['partiel'],
     garantie:'Caution Crédit Logement (~1.73%)',assureur:'SURAVENIR',ageFin:75,

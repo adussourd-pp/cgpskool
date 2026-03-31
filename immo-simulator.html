@@ -29,12 +29,13 @@ body { background: var(--paper); }
 .cs-sidebar { padding: 24px 20px 40px; }
 
 .ps { margin-bottom: 22px; }
-.ps-title {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-30); margin-bottom: 12px; padding-bottom: 7px;
-  border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 7px;
-}
-.ps-title span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-sidebar-lbl:first-child{margin-top:0}
+.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
+.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open{max-height:2000px;opacity:1}
 
 .pr { margin-bottom: 11px; }
 .pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; }
@@ -182,9 +183,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 
   <div class="cs-sidebar">
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Bien immobilier</div>
-
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Bien immobilier</div>
+    <div class="sb-body open">
       <div id="B-mono">
         <div class="pr"><div class="pl">Prix de vente TTC (foncier + immo)</div>
           <div class="iu"><input type="number" id="prixTotal" value="200000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
@@ -229,8 +229,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Revenus locatifs</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Revenus locatifs</div>
+    <div class="sb-body open">
       <div id="R-mono">
         <div class="pr"><div class="pl">Loyer mensuel (hors charges)</div>
           <div class="iu"><input type="number" id="loyerM" value="700" step="50" oninput="recalc()"><div class="iu-u">€/mois</div></div></div>
@@ -255,8 +255,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="iu"><input type="number" id="revaloV" value="0" step="0.5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Charges annuelles</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Charges annuelles</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">Charges de copropriété (propriétaire)</div>
         <div class="iu"><input type="number" id="cCopro" value="180" step="50" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
       <div class="pr"><div class="pl">Taxe foncière</div>
@@ -275,16 +275,16 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="iu"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Amortissement LMNP</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">Durée amortissement immobilier</div>
         <div class="iu"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
       <div class="pr"><div class="pl">Durée amortissement mobilier</div>
         <div class="iu"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
     </div>
 
-    <div class="ps">
-      <div class="ps-title"><span></span>Financement</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Financement</div>
+    <div class="sb-body open">
       <div class="pr"><div class="pl">Apport personnel</div>
         <div class="iu"><input type="number" id="apport" value="10000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
       <div class="pr"><div class="pl">Frais de dossier / courtage</div>
@@ -426,6 +426,11 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 
 
 <script>
+function toggleAcc(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
+}
 var mode = 'mono';
 var chartInst = null;
 
