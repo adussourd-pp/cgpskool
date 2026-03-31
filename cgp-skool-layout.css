@@ -81,13 +81,20 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 .cs-kpi-val{font-size:18px;font-weight:700;color:var(--ink)}
 
 /* ══════════════════════════════════════════════════════════════
-   BARRE DE NAVIGATION — Boutons d'action (injectes par nav.js)
+   BARRE DE NAVIGATION — Bouton Accueil (injecte par nav.js)
    ══════════════════════════════════════════════════════════════ */
 .cs-nav-actions{display:flex;align-items:center;gap:4px}
 .cs-nav-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-family:var(--sans);font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);background:none;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.15s;text-decoration:none;position:relative;white-space:nowrap}
 .cs-nav-btn:hover{color:#fff;border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.05)}
-.cs-nav-guide{color:var(--orange);border-color:rgba(212,98,42,0.3)}
-.cs-nav-guide:hover{background:rgba(212,98,42,0.1);border-color:rgba(212,98,42,0.5)}
+
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR — Boutons d'action (PDF, Sauver, Charger, Guide)
+   ══════════════════════════════════════════════════════════════ */
+.cs-sidebar-actions{margin-top:auto;padding-top:16px;border-top:1px solid var(--rule-l);display:flex;flex-direction:column;gap:6px}
+.cs-sidebar-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink-60);background:#fff;border:1px solid var(--rule-l);cursor:pointer;transition:all 0.15s;text-align:left;position:relative}
+.cs-sidebar-btn:hover{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.03)}
+.cs-sidebar-guide{color:var(--orange);border-color:rgba(212,98,42,0.2);background:rgba(212,98,42,0.03)}
+.cs-sidebar-guide:hover{background:rgba(212,98,42,0.08)}
 
 /* ── Guide panel ── */
 .cgp-guide-panel{position:fixed;top:54px;right:0;width:360px;max-height:calc(100vh - 54px);overflow-y:auto;background:#fff;border-left:1px solid #EDE8DF;box-shadow:-4px 0 24px rgba(0,0,0,0.08);z-index:90;padding:0}
@@ -102,7 +109,7 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
   /* NB: * { print-color-adjust:exact } rend le texte flou sur Chrome/Edge — cibler uniquement les fonds */
 
   /* ── 2. MASQUER : navigation, sidebars, boutons d'action ── */
-  .cs-nav,.cs-nav-actions,.cgp-guide-panel,.no-print,
+  .cs-nav,.cs-nav-actions,.cs-sidebar-actions,.cgp-guide-panel,.no-print,
   input[type=file],
   .cs-btn,.sidebar-btn,.cgp-nav-toggle{display:none!important}
 
