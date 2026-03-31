@@ -83,7 +83,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
 .tbl-block { background: #fff; border: 1px solid var(--rule-l); overflow: hidden; margin-bottom: 16px; }
 .tbl-block-header { padding: 12px 16px; border-bottom: 1px solid var(--rule-l); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); }
 table { width: 100%; border-collapse: collapse; font-size: 11px; }
-table th { background: var(--ink); color: #fff; padding: 8px 12px; text-align: right; font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; }
+table th { background: var(--paper); color: var(--ink); padding: 8px 12px; text-align: right; font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; }
 table th:first-child { text-align: left; }
 table td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--rule-l); color: var(--ink-60); }
 table td:first-child { text-align: left; font-weight: 600; color: var(--ink); font-size: 10px; }
@@ -91,7 +91,7 @@ table td.o { color: var(--orange); font-weight: 700; }
 table td.g { color: #1a7a4a; font-weight: 700; }
 table td.muted { color: var(--ink-30); }
 table tr.subtotal td { background: var(--paper); font-style: italic; }
-table tr.total td { background: var(--ink); color: #fff; font-weight: 700; border-bottom: none; }
+table tr.total td { background: var(--paper); color: var(--ink); font-weight: 700; border-bottom: none; }
 table tr.total td.o { color: var(--orange-lt); }
 table tr:hover td { background: var(--paper); }
 
@@ -282,14 +282,14 @@ table tr:hover td { background: var(--paper); }
 
 <div id="conseillerFooter"></div>
 
-<footer style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);padding:28px 52px;display:flex;align-items:center;justify-content:space-between">
+<footer style="background:var(--paper);border-top:1px solid var(--rule-l);padding:28px 52px;display:flex;align-items:center;justify-content:space-between">
   <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
     <div style="width:26px;height:26px;border:1px solid rgba(212,98,42,0.38);display:flex;align-items:center;justify-content:center">
       <span style="font-family:var(--serif);font-size:12px;color:var(--orange);line-height:1">C</span>
     </div>
-    <span style="font-size:10.5px;color:rgba(255,255,255,0.25);letter-spacing:0.2em;text-transform:uppercase">CGP Skool</span>
+    <span style="font-size:10.5px;color:var(--ink-30);letter-spacing:0.2em;text-transform:uppercase">CGP Skool</span>
   </a>
-  <span style="font-size:11px;color:rgba(255,255,255,0.16)">© 2025 — Outil interne reserves aux consultants du reseau</span>
+  <span style="font-size:11px;color:var(--ink-30)">© 2025 — Outil interne reserves aux consultants du reseau</span>
 </footer>
 
 
@@ -565,16 +565,16 @@ function recalc() {
   }, '');
 
   // ── Ligne de synthèse en haut ──
-  var synthHTML = '<div style="width:100%;background:var(--ink);padding:14px 16px;margin-bottom:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">'
-    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">TPC effectif max projeté</div>'
-    + '<div style="font-family:var(--serif);font-size:22px;color:var(--orange-lt)">'+(tpcMaxEffectif*100).toFixed(1)+'%</div>'
-    + '<div style="font-size:10px;color:var(--fog-2)">TPC + Prime Qualité</div></div>'
-    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Qualification terminale</div>'
-    + '<div style="font-family:var(--serif);font-size:18px;color:#fff">'+lastRow.qualif+'</div>'
-    + '<div style="font-size:10px;color:var(--fog-2)">An '+dureePlan+'</div></div>'
-    + (titreMaxAtteint ? '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--fog-2);margin-bottom:4px">Titre max atteint</div>'
-    + '<div style="font-family:var(--serif);font-size:18px;color:var(--orange-lt)">'+titreMaxAtteint+'</div>'
-    + '<div style="font-size:10px;color:var(--fog-2)">Prime Qualité '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div></div>' : '')
+  var synthHTML = '<div style="width:100%;background:var(--paper);border:1px solid var(--rule-l);padding:14px 16px;margin-bottom:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">'
+    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">TPC effectif max projeté</div>'
+    + '<div style="font-family:var(--serif);font-size:22px;color:var(--orange)">'+(tpcMaxEffectif*100).toFixed(1)+'%</div>'
+    + '<div style="font-size:10px;color:var(--ink-30)">TPC + Prime Qualité</div></div>'
+    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">Qualification terminale</div>'
+    + '<div style="font-family:var(--serif);font-size:18px;color:var(--ink)">'+lastRow.qualif+'</div>'
+    + '<div style="font-size:10px;color:var(--ink-30)">An '+dureePlan+'</div></div>'
+    + (titreMaxAtteint ? '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">Titre max atteint</div>'
+    + '<div style="font-family:var(--serif);font-size:18px;color:var(--orange)">'+titreMaxAtteint+'</div>'
+    + '<div style="font-size:10px;color:var(--ink-30)">Prime Qualité '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div></div>' : '')
     + '</div>';
 
   // ── Nomenclature qualifications & titres (compacte) ──
