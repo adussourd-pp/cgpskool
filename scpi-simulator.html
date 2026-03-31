@@ -10,19 +10,13 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Variables deja dans cgp-skool-theme.css */
-body{font-family:var(--sans);color:var(--noir);background:#ECEAE6;-webkit-font-smoothing:antialiased}
-
-/* ── LAYOUT ── */
-.app-shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 64px);width:100%}
-
-/* ── SIDEBAR ── */
-.sidebar{background:#F2F1EE;border-right:1px solid var(--bord);padding:16px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:0;position:sticky;top:64px;height:calc(100vh - 64px);width:280px;min-width:280px;max-width:280px;box-sizing:border-box}
-.sidebar-section{margin-bottom:0}
-.sidebar-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 8px 6px;user-select:none;transition:color 0.15s}
-.sidebar-label:hover{color:var(--noir)}
-.sidebar-label .acc-arrow{font-size:7px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
-.sidebar-label.open .acc-arrow{transform:rotate(90deg)}
+/* ── SIDEBAR OVERRIDES (module-specific) ── */
+.cs-sidebar{padding:16px 14px}
+.cs-sidebar-section{margin-bottom:0}
+.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 8px 6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover{color:var(--noir)}
+.cs-sidebar-lbl .acc-arrow{font-size:7px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
+.cs-sidebar-lbl.open .acc-arrow{transform:rotate(90deg)}
 .sidebar-body{overflow:hidden;transition:max-height 0.3s ease,opacity 0.25s ease;max-height:0;opacity:0;padding:0 4px}
 .sidebar-body.open{max-height:800px;opacity:1;padding:4px 4px 8px}
 
@@ -76,8 +70,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .sim-btn:hover{opacity:0.85}
 .divider{height:1px;background:var(--bord);margin:20px 0}
 
-/* ── MAIN CONTENT ── */
-.main-content{padding:28px 32px;background:#ECEAE6;min-height:calc(100vh - 64px);min-width:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:12px}
 .empty-icon{font-size:48px;opacity:0.18}
 .empty-title{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-0.01em;color:var(--ink)}
@@ -254,12 +246,12 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
   <nav id="cgp-nav-slot"></nav>
   <div class="cgp-module">
 
-<div class="app-shell">
+<div class="cs-app">
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<div class="cs-sidebar">
 
-  <div class="sidebar-section">
-    <div class="sidebar-label open" onclick="toggleAcc(this)">Type de projection<span class="acc-arrow">▶</span></div>
+  <div class="cs-sidebar-section">
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)">Type de projection<span class="acc-arrow">▶</span></div>
     <div class="sidebar-body open">
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">📈</span>Plan Retraite SCPI</div>
@@ -269,8 +261,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
   </div>
 
-  <div class="sidebar-section">
-    <div class="sidebar-label open" onclick="toggleAcc(this)">SCPI<span class="acc-arrow">▶</span></div>
+  <div class="cs-sidebar-section">
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)">SCPI<span class="acc-arrow">▶</span></div>
     <div class="sidebar-body open">
     <div class="source-toggle">
       <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
@@ -301,8 +293,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
   </div>
 
-  <div class="sidebar-section">
-    <div class="sidebar-label open" onclick="toggleAcc(this)">Plan d'investissement<span class="acc-arrow">▶</span></div>
+  <div class="cs-sidebar-section">
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)">Plan d'investissement<span class="acc-arrow">▶</span></div>
     <div class="sidebar-body open">
 
     <!-- RETRAITE -->
@@ -382,9 +374,9 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 
   <button class="sim-btn" onclick="runSimulation()" style="background:var(--orange);margin-top:8px">Lancer la projection &#8594;</button>
   <button class="sim-btn" onclick="window.print()" style="margin-top:6px">&#11015; Exporter PDF</button>
-</aside>
-<div class="main-content" id="mainContent">
-<div style="background:#fff;border:1px solid var(--bord);border-radius:4px;padding:40px;max-width:794px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.06);position:relative">
+</div>
+<div class="cs-main" id="mainContent">
+<div class="cs-page">
   <div class="empty-state" id="emptyState">
     <div class="empty-icon" style="font-size:56px;opacity:0.5">&#129489;&#8205;&#128640;</div>
     <div class="empty-title">Pr&#234;t pour le d&#233;collage ?</div>

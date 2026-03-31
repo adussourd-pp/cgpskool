@@ -10,21 +10,9 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-html,body{color:var(--noir);background:var(--blanc)}
-body{font-family:var(--sans);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
-nav{position:sticky;top:0;z-index:200;background:rgba(13,13,13,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(240,167,56,0.15)}
-.nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{display:flex;align-items:center;gap:2px;font-family:var(--sans);font-size:17px;font-weight:700;text-decoration:none}
-.logo .cgp{color:#fff}.logo .sep{color:#333;margin:0 3px}
-.logo .s{color:#E03535}.logo .k{color:#2B65C0}.logo .o1{color:#E8C547}.logo .o2{color:#4C9BE8}.logo .l{color:#E03535}
-.nav-links{display:flex;gap:4px}
-.nav-link{font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.2s}
-.nav-link:hover{color:rgba(255,255,255,0.8)}.nav-link.active{color:var(--ambre)}
-.nav-btn-pdf{font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);background:transparent;cursor:pointer;transition:all 0.2s}
-.nav-btn-pdf:hover{border-color:var(--ambre);color:var(--ambre)}
-.app{display:flex;flex-direction:row;min-height:calc(100vh - 106px)}
-.sidebar{width:340px;min-width:340px;max-width:340px;flex-shrink:0;background:var(--gris-l);border-right:1.5px solid var(--bord);padding:28px 20px;overflow-y:auto;display:flex;flex-direction:column;position:sticky;top:106px;height:calc(100vh - 106px);box-sizing:border-box;overflow-x:hidden}
-.main{flex:1;min-width:0;padding:24px 28px;overflow-y:auto;background:#fff}
+/* Override cs-app grid for this module: 340px sidebar */
+.cs-app{grid-template-columns:340px 1fr}
+.cs-sidebar{padding:28px 20px;overflow-x:hidden}
 .sb-sep{height:1px;background:var(--bord);margin:10px 0}
 .sb-lbl{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gris);margin-bottom:8px;display:flex;align-items:center;gap:7px}
 .sb-lbl::after{content:'';flex:1;height:1px;background:var(--bord)}
@@ -131,7 +119,7 @@ details summary span.arr{display:inline-block;transition:transform 0.2s;font-sty
 details[open] summary span.arr{transform:rotate(90deg)}
 
 
-.bank-tabs-wrap{background:#fff;border-bottom:1.5px solid var(--bord);padding:0 24px;display:flex;position:sticky;top:58px;z-index:100;box-shadow:0 1px 0 var(--bord)}
+.bank-tabs-wrap{background:#fff;border-bottom:1.5px solid var(--bord);padding:0 24px;display:flex;position:sticky;top:54px;z-index:100;box-shadow:0 1px 0 var(--bord)}
 .bank-tab{padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
 .bank-tab:hover{color:var(--gris-f);background:var(--gris-l)}
 .bank-tab.active[data-bank="sofiap"]{color:var(--sofiap);border-bottom-color:var(--sofiap);background:rgba(27,79,138,0.05)}
@@ -190,8 +178,8 @@ details[open] summary span.arr{transform:rotate(90deg)}
   <div class="bank-tab" data-bank="cacf" onclick="setBank('cacf',this)"><span class="bank-dot"></span>CACF · min 10K€ · différé total 6 mois</div>
 </div>
 
-<div class="app">
-<aside class="sidebar">
+<div class="cs-app">
+<div class="cs-sidebar">
 
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:12px">
     <div id="bankBtn_sofiap" onclick="setBank('sofiap')" style="padding:8px 4px;border:2px solid var(--sofiap);border-radius:8px;text-align:center;cursor:pointer;background:var(--sofiap);font-size:10px;font-weight:700;color:#fff;line-height:1.3">SOFIAP<br><span style="font-weight:400;opacity:0.8">80K€ min</span></div>
@@ -331,17 +319,19 @@ details[open] summary span.arr{transform:rotate(90deg)}
   <div class="barem-panel" id="baremPanel"></div>
 
   <button class="sim-btn" onclick="runSim()">Lancer la projection →</button>
-</aside>
+</div>
 
-<main class="main">
-  <div class="empty-state" id="emptyState">
-    <div class="empty-icon">🏦</div>
-    <div class="empty-title">Projection Financière SCPI</div>
-    <div class="empty-sub">Renseignez le profil client, les SCPI et les paramètres, puis lancez.</div>
+<div class="cs-main">
+  <div class="cs-page">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🏦</div>
+      <div class="empty-title">Projection Financière SCPI</div>
+      <div class="empty-sub">Renseignez le profil client, les SCPI et les paramètres, puis lancez.</div>
+    </div>
+    <div id="results" style="display:none"></div>
+    <div id="conseillerFooter"></div>
   </div>
-  <div id="results" style="display:none"></div>
-  <div id="conseillerFooter"></div>
-</main>
+</div>
 </div>
 
 </div><!-- /cgp-module -->
