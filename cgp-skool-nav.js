@@ -65,16 +65,36 @@
     // Ne pas injecter si la sidebar a deja des boutons d'action
     if (sidebar.querySelector('.btn-success') || sidebar.querySelector('.sidebar-btn') || sidebar.querySelector('.cs-sidebar-btn')) return false;
 
-    var pdfAction = 'typeof exportPDF==="function"?exportPDF():CGP.pdf.print()';
-    var saveAction = 'typeof sauvegarderEtude==="function"?sauvegarderEtude():CGP.project.exportAll()';
-
     var div = document.createElement('div');
     div.className = 'cs-sidebar-actions';
-    div.innerHTML = '<button class="cs-sidebar-btn cs-sidebar-btn-primary" onclick="' + pdfAction + '">\u2B07 Exporter PDF</button>'
-      + '<button class="cs-sidebar-btn" onclick="' + saveAction + '">\uD83D\uDCBE Sauvegarder</button>'
-      + '<label class="cs-sidebar-btn" style="cursor:pointer">\uD83D\uDCC2 Charger'
-      + '<input type="file" accept=".json" onchange="typeof chargerEtude===\'function\'?chargerEtude(this):CGP.project.importAll(this.files[0]);this.value=\'\'" style="position:absolute;opacity:0;width:0;height:0">'
-      + '</label>';
+
+    var btnPdf = document.createElement('button');
+    btnPdf.className = 'cs-sidebar-btn cs-sidebar-btn-primary';
+    btnPdf.textContent = '\u2B07 Exporter PDF';
+    btnPdf.onclick = function() { typeof exportPDF === 'function' ? exportPDF() : CGP.pdf.print(); };
+
+    var btnSave = document.createElement('button');
+    btnSave.className = 'cs-sidebar-btn';
+    btnSave.textContent = '\uD83D\uDCBE Sauvegarder';
+    btnSave.onclick = function() { typeof sauvegarderEtude === 'function' ? sauvegarderEtude() : CGP.project.exportAll(); };
+
+    var lblLoad = document.createElement('label');
+    lblLoad.className = 'cs-sidebar-btn';
+    lblLoad.style.cursor = 'pointer';
+    lblLoad.textContent = '\uD83D\uDCC2 Charger';
+    var inputLoad = document.createElement('input');
+    inputLoad.type = 'file';
+    inputLoad.accept = '.json';
+    inputLoad.style.cssText = 'position:absolute;opacity:0;width:0;height:0';
+    inputLoad.onchange = function() {
+      typeof chargerEtude === 'function' ? chargerEtude(this) : CGP.project.importAll(this.files[0]);
+      this.value = '';
+    };
+    lblLoad.appendChild(inputLoad);
+
+    div.appendChild(btnPdf);
+    div.appendChild(btnSave);
+    div.appendChild(lblLoad);
     sidebar.appendChild(div);
     return true;
   }
@@ -95,13 +115,31 @@
 
     // 3. Fallback modules sans sidebar : boutons dans la barre du haut
     if (!injected && navSlot) {
-      var pdfAction = 'typeof exportPDF===&quot;function&quot;?exportPDF():CGP.pdf.print()';
-      var saveAction = 'typeof sauvegarderEtude===&quot;function&quot;?sauvegarderEtude():CGP.project.exportAll()';
-      navSlot.innerHTML += '<button class="cs-nav-btn" onclick="' + pdfAction + '">\uD83D\uDCC4 PDF</button>'
-        + '<button class="cs-nav-btn" onclick="' + saveAction + '">\uD83D\uDCBE Sauver</button>'
-        + '<label class="cs-nav-btn" style="cursor:pointer">\uD83D\uDCC2 Charger'
-        + '<input type="file" accept=".json" onchange="CGP.project.importAll(this.files[0]);this.value=\'\'" style="position:absolute;opacity:0;width:0;height:0">'
-        + '</label>';
+      var bp = document.createElement('button');
+      bp.className = 'cs-nav-btn';
+      bp.textContent = '\uD83D\uDCC4 PDF';
+      bp.onclick = function() { typeof exportPDF === 'function' ? exportPDF() : CGP.pdf.print(); };
+      navSlot.appendChild(bp);
+
+      var bs = document.createElement('button');
+      bs.className = 'cs-nav-btn';
+      bs.textContent = '\uD83D\uDCBE Sauver';
+      bs.onclick = function() { typeof sauvegarderEtude === 'function' ? sauvegarderEtude() : CGP.project.exportAll(); };
+      navSlot.appendChild(bs);
+
+      var bl = document.createElement('label');
+      bl.className = 'cs-nav-btn';
+      bl.style.cursor = 'pointer';
+      bl.textContent = '\uD83D\uDCC2 Charger';
+      var il = document.createElement('input');
+      il.type = 'file'; il.accept = '.json';
+      il.style.cssText = 'position:absolute;opacity:0;width:0;height:0';
+      il.onchange = function() {
+        typeof chargerEtude === 'function' ? chargerEtude(this) : CGP.project.importAll(this.files[0]);
+        this.value = '';
+      };
+      bl.appendChild(il);
+      navSlot.appendChild(bl);
     }
   }
 
