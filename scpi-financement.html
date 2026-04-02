@@ -16,10 +16,7 @@
 .cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
 .cs-sidebar-lbl:hover{color:var(--noir)}
 .cs-sidebar-lbl:first-child{margin-top:0}
-.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
-.sb-body{max-height:0;opacity:0;overflow:hidden;transition:max-height 0.3s ease,opacity 0.2s ease}
-.sb-body.open{max-height:2000px;opacity:1;overflow:visible}
+/* accordion CSS: see cgp-skool-layout.css */
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
 .fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 select.fi{cursor:pointer}
@@ -306,11 +303,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
 
 
 <script>
-function toggleAcc(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
-}
+var toggleAcc=CGP.toggleAcc;
 const BANKS={
   sofiap:{name:'SOFIAP',color:'#1B4F8A',min:80000,minD:120,maxD:240,difMax:6,difTypes:['partiel'],
     garantie:'Caution Crédit Logement (~1.73%)',assureur:'SURAVENIR',ageFin:75,
@@ -855,7 +848,7 @@ function render(d){
   });
 }
 
-function fmt(n){return Math.round(n||0).toLocaleString('fr-FR');}
+var fmt=CGP.fmt;
 
 function setTMI(val){
   document.getElementById('fTMI').value=val;

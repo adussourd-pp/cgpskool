@@ -26,10 +26,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
 .cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
 .cs-sidebar-lbl:hover{color:var(--noir)}
 .cs-sidebar-lbl:first-child{margin-top:0}
-.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
-.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
-.sb-body.open{max-height:2000px;opacity:1;overflow:visible}
+/* accordion CSS: see cgp-skool-layout.css */
 .pr { margin-bottom: 10px; }
 .pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
 .pl small { font-size: 9px; color: var(--ink-30); }
@@ -300,15 +297,11 @@ table tr:hover td { background: var(--paper); }
 
 
 <script>
-function toggleAcc(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
-}
+var toggleAcc=CGP.toggleAcc;
 var caChartInst = null, encChartInst = null;
 
 function gv(id,def) { var el=document.getElementById(id); return el?(parseFloat(el.value)||0):(def||0); }
-function fmt(n) { return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(n)); }
+var fmt=CGP.fmt;
 function fmtE(n) { return fmt(n)+' €'; }
 function fmtPct(n,d) { return n.toFixed(d||1)+' %'; }
 function setHTML(id,v) { var el=document.getElementById(id); if(el) el.innerHTML=v; }

@@ -33,10 +33,7 @@
 .cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
 .cs-sidebar-lbl:hover{color:var(--noir)}
 .cs-sidebar-lbl:first-child{margin-top:0}
-.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
-.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
-.sb-body.open{max-height:2000px;opacity:1;overflow:visible}
+/* accordion CSS: see cgp-skool-layout.css */
 
 .fg{margin-bottom:14px}
 .fg>label{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500;color:var(--ink-60);margin-bottom:5px}
@@ -445,11 +442,7 @@
 
 
 <script>
-function toggleAcc(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
-}
+var toggleAcc=CGP.toggleAcc;
 // ── État ──
 var freq = 'mensuel';       // mensuel | trimestriel | annuel
 var capit = 'annuelle';     // annuelle | mensuelle
@@ -459,12 +452,7 @@ var chartInst = null;
 
 // ── Helpers ──
 function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
-function fmt(n, decimals) {
-  return new Intl.NumberFormat('fr-FR', {
-    maximumFractionDigits: decimals !== undefined ? decimals : 0,
-    minimumFractionDigits: 0
-  }).format(Math.round(n * Math.pow(10, decimals || 0)) / Math.pow(10, decimals || 0));
-}
+var fmt=CGP.fmt;
 function fmtE(n) { return fmt(n) + ' €'; }
 function fmtPct(n) { return fmt(n, 2) + ' %'; }
 

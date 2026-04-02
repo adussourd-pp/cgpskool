@@ -16,10 +16,7 @@
 .cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
 .cs-sidebar-lbl:hover{color:var(--noir)}
 .cs-sidebar-lbl:first-child{margin-top:0}
-.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
-.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
-.sb-body.open{max-height:800px;opacity:1;overflow:visible}
+/* accordion CSS: see cgp-skool-layout.css */
 .sb-field { margin-bottom: 10px; }
 .sb-label {
   font-size: 10px; font-weight: 600;
@@ -457,11 +454,7 @@
 </div><!-- /cs-app -->
 
 <script>
-function toggleAcc(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
-}
+var toggleAcc=CGP.toggleAcc;
 // ── État ──
 var duree = 10;
 var tmiEntree = 0.41;
@@ -473,9 +466,7 @@ var evolutionChartInst = null;
 var recapChartInst = null;
 
 // ── Helpers ──
-function fmt(n) {
-  return new Intl.NumberFormat('fr-FR', {maximumFractionDigits: 0}).format(Math.round(n)) + ' €';
-}
+var fmt=CGP.fmtE;
 function fmtPct(n) {
   return (n * 100).toFixed(1).replace('.', ',') + ' %';
 }
