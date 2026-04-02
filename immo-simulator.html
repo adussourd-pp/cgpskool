@@ -10,28 +10,14 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-body { background: var(--paper); }
+body { background: #ECEAE6; }
 
 
-.mode-bar { background: #fff; border-bottom: 1px solid var(--rule-l); padding: 0 52px; }
-.mode-bar-inner { max-width: 1200px; margin: 0 auto; display: flex; }
-.mode-tab {
-  padding: 14px 22px; font-size: 12px; font-weight: 600;
-  letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-30); cursor: pointer; border: none;
-  background: transparent; font-family: var(--sans);
-  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s;
-}
-.mode-tab:hover { color: var(--ink); }
-.mode-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
 
 /* Sidebar overrides */
 .cs-sidebar { padding: 24px 20px 40px; }
 
 .ps { margin-bottom: 22px; }
-.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
-.cs-sidebar-lbl:hover{color:var(--noir)}
-.cs-sidebar-lbl:first-child{margin-top:0}
 /* accordion CSS: see cgp-skool-layout.css */
 
 .pr { margin-bottom: 11px; }
@@ -159,7 +145,6 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
   .result-header { grid-template-columns: 1fr; gap: 16px; }
   .rh-block { border-right: none; padding-left: 0; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 14px; }
   .cards-3, .cards-2, .detail-grid { grid-template-columns: 1fr 1fr; }
-  .mode-bar { padding: 0 20px; }
 }
 </style>
 </head>
@@ -179,6 +164,14 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 <div class="cs-app">
 
   <div class="cs-sidebar">
+
+    <div class="ps" style="margin-bottom:16px">
+      <div class="tog-row">
+        <button class="tog mode-tab active" onclick="setMode('mono',this)">Sans exploit.</button>
+        <button class="tog mode-tab" onclick="setMode('coloc',this)">Colocation</button>
+        <button class="tog mode-tab" onclick="setMode('resid',this)">Resid. Serv.</button>
+      </div>
+    </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Bien immobilier</div>
     <div class="sb-body open">
@@ -306,7 +299,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
-    <button class="btn-sim" onclick="recalc()">Calculer la projection →</button>
+    <button class="btn-sim" onclick="recalc()">Calculer la projection</button>
+    <button style="width:100%;padding:13px;background:#2D7A5B;color:#fff;font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:0.04em;border:none;border-radius:0;cursor:pointer;margin-top:6px" onclick="CGP.pdf.print()">Exporter PDF</button>
   </div>
 
   <div class="cs-main">
@@ -318,13 +312,6 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       <p style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300;max-width:500px;line-height:1.7">Participation, patrimoine créé et défiscalisation — 3 modèles LMNP avec amortissement complet.</p>
     </div>
 
-    <div class="mode-bar" style="margin:-40px -40px 20px;padding:0 40px">
-      <div class="mode-bar-inner" style="max-width:none;margin:0">
-        <button class="mode-tab active" onclick="setMode('mono',this)">LMNP Sans exploitant</button>
-        <button class="mode-tab" onclick="setMode('coloc',this)">LMNP Colocation</button>
-        <button class="mode-tab" onclick="setMode('resid',this)">Résidence de Services</button>
-      </div>
-    </div>
 
     <div class="empty-panel" id="emptyPanel">
       <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style="opacity:0.14">
