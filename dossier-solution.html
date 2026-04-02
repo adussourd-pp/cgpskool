@@ -197,14 +197,14 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
             <tr><td>Frais pilot&#233;s</td><td class="frais-montant" contenteditable="true">0 %</td><td contenteditable="true">Gestion libre, sans surcouche</td></tr>
           </tbody>
         </table>
-        <div style="font-size:11px;color:var(--gris);margin-top:8px;font-style:italic">&#8594; Moyenne globale sur 10 ans : &#8776; 1,48 %/an tous frais confondus</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:8px;font-style:italic" id="fraisNote">&#8594; Moyenne globale sur 10 ans : &#8776; 1,48 %/an tous frais confondus</div>
       </div>
 
       <!-- PROCHAINES ETAPES -->
       <div class="bloc" id="blocEtapes">
         <div class="bloc-tag">Prochaines &#233;tapes</div>
         <div class="bloc-title">La suite concr&#232;tement</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:10px" id="etapesContent">
           <div class="check-item"><div class="check-num">1</div><div><b>Envoi des documents</b><br>Pi&#232;ce d'identit&#233; valide, RIB au format PDF, justificatif de domicile (moins de 3 mois)</div></div>
           <div class="check-item"><div class="check-num">2</div><div><b>Signature &#233;lectronique</b><br>Fiche Conseil + proposition de souscription par e-mail</div></div>
           <div class="check-item"><div class="check-num">3</div><div><b>Confirmation</b><br>Confirmation d'ouverture du contrat par l'assureur</div></div>
@@ -237,10 +237,30 @@ var TEMPLATES={
     accompagnement:'<b>L\'assurance vie n\'est pas un simple placement.</b> C\'est la premi\u00e8re pierre d\'une strat\u00e9gie patrimoniale compl\u00e8te, pens\u00e9e pour \u00eatre coh\u00e9rente, personnalis\u00e9e et durable.<br><br>Notre objectif est de vous aider \u00e0 faire fructifier intelligemment votre capital, tout en vous apportant une relation de confiance, humaine et suivie dans le temps.<br><br>Au-del\u00e0 de la performance, cette premi\u00e8re \u00e9tape s\'inscrit dans une <b>vision 360\u00b0 de votre patrimoine</b>, en travaillant sur trois leviers essentiels : <b>placements / financement / fiscalit\u00e9</b>.',
     contrat:'Ce contrat est \u00e9tabli avec <b>VIE PLUS</b>, filiale de Suravenir (Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e).<br><br>\u2713 Architecture ouverte (300+ supports)<br>\u2713 +60 soci\u00e9t\u00e9s de gestion partenaires<br>\u2713 Fonds en euros garanti<br>\u2713 Offre immobili\u00e8re : SCPI, SCI, OPCI<br>\u2713 Capital-investissement<br>\u2713 Obligations dat\u00e9es et produits structur\u00e9s',
     gestion:'<b>Versement initial (VI)</b> : Base solide + opportunit\u00e9s de march\u00e9<br><b>Versements programm\u00e9s (VP)</b> : Fonds actions en DCA<br><b>Versements compl\u00e9mentaires (VC)</b> : Renforcement selon opportunit\u00e9s<br><br>\u2192 Horizon : <b>5 ans minimum</b><br>Ambition : <b>3 \u00e0 5 % nets</b> sur la dur\u00e9e',
-    frais:[['Frais sur versement','4,8 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 % /an','Standard assureur'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre'],['Frais de sortie','0 %','Capital libre'],['Frais pilot\u00e9s','0 %','Gestion libre']]
+    frais:[['Frais sur versement','4,8 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 % /an','Standard assureur'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre'],['Frais de sortie','0 %','Capital libre'],['Frais pilot\u00e9s','0 %','Gestion libre']],
+    fraisNote:'\u2192 Moyenne globale sur 10 ans : \u2248 1,48 %/an tous frais confondus',
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9 valide (CNI ou passeport), RIB au format PDF, justificatif de domicile (moins de 3 mois)'],['Signature \u00e9lectronique','Fiche Conseil (noreply@universign.eu) + proposition Suravenir (noreply@notif.suravenir.fr)'],['Confirmation','Confirmation d\'ouverture du contrat par l\'assureur'],['Premier suivi \u00e0 4 mois','Bilan performance, ajustement strat\u00e9gie et questions'],['Rendez-vous annuel','Suivi global et \u00e9volution de la strat\u00e9gie patrimoniale']]
   },
-  per:{type:'PLAN \u00c9PARGNE RETRAITE',title:'Proposition de transfert PER'},
-  scpi:{type:'SCPI',title:'Proposition d\'investissement SCPI'},
+  per:{
+    type:'PLAN \u00c9PARGNE RETRAITE',
+    title:'Mon accompagnement & proposition',
+    accompagnement:'<b>Le Plan \u00c9pargne Retraite (PER) n\'est pas qu\'un outil de d\u00e9fiscalisation.</b> C\'est avant tout un levier strat\u00e9gique pour transformer votre effort d\'\u00e9pargne d\'aujourd\'hui en revenus futurs demain.<br><br>Avec la baisse progressive du taux de remplacement, les r\u00e9gimes obligatoires ne suffisent plus \u00e0 maintenir le m\u00eame niveau de vie \u00e0 la retraite. C\'est ce qu\'on appelle le <b>d\u00e9ficit retraite</b> : l\'\u00e9cart entre votre dernier salaire et votre future pension.<br><br>Pr\u00e9parer sa retraite, c\'est donc reprendre la main sur cette partie manquante, en construisant un <b>revenu compl\u00e9mentaire par capitalisation</b>, \u00e0 votre rythme et selon vos objectifs.<br><br>\u2192 Mon r\u00f4le : vous aider \u00e0 structurer cette d\u00e9marche avec une approche claire, humaine et suivie dans le temps.<br><br><b>Mon ambition pour vous :</b> aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la dur\u00e9e, avec une strat\u00e9gie solide, diversifi\u00e9e et coh\u00e9rente dans le temps, tout en profitant d\'un avantage fiscal imm\u00e9diat.',
+    contrat:'Ce contrat est \u00e9tabli avec <b>VIE PLUS</b>, filiale de Suravenir (Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e).<br><br>\u2713 Architecture ouverte (300+ supports financiers et immobiliers)<br>\u2713 +60 soci\u00e9t\u00e9s de gestion partenaires ind\u00e9pendantes<br>\u2713 Fonds en euros garanti<br>\u2713 Offre immobili\u00e8re compl\u00e8te : SCPI, SCI, OPCI<br>\u2713 Capital-investissement : FCPR<br>\u2713 Produits structur\u00e9s exclusifs d\u00e8s 25 \u20ac<br><br>En clair : un cadre d\'investissement <b>flexible, haut de gamme et \u00e9volutif</b>.',
+    gestion:'<b>Objectif : Performance, s\u00e9r\u00e9nit\u00e9 et coh\u00e9rence dans le temps</b><br><br><b>Versement initial (VI)</b> : amorcer le contrat avec une base solide (produits structur\u00e9s, obligations dat\u00e9es, fonds euros boost\u00e9, private equity\u2026)<br><br><b>Versements programm\u00e9s (VP)</b> : investir progressivement pour lisser les points d\'entr\u00e9e (m\u00e9thode DCA)<br><br><b>Versements compl\u00e9mentaires (VC)</b> : renforcer la performance au fil du temps selon les opportunit\u00e9s<br><br>\u2192 Horizon d\'investissement conseill\u00e9 : <b>3 \u00e0 5 ans minimum</b>',
+    frais:[['Frais sur versement','4,5 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 % /an','Li\u00e9s \u00e0 l\'assureur (norme du march\u00e9)'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre sans surco\u00fbt'],['Frais de sortie','0 %','Capital libre, sans p\u00e9nalit\u00e9'],['Frais pilot\u00e9s','0 %','Gestion libre et ind\u00e9pendante']],
+    fraisNote:'\u2192 Moyenne globale sur 30 ans : \u2248 1,15 %/an tous frais confondus',
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9 valide, RIB au format PDF, justificatif de domicile (moins de 3 mois)'],['Signature \u00e9lectronique','Fiche Conseil + proposition de souscription par e-mail'],['Confirmation','Confirmation d\'ouverture du contrat par l\'assureur'],['Premier suivi \u00e0 3 mois','Bilan performance, ajustement strat\u00e9gie'],['Suivi annuel structur\u00e9','D\u00e9claration d\'imp\u00f4ts en avril, correction en septembre, bilan complet oct-nov']]
+  },
+  scpi:{
+    type:'SCPI DE RENDEMENT',
+    title:'Notre accompagnement & proposition',
+    accompagnement:'<b>La SCPI est un outil d\'\u00e9pargne immobili\u00e8re</b> qui permet d\'investir dans l\'immobilier professionnel (bureaux, commerces, logistique, sant\u00e9, h\u00f4tellerie\u2026) sans aucune contrainte de gestion. C\'est un pilier de diversification de votre patrimoine.<br><br>L\'objectif : vous permettre de <b>cr\u00e9er un revenu compl\u00e9mentaire r\u00e9gulier</b> tout en b\u00e9n\u00e9ficiant d\'une gestion totalement d\u00e9l\u00e9gu\u00e9e \u00e0 des professionnels.<br><br>\u2713 Diversification immobili\u00e8re sur diff\u00e9rents types d\'actifs et zones g\u00e9ographiques<br>\u2713 Rendement locatif r\u00e9gulier vers\u00e9 sous forme de dividendes trimestriels<br>\u2713 Gestion cl\u00e9 en main encadr\u00e9e (AMF, Conseil de Surveillance)<br>\u2713 Modes d\'acquisition flexibles : comptant, cr\u00e9dit, d\u00e9membrement<br><br>En clair : un placement immobilier <b>simple, efficace et g\u00e9r\u00e9 par des professionnels</b>.',
+    contrat:'<b>Pourquoi nous privil\u00e9gions les SCPI europ\u00e9ennes et internationales</b><br><br>C\'est un avantage fiscal majeur de notre s\u00e9lection. Les revenus issus de SCPI investies hors de France <b>ne sont pas soumis aux pr\u00e9l\u00e8vements sociaux (17,2 %)</b>.<br><br><b>Aide \u00e0 la d\u00e9claration d\'imp\u00f4ts incluse</b><br>Les revenus SCPI doivent \u00eatre d\u00e9clar\u00e9s. En tant que votre conseiller, je vous accompagne :<br>\u2713 R\u00e9capitulatif fiscal clair transmis chaque ann\u00e9e<br>\u2713 Identification des cases \u00e0 remplir sur votre d\u00e9claration<br>\u2713 Explication de l\'impact fiscal selon votre TMI<br>\u2713 V\u00e9rification crois\u00e9e IFU / montants d\u00e9clar\u00e9s',
+    gestion:'<b>Objectif : Revenu, s\u00e9r\u00e9nit\u00e9 et constitution de capital dans le temps</b><br><br><b>Acquisition au comptant</b> : g\u00e9n\u00e9rer un revenu compl\u00e9mentaire imm\u00e9diat, avec un rendement optimis\u00e9.<br><br><b>Horizon long terme</b> : la SCPI se pr\u00eate particuli\u00e8rement bien \u00e0 une logique de transmission patrimoniale, sans friction de revente.<br><br><b>Notre ambition :</b> aller chercher un rendement d\'environ <b>6 % net de frais de gestion</b>, brut de fiscalit\u00e9, sur la dur\u00e9e.<br><br><i>NB : Objectif indicatif non garanti. Les rendements pass\u00e9s ne pr\u00e9jugent pas des rendements futurs. Risque de perte en capital.</i>',
+    frais:[['Frais de gestion','\u2248 10 % /an des loyers bruts','Pr\u00e9lev\u00e9s avant versement des dividendes. Le rendement de 6 % est d\u00e9j\u00e0 net de ces frais.'],['Frais de souscription','8 % \u00e0 12 %','Int\u00e9gr\u00e9s dans le prix de la part. N\'impactent qu\'en cas de revente.']],
+    fraisNote:'Dans une optique de d\u00e9tention long terme ou de transmission, les frais de souscription ne vous impactent pas.',
+    etapes:[['S\u00e9lection des SCPI','Choix des SCPI adapt\u00e9es \u00e0 votre profil et objectifs'],['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB, justificatif de domicile'],['Signature \u00e9lectronique','Bulletin de souscription par e-mail'],['D\u00e9lai de jouissance','3 \u00e0 6 mois selon les SCPI (premier versement de dividendes)'],['Suivi annuel','Bilan performance + aide d\u00e9claration fiscale']]
+  },
   immo:{type:'IMMOBILIER LMNP',title:'Proposition d\'investissement immobilier'},
   mixte:{type:'MULTI-SOLUTIONS',title:'Strat\u00e9gie patrimoniale globale'}
 };
@@ -278,6 +298,17 @@ function onTypeChange(){
       html+='<tr><td>'+r[0]+'</td><td class="frais-montant" contenteditable="true">'+r[1]+'</td><td contenteditable="true">'+r[2]+'</td></tr>';
     });
     V('fraisTable').querySelector('tbody').innerHTML=html;
+  }
+  // Frais note
+  var noteEl=V('fraisNote');
+  if(noteEl)noteEl.textContent=t.fraisNote||'\u2192 Moyenne globale sur 10 ans : \u2248 1,48 %/an tous frais confondus';
+  // Etapes
+  if(t.etapes){
+    var etHtml='';
+    t.etapes.forEach(function(e,i){
+      etHtml+='<div class="check-item"><div class="check-num">'+(i+1)+'</div><div><b>'+e[0]+'</b><br>'+e[1]+'</div></div>';
+    });
+    V('etapesContent').innerHTML=etHtml;
   }
   updateGarde();
 }
