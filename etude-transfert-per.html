@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CGP Skool &#8212; &#201;tude de transfert Plan &#201;pargne Retraite</title>
+<title>CGP Skool &#8212; Comparaison de contrats</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
 <script src="cgp-skool-core.js"></script>
@@ -105,7 +105,13 @@
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
     <div class="sb-body open">
-      <div class="sf"><label>Type de contrat</label>
+      <div class="sf"><label>Famille</label>
+        <select id="pFamille" onchange="onFamilleChange()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
+          <option value="per">Plan &#201;pargne Retraite</option>
+          <option value="av">Assurance Vie</option>
+        </select>
+      </div>
+      <div id="perTypeRow" class="sf"><label>Type de contrat</label>
         <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
           <option value="per">PER</option>
           <option value="perp">PERP</option>
@@ -175,7 +181,7 @@
       <!-- Header -->
       <div style="margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between">
         <div>
-          <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">&#201;tude de transfert Plan &#201;pargne Retraite</div>
+          <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)" id="hTitle">&#201;tude de transfert Plan &#201;pargne Retraite</div>
           <div id="typeBlock" style="display:flex;align-items:center;gap:6px;margin-top:4px">
             <span id="tbBadge" style="font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 8px;background:var(--orange);color:#fff;border-radius:3px">PER</span>
             <span style="font-size:12px;font-weight:600;color:var(--noir)" id="tbLabel">Transfert PER vers PER</span>
@@ -348,14 +354,45 @@ function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
 
 // Matrice des types de contrats
 var TYPE_RULES={
-  per:       {label:'PER',         badge:'PER',     fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert', details:'Transfert vers un nouveau PER individuel. Gestion libre avec acc\u00e8s \u00e0 une allocation diversifi\u00e9e.'},
-  perp:      {label:'PERP',        badge:'PERP',    fraisMax:5, seuilAns:10, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Frais de transfert \u00e9lev\u00e9s (5% max si < 10 ans)', details:'Le PERP peut \u00eatre transf\u00e9r\u00e9 sur un PER. Int\u00e9r\u00eat principal : possibilit\u00e9 de sortie 100% en capital au lieu de la rente viag\u00e8re.'},
-  madelin:   {label:'Loi Madelin', badge:'MADELIN',  fraisMax:5, seuilAns:10, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Anciennet\u00e9 contrat, table de mortalit\u00e9', details:'Contrat Madelin TNS. Le transfert permet la sortie en capital (impossible sur Madelin). Attention aux frais \u00e9lev\u00e9s si contrat < 10 ans.'},
-  permadelin:{label:'PER Madelin', badge:'ART.154',  fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert', details:'PER issu de l\'article 154 bis du CGI. M\u00eames r\u00e8gles qu\'un PER classique pour le transfert.'},
-  perco:     {label:'PERCO',       badge:'PERCO',    fraisMax:1, seuilAns:5,  transfert:'Oui, tous les 3 ans', interet:'Clause b\u00e9n\u00e9ficiaire, gestion libre', attention:'Transfert sans cl\u00f4ture du plan', details:'PERCO/PERCOL/PERECO. Transfert possible tous les 3 ans sans cl\u00f4turer le plan. Permet d\'acc\u00e9der \u00e0 une gestion libre optimis\u00e9e.'},
-  art83:     {label:'Article 83',  badge:'ART.83',   fraisMax:1, seuilAns:5,  transfert:'Apr\u00e8s d\u00e9part soci\u00e9t\u00e9', interet:'Gestion libre optimis\u00e9e', attention:'Certificat de travail obligatoire', details:'Article 83 / PERE / PERO / PEROB. Transfert uniquement apr\u00e8s avoir quitt\u00e9 l\'entreprise. N\u00e9cessite un certificat de travail.'},
-  prefon:    {label:'PREFON',      badge:'PREFON',   fraisMax:1, seuilAns:5,  transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre, conversion points/\u20ac', attention:'Frais de transfert', details:'PREFON ou COREM. Le transfert permet de passer d\'un syst\u00e8me \u00e0 points vers une gestion libre en euros.'}
+  // PER
+  per:       {famille:'per',label:'PER',         badge:'PER',     fraisMax:1, seuilAns:5,  fraisEntreeMax:4.5, transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert'},
+  perp:      {famille:'per',label:'PERP',        badge:'PERP',    fraisMax:5, seuilAns:10, fraisEntreeMax:4.5, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Frais \u00e9lev\u00e9s si < 10 ans'},
+  madelin:   {famille:'per',label:'Loi Madelin', badge:'MADELIN', fraisMax:5, seuilAns:10, fraisEntreeMax:4.5, transfert:'Oui, \u00e0 tout moment', interet:'Sortie 100% en capital', attention:'Table de mortalit\u00e9'},
+  permadelin:{famille:'per',label:'PER Madelin', badge:'ART.154', fraisMax:1, seuilAns:5,  fraisEntreeMax:4.5, transfert:'Oui, \u00e0 tout moment', interet:'Gestion libre optimis\u00e9e', attention:'Frais de transfert'},
+  perco:     {famille:'per',label:'PERCO',       badge:'PERCO',   fraisMax:1, seuilAns:5,  fraisEntreeMax:4.5, transfert:'Oui, tous les 3 ans', interet:'Clause b\u00e9n\u00e9ficiaire', attention:'Transfert sans cl\u00f4ture'},
+  art83:     {famille:'per',label:'Article 83',  badge:'ART.83',  fraisMax:1, seuilAns:5,  fraisEntreeMax:4.5, transfert:'Apr\u00e8s d\u00e9part soci\u00e9t\u00e9', interet:'Gestion libre optimis\u00e9e', attention:'Certificat de travail'},
+  prefon:    {famille:'per',label:'PREFON',      badge:'PREFON',  fraisMax:1, seuilAns:5,  fraisEntreeMax:4.5, transfert:'Oui, \u00e0 tout moment', interet:'Conversion points/\u20ac', attention:'Frais de transfert'},
+  // Assurance Vie
+  av:        {famille:'av', label:'Assurance Vie',badge:'AV',     fraisMax:0, seuilAns:0,  fraisEntreeMax:4.8, transfert:'Rachat total + r\u00e9investissement', interet:'Gestion libre, clause b\u00e9n\u00e9ficiaire', attention:'Fiscalit\u00e9 rachat (PFU ou bar\u00e8me)'}
 };
+
+function onFamilleChange(){
+  var fam=V('pFamille').value;
+  if(fam==='av'){
+    V('perTypeRow').style.display='none';
+    V('pTypePER').value='av';
+    V('pFraisTransfert').value='0';
+    V('pFraisTransfert').max='0';
+    V('pFraisTransfert').disabled=true;
+    V('pFraisEntree').max='4.8';
+    V('pContratA').value='AV Actuelle';
+    V('pContratB').value='AV Recommand\u00e9e';
+    V('typeEncart').style.display='none';
+    document.querySelector('[onclick="openRecap()"]').style.display='none';
+  }else{
+    V('perTypeRow').style.display='';
+    V('pTypePER').value='per';
+    V('pFraisTransfert').disabled=false;
+    V('pFraisTransfert').max='5';
+    V('pFraisEntree').max='4.5';
+    V('pContratA').value='PER Ancien';
+    V('pContratB').value='PER Recommand\u00e9';
+    V('typeEncart').style.display='';
+    document.querySelector('[onclick="openRecap()"]').style.display='';
+  }
+  onTypeChange();
+  update();
+}
 
 function onTypeChange(){
   var type=V('pTypePER').value;
@@ -424,9 +461,16 @@ function update(){
   V('hClient').textContent=client||'Client';
   V('hDate').textContent=dateEtude;
 
-  // Type PER block
+  // Type block + titre
+  var fam=V('pFamille').value;
   V('tbBadge').textContent=rule.badge;
-  V('tbLabel').textContent='Transfert '+rule.label+' vers PER';
+  if(fam==='av'){
+    V('hTitle').textContent='Comparaison de contrats Assurance Vie';
+    V('tbLabel').textContent='Transfert Assurance Vie';
+  }else{
+    V('hTitle').textContent='\u00c9tude de transfert Plan \u00c9pargne Retraite';
+    V('tbLabel').textContent='Transfert '+rule.label+' vers PER';
+  }
 
   V('ccNameA').textContent=nomA;
   V('ccNameB').textContent=nomB;
