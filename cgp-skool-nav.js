@@ -63,7 +63,7 @@
     var sidebar = document.querySelector('.cs-sidebar') || document.querySelector('.sidebar');
     if (!sidebar) return false;
     // Ne pas injecter si la sidebar a deja des boutons d'action (mais retourner true = pas de fallback)
-    if (sidebar.querySelector('.btn-success') || sidebar.querySelector('.sidebar-btn') || sidebar.querySelector('.cs-sidebar-btn')) return true;
+    if (sidebar.querySelector('.btn-success,.sidebar-btn,.cs-sidebar-btn,.sim-btn,.btn-sim,.btn-calc')) return true;
 
     var div = document.createElement('div');
     div.className = 'cs-sidebar-actions';
