@@ -20,7 +20,10 @@
 var CGP = CGP || {};
 
 /* ── FORMATTING ─────────────────────────────────── */
-CGP.fmt = function(n) {
+CGP.fmt = function(n, decimals) {
+  if (decimals !== undefined && decimals > 0) {
+    return (+(n || 0)).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  }
   return Math.round(n || 0).toLocaleString('fr-FR');
 };
 CGP.fmtE = function(n) {
@@ -29,6 +32,22 @@ CGP.fmtE = function(n) {
 CGP.fmtPct = function(n, decimals) {
   var d = decimals !== undefined ? decimals : 1;
   return (+(n || 0)).toFixed(d) + '%';
+};
+
+/* ── UTILITIES ──────────────────────────────────── */
+CGP.esc = function(s) {
+  if (!s) return '';
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+};
+
+CGP.toggleAcc = function(lbl) {
+  lbl.classList.toggle('open');
+  var body = lbl.nextElementSibling;
+  if (body && body.classList.contains('sb-body')) body.classList.toggle('open');
+  // Also support .sidebar-body class (scpi-simulator)
+  if (body && body.classList.contains('sidebar-body')) body.classList.toggle('open');
 };
 
 /* ── PROFIL ──────────────────────────────────────── */
@@ -117,13 +136,14 @@ CGP.footer.render = function(el) {
   var img = CGP.profil.loadImages();
   var nom = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
   if (!nom) { el.style.display = 'none'; return; }
+  var e = CGP.esc;
 
   var left = '';
-  left += '<div style="font-size:16px;font-weight:700;color:#181614">' + nom + '</div>';
-  if (p.cabinet) left += '<div style="font-size:11px;color:#6B6B6B;margin-top:2px">' + p.cabinet + '</div>';
+  left += '<div style="font-size:16px;font-weight:700;color:#181614">' + e(nom) + '</div>';
+  if (p.cabinet) left += '<div style="font-size:11px;color:#6B6B6B;margin-top:2px">' + e(p.cabinet) + '</div>';
   var contact = [];
-  if (p.tel) contact.push('\u260e ' + p.tel);
-  if (p.email) contact.push('\u2709 ' + p.email);
+  if (p.tel) contact.push('\u260e ' + e(p.tel));
+  if (p.email) contact.push('\u2709 ' + e(p.email));
   if (contact.length) left += '<div style="font-size:11px;color:#6B6B6B;margin-top:4px">' + contact.join(' \u00a0\u00a0 ') + '</div>';
 
   var right = '';
@@ -154,9 +174,9 @@ CGP.header.render = function(el, opts) {
   var dateStr = today.toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'});
 
   var left = '<div>'
-    + '<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#D4622A">' + (opts.tag || '') + '</div>'
-    + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:400;color:#0D0D0D;margin-top:4px">' + (opts.title || '') + '</div>';
-  if (opts.subtitle) left += '<div style="font-size:13px;color:#6B6B6B;margin-top:4px;font-weight:300">' + opts.subtitle + '</div>';
+    + '<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#D4622A">' + CGP.esc(opts.tag || '') + '</div>'
+    + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:400;color:#0D0D0D;margin-top:4px">' + CGP.esc(opts.title || '') + '</div>';
+  if (opts.subtitle) left += '<div style="font-size:13px;color:#6B6B6B;margin-top:4px;font-weight:300">' + CGP.esc(opts.subtitle) + '</div>';
   left += '</div>';
 
   var right = '<div style="text-align:right">'

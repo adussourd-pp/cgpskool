@@ -25,9 +25,16 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
 
 /* ── SIDEBAR ── */
 .cs-sidebar{background:var(--paper);border-right:1px solid var(--rule-l);padding:24px 20px;overflow-y:auto;position:sticky;top:54px;height:calc(100vh - 54px);box-sizing:border-box;display:flex;flex-direction:column;gap:0}
-.cs-sidebar-lbl,.sidebar-lbl{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);padding:12px 0 6px}
+.cs-sidebar-lbl,.sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-60);padding:10px 8px 6px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
+.cs-sidebar-lbl:hover,.sidebar-lbl:hover{color:var(--ink)}
 .cs-sidebar-section{margin-bottom:14px}
 .cs-sidebar-divider,.sidebar-divider{height:1px;background:var(--rule-l);margin:10px 0}
+
+/* ── ACCORDION SIDEBAR ── */
+.sidebar-lbl .acc,.sidebar-label .acc-arrow,.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.22s;color:var(--ink-60);flex-shrink:0;line-height:1}
+.sidebar-lbl.open .acc,.sidebar-label.open .acc-arrow,.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
+.sb-body,.sidebar-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
+.sb-body.open,.sidebar-body.open{max-height:2000px;opacity:1;overflow:visible}
 
 /* ── MAIN (zone A4) ── */
 .cs-main{padding:28px 32px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:24px}

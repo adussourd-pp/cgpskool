@@ -10,13 +10,8 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-.cs-sidebar-section{margin-bottom:0}
-.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 8px 6px;user-select:none;transition:color 0.15s}
-.cs-sidebar-lbl:hover{color:var(--noir)}
-.cs-sidebar-lbl .acc-arrow{font-size:7px;color:var(--gris);transition:transform 0.22s;flex-shrink:0;line-height:1;order:-1}
-.cs-sidebar-lbl.open .acc-arrow{transform:rotate(90deg)}
-.sidebar-body{transition:max-height 0.3s ease,opacity 0.25s ease;max-height:0;opacity:0;padding:0 4px}
-.sidebar-body.open{max-height:800px;opacity:1;padding:4px 4px 8px;overflow:visible}
+/* accordion styles via cgp-skool-layout.css */
+.sidebar-body.open{padding:4px 4px 8px}
 
 /* MODE TABS */
 .mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
@@ -439,11 +434,7 @@ let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi
 
 // ─── INIT ─────────────────────────────────────────────────────────
 
-function toggleAcc(label){
-  label.classList.toggle('open');
-  const body=label.nextElementSibling;
-  body.classList.toggle('open');
-}
+var toggleAcc=CGP.toggleAcc;
 
 function init(){renderSCPIList(SCPI_DATA)}
 
@@ -838,12 +829,12 @@ function renderChart(labels,datasets){
   chartInstance=new Chart(document.getElementById('mainChart').getContext('2d'),{
     type:'line',
     data:{labels,datasets:datasets.map(d=>({label:d.label,data:d.data,borderColor:d.color,backgroundColor:d.color+'18',fill:true,tension:0.4,borderWidth:2.5,pointRadius:3,pointHoverRadius:7,pointBackgroundColor:d.color}))},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:var_='rgba(13,13,13,0.92)',borderColor:'rgba(240,167,56,0.3)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:12,callbacks:{label:ctx=>ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10},callback:v=>fmt(v)+' €'}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(13,13,13,0.92)',borderColor:'rgba(240,167,56,0.3)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:12,callbacks:{label:ctx=>ctx.dataset.label+' : '+fmt(ctx.parsed.y)+' €'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'rgba(24,22,20,0.55)',font:{family:'Inter',size:10},callback:v=>fmt(v)+' €'}}}}
   });
   document.getElementById('chartLegend').innerHTML=datasets.map(d=>`<span><span class="leg-dot" style="background:${d.color}"></span>${d.label}</span>`).join('');
 }
 
-function fmt(n){return Math.round(n).toLocaleString('fr-FR')}
+var fmt=CGP.fmt;
 init();
 function setScpiTMI(val, btn) {
   document.getElementById('ret-tmi').value = val;

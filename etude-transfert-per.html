@@ -10,13 +10,7 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-.cs-sidebar-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);padding:10px 8px 6px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.15s}
-.cs-sidebar-lbl:hover{color:var(--noir)}
-.cs-sidebar-lbl:first-child{margin-top:0}
-.cs-sidebar-lbl .acc{font-size:7px;transition:transform 0.2s;color:var(--gris)}
-.cs-sidebar-lbl.open .acc{transform:rotate(90deg)}
-.sb-body{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease}
-.sb-body.open{max-height:800px;opacity:1;overflow:visible}
+/* accordion styles via cgp-skool-layout.css */
 .sf{padding:0 8px;margin-bottom:8px}
 .sf-range{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:8px}
 .sf-range input[type="range"]{flex:1;accent-color:var(--orange);height:4px;-webkit-appearance:none;background:rgba(0,0,0,0.08);border-radius:2px}
@@ -103,13 +97,13 @@
 <div class="cs-app">
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open">
       <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
       <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
     <div class="sb-body open">
       <div class="sf"><label>Type de contrat</label>
         <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
@@ -147,7 +141,7 @@
       <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
@@ -334,16 +328,10 @@ function updateTypeEncart(){
   V('teFrais').textContent='Frais : '+r.fraisMax+'% max, 0% apr\u00e8s '+r.seuilAns+' ans';
 }
 
-function toggleAcc(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body&&body.classList.contains('sb-body'))body.classList.toggle('open');
-}
-
 function V(id){return document.getElementById(id)}
 function num(id){return parseFloat(V(id).value)||0}
 function txt(id){return V(id).value||''}
-function fmt(n){return Math.round(n).toLocaleString('fr-FR')}
+var fmt=CGP.fmt;
 function fmtD(n,d){return n.toFixed(d)}
 
 function getAllocA(){
