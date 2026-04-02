@@ -136,7 +136,8 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 ## Format "One-Page" — Standard pour les modules outils
 
-Chaque module outil (simulateur, étude) doit suivre ce format :
+Chaque module outil (simulateur, étude) doit suivre ce format.
+**RÉFÉRENCE UNIQUE** — toute modification UI doit respecter ces specs.
 
 ### Structure
 
@@ -144,40 +145,92 @@ Chaque module outil (simulateur, étude) doit suivre ce format :
 ┌─────────────────────────────────────────────────────┐
 │  <nav class="cs-nav"> — barre noire, logo C, Accueil│
 ├───────────┬─────────────────────────────────────────┤
-│ sidebar   │  .main-area (fond beige #ECEAE6)        │
-│ 260px     │  └─ .cs-page (page A4, fond blanc)      │
+│ sidebar   │  .cs-main (fond beige #ECEAE6)          │
+│ 320px     │  └─ .cs-page (page A4, fond blanc)      │
 │ #F2F1EE   │     ├─ Header (tag orange + titre gras) │
 │ sticky    │     ├─ Contenu (cards, KPIs, charts)     │
 │           │     ├─ Disclaimer                        │
-│ labels    │     └─ Pied de page conseiller           │
-│ uppercase │        (fond beige, pleine largeur,      │
-│ inputs    │         margin négatif -40px)             │
-│ blancs    │                                          │
+│ Toggles   │     └─ Pied de page conseiller           │
+│ ▶ LABEL   │        (fond beige, pleine largeur,      │
+│            │         margin négatif -40px)             │
 │           │                                          │
-│ Bouton    │                                          │
-│ Exporter  │                                          │
-│ vert      │                                          │
-│ #2D7A5B   │                                          │
-│ carré     │                                          │
+│ [Bouton]  │                                          │
+│ orange    │                                          │
 └───────────┴─────────────────────────────────────────┘
 ```
 
-### CSS requis
-
-- `<link rel="stylesheet" href="cgp-skool-theme.css">`
-- `<link rel="stylesheet" href="cgp-skool-layout.css">`
-- Sidebar : `.sidebar` fond `#F2F1EE`, labels `.sidebar-lbl` (9px uppercase), inputs `.sf` (fond blanc, bordure `var(--bord)`)
-- Sliders : `.sf-range` avec `accent-color:var(--orange)`, valeur `.sf-range-val` orange bold
-- Main : `.main-area` fond `#ECEAE6`, contenu dans `.cs-page` (blanc, padding 40px, max-width 794px)
-- Bouton Exporter : carré (pas de border-radius), fond `#2D7A5B`, couleur blanche, `font-size:13px`
-
-### Header page A4
+### Imports requis (dans cet ordre)
 
 ```html
-<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">NOM DU MODULE</div>
-<div style="font-family:var(--sans);font-size:24px;font-weight:700;color:var(--noir)" id="hClient">Client</div>
-<div style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300" id="hDate">30/03/2026</div>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 ```
+
+### Sidebar — Standard
+
+| Élément | Classe | Specs |
+|---|---|---|
+| Conteneur | `.cs-sidebar` (layout.css) | fond `var(--paper)` (#F2F1EE), 320px, sticky, padding `16px 14px` |
+| Toggle label | `.cs-sidebar-lbl` (layout.css) | 9px, weight 700, uppercase, letter-spacing 0.18em, couleur `var(--ink-60)` |
+| Toggle icône | `<span class="acc">▶</span>` | 7px, rotate 90deg quand `.open` |
+| Toggle body | `.sb-body` | max-height 0→2000px, transition 0.3s |
+| Toggle onclick | `onclick="CGP.toggleAcc(this)"` | ou alias local `var toggleAcc=CGP.toggleAcc;` |
+| Pas de trait | — | Pas de `.sidebar-divider` entre les toggles |
+| Tous ouverts | `class="... open"` | Label ET body ont la classe `open` par défaut |
+
+### Sidebar — Inputs
+
+| Élément | Specs |
+|---|---|
+| Input label | 10px, weight 600, uppercase, letter-spacing 0.08em, couleur `var(--gris)` |
+| Input text/number | fond `#fff`, bordure `1.5px solid var(--bord)`, border-radius `7px`, font-size `13px`, weight 500, couleur `var(--noir)`, padding `8px 10px` |
+| Input focus | `border-color: var(--orange)` |
+| Select | Même style que input + `cursor:pointer` |
+| Slider range | accent-color `var(--orange)`, height `4px`, background `rgba(0,0,0,0.08)` |
+| Slider thumb | 14px, round, background `var(--orange)`, cursor pointer |
+| Slider valeur | 12px, weight 700, couleur `var(--orange)` |
+| Slider labs (min/max) | 9px, couleur `var(--ink-30)` |
+
+### Sidebar — Boutons
+
+**Règle : 1 seul bouton par module.**
+
+| Type de module | Bouton | Style |
+|---|---|---|
+| Avec calcul (Lancer/Calculer) | **Orange** `var(--orange)` | Texte blanc, pas de border-radius, hover `var(--orange-hover)` |
+| Sans calcul (live) | **Vert** `#2D7A5B` | Texte "⬇ Exporter PDF", pas de border-radius, hover opacity 0.85 |
+
+**JAMAIS 2 boutons** (pas de Exporter en doublon sous le bouton action).
+L'export se fait via Ctrl+P (`CGP.pdf.print()` déclenché automatiquement par `beforeprint`).
+
+Specs bouton : `width:100%; padding:10px; font-size:13px; font-weight:500; font-family:var(--sans); border:none; cursor:pointer`
+
+### Page A4 — Header
+
+```
+┌─────────────────────────────────────────────────┐
+│ TAG MODULE (orange 10px uppercase)    Client     │
+│                                       30/03/2026 │
+└─────────────────────────────────────────────────┘
+```
+
+| Élément | Specs |
+|---|---|
+| Tag | 10px, weight 500, letter-spacing 0.22em, uppercase, couleur `var(--orange)` |
+| Titre client | 18-24px, weight 700, font-family `var(--sans)`, couleur `var(--noir)` |
+| Date | 12-13px, weight 300, couleur `var(--gris)` |
+
+### Page A4 — Contenu
+
+| Élément | Specs |
+|---|---|
+| KPI label | 9px, weight 600, uppercase, letter-spacing 0.08em, couleur `var(--gris)` |
+| KPI valeur | 18px, weight 700 |
+| KPI sous-texte | 10px, couleur `var(--gris)` |
+| Card | fond `#fff`, bordure `1.5px solid var(--bord)`, border-radius `10px`, padding `20px` |
+| Section label | 9px, weight 700, uppercase, letter-spacing 0.22em, couleur `var(--ink-30)` |
 
 ### Pied de page conseiller
 
@@ -215,6 +268,15 @@ Les `<canvas>` apparaissent vides/blancs en impression. Solution :
 - Ne JAMAIS appeler `window.print()` directement dans un module avec des graphiques
 
 **Print CSS partagé** : géré dans `cgp-skool-layout.css` (ne pas dupliquer dans les modules).
+
+### Processus de modification UI
+
+1. **Audit** → lister les écarts par rapport à ce standard
+2. **Plan écrit** → proposer les changements fichier par fichier
+3. **Validation utilisateur** → attendre le OK avant d'exécuter
+4. **Exécution** → un fichier à la fois, vérif visuelle
+5. **Jamais** de modification en masse par agent sans plan validé
+6. **Toute nouvelle classe UI** va dans `cgp-skool-layout.css`, pas en inline
 
 ---
 
