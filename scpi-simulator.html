@@ -307,18 +307,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         <input type="range" id="ret-horizon" min="3" max="40" value="20" step="1" oninput="document.getElementById('ret-horizon-val').textContent=this.value+' ans'">
         <div class="slider-labs"><span>3 ans</span><span>20 ans</span><span>40 ans</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Votre TMI (calcul rente nette)</span>
-        <!-- Champ caché pour compatibilité JS existant -->
-        <input type="hidden" id="ret-tmi" value="30">
-        <div style="display:flex;gap:5px;margin-top:6px" id="tmiBtns">
-          <button class="tmi-pill" onclick="setScpiTMI(0,this)">0 %</button>
-          <button class="tmi-pill" onclick="setScpiTMI(11,this)">11 %</button>
-          <button class="tmi-pill active" onclick="setScpiTMI(30,this)">30 %</button>
-          <button class="tmi-pill" onclick="setScpiTMI(41,this)">41 %</button>
-          <button class="tmi-pill" onclick="setScpiTMI(45,this)">45 %</button>
-        </div>
-      </div>
+      <!-- TMI masqué — rente nette non affichée (fiscalité SCPI étrangères non fiable) -->
+      <input type="hidden" id="ret-tmi" value="30">
     </div>
 
     <!-- NP -->
@@ -564,10 +554,9 @@ function renderRetraite(){
   const res=calcRetraite(s,init,monthly,reinvest,horizon,tmi);
 
   document.getElementById('kpiRow').innerHTML=[
-    {label:'Total versé',val:fmt(res.totalVerse)+' €',sub:"Capital investi",cls:''},
-    {label:'Patrimoine à terme',val:fmt(res.patrimoineTerme)+' €',sub:'Après '+horizon+' ans',cls:'featured'},
-    {label:'Rente mensuelle brute',val:fmt(res.renteGross)+' €',sub:'Avant fiscalité',cls:'green-card'},
-    {label:'Rente mensuelle nette',val:fmt(res.renteNet)+' €',sub:`Après IR ${res.tmi}% + PS 17.2%`,cls:'green-card'}
+    {label:'Total vers\u00e9',val:fmt(res.totalVerse)+' \u20ac',sub:"Capital investi",cls:''},
+    {label:'Patrimoine \u00e0 terme',val:fmt(res.patrimoineTerme)+' \u20ac',sub:'Apr\u00e8s '+horizon+' ans',cls:'featured'},
+    {label:'Rente mensuelle brute',val:fmt(res.renteGross)+' \u20ac',sub:'Avant fiscalit\u00e9',cls:'green-card'}
   ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   document.getElementById('chartTitle').textContent='Évolution du patrimoine sur '+horizon+' ans';
@@ -623,7 +612,7 @@ function renderNP(){
         ${nprow("Au terme","Pleine propriété ✅",null,'gre')}
         ${nprow("Valeur récupérée",fmt(res.ppVal)+' €',null,'gold')}
         ${nprow("Plus-value nette",fmt(res.gain)+' €',null,'gre')}
-        ${nprow("Rente mensuelle nette",fmt(res.renteNet)+' €/mois',null,'gold')}
+        ${nprow("Rente mensuelle brute",fmt(Math.round(res.ppVal*s.yieldGross/12))+' \u20ac/mois',null,'gold')}
       </div>
       <div class="np-card other">
         <div class="np-badge other">Usufruitier</div>
