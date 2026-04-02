@@ -237,9 +237,11 @@ table.ct tbody td.cp{background:rgba(91,33,182,.03);border-left:2px solid rgba(9
   </div>
 </div>
 <script>
-function checkGate(){
+async function checkGate(){
   var code=(document.getElementById('gateCode').value||'').trim().toLowerCase();
-  if(code==='skool2026'){
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code));
+  var hash=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+  if(hash==='67f8e78f8a58e1ae3c5906f48949e92a40deb611c2c0fc818e8e2b3754f77058'){
     document.getElementById('gateOverlay').style.display='none';
     try{sessionStorage.setItem('cgpskool_gate','ok');}catch(e){}
   } else {

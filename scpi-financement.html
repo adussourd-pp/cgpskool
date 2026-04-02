@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
 <script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-scpi-data.js"></script>
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -331,16 +332,8 @@ const BANKS={
     note:'Financement 90% (apport 10% + honoraires). Montant max = 30× revenus. Pas de prise en compte des revenus SCPI.'}
 };
 
-const SCPI=[
-  {id:'activimmo',n:'Activimmo',r:5.52,p:610},{id:'comete',n:'Comète',r:11.18,p:250},
-  {id:'altaconv',n:'Alta Convictions',r:6.50,p:308},{id:'epe',n:'Epargne Pierre Europe',r:6.75,p:200},
-  {id:'ep',n:'Epargne Pierre',r:5.28,p:208},{id:'atream',n:'Atream Hôtels',r:6.50,p:1000},
-  {id:'te',n:'Transitions Europe',r:8.25,p:202},{id:'corigin',n:'Corum Origin',r:7.30,p:1135},
-  {id:'ceurion',n:'Corum Eurion',r:6.50,p:215},{id:'lfsante',n:'LF Avenir Santé',r:9.33,p:300},
-  {id:'osmo',n:'Osmo Energie',r:9.33,p:300},{id:'ncap',n:'NCAP Régions',r:6.01,p:682},
-  {id:'perial',n:'Perial Opportunités Europe',r:5.50,p:44},{id:'immorente',n:'Immorente',r:5.72,p:340},
-  {id:'sofidy',n:'Sofidy Europe Invest',r:6.50,p:235},{id:'eurovalys',n:'Eurovalys',r:5.50,p:960},
-];
+// SCPI chargee depuis cgp-skool-scpi-data.js, adaptateur {n,r,p} pour compat
+const SCPI=CGP.SCPI_DATA.map(function(s){return{id:s.id,n:s.name,r:+(s.yieldGross*100).toFixed(2),p:s.price}});
 
 let bank='sofiap', sc=0, cBar=null, cPie=null, invMode='solo';
 
