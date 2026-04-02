@@ -27,11 +27,17 @@ select.fi{cursor:pointer}
 .sl-val{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ambre-d);text-align:center;margin-bottom:2px}
 .sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
 .hint{font-size:10px;color:var(--green);margin-top:2px}
-.scpi-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;background:var(--gris-l);border-radius:7px;padding:6px 7px}
-.scpi-num{font-size:10px;font-weight:700;color:var(--gris);width:12px;flex-shrink:0}
-.scpi-row select{flex:1;min-width:0;font-size:11px;border:none;background:transparent;outline:none;font-family:var(--sans);color:var(--noir)}
-.scpi-row input[type=number]{width:55px;flex:0 0 55px;font-size:11px;border:1px solid var(--bord);border-radius:5px;padding:3px 5px;text-align:right;background:#fff}
-.scpi-del{background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:15px;flex-shrink:0;padding:0 1px;line-height:1}
+.scpi-row{margin-bottom:8px;background:#fff;border:1.5px solid var(--bord);border-radius:7px;padding:12px 14px;position:relative}
+.scpi-row-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.scpi-num{font-size:14px;font-weight:700;color:var(--gris);flex-shrink:0;width:18px}
+.scpi-row select{flex:1;min-width:0;font-size:13px;font-weight:500;border:none;background:transparent;outline:none;font-family:var(--sans);color:var(--noir);cursor:pointer;padding:0}
+.scpi-row-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.scpi-row-parts{display:flex;align-items:center;gap:4px}
+.scpi-row input[type=number]{width:60px;font-size:13px;font-weight:500;border:1.5px solid var(--bord);border-radius:7px;padding:6px 8px;text-align:right;background:#fff;font-family:var(--sans);color:var(--noir)}
+.scpi-row input[type=number]:focus{border-color:var(--orange)}
+.scpi-row-unit{font-size:10px;color:var(--gris)}
+.scpi-row-total{font-size:14px;font-weight:700;color:var(--ambre-d);text-align:right}
+.scpi-del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:14px;padding:2px;line-height:1;transition:color 0.15s}
 .scpi-del:hover{color:var(--red)}
 .scpi-add{font-size:11px;color:var(--ambre-d);background:transparent;border:1.5px dashed var(--ambre-m);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:var(--sans);transition:all 0.2s;width:100%;margin-top:2px}
 .scpi-add:hover{background:var(--ambre-l);border-color:var(--ambre)}
@@ -478,31 +484,27 @@ function addSCPI(){
   if(b.maxLignes&&document.querySelectorAll('.scpi-row').length>=b.maxLignes){alert('Max '+b.maxLignes+' lignes pour '+b.name);return;}
   sc++;const id='s'+sc; const n=document.querySelectorAll('.scpi-row').length+1;
   const d=document.createElement('div');d.className='scpi-row';d.id=id;
-  d.innerHTML=`<span class="scpi-num">${n}</span>
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-      <select class="fi scpi-sel" style="font-size:11px;padding:4px 5px;border:none;background:transparent;width:100%" onchange="updateScpiMontant('${id}')">
-        ${SCPI.map(s=>`<option value="${s.id}" data-p="${s.p}" data-r="${s.r}">${s.n} — ${s.r.toFixed(2)}%</option>`).join('')}
-        <option value="custom" data-p="0" data-r="0">✏️ Taux personnalisé</option>
+  d.innerHTML=`<button class="scpi-del" onclick="document.getElementById('${id}').remove();updateScpiTotal()">&times;</button>
+    <div class="scpi-row-top">
+      <span class="scpi-num">${n}</span>
+      <select class="fi scpi-sel" style="font-size:13px;padding:0;border:none;background:transparent;width:100%;font-weight:500" onchange="updateScpiMontant('${id}')">
+        ${SCPI.map(s=>`<option value="${s.id}" data-p="${s.p}" data-r="${s.r}">${s.n} \u2014 ${s.r.toFixed(2)}%</option>`).join('')}
+        <option value="custom" data-p="0" data-r="0">\u270f\ufe0f Taux personnalis\u00e9</option>
       </select>
-      <div id="custom_${id}" style="display:none;gap:4px;margin-top:2px">
-        <div class="fi-row" style="height:26px">
-          <input type="number" class="scpi-custom-prix" placeholder="Prix/part" style="width:60px;font-size:11px" oninput="updateScpiMontant('${id}')">
-          <span class="fi-unit" style="font-size:9px">€/pt</span>
-        </div>
-        <div class="fi-row" style="height:26px;margin-top:2px">
-          <input type="number" class="scpi-custom-rdt" placeholder="Rdt %" value="6" style="width:50px;font-size:11px">
-          <span class="fi-unit" style="font-size:9px">%</span>
-        </div>
+    </div>
+    <div id="custom_${id}" style="display:none;gap:6px;margin-bottom:8px">
+      <div style="display:flex;gap:6px">
+        <div style="flex:1"><input type="number" class="scpi-custom-prix" placeholder="Prix/part" style="font-size:12px;padding:6px 8px;border:1.5px solid var(--bord);border-radius:7px;width:100%" oninput="updateScpiMontant('${id}')"></div>
+        <div style="flex:1"><input type="number" class="scpi-custom-rdt" placeholder="Rdt %" value="6" style="font-size:12px;padding:6px 8px;border:1.5px solid var(--bord);border-radius:7px;width:100%"></div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
-      <div class="fi-row" style="width:72px;height:28px">
-        <input type="number" class="sp" value="100" min="1" step="1" style="width:45px;font-size:11px;text-align:right" oninput="updateScpiMontant('${id}')">
-        <span class="fi-unit" style="font-size:9px">pts</span>
+    <div class="scpi-row-bottom">
+      <div class="scpi-row-parts">
+        <input type="number" class="sp" value="100" min="1" step="1" oninput="updateScpiMontant('${id}')">
+        <span class="scpi-row-unit">pts</span>
       </div>
-      <span class="scpi-montant" id="mont_${id}" style="font-size:10px;font-weight:700;color:var(--ambre-d);white-space:nowrap">—</span>
-    </div>
-    <button class="scpi-del" onclick="document.getElementById('${id}').remove();updateScpiTotal()">×</button>`;
+      <span class="scpi-row-total" id="mont_${id}">\u2014</span>
+    </div>`;
   document.getElementById('scpiList').appendChild(d);
   updateScpiMontant(id);
   setTimeout(updateBankReco, 50);
