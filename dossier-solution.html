@@ -149,7 +149,6 @@
       <label class="cb-row"><input type="checkbox" id="cbContrat" checked onchange="toggleBloc()"> Le contrat</label>
       <label class="cb-row"><input type="checkbox" id="cbGestion" checked onchange="toggleBloc()"> Mode de gestion</label>
       <label class="cb-row"><input type="checkbox" id="cbFrais" checked onchange="toggleBloc()"> Frais</label>
-      <label class="cb-row"><input type="checkbox" id="cbEtapes" checked onchange="toggleBloc()"> Prochaines &#233;tapes</label>
       <label class="cb-row"><input type="checkbox" id="cbSchema" checked onchange="toggleBloc()"> Sch&#233;ma p&#233;dagogique</label>
       <label class="cb-row"><input type="checkbox" id="cbWorkflow" checked onchange="toggleBloc()"> Workflow souscription</label>
       <label class="cb-row"><input type="checkbox" id="cbAnnexes" checked onchange="toggleBloc()"> Annexes projections</label>
@@ -240,18 +239,6 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
       </div>
 
       <!-- PROCHAINES ETAPES -->
-      <div class="bloc" id="blocEtapes">
-        <div class="bloc-tag">Prochaines &#233;tapes</div>
-        <div class="bloc-title">La suite concr&#232;tement</div>
-        <div style="display:flex;flex-direction:column;gap:10px" id="etapesContent">
-          <div class="check-item"><div class="check-num">1</div><div><b>Envoi des documents</b><br>Pi&#232;ce d'identit&#233; valide, RIB au format PDF, justificatif de domicile (moins de 3 mois)</div></div>
-          <div class="check-item"><div class="check-num">2</div><div><b>Signature &#233;lectronique</b><br>Fiche Conseil + proposition de souscription par e-mail</div></div>
-          <div class="check-item"><div class="check-num">3</div><div><b>Confirmation</b><br>Confirmation d'ouverture du contrat par l'assureur</div></div>
-          <div class="check-item"><div class="check-num">4</div><div><b>Premier suivi &#224; 4 mois</b><br>Bilan performance, ajustement strat&#233;gie</div></div>
-          <div class="check-item"><div class="check-num">5</div><div><b>Rendez-vous annuel</b><br>Suivi global et &#233;volution de la strat&#233;gie patrimoniale</div></div>
-        </div>
-      </div>
-
       <!-- SCHEMA PEDAGOGIQUE -->
       <div class="bloc" id="blocSchema">
         <div class="bloc-tag">Compr&#233;hension</div>
@@ -449,13 +436,13 @@ function onTypeChange(){
   // Frais note
   var noteEl=V('fraisNote');
   if(noteEl)noteEl.textContent=t.fraisNote||'\u2192 Moyenne globale sur 10 ans : \u2248 1,48 %/an tous frais confondus';
-  // Etapes
+  // Workflow visuel
   if(t.etapes){
-    var etHtml='';
+    var wfHtml='';
     t.etapes.forEach(function(e,i){
-      etHtml+='<div class="check-item"><div class="check-num">'+(i+1)+'</div><div><b>'+e[0]+'</b><br>'+e[1]+'</div></div>';
+      wfHtml+='<div class="wf-step"><div class="wf-num">'+(i+1)+'</div><div class="wf-pill">'+e[0]+'</div><div class="wf-detail">'+e[1]+'</div></div>';
     });
-    V('etapesContent').innerHTML=etHtml;
+    V('wfSteps').innerHTML=wfHtml;
   }
   // Schema pedagogique selon le type
   var pyrEl=V('schemaPyramide');
@@ -469,7 +456,7 @@ function onTypeChange(){
 }
 
 function toggleBloc(){
-  var map={cbGarde:'blocGarde',cbAccompagnement:'blocAccompagnement',cbContrat:'blocContrat',cbGestion:'blocGestion',cbFrais:'blocFrais',cbEtapes:'blocEtapes',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
+  var map={cbGarde:'blocGarde',cbAccompagnement:'blocAccompagnement',cbContrat:'blocContrat',cbGestion:'blocGestion',cbFrais:'blocFrais',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
   Object.keys(map).forEach(function(cbId){
     var el=V(map[cbId]);
     if(el)el.style.display=V(cbId).checked?'':'none';
@@ -509,7 +496,7 @@ function saveDossier(){
     }),
     checkboxes:{}
   };
-  ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbEtapes','cbAnnexes'].forEach(function(id){
+  ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
     state.checkboxes[id]=V(id).checked;
   });
   var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
