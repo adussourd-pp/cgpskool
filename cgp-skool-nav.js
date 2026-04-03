@@ -59,43 +59,8 @@
   };
 
   /* ── INJECTION BOUTONS SIDEBAR ────────────────── */
+  /* D\u00e9sactiv\u00e9 : chaque module g\u00e8re son propre bouton (standard CLAUDE.md) */
   function injectSidebarButtons() {
-    var sidebar = document.querySelector('.cs-sidebar') || document.querySelector('.sidebar');
-    if (!sidebar) return false;
-    // Ne pas injecter si la sidebar a deja des boutons d'action (mais retourner true = pas de fallback)
-    if (sidebar.querySelector('.btn-success,.sidebar-btn,.cs-sidebar-btn,.sim-btn,.btn-sim,.btn-calc')) return true;
-
-    var div = document.createElement('div');
-    div.className = 'cs-sidebar-actions';
-
-    var btnPdf = document.createElement('button');
-    btnPdf.className = 'cs-sidebar-btn cs-sidebar-btn-primary';
-    btnPdf.textContent = '\u2B07 Exporter PDF';
-    btnPdf.onclick = function() { typeof exportPDF === 'function' ? exportPDF() : CGP.pdf.print(); };
-
-    var btnSave = document.createElement('button');
-    btnSave.className = 'cs-sidebar-btn';
-    btnSave.textContent = '\uD83D\uDCBE Sauvegarder';
-    btnSave.onclick = function() { typeof sauvegarderEtude === 'function' ? sauvegarderEtude() : CGP.project.exportAll(); };
-
-    var lblLoad = document.createElement('label');
-    lblLoad.className = 'cs-sidebar-btn';
-    lblLoad.style.cursor = 'pointer';
-    lblLoad.textContent = '\uD83D\uDCC2 Charger';
-    var inputLoad = document.createElement('input');
-    inputLoad.type = 'file';
-    inputLoad.accept = '.json';
-    inputLoad.style.cssText = 'position:absolute;opacity:0;width:0;height:0';
-    inputLoad.onchange = function() {
-      typeof chargerEtude === 'function' ? chargerEtude(this) : CGP.project.importAll(this.files[0]);
-      this.value = '';
-    };
-    lblLoad.appendChild(inputLoad);
-
-    div.appendChild(btnPdf);
-    div.appendChild(btnSave);
-    div.appendChild(lblLoad);
-    sidebar.appendChild(div);
     return true;
   }
 
