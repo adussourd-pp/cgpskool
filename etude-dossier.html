@@ -402,9 +402,9 @@ select.span2{grid-column:span 2}
   /* ── PIED DE PAGE : masquer les .page-number inline ── */
   .page-number{display:none!important}
   .page-nav-btns{display:none!important}
-  /* ── GRAPHIQUES : canvas masque, image PNG visible ── */
-  canvas{display:none!important;max-width:100%!important}
-  .cgp-chart-print-img{display:block!important;max-width:100%!important;height:auto!important}
+  /* ── GRAPHIQUES : canvas masque, image PNG statique visible ── */
+  canvas{display:none!important}
+  #retChartPrint{display:block!important;width:100%!important;height:auto!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .synthese-step{break-inside:avoid}
   .synthese-step::after{background:#fff!important}
   /* ── ANCIENNES PAGES PDF : masquer ── */
@@ -1078,6 +1078,7 @@ select.span2{grid-column:span 2}
     </div>
     <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
     <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
+    <img id="retChartPrint" style="display:none;width:100%;height:auto" src="" alt="">
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
     <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
       <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
@@ -4446,12 +4447,16 @@ function rRetraite(){
   if(!ctx)return;
   if(window.retChartInst)window.retChartInst.destroy();
   window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:55}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}},plugins:[clientTagPlugin]});
-  // Capturer un snapshot PNG du chart pour l'export PDF (le canvas sera vide si off-screen)
+  // Mettre a jour l'image statique pour l'impression PDF
+  // (le canvas sera vide en print car display:none, cette img le remplace)
   setTimeout(function(){
     try{
       if(window.retChartInst){
         var snap=window.retChartInst.toBase64Image();
-        if(snap&&snap.length>100){window._retChartSnapshot=snap;console.warn('[CHART] Snapshot retraite capture, '+snap.length+' chars');}
+        if(snap&&snap.length>100){
+          var pImg=document.getElementById('retChartPrint');
+          if(pImg){pImg.src=snap;console.warn('[CHART] Image print mise a jour, '+snap.length+' chars');}
+        }
       }
     }catch(e){console.warn('[CHART] snapshot echec:',e);}
   },600);
@@ -8345,41 +8350,14 @@ function exportPDF() {
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
 
-  // 5. Inserer le snapshot du chart retraite comme image PNG
-  var _pdfChartImgs = [];
-  var _pdfHiddenElements = [];
-  var retC = document.getElementById('retChart');
-  // Source 1 : snapshot pre-capture (pris quand le chart etait visible a l'ecran)
-  var snapUrl = window._retChartSnapshot || null;
-  // Source 2 : capture live si le canvas est actuellement visible
-  if ((!snapUrl || snapUrl.length < 100) && window.retChartInst && retC && retC.width > 0) {
-    try { snapUrl = window.retChartInst.toBase64Image(); } catch(e3) {}
-  }
-  if ((!snapUrl || snapUrl.length < 100) && retC && retC.width > 0) {
-    try { snapUrl = retC.toDataURL('image/png'); } catch(e3b) {}
-  }
-  console.warn('[PDF] Snapshot retraite:', snapUrl ? snapUrl.length + ' chars' : 'AUCUN');
-
-  if (snapUrl && snapUrl.length > 100 && retC) {
-    var img = document.createElement('img');
-    img.src = snapUrl;
-    img.style.cssText = 'width:100%;height:auto;display:block;max-width:100%';
-    img.className = 'cgp-chart-print-img';
-    // Masquer le container du canvas, inserer l'image a cote
-    var chartContainer = retC.parentNode;
-    chartContainer.style.display = 'none';
-    chartContainer.parentNode.insertBefore(img, chartContainer.nextSibling);
-    _pdfChartImgs.push(img);
-    _pdfHiddenElements.push(chartContainer);
-    console.warn('[PDF] Image chart inseree OK');
-  }
+  // 5. L'image #retChartPrint est deja a jour (mise a jour dans rRetraite)
+  //    Le CSS @media print masque le canvas et affiche l'image.
+  //    Aucune manipulation JS necessaire.
 
   // 6. Imprimer
   window.print();
 
   // 7. Nettoyer apres impression
-  _pdfChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
-  _pdfHiddenElements.forEach(function(el) { el.style.display = ''; });
   document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
   if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
 }
@@ -8461,34 +8439,10 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : mettre a jour l'en-tete et inserer le snapshot chart
-var _ctrlPChartImgs = [];
-var _ctrlPHiddenElements = [];
+// Ctrl+P : mettre a jour l'en-tete
+// Le chart retraite est gere par l'image statique #retChartPrint + CSS print
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
-  if (_ctrlPChartImgs.length > 0) return;
-  var retC = document.getElementById('retChart');
-  var snap = window._retChartSnapshot || null;
-  if ((!snap || snap.length < 100) && window.retChartInst && retC && retC.width > 0) {
-    try { snap = window.retChartInst.toBase64Image(); } catch(e) {}
-  }
-  if (snap && snap.length > 100 && retC) {
-    var img = document.createElement('img');
-    img.src = snap;
-    img.style.cssText = 'width:100%;height:auto;display:block;max-width:100%';
-    img.className = 'cgp-chart-print-img';
-    var container = retC.parentNode;
-    container.style.display = 'none';
-    container.parentNode.insertBefore(img, container.nextSibling);
-    _ctrlPChartImgs.push(img);
-    _ctrlPHiddenElements.push(container);
-  }
-});
-window.addEventListener('afterprint', function() {
-  _ctrlPChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
-  _ctrlPChartImgs = [];
-  _ctrlPHiddenElements.forEach(function(el) { el.style.display = ''; });
-  _ctrlPHiddenElements = [];
 });
 
 </script>
