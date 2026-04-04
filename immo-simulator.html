@@ -165,8 +165,15 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 
   <div class="cs-sidebar">
 
-    <div class="ps" style="margin-bottom:16px">
-      <div class="tog-row">
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open">
+      <div class="pr"><div class="pl">Nom du client</div>
+        <div class="iu"><input type="text" id="immoClient" placeholder="Nom Pr&#233;nom"><div class="iu-u">&#128100;</div></div></div>
+    </div>
+
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type d'investissement</div>
+    <div class="sb-body open">
+      <div class="tog-row" style="margin-bottom:6px">
         <button class="tog mode-tab active" onclick="setMode('mono',this)">Sans exploit.</button>
         <button class="tog mode-tab" onclick="setMode('coloc',this)">Colocation</button>
         <button class="tog mode-tab" onclick="setMode('resid',this)">Resid. Serv.</button>
@@ -265,14 +272,6 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="iu"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
-    <div class="sb-body open">
-      <div class="pr"><div class="pl">Durée amortissement immobilier</div>
-        <div class="iu"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
-      <div class="pr"><div class="pl">Durée amortissement mobilier</div>
-        <div class="iu"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
-    </div>
-
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Financement</div>
     <div class="sb-body open">
       <div class="pr"><div class="pl">Apport personnel</div>
@@ -299,16 +298,29 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
+    <div class="cs-sidebar-lbl" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
+    <div class="sb-body">
+      <div class="pr"><div class="pl">Dur&#233;e amortissement immobilier</div>
+        <div class="iu"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
+      <div class="pr"><div class="pl">Dur&#233;e amortissement mobilier</div>
+        <div class="iu"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
+    </div>
+
     <button class="btn-sim" onclick="recalc()">Calculer la projection</button>
   </div>
 
   <div class="cs-main">
   <div class="cs-page">
 
-    <div style="margin-bottom:24px">
-      <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">SIMULATEUR PATRIMONIAL</div>
-      <div style="font-family:var(--sans);font-size:24px;font-weight:700;color:var(--noir)">Simulateur Immobilier LMNP</div>
-      <p style="font-size:13px;color:var(--gris);margin-top:3px;font-weight:300;max-width:500px;line-height:1.7">Participation, patrimoine créé et défiscalisation — 3 modèles LMNP avec amortissement complet.</p>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">PROJECTION IMMOBILI&#200;RE LMNP</div>
+        <div id="immoConseillerLine" style="font-size:11px;color:var(--gris);margin-top:4px"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:700;color:var(--noir)" id="immoClientLine">Client</div>
+        <div style="font-size:12px;color:var(--gris);margin-top:2px" id="immoDateLine"></div>
+      </div>
     </div>
 
 
@@ -472,7 +484,14 @@ function colorClass(c) {
 }
 
 function recalc() {
-  // ── Collecter les paramètres selon le mode ──
+  // Header client/conseiller
+  var _pr=CGP.profil.load();
+  var _cn=((_pr.prenom||'')+' '+(_pr.nom||'')).trim();
+  var _cl=(document.getElementById('immoClient')||{}).value||'Client';
+  document.getElementById('immoClientLine').textContent=_cl;
+  document.getElementById('immoConseillerLine').textContent=_cn?CGP.esc(_cn)+(_pr.cabinet?' \u2014 '+CGP.esc(_pr.cabinet):''):'';
+  document.getElementById('immoDateLine').textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  // ── Collecter les param\u00e8tres selon le mode ──
   var p = {};
   p.dureePret = Math.max(1, Math.round(gv('dureePret',25)));
   p.tauxN     = gv('tauxN',1.6) / 100;
