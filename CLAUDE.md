@@ -207,6 +207,67 @@ L'export se fait via Ctrl+P (`CGP.pdf.print()` déclenché automatiquement par `
 
 Specs bouton : `width:100%; padding:10px; font-size:13px; font-weight:500; font-family:var(--sans); border:none; cursor:pointer`
 
+### Sidebar — Classes HTML standard (référence : scpi-financement.html)
+
+```html
+<!-- Label + Input -->
+<div class="fg"><label>Nom du champ</label>
+  <div class="fi-row"><input type="number" id="xxx" value="0"><span class="fi-unit">€</span></div>
+</div>
+
+<!-- Label + Select -->
+<div class="fg"><label>Choix</label>
+  <select class="fi" id="xxx"><option>...</option></select>
+</div>
+
+<!-- Label + Input simple (sans unité) -->
+<div class="fg"><label>Texte</label>
+  <input class="fi" type="text" id="xxx" placeholder="...">
+</div>
+
+<!-- Grille 2 colonnes -->
+<div class="grid2">
+  <div class="fg">...</div>
+  <div class="fg">...</div>
+</div>
+```
+
+**Classes CSS sidebar :**
+- `.fg` : conteneur label + input (flex column, gap 4px, margin-bottom 12px)
+- `.fg label` : 9px, weight 600, uppercase, letter-spacing 0.06em, color var(--gris)
+- `.fi` : input/select standard (border 1.5px solid var(--bord), border-radius 7px, padding 8px 10px, font-size 13px)
+- `.fi-row` : conteneur input + unité (flex, border, border-radius 7px)
+- `.fi-unit` : unité à droite (padding 7px 9px, font-size 11px, color var(--gris), border-left)
+- `.grid2` : grille 2 colonnes (gap 6px)
+
+**NE PAS utiliser** les anciennes classes `.pr`, `.pl`, `.iu`, `.iu-u` — elles sont dépréciées.
+
+### Page A4 — Résultats (référence : scpi-financement.html)
+
+**Ordre des blocs résultats :**
+1. Header client/conseiller + date
+2. Bloc emprunteur/capacité (noms, revenus, charges, endettement avant/après)
+3. Détail investissement + Conditions de financement (côte à côte)
+4. Équation (mensualité − revenus = effort/gain, toujours en valeur positive)
+5. Bilans côte à côte (Pendant / Au terme)
+6. Graphique (doughnut ou chart)
+7. Tableau annuel détaillé
+
+**Classes CSS résultats :**
+- `.card` : bloc blanc avec bordure (border 1.5px solid var(--bord), border-radius 11px, padding 14px)
+- `.card-title` : titre avec point orange (font-weight 700, font-size 14px)
+- `.bl-row` : ligne label/valeur (flex, justify-content space-between, padding 6px 0, border-bottom)
+- `.bl-k` : label gauche (font-size 12px, color var(--gris))
+- `.bl-v` : valeur droite (font-size 13px, font-weight 600)
+- `.bl-v.gold` : couleur orange
+- `.bl-v.green` : couleur verte
+- `.bl-v.red` : couleur rouge
+- `.bilan-2` : conteneur 2 bilans côte à côte (display grid, 1fr 1fr)
+- `.bl-title` : titre de bilan (font-weight 700, uppercase, border-bottom)
+- `.eq` : conteneur équation (display flex, gap, align-items center)
+- `.eq-b` : bulle équation (background, padding, border-radius)
+- `.eq-op` : opérateur (font-size 20px, color var(--gris))
+
 ### Page A4 — Header
 
 ```
