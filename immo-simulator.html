@@ -287,88 +287,13 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       <div class="empty-sub">Renseignez les paramètres et lancez la simulation.</div>
     </div>
 
-    <div id="results" style="display:none">
+    <div id="results" style="display:none"></div>
 
-      <!-- Header résultat -->
-      <div class="result-header" id="resultHeader"></div>
-
-      <!-- Pendant le prêt -->
-      <div class="section-label"><span></span>Pendant la durée du prêt</div>
-
-      <!-- Équation participation -->
-      <div class="equa-block" id="equaBlock"></div>
-
-      <div class="cards-3" id="cards1"></div>
-
-      <!-- À l'issue du financement -->
-      <div class="section-label"><span></span>À l'issue du financement</div>
-      <div class="cards-3" id="cards2"></div>
-
-      <!-- Bilan final -->
-      <div class="bilan-block" id="bilanBlock"></div>
-
-      <!-- Camembert -->
-      <div class="chart-block">
-        <div class="chart-title">Répartition du financement — participation vs loyers nets</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center">
-          <div style="position:relative;height:220px"><canvas id="mainChart"></canvas></div>
-          <div id="pieLegende" style="font-size:12px"></div>
-        </div>
-      </div>
-
-      <!-- Détail -->
-      <div class="detail-grid">
-        <div class="detail-block">
-          <div class="detail-block-title">Investissement & financement</div>
-          <div id="dInvest"></div>
-        </div>
-        <div class="detail-block">
-          <div class="detail-block-title">Charges annuelles détaillées</div>
-          <div id="dCharges"></div>
-        </div>
-        <div class="detail-block">
-          <div class="detail-block-title">Amortissement LMNP</div>
-          <div id="dAmort"></div>
-        </div>
-        <div class="detail-block">
-          <div class="detail-block-title">Rendements</div>
-          <div id="dRend"></div>
-        </div>
-      </div>
-
-      <!-- Tableau annuel -->
-      <div class="tbl-block">
-        <div class="tbl-header">Tableau de bord annuel</div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead>
-              <tr>
-                <th style="text-align:center">An</th>
-                <th>CRD début</th>
-                <th>Loyer brut</th>
-                <th>Loyer net</th>
-                <th>Mensualité</th>
-                <th>Participation</th>
-                <th>Part. cumulée</th>
-                <th>Amort. généré</th>
-                <th>Réserve amort.</th>
-                <th>Valeur immo</th>
-                <th>Patrimoine net</th>
-              </tr>
-            </thead>
-            <tbody id="tblBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="sim-note" id="simNote"></div>
-    </div>
+    <div id="conseillerFooter"></div>
 
   </div>
   </div>
 </div>
-
-<div id="conseillerFooter"></div>
 
 
 <script>
@@ -614,158 +539,112 @@ function recalc() {
   var loyerNetsCumules = last.partCumul > 0 ? loyerNetCumul : 0;
 
   // ── Affichage ──
-  hide('emptyPanel'); show('results');
+  document.getElementById('emptyPanel').style.display='none';
+  document.getElementById('results').style.display='block';
+  var pos = partM <= 0;
+  var partAbs = Math.abs(partM);
+  var h = '';
 
-  // Header
-  setHTML('resultHeader', `
-    <div class="rh-block">
-      <div class="rh-label">Participation mensuelle</div>
-      <div class="rh-val ${partM>0?'orange':'green'}">${(partM>0?'':'+') + fmtE(-partM)}</div>
-      <div class="rh-sub">${partM>0?'Effort mensuel de votre poche':'Excédent mensuel'}</div>
-    </div>
-    <div class="rh-block">
-      <div class="rh-label">Patrimoine créé à l'issue</div>
-      <div class="rh-val ${patrimoineNet>0?'green':'red'}">${fmtE(patrimoineNet)}</div>
-      <div class="rh-sub">Valeur immo + réserve − capital restant dû</div>
-    </div>
-    <div class="rh-block">
-      <div class="rh-label">Rente mensuelle nette</div>
-      <div class="rh-val green">${fmtE(p.loyerNetM)}</div>
-      <div class="rh-sub">Défiscalisée pendant ${anneesDefisc} ans après le prêt</div>
-    </div>`);
-
-  // Équation participation
-  setHTML('equaBlock', `
-    <div class="equa-item">
-      <div class="equa-val" style="color:var(--ink-60)">${fmtE(mensTotal_init)}</div>
-      <div class="equa-lbl">Mensualité ADI</div>
-    </div>
-    <div class="equa-op">−</div>
-    <div class="equa-item">
-      <div class="equa-val" style="color:#1a7a4a">${fmtE(p.loyerNetM)}</div>
-      <div class="equa-lbl">Loyer net / mois</div>
-    </div>
-    <div class="equa-op">=</div>
-    <div class="equa-item">
-      <div class="equa-val" style="color:${partM>0?'var(--orange)':'#1a7a4a'}">${(partM>0?'+':'') + fmtE(partM)}</div>
-      <div class="equa-lbl">Participation / mois</div>
-    </div>`);
-
-  // Cards 1
-  setHTML('cards1', [
-    card('Budget total', fmtE(p.budgetTotal), 'Acquisition + frais', 'var(--rule-l)'),
-    card('Montant emprunté', fmtE(p.montantEmprunte), 'Apport : '+fmtE(p.apport), 'var(--orange)'),
-    card('Participation cumulée', fmtE(last.partCumul), 'Sur '+p.dureePret+' ans', 'var(--orange)', true),
-  ].join(''));
-
-  // Cards 2 — à l'issue
-  setHTML('cards2', [
-    card('Valeur immobilière', fmtE(valeurImmoFinale), 'Revalorisation : '+fmtPct(gv('revaloV',0))+'%/an', '#1a7a4a'),
-    card('Réserve amortissement', fmtE(reserveFinale), 'Capital non imposé accumulé', 'var(--orange)'),
-    card('Patrimoine net créé', fmtE(patrimoineNet), 'Valeur immo + réserve − CRD', patrimoineNet>0?'#1a7a4a':'#c0392b', true),
-  ].join(''));
-
-  // Bilan final
-  setHTML('bilanBlock', `
-    <div class="bilan-title">Au final — votre retraite aura été financée par :</div>
-    <div class="bilan-row"><span class="lbl">Loyers nets perçus pendant le prêt</span><span class="val g">${fmtE(loyerNetCumul)}</span></div>
-    <div class="bilan-row"><span class="lbl">Votre participation personnelle</span><span class="val o">${fmtE(last.partCumul)}</span></div>
-    <div class="bilan-row"><span class="lbl">Rente mensuelle nette après le prêt</span><span class="val g">${fmtE(p.loyerNetM)} / mois</span></div>
-    <div class="bilan-row"><span class="lbl">Revenus défiscalisés pendant</span><span class="val">${anneesDefisc} ans</span></div>
-    <div class="bilan-row total"><span class="lbl">Patrimoine net créé</span><span class="val ${patrimoineNet>0?'g':'o'}">${fmtE(patrimoineNet)}</span></div>`);
-
-  // Détail investissement
+  // 1. Investissement + Conditions de financement (cote a cote)
   var iRows = [];
-  if(mode==='mono') iRows = [['Prix du bien TTC', fmtE(p.prixTotal),''], ['Frais de notaire', fmtE(p.fraisNotaire),''], ['Mobilier', fmtE(p.prixMobilier),'']];
-  else if(mode==='coloc') iRows = [['Prix FAI', fmtE(gv('prixFAI')),''], ['Travaux', fmtE(gv('travaux')),''], ['Mobilier', fmtE(gv('mobilierC')),''], ['Notaire', fmtE(gv('fraisNotaireC')),'']];
-  else iRows = [['Prix TTC', fmtE(gv('prixTotalR')),''], ['TVA récupérée', '− '+fmtE(gv('tvaRec')),'g'], ['Notaire', fmtE(gv('fraisNotaireR')),'']];
-  iRows.push(['Frais bancaires', fmtE(p.fDoss+p.fHypo),'']);
-  iRows.push(['Apport', '− '+fmtE(p.apport),'g']);
-  setHTML('dInvest', iRows.map(r=>dRow(r[0],r[1],r[2])).join('') + dTot('Emprunt net', fmtE(p.montantEmprunte), 'o'));
+  if(mode==='mono') iRows = [['Prix du bien TTC', fmtE(p.prixTotal)],['Frais de notaire', fmtE(p.fraisNotaire)],['Mobilier', fmtE(p.prixMobilier)]];
+  else if(mode==='coloc') iRows = [['Prix FAI', fmtE(gv('prixFAI'))],['Travaux', fmtE(gv('travaux'))],['Mobilier', fmtE(gv('mobilierC'))],['Notaire', fmtE(gv('fraisNotaireC'))]];
+  else iRows = [['Prix TTC', fmtE(gv('prixTotalR'))],['TVA r\u00e9cup\u00e9r\u00e9e', '\u2212 '+fmtE(gv('tvaRec'))],['Notaire', fmtE(gv('fraisNotaireR'))]];
 
-  // Détail charges
-  setHTML('dCharges', [
-    ['Copropriété', fmtE(p.cCopro),''],
-    ['Taxe foncière', fmtE(p.cTF),''],
-    ['Gestion ('+gv('cGest',8)+'%)', fmtE(gv('cGest',8)/100*p.loyerBrut),''],
-    ['Mise en location ('+gv('cMEL',5)+'%)', fmtE(gv('cMEL',5)/100*p.loyerBrut),''],
-    ['PNO', fmtE(p.cPNO),''],
-    ['Garanties ('+gv('cGar',4.5)+'%)', fmtE(gv('cGar',4.5)/100*p.loyerBrut),''],
-    ['Comptabilité + CGA', fmtE(p.cCompta),''],
-  ].concat(mode==='coloc'?[['CFE', fmtE(p.cCFE),'']]:chargesNR>0?[['Charges non récup.', fmtE(chargesNR),'']]:[] )
-   .map(r=>dRow(r[0],r[1],r[2])).join('') + dTot('Total / an', fmtE(p.chargesAn),'r'));
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
+  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Investissement</div>';
+  iRows.forEach(function(r){h+='<div class="bl-row"><span class="bl-k">'+r[0]+'</span><span class="bl-v">'+r[1]+'</span></div>';});
+  h+='<div class="bl-row"><span class="bl-k">Frais bancaires</span><span class="bl-v red">+'+fmtE(p.fDoss+p.fHypo)+'</span></div>';
+  h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Budget total</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.budgetTotal)+'</span></div>';
+  h+='</div>';
 
-  // Détail amortissement
-  setHTML('dAmort', [
-    ['Base amort. immobilier', fmtE(p.amortImmoAn * p.durAmI),''],
-    ['Amort. immo / an ('+p.durAmI+' ans)', fmtE(p.amortImmoAn),'o'],
-    ['Base amort. mobilier', fmtE(p.amortMobAn * p.durAmM),''],
-    ['Amort. mobilier / an ('+p.durAmM+' ans)', fmtE(p.amortMobAn),'o'],
-  ].map(r=>dRow(r[0],r[1],r[2])).join('') +
-  dTot('Total amort. / an', fmtE(p.amortImmoAn+p.amortMobAn),'o') +
-  dRow('Réserve à terme prêt', fmtE(reserveFinale),'g') +
-  dRow('Défiscalisé après prêt', anneesDefisc+' ans','g'));
+  // Conditions de financement
+  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Conditions de financement</div>';
+  h+='<div class="bl-row"><span class="bl-k">Dur\u00e9e</span><span class="bl-v" style="font-weight:700">'+p.dureePret+' ans</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Taux nominal</span><span class="bl-v" style="font-weight:700;color:var(--orange);font-size:14px">'+fmtPct(p.tauxN*100)+'%</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Diff\u00e9r\u00e9</span><span class="bl-v">'+p.differe+' mois</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">ADI</span><span class="bl-v">'+fmtPct(gv('adi1',0.15))+'% / '+fmtPct(gv('adi2',0.15))+'%</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Apport</span><span class="bl-v" style="font-weight:700">'+fmtE(p.apport)+'</span></div>';
+  h+='<div style="border-top:1px solid var(--bord);padding-top:8px;margin-top:8px">';
+  h+='<div class="bl-row" style="border-bottom:none"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.montantEmprunte)+'</span></div>';
+  h+='</div></div></div>';
 
-  // Rendements
-  var rendBrut = p.loyerBrut / p.budgetTotal * 100;
-  var rendNet  = p.loyerNetAn / p.budgetTotal * 100;
-  var tauxEnd  = p.montantEmprunte / p.budgetTotal * 100;
-  setHTML('dRend', [
-    ['Rendement brut', fmtPct(rendBrut),''],
-    ['Rendement net charges', fmtPct(rendNet),'g'],
-    ['Taux d\'endettement', fmtPct(tauxEnd),''],
-    ['Durée défiscalisation tot.', (p.dureePret+anneesDefisc)+' ans','o'],
-    ['Loyers cumulés / prêt', fmtE(loyerNetCumul),'g'],
-    ['Participation totale', fmtE(last.partCumul),'o'],
-  ].map(r=>dRow(r[0],r[1],r[2])).join(''));
+  // 2. Equation
+  h+='<div class="eq">';
+  h+='<div class="eq-b"><div class="eq-lbl">Mensualit\u00e9 + ADI</div><div class="eq-val">'+fmtE(mensTotal_init)+'</div><div class="eq-sub">/mois</div></div>';
+  h+='<div class="eq-op">\u2212</div>';
+  h+='<div class="eq-b"><div class="eq-lbl">Loyer net</div><div class="eq-val" style="color:var(--green)">'+fmtE(p.loyerNetM)+'</div><div class="eq-sub">/mois</div></div>';
+  h+='<div class="eq-op">=</div>';
+  h+='<div class="eq-b '+(pos?'pos':'neg')+'"><div class="eq-lbl">'+(pos?'Gain mensuel':'Effort mensuel')+'</div><div class="eq-val" style="color:'+(pos?'var(--green)':'var(--red)')+'">'+fmtE(partAbs)+'</div><div class="eq-sub">'+(pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge')+'</div></div>';
+  h+='</div>';
 
-  // Camembert : participation cumulée vs loyers nets cumulés vs réserve amort
+  // 3. Bilans cote a cote
+  h+='<div class="bilan-2">';
+  h+='<div class="bl"><div class="bl-title">Pendant le financement</div>';
+  h+='<div class="bl-row"><span class="bl-k">Loyers nets cumul\u00e9s</span><span class="bl-v green">'+fmtE(loyerNetCumul)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Participation cumul\u00e9e</span><span class="bl-v '+(last.partCumul>0?'red':'green')+'">'+fmtE(Math.abs(last.partCumul))+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">D\u00e9fiscalis\u00e9 pendant</span><span class="bl-v">'+anneesDefisc+' ans</span></div>';
+  h+='</div>';
+  h+='<div class="bl hi"><div class="bl-title">Au terme</div>';
+  h+='<div class="bl-row"><span class="bl-k">Patrimoine constitu\u00e9</span><span class="bl-v gold">'+fmtE(valeurImmoFinale)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">R\u00e9serve amortissement</span><span class="bl-v">'+fmtE(reserveFinale)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Patrimoine net</span><span class="bl-v '+(patrimoineNet>0?'green':'red')+'" style="font-size:15px">'+fmtE(patrimoineNet)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Rente mensuelle nette</span><span class="bl-v green">'+fmtE(p.loyerNetM)+' /mois</span></div>';
+  h+='</div></div>';
+
+  // 4. Doughnut
+  h+='<div class="card"><div class="card-title"><span class="dot"></span>R\u00e9partition du financement</div><div style="max-width:320px;margin:0 auto;height:220px"><canvas id="mainChart"></canvas></div></div>';
+
+  // 5. Detail charges + amortissement + rendements (2x2)
+  var chargesRows = [['Copropri\u00e9t\u00e9', fmtE(p.cCopro)],['Taxe fonci\u00e8re', fmtE(p.cTF)],['Gestion', fmtE(gv('cGest',8)/100*p.loyerBrut)],['PNO', fmtE(p.cPNO)],['Comptabilit\u00e9', fmtE(p.cCompta)]];
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
+  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Charges annuelles</div>';
+  chargesRows.forEach(function(r){h+='<div class="bl-row"><span class="bl-k">'+r[0]+'</span><span class="bl-v">'+r[1]+'</span></div>';});
+  h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total / an</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
+  h+='</div>';
+
+  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Amortissement LMNP</div>';
+  h+='<div class="bl-row"><span class="bl-k">Amort. immo / an ('+p.durAmI+' ans)</span><span class="bl-v gold">'+fmtE(p.amortImmoAn)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Amort. mobilier / an ('+p.durAmM+' ans)</span><span class="bl-v gold">'+fmtE(p.amortMobAn)+'</span></div>';
+  h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total amort. / an</span><span class="bl-v gold">'+fmtE(p.amortImmoAn+p.amortMobAn)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">R\u00e9serve \u00e0 terme</span><span class="bl-v green">'+fmtE(reserveFinale)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'%</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'%</span></div>';
+  h+='</div></div>';
+
+  // 6. Tableau annuel
+  h+='<div class="card"><div class="card-title"><span class="dot"></span>Tableau de bord annuel</div>';
+  h+='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>An</th><th>Loyer brut</th><th>Loyer net</th><th>Mensualit\u00e9</th><th>Participation</th><th>Part. cumul.</th><th>R\u00e9serve amort.</th><th>Patrimoine net</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    h+='<tr><td>'+r.an+'</td><td>'+fmtE(r.loyerBrut)+'</td><td class="green">'+fmtE(r.loyerNet)+'</td><td>'+fmtE(r.mensTotal)+'</td>';
+    h+='<td class="'+(r.partAn>0?'red':'green')+'">'+fmtE(Math.abs(r.partAn))+'</td>';
+    h+='<td>'+fmtE(Math.abs(r.partCumul))+'</td>';
+    h+='<td>'+fmtE(r.reserve)+'</td>';
+    h+='<td class="'+(r.patrimoineNet>0?'green':'red')+'">'+fmtE(r.patrimoineNet)+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+
+  // Disclaimer
+  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP R\u00e9sidence de Services';
+  h+='<div style="font-size:10px;color:var(--gris);margin-top:8px;line-height:1.5">Simulation indicative \u2014 '+modeLabel+'. Taux '+fmtPct(p.tauxN*100)+'%, dur\u00e9e '+p.dureePret+' ans.</div>';
+
+  document.getElementById('results').innerHTML = h;
+
+  // Doughnut
   if(chartInst) chartInst.destroy();
-  var pieData = [Math.round(last.partCumul), Math.round(loyerNetCumul), Math.round(reserveFinale)];
-  var pieLabels = ['Votre participation', 'Loyers nets', 'Réserve amortissement'];
-  var pieColors = ['rgba(212,98,42,0.85)', 'rgba(26,122,74,0.8)', 'rgba(24,22,20,0.2)'];
+  var pieData = [Math.round(Math.abs(last.partCumul)), Math.round(loyerNetCumul)];
+  var pieLabels = ['Votre participation', 'Loyers nets'];
+  var pieColors = ['rgba(212,98,42,0.75)', 'rgba(45,122,91,0.75)'];
   chartInst = new Chart(document.getElementById('mainChart'), {
     type: 'doughnut',
-    data: {
-      labels: pieLabels,
-      datasets: [{ data: pieData, backgroundColor: pieColors, borderWidth: 0, hoverOffset: 6 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '60%',
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' '+ctx.label+' : '+fmt(ctx.parsed)+' €' } }
+    data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: pieColors, borderWidth: 0, hoverOffset: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, padding: 8 } },
+        tooltip: { callbacks: { label: function(ctx) { var t=pieData[0]+pieData[1]; return ctx.label+': '+fmt(ctx.parsed)+' \u20ac ('+Math.round(ctx.parsed/t*100)+'%)'; } } }
       }
     }
   });
-  // Légende custom
-  var total = pieData.reduce((a,b)=>a+b,0);
-  setHTML('pieLegende', pieLabels.map((lbl,i) => {
-    var pct = total > 0 ? (pieData[i]/total*100).toFixed(1) : 0;
-    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule-l)">'
-      +'<span style="width:12px;height:12px;border-radius:2px;background:'+pieColors[i]+';flex-shrink:0"></span>'
-      +'<span style="color:var(--ink-60);flex:1">'+lbl+'</span>'
-      +'<span style="font-weight:700;color:var(--ink)">'+fmtE(pieData[i])+'</span>'
-      +'<span style="color:var(--ink-30);font-size:10px;min-width:36px;text-align:right">'+pct+' %</span>'
-      +'</div>';
-  }).join(''));
 
-  // Tableau
-  var tbody = '';
-  rows.forEach(r => {
-    var hl = r.an===p.dureePret || r.an%5===0;
-    tbody += '<tr class="'+(hl?'hl':'')+'"><td>'+r.an+'</td><td>'+fmtE(r.crdDebut)+'</td><td>'+fmtE(r.loyerBrut)+'</td><td class="g">'+fmtE(r.loyerNet)+'</td><td>'+fmtE(r.mensTotal)+'</td>'
-      +'<td class="'+(r.partAn>0?'r':'g')+'">'+(r.partAn>0?'+':'')+fmtE(r.partAn)+'</td>'
-      +'<td class="o">'+fmtE(r.partCumul)+'</td>'
-      +'<td>'+fmtE(r.amortGenere)+'</td><td>'+fmtE(r.reserve)+'</td>'
-      +'<td>'+fmtE(r.valeurImmo)+'</td>'
-      +'<td class="'+(r.patrimoineNet>0?'g':'r')+'">'+fmtE(r.patrimoineNet)+'</td></tr>';
-  });
-  setHTML('tblBody', tbody);
-
-  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP Résidence de Services';
-  setHTML('simNote', 'Simulation à titre indicatif — non contractuelle. Mode : '+modeLabel+'. Taux : '+fmtPct(p.tauxN*100)+'%, durée '+p.dureePret+' ans, différé '+p.differe+' mois. Amortissement : immo '+p.durAmI+' ans, mobilier '+p.durAmM+' ans. Hypothèse simplificatrice : participation calculée sur la mensualité constante après différé. Aucune fiscalité supplémentaire due tant que la réserve d\'amortissement n\'est pas épuisée.');
   CGP.project.autoSave('immo-simulator');
 }
 
