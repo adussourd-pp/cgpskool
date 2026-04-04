@@ -20,22 +20,21 @@ body { background: #ECEAE6; }
 .ps { margin-bottom: 22px; }
 /* accordion CSS: see cgp-skool-layout.css */
 
-.pr { margin-bottom: 11px; }
-.pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; }
-.pl small { font-size: 9px; color: var(--ink-30); font-weight: 400; }
-
-.iu { display: flex; border: 1px solid var(--rule-l); background: #fff; transition: border-color 0.2s; }
-.iu:focus-within { border-color: var(--orange); }
-.iu input { flex: 1; padding: 8px 10px; border: none; background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink); outline: none; min-width: 0; }
-.iu-u { padding: 0 10px; display: flex; align-items: center; font-size: 11px; font-weight: 600; color: var(--ink-30); background: var(--paper); border-left: 1px solid var(--rule-l); flex-shrink: 0; white-space: nowrap; }
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fg label small{font-size:9px;color:var(--ink-30);font-weight:400}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--ambre)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
 
 .tog-row { display: flex; gap: 3px; }
 .tog { flex: 1; padding: 7px 3px; font-family: var(--sans); font-size: 11px; font-weight: 600; border: 1px solid var(--rule-l); background: #fff; color: var(--ink-60); cursor: pointer; transition: all 0.15s; text-align: center; }
 .tog:hover { border-color: var(--orange); color: var(--orange); }
 .tog.active { background: var(--orange); color: #fff; border-color: var(--orange); }
 
-.btn-sim { width: 100%; padding: 10px; background: var(--orange); color: #fff; font-family: var(--sans); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; border: none; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
-.btn-sim:hover { background: var(--orange-hover); }
+.btn-sim{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:10px}
+.btn-sim:hover{background:var(--orange-hover)}
 
 /* Résultats */
 
@@ -167,8 +166,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">Nom du client</div>
-        <div class="iu"><input type="text" id="immoClient" placeholder="Nom Pr&#233;nom"><div class="iu-u">&#128100;</div></div></div>
+      <div class="fg"><label>Nom du client</label>
+        <div class="fi-row"><input type="text" id="immoClient" placeholder="Nom Pr&#233;nom"><span class="fi-unit">&#128100;</span></div></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type d'investissement</div>
@@ -183,127 +182,127 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Bien immobilier</div>
     <div class="sb-body open">
       <div id="B-mono">
-        <div class="pr"><div class="pl">Prix de vente TTC (foncier + immo)</div>
-          <div class="iu"><input type="number" id="prixTotal" value="200000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">dont Foncier <small>(exclu de l'amort.)</small></div>
-          <div class="iu"><input type="number" id="partFoncier" value="30000" step="1000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Frais de notaire</div>
-          <div class="iu"><input type="number" id="fraisNotaire" value="5000" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Prix du mobilier TTC</div>
-          <div class="iu"><input type="number" id="prixMobilier" value="5400" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
+        <div class="fg"><label>Prix de vente TTC (foncier + immo)</label>
+          <div class="fi-row"><input type="number" id="prixTotal" value="200000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>dont Foncier <small>(exclu de l'amort.)</small></label>
+          <div class="fi-row"><input type="number" id="partFoncier" value="30000" step="1000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Frais de notaire</label>
+          <div class="fi-row"><input type="number" id="fraisNotaire" value="5000" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Prix du mobilier TTC</label>
+          <div class="fi-row"><input type="number" id="prixMobilier" value="5400" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
       </div>
 
       <div id="B-coloc" style="display:none">
-        <div class="pr"><div class="pl">Prix de vente FAI</div>
-          <div class="iu"><input type="number" id="prixFAI" value="175000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Frais de notaire</div>
-          <div class="iu"><input type="number" id="fraisNotaireC" value="14000" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Devis travaux</div>
-          <div class="iu"><input type="number" id="travaux" value="80000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Quote-part valeur ajoutée travaux</div>
-          <div class="iu"><input type="number" id="qaVA" value="60" step="5" oninput="recalc()"><div class="iu-u">%</div></div></div>
-        <div class="pr"><div class="pl">Frais mobilier</div>
-          <div class="iu"><input type="number" id="mobilierC" value="18500" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Frais d'ingénierie / montage</div>
-          <div class="iu"><input type="number" id="ingenierieC" value="0" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Nombre de chambres</div>
-          <div class="iu"><input type="number" id="nbChambres" value="4" min="1" max="20" step="1" oninput="recalc()"><div class="iu-u">ch.</div></div></div>
+        <div class="fg"><label>Prix de vente FAI</label>
+          <div class="fi-row"><input type="number" id="prixFAI" value="175000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Frais de notaire</label>
+          <div class="fi-row"><input type="number" id="fraisNotaireC" value="14000" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Devis travaux</label>
+          <div class="fi-row"><input type="number" id="travaux" value="80000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Quote-part valeur ajoutée travaux</label>
+          <div class="fi-row"><input type="number" id="qaVA" value="60" step="5" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+        <div class="fg"><label>Frais mobilier</label>
+          <div class="fi-row"><input type="number" id="mobilierC" value="18500" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Frais d'ingénierie / montage</label>
+          <div class="fi-row"><input type="number" id="ingenierieC" value="0" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Nombre de chambres</label>
+          <div class="fi-row"><input type="number" id="nbChambres" value="4" min="1" max="20" step="1" oninput="recalc()"><span class="fi-unit">ch.</span></div></div>
       </div>
 
       <div id="B-resid" style="display:none">
-        <div class="pr"><div class="pl">Prix de vente TTC total</div>
-          <div class="iu"><input type="number" id="prixTotalR" value="120000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Prix foncier HT</div>
-          <div class="iu"><input type="number" id="prixFoncierR" value="15000" step="1000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Prix immobilier HT</div>
-          <div class="iu"><input type="number" id="prixImmoHT" value="85000" step="1000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">Prix mobilier TTC</div>
-          <div class="iu"><input type="number" id="prixMobilierR" value="5400" step="500" oninput="recalc()"><div class="iu-u">€</div></div></div>
-        <div class="pr"><div class="pl">TVA récupérée</div>
-          <div class="iu" style="border-color:var(--orange)"><input type="number" id="tvaRec" value="20900" step="500" oninput="recalc()"><div class="iu-u" style="color:var(--orange)">€</div></div></div>
-        <div class="pr"><div class="pl">Frais d'acte (notaire)</div>
-          <div class="iu"><input type="number" id="fraisNotaireR" value="2760" step="100" oninput="recalc()"><div class="iu-u">€</div></div></div>
+        <div class="fg"><label>Prix de vente TTC total</label>
+          <div class="fi-row"><input type="number" id="prixTotalR" value="120000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Prix foncier HT</label>
+          <div class="fi-row"><input type="number" id="prixFoncierR" value="15000" step="1000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Prix immobilier HT</label>
+          <div class="fi-row"><input type="number" id="prixImmoHT" value="85000" step="1000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Prix mobilier TTC</label>
+          <div class="fi-row"><input type="number" id="prixMobilierR" value="5400" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>TVA récupérée</label>
+          <div class="fi-row" style="border-color:var(--orange)"><input type="number" id="tvaRec" value="20900" step="500" oninput="recalc()"><span class="fi-unit" style="color:var(--orange)">€</div></div></div>
+        <div class="fg"><label>Frais d'acte (notaire)</label>
+          <div class="fi-row"><input type="number" id="fraisNotaireR" value="2760" step="100" oninput="recalc()"><span class="fi-unit">€</span></div></div>
       </div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Revenus locatifs</div>
     <div class="sb-body open">
       <div id="R-mono">
-        <div class="pr"><div class="pl">Loyer mensuel (hors charges)</div>
-          <div class="iu"><input type="number" id="loyerM" value="700" step="50" oninput="recalc()"><div class="iu-u">€/mois</div></div></div>
-        <div class="pr"><div class="pl">Charges non récupérables <small>(% loyer)</small></div>
-          <div class="iu"><input type="number" id="tauxCNR" value="35" step="1" oninput="recalc()"><div class="iu-u">%</div></div></div>
+        <div class="fg"><label>Loyer mensuel (hors charges)</label>
+          <div class="fi-row"><input type="number" id="loyerM" value="700" step="50" oninput="recalc()"><span class="fi-unit">€/mois</span></div></div>
+        <div class="fg"><label>Charges non récupérables <small>(% loyer)</small></label>
+          <div class="fi-row"><input type="number" id="tauxCNR" value="35" step="1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
       </div>
       <div id="R-resid" style="display:none">
-        <div class="pr"><div class="pl">Loyer annuel HT (bail commercial)</div>
-          <div class="iu"><input type="number" id="loyerAHT" value="5000" step="500" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
-        <div class="pr"><div class="pl">Charges non récupérables <small>(% loyer)</small></div>
-          <div class="iu"><input type="number" id="tauxCNRR" value="18" step="1" oninput="recalc()"><div class="iu-u">%</div></div></div>
+        <div class="fg"><label>Loyer annuel HT (bail commercial)</label>
+          <div class="fi-row"><input type="number" id="loyerAHT" value="5000" step="500" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+        <div class="fg"><label>Charges non récupérables <small>(% loyer)</small></label>
+          <div class="fi-row"><input type="number" id="tauxCNRR" value="18" step="1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
       </div>
       <div id="R-coloc" style="display:none">
-        <div class="pr"><div class="pl">Loyer mensuel / chambre (hors charges)</div>
-          <div class="iu"><input type="number" id="loyerCh" value="500" step="25" oninput="recalc()"><div class="iu-u">€/mois</div></div></div>
-        <div class="pr"><div class="pl">Taux de remplissage</div>
-          <div class="iu"><input type="number" id="tauxRpl" value="95" step="1" min="50" max="100" oninput="recalc()"><div class="iu-u">%</div></div></div>
+        <div class="fg"><label>Loyer mensuel / chambre (hors charges)</label>
+          <div class="fi-row"><input type="number" id="loyerCh" value="500" step="25" oninput="recalc()"><span class="fi-unit">€/mois</span></div></div>
+        <div class="fg"><label>Taux de remplissage</label>
+          <div class="fi-row"><input type="number" id="tauxRpl" value="95" step="1" min="50" max="100" oninput="recalc()"><span class="fi-unit">%</span></div></div>
       </div>
-      <div class="pr"><div class="pl">Revalorisation annuelle des loyers</div>
-        <div class="iu"><input type="number" id="revaloL" value="0" step="0.5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
-      <div class="pr"><div class="pl">Revalorisation annuelle de la valeur immo</div>
-        <div class="iu"><input type="number" id="revaloV" value="0" step="0.5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
+      <div class="fg"><label>Revalorisation annuelle des loyers</label>
+        <div class="fi-row"><input type="number" id="revaloL" value="0" step="0.5" oninput="recalc()"><span class="fi-unit">%/an</span></div></div>
+      <div class="fg"><label>Revalorisation annuelle de la valeur immo</label>
+        <div class="fi-row"><input type="number" id="revaloV" value="0" step="0.5" oninput="recalc()"><span class="fi-unit">%/an</span></div></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Charges annuelles</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">Charges de copropriété (propriétaire)</div>
-        <div class="iu"><input type="number" id="cCopro" value="180" step="50" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
-      <div class="pr"><div class="pl">Taxe foncière</div>
-        <div class="iu"><input type="number" id="cTF" value="840" step="50" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
-      <div class="pr"><div class="pl">Frais de gestion locative <small>(% loyer)</small></div>
-        <div class="iu"><input type="number" id="cGest" value="8" step="0.5" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Frais de mise en location <small>(% loyer)</small></div>
-        <div class="iu"><input type="number" id="cMEL" value="5" step="0.5" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Assurance PNO</div>
-        <div class="iu"><input type="number" id="cPNO" value="150" step="25" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
-      <div class="pr"><div class="pl">Garanties locatives <small>(% loyer)</small></div>
-        <div class="iu"><input type="number" id="cGar" value="4.5" step="0.5" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Comptabilité + CGA</div>
-        <div class="iu"><input type="number" id="cCompta" value="140" step="10" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
-      <div class="pr" id="pr-cfe" style="display:none"><div class="pl">CFE (Cotisation Foncière)</div>
-        <div class="iu"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><div class="iu-u">€/an</div></div></div>
+      <div class="fg"><label>Charges de copropriété (propriétaire)</label>
+        <div class="fi-row"><input type="number" id="cCopro" value="180" step="50" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+      <div class="fg"><label>Taxe foncière</label>
+        <div class="fi-row"><input type="number" id="cTF" value="840" step="50" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+      <div class="fg"><label>Frais de gestion locative <small>(% loyer)</small></label>
+        <div class="fi-row"><input type="number" id="cGest" value="8" step="0.5" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Frais de mise en location <small>(% loyer)</small></label>
+        <div class="fi-row"><input type="number" id="cMEL" value="5" step="0.5" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Assurance PNO</label>
+        <div class="fi-row"><input type="number" id="cPNO" value="150" step="25" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+      <div class="fg"><label>Garanties locatives <small>(% loyer)</small></label>
+        <div class="fi-row"><input type="number" id="cGar" value="4.5" step="0.5" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Comptabilité + CGA</label>
+        <div class="fi-row"><input type="number" id="cCompta" value="140" step="10" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+      <div class="fg" id="pr-cfe" style="display:none"><label>CFE (Cotisation Foncière)</label>
+        <div class="fi-row"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Financement</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">Apport personnel</div>
-        <div class="iu"><input type="number" id="apport" value="10000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Frais de dossier / courtage</div>
-        <div class="iu"><input type="number" id="fDoss" value="1500" step="100" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Frais hypothèque / caution</div>
-        <div class="iu"><input type="number" id="fHypo" value="2500" step="100" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Taux nominal</div>
-        <div class="iu"><input type="number" id="tauxN" value="1.6" step="0.1" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Durée du prêt</div>
-        <div class="iu"><input type="number" id="dureePret" value="25" min="5" max="30" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
-      <div class="pr"><div class="pl">Différé total</div>
-        <div class="iu"><input type="number" id="differe" value="12" min="0" max="36" step="1" oninput="recalc()"><div class="iu-u">mois</div></div></div>
-      <div class="pr"><div class="pl">Taux ADI emprunteur 1</div>
-        <div class="iu"><input type="number" id="adi1" value="0.15" step="0.01" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Taux ADI emprunteur 2 <small>(0 si seul)</small></div>
-        <div class="iu"><input type="number" id="adi2" value="0.15" step="0.01" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Quotité emp. 1 / emp. 2</div>
+      <div class="fg"><label>Apport personnel</label>
+        <div class="fi-row"><input type="number" id="apport" value="10000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+      <div class="fg"><label>Frais de dossier / courtage</label>
+        <div class="fi-row"><input type="number" id="fDoss" value="1500" step="100" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+      <div class="fg"><label>Frais hypothèque / caution</label>
+        <div class="fi-row"><input type="number" id="fHypo" value="2500" step="100" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+      <div class="fg"><label>Taux nominal</label>
+        <div class="fi-row"><input type="number" id="tauxN" value="1.6" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Durée du prêt</label>
+        <div class="fi-row"><input type="number" id="dureePret" value="25" min="5" max="30" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
+      <div class="fg"><label>Différé total</label>
+        <div class="fi-row"><input type="number" id="differe" value="12" min="0" max="36" step="1" oninput="recalc()"><span class="fi-unit">mois</span></div></div>
+      <div class="fg"><label>Taux ADI emprunteur 1</label>
+        <div class="fi-row"><input type="number" id="adi1" value="0.15" step="0.01" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Taux ADI emprunteur 2 <small>(0 si seul)</small></label>
+        <div class="fi-row"><input type="number" id="adi2" value="0.15" step="0.01" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Quotité emp. 1 / emp. 2</label>
         <div style="display:flex;gap:4px">
-          <div class="iu" style="flex:1"><input type="number" id="q1" value="50" step="5" oninput="recalc()"><div class="iu-u">%</div></div>
-          <div class="iu" style="flex:1"><input type="number" id="q2" value="50" step="5" oninput="recalc()"><div class="iu-u">%</div></div>
+          <div class="fi-row" style="flex:1"><input type="number" id="q1" value="50" step="5" oninput="recalc()"><span class="fi-unit">%</span></div>
+          <div class="fi-row" style="flex:1"><input type="number" id="q2" value="50" step="5" oninput="recalc()"><span class="fi-unit">%</span></div>
         </div>
       </div>
     </div>
 
     <div class="cs-sidebar-lbl" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
     <div class="sb-body">
-      <div class="pr"><div class="pl">Dur&#233;e amortissement immobilier</div>
-        <div class="iu"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
-      <div class="pr"><div class="pl">Dur&#233;e amortissement mobilier</div>
-        <div class="iu"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
+      <div class="fg"><label>Dur&#233;e amortissement immobilier</label>
+        <div class="fi-row"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
+      <div class="fg"><label>Dur&#233;e amortissement mobilier</label>
+        <div class="fi-row"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
     </div>
 
     <button class="btn-sim" onclick="recalc()">Calculer la projection</button>
