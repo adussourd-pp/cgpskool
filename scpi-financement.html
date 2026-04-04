@@ -236,6 +236,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <div id="bankBtn_cfcal" onclick="setBank('cfcal')" style="padding:8px 4px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:10px;font-weight:700;color:var(--gris);line-height:1.3">CFCAL<br><span style="font-weight:400;opacity:0.8">40K&#8364; min</span></div>
     <div id="bankBtn_cacf" onclick="setBank('cacf')" style="padding:8px 4px;border:2px solid var(--bord);border-radius:8px;text-align:center;cursor:pointer;background:#fff;font-size:10px;font-weight:700;color:var(--gris);line-height:1.3">CACF<br><span style="font-weight:400;opacity:0.8">10K&#8364; min</span></div>
   </div>
+  <div id="bankMsg" style="font-size:10px;color:var(--gris);margin-bottom:8px;min-height:14px"></div>
   <div class="fg"><label>Dur&#233;e</label>
     <div class="sl-val" id="slDurVal">240 mois (20 ans)</div>
     <input type="range" id="sDur" min="120" max="300" value="240" step="12" oninput="onDur(this.value)">
@@ -424,6 +425,8 @@ function updateBankButtons(){
   var p=document.getElementById('fProfil').value;
   var mont=getScpis().reduce(function(s,r){return s+r.montant},0)||0;
   var btns=['sofiap','cfcal','cacf'];
+  var labels={sofiap:'SOFIAP',cfcal:'CFCAL',cacf:'CACF'};
+  var reasons=[];
   var anyEligible=false;
   btns.forEach(function(id){
     var bk=BANKS[id];
@@ -432,7 +435,7 @@ function updateBankButtons(){
     var ok=bk.profiles.includes(p)&&(mont<=0||mont>=bk.min);
     var reason='';
     if(!bk.profiles.includes(p))reason='Profil non \u00e9ligible';
-    else if(mont>0&&mont<bk.min)reason='Min '+fmt(bk.min)+' \u20ac';
+    else if(mont>0&&mont<bk.min)reason='Montant min '+fmt(bk.min)+' \u20ac';
     if(ok){
       el.style.opacity='1';
       el.style.cursor='pointer';
@@ -444,9 +447,20 @@ function updateBankButtons(){
       el.style.cursor='not-allowed';
       el.style.pointerEvents='none';
       el.title=reason;
+      reasons.push(labels[id]+' : '+reason);
       if(id===bank){bank=null;}
     }
   });
+  var msgEl=document.getElementById('bankMsg');
+  if(msgEl){
+    if(reasons.length>0&&reasons.length<3){
+      msgEl.innerHTML='<span style="color:var(--red)">\u26a0 '+reasons.join(' | ')+'</span>';
+    }else if(reasons.length>=3){
+      msgEl.innerHTML='<span style="color:var(--red)">\u26a0 Aucun partenaire compatible</span>';
+    }else{
+      msgEl.textContent='';
+    }
+  }
   if(!bank){
     btns.forEach(function(id){
       var bk=BANKS[id];
