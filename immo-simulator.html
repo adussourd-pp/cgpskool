@@ -36,77 +36,29 @@ body { background: #ECEAE6; }
 .btn-sim{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:10px}
 .btn-sim:hover{background:var(--orange-hover)}
 
-/* Résultats */
-
-/* Header résultat — style rapport */
-.result-header {
-  background: var(--paper); padding: 20px 24px; margin-bottom: 20px;
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
-}
-.rh-block { padding: 0 20px; border-right: 1px solid rgba(0,0,0,0.08); }
-.rh-block:first-child { padding-left: 0; }
-.rh-block:last-child { border-right: none; }
-.rh-label { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fog-2); margin-bottom: 6px; }
-.rh-val { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
-.rh-val.orange { color: var(--orange-lt); }
-.rh-val.green { color: #4fc98e; }
-.rh-val.red { color: #f07070; }
-.rh-sub { font-size: 10px; color: var(--fog-2); margin-top: 4px; }
-
-/* Section pendant le prêt */
-.section-label {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-30); margin: 20px 0 12px; padding-bottom: 8px;
-  border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 8px;
-}
-.section-label span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
-
-/* Cartes résumé en grille */
-.cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin-bottom: 16px; }
-.cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 16px; }
-.card {
-  background: #fff; border: 1px solid var(--rule-l); padding: 14px 16px; position: relative;
-}
-.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--kc, var(--rule-l)); }
-.card-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 6px; }
-.card-val { font-family: var(--serif); font-size: 18px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); line-height: 1.1; }
-.card-sub { font-size: 10px; color: var(--ink-30); margin-top: 3px; }
-.card-val.orange { color: var(--orange); }
-.card-val.green { color: #1a7a4a; }
-.card-val.red { color: #c0392b; }
-.card-val.big { font-size: 22px; }
-
-/* Bloc équation participation */
-.equa-block {
-  background: #fff; border: 1px solid var(--rule-l); padding: 16px 20px; margin-bottom: 16px;
-  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
-}
-.equa-item { text-align: center; flex: 1; min-width: 100px; }
-.equa-val { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -0.02em; }
-.equa-lbl { font-size: 10px; color: var(--ink-30); margin-top: 3px; }
-.equa-op { font-size: 24px; color: var(--ink-30); padding: 0 8px; flex: 0; }
-
-/* Bilan "Au final" */
-.bilan-block {
-  background: var(--o-dim); border: 1px solid rgba(212,98,42,0.2);
-  padding: 18px 20px; margin-bottom: 16px;
-}
-.bilan-title { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
-.bilan-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(212,98,42,0.12); font-size: 13px; }
-.bilan-row:last-child { border-bottom: none; }
-.bilan-row.total { font-weight: 700; font-size: 14px; border-top: 2px solid rgba(212,98,42,0.25); padding-top: 10px; }
-.bilan-row .lbl { color: var(--ink-60); }
-.bilan-row .val { font-weight: 600; color: var(--ink); }
-.bilan-row .val.g { color: #1a7a4a; }
-.bilan-row .val.o { color: var(--orange); }
-
-/* Blocs détail */
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.detail-block { background: #fff; border: 1px solid var(--rule-l); padding: 16px 18px; }
-.detail-block-title { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 10px; }
-.dr { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--rule-l); font-size: 12px; }
-.dr:last-child { border-bottom: none; }
-.dr .l { color: var(--ink-60); }
+/* Résultats — classes standard (ref: scpi-financement) */
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:14px 16px;margin-bottom:14px}
+.card-title{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.bl-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bord);font-size:12px}
+.bl-row:last-child{border-bottom:none}
+.bl-k{color:var(--gris)}
+.bl-v{font-weight:600;color:var(--noir);font-size:13px}
+.bl-v.gold{color:var(--orange)}
+.bl-v.green{color:#2D7A5B}
+.bl-v.red{color:#c0392b}
+.bilan-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.bl{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:14px 16px}
+.bl.hi{border-color:var(--orange);background:rgba(212,98,42,0.02)}
+.bl-title{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bord)}
+.eq{display:flex;align-items:center;gap:0;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
+.eq-b{flex:1;min-width:120px;text-align:center;padding:14px 12px;background:#fff;border:1.5px solid var(--bord);border-radius:11px}
+.eq-b.neg{border-color:var(--red);background:rgba(192,57,43,0.03)}
+.eq-b.pos{border-color:var(--green);background:rgba(45,122,91,0.03)}
+.eq-lbl{font-size:10px;color:var(--gris);margin-bottom:4px}
+.eq-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--noir)}
+.eq-sub{font-size:10px;color:var(--gris);margin-top:2px}
+.eq-op{font-size:22px;color:var(--gris);padding:0 10px;flex-shrink:0}
 .dr .v { font-weight: 600; color: var(--ink); }
 .dr .v.g { color: #1a7a4a; }
 .dr .v.o { color: var(--orange); }
