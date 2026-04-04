@@ -4448,16 +4448,17 @@ function rRetraite(){
   if(window.retChartInst)window.retChartInst.destroy();
   window.retChartInst=new Chart(ctx,{type:'line',data:{labels:AGES,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:55}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx2){return ' '+ctx2.dataset.label+' : '+ctx2.parsed.y+'%';}}}},scales:{x:{title:{display:true,text:'Age actuel',font:{family:'Inter',size:11},color:'#6B6B6B'},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Inter',size:11}}},y:{min:30,max:100,ticks:{callback:function(v){return v+'%';},font:{family:'Inter',size:11}},grid:{color:'rgba(0,0,0,0.06)'},title:{display:true,text:'Taux de remplacement (%)',font:{family:'Inter',size:11},color:'#6B6B6B'}}}},plugins:[clientTagPlugin]});
   // Mettre a jour l'image statique pour l'impression PDF
-  // (le canvas sera vide en print car display:none, cette img le remplace)
+  // Seulement si le canvas a des dimensions reelles (pas si section cachee)
   setTimeout(function(){
     try{
-      if(window.retChartInst){
+      var retCV=document.getElementById('retChart');
+      if(window.retChartInst&&retCV&&retCV.width>10&&retCV.height>10){
         var snap=window.retChartInst.toBase64Image();
-        if(snap&&snap.length>100){
+        if(snap&&snap.length>5000){
           var pImg=document.getElementById('retChartPrint');
-          if(pImg){pImg.src=snap;console.warn('[CHART] Image print mise a jour, '+snap.length+' chars');}
-        }
-      }
+          if(pImg){pImg.src=snap;console.warn('[CHART] Image print mise a jour, '+snap.length+' chars, canvas='+retCV.width+'x'+retCV.height);}
+        }else{console.warn('[CHART] Snapshot trop petit ('+((snap&&snap.length)||0)+' chars), ignore');}
+      }else{console.warn('[CHART] Canvas non visible ('+((retCV&&retCV.width)||0)+'x'+((retCV&&retCV.height)||0)+'), snapshot ignore');}
     }catch(e){console.warn('[CHART] snapshot echec:',e);}
   },600);
   // Remove header tags (now drawn on chart)
@@ -8350,14 +8351,51 @@ function exportPDF() {
     footRight.textContent=nbPages>0?nbPages+' page'+(nbPages>1?'s':''):'';
   }
 
-  // 5. L'image #retChartPrint est deja a jour (mise a jour dans rRetraite)
-  //    Le CSS @media print masque le canvas et affiche l'image.
-  //    Aucune manipulation JS necessaire.
+  // 5. Preparer le chart retraite pour l'impression
+  var retPrintImg=document.getElementById('retChartPrint');
+  var retCanvas=document.getElementById('retChart');
+  var retContainer=retCanvas?retCanvas.parentNode:null;
+
+  // Si l'image n'a pas de src valide, tenter une capture de derniere minute
+  if(retPrintImg&&(!retPrintImg.src||retPrintImg.src.length<100||retPrintImg.src===window.location.href)){
+    console.warn('[PDF] retChartPrint src vide, tentative capture...');
+    // Rendre la section visible temporairement pour capturer
+    var secRet=document.getElementById('sec-retraite');
+    if(secRet){
+      secRet.style.cssText='display:block!important;position:fixed;left:0;top:0;width:794px;z-index:-1;opacity:0.01';
+      try{rRetraite();}catch(e){}
+      // Forcer le rendu synchrone
+      if(window.retChartInst){
+        try{window.retChartInst.resize();window.retChartInst.update('none');}catch(e){}
+        // Capture immediate (pas de setTimeout)
+        try{
+          retCanvas=document.getElementById('retChart');
+          if(retCanvas&&retCanvas.width>10){
+            var snap2=window.retChartInst.toBase64Image();
+            if(snap2&&snap2.length>5000){retPrintImg.src=snap2;console.warn('[PDF] Capture urgente OK, '+snap2.length+' chars');}
+          }
+        }catch(e){}
+      }
+      secRet.style.cssText='';
+    }
+  }
+
+  // Forcer l'affichage de l'image et masquer le canvas AVANT window.print()
+  // (ne pas compter uniquement sur le CSS @media print)
+  if(retPrintImg&&retPrintImg.src&&retPrintImg.src.length>100&&retPrintImg.src!==window.location.href){
+    retPrintImg.style.display='block';
+    if(retContainer)retContainer.style.display='none';
+    console.warn('[PDF] Image chart forcee visible, src='+retPrintImg.src.length+' chars');
+  }else{
+    console.warn('[PDF] AUCUN snapshot disponible pour le chart retraite!');
+  }
 
   // 6. Imprimer
   window.print();
 
   // 7. Nettoyer apres impression
+  if(retPrintImg)retPrintImg.style.display='none';
+  if(retContainer)retContainer.style.display='';
   document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
   if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
 }
