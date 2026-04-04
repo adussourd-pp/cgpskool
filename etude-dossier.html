@@ -8339,55 +8339,81 @@ function exportPDF() {
   // 5. Rendre la section retraite visible hors-ecran pour dessiner le chart
   var savedSec=currentSection;
   var secRet=document.getElementById('sec-retraite');
+  console.warn('[PDF] sec-retraite trouvee:', !!secRet);
   if(secRet){secRet.style.display='block';secRet.style.position='fixed';secRet.style.left='0';secRet.style.top='0';secRet.style.width='794px';secRet.style.zIndex='-1';secRet.style.opacity='0.01';}
-  try{rRetraite();}catch(e3){console.warn('rRetraite export:',e3);}
+  try{rRetraite();}catch(e3){console.warn('[PDF] rRetraite ERREUR:',e3);}
+  console.warn('[PDF] retChartInst apres rRetraite:', !!window.retChartInst);
 
   // 6. Attendre que Chart.js dessine, puis capturer et imprimer
   setTimeout(function(){
+    var retCanvas=document.getElementById('retChart');
+    console.warn('[PDF] retChart canvas:', retCanvas ? retCanvas.width+'x'+retCanvas.height : 'NULL');
     try{
       if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
-    }catch(e4){}
+    }catch(e4){console.warn('[PDF] resize/update ERREUR:',e4);}
     setTimeout(function(){
-      // 7. Capturer TOUS les charts (retraite + synthese) depuis les instances Chart.js
+      // 7. Capturer le chart retraite et le convertir en image PNG
       var _pdfChartImgs = [];
-      var _pdfHiddenCanvases = [];
-      var chartEntries = [
-        {inst: window.retChartInst, id: 'retChart'},
-        {inst: window._pyramideChart, id: 'pyramideChart'},
-        {inst: window._synthRetChart, id: 'synthRetChart'}
-      ];
-      chartEntries.forEach(function(entry) {
-        try {
-          if (entry.inst) {
-            var c = document.getElementById(entry.id);
-            if (c && c.width > 0 && c.height > 0) {
-              var url = entry.inst.toBase64Image();
-              if (url && url.length > 100) {
-                var img = document.createElement('img');
-                img.src = url;
-                img.className = 'cgp-chart-print-img';
-                img.style.cssText = 'width:100%;max-width:100%;height:auto;display:block';
-                c.parentNode.insertBefore(img, c.nextSibling);
-                c.style.display = 'none';
-                _pdfChartImgs.push(img);
-                _pdfHiddenCanvases.push(c);
-              }
+      var _pdfHiddenElements = [];
+
+      // Capture du chart retraite
+      try {
+        var retC = document.getElementById('retChart');
+        console.warn('[PDF] Canvas retChart:', retC ? retC.width+'x'+retC.height : 'ABSENT');
+        console.warn('[PDF] retChartInst existe:', !!window.retChartInst);
+
+        if (window.retChartInst && retC) {
+          // Essai 1 : toBase64Image() de Chart.js
+          var url = null;
+          try { url = window.retChartInst.toBase64Image(); } catch(eb) {
+            console.warn('[PDF] toBase64Image echec, fallback toDataURL:', eb);
+          }
+          // Essai 2 : fallback canvas.toDataURL
+          if (!url || url.length < 100) {
+            try { url = retC.toDataURL('image/png'); } catch(ec) {
+              console.warn('[PDF] toDataURL echec:', ec);
             }
           }
-        } catch(e5) { console.warn('chart capture ' + entry.id + ':', e5); }
-      });
+          console.warn('[PDF] URL capturee, longueur:', url ? url.length : 0);
+
+          if (url && url.length > 100) {
+            var img = document.createElement('img');
+            img.src = url;
+            // Dimensions explicites depuis le canvas
+            img.width = retC.width;
+            img.height = retC.height;
+            img.style.cssText = 'width:100%;height:auto;display:block;max-width:100%';
+            img.className = 'cgp-chart-print-img';
+
+            // Inserer APRES le container du chart (pas dedans)
+            // pour eviter les interactions avec height:320px
+            var chartContainer = retC.parentNode; // div position:relative height:320px
+            chartContainer.style.display = 'none';
+            chartContainer.parentNode.insertBefore(img, chartContainer.nextSibling);
+            _pdfChartImgs.push(img);
+            _pdfHiddenElements.push(chartContainer);
+            console.warn('[PDF] Image inseree OK, dimensions:', img.width, 'x', img.height);
+          } else {
+            console.warn('[PDF] ECHEC capture : URL trop courte ou nulle');
+          }
+        } else {
+          console.warn('[PDF] PAS de chart a capturer');
+        }
+      } catch(e5) { console.warn('[PDF] chart capture ERREUR:', e5); }
 
       // 8. Remettre la section en place
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
       var origSec=document.getElementById('sec-'+savedSec);
       if(origSec)origSec.classList.add('active');
 
+      console.warn('[PDF] Images chart creees:', _pdfChartImgs.length, '- Lancement window.print()');
+
       // 9. Imprimer (beforeprint/afterprint de core.js ignores grace a customHandler)
       window.print();
 
       // 10. Nettoyer apres impression
       _pdfChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
-      _pdfHiddenCanvases.forEach(function(c) { c.style.display = ''; });
+      _pdfHiddenElements.forEach(function(el) { el.style.display = ''; });
       document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
       if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
     },500);
@@ -8471,43 +8497,39 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : mettre a jour l'en-tete et capturer tous les charts
+// Ctrl+P : mettre a jour l'en-tete et capturer le chart retraite
 var _ctrlPChartImgs = [];
-var _ctrlPHiddenCanvases = [];
+var _ctrlPHiddenElements = [];
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
   if (_ctrlPChartImgs.length > 0) return; // deja capture
-  var chartEntries = [
-    {inst: window.retChartInst, id: 'retChart'},
-    {inst: window._pyramideChart, id: 'pyramideChart'},
-    {inst: window._synthRetChart, id: 'synthRetChart'}
-  ];
-  chartEntries.forEach(function(entry) {
-    try {
-      if (entry.inst) {
-        var c = document.getElementById(entry.id);
-        if (c && c.width > 0 && c.height > 0) {
-          var url = entry.inst.toBase64Image();
-          if (url && url.length > 100) {
-            var img = document.createElement('img');
-            img.src = url;
-            img.className = 'cgp-chart-print-img';
-            img.style.cssText = 'width:100%;max-width:100%;height:auto;display:block';
-            c.parentNode.insertBefore(img, c.nextSibling);
-            c.style.display = 'none';
-            _ctrlPChartImgs.push(img);
-            _ctrlPHiddenCanvases.push(c);
-          }
-        }
+  try {
+    var retC = document.getElementById('retChart');
+    if (window.retChartInst && retC && retC.width > 0 && retC.height > 0) {
+      var url = null;
+      try { url = window.retChartInst.toBase64Image(); } catch(e) {}
+      if (!url || url.length < 100) try { url = retC.toDataURL('image/png'); } catch(e) {}
+      if (url && url.length > 100) {
+        var img = document.createElement('img');
+        img.src = url;
+        img.width = retC.width;
+        img.height = retC.height;
+        img.style.cssText = 'width:100%;height:auto;display:block;max-width:100%';
+        img.className = 'cgp-chart-print-img';
+        var container = retC.parentNode;
+        container.style.display = 'none';
+        container.parentNode.insertBefore(img, container.nextSibling);
+        _ctrlPChartImgs.push(img);
+        _ctrlPHiddenElements.push(container);
       }
-    } catch(e) {}
-  });
+    }
+  } catch(e) { console.warn('[PDF] beforeprint chart capture:', e); }
 });
 window.addEventListener('afterprint', function() {
   _ctrlPChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
   _ctrlPChartImgs = [];
-  _ctrlPHiddenCanvases.forEach(function(c) { c.style.display = ''; });
-  _ctrlPHiddenCanvases = [];
+  _ctrlPHiddenElements.forEach(function(el) { el.style.display = ''; });
+  _ctrlPHiddenElements = [];
 });
 
 </script>
