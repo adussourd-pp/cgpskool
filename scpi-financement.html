@@ -290,6 +290,10 @@ details[open] summary span.arr{transform:rotate(90deg)}
   <div class="barem-panel" id="baremPanel"></div>
 
   <button class="sim-btn" onclick="runSim()">Lancer la projection &#8594;</button>
+  <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+  <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+  <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;border-radius:0" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+  <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center;border-radius:0">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
 </div>
 
 <div class="cs-main">
@@ -700,7 +704,21 @@ function render(d){
   const pos=d.part>=0;
   let h='';
 
-  // Header
+  // Header client/conseiller
+  var _p=CGP.profil.load();
+  var _nom=((_p.prenom||'')+' '+(_p.nom||'')).trim();
+  var _today=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  h+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">PROJECTION FINANCIÈRE SCPI</div>
+      ${_nom?'<div style="font-size:11px;color:var(--gris);margin-top:4px">'+CGP.esc(_nom)+(_p.cabinet?' — '+CGP.esc(_p.cabinet):'')+'</div>':''}
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:12px;color:var(--gris)">${_today}</div>
+    </div>
+  </div>`;
+
+  // Header banque
   h+=`<div class="bank-hdr" data-bank="${bank}">
     <div class="bh-name">${d.b.name}</div>
     <div class="bh-it"><div class="bh-lbl">Investi</div><div class="bh-v">${fmt(d.mont)} €</div></div>
@@ -750,14 +768,6 @@ function render(d){
     <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel net':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmt(d.part)} €</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'Votre participation /mois'}</div></div>
   </div>`;
 
-  // KPIs
-  h+=`<div class="kpi-row">
-    <div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Mensualité</div><div class="kpi-val">${fmt(d.mA)} €</div><div class="kpi-sub">/mois amortissement</div></div>
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Dividendes bruts</div><div class="kpi-val">${fmt(d.divM)} €</div><div class="kpi-sub">/mois — rdt ${(d.rdtMoy*100).toFixed(2)}%</div></div>
-    <div class="kpi ${pos?'green':'red'}"><div class="kpi-label">${pos?'Gain mensuel':'Effort mensuel'}</div><div class="kpi-val">${pos?'+':''}${fmt(d.part)} €</div><div class="kpi-sub">${pos?'Dividendes > mensualité':'Votre participation'}</div></div>
-    <div class="kpi featured"><div class="kpi-label">Patrimoine terme</div><div class="kpi-val">${fmt(d.mont)} €</div><div class="kpi-sub">au terme</div></div>
-  </div>`;
-
   // BILAN EN HAUT
   h+=`<div class="bilan-2">
     <div class="bl">
@@ -776,11 +786,8 @@ function render(d){
     </div>
   </div>`;
 
-  // Charts
-  h+=`<div class="charts-2">
-    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Mensualités vs Dividendes</div><div class="chart-h"><canvas id="cBar"></canvas></div></div>
-    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement par les loyers</div><div class="chart-h"><canvas id="cPie"></canvas></div></div>
-  </div>`;
+  // Chart — Financement par les loyers
+  h+=`<div class="card" style="margin-bottom:14px"><div class="card-title"><span class="dot"></span>Votre retraite aura \u00e9t\u00e9 financ\u00e9e par</div><div class="chart-h" style="max-width:320px;margin:0 auto"><canvas id="cPie"></canvas></div></div>`;
 
   // SCPI + frais
   h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
@@ -813,25 +820,12 @@ function render(d){
 
   document.getElementById('results').innerHTML=h;
 
-  // Charts
-  if(cBar)cBar.destroy();
-  cBar=new Chart(document.getElementById('cBar').getContext('2d'),{type:'bar',
-    data:{labels:d.tab.map(r=>'An '+r.an),datasets:[
-      {label:'Mensualité',data:d.tab.map(r=>r.mM),backgroundColor:'#F5D9A8',borderColor:'#F0A738',borderWidth:1.5,borderRadius:3},
-      {label:'Dividendes',data:d.tab.map(r=>r.divM),backgroundColor:'rgba(45,122,91,0.25)',borderColor:'#2D7A5B',borderWidth:1.5,borderRadius:3}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},padding:8}},
-        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+' €'}}},
-      scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:9}}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'Inter',size:9},callback:v=>fmt(v)+' €'}}}}
-  });
-
+  // Chart
   if(cPie)cPie.destroy();
   const loyers=Math.max(0,d.tL);
   const eff=Math.max(0,d.effort);
   cPie=new Chart(document.getElementById('cPie').getContext('2d'),{type:'doughnut',
-    data:{labels:['Financé par les dividendes','Effort client'],
+    data:{labels:['Loyers','Votre participation'],
       datasets:[{data:[loyers,eff],backgroundColor:['rgba(45,122,91,0.65)','rgba(240,167,56,0.65)'],borderColor:['#2D7A5B','#F0A738'],borderWidth:2,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
       plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},padding:8}},
