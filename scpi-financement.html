@@ -694,7 +694,7 @@ function runSim(){
   });
   const curEligib=eligib.find(e=>e.id===bank)||eligib[0];
 
-  render({b,scpis,mont,emp,frais,apport,dur,dif,typD,tx,rdtMoy,divM,divNet,mA,mD,part,tab,tL,tP,tI,tADI,effort,rev,tmi,eAvt,eApr,eligib,curEligib});
+  render({b,scpis,mont,emp,frais,apport,dur,dif,typD,tx,rdtMoy,divM,divNet,mA,mD,part,tab,tL,tP,tI,tADI,effort,rev,tmi,eAvt,eApr,eligib,curEligib,rev1:revC,chg1:charges});
   CGP.project.autoSave('scpi-financement');
 }
 
@@ -702,120 +702,111 @@ function render(d){
   document.getElementById('emptyState').style.display='none';
   document.getElementById('results').style.display='block';
   const pos=d.part>=0;
+  const partAbs=Math.abs(d.part);
   let h='';
 
-  // Header client/conseiller
+  // 1. Header client/conseiller
   var _p=CGP.profil.load();
   var _nom=((_p.prenom||'')+' '+(_p.nom||'')).trim();
   var _today=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
   h+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
     <div>
-      <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">PROJECTION FINANCIÈRE SCPI</div>
-      ${_nom?'<div style="font-size:11px;color:var(--gris);margin-top:4px">'+CGP.esc(_nom)+(_p.cabinet?' — '+CGP.esc(_p.cabinet):'')+'</div>':''}
+      <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">PROJECTION FINANCI\u00c8RE SCPI</div>
+      ${_nom?'<div style="font-size:11px;color:var(--gris);margin-top:4px">'+CGP.esc(_nom)+(_p.cabinet?' \u2014 '+CGP.esc(_p.cabinet):'')+'</div>':''}
     </div>
     <div style="text-align:right">
       <div style="font-size:12px;color:var(--gris)">${_today}</div>
     </div>
   </div>`;
 
-  // Header banque
-  h+=`<div class="bank-hdr" data-bank="${bank}">
-    <div class="bh-name">${d.b.name}</div>
-    <div class="bh-it"><div class="bh-lbl">Investi</div><div class="bh-v">${fmt(d.mont)} €</div></div>
-    <div class="bh-it"><div class="bh-lbl">Emprunté</div><div class="bh-v">${fmt(d.emp)} €</div></div>
-    <div class="bh-it"><div class="bh-lbl">Durée</div><div class="bh-v">${d.dur}m</div></div>
-    <div class="bh-it"><div class="bh-lbl">Taux</div><div class="bh-v">${(d.tx*100).toFixed(2)}%</div></div>
-    <div class="bh-it"><div class="bh-lbl">Rdt moy.</div><div class="bh-v">${(d.rdtMoy*100).toFixed(2)}%</div></div>
-  </div>`;
-
-  // Éligibilité banque courante
-  const ce=d.curEligib;
-  const ceCol=ce.ok?'var(--green)':ce.iss.length<=1?'var(--ambre-d)':'var(--red)';
-  const ceBg=ce.ok?'var(--green-l)':ce.iss.length<=1?'var(--ambre-l)':'var(--red-l)';
-  h+=`<div class="card" style="background:${ceBg};border-color:${ceCol}20;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="font-size:28px">${ce.ok?'✅':ce.iss.length<=1?'⚠️':'❌'}</div>
-      <div style="flex:1">
-        <div style="font-family:var(--sans);font-weight:700;font-size:14px;color:${ceCol}">${ce.ok?d.b.name+' — Dossier éligible':d.b.name+' — Vérification requise'}</div>
-        <div style="font-size:12px;color:var(--gris-f);margin-top:3px">${ce.ok?`Profil validé · Endettement: ${d.eApr.toFixed(1)}% ≤ ${d.b.endMax}% · Montant: ${fmt(d.mont)} € ≥ min ${fmt(d.b.min)} €`:ce.iss.map(i=>'• '+i).join(' &nbsp;|&nbsp; ')}</div>
-      </div>
-    </div>
-  </div>`;
-
-  // Endettement
+  // 2. Hypoth\u00e8ses + endettement
   const cA=d.eAvt>d.b.endMax?'var(--red)':d.eAvt>d.b.endMax-5?'var(--ambre)':'var(--green)';
   const cAp=d.eApr>d.b.endMax?'var(--red)':d.eApr>d.b.endMax-5?'var(--ambre)':'var(--green)';
-  h+=`<div class="card"><div class="card-title"><span class="dot"></span>Taux d'endettement</div>
-  <div class="endett-bars">
-    <div>
-      <div class="eb-label"><span>Avant investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
-      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
+  const ce=d.curEligib;
+  const ceOk=ce.ok;
+  h+=`<div class="card" style="margin-bottom:14px">
+    <div class="card-title"><span class="dot"></span>Capacit\u00e9 d'emprunt
+      <span style="float:right;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:${ceOk?'var(--green-l)':'var(--red-l)'};color:${ceOk?'var(--green)':'var(--red)'}">${ceOk?'\u2713 \u00c9ligible '+d.b.name:'\u26a0 V\u00e9rification requise'}</span>
     </div>
-    <div>
-      <div class="eb-label"><span>Après investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
-      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
+      <div>
+        <div class="bl-row"><span class="bl-k">Revenus mensuels</span><span class="bl-v">${fmt(d.rev1)} \u20ac</span></div>
+        <div class="bl-row"><span class="bl-k">Charges mensuelles</span><span class="bl-v">${fmt(d.chg1)} \u20ac</span></div>
+        <div class="bl-row"><span class="bl-k">Montant emprunt\u00e9</span><span class="bl-v gold">${fmt(d.emp)} \u20ac</span></div>
+        <div class="bl-row"><span class="bl-k">Dur\u00e9e / Taux</span><span class="bl-v">${d.dur}m \u00e0 ${(d.tx*100).toFixed(2)}%</span></div>
+      </div>
+      <div>
+        <div style="margin-bottom:8px">
+          <div class="eb-label"><span>Avant investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
+        </div>
+        <div>
+          <div class="eb-label"><span>Apr\u00e8s investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
+        </div>
+        <div style="font-size:10px;color:var(--gris);margin-top:6px">Seuil ${d.b.name}: <strong>${d.b.endMax}%</strong></div>
+      </div>
     </div>
-  </div>
-  <div style="font-size:11px;color:var(--gris);margin-top:8px">Seuil ${d.b.name}: <strong>${d.b.endMax}%</strong>${bank==='sofiap'?' — Rendements SCPI pris en compte plafonnés à 4%':' — Rendements SCPI non pris en compte'}</div>
+    ${!ceOk?'<div style="font-size:11px;color:var(--red);margin-top:4px">'+ce.iss.map(i=>'\u2022 '+i).join('<br>')+'</div>':''}
   </div>`;
 
-  // Équation
+  // 3. \u00c9quation : Mensualit\u00e9 - Dividendes = Participation
   h+=`<div class="eq">
-    <div class="eq-b mens"><div class="eq-lbl">Mensualité emprunt</div><div class="eq-val">${fmt(d.mA)} €</div><div class="eq-sub">/mois amort.${d.dif>0?' | différé: '+fmt(d.mD)+' €':''}</div></div>
-    <div class="eq-op">−</div>
-    <div class="eq-b divs"><div class="eq-lbl">Dividendes bruts</div><div class="eq-val">${fmt(d.divM)} €</div><div class="eq-sub">/mois | net: ${fmt(d.divNet)} €</div></div>
+    <div class="eq-b mens"><div class="eq-lbl">Mensualit\u00e9 emprunt</div><div class="eq-val">${fmt(d.mA)} \u20ac</div><div class="eq-sub">/mois${d.dif>0?' | diff\u00e9r\u00e9: '+fmt(d.mD)+' \u20ac':''}</div></div>
+    <div class="eq-op">\u2212</div>
+    <div class="eq-b divs"><div class="eq-lbl">Dividendes bruts</div><div class="eq-val">${fmt(d.divM)} \u20ac</div><div class="eq-sub">/mois</div></div>
     <div class="eq-op">=</div>
-    <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel net':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmt(d.part)} €</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'Votre participation /mois'}</div></div>
+    <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${fmt(partAbs)} \u20ac</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge'}</div></div>
   </div>`;
 
-  // BILAN EN HAUT
+  // 4. SCPI financ\u00e9es + Frais (c\u00f4te \u00e0 c\u00f4te)
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>SCPI financ\u00e9es</div>
+    <table class="tbl"><thead><tr><th>SCPI</th><th>Parts</th><th>Montant</th><th>Rdt</th><th>Div/mois</th></tr></thead><tbody>`;
+  d.scpis.forEach(r=>{h+=`<tr><td>${r.name}</td><td>${r.parts}</td><td class="gold">${fmt(r.montant)} \u20ac</td><td>${(r.rdt*100).toFixed(2)}%</td><td class="green">${fmt(r.montant*r.rdt/12)} \u20ac</td></tr>`;});
+  h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${fmt(d.mont)} \u20ac</td><td>${(d.rdtMoy*100).toFixed(2)}%</td><td>${fmt(d.divM)} \u20ac</td></tr></tbody></table></div>
+
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Frais & financement</div>
+    <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} \u20ac</span></div>
+    <div class="bl-row"><span class="bl-k">Courtage (1%)</span><span class="bl-v red">+${fmt(d.frais.co)} \u20ac</span></div>
+    <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} \u20ac</span></div>
+    ${d.frais.nant>0?`<div class="bl-row"><span class="bl-k">Nantissement</span><span class="bl-v red">+${fmt(d.frais.nant)} \u20ac</span></div>`:''}
+    ${d.frais.gar>0?`<div class="bl-row"><span class="bl-k">Caution CL</span><span class="bl-v red">+${fmt(d.frais.gar)} \u20ac</span></div>`:''}
+    <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:7px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold">${fmt(d.emp)} \u20ac</span></div>
+    <div class="bl-row"><span class="bl-k">Apport client</span><span class="bl-v">${fmt(d.apport)} \u20ac</span></div>
+    </div>
+  </div>`;
+
+  // 5. Bilans c\u00f4te \u00e0 c\u00f4te
   h+=`<div class="bilan-2">
     <div class="bl">
       <div class="bl-title">Pendant le financement</div>
-      <div class="bl-row"><span class="bl-k">Total loyers perçus</span><span class="bl-v green">${fmt(d.tL)} €</span></div>
-      <div class="bl-row"><span class="bl-k">Total intérêts payés</span><span class="bl-v red">− ${fmt(d.tI)} €</span></div>
-      <div class="bl-row"><span class="bl-k">Total ADI payée</span><span class="bl-v red">− ${fmt(d.tADI)} €</span></div>
-      <div class="bl-row"><span class="bl-k">Participation cumulée</span><span class="bl-v ${d.tP>=0?'green':'red'}">${d.tP>=0?'+':''}${fmt(d.tP)} €</span></div>
+      <div class="bl-row"><span class="bl-k">Total loyers per\u00e7us</span><span class="bl-v green">${fmt(d.tL)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Total int\u00e9r\u00eats pay\u00e9s</span><span class="bl-v red">\u2212 ${fmt(d.tI)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Total ADI pay\u00e9e</span><span class="bl-v red">\u2212 ${fmt(d.tADI)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Participation cumul\u00e9e</span><span class="bl-v ${d.tP>=0?'green':'red'}">${fmt(Math.abs(d.tP))} \u20ac</span></div>
     </div>
     <div class="bl hi">
       <div class="bl-title">Au terme</div>
-      <div class="bl-row"><span class="bl-k">Patrimoine constitué</span><span class="bl-v gold">${fmt(d.mont)} €</span></div>
-      <div class="bl-row"><span class="bl-k">Revenus /mois</span><span class="bl-v green">${fmt(d.divM*Math.pow(1+d.rev,d.dur/12))} €</span></div>
-      <div class="bl-row"><span class="bl-k">Effort total client</span><span class="bl-v">${fmt(d.effort)} €</span></div>
-      <div class="bl-row"><span class="bl-k">Loyers couvrent</span><span class="bl-v gold">${Math.round(d.tL/(d.tL+Math.max(0,d.effort))*100)}% du coût total</span></div>
+      <div class="bl-row"><span class="bl-k">Patrimoine constitu\u00e9</span><span class="bl-v gold">${fmt(d.mont)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Revenus /mois</span><span class="bl-v green">${fmt(d.divM*Math.pow(1+d.rev,d.dur/12))} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Effort total client</span><span class="bl-v">${fmt(Math.abs(d.effort))} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Loyers couvrent</span><span class="bl-v gold">${Math.round(d.tL/(d.tL+Math.max(0,d.effort))*100)}% du co\u00fbt total</span></div>
     </div>
   </div>`;
 
-  // Chart — Financement par les loyers
-  h+=`<div class="card" style="margin-bottom:14px"><div class="card-title"><span class="dot"></span>Votre retraite aura \u00e9t\u00e9 financ\u00e9e par</div><div class="chart-h" style="max-width:320px;margin:0 auto"><canvas id="cPie"></canvas></div></div>`;
+  // 6. Doughnut — Financement par les loyers
+  h+=`<div class="card" style="margin-bottom:14px"><div class="card-title"><span class="dot"></span>Votre investissement aura \u00e9t\u00e9 financ\u00e9 par</div><div class="chart-h" style="max-width:320px;margin:0 auto"><canvas id="cPie"></canvas></div></div>`;
 
-  // SCPI + frais
-  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>SCPI financées</div>
-    <table class="tbl"><thead><tr><th>SCPI</th><th>Parts</th><th>Montant</th><th>Rdt</th><th>Div/mois</th></tr></thead><tbody>`;
-  d.scpis.forEach(r=>{h+=`<tr><td>${r.name}</td><td>${r.parts}</td><td class="gold">${fmt(r.montant)} €</td><td>${(r.rdt*100).toFixed(2)}%</td><td class="green">${fmt(r.montant*r.rdt/12)} €</td></tr>`;});
-  h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${fmt(d.mont)} €</td><td>${(d.rdtMoy*100).toFixed(2)}%</td><td>${fmt(d.divM)} €</td></tr></tbody></table></div>
-
-    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Frais & financement</div>
-    <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} €</span></div>
-    <div class="bl-row"><span class="bl-k">Courtage (1%)</span><span class="bl-v red">+${fmt(d.frais.co)} €</span></div>
-    <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} €</span></div>
-    ${d.frais.nant>0?`<div class="bl-row"><span class="bl-k">Nantissement</span><span class="bl-v red">+${fmt(d.frais.nant)} €</span></div>`:''}
-    ${d.frais.gar>0?`<div class="bl-row"><span class="bl-k">Caution CL</span><span class="bl-v red">+${fmt(d.frais.gar)} €</span></div>`:''}
-    <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:7px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunté</span><span class="bl-v gold">${fmt(d.emp)} €</span></div>
-    <div class="bl-row"><span class="bl-k">Apport client</span><span class="bl-v">${fmt(d.apport)} €</span></div>
-    </div>
-  </div>`;
-
-  // Tableau annuel
+  // 7. Tableau annuel
   h+=`<div class="card"><div class="card-title"><span class="dot"></span>Tableau de financement annuel</div>
   <div style="overflow-x:auto"><table class="tbl">
-  <thead><tr><th>Année</th><th>Mensualité</th><th>Intérêts</th><th>Amort.</th><th>ADI</th><th>CRD</th><th>Dividendes</th><th>Participation</th></tr></thead><tbody>`;
+  <thead><tr><th>Ann\u00e9e</th><th>Mensualit\u00e9</th><th>Int\u00e9r\u00eats</th><th>Amort.</th><th>ADI</th><th>CRD</th><th>Dividendes</th><th>Participation</th></tr></thead><tbody>`;
   d.tab.forEach(r=>{
     const p=r.pM>=0;
-    h+=`<tr><td>An ${r.an}</td><td>${fmt(r.mM)} €</td><td class="red">${fmt(r.iM)} €</td><td>${fmt(r.aM)} €</td><td>${fmt(r.adM)} €</td><td>${fmt(r.crd)} €</td><td class="green">${fmt(r.divM)} €</td><td class="${p?'green':'red'}">${p?'+':''}${fmt(r.pM)} €</td></tr>`;
+    h+=`<tr><td>An ${r.an}</td><td>${fmt(r.mM)} \u20ac</td><td class="red">${fmt(r.iM)} \u20ac</td><td>${fmt(r.aM)} \u20ac</td><td>${fmt(r.adM)} \u20ac</td><td>${fmt(r.crd)} \u20ac</td><td class="green">${fmt(r.divM)} \u20ac</td><td class="${p?'green':'red'}">${fmt(Math.abs(r.pM))} \u20ac</td></tr>`;
   });
-  h+=`<tr class="tot"><td>BILAN</td><td></td><td>${fmt(d.tI)} €</td><td></td><td>${fmt(d.tADI)} €</td><td></td><td>${fmt(d.tL)} €</td><td class="${d.tP>=0?'green':''}">${d.tP>=0?'+':''}${fmt(d.tP)} €</td></tr>
+  h+=`<tr class="tot"><td>BILAN</td><td></td><td>${fmt(d.tI)} \u20ac</td><td></td><td>${fmt(d.tADI)} \u20ac</td><td></td><td>${fmt(d.tL)} \u20ac</td><td class="${d.tP>=0?'green':''}">${fmt(Math.abs(d.tP))} \u20ac</td></tr>
   </tbody></table></div></div>`;
 
   document.getElementById('results').innerHTML=h;
@@ -829,7 +820,7 @@ function render(d){
       datasets:[{data:[loyers,eff],backgroundColor:['rgba(45,122,91,0.65)','rgba(240,167,56,0.65)'],borderColor:['#2D7A5B','#F0A738'],borderWidth:2,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
       plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},padding:8}},
-        tooltip:{callbacks:{label:c=>{const t=loyers+eff;return c.label+': '+fmt(c.raw)+' € ('+Math.round(c.raw/t*100)+'%)';}}}}
+        tooltip:{callbacks:{label:c=>{const t=loyers+eff;return c.label+': '+fmt(c.raw)+' \u20ac ('+Math.round(c.raw/t*100)+'%)';}}}}
     }
   });
 }
