@@ -130,6 +130,10 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
     <div class="sb-body open">
       <div class="fg"><label>Nom du client</label>
         <div class="fi-row"><input type="text" id="immoClient" placeholder="Nom Pr&#233;nom"><span class="fi-unit">&#128100;</span></div></div>
+      <div class="fg"><label>Revenus annuels nets</label>
+        <div class="fi-row"><input type="number" id="immoRev" value="60000" step="1000"><span class="fi-unit">&#8364;/an</span></div></div>
+      <div class="fg"><label>Charges cr&#233;dits existants /mois</label>
+        <div class="fi-row"><input type="number" id="immoChg" value="0" step="50"><span class="fi-unit">&#8364;</span></div></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type d'investissement</div>
@@ -561,21 +565,39 @@ function recalc() {
   var h = '';
 
   // 1. Bloc emprunteur / projet
-  var endAvt = p.montantEmprunte > 0 ? (mensTotal_init / (gv('fRev',60000)/12 || 1) * 100) : 0;
-  // Estimation simplifi\u00e9e endettement
-  var endApr = endAvt; // d\u00e9j\u00e0 inclus car c'est le projet
-  var cEndAvt = endAvt > 35 ? 'var(--red)' : endAvt > 28 ? 'var(--ambre)' : 'var(--green)';
+  var _revM = gv('immoRev',60000)/12;
+  var _chgM = gv('immoChg',0);
+  var _endAvt = _revM>0 ? (_chgM/_revM*100) : 0;
+  var _endApr = _revM>0 ? ((_chgM+mensTotal_init)/_revM*100) : 0;
+  var cEndAvt = _endAvt>35?'var(--red)':_endAvt>28?'var(--ambre)':'var(--green)';
+  var cEndApr = _endApr>35?'var(--red)':_endApr>28?'var(--ambre)':'var(--green)';
+  var _cl = (document.getElementById('immoClient')||{}).value||'Client';
   h+='<div class="card" style="margin-bottom:14px">';
   h+='<div class="card-title"><span class="dot"></span>Projet immobilier';
   h+='<span style="float:right;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--ambre-l);color:var(--ambre-d)">'+modeLabel+'</span></div>';
-  var _cl = (document.getElementById('immoClient')||{}).value||'Client';
   h+='<div style="font-size:13px;font-weight:600;color:var(--noir);margin-bottom:8px">'+CGP.esc(_cl)+'</div>';
+  // Infos sp\u00e9cifiques coloc
+  if(mode==='coloc'){
+    h+='<div class="bl-row"><span class="bl-k">Nombre de chambres</span><span class="bl-v">'+Math.round(gv('nbChambres',4))+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Loyer / chambre</span><span class="bl-v green">'+fmtE(gv('loyerCh',500))+' /mois</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Taux de remplissage</span><span class="bl-v">'+Math.round(gv('tauxRpl',95))+'%</span></div>';
+  }
   h+='<div class="bl-row"><span class="bl-k">Budget total</span><span class="bl-v gold" style="font-size:14px">'+fmtE(p.budgetTotal)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Montant emprunt\u00e9</span><span class="bl-v" style="font-weight:700">'+fmtE(p.montantEmprunte)+'</span></div>';
   h+='<div class="bl-row"><span class="bl-k">Loyer brut mensuel</span><span class="bl-v green">'+fmtE(p.loyerBrut/12)+'</span></div>';
-  h+='<div style="margin-top:10px">';
-  h+='<div class="eb-label"><span>Taux d\'effort (mensualit\u00e9 / revenus)</span><span style="font-family:var(--sans);font-weight:700;color:'+cEndAvt+'">'+endAvt.toFixed(1)+'%</span></div>';
-  h+='<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(endAvt,50)/50*100+'%;background:'+cEndAvt+'"></div></div>';
+  h+='<div class="bl-row"><span class="bl-k">Charges annuelles</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
+  // Revenus / charges / endettement
+  h+='<div style="border-top:1px solid var(--bord);margin-top:10px;padding-top:10px">';
+  h+='<div class="bl-row"><span class="bl-k">Revenus mensuels</span><span class="bl-v" style="font-weight:700">'+fmtE(_revM)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Charges cr\u00e9dits existants</span><span class="bl-v">'+fmtE(_chgM)+' /mois</span></div>';
+  h+='<div style="margin-top:8px">';
+  h+='<div class="eb-label"><span>Endettement avant</span><span style="font-family:var(--sans);font-weight:700;color:'+cEndAvt+'">'+_endAvt.toFixed(1)+'%</span></div>';
+  h+='<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(_endAvt,50)/50*100+'%;background:'+cEndAvt+'"></div></div>';
+  h+='</div>';
+  h+='<div style="margin-top:6px">';
+  h+='<div class="eb-label"><span>Endettement apr\u00e8s</span><span style="font-family:var(--sans);font-weight:700;color:'+cEndApr+'">'+_endApr.toFixed(1)+'%</span></div>';
+  h+='<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(_endApr,50)/50*100+'%;background:'+cEndApr+'"></div></div>';
+  h+='<div style="font-size:10px;color:var(--gris);margin-top:4px;text-align:right">Seuil : <strong>35%</strong></div>';
+  h+='</div>';
   h+='</div>';
   h+='</div>';
 
