@@ -59,10 +59,20 @@ body { background: #ECEAE6; }
 .eq-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--noir)}
 .eq-sub{font-size:10px;color:var(--gris);margin-top:2px}
 .eq-op{font-size:22px;color:var(--gris);padding:0 10px;flex-shrink:0}
-.dr .v { font-weight: 600; color: var(--ink); }
-.dr .v.g { color: #1a7a4a; }
-.dr .v.o { color: var(--orange); }
-.dr .v.r { color: #c0392b; }
+.eq-b.mens{border-color:var(--bord)}
+.eq-b.divs{border-color:rgba(45,122,91,0.3);background:rgba(45,122,91,0.03)}
+.eb-label{display:flex;justify-content:space-between;font-size:11px;color:var(--gris);margin-bottom:4px}
+.prog-track{height:8px;background:var(--bord);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl thead th{padding:8px 10px;text-align:right;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:var(--paper);border-bottom:1px solid var(--bord)}
+.tbl thead th:first-child{text-align:left}
+.tbl tbody tr{border-bottom:1px solid var(--bord)}
+.tbl tbody td{padding:7px 10px;text-align:right;font-size:11px;color:var(--gris)}
+.tbl tbody td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+.tbl td.green{color:#2D7A5B!important;font-weight:600}
+.tbl td.red{color:#c0392b!important}
+.tbl td.gold{color:var(--orange)!important;font-weight:600}
 .dr.tot { font-weight: 700; border-top: 2px solid var(--rule-l); border-bottom: none; padding-top: 8px; }
 
 /* Chart */
@@ -258,6 +268,10 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
     </div>
 
     <button class="btn-sim" onclick="recalc()">Calculer la projection</button>
+    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
   </div>
 
   <div class="cs-main">
@@ -543,9 +557,29 @@ function recalc() {
   document.getElementById('results').style.display='block';
   var pos = partM <= 0;
   var partAbs = Math.abs(partM);
+  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP R\u00e9sidence de Services';
   var h = '';
 
-  // 1. Investissement + Conditions de financement (cote a cote)
+  // 1. Bloc emprunteur / projet
+  var endAvt = p.montantEmprunte > 0 ? (mensTotal_init / (gv('fRev',60000)/12 || 1) * 100) : 0;
+  // Estimation simplifi\u00e9e endettement
+  var endApr = endAvt; // d\u00e9j\u00e0 inclus car c'est le projet
+  var cEndAvt = endAvt > 35 ? 'var(--red)' : endAvt > 28 ? 'var(--ambre)' : 'var(--green)';
+  h+='<div class="card" style="margin-bottom:14px">';
+  h+='<div class="card-title"><span class="dot"></span>Projet immobilier';
+  h+='<span style="float:right;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--ambre-l);color:var(--ambre-d)">'+modeLabel+'</span></div>';
+  var _cl = (document.getElementById('immoClient')||{}).value||'Client';
+  h+='<div style="font-size:13px;font-weight:600;color:var(--noir);margin-bottom:8px">'+CGP.esc(_cl)+'</div>';
+  h+='<div class="bl-row"><span class="bl-k">Budget total</span><span class="bl-v gold" style="font-size:14px">'+fmtE(p.budgetTotal)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Montant emprunt\u00e9</span><span class="bl-v" style="font-weight:700">'+fmtE(p.montantEmprunte)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Loyer brut mensuel</span><span class="bl-v green">'+fmtE(p.loyerBrut/12)+'</span></div>';
+  h+='<div style="margin-top:10px">';
+  h+='<div class="eb-label"><span>Taux d\'effort (mensualit\u00e9 / revenus)</span><span style="font-family:var(--sans);font-weight:700;color:'+cEndAvt+'">'+endAvt.toFixed(1)+'%</span></div>';
+  h+='<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(endAvt,50)/50*100+'%;background:'+cEndAvt+'"></div></div>';
+  h+='</div>';
+  h+='</div>';
+
+  // 2. Investissement + Conditions de financement (cote a cote)
   var iRows = [];
   if(mode==='mono') iRows = [['Prix du bien TTC', fmtE(p.prixTotal)],['Frais de notaire', fmtE(p.fraisNotaire)],['Mobilier', fmtE(p.prixMobilier)]];
   else if(mode==='coloc') iRows = [['Prix FAI', fmtE(gv('prixFAI'))],['Travaux', fmtE(gv('travaux'))],['Mobilier', fmtE(gv('mobilierC'))],['Notaire', fmtE(gv('fraisNotaireC'))]];
@@ -558,7 +592,6 @@ function recalc() {
   h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Budget total</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.budgetTotal)+'</span></div>';
   h+='</div>';
 
-  // Conditions de financement
   h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Conditions de financement</div>';
   h+='<div class="bl-row"><span class="bl-k">Dur\u00e9e</span><span class="bl-v" style="font-weight:700">'+p.dureePret+' ans</span></div>';
   h+='<div class="bl-row"><span class="bl-k">Taux nominal</span><span class="bl-v" style="font-weight:700;color:var(--orange);font-size:14px">'+fmtPct(p.tauxN*100)+'</span></div>';
@@ -569,16 +602,16 @@ function recalc() {
   h+='<div class="bl-row" style="border-bottom:none"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.montantEmprunte)+'</span></div>';
   h+='</div></div></div>';
 
-  // 2. Equation
+  // 3. Equation avec bulles color\u00e9es
   h+='<div class="eq">';
-  h+='<div class="eq-b"><div class="eq-lbl">Mensualit\u00e9 + ADI</div><div class="eq-val">'+fmtE(mensTotal_init)+'</div><div class="eq-sub">/mois</div></div>';
+  h+='<div class="eq-b mens"><div class="eq-lbl">Mensualit\u00e9 + ADI</div><div class="eq-val">'+fmtE(mensTotal_init)+'</div><div class="eq-sub">/mois</div></div>';
   h+='<div class="eq-op">\u2212</div>';
-  h+='<div class="eq-b"><div class="eq-lbl">Loyer net</div><div class="eq-val" style="color:var(--green)">'+fmtE(p.loyerNetM)+'</div><div class="eq-sub">/mois</div></div>';
+  h+='<div class="eq-b divs"><div class="eq-lbl">Loyer net</div><div class="eq-val" style="color:var(--green)">'+fmtE(p.loyerNetM)+'</div><div class="eq-sub">/mois</div></div>';
   h+='<div class="eq-op">=</div>';
   h+='<div class="eq-b '+(pos?'pos':'neg')+'"><div class="eq-lbl">'+(pos?'Gain mensuel':'Effort mensuel')+'</div><div class="eq-val" style="color:'+(pos?'var(--green)':'var(--red)')+'">'+fmtE(partAbs)+'</div><div class="eq-sub">'+(pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge')+'</div></div>';
   h+='</div>';
 
-  // 3. Bilans cote a cote
+  // 4. Bilans cote a cote
   h+='<div class="bilan-2">';
   h+='<div class="bl"><div class="bl-title">Pendant le financement</div>';
   h+='<div class="bl-row"><span class="bl-k">Loyers nets cumul\u00e9s</span><span class="bl-v green">'+fmtE(loyerNetCumul)+'</span></div>';
@@ -592,27 +625,25 @@ function recalc() {
   h+='<div class="bl-row"><span class="bl-k">Rente mensuelle nette</span><span class="bl-v green">'+fmtE(p.loyerNetM)+' /mois</span></div>';
   h+='</div></div>';
 
-  // 4. Doughnut
+  // 5. Doughnut
   h+='<div class="card"><div class="card-title"><span class="dot"></span>R\u00e9partition du financement</div><div style="max-width:320px;margin:0 auto;height:220px"><canvas id="mainChart"></canvas></div></div>';
 
-  // 5. Detail charges + amortissement + rendements (2x2)
+  // 6. Charges + Amortissement
   var chargesRows = [['Copropri\u00e9t\u00e9', fmtE(p.cCopro)],['Taxe fonci\u00e8re', fmtE(p.cTF)],['Gestion', fmtE(gv('cGest',8)/100*p.loyerBrut)],['PNO', fmtE(p.cPNO)],['Comptabilit\u00e9', fmtE(p.cCompta)]];
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
   h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Charges annuelles</div>';
   chargesRows.forEach(function(r){h+='<div class="bl-row"><span class="bl-k">'+r[0]+'</span><span class="bl-v">'+r[1]+'</span></div>';});
   h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total / an</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
   h+='</div>';
-
   h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Amortissement LMNP</div>';
   h+='<div class="bl-row"><span class="bl-k">Amort. immo / an ('+p.durAmI+' ans)</span><span class="bl-v gold">'+fmtE(p.amortImmoAn)+'</span></div>';
   h+='<div class="bl-row"><span class="bl-k">Amort. mobilier / an ('+p.durAmM+' ans)</span><span class="bl-v gold">'+fmtE(p.amortMobAn)+'</span></div>';
   h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total amort. / an</span><span class="bl-v gold">'+fmtE(p.amortImmoAn+p.amortMobAn)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">R\u00e9serve \u00e0 terme</span><span class="bl-v green">'+fmtE(reserveFinale)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'%</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'%</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'</span></div>';
+  h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'</span></div>';
   h+='</div></div>';
 
-  // 6. Tableau annuel
+  // 7. Tableau annuel
   h+='<div class="card"><div class="card-title"><span class="dot"></span>Tableau de bord annuel</div>';
   h+='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>An</th><th>Loyer brut</th><th>Loyer net</th><th>Mensualit\u00e9</th><th>Participation</th><th>Part. cumul.</th><th>R\u00e9serve amort.</th><th>Patrimoine net</th></tr></thead><tbody>';
   rows.forEach(function(r){
@@ -624,8 +655,6 @@ function recalc() {
   });
   h+='</tbody></table></div></div>';
 
-  // Disclaimer
-  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP R\u00e9sidence de Services';
   h+='<div style="font-size:10px;color:var(--gris);margin-top:8px;line-height:1.5">Simulation indicative \u2014 '+modeLabel+'. Taux '+fmtPct(p.tauxN*100)+', dur\u00e9e '+p.dureePret+' ans.</div>';
 
   document.getElementById('results').innerHTML = h;
