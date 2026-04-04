@@ -745,35 +745,39 @@ function render(d){
     </div>
   </div>`;
 
-  // 2. Hypoth\u00e8ses + endettement
+  // 2. Capacit\u00e9 d'emprunt
   const cA=d.eAvt>d.b.endMax?'var(--red)':d.eAvt>d.b.endMax-5?'var(--ambre)':'var(--green)';
   const cAp=d.eApr>d.b.endMax?'var(--red)':d.eApr>d.b.endMax-5?'var(--ambre)':'var(--green)';
   const ce=d.curEligib;
   const ceOk=ce.ok;
+  var _c1=(document.getElementById('fClient1')||{}).value||'';
+  var _c2=(document.getElementById('fClient2')||{}).value||'';
+  var _a1=(document.getElementById('fA1')||{}).value||'';
+  var _a2=(document.getElementById('fA2')||{}).value||'';
+  var _q1=(document.getElementById('fQ1')||{}).value||'100';
+  var _q2=(document.getElementById('fQ2')||{}).value||'50';
   h+=`<div class="card" style="margin-bottom:14px">
     <div class="card-title"><span class="dot"></span>Capacit\u00e9 d'emprunt
       <span style="float:right;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:${ceOk?'var(--green-l)':'var(--red-l)'};color:${ceOk?'var(--green)':'var(--red)'}">${ceOk?'\u2713 \u00c9ligible '+d.b.name:'\u26a0 V\u00e9rification requise'}</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
-      <div>
-        <div class="bl-row"><span class="bl-k">Revenus mensuels</span><span class="bl-v">${fmt(d.rev1)} \u20ac</span></div>
-        <div class="bl-row"><span class="bl-k">Charges mensuelles</span><span class="bl-v">${fmt(d.chg1)} \u20ac</span></div>
-        <div class="bl-row"><span class="bl-k">Montant emprunt\u00e9</span><span class="bl-v gold">${fmt(d.emp)} \u20ac</span></div>
-        <div class="bl-row"><span class="bl-k">Dur\u00e9e / Taux</span><span class="bl-v">${d.dur}m \u00e0 ${(d.tx*100).toFixed(2)}%</span></div>
-      </div>
-      <div>
-        <div style="margin-bottom:8px">
-          <div class="eb-label"><span>Avant investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
-          <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
-        </div>
-        <div>
-          <div class="eb-label"><span>Apr\u00e8s investissement</span><span style="font-family:var(--sans);font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
-          <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
-        </div>
-        <div style="font-size:10px;color:var(--gris);margin-top:6px">Seuil ${d.b.name}: <strong>${d.b.endMax}%</strong></div>
-      </div>
+    <div style="font-size:12px;color:var(--noir);margin-bottom:10px">
+      ${_c1||_a1?'<div style="margin-bottom:3px"><b>Emprunteur 1</b> : '+CGP.esc(_c1||'Client')+(_a1?', '+_a1+' ans':'')+'<span style="float:right;color:var(--gris)">'+_q1+'%</span></div>':''}
+      ${invMode==='couple'&&(_c2||_a2)?'<div><b>Emprunteur 2</b> : '+CGP.esc(_c2||'Co-emprunteur')+(_a2?', '+_a2+' ans':'')+'<span style="float:right;color:var(--gris)">'+_q2+'%</span></div>':''}
     </div>
-    ${!ceOk?'<div style="font-size:11px;color:var(--red);margin-top:4px">'+ce.iss.map(i=>'\u2022 '+i).join('<br>')+'</div>':''}
+    <div class="bl-row"><span class="bl-k">Revenus mensuels</span><span class="bl-v" style="font-weight:700">${fmt(d.rev1)} \u20ac</span></div>
+    <div class="bl-row"><span class="bl-k">Charges mensuelles</span><span class="bl-v" style="font-weight:700">${fmt(d.chg1)} \u20ac</span></div>
+    <div style="margin-top:12px">
+      <div style="margin-bottom:8px">
+        <div class="eb-label"><span>Endettement avant</span><span style="font-family:var(--sans);font-weight:700;color:${cA}">${d.eAvt.toFixed(1)}%</span></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eAvt,65)/65*100}%;background:${cA}"></div></div>
+      </div>
+      <div>
+        <div class="eb-label"><span>Endettement apr\u00e8s</span><span style="font-family:var(--sans);font-weight:700;color:${cAp}">${d.eApr.toFixed(1)}%</span></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${Math.min(d.eApr,65)/65*100}%;background:${cAp}"></div></div>
+      </div>
+      <div style="font-size:10px;color:var(--gris);margin-top:4px;text-align:right">Seuil ${d.b.name} : <strong>${d.b.endMax}%</strong></div>
+    </div>
+    ${!ceOk?'<div style="font-size:11px;color:var(--red);margin-top:8px">'+ce.iss.map(i=>'\u2022 '+i).join('<br>')+'</div>':''}
   </div>`;
 
   // 3. SCPI financ\u00e9es + Conditions de financement (c\u00f4te \u00e0 c\u00f4te)
@@ -784,13 +788,22 @@ function render(d){
   h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${fmt(d.mont)} \u20ac</td><td>${(d.rdtMoy*100).toFixed(2)}%</td><td>${fmt(d.divM)} \u20ac</td></tr></tbody></table></div>
 
     <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Conditions de financement</div>
-    <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} \u20ac</span></div>
-    <div class="bl-row"><span class="bl-k">Courtage (1%)</span><span class="bl-v red">+${fmt(d.frais.co)} \u20ac</span></div>
-    <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} \u20ac</span></div>
-    ${d.frais.nant>0?`<div class="bl-row"><span class="bl-k">Nantissement</span><span class="bl-v red">+${fmt(d.frais.nant)} \u20ac</span></div>`:''}
-    ${d.frais.gar>0?`<div class="bl-row"><span class="bl-k">Caution CL</span><span class="bl-v red">+${fmt(d.frais.gar)} \u20ac</span></div>`:''}
-    <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:7px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold">${fmt(d.emp)} \u20ac</span></div>
-    <div class="bl-row"><span class="bl-k">Apport client</span><span class="bl-v">${fmt(d.apport)} \u20ac</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-bottom:10px;font-size:12px">
+      <div class="bl-row"><span class="bl-k">Partenaire</span><span class="bl-v" style="font-weight:700;color:var(--noir)">${d.b.name}</span></div>
+      <div class="bl-row"><span class="bl-k">Dur\u00e9e</span><span class="bl-v" style="font-weight:700">${Math.round(d.dur/12)} ans (${d.dur}m)</span></div>
+      <div class="bl-row"><span class="bl-k">Taux nominal</span><span class="bl-v" style="font-weight:700;color:var(--orange)">${(d.tx*100).toFixed(2)}%</span></div>
+      <div class="bl-row"><span class="bl-k">Diff\u00e9r\u00e9</span><span class="bl-v">${d.dif} mois</span></div>
+      <div class="bl-row"><span class="bl-k">ADI</span><span class="bl-v">${(+(document.getElementById('fADI')||{}).value||0).toFixed(3)}%</span></div>
+      <div class="bl-row"><span class="bl-k">Apport</span><span class="bl-v">${fmt(d.apport)} \u20ac</span></div>
+    </div>
+    <div style="border-top:1px solid var(--bord);padding-top:8px;margin-top:4px">
+      <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Courtage</span><span class="bl-v red">+${fmt(d.frais.co)} \u20ac</span></div>
+      <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} \u20ac</span></div>
+      ${d.frais.nant>0?`<div class="bl-row"><span class="bl-k">Nantissement</span><span class="bl-v red">+${fmt(d.frais.nant)} \u20ac</span></div>`:''}
+      ${d.frais.gar>0?`<div class="bl-row"><span class="bl-k">Caution</span><span class="bl-v red">+${fmt(d.frais.gar)} \u20ac</span></div>`:''}
+      <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold" style="font-size:15px">${fmt(d.emp)} \u20ac</span></div>
+    </div>
     </div>
   </div>`;
 
