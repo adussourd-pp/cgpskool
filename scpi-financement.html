@@ -776,23 +776,14 @@ function render(d){
     ${!ceOk?'<div style="font-size:11px;color:var(--red);margin-top:4px">'+ce.iss.map(i=>'\u2022 '+i).join('<br>')+'</div>':''}
   </div>`;
 
-  // 3. \u00c9quation : Mensualit\u00e9 - Dividendes = Participation
-  h+=`<div class="eq">
-    <div class="eq-b mens"><div class="eq-lbl">Mensualit\u00e9 emprunt</div><div class="eq-val">${fmt(d.mA)} \u20ac</div><div class="eq-sub">/mois${d.dif>0?' | diff\u00e9r\u00e9: '+fmt(d.mD)+' \u20ac':''}</div></div>
-    <div class="eq-op">\u2212</div>
-    <div class="eq-b divs"><div class="eq-lbl">Dividendes bruts</div><div class="eq-val">${fmt(d.divM)} \u20ac</div><div class="eq-sub">/mois</div></div>
-    <div class="eq-op">=</div>
-    <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${fmt(partAbs)} \u20ac</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge'}</div></div>
-  </div>`;
-
-  // 4. SCPI financ\u00e9es + Frais (c\u00f4te \u00e0 c\u00f4te)
+  // 3. SCPI financ\u00e9es + Conditions de financement (c\u00f4te \u00e0 c\u00f4te)
   h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
     <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>SCPI financ\u00e9es</div>
     <table class="tbl"><thead><tr><th>SCPI</th><th>Parts</th><th>Montant</th><th>Rdt</th><th>Div/mois</th></tr></thead><tbody>`;
   d.scpis.forEach(r=>{h+=`<tr><td>${r.name}</td><td>${r.parts}</td><td class="gold">${fmt(r.montant)} \u20ac</td><td>${(r.rdt*100).toFixed(2)}%</td><td class="green">${fmt(r.montant*r.rdt/12)} \u20ac</td></tr>`;});
   h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${fmt(d.mont)} \u20ac</td><td>${(d.rdtMoy*100).toFixed(2)}%</td><td>${fmt(d.divM)} \u20ac</td></tr></tbody></table></div>
 
-    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Frais & financement</div>
+    <div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Conditions de financement</div>
     <div class="bl-row"><span class="bl-k">Souscription</span><span class="bl-v">${fmt(d.mont)} \u20ac</span></div>
     <div class="bl-row"><span class="bl-k">Courtage (1%)</span><span class="bl-v red">+${fmt(d.frais.co)} \u20ac</span></div>
     <div class="bl-row"><span class="bl-k">Frais dossier</span><span class="bl-v red">+${fmt(d.frais.doss)} \u20ac</span></div>
@@ -801,6 +792,15 @@ function render(d){
     <div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:7px;margin-top:4px"><span class="bl-k" style="font-weight:700">Montant emprunt\u00e9</span><span class="bl-v gold">${fmt(d.emp)} \u20ac</span></div>
     <div class="bl-row"><span class="bl-k">Apport client</span><span class="bl-v">${fmt(d.apport)} \u20ac</span></div>
     </div>
+  </div>`;
+
+  // 4. \u00c9quation : Mensualit\u00e9 - Dividendes = Participation
+  h+=`<div class="eq">
+    <div class="eq-b mens"><div class="eq-lbl">Mensualit\u00e9 emprunt</div><div class="eq-val">${fmt(d.mA)} \u20ac</div><div class="eq-sub">/mois${d.dif>0?' | diff\u00e9r\u00e9: '+fmt(d.mD)+' \u20ac':''}</div></div>
+    <div class="eq-op">\u2212</div>
+    <div class="eq-b divs"><div class="eq-lbl">Dividendes bruts</div><div class="eq-val">${fmt(d.divM)} \u20ac</div><div class="eq-sub">/mois</div></div>
+    <div class="eq-op">=</div>
+    <div class="eq-b ${pos?'pos':'neg'}"><div class="eq-lbl">${pos?'Gain mensuel':'Effort mensuel'}</div><div class="eq-val" style="color:${pos?'var(--green)':'var(--red)'}">${fmt(partAbs)} \u20ac</div><div class="eq-sub">${pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge'}</div></div>
   </div>`;
 
   // 5. Bilans c\u00f4te \u00e0 c\u00f4te
