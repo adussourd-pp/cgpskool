@@ -402,8 +402,9 @@ select.span2{grid-column:span 2}
   /* ── PIED DE PAGE : masquer les .page-number inline ── */
   .page-number{display:none!important}
   .page-nav-btns{display:none!important}
-  /* ── GRAPHIQUES : éviter la coupure ── */
-  canvas{max-width:100%!important}
+  /* ── GRAPHIQUES : canvas masque, image PNG visible ── */
+  canvas{display:none!important;max-width:100%!important}
+  .cgp-chart-print-img{display:block!important;max-width:100%!important;height:auto!important}
   .synthese-step{break-inside:avoid}
   .synthese-step::after{background:#fff!important}
   /* ── ANCIENNES PAGES PDF : masquer ── */
@@ -8347,24 +8348,34 @@ function exportPDF() {
       if(window.retChartInst){window.retChartInst.resize();window.retChartInst.update('none');}
     }catch(e4){}
     setTimeout(function(){
-      // 7. Capturer le chart retraite directement depuis l'instance Chart.js
+      // 7. Capturer TOUS les charts (retraite + synthese) depuis les instances Chart.js
       var _pdfChartImgs = [];
-      try {
-        if (window.retChartInst) {
-          var c = document.getElementById('retChart');
-          if (c) {
-            var url = window.retChartInst.toBase64Image();
-            if (url && url.length > 100) {
-              var img = document.createElement('img');
-              img.src = url;
-              img.className = 'cgp-chart-print-img';
-              img.style.cssText = 'width:100%;max-width:100%;height:auto;display:none';
-              c.parentNode.insertBefore(img, c.nextSibling);
-              _pdfChartImgs.push(img);
+      var _pdfHiddenCanvases = [];
+      var chartEntries = [
+        {inst: window.retChartInst, id: 'retChart'},
+        {inst: window._pyramideChart, id: 'pyramideChart'},
+        {inst: window._synthRetChart, id: 'synthRetChart'}
+      ];
+      chartEntries.forEach(function(entry) {
+        try {
+          if (entry.inst) {
+            var c = document.getElementById(entry.id);
+            if (c && c.width > 0 && c.height > 0) {
+              var url = entry.inst.toBase64Image();
+              if (url && url.length > 100) {
+                var img = document.createElement('img');
+                img.src = url;
+                img.className = 'cgp-chart-print-img';
+                img.style.cssText = 'width:100%;max-width:100%;height:auto;display:block';
+                c.parentNode.insertBefore(img, c.nextSibling);
+                c.style.display = 'none';
+                _pdfChartImgs.push(img);
+                _pdfHiddenCanvases.push(c);
+              }
             }
           }
-        }
-      } catch(e5) { console.warn('chart capture:', e5); }
+        } catch(e5) { console.warn('chart capture ' + entry.id + ':', e5); }
+      });
 
       // 8. Remettre la section en place
       if(secRet){secRet.style.display='';secRet.style.position='';secRet.style.left='';secRet.style.top='';secRet.style.width='';secRet.style.zIndex='';secRet.style.opacity='';}
@@ -8376,6 +8387,7 @@ function exportPDF() {
 
       // 10. Nettoyer apres impression
       _pdfChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
+      _pdfHiddenCanvases.forEach(function(c) { c.style.display = ''; });
       document.querySelectorAll('.section-page').forEach(function(el){el.classList.remove('print-visible');});
       if(confirm('PDF exporte. Voulez-vous sauvegarder l\'etude ?'))sauvegarderEtude();
     },500);
@@ -8459,33 +8471,43 @@ function updatePdfHeader() {
   }
 }
 
-// Ctrl+P : mettre a jour l'en-tete et capturer le chart retraite
+// Ctrl+P : mettre a jour l'en-tete et capturer tous les charts
 var _ctrlPChartImgs = [];
+var _ctrlPHiddenCanvases = [];
 window.addEventListener('beforeprint', function() {
   updatePdfHeader();
-  // Capturer le chart retraite s'il existe
   if (_ctrlPChartImgs.length > 0) return; // deja capture
-  try {
-    if (window.retChartInst) {
-      var c = document.getElementById('retChart');
-      if (c) {
-        var url = window.retChartInst.toBase64Image();
-        if (url && url.length > 100) {
-          var img = document.createElement('img');
-          img.src = url;
-          img.className = 'cgp-chart-print-img';
-          img.style.cssText = 'width:100%;max-width:100%;height:auto;display:none';
-          c.parentNode.insertBefore(img, c.nextSibling);
-          _ctrlPChartImgs.push(img);
+  var chartEntries = [
+    {inst: window.retChartInst, id: 'retChart'},
+    {inst: window._pyramideChart, id: 'pyramideChart'},
+    {inst: window._synthRetChart, id: 'synthRetChart'}
+  ];
+  chartEntries.forEach(function(entry) {
+    try {
+      if (entry.inst) {
+        var c = document.getElementById(entry.id);
+        if (c && c.width > 0 && c.height > 0) {
+          var url = entry.inst.toBase64Image();
+          if (url && url.length > 100) {
+            var img = document.createElement('img');
+            img.src = url;
+            img.className = 'cgp-chart-print-img';
+            img.style.cssText = 'width:100%;max-width:100%;height:auto;display:block';
+            c.parentNode.insertBefore(img, c.nextSibling);
+            c.style.display = 'none';
+            _ctrlPChartImgs.push(img);
+            _ctrlPHiddenCanvases.push(c);
+          }
         }
       }
-    }
-  } catch(e) {}
+    } catch(e) {}
+  });
 });
 window.addEventListener('afterprint', function() {
-  // Supprimer les images chart temporaires (Ctrl+P)
   _ctrlPChartImgs.forEach(function(img) { if(img.parentNode) img.parentNode.removeChild(img); });
   _ctrlPChartImgs = [];
+  _ctrlPHiddenCanvases.forEach(function(c) { c.style.display = ''; });
+  _ctrlPHiddenCanvases = [];
 });
 
 </script>
