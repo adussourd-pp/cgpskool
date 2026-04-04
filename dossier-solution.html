@@ -184,6 +184,11 @@
           <div class="garde-client" id="gardeClient">Client</div>
           <div class="garde-date" id="gardeDate"></div>
           <div class="garde-rule"></div>
+          <div style="margin-top:28px;font-size:12px;color:var(--gris);line-height:1.7">
+            <div style="font-weight:600;color:var(--noir)" id="gardeConseiller"></div>
+            <div id="gardeCabinet"></div>
+            <div id="gardeOrias" style="font-size:11px"></div>
+          </div>
         </div>
       </div>
 
@@ -460,6 +465,12 @@ function updateGarde(){
   V('gardeType').textContent=t.type;
   V('gardeClient').textContent=V('pClient').value||'Client';
   V('gardeDate').textContent=V('pDate').value;
+  // Infos conseiller
+  var p=CGP.profil.load();
+  var nom=((p.prenom||'')+(p.nom?' '+p.nom:'')).trim();
+  V('gardeConseiller').textContent=nom||'';
+  V('gardeCabinet').textContent=p.cabinet||'';
+  V('gardeOrias').textContent=p.orias?'ORIAS n\u00b0 '+p.orias:'';
 }
 
 function onTypeChange(){
