@@ -533,19 +533,30 @@ function runSimulation(){
 
 function renderSCPIHeader(){
   const s=getActiveScpi();
-  const decStr='';
-  const tofStr=s.tof?`<div class="sh-item"><div class="sh-label">TOF</div><div class="sh-val ${s.tof<0.9?'red':'gre'}">${(s.tof*100).toFixed(1)}%</div></div>`:'';
-  const attenteStr=s.partsAttente>0?`<div class="sh-item"><div class="sh-label">Parts en attente</div><div class="sh-val red">${s.partsAttente}M€ ⚠</div></div>`:'';
-  const priceStr=s.price?`<div class="sh-item"><div class="sh-label">Prix part</div><div class="sh-val gold">${s.price} €</div></div>`:'';
-  const capiStr=s.capi?`<div class="sh-item"><div class="sh-label">Capitalisation</div><div class="sh-val orn">${s.capi}M€</div></div>`:'';
+  if(s.isCustom){
+    document.getElementById('scpiHeaderBar').innerHTML=`
+      <div class="scpi-header fade-in" style="padding:14px 18px">
+        <div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir)">SCPI personnalis&eacute;e</div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ambre);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.18);padding:4px 12px;border-radius:20px">${(s.yieldGross*100).toFixed(2)}%</span>
+        </div>
+      </div>`;
+    return;
+  }
+  const tags=[];
+  if(s.theme) tags.push(s.theme);
+  if(s.geo) tags.push(s.geo);
+  if(s.price) tags.push(s.price+' &euro;');
+  tags.push((s.yieldGross*100).toFixed(2)+'%');
   document.getElementById('scpiHeaderBar').innerHTML=`
-    <div class="scpi-header fade-in">
-      <div class="scpi-header-name">${s.name}${s.isCustom?'':` <span>— ${s.manager}</span>`}</div>
-      ${s.isCustom?'':`${priceStr}`}
-      <div class="sh-item"><div class="sh-label">Taux de distribution</div><div class="sh-val gold">${(s.yieldGross*100).toFixed(2)}%</div></div>
-      ${s.isCustom?'':`${capiStr}${decStr}${tofStr}${attenteStr}`}
-      ${s.isCustom?'':s.isr?'<div class="sh-item"><div class="sh-label">Label</div><div class="sh-val gre">✓ ISR</div></div>':''}
-      ${s.isCustom?'':`<div class="sh-item"><div class="sh-label">Durabilité</div><div class="sh-val">${s.durabilite}</div></div>`}
+    <div class="scpi-header fade-in" style="padding:14px 18px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0">
+        <div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);line-height:1.2">${s.name}</div>
+        <div style="font-size:11px;color:var(--gris);font-weight:400">${s.manager}</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${tags.map(t=>`<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ambre);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.18);padding:4px 12px;border-radius:20px;white-space:nowrap">${t}</span>`).join('')}
+      </div>
     </div>`;
 }
 
