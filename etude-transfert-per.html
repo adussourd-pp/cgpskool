@@ -150,8 +150,14 @@
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
-      <div class="sf-range"><input type="range" id="pFraisTransfert" min="0" max="5" step="0.1" value="1" oninput="update()"><span class="sf-range-val" id="vFraisTransfert">1.0%</span></div>
+      <div id="fraisTransfertRow">
+        <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
+        <div style="display:flex;gap:6px;padding:0 8px;margin-bottom:8px">
+          <button type="button" id="ftBtnOui" onclick="setFraisTransfert(1)" style="flex:1;padding:8px;border:1.5px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;border-radius:7px;cursor:pointer">Oui &mdash; 1 %</button>
+          <button type="button" id="ftBtnNon" onclick="setFraisTransfert(0)" style="flex:1;padding:8px;border:1.5px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;border-radius:7px;cursor:pointer">Non &mdash; 0 %</button>
+        </div>
+        <input type="hidden" id="pFraisTransfert" value="1">
+      </div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
       <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
       <div class="alloc-grid-simple">
@@ -339,14 +345,30 @@ var TYPE_RULES={
   av:        {famille:'av', label:'Assurance Vie',badge:'AV',     fraisMax:0, seuilAns:0,  fraisEntreeMax:4.8, transfert:'Rachat total + r\u00e9investissement', interet:'Gestion libre, clause b\u00e9n\u00e9ficiaire', attention:'Fiscalit\u00e9 rachat (PFU ou bar\u00e8me)'}
 };
 
+function setFraisTransfert(v){
+  V('pFraisTransfert').value=String(v);
+  var bOui=document.getElementById('ftBtnOui');
+  var bNon=document.getElementById('ftBtnNon');
+  if(bOui&&bNon){
+    var on=v===1;
+    bOui.style.background=on?'var(--orange)':'#fff';
+    bOui.style.color=on?'#fff':'var(--gris)';
+    bOui.style.borderColor=on?'var(--orange)':'var(--bord)';
+    bNon.style.background=on?'#fff':'var(--orange)';
+    bNon.style.color=on?'var(--gris)':'#fff';
+    bNon.style.borderColor=on?'var(--bord)':'var(--orange)';
+  }
+  update();
+}
+
 function onFamilleChange(){
   var fam=V('pFamille').value;
+  var ftRow=document.getElementById('fraisTransfertRow');
   if(fam==='av'){
     V('perTypeRow').style.display='none';
     V('pTypePER').value='av';
     V('pFraisTransfert').value='0';
-    V('pFraisTransfert').max='0';
-    V('pFraisTransfert').disabled=true;
+    if(ftRow)ftRow.style.display='none';
     V('pFraisEntree').max='4.8';
     V('pContratA').value='AV Actuelle';
     V('pContratB').value='AV Recommand\u00e9e';
@@ -355,8 +377,8 @@ function onFamilleChange(){
   }else{
     V('perTypeRow').style.display='';
     V('pTypePER').value='per';
-    V('pFraisTransfert').disabled=false;
-    V('pFraisTransfert').max='5';
+    if(ftRow)ftRow.style.display='';
+    setFraisTransfert(1);
     V('pFraisEntree').max='4.5';
     V('pContratA').value='PER Ancien';
     V('pContratB').value='PER Recommand\u00e9';
