@@ -268,12 +268,31 @@ CGP.copernic = {
     'PINEL':      ['Creer patrimoine immobilier','Optimiser votre fiscalite','Proteger votre conjoint','Proteger vos enfants','Preparer votre retraite'],
     'LMNP':       ['Creer patrimoine immobilier','Completer vos revenus','Proteger votre conjoint','Preparer votre retraite','Accompagner vos enfants']
   },
+  // Tags affiches sous le titre (extraits de la matrice COPERNIC d'etude-dossier)
+  TAGS_BY_SOLUTION: {
+    'AV':        ['Placement'],
+    'PER':       ['Retraite','Imp\u00f4ts'],
+    'SCPI_CASH': ['SCPI','Placement'],
+    'SCPI_FIN':  ['Immobilier','Financement'],
+    'LMNP':      ['Immobilier','Financement'],
+    'PINEL':     ['Immobilier','Financement']
+  },
   // Fusionne plusieurs solutions en une liste unique d'objectifs
   union: function(solutions) {
     var seen = {}, out = [];
     (solutions || []).forEach(function(sol) {
       (CGP.copernic.OBJECTIFS_BY_SOLUTION[sol] || []).forEach(function(o) {
         if (!seen[o]) { seen[o] = true; out.push(o); }
+      });
+    });
+    return out;
+  },
+  // Fusionne les tags de plusieurs solutions
+  unionTags: function(solutions) {
+    var seen = {}, out = [];
+    (solutions || []).forEach(function(sol) {
+      (CGP.copernic.TAGS_BY_SOLUTION[sol] || []).forEach(function(t) {
+        if (!seen[t]) { seen[t] = true; out.push(t); }
       });
     });
     return out;
@@ -317,6 +336,10 @@ CGP.header.render = function(target, opts) {
   if (opts.objectifs) objectifs = opts.objectifs;
   else if (opts.solutions) objectifs = CGP.copernic.union(opts.solutions);
 
+  // Tags solution (sous le titre)
+  var solTags = [];
+  if (opts.solutions) solTags = CGP.copernic.unionTags(opts.solutions);
+
   // Etat coches (localStorage)
   var savedKey = opts.savedKey ? ('cgpskool_obj_' + opts.savedKey) : null;
   var checked = {};
@@ -332,8 +355,17 @@ CGP.header.render = function(target, opts) {
 
   // Ligne tag + client + date
   h += '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">';
+  h += '<div style="min-width:0">';
   h += '<div style="font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:' + color1 + ';padding-top:3px">' + e(opts.tag || '') + '</div>';
-  h += '<div style="text-align:right">';
+  if (solTags.length) {
+    h += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">';
+    solTags.forEach(function(t) {
+      h += '<span style="font-size:9px;font-weight:600;letter-spacing:0.04em;color:#6B6B6B;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);padding:2px 8px;border-radius:10px">' + e(t) + '</span>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '<div style="text-align:right;flex-shrink:0">';
   h += '<div style="font-size:18px;font-weight:700;color:#0D0D0D;text-transform:uppercase;letter-spacing:0.02em">' + e(clientDisplay) + '</div>';
   h += '<div style="font-size:12px;color:#6B6B6B;font-weight:300;margin-top:2px">' + e(dateStr) + '</div>';
   h += '</div>';
