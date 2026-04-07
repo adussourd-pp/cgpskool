@@ -741,48 +741,6 @@ select.span2{grid-column:span 2}
         <button class="btn btn-primary" onclick="appliquerVerification()" style="padding:10px 28px;font-size:13px;margin-top:10px">Appliquer les modifications</button>
       </div>
     </div>
-    <!-- ── BLOC FICHE LÉGALE (DER) ── -->
-    <div style="background:#fff;border:2px dashed var(--orange);border-radius:14px;padding:20px;margin-bottom:18px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div>
-          <div style="font-family:var(--sans);font-weight:700;font-size:15px;color:var(--noir)">Fiche d'informations l&#233;gales</div>
-          <div style="font-size:12px;color:var(--gris);margin-top:3px">Collez le contenu de votre DER (fiche l&#233;gale)</div>
-        </div>
-      </div>
-      <textarea id="mentionsDirectInput" rows="4"
-        placeholder="Collez ici le contenu de votre fiche d'informations l&#233;gales..."
-        style="width:100%;padding:12px;border:1.5px solid var(--bord);border-radius:10px;font-family:var(--sans);font-size:13px;color:var(--noir);resize:vertical;outline:none;line-height:1.6;background:#fafaf9"
-        oninput="saveMentionsDirect()"></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="saveMentionsDirect()">&#9654; Valider</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('mentionsDirectInput').value='';saveMentionsDirect()">Effacer</button>
-      </div>
-      <!-- Vérif mentions légales (dans la même bulle) -->
-      <div style="margin-top:14px;border-top:1px solid rgba(212,98,42,0.2);padding-top:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var b=document.getElementById('verifierMentionsBody');b.style.display=b.style.display==='none'?'':'none'">
-        <span style="font-size:13px;font-weight:600;color:var(--orange)">V&#233;rifier les mentions l&#233;gales</span>
-        <span style="color:var(--orange);font-size:14px">&#9660;</span>
-      </div>
-      <div id="verifierMentionsBody" style="display:none;padding:16px 20px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><label style="font-size:10px;color:var(--gris)">Nom / Pr&#233;nom</label><input class="fi" id="vMlNom"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Email</label><input class="fi" id="vMlEmail"></div>
-          <div><label style="font-size:10px;color:var(--gris)">T&#233;l&#233;phone</label><input class="fi" id="vMlTel"></div>
-          <div><label style="font-size:10px;color:var(--gris)">N&#176; ORIAS</label><input class="fi" id="vMlOrias"></div>
-        </div>
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--gris);margin-bottom:6px">Habilitations d&#233;tect&#233;es</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlImmo" style="accent-color:var(--orange)">TRANSACTION (Immobilier)</label>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlIOBSP" style="accent-color:var(--orange)">IOBSP (Financement)</label>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlIAS" style="accent-color:var(--orange)">IAS (Assurance)</label>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="vMlCIF" style="accent-color:var(--orange)">AGENT LI&#201; (Instruments financiers)</label>
-        </div>
-        <div><label style="font-size:10px;color:var(--gris)">N&#176; CPI</label><input class="fi" id="vMlCPI" style="margin-bottom:10px"></div>
-        <button class="btn btn-primary" onclick="appliquerVerifMentions()" style="padding:10px 28px;font-size:13px">Appliquer les modifications</button>
-      </div>
-    </div>
-
-
-
   </div>
 </div><!-- /sec-import -->
 
@@ -1535,7 +1493,7 @@ select.span2{grid-column:span 2}
     <div style="padding:14px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f);line-height:1.7">
       <strong>Astuces :</strong><br>
       &#8226; Le fichier JSON sauvegard&#233; contient TOUTE l'&#233;tude. Conserve-le pr&#233;cieusement pour pouvoir la reprendre 3, 6 ou 12 mois plus tard.<br>
-      &#8226; Les mentions l&#233;gales et l'avis d'imposition ont chacun leur propre zone de copier-coller + v&#233;rification dans Import / Saisie.<br>
+      &#8226; Les mentions l&#233;gales sont g&#233;n&#233;r&#233;es automatiquement depuis ton profil (page d'accueil). L'avis d'imposition a sa propre zone de copier-coller dans Import / Saisie.<br>
       &#8226; Tu peux revoir ce guide &#224; tout moment via "&#128214; Revoir le guide" en bas de la sidebar.
     </div>
 
@@ -7721,31 +7679,6 @@ function calcProjectionFin(){
     el.innerHTML=h;
   }catch(e){console.warn('calcProjectionFin error:',e);}
 }
-// ── VÉRIF MENTIONS LÉGALES ──
-function remplirVerifMentions(){
-  try{
-    var raw=(document.getElementById('mentionsDirectInput')?document.getElementById('mentionsDirectInput').value:'')||'';
-    var mNom=raw.match(/(?:Par|Nom\s*\/\s*Pr[e\u00e9]nom)\s*[:\-]\s*([^\n]+)/im);
-    var mMail=raw.match(/E-mail\s*[:\t]\s*([^\s\n]+@[^\s\n]+)/im);
-    var mTel=raw.match(/Tel[.\s]*Portable\s*[:\t]\s*([\d\s+]+)/im);
-    var mOrias=raw.match(/N[\u00b0o]\s*:\s*(\d[\d\s\-]*\d)/m);
-    var mCPI=raw.match(/CPI\s+([\d\s]+\d)/m);
-    var s=function(id,v){var el=document.getElementById(id);if(el&&v)el.value=String(v).trim();};
-    s('vMlNom',mNom?mNom[1]:'');s('vMlEmail',mMail?mMail[1]:'');
-    s('vMlTel',mTel?mTel[1]:'');s('vMlOrias',mOrias?mOrias[1].replace(/[\s\-]/g,''):'');
-    s('vMlCPI',mCPI?mCPI[1]:'');
-    var cb=function(id,test){var el=document.getElementById(id);if(el)el.checked=test;};
-    cb('vMlImmo',/IMMOBILIER[\s\S]*?agent commercial[\s\S]*?:\s*OUI/i.test(raw));
-    cb('vMlIOBSP',/FINANCEMENT[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw));
-    cb('vMlIAS',/ASSURANCE[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw));
-    cb('vMlCIF',/INSTRUMENTS FINANCIERS[\s\S]*?Agent li\u00e9[\s\S]*?:\s*OUI/i.test(raw));
-    document.getElementById('verifierMentionsBody').style.display='';
-    highlightEmptyFields('verifierMentionsBody');
-  }catch(e){console.warn('remplirVerifMentions:',e);}
-}
-function appliquerVerifMentions(){
-  try{saveMentionsDirect();showNotif('Mentions l\u00e9gales appliqu\u00e9es');}catch(e){}
-}
 // ── VÉRIF AVIS IMPOSITION ──
 function remplirVerifFisc(){
   try{
@@ -8092,84 +8025,57 @@ function updEntreprise(){
   }
 }
 function rMentions(){
-  var input=document.getElementById('mentionsDirectInput');
-  if(input&&!input.value){
-    try{var txt=localStorage.getItem('cgpskool_mentions')||'';if(txt)input.value=txt;}catch(e){}
-  }
-  saveMentionsDirect();
-}
-function saveMentionsDirect(){
   try{
-  var input=document.getElementById('mentionsDirectInput');
-  if(!input)return;
-  try{localStorage.setItem('cgpskool_mentions',input.value);}catch(e){}
-  var mel=document.getElementById('mentionsPreview');
-  if(!mel)return;
-  var raw=input.value.replace(/\u00a0/g,' ').replace(/[\u200b\u200c\u200d\ufeff]/g,'').trim();
-  if(!raw){mel.innerHTML='<em style="color:var(--gris)">Collez votre fiche d\'informations l\u00e9gales ci-dessus.</em>';return;}
+    var mel=document.getElementById('mentionsPreview');
+    if(mel)mel.innerHTML=buildMentionsHtml(false);
+  }catch(e){console.warn('rMentions error:',e);}
+}
+// Alias retro-compat (callers historiques)
+function saveMentionsDirect(){rMentions();}
 
-  // Extraire infos
-  var mNom=raw.match(/(?:Par|Nom\s*\/\s*Pr[e\u00e9]nom)\s*[:\-]\s*([^\n]+)/im);
-  var mAdr=raw.match(/Adresse professionnelle\s*[:\t]\s*([^\n]+)/im);
-  var mVille=raw.match(/(\d{5}\s+[A-Z\u00c0-\u00dc\s]+)/m);
-  var mMail=raw.match(/E-mail\s*[:\t]\s*([^\s\n]+@[^\s\n]+)/im);
-  var mTel=raw.match(/Tel[.\s]*Portable\s*[:\t]\s*([\d\s]+)/im);
-  var mOrias=raw.match(/N[\u00b0o]\s*:\s*(\d[\d\s\-]*\d)/m);
-  var mCPI=raw.match(/CPI\s+([\d\s]+\d)/m);
-  var mSiret=raw.match(/SIRET\s*[:\s]*([\d\s\-]+\d)/im);
-  var mRSAC=raw.match(/RSAC\s+(\w+)/im);
-  var mAPE=raw.match(/APE\s*[:\s]*([\w]+)/im);
-
-  // Habilitations : chercher OUI après chaque section
-  var habImmo=/IMMOBILIER[\s\S]*?agent commercial[\s\S]*?:\s*OUI/i.test(raw);
-  var habIOBSP=/FINANCEMENT[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw);
-  var habIAS=/ASSURANCE[\s\S]*?Mandataire[\s\S]*?:\s*OUI/i.test(raw);
-  var habCIF=/INSTRUMENTS FINANCIERS[\s\S]*?Agent li\u00e9[\s\S]*?:\s*OUI/i.test(raw);
-
+function buildMentionsHtml(forPdf){
+  var L=(typeof CGP!=='undefined'&&CGP.profil&&CGP.profil.loadLegal)?CGP.profil.loadLegal():null;
+  if(!L||!L.self||(!L.self.nom&&!L.self.cabinet)){
+    return '<em style="color:var(--gris)">Renseignez votre profil sur la page d\'accueil pour g\u00e9n\u00e9rer vos mentions l\u00e9gales.</em>';
+  }
+  var self=L.self;
+  var habils=L.habils;
+  var mand=L.mandats;
+  var addr=L.addrs;
   var photoUrl='';try{photoUrl=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
-  var nom=mNom?mNom[1].trim():'';
-  var adr=mAdr?mAdr[1].trim():'';
-  if(mVille)adr+=(adr?', ':'')+mVille[1].trim();
-  var email=mMail?mMail[1]:'';
-  var tel=mTel?mTel[1].trim():'';
-  var orias=mOrias?mOrias[1].replace(/[\s\-]/g,''):'';
-  var cpi=mCPI?mCPI[1].trim():'';
+  var nomComplet=((self.prenom||'')+' '+(self.nom||'')).trim();
+  var adresseComplete=(self.adresse||'');
+  if(self.cp||self.ville)adresseComplete+=(adresseComplete?', ':'')+((self.cp||'')+' '+(self.ville||'')).trim();
 
   var h='<div style="font-family:var(--sans)">';
 
   // Bulle contact
   h+='<div style="display:flex;align-items:center;gap:20px;background:rgba(212,98,42,0.05);border:1.5px solid rgba(212,98,42,0.12);border-radius:14px;padding:20px 24px;margin-bottom:20px">';
-  if(photoUrl)h+='<img src="'+photoUrl+'" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0">';
+  if(photoUrl&&!forPdf)h+='<img src="'+photoUrl+'" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0">';
   h+='<div style="flex:1;min-width:0">';
-  var profil=typeof loadProfil==='function'?loadProfil():{};
-  if(profil.cabinet)h+='<div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:2px">'+profil.cabinet+'</div>';
-  if(nom)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:2px">'+nom+'</div>';
-  if(email)h+='<div style="font-size:12px;color:var(--orange)">'+email+'</div>';
-  if(tel)h+='<div style="font-size:12px;color:var(--gris-f)">'+tel+'</div>';
+  if(self.cabinet)h+='<div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:2px">'+self.cabinet+'</div>';
+  if(nomComplet)h+='<div style="font-weight:700;font-size:16px;color:var(--noir);margin-bottom:2px">'+nomComplet+'</div>';
+  if(adresseComplete)h+='<div style="font-size:11px;color:var(--gris-f);margin-bottom:2px">'+adresseComplete+'</div>';
+  if(self.email)h+='<div style="font-size:12px;color:var(--orange)">'+self.email+'</div>';
+  if(self.tel)h+='<div style="font-size:12px;color:var(--gris-f)">'+self.tel+'</div>';
   h+='</div>';
-  if(orias)h+='<div style="flex-shrink:0;text-align:center"><span style="display:inline-block;font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;white-space:nowrap">ORIAS n\u00b0 '+orias+'</span><br><a href="https://www.orias.fr" target="_blank" style="font-size:10px;color:var(--orange);text-decoration:none">www.orias.fr</a></div>';
+  if(self.orias)h+='<div style="flex-shrink:0;text-align:center"><span style="display:inline-block;font-size:11px;font-weight:600;color:var(--orange);background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.15);padding:5px 14px;border-radius:20px;white-space:nowrap">ORIAS n\u00b0 '+self.orias+'</span><br><a href="https://www.orias.fr" target="_blank" style="font-size:10px;color:var(--orange);text-decoration:none">www.orias.fr</a></div>';
   h+='</div>';
 
   // Tags habilitations
   var tags=[];
-  if(habImmo)tags.push('TRANSACTION');
-  if(habIOBSP)tags.push('IOBSP');
-  if(habIAS)tags.push('IAS');
-  if(habCIF)tags.push('AGENT LI\u00c9');
+  if(habils.immo)tags.push('TRANSACTION');
+  if(habils.iobsp)tags.push('IOBSP');
+  if(habils.ias)tags.push('IAS');
+  if(habils.cif||habils.agent)tags.push('AGENT LI\u00c9');
   if(tags.length){
-    h+='<div style="display:flex;gap:8px;margin-bottom:20px">';
+    h+='<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">';
     tags.forEach(function(t){h+='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);background:rgba(212,98,42,0.07);border:1.5px solid rgba(212,98,42,0.18);padding:5px 16px;border-radius:20px">'+t+'</span>';});
     h+='</div>';
   }
 
-  // Profil legal dynamique (mode junior/parrain pris en compte)
-  var L=(typeof CGP!=='undefined'&&CGP.profil&&CGP.profil.loadLegal)?CGP.profil.loadLegal():null;
-  var mand=L?L.mandats:{iobsp:'Stellium Financement',ias:'Stellium Courtage',cif:'Stellium Invest (ACPR n\u00b0 10983)',immo:'Stellium Immobilier'};
-  var addr=L?L.addrs:{acpr:'4 Place de Budapest, 75436 Paris',rcp:'Zurich Insurance \u2014 112 av. de Wagram, 75017 Paris',reclamation:'reclamations@stellium.fr',medAmf:'17 place de la Bourse, 75082 Paris',medAss:'AME Conso, 11 place Dauphine, 75001 Paris'};
-  var anacofi=L?L.habils.anacofi:true;
-
   // Bandeau parrainage si junior
-  if(L&&L.junior&&(L.parrain.nom||L.parrain.cabinet)){
+  if(L.junior&&(L.parrain.nom||L.parrain.cabinet)){
     var pNom=((L.parrain.prenom||'')+' '+(L.parrain.nom||'')).trim();
     h+='<div style="background:rgba(212,98,42,0.05);border-left:3px solid var(--orange);padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--gris-f);line-height:1.5">';
     h+='<strong style="color:var(--noir)">Sous le parrainage de '+pNom+'</strong>';
@@ -8183,31 +8089,23 @@ function saveMentionsDirect(){
 
   // Qualités (libellés issus du profil)
   var qualites=[];
-  if(habIOBSP)qualites.push('Mandataire IOBSP \u2014 '+mand.iobsp);
-  if(habIAS)qualites.push('Mandataire IAS \u2014 '+mand.ias);
-  if(habCIF)qualites.push('Agent li\u00e9 \u2014 '+mand.cif);
-  if(habImmo){
-    var lImmo=mand.immo;
-    if(cpi&&lImmo.indexOf('CPI')<0)lImmo+=' \u2014 CPI '+cpi;
-    qualites.push('Agent commercial \u2014 '+lImmo);
-  }
+  if(habils.iobsp)qualites.push('Mandataire IOBSP \u2014 '+mand.iobsp);
+  if(habils.ias)qualites.push('Mandataire IAS \u2014 '+mand.ias);
+  if(habils.cif)qualites.push('Agent li\u00e9 CIF \u2014 '+mand.cif);
+  if(habils.immo)qualites.push('Agent commercial immobilier \u2014 '+mand.immo);
   if(qualites.length){
     qualites.forEach(function(q){h+='<div style="padding:2px 0">\u2022 '+q+'</div>';});
   }
 
-  // Contrôle + CIF
+  // Contrôle ACPR + ANACOFI
   h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
   h+='Contr\u00f4le ACPR \u2014 '+addr.acpr;
-  if(habCIF&&anacofi)h+='<br>Agent li\u00e9 \u2014 membre ANACOFI (agr\u00e9\u00e9e AMF)';
+  if(habils.cif&&habils.anacofi)h+='<br>Agent li\u00e9 \u2014 membre ANACOFI (agr\u00e9\u00e9e AMF)';
   h+='</div>';
 
-  // RCP + SIRET
+  // RCP
   h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
   h+='RCP : <strong>'+addr.rcp+'</strong>';
-  var identParts=[];
-  if(mSiret)identParts.push('SIRET '+mSiret[1].trim());
-  if(mRSAC)identParts.push('RSAC '+mRSAC[1]);
-  if(identParts.length)h+='<br>'+identParts.join(' \u2014 ');
   h+='</div>';
 
   // Réclamations + Médiateurs
@@ -8217,11 +8115,14 @@ function saveMentionsDirect(){
   h+='<br>M\u00e9diateur assurance : '+addr.medAss;
   h+='</div>';
 
+  // Mentions libres (champ pMentions du profil)
+  if(L.mentionsLibres&&L.mentionsLibres.trim()){
+    h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord);white-space:pre-wrap">'+L.mentionsLibres+'</div>';
+  }
+
   h+='</div>';
   h+='</div>';
-  mel.innerHTML=h;
-  try{remplirVerifMentions();}catch(e2){}
-  }catch(e){console.warn('saveMentionsDirect error:',e);}
+  return h;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -8484,7 +8385,7 @@ function updatePdfHeader() {
   var mentionsFooter = document.getElementById('pdfMentionsFooter');
   if (mentionsContent) {
     var mHtml = '';
-    if (p && p.mentions) mHtml += p.mentions.replace(/\n/g, '<br>');
+    try { mHtml += buildMentionsHtml(true); } catch(e) {}
     // Trustpilot reviews
     try {
       var tpRaw = localStorage.getItem('cgpskool_trustpilot');
