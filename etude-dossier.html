@@ -7074,20 +7074,11 @@ function injectProfilIntoED(p) {
 }
 
 function updatePdfFooter(p) {
+  // Footer désactivé sur étude de dossier (demande utilisateur)
   var el = document.getElementById('pdfConseillerFooter');
-  if (!el || !p) return;
-  var nom  = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
-  var lines = [];
-  if (nom)        lines.push('<strong>' + nom + '</strong>' + (p.cabinet ? ' — ' + p.cabinet : ''));
-  if (p.tel)      lines.push('📞 ' + p.tel);
-  if (p.email)    lines.push('✉ ' + p.email);
-  if (p.adresse)  lines.push('📍 ' + p.adresse + (p.cp||p.ville ? ', '+(p.cp||'')+' '+(p.ville||'') : ''));
-  if (p.orias)    lines.push('ORIAS n° ' + p.orias + ' — www.orias.fr');
-  if (p.mentions) lines.push(p.mentions);
-  el.innerHTML = lines.length
-    ? lines.join(' &nbsp;|&nbsp; ') +
-      '<div style="margin-top:4px;font-style:italic;color:#aaa">Simulations non contractuelles. Les hypothèses de rendement affichées ne constituent pas une promesse de rendement.</div>'
-    : '';
+  if (el) el.innerHTML = '';
+  if (!p) return;
+  var nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
   // Badge dans la synthèse
   var badge = document.getElementById('syntheseConseillerBadge');
   if (badge) {
