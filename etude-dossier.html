@@ -8162,29 +8162,48 @@ function saveMentionsDirect(){
     h+='</div>';
   }
 
+  // Profil legal dynamique (mode junior/parrain pris en compte)
+  var L=(typeof CGP!=='undefined'&&CGP.profil&&CGP.profil.loadLegal)?CGP.profil.loadLegal():null;
+  var mand=L?L.mandats:{iobsp:'Stellium Financement',ias:'Stellium Courtage',cif:'Stellium Invest (ACPR n\u00b0 10983)',immo:'Stellium Immobilier'};
+  var addr=L?L.addrs:{acpr:'4 Place de Budapest, 75436 Paris',rcp:'Zurich Insurance \u2014 112 av. de Wagram, 75017 Paris',reclamation:'reclamations@stellium.fr',medAmf:'17 place de la Bourse, 75082 Paris',medAss:'AME Conso, 11 place Dauphine, 75001 Paris'};
+  var anacofi=L?L.habils.anacofi:true;
+
+  // Bandeau parrainage si junior
+  if(L&&L.junior&&(L.parrain.nom||L.parrain.cabinet)){
+    var pNom=((L.parrain.prenom||'')+' '+(L.parrain.nom||'')).trim();
+    h+='<div style="background:rgba(212,98,42,0.05);border-left:3px solid var(--orange);padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--gris-f);line-height:1.5">';
+    h+='<strong style="color:var(--noir)">Sous le parrainage de '+pNom+'</strong>';
+    if(L.parrain.cabinet)h+=' \u2014 '+L.parrain.cabinet;
+    if(L.parrain.orias)h+='<br>ORIAS n\u00b0 '+L.parrain.orias;
+    h+='</div>';
+  }
+
   // Bloc compact infos légales
-  // Bloc compact
   h+='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">';
 
-  // Qualités
+  // Qualités (libellés issus du profil)
   var qualites=[];
-  if(habIOBSP)qualites.push('Mandataire IOBSP \u2014 Stellium Financement');
-  if(habIAS)qualites.push('Mandataire IAS \u2014 Stellium Courtage');
-  if(habCIF)qualites.push('Agent li\u00e9 \u2014 Stellium Invest (ACPR n\u00b0 10983)');
-  if(habImmo)qualites.push('Agent commercial \u2014 Stellium Immobilier'+(cpi?' \u2014 CPI '+cpi:''));
+  if(habIOBSP)qualites.push('Mandataire IOBSP \u2014 '+mand.iobsp);
+  if(habIAS)qualites.push('Mandataire IAS \u2014 '+mand.ias);
+  if(habCIF)qualites.push('Agent li\u00e9 \u2014 '+mand.cif);
+  if(habImmo){
+    var lImmo=mand.immo;
+    if(cpi&&lImmo.indexOf('CPI')<0)lImmo+=' \u2014 CPI '+cpi;
+    qualites.push('Agent commercial \u2014 '+lImmo);
+  }
   if(qualites.length){
     qualites.forEach(function(q){h+='<div style="padding:2px 0">\u2022 '+q+'</div>';});
   }
 
   // Contrôle + CIF
   h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
-  h+='Contr\u00f4le ACPR \u2014 4 Place de Budapest, 75436 Paris';
-  if(habCIF)h+='<br>Agent li\u00e9 \u2014 membre ANACOFI (agr\u00e9\u00e9e AMF)';
+  h+='Contr\u00f4le ACPR \u2014 '+addr.acpr;
+  if(habCIF&&anacofi)h+='<br>Agent li\u00e9 \u2014 membre ANACOFI (agr\u00e9\u00e9e AMF)';
   h+='</div>';
 
   // RCP + SIRET
   h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
-  h+='RCP : <strong>Zurich Insurance</strong> \u2014 112 av. de Wagram, 75017 Paris';
+  h+='RCP : <strong>'+addr.rcp+'</strong>';
   var identParts=[];
   if(mSiret)identParts.push('SIRET '+mSiret[1].trim());
   if(mRSAC)identParts.push('RSAC '+mRSAC[1]);
@@ -8193,9 +8212,9 @@ function saveMentionsDirect(){
 
   // Réclamations + Médiateurs
   h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">';
-  h+='R\u00e9clamations : <strong>reclamations@stellium.fr</strong>';
-  h+='<br>M\u00e9diateur AMF : 17 place de la Bourse, 75082 Paris';
-  h+='<br>M\u00e9diateur assurance : AME Conso, 11 place Dauphine, 75001 Paris';
+  h+='R\u00e9clamations : <strong>'+addr.reclamation+'</strong>';
+  h+='<br>M\u00e9diateur AMF : '+addr.medAmf;
+  h+='<br>M\u00e9diateur assurance : '+addr.medAss;
   h+='</div>';
 
   h+='</div>';
