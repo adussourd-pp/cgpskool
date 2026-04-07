@@ -356,8 +356,8 @@ CGP.header.render = function(target, opts) {
         + '</button>';
     });
     h += '</div>';
-    // Trait fin sous les chips (40% de largeur, gris très clair)
-    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin:14px auto 0;width:40%"></div>';
+    // Trait fin sous les chips (pleine largeur, gris très clair)
+    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin-top:14px"></div>';
     h += '</div>';
   }
 
