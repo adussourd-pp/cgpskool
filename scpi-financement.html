@@ -105,12 +105,13 @@ select.fi{cursor:pointer}
 .ec-txt{font-size:11px;line-height:1.5;color:var(--gris-f)}
 .endett-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .eb-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;font-weight:500}
-.tbl{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
-.tbl thead th{padding:6px 4px;text-align:right;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
-.tbl thead th:first-child{text-align:left;width:48px}
+.tbl{width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed}
+.tbl thead th{padding:5px 2px;text-align:right;font-size:8px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl thead th:first-child{text-align:left;width:42px}
 .tbl tbody tr{border-bottom:1px solid var(--bord);transition:background 0.1s}
 .tbl tbody tr:hover{background:var(--ambre-l)}
-.tbl td{padding:6px 4px;text-align:right;color:var(--gris-f);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tbl td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+.tbl td{padding:5px 2px;text-align:right;color:var(--gris-f);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tbl td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+.card-tbl{padding:14px 14px 16px}
 .tbl .tot{background:var(--paper,#F2F1EE)}.tbl .tot td{color:var(--noir);font-weight:700;font-family:var(--sans)}
 .tbl td.gold{color:var(--ambre-d);font-weight:600}.tbl td.green{color:var(--green);font-weight:600}.tbl td.red{color:var(--red)}
 details summary{user-select:none}
@@ -798,15 +799,15 @@ function render(d){
   h+=`<div class="card" style="margin-bottom:14px"><div class="card-title"><span class="dot"></span>Votre investissement aura \u00e9t\u00e9 financ\u00e9 par</div><div class="chart-h" style="max-width:320px;margin:0 auto"><canvas id="cPie"></canvas></div></div>`;
 
   // 7. Tableau annuel
-  h+=`<div class="card"><div class="card-title"><span class="dot"></span>Tableau de financement annuel</div>
-  <div><table class="tbl">
+  h+=`<div class="card card-tbl"><div class="card-title"><span class="dot"></span>Tableau de financement annuel</div>
+  <table class="tbl">
   <thead><tr><th>Ann\u00e9e</th><th>Mensualit\u00e9</th><th>Int\u00e9r\u00eats</th><th>Amort.</th><th>ADI</th><th>CRD</th><th>Dividendes</th><th>Participation</th></tr></thead><tbody>`;
   d.tab.forEach(r=>{
     const p=r.pM>=0;
     h+=`<tr><td>An ${r.an}</td><td>${fmt(r.mM)} \u20ac</td><td class="red">${fmt(r.iM)} \u20ac</td><td>${fmt(r.aM)} \u20ac</td><td>${fmt(r.adM)} \u20ac</td><td>${fmt(r.crd)} \u20ac</td><td class="green">${fmt(r.divM)} \u20ac</td><td class="${p?'green':'red'}">${fmt(Math.abs(r.pM))} \u20ac</td></tr>`;
   });
   h+=`<tr class="tot"><td>BILAN</td><td></td><td>${fmt(d.tI)} \u20ac</td><td></td><td>${fmt(d.tADI)} \u20ac</td><td></td><td>${fmt(d.tL)} \u20ac</td><td class="${d.tP>=0?'green':''}">${fmt(Math.abs(d.tP))} \u20ac</td></tr>
-  </tbody></table></div></div>`;
+  </tbody></table></div>`;
 
   document.getElementById('results').innerHTML=h;
   try{updateHeader();}catch(e){}
