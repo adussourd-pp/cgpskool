@@ -94,47 +94,39 @@
 
 /* ── Zone résultats ── */
 
-/* KPIs */
-/* .kpi-grid base: see cgp-skool-layout.css — overrides only */
+/* KPIs — aligné sur le standard des autres modules */
 .kpi-grid {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 3px;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 14px;
   margin-bottom: 24px;
 }
-/* .kpi-card base (bg/border): see cgp-skool-layout.css — overrides only */
 .kpi-card {
-  border: 1px solid var(--rule-l);
-  padding: 16px 18px;
+  background: #fff;
+  border: 1.5px solid var(--rule-l);
+  border-radius: 12px;
+  padding: 18px 20px;
   position: relative;
   overflow: hidden;
 }
-.kpi-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--kpi-color, var(--rule-l));
-}
-/* .kpi-label base: see cgp-skool-layout.css — overrides only */
 .kpi-label {
-  font-size: 9.5px; font-weight: 600;
+  font-size: 10px; font-weight: 600;
   letter-spacing: 0.12em;
-  color: var(--ink-30); margin-bottom: 8px;
+  text-transform: uppercase;
+  color: var(--ink-60); margin-bottom: 10px;
 }
 .kpi-value {
-  font-family: var(--serif);
-  font-size: 22px; font-weight: 400;
-  letter-spacing: -0.02em;
+  font-family: var(--sans);
+  font-size: 26px; font-weight: 700;
   color: var(--ink); line-height: 1;
 }
 .kpi-sub {
-  font-size: 10px; color: var(--ink-30); margin-top: 4px;
+  font-size: 11px; color: var(--ink-60); margin-top: 5px; font-weight: 300;
 }
 .kpi-card.featured {
-  background: var(--paper); border-color: var(--orange);
+  background: var(--o-dim, rgba(212,98,42,0.06));
+  border-color: var(--orange);
 }
-.kpi-card.featured .kpi-label { color: var(--ink-30); }
-.kpi-card.featured .kpi-value { color: var(--ink); }
-.kpi-card.featured .kpi-sub { color: var(--ink-30); }
+.kpi-card.featured .kpi-value { color: var(--orange); }
 
 /* Tableau de synthèse */
 .summary-row {
@@ -153,27 +145,32 @@
   padding-top: 12px; margin-top: 4px;
 }
 
-/* Chart */
+/* Chart — aligné sur le standard des autres modules */
 .chart-wrap {
-  background: #fff; border: 1px solid var(--rule-l);
-  padding: 20px 24px;
-  margin-bottom: 20px;
+  background: #fff; border: 1.5px solid var(--rule-l);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
 }
 .chart-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .chart-title {
-  font-size: 10.5px; font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-30);
+  font-family: var(--sans);
+  font-size: 17px; font-weight: 700;
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
 }
 .chart-canvas-wrap { position: relative; height: 260px; }
 
 /* Tableau annuel */
 .table-section {
-  background: #fff; border: 1px solid var(--rule-l);
+  background: #fff; border: 1.5px solid var(--rule-l);
+  border-radius: 12px;
   overflow: hidden;
+  margin-bottom: 24px;
 }
 .table-section-header {
   padding: 14px 20px; border-bottom: 1px solid var(--rule-l);
@@ -211,8 +208,8 @@
 }
 .empty-panel svg { opacity: 0.14; }
 .empty-panel-title {
-  font-family: var(--serif); font-size: 22px; font-weight: 400;
-  letter-spacing: -0.01em; color: var(--ink); margin-top: 4px;
+  font-family: var(--sans); font-size: 18px; font-weight: 700;
+  letter-spacing: 0; color: var(--ink); margin-top: 4px;
 }
 .empty-panel-sub { font-size: 13px; color: var(--ink-60); font-weight: 300; max-width: 280px; line-height: 1.8; }
 
