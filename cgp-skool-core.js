@@ -189,11 +189,17 @@ CGP.footer = {};
  * Used for PDF pages. Shows name, cabinet, contact, logo.
  */
 CGP.footer.render = function(el) {
+  if (typeof el === 'string') el = document.getElementById(el);
   if (!el) return;
   var p = CGP.profil.load();
   var img = CGP.profil.loadImages();
   var nom = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
-  if (!nom) { el.style.display = 'none'; return; }
+  // Si rien dans le profil → afficher placeholder
+  if (!nom && !p.cabinet) {
+    el.innerHTML = '<div style="background:#F2F1EE;margin:28px -40px -40px -40px;padding:20px 40px;text-align:center;font-size:11px;color:#9C9A96;font-style:italic">Renseignez votre profil sur la page d\'accueil pour personnaliser ce pied de page</div>';
+    el.style.display = '';
+    return;
+  }
   var e = CGP.esc;
 
   // Couleurs personnalisees (fallback orange)
@@ -344,10 +350,9 @@ CGP.header.render = function(target, opts) {
   h += '</div>';
   h += '</div>';
 
-  // Section objectifs (si presents)
+  // Section objectifs (si presents) — chips puis trait fin en dessous
   if (objectifs.length) {
-    h += '<div style="border-top:1px solid rgba(0,0,0,0.08);margin-top:16px;padding-top:14px">';
-    h += '<div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#9C9A96;margin-bottom:10px">Objectifs patrimoniaux</div>';
+    h += '<div style="margin-top:14px">';
     h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
     objectifs.forEach(function(obj, idx) {
       var isOn = !!checked[obj];
@@ -362,6 +367,8 @@ CGP.header.render = function(target, opts) {
         + '</button>';
     });
     h += '</div>';
+    // Trait fin sous les chips (40% de largeur, gris très clair)
+    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin:14px auto 0;width:40%"></div>';
     h += '</div>';
   }
 
