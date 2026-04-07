@@ -121,16 +121,6 @@ details summary span.arr{display:inline-block;transition:transform 0.2s;font-sty
 details[open] summary span.arr{transform:rotate(90deg)}
 
 
-.bank-tabs-wrap{background:#fff;border-bottom:1.5px solid var(--bord);padding:0 24px;display:flex;position:sticky;top:54px;z-index:100;box-shadow:0 1px 0 var(--bord)}
-.bank-tab{padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
-.bank-tab:hover{color:var(--gris-f);background:var(--gris-l)}
-.bank-tab.active[data-bank="sofiap"]{color:var(--sofiap);border-bottom-color:var(--sofiap);background:rgba(27,79,138,0.05)}
-.bank-tab.active[data-bank="cfcal"]{color:var(--cfcal);border-bottom-color:var(--cfcal);background:rgba(46,125,50,0.05)}
-.bank-tab.active[data-bank="cacf"]{color:var(--cacf);border-bottom-color:var(--cacf);background:rgba(123,31,162,0.05)}
-.bank-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.bank-tab[data-bank="sofiap"] .bank-dot{background:var(--sofiap)}
-.bank-tab[data-bank="cfcal"] .bank-dot{background:var(--cfcal)}
-.bank-tab[data-bank="cacf"] .bank-dot{background:var(--cacf)}
 </style>
 </head>
 <body>
@@ -144,12 +134,6 @@ details[open] summary span.arr{transform:rotate(90deg)}
     <div id="cs-nav-actions"></div>
   </div>
 </nav>
-
-<div class="bank-tabs-wrap">
-  <div class="bank-tab active" data-bank="sofiap" onclick="setBank('sofiap',this)"><span class="bank-dot"></span>SOFIAP · min 80K€ · différé 6 mois</div>
-  <div class="bank-tab" data-bank="cfcal" onclick="setBank('cfcal',this)"><span class="bank-dot"></span>CFCAL · min 40K€ · différé 9 mois</div>
-  <div class="bank-tab" data-bank="cacf" onclick="setBank('cacf',this)"><span class="bank-dot"></span>CACF · min 10K€ · différé total 6 mois</div>
-</div>
 
 <div class="cs-app">
 <div class="cs-sidebar">
@@ -367,10 +351,6 @@ function setInvMode(mode){
 
 function setBank(b, el){
   bank=b;
-  // Active tab dans le header
-  document.querySelectorAll('.bank-tab').forEach(t=>t.classList.remove('active'));
-  if(el) el.classList.add('active');
-  else { const t=document.querySelector(`.bank-tab[data-bank="${b}"]`); if(t) t.classList.add('active'); }
   // Highlight bouton banque dans sidebar
   ['sofiap','cfcal','cacf'].forEach(id=>{
     const btn=document.getElementById('bankBtn_'+id);
@@ -469,11 +449,6 @@ function updateBankButtons(){
     });
     if(bank)setBank(bank);
   }
-}
-
-function switchToBank(b){
-  const tabs=document.querySelectorAll('.bank-tab');
-  tabs.forEach(t=>{if(t.dataset.bank===b){setBank(b);}});
 }
 
 function calcEndett(){
