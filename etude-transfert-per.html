@@ -442,20 +442,8 @@ function update(){
   var projB=capitalNet*Math.pow(1+yieldB/100,horizon);
   var gainTotal=projB-projA;
 
-  V('hClient').textContent=client||'Client';
-  V('hDate').textContent=dateEtude;
-
-  // Type block + titre
+  // hClient/hDate/hTitle/tbBadge/tbLabel : éléments supprimés (remplacés par pageHeader)
   var fam=V('pFamille').value;
-  if(fam==='av'){
-    V('hTitle').textContent='Comparaison de contrats Assurance Vie';
-    V('tbBadge').textContent='AV';
-    V('tbLabel').textContent='Rachat et r\u00e9investissement';
-  }else{
-    V('hTitle').textContent='\u00c9tude de transfert Plan \u00c9pargne Retraite';
-    V('tbBadge').textContent=rule.badge;
-    V('tbLabel').textContent='Transfert '+rule.label+' vers PER';
-  }
 
   V('ccNameA').textContent=nomA;
   V('ccNameB').textContent=nomB;
