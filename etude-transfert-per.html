@@ -100,7 +100,6 @@
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open">
       <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
-      <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="update()"></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
@@ -345,19 +344,21 @@ var TYPE_RULES={
   av:        {famille:'av', label:'Assurance Vie',badge:'AV',     fraisMax:0, seuilAns:0,  fraisEntreeMax:4.8, transfert:'Rachat total + r\u00e9investissement', interet:'Gestion libre, clause b\u00e9n\u00e9ficiaire', attention:'Fiscalit\u00e9 rachat (PFU ou bar\u00e8me)'}
 };
 
-function setFraisTransfert(v){
-  V('pFraisTransfert').value=String(v);
+function syncFraisTransfertButtons(v){
   var bOui=document.getElementById('ftBtnOui');
   var bNon=document.getElementById('ftBtnNon');
-  if(bOui&&bNon){
-    var on=v===1;
-    bOui.style.background=on?'var(--orange)':'#fff';
-    bOui.style.color=on?'#fff':'var(--gris)';
-    bOui.style.borderColor=on?'var(--orange)':'var(--bord)';
-    bNon.style.background=on?'#fff':'var(--orange)';
-    bNon.style.color=on?'var(--gris)':'#fff';
-    bNon.style.borderColor=on?'var(--bord)':'var(--orange)';
-  }
+  if(!bOui||!bNon)return;
+  var on=Number(v)>0;
+  bOui.style.background=on?'var(--orange)':'#fff';
+  bOui.style.color=on?'#fff':'var(--gris)';
+  bOui.style.borderColor=on?'var(--orange)':'var(--bord)';
+  bNon.style.background=on?'#fff':'var(--orange)';
+  bNon.style.color=on?'var(--gris)':'#fff';
+  bNon.style.borderColor=on?'var(--bord)':'var(--orange)';
+}
+function setFraisTransfert(v){
+  V('pFraisTransfert').value=String(v);
+  syncFraisTransfertButtons(v);
   update();
 }
 
@@ -415,20 +416,18 @@ function update(){
   if(anciennete>rule.seuilAns){
     fraisT=0;
     V('pFraisTransfert').value='0';
-    V('pFraisTransfert').disabled=true;
     V('ancienneteInfo').textContent='\u2713 '+rule.label+' > '+rule.seuilAns+' ans : frais de transfert = 0%';
     V('ancienneteInfo').style.display='block';
   }else{
-    V('pFraisTransfert').disabled=false;
     V('ancienneteInfo').textContent='Frais max '+rule.fraisMax+'% si < '+rule.seuilAns+' ans';
     V('ancienneteInfo').style.display='block';
   }
+  syncFraisTransfertButtons(fraisT);
 
   var horizon=parseInt(V('pHorizon').value)||10;
   var nomA=txt('pContratA');
   var nomB=txt('pContratB');
   var client=txt('pClient');
-  var dateEtude=txt('pDate');
 
   V('vFraisEntree').textContent=fmtD(fraisE,1)+'%';
   V('vHorizon').textContent=horizon+' ans';
@@ -575,10 +574,6 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
 // loadProfil supprime — gere par CGP.footer.render() dans core.js
 
 (function(){
-  var today=new Date();
-  var dd=String(today.getDate()).padStart(2,'0');
-  var mm=String(today.getMonth()+1).padStart(2,'0');
-  V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
   CGP.footer.render(document.getElementById('conseillerFooter'));
   updateTypeEncart();
   update();
@@ -593,7 +588,6 @@ CGP.project.registerModule('etude-transfert-per', {
   getState: function() {
     return {
       pClient: V('pClient').value,
-      pDate: V('pDate').value,
       pTypePER: V('pTypePER').value,
       pContratA: V('pContratA').value,
       aA0n: V('aA0n').value,
@@ -620,7 +614,6 @@ CGP.project.registerModule('etude-transfert-per', {
   },
   setState: function(d) {
     if (d.pClient !== undefined) V('pClient').value = d.pClient;
-    if (d.pDate !== undefined) V('pDate').value = d.pDate;
     if (d.pTypePER !== undefined) V('pTypePER').value = d.pTypePER;
     if (d.pContratA !== undefined) V('pContratA').value = d.pContratA;
     if (d.aA0n !== undefined) V('aA0n').value = d.aA0n;
