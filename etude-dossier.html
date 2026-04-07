@@ -2953,10 +2953,16 @@ function parseTextRI(txt){
     var profPt=pt01['profession']||pt01['activit\u00e9 professionnelle']||pt01['activite professionnelle'];
     if(profPt&&profPt.v1){ED.c1.profession=profPt.v1;if(isCouple&&profPt.v2)ED.c2.profession=profPt.v2;}
     else{var profVal=kv01['profession']||kv01['activit\u00e9 professionnelle']||'';if(profVal)ED.c1.profession=profVal;}
-    // Société / Employeur
-    var socPt=pt01['soci\u00e9t\u00e9']||pt01['societe']||pt01['employeur']||pt01['entreprise'];
+    // Soci\u00e9t\u00e9 / Employeur — variantes \u00e9largies
+    var socKeys=['soci\u00e9t\u00e9','societe','employeur','entreprise','raison sociale','nom de l\'entreprise','nom de l\'employeur','nom soci\u00e9t\u00e9','nom societe','nom de la soci\u00e9t\u00e9','nom de la societe'];
+    var socPt=null;
+    for(var _i=0;_i<socKeys.length;_i++){if(pt01[socKeys[_i]]){socPt=pt01[socKeys[_i]];break;}}
     if(socPt&&socPt.v1){ED.c1.societe=socPt.v1;if(isCouple&&socPt.v2)ED.c2.societe=socPt.v2;}
-    else{var socVal=kv01['soci\u00e9t\u00e9']||kv01['societe']||kv01['employeur']||kv01['entreprise']||'';if(socVal)ED.c1.societe=socVal;}
+    else{
+      var socVal='';
+      for(var _j=0;_j<socKeys.length;_j++){if(kv01[socKeys[_j]]){socVal=kv01[socKeys[_j]];break;}}
+      if(socVal)ED.c1.societe=socVal;
+    }
 
     // Enfants
     ED.nbEnfants = 0; ED.enfants=[];
@@ -3263,7 +3269,7 @@ function parseTextRI(txt){
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
   var profRow2=t01['profession']||t01['activit\u00e9 professionnelle']||t01['activite professionnelle'];
   if(profRow2){ED.c1.profession=profRow2.v1||'';if(isCouple2&&profRow2.v2)ED.c2.profession=profRow2.v2;}
-  var socRow2=t01['soci\u00e9t\u00e9']||t01['societe']||t01['employeur']||t01['entreprise'];
+  var socRow2=t01['soci\u00e9t\u00e9']||t01['societe']||t01['employeur']||t01['entreprise']||t01['raison sociale']||t01['nom de l\'entreprise']||t01['nom de l\'employeur']||t01['nom soci\u00e9t\u00e9']||t01['nom societe']||t01['nom de la soci\u00e9t\u00e9']||t01['nom de la societe'];
   if(socRow2){ED.c1.societe=socRow2.v1||'';if(isCouple2&&socRow2.v2)ED.c2.societe=socRow2.v2;}
   // Enfants
   ED.nbEnfants=0;
@@ -7483,12 +7489,17 @@ function calcProjectionIR(){
     var el=document.getElementById('projFiscResultat');
     if(!el)return;
     var irActuel=(ED.fiscal.irnet||0);
-    var diff=res.irNet-irActuel;
+    var irNetCalc=res.irNet;
+    // Permettre override manuel via input editable
+    var irOverride=document.getElementById('projIRoverride');
+    var irNetFinal=irOverride&&irOverride.value!==''?(+irOverride.value||irNetCalc):irNetCalc;
+    var diff=irNetFinal-irActuel;
     var h='';
     h+='<div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--noir)">Revenu imposable</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--noir)">'+fmt(rbg)+' \u20ac</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Nb parts</span><span class="fr-v">'+res.nbParts+'</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill">'+res.tmi+' %</span></span></div>';
-    h+='<div class="fiscal-row" style="padding:10px 0;background:rgba(45,122,91,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--green)">IR projet\u00e9</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--green)">'+fmt(res.irNet)+' \u20ac</span></div>';
+    h+='<div class="fiscal-row" style="padding:10px 0;background:rgba(45,122,91,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--green)">IR projet\u00e9</span><span class="fr-v"><input type="number" id="projIRoverride" value="'+(irOverride&&irOverride.value!==''?irOverride.value:irNetCalc)+'" oninput="calcProjectionIR()" style="width:90px;padding:4px 8px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--green);text-align:right;background:#fff"> \u20ac</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l" style="font-size:11px;color:var(--gris-30)">Calcul auto</span><span class="fr-v" style="font-size:11px;color:var(--gris)">'+fmt(irNetCalc)+' \u20ac</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Taux moyen</span><span class="fr-v">'+res.tauxMoyen+' %</span></div>';
     h+='<div class="fiscal-row" style="border-top:2px solid rgba(45,122,91,0.3);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">\u00c9cart vs actuel</span><span class="fr-v" style="font-size:16px;font-weight:700;color:'+(diff>0?'var(--red)':diff<0?'var(--green)':'var(--gris)')+'">'+(diff>0?'+':'')+fmt(diff)+' \u20ac</span></div>';
     el.innerHTML=h;
