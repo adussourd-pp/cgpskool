@@ -383,7 +383,7 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
 
       <!-- MENTIONS LEGALES -->
       <div class="bloc" id="blocMentions">
-        <div id="mentionsContent" style="font-size:10px;color:var(--gris);line-height:1.6;white-space:pre-wrap"></div>
+        <div id="mentionsContent" style="font-size:10px;color:var(--gris);line-height:1.6"></div>
       </div>
 
       <!-- PIED DE PAGE CONSEILLER -->
@@ -638,10 +638,52 @@ function updateSCPICards(){
 // Mentions legales
 function loadMentions(){
   try{
-    var p=CGP.profil.load();
-    var m=p.mentions||p.pMentions||'';
-    if(m){V('mentionsContent').textContent=m;V('blocMentions').style.display='';}
-    else{V('blocMentions').style.display='none';}
+    var L=CGP.profil.loadLegal?CGP.profil.loadLegal():null;
+    if(!L){V('blocMentions').style.display='none';return;}
+    var h='';
+    var leg=L.legal;
+    var nomLeg=((leg.prenom||'')+' '+(leg.nom||'')).trim();
+
+    // Bandeau parrainage si junior
+    if(L.junior&&(L.parrain.nom||L.parrain.cabinet)){
+      h+='<div style="background:rgba(212,98,42,0.06);border-left:3px solid var(--orange);padding:8px 12px;margin-bottom:10px;font-size:10px;color:var(--noir)">';
+      h+='<b>Sous le parrainage de '+nomLeg+'</b>';
+      if(leg.cabinet)h+=' \u2014 '+leg.cabinet;
+      if(leg.orias)h+=' \u2014 ORIAS n\u00b0 '+leg.orias;
+      h+='</div>';
+    }
+
+    // Qualites
+    var qualites=[];
+    if(L.habils.iobsp)qualites.push('Mandataire IOBSP \u2014 '+L.mandats.iobsp);
+    if(L.habils.ias)qualites.push('Mandataire IAS \u2014 '+L.mandats.ias);
+    if(L.habils.cif)qualites.push('Agent li\u00e9 \u2014 '+L.mandats.cif);
+    if(L.habils.immo)qualites.push('Agent commercial \u2014 '+L.mandats.immo);
+    if(qualites.length){
+      qualites.forEach(function(q){h+='<div>\u2022 '+q+'</div>';});
+    }
+
+    h+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--bord)">';
+    h+='Contr\u00f4le ACPR \u2014 '+L.addrs.acpr;
+    if(L.habils.cif&&L.habils.anacofi)h+='<br>Agent li\u00e9 \u2014 membre ANACOFI (agr\u00e9\u00e9e AMF)';
+    h+='</div>';
+
+    h+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--bord)">';
+    h+='RCP : '+L.addrs.rcp;
+    h+='</div>';
+
+    h+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--bord)">';
+    h+='R\u00e9clamations : '+L.addrs.reclamation;
+    h+='<br>M\u00e9diateur AMF : '+L.addrs.medAmf;
+    h+='<br>M\u00e9diateur assurance : '+L.addrs.medAss;
+    h+='</div>';
+
+    if(L.mentionsLibres){
+      h+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--bord);white-space:pre-wrap">'+CGP.esc(L.mentionsLibres)+'</div>';
+    }
+
+    V('mentionsContent').innerHTML=h;
+    V('blocMentions').style.display='';
   }catch(e){V('blocMentions').style.display='none';}
 }
 
