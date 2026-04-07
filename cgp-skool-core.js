@@ -341,8 +341,8 @@ CGP.header.render = function(target, opts) {
 
   // Section objectifs (si presents) — chips puis trait fin en dessous
   if (objectifs.length) {
-    h += '<div style="margin-top:14px">';
-    h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    h += '<div style="margin-top:10px;max-width:62%">';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
     objectifs.forEach(function(obj, idx) {
       var isOn = !!checked[obj];
       var bg = isOn ? color1 : '#fff';
@@ -350,15 +350,15 @@ CGP.header.render = function(target, opts) {
       var bord = isOn ? color1 : '#d8d6d2';
       var dot = isOn ? '\u25cf' : '\u25cb';
       h += '<button type="button" data-obj="' + e(obj) + '"'
-        + ' style="font-family:inherit;font-size:11px;font-weight:' + (isOn?'600':'500') + ';color:' + txtCol + ';background:' + bg + ';border:1.5px solid ' + bord + ';border-radius:20px;padding:6px 14px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px">'
-        + '<span style="font-size:10px">' + dot + '</span>'
+        + ' style="font-family:inherit;font-size:9px;font-weight:' + (isOn?'600':'500') + ';color:' + txtCol + ';background:' + bg + ';border:1px solid ' + bord + ';border-radius:14px;padding:3px 9px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;line-height:1.2">'
+        + '<span style="font-size:8px">' + dot + '</span>'
         + e(obj)
         + '</button>';
     });
     h += '</div>';
-    // Trait fin sous les chips (pleine largeur, gris très clair)
-    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin-top:14px"></div>';
     h += '</div>';
+    // Trait fin sous tout le header (pleine largeur)
+    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin-top:12px"></div>';
   }
 
   h += '</div>';
