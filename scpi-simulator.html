@@ -243,6 +243,11 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <!-- SIDEBAR -->
 <div class="cs-sidebar">
 
+  <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+    <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+  </div>
+  <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
   <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type de projection</div>
     <div class="sb-body open">
     <div class="mode-tabs">
@@ -363,8 +368,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     <div class="empty-sub">S&#233;lectionnez une SCPI de la gamme ou saisissez un taux, configurez les param&#232;tres et lancez la projection.</div>
   </div>
 
+  <div id="pageHeader"></div>
   <div id="results" style="display:none">
-    <div id="scpiHeaderBar"></div>
     <div id="kpiRow" class="kpi-row"></div>
     <div id="chartBox" class="chart-box">
       <div class="chart-box-header">
@@ -373,6 +378,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
       </div>
       <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
     </div>
+    <div id="scpiHeaderBar"></div>
     <div id="extraContent"></div>
   </div>
 
@@ -518,6 +524,10 @@ function calcEntreprise(scpi,investUS,duration,isTaxPct,investNPperso){
 
 // ─── RENDER ───────────────────────────────────────────────────────
 
+function renderHeader(){
+  CGP.header.render('pageHeader',{tag:'SCPI CASH',solutions:['SCPI_CASH'],clientId:'clientNom',savedKey:'scpi-simulator'});
+}
+
 function runSimulation(){
   const active=getActiveScpi();
   if(!active){alert('Veuillez sélectionner une SCPI ou saisir un taux');return}
@@ -525,6 +535,7 @@ function runSimulation(){
   document.getElementById('emptyState').style.display='none';
   document.getElementById('results').style.display='block';
   const btn=document.getElementById('exportBtn');if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  renderHeader();
   renderSCPIHeader();
   if(currentMode==='retraite')renderRetraite();
   else if(currentMode==='np')renderNP();
@@ -808,6 +819,7 @@ function renderChart(labels,datasets){
 
 var fmt=CGP.fmt;
 init();
+try{renderHeader();}catch(e){}
 function setScpiTMI(val, btn) {
   document.getElementById('ret-tmi').value = val;
   document.querySelectorAll('.tmi-pill').forEach(b => b.classList.remove('active'));

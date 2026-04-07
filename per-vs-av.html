@@ -207,6 +207,11 @@
   <!-- ── SIDEBAR ── -->
   <div class="cs-sidebar">
 
+    <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses</div>
     <div class="sb-body open">
       <div class="sb-field">
@@ -273,15 +278,8 @@
   <!-- ── MAIN ── -->
   <div class="cs-main"><div class="cs-page">
 
-  <!-- En-tete -->
-  <div style="margin-bottom:28px;padding-top:8px">
-    <div class="cs-kicker">
-      <span class="cs-kicker-line"></span>
-      <span class="cs-kicker-text">Simulateur patrimonial</span>
-    </div>
-    <h1 class="cs-h1" style="font-size:32px;margin-bottom:6px">Comparateur <em>PER vs Assurance Vie</em></h1>
-    <p style="font-size:13px;color:var(--ink-60);font-weight:300">Efficacite nette selon la TMI d'entree (periode active) et la TMI de sortie (a la retraite)</p>
-  </div>
+  <!-- Header uniforme -->
+  <div id="pageHeader"></div>
 
   <!-- Onglets vues -->
   <div class="tabs">
@@ -529,7 +527,11 @@ function calcScenario(montant, rdt, psAv, irPer, psPer, tmiE, tmiS, duree) {
 function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 
 // ── Recalcul global ──
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'PER vs ASSURANCE VIE',solutions:['PER','AV'],clientId:'clientNom',savedKey:'per-vs-av'});}catch(e){}
+}
 function recalc() {
+  renderHeader();
   var p = getParams();
   // Mettre à jour footer
   var irAvVal = parseFloat(document.getElementById('irAv').value)||12.8;

@@ -729,21 +729,8 @@ function render(d){
   const partAbs=Math.abs(d.part);
   let h='';
 
-  // 1. Header client/conseiller
-  var _p=CGP.profil.load();
-  var _nom=((_p.prenom||'')+' '+(_p.nom||'')).trim();
-  var _today=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-  h+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
-    <div>
-      <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">PROJECTION FINANCI\u00c8RE SCPI</div>
-      ${_nom?'<div style="font-size:11px;color:var(--gris);margin-top:4px">'+CGP.esc(_nom)+(_p.cabinet?' \u2014 '+CGP.esc(_p.cabinet):'')+'</div>':''}
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:16px;font-weight:700;color:var(--noir)">${CGP.esc((document.getElementById('fClient1')||{}).value||'Client')}</div>
-      ${(document.getElementById('fClient2')||{}).value?'<div style="font-size:13px;color:var(--gris)">& '+CGP.esc(document.getElementById('fClient2').value)+'</div>':''}
-      <div style="font-size:12px;color:var(--gris);margin-top:2px">${_today}</div>
-    </div>
-  </div>`;
+  // 1. Header (rendu via CGP.header)
+  h+='<div id="pageHeader"></div>';
 
   // 2. Capacit\u00e9 d'emprunt
   const cA=d.eAvt>d.b.endMax?'var(--red)':d.eAvt>d.b.endMax-5?'var(--ambre)':'var(--green)';
@@ -847,6 +834,7 @@ function render(d){
   </tbody></table></div></div>`;
 
   document.getElementById('results').innerHTML=h;
+  try{updateHeader();}catch(e){}
 
   // Chart
   if(cPie)cPie.destroy();
@@ -864,7 +852,9 @@ function render(d){
 
 var fmt=CGP.fmt;
 
-function updateHeader(){}
+function updateHeader(){
+  try{CGP.header.render('pageHeader',{tag:'SCPI FINANCEMENT',solutions:['SCPI_FIN'],clientId:'fClient1',savedKey:'scpi-financement'});}catch(e){}
+}
 
 function setTMI(val){
   document.getElementById('fTMI').value=val;

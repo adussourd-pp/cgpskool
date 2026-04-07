@@ -249,6 +249,11 @@
   <!-- ── PANNEAU GAUCHE ── -->
   <div class="cs-sidebar">
 
+    <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
     <!-- Capital & versements -->
     <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Capital & versements</div>
     <div class="sb-body open">
@@ -373,6 +378,7 @@
   <div class="cs-main" id="panelRight">
 
     <div class="cs-page">
+    <div id="pageHeader"></div>
     <div class="empty-panel" id="emptyPanel">
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <rect x="4" y="28" width="8" height="20" rx="0" fill="#181614"/>
@@ -493,7 +499,11 @@ function toggleFrais() {
 }
 
 // ── Calcul core ──
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'INTERETS COMPOSES',solutions:['AV'],clientId:'clientNom',savedKey:'interets-composes'});}catch(e){}
+}
 function recalc() {
+  renderHeader();
   var capital      = gv('capital');
   var versement    = gv('versement');
   var duree        = Math.max(1, Math.min(50, Math.round(gv('duree'))));

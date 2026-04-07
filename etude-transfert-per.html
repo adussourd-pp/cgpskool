@@ -182,20 +182,8 @@
   <div class="cs-main">
     <div class="cs-page">
 
-      <!-- Header -->
-      <div style="margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between">
-        <div>
-          <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)" id="hTitle">&#201;tude de transfert Plan &#201;pargne Retraite</div>
-          <div id="typeBlock" style="display:flex;align-items:center;gap:6px;margin-top:4px">
-            <span id="tbBadge" style="font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 8px;background:var(--orange);color:#fff;border-radius:3px">PER</span>
-            <span style="font-size:12px;font-weight:600;color:var(--noir)" id="tbLabel">Transfert PER vers PER</span>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)" id="hClient">Client</div>
-          <div style="font-size:12px;color:var(--gris);margin-top:2px;font-weight:300" id="hDate"></div>
-        </div>
-      </div>
+      <!-- Header uniforme -->
+      <div id="pageHeader"></div>
 
       <!-- Comparison -->
       <div class="compare-grid">
@@ -408,7 +396,11 @@ function onTypeChange(){
   updateTypeEncart();
 }
 
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'ETUDE DE TRANSFERT PER',solutions:['PER'],clientId:'pClient',savedKey:'etude-transfert-per'});}catch(e){}
+}
 function update(){
+  renderHeader();
   var capital=num('pCapital');
   var anciennete=num('pAnciennete');
   var fraisT=num('pFraisTransfert');

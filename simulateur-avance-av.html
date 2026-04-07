@@ -59,7 +59,11 @@
 
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
-    <div class="cs-sidebar-lbl">Votre contrat</div>
+
+    <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Votre contrat</div>
     <div class="sb-body open">
@@ -110,12 +114,8 @@
   <div class="cs-main">
     <div class="cs-page">
 
-      <!-- HEADER -->
-      <div style="margin-bottom:32px">
-        <div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)">AVANCE SUR ASSURANCE VIE</div>
-        <div style="font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink)">Avance sur Assurance Vie</div>
-        <div style="font-size:14px;color:var(--ink-60);margin-top:6px">Obtenez des liquidit&#233;s sans racheter votre contrat</div>
-      </div>
+      <!-- HEADER uniforme -->
+      <div id="pageHeader"></div>
 
       <!-- RESULTATS AVANCE SEULE -->
       <div class="kpi-grid" id="kpiAvance">
@@ -188,7 +188,11 @@ function selectSCPI(i){
   calc();
 }
 
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'AVANCE SUR ASSURANCE VIE',solutions:['AV'],clientId:'clientNom',savedKey:'simulateur-avance-av'});}catch(e){}
+}
 function calc(){
+  renderHeader();
   var contrat=+document.getElementById('vContrat').value;
   var rendAV=+document.getElementById('vRendAV').value/100;
   var tauxAv=+document.getElementById('vTauxAv').value/100;

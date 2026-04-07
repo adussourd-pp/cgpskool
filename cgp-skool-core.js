@@ -263,36 +263,122 @@ CGP.footer.render = function(el) {
   el.style.display = '';
 };
 
+/* ── COPERNIC OBJECTIFS PAR SOLUTION ─────────────── */
+CGP.copernic = {
+  OBJECTIFS_BY_SOLUTION: {
+    'AV':         ['Reorganiser votre patrimoine','Optimiser vos placements','Optimiser votre patrimoine','Optimiser votre transmission','Proteger votre conjoint','Proteger vos enfants','Transmettre votre patrimoine','Preparer votre retraite','Accompagner vos enfants'],
+    'PER':        ['Optimiser votre fiscalite','Optimiser votre transmission','Proteger votre conjoint','Transmettre votre patrimoine','Preparer votre retraite'],
+    'SCPI_FIN':   ['Optimiser vos placements','Creer patrimoine immobilier','Optimiser votre patrimoine','Completer vos revenus','Proteger votre conjoint','Proteger vos enfants','Preparer votre retraite'],
+    'SCPI_CASH':  ['Reorganiser votre patrimoine','Optimiser vos placements','Creer patrimoine immobilier','Completer vos revenus','Preparer votre retraite'],
+    'PINEL':      ['Creer patrimoine immobilier','Optimiser votre fiscalite','Proteger votre conjoint','Proteger vos enfants','Preparer votre retraite'],
+    'LMNP':       ['Creer patrimoine immobilier','Completer vos revenus','Proteger votre conjoint','Preparer votre retraite','Accompagner vos enfants']
+  },
+  // Fusionne plusieurs solutions en une liste unique d'objectifs
+  union: function(solutions) {
+    var seen = {}, out = [];
+    (solutions || []).forEach(function(sol) {
+      (CGP.copernic.OBJECTIFS_BY_SOLUTION[sol] || []).forEach(function(o) {
+        if (!seen[o]) { seen[o] = true; out.push(o); }
+      });
+    });
+    return out;
+  }
+};
+
 /* ── HEADER PAGE A4 ─────────────────────────────── */
 CGP.header = {};
 
 /**
- * Render a standard page header with tag, title, client name and date.
- * @param {HTMLElement} el - Container element
- * @param {object} opts - {tag:'MODULE TAG', title:'Titre', subtitle:'Sous-titre'}
+ * Render a standard page header with tag, client name, date, optional COPERNIC chips.
+ * @param {string|HTMLElement} target - id or element
+ * @param {object} opts - {
+ *   tag: 'MODULE TAG',
+ *   solutions: ['SCPI_CASH']  OR  objectifs: [...]  (optional, no chips if neither),
+ *   clientId: 'clientNom',     (id of input in sidebar)
+ *   savedKey: 'scpi-simulator' (localStorage key for chip state)
+ * }
  */
-CGP.header.render = function(el, opts) {
+CGP.header.render = function(target, opts) {
+  var el = (typeof target === 'string') ? document.getElementById(target) : target;
   if (!el || !opts) return;
+  var e = CGP.esc;
+  var p = CGP.profil.load();
+  var color1 = p.color1 || p.pColor1 || '#D4622A';
+
+  // Date du jour
   var today = new Date();
-  var dateStr = today.toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'});
+  var dateStr = today.toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
 
-  var left = '<div>'
-    + '<div style="font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#D4622A">' + CGP.esc(opts.tag || '') + '</div>'
-    + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:400;color:#0D0D0D;margin-top:4px">' + CGP.esc(opts.title || '') + '</div>';
-  if (opts.subtitle) left += '<div style="font-size:13px;color:#6B6B6B;margin-top:4px;font-weight:300">' + CGP.esc(opts.subtitle) + '</div>';
-  left += '</div>';
+  // Nom client (depuis input sidebar)
+  var clientName = '';
+  if (opts.clientId) {
+    var inp = document.getElementById(opts.clientId);
+    if (inp && inp.value) clientName = inp.value.trim();
+  }
+  var clientDisplay = clientName ? clientName.toUpperCase() : 'CLIENT';
 
-  var right = '<div style="text-align:right">'
-    + '<div style="font-size:16px;font-weight:700;color:#0D0D0D" id="hClient">Client</div>'
-    + '<div style="font-size:12px;color:#6B6B6B;margin-top:2px" id="hDate">' + dateStr + '</div>'
-    + '</div>';
+  // Liste objectifs (chips)
+  var objectifs = [];
+  if (opts.objectifs) objectifs = opts.objectifs;
+  else if (opts.solutions) objectifs = CGP.copernic.union(opts.solutions);
 
-  el.innerHTML = '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px">' + left + right + '</div>';
+  // Etat coches (localStorage)
+  var savedKey = opts.savedKey ? ('cgpskool_obj_' + opts.savedKey) : null;
+  var checked = {};
+  if (savedKey) {
+    try {
+      var raw = localStorage.getItem(savedKey);
+      if (raw) checked = JSON.parse(raw) || {};
+    } catch(err) {}
+  }
 
-  // Remplir le nom client depuis la sidebar si possible
-  var clientInput = document.getElementById('pClient') || document.getElementById('clientNom');
-  if (clientInput && clientInput.value) {
-    document.getElementById('hClient').textContent = clientInput.value;
+  // ── Construction HTML ────────────────────────────
+  var h = '<div style="margin-bottom:24px">';
+
+  // Ligne tag + client + date
+  h += '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">';
+  h += '<div style="font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:' + color1 + ';padding-top:3px">' + e(opts.tag || '') + '</div>';
+  h += '<div style="text-align:right">';
+  h += '<div style="font-size:18px;font-weight:700;color:#0D0D0D;text-transform:uppercase;letter-spacing:0.02em">' + e(clientDisplay) + '</div>';
+  h += '<div style="font-size:12px;color:#6B6B6B;font-weight:300;margin-top:2px">' + e(dateStr) + '</div>';
+  h += '</div>';
+  h += '</div>';
+
+  // Section objectifs (si presents)
+  if (objectifs.length) {
+    h += '<div style="border-top:1px solid rgba(0,0,0,0.08);margin-top:16px;padding-top:14px">';
+    h += '<div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#9C9A96;margin-bottom:10px">Objectifs patrimoniaux</div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    objectifs.forEach(function(obj, idx) {
+      var isOn = !!checked[obj];
+      var bg = isOn ? color1 : '#fff';
+      var txtCol = isOn ? '#fff' : '#6B6B6B';
+      var bord = isOn ? color1 : '#d8d6d2';
+      var dot = isOn ? '\u25cf' : '\u25cb';
+      h += '<button type="button" data-obj="' + e(obj) + '"'
+        + ' style="font-family:inherit;font-size:11px;font-weight:' + (isOn?'600':'500') + ';color:' + txtCol + ';background:' + bg + ';border:1.5px solid ' + bord + ';border-radius:20px;padding:6px 14px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px">'
+        + '<span style="font-size:10px">' + dot + '</span>'
+        + e(obj)
+        + '</button>';
+    });
+    h += '</div>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  el.innerHTML = h;
+
+  // Wire-up clicks chips
+  if (savedKey && objectifs.length) {
+    el.querySelectorAll('button[data-obj]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var obj = btn.getAttribute('data-obj');
+        checked[obj] = !checked[obj];
+        try { localStorage.setItem(savedKey, JSON.stringify(checked)); } catch(err) {}
+        // Re-render
+        CGP.header.render(el, opts);
+      });
+    });
   }
 };
 
