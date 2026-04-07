@@ -398,7 +398,7 @@ p.hero-desc {
 <div class="tools-section" style="background:var(--bg);border-top:1px solid var(--rule-d)">
   <div class="tools-inner">
     <div class="tools-label" style="color:var(--fog-2)">Formation continue</div>
-    <p style="font-size:12px;color:var(--fog-2);font-weight:300;max-width:560px;line-height:1.8;margin:0 0 20px">R&#233;visez vos habilitations r&#233;glementaires pour <em style="color:var(--orange-lt)">rester \u00e0 jour sur vos obligations professionnelles</em>.</p>
+    <p style="font-size:12px;color:var(--fog-2);font-weight:300;max-width:560px;line-height:1.8;margin:0 0 20px">R&#233;visez vos habilitations r&#233;glementaires pour <em style="color:var(--orange-lt)">rester &agrave; jour sur vos obligations professionnelles</em>.</p>
     <div class="tools-grid">
 
       <a href="https://adussourd-pp.github.io/cgpskool_quiz_habilitation/" target="_blank" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
@@ -513,7 +513,26 @@ p.hero-desc {
         </div>
       </div>
     </div>
-    <div class="fg"><label>Habilitations</label>
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Statut</div>
+    <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)"><input type="checkbox" id="pJunior" onchange="onJuniorToggle();saveProfil()"> Consultant junior (sous parrainage)</label></div>
+    <div id="parrainBlock" style="display:none;background:var(--paper-2);border:1px solid var(--rule-l);padding:14px;border-radius:8px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink-60);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Mon parrain habilit&#233;</div>
+      <div class="grid2">
+        <div class="fg"><label>Pr&#233;nom</label><input class="fi" id="pParrainPrenom" oninput="saveProfil()"></div>
+        <div class="fg"><label>Nom</label><input class="fi" id="pParrainNom" oninput="saveProfil()"></div>
+      </div>
+      <div class="fg"><label>Cabinet</label><input class="fi" id="pParrainCabinet" oninput="saveProfil()"></div>
+      <div class="grid2">
+        <div class="fg"><label>ORIAS</label><input class="fi" id="pParrainOrias" oninput="saveProfil()"></div>
+        <div class="fg"><label>T&#233;l&#233;phone</label><input class="fi" id="pParrainTel" oninput="saveProfil()"></div>
+      </div>
+      <div class="fg"><label>Email</label><input class="fi" id="pParrainEmail" oninput="saveProfil()"></div>
+    </div>
+
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Habilitations &amp; mandats</div>
+    <div class="fg"><label>Habilitations actives</label>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
         <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hImmo" onchange="saveProfil()"> Immobilier</label>
         <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hIobsp" onchange="saveProfil()"> IOBSP</label>
@@ -522,7 +541,23 @@ p.hero-desc {
         <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hCif" onchange="saveProfil()"> CIF</label>
       </div>
     </div>
-    <div class="fg"><label>Mentions légales (pied de page PDF)</label>
+    <div class="fg"><label>Mandataire IOBSP &mdash; libell&#233;</label><input class="fi" id="pMandIobsp" placeholder="Stellium Financement" oninput="saveProfil()"></div>
+    <div class="fg"><label>Mandataire IAS &mdash; libell&#233;</label><input class="fi" id="pMandIas" placeholder="Stellium Courtage" oninput="saveProfil()"></div>
+    <div class="fg"><label>Agent li&#233; CIF &mdash; libell&#233;</label><input class="fi" id="pMandCif" placeholder="Stellium Invest (ACPR n&deg; 10983)" oninput="saveProfil()"></div>
+    <div class="fg"><label>Immobilier &mdash; libell&#233; + CPI</label><input class="fi" id="pMandImmo" placeholder="Stellium Immobilier &mdash; CPI 3101 2015 000 001 813" oninput="saveProfil()"></div>
+
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Coordonn&#233;es l&#233;gales</div>
+    <div class="fg"><label>Adresse ACPR (contr&ocirc;le)</label><input class="fi" id="pAcpr" placeholder="4 Place de Budapest, 75436 Paris" oninput="saveProfil()"></div>
+    <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:12px"><input type="checkbox" id="pAnacofi" onchange="saveProfil()"> Membre ANACOFI (agr&#233;&#233;e AMF)</label></div>
+    <div class="fg"><label>RCP (assureur + adresse)</label><input class="fi" id="pRcp" placeholder="Zurich Insurance &mdash; 112 av. de Wagram, 75017 Paris" oninput="saveProfil()"></div>
+    <div class="fg"><label>R&#233;clamations &mdash; email</label><input class="fi" id="pReclamation" placeholder="reclamations@stellium.fr" oninput="saveProfil()"></div>
+    <div class="grid2">
+      <div class="fg"><label>M&#233;diateur AMF</label><input class="fi" id="pMediateurAmf" placeholder="17 place de la Bourse, 75082 Paris" oninput="saveProfil()"></div>
+      <div class="fg"><label>M&#233;diateur Assurance</label><input class="fi" id="pMediateurAss" placeholder="AME Conso, 11 place Dauphine, 75001 Paris" oninput="saveProfil()"></div>
+    </div>
+
+    <div class="fg"><label>Mentions légales libres (pied de page PDF)</label>
       <textarea class="fi" id="pMentions" rows="3" placeholder="Conseiller en Gestion de Patrimoine — ORIAS…" oninput="saveProfil()" style="resize:vertical"></textarea>
     </div>
     <div class="modal-actions">
@@ -534,11 +569,12 @@ p.hero-desc {
 
 <script>
 var PROFIL_KEY='cgpskool_profil_v1';
-var FIELDS=['pPrenom','pNom','pCabinet','pOrias','pTel','pEmail','pAdresse','pCp','pVille','pMentions'];
-var HABILS=['hImmo','hIobsp','hIas','hAgent','hCif'];
-function saveProfil(){var p={};FIELDS.forEach(function(id){p[id]=document.getElementById(id).value;});HABILS.forEach(function(id){p[id]=document.getElementById(id).checked;});var MAP={pPrenom:'prenom',pNom:'nom',pCabinet:'cabinet',pOrias:'orias',pTel:'tel',pEmail:'email',pAdresse:'adresse',pCp:'cp',pVille:'ville',pMentions:'mentions'};Object.keys(MAP).forEach(function(k){if(p[k]!==undefined)p[MAP[k]]=p[k];});localStorage.setItem(PROFIL_KEY,JSON.stringify(p));updateProfilBtn();}
-function loadProfil(){try{var raw=localStorage.getItem(PROFIL_KEY);if(!raw)return;var p=JSON.parse(raw);FIELDS.forEach(function(id){if(p[id])document.getElementById(id).value=p[id];});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=!!p[id];});}catch(e){}updateProfilBtn();}
-function clearProfil(){localStorage.removeItem(PROFIL_KEY);FIELDS.forEach(function(id){document.getElementById(id).value='';});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});updateProfilBtn();}
+var FIELDS=['pPrenom','pNom','pCabinet','pOrias','pTel','pEmail','pAdresse','pCp','pVille','pMentions','pParrainPrenom','pParrainNom','pParrainCabinet','pParrainOrias','pParrainTel','pParrainEmail','pMandIobsp','pMandIas','pMandCif','pMandImmo','pAcpr','pRcp','pReclamation','pMediateurAmf','pMediateurAss'];
+var HABILS=['hImmo','hIobsp','hIas','hAgent','hCif','pJunior','pAnacofi'];
+function onJuniorToggle(){var cb=document.getElementById('pJunior');var bl=document.getElementById('parrainBlock');if(bl)bl.style.display=cb&&cb.checked?'block':'none';}
+function saveProfil(){var p={};FIELDS.forEach(function(id){var el=document.getElementById(id);if(el)p[id]=el.value;});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)p[id]=el.checked;});var MAP={pPrenom:'prenom',pNom:'nom',pCabinet:'cabinet',pOrias:'orias',pTel:'tel',pEmail:'email',pAdresse:'adresse',pCp:'cp',pVille:'ville',pMentions:'mentions'};Object.keys(MAP).forEach(function(k){if(p[k]!==undefined)p[MAP[k]]=p[k];});localStorage.setItem(PROFIL_KEY,JSON.stringify(p));updateProfilBtn();}
+function loadProfil(){try{var raw=localStorage.getItem(PROFIL_KEY);if(!raw){onJuniorToggle();return;}var p=JSON.parse(raw);FIELDS.forEach(function(id){var el=document.getElementById(id);if(el&&p[id])el.value=p[id];});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=!!p[id];});}catch(e){}onJuniorToggle();updateProfilBtn();}
+function clearProfil(){localStorage.removeItem(PROFIL_KEY);FIELDS.forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});onJuniorToggle();updateProfilBtn();}
 function updateProfilBtn(){
   var p=null;try{p=JSON.parse(localStorage.getItem(PROFIL_KEY)||'{}')}catch(e){}
   var has=p&&(p.pPrenom||p.pNom||p.pCabinet);

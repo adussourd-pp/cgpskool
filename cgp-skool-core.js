@@ -116,6 +116,64 @@ CGP.profil.isComplete = function() {
   return !!(p.nom && p.cabinet && p.orias);
 };
 
+/**
+ * Load legal/regulatory profile.
+ * Returns:
+ *   interlocuteur : data for the client-facing footer/header (junior if junior, else self)
+ *   legal         : regulatory data (parrain if junior, else self) — used in mentions legales
+ *   mandats       : editable mandate labels with defaults
+ *   addrs         : legal addresses (ACPR, RCP, mediateurs, ...)
+ *   habils        : booleans hImmo/hIobsp/hIas/hAgent/hCif/pAnacofi
+ *   junior        : true if junior mode
+ */
+CGP.profil.loadLegal = function() {
+  var raw = {};
+  try { raw = JSON.parse(localStorage.getItem(CGP.profil._KEY) || '{}'); } catch(e) {}
+  var g = function(k) { return raw[k] || ''; };
+  var isJunior = !!raw.pJunior;
+
+  var self = {
+    prenom: g('pPrenom'), nom: g('pNom'), cabinet: g('pCabinet'),
+    orias: g('pOrias'), tel: g('pTel'), email: g('pEmail'),
+    adresse: g('pAdresse'), cp: g('pCp'), ville: g('pVille')
+  };
+  var parrain = {
+    prenom: g('pParrainPrenom'), nom: g('pParrainNom'),
+    cabinet: g('pParrainCabinet'), orias: g('pParrainOrias'),
+    tel: g('pParrainTel'), email: g('pParrainEmail')
+  };
+
+  return {
+    junior: isJunior,
+    self: self,
+    parrain: parrain,
+    interlocuteur: self,
+    legal: isJunior && (parrain.nom || parrain.cabinet) ? parrain : self,
+    mandats: {
+      iobsp: g('pMandIobsp') || 'Stellium Financement',
+      ias:   g('pMandIas')   || 'Stellium Courtage',
+      cif:   g('pMandCif')   || 'Stellium Invest (ACPR n\u00b0 10983)',
+      immo:  g('pMandImmo')  || 'Stellium Immobilier \u2014 CPI 3101 2015 000 001 813'
+    },
+    addrs: {
+      acpr:        g('pAcpr')        || '4 Place de Budapest, 75436 Paris',
+      rcp:         g('pRcp')         || 'Zurich Insurance \u2014 112 av. de Wagram, 75017 Paris',
+      reclamation: g('pReclamation') || 'reclamations@stellium.fr',
+      medAmf:      g('pMediateurAmf')|| '17 place de la Bourse, 75082 Paris',
+      medAss:      g('pMediateurAss')|| 'AME Conso, 11 place Dauphine, 75001 Paris'
+    },
+    habils: {
+      immo:    !!raw.hImmo,
+      iobsp:   !!raw.hIobsp,
+      ias:     !!raw.hIas,
+      agent:   !!raw.hAgent,
+      cif:     !!raw.hCif,
+      anacofi: !!raw.pAnacofi
+    },
+    mentionsLibres: g('pMentions')
+  };
+};
+
 CGP.profil.loadImages = function() {
   var photo = null, logo = null;
   try { photo = localStorage.getItem('cgpskool_photo'); } catch(e) {}
