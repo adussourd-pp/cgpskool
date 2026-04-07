@@ -206,13 +206,6 @@
         </div>
       </div>
 
-      <!-- Fee summary -->
-      <div class="fee-summary">
-        <div class="fee-item">Frais de transfert<b id="feeTransfert">500 &#8364;</b></div>
-        <div class="fee-item">Frais d'entr&#233;e<b id="feeEntree">0 &#8364;</b></div>
-        <div class="fee-item">Co&#251;t total<b id="feeTotal">500 &#8364;</b></div>
-      </div>
-
       <!-- KPIs -->
       <div class="kpi-row">
         <div class="kpi-box red">
@@ -459,12 +452,12 @@ function update(){
   renderAllocBar('allocBarA','allocLegA',allocA,COLORS_A);
   renderAllocBar('allocBarB','allocLegB',allocB,COLORS_B);
 
-  V('feeTransfert').textContent=fmt(montantTransfert)+' \u20ac';
-  V('feeEntree').textContent=fmt(montantEntree)+' \u20ac';
-  V('feeTotal').textContent=fmt(fraisTotal)+' \u20ac';
-
   V('kpiFrais').textContent=fmt(fraisTotal)+' \u20ac';
-  V('kpiFraisPct').textContent=fmtD(capital>0?fraisTotal/capital*100:0,1)+'% du capital';
+  var pctFrais=fmtD(capital>0?fraisTotal/capital*100:0,1)+'% du capital';
+  var detailFrais=montantTransfert>0
+    ? pctFrais+' \u00b7 '+fmt(montantTransfert)+' \u20ac transfert + '+fmt(montantEntree)+' \u20ac entr\u00e9e'
+    : pctFrais+' \u00b7 sans frais de transfert';
+  V('kpiFraisPct').textContent=detailFrais;
   V('kpiNet').textContent=fmt(capitalNet)+' \u20ac';
   V('kpiGainTotal').textContent=(gainTotal>=0?'+':'')+fmt(gainTotal)+' \u20ac';
   V('kpiGainSub').textContent='\u00e0 '+horizon+' ans vs actuel';
