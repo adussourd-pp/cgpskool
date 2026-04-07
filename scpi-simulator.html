@@ -362,13 +362,13 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 </div>
 <div class="cs-main" id="mainContent">
 <div class="cs-page">
-  <div class="empty-state" id="emptyState">
+  <div id="pageHeader"></div>
+  <div class="empty-state" id="emptyState" style="height:auto;padding:60px 0">
     <div class="empty-icon" style="font-size:56px;opacity:0.5">&#129489;&#8205;&#128640;</div>
     <div class="empty-title">Pr&#234;t pour le d&#233;collage ?</div>
     <div class="empty-sub">S&#233;lectionnez une SCPI de la gamme ou saisissez un taux, configurez les param&#232;tres et lancez la projection.</div>
   </div>
 
-  <div id="pageHeader"></div>
   <div id="results" style="display:none">
     <div id="kpiRow" class="kpi-row"></div>
     <div id="chartBox" class="chart-box">
@@ -382,20 +382,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     <div id="extraContent"></div>
   </div>
 
-  <!-- Pied de page conseiller -->
-  <div id="conseillerBlock" style="display:none;background:#F2F1EE;padding:20px 40px;margin:28px -40px -40px -40px">
-    <div style="display:flex;align-items:center;gap:20px">
-      <div style="flex:1">
-        <div style="font-size:16px;font-weight:700;color:var(--noir)" id="cpNom"></div>
-        <div style="font-size:11px;color:var(--gris);margin-top:2px" id="cpCabinet"></div>
-        <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--gris)" id="cpTelRow">&#9742; <span id="cpTel"></span></span>
-          <span style="font-size:11px;color:var(--gris)" id="cpEmailRow">&#9993; <span id="cpEmail"></span></span>
-        </div>
-      </div>
-      <div id="cpLogo" style="flex-shrink:0;display:flex;align-items:center"></div>
-    </div>
-  </div>
+  <!-- Pied de page conseiller (rendu via CGP.footer.render) -->
+  <div id="conseillerFooter"></div>
 </div>
 </div>
 </div>
@@ -827,7 +815,7 @@ function setScpiTMI(val, btn) {
 }
 
 // Footer conseiller (gere par CGP.profil.load() dans core.js)
-CGP.footer.render(document.getElementById('conseillerBlock'));
+CGP.footer.render(document.getElementById('conseillerFooter'));
 
 // ── Project save/restore ──
 CGP.project.registerModule('scpi-simulator', {

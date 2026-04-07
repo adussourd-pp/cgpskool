@@ -253,20 +253,8 @@
       <!-- Disclaimer -->
       <div style="font-size:9px;color:var(--gris);text-align:center;margin-bottom:8px;line-height:1.4" id="footerNote"></div>
 
-      <!-- Conseiller — pleine largeur, collé aux bords et au bas -->
-      <div id="conseillerBlock" style="display:none;background:#F2F1EE;padding:20px 40px;margin:28px -40px -40px -40px">
-        <div style="display:flex;align-items:center;gap:20px">
-          <div style="flex:1">
-            <div style="font-size:16px;font-weight:700;color:var(--noir)" id="cpNom"></div>
-            <div style="font-size:11px;color:var(--gris);margin-top:2px" id="cpCabinet">Votre consultant patrimonial</div>
-            <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
-              <span style="font-size:11px;color:var(--gris)" id="cpTelRow">&#9742; <span id="cpTel"></span></span>
-              <span style="font-size:11px;color:var(--gris)" id="cpEmailRow">&#9993; <span id="cpEmail"></span></span>
-            </div>
-          </div>
-          <div id="cpLogo" style="flex-shrink:0;display:flex;align-items:center"></div>
-        </div>
-      </div>
+      <!-- Conseiller (rendu via CGP.footer.render) -->
+      <div id="conseillerFooter"></div>
 
     </div>
   </div>
@@ -589,7 +577,7 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
   var dd=String(today.getDate()).padStart(2,'0');
   var mm=String(today.getMonth()+1).padStart(2,'0');
   V('pDate').value=dd+'/'+mm+'/'+today.getFullYear();
-  CGP.footer.render(document.getElementById('conseillerBlock'));
+  CGP.footer.render(document.getElementById('conseillerFooter'));
   updateTypeEncart();
   update();
 })();

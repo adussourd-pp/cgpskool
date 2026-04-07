@@ -294,6 +294,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
 
 <div class="cs-main">
   <div class="cs-page">
+    <div id="pageHeader"></div>
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">🏦</div>
       <div class="empty-title">Projection Financière SCPI</div>
@@ -340,7 +341,7 @@ const SCPI=CGP.SCPI_DATA.map(function(s){return{id:s.id,n:s.name,r:+(s.yieldGros
 
 let bank='sofiap', sc=0, cBar=null, cPie=null, invMode='solo';
 
-window.onload=()=>{addSCPI();setBank('sofiap');calcEndett();autoADI();renderBarem();onProfil();};
+window.onload=()=>{addSCPI();setBank('sofiap');calcEndett();autoADI();renderBarem();onProfil();try{updateHeader();}catch(e){}};
 
 function setInvMode(mode){
   invMode=mode;
@@ -729,8 +730,7 @@ function render(d){
   const partAbs=Math.abs(d.part);
   let h='';
 
-  // 1. Header (rendu via CGP.header)
-  h+='<div id="pageHeader"></div>';
+  // 1. Header (rendu via CGP.header — div statique en haut de la page)
 
   // 2. Capacit\u00e9 d'emprunt
   const cA=d.eAvt>d.b.endMax?'var(--red)':d.eAvt>d.b.endMax-5?'var(--ambre)':'var(--green)';
