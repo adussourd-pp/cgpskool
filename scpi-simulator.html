@@ -546,16 +546,16 @@ function renderSCPIHeader(){
   const tags=[];
   if(s.theme) tags.push(s.theme);
   if(s.geo) tags.push(s.geo);
-  if(s.price) tags.push(s.price+' &euro;');
-  tags.push((s.yieldGross*100).toFixed(2)+'%');
+  const tagsHtml=tags.map(t=>`<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ambre);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.18);padding:4px 12px;border-radius:20px;white-space:nowrap">${t}</span>`).join('');
   document.getElementById('scpiHeaderBar').innerHTML=`
     <div class="scpi-header fade-in" style="padding:14px 18px;align-items:center">
-      <div style="display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0">
-        <div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);line-height:1.2">${s.name}</div>
-        <div style="font-size:11px;color:var(--gris);font-weight:400">${s.manager}</div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);line-height:1.2">${s.name} <span style="color:var(--gris);font-weight:400">— ${s.manager}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${tagsHtml}</div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${tags.map(t=>`<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--ambre);background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.18);padding:4px 12px;border-radius:20px;white-space:nowrap">${t}</span>`).join('')}
+      <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:2px">
+        ${s.price?`<div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir)">${s.price} &euro;</div>`:''}
+        <div style="font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ambre)">${(s.yieldGross*100).toFixed(2)}%</div>
       </div>
     </div>`;
 }
