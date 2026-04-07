@@ -371,43 +371,11 @@ CGP.header.render = function(target, opts) {
   h += '</div>';
   h += '</div>';
 
-  // Section objectifs (si presents) — chips puis trait fin en dessous
-  if (objectifs.length) {
-    h += '<div style="margin-top:10px;max-width:62%">';
-    h += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
-    objectifs.forEach(function(obj, idx) {
-      var isOn = !!checked[obj];
-      var bg = isOn ? color1 : '#fff';
-      var txtCol = isOn ? '#fff' : '#6B6B6B';
-      var bord = isOn ? color1 : '#d8d6d2';
-      var dot = isOn ? '\u25cf' : '\u25cb';
-      h += '<button type="button" data-obj="' + e(obj) + '"'
-        + ' style="font-family:inherit;font-size:9px;font-weight:' + (isOn?'600':'500') + ';color:' + txtCol + ';background:' + bg + ';border:1px solid ' + bord + ';border-radius:14px;padding:3px 9px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;line-height:1.2">'
-        + '<span style="font-size:8px">' + dot + '</span>'
-        + e(obj)
-        + '</button>';
-    });
-    h += '</div>';
-    h += '</div>';
-    // Trait fin sous tout le header (pleine largeur)
-    h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin-top:12px"></div>';
-  }
+  // Trait fin sous le header (pleine largeur)
+  h += '<div style="height:1px;background:rgba(0,0,0,0.06);margin-top:14px"></div>';
 
   h += '</div>';
   el.innerHTML = h;
-
-  // Wire-up clicks chips
-  if (savedKey && objectifs.length) {
-    el.querySelectorAll('button[data-obj]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var obj = btn.getAttribute('data-obj');
-        checked[obj] = !checked[obj];
-        try { localStorage.setItem(savedKey, JSON.stringify(checked)); } catch(err) {}
-        // Re-render
-        CGP.header.render(el, opts);
-      });
-    });
-  }
 };
 
 /* ── PROJECT EXPORT/IMPORT ──────────────────────── */

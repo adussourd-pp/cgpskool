@@ -379,6 +379,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
       <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
     </div>
     <div id="scpiHeaderBar"></div>
+    <div id="hypothesesBox"></div>
     <div id="extraContent"></div>
   </div>
 
@@ -560,6 +561,20 @@ function renderSCPIHeader(){
     </div>`;
 }
 
+function renderHypothesesBox(items){
+  var box=document.getElementById('hypothesesBox');
+  if(!box)return;
+  if(!items||!items.length){box.innerHTML='';return;}
+  var h='<div style="background:#fafaf9;border:1px solid var(--bord);border-radius:10px;padding:14px 18px;margin-bottom:18px">';
+  h+='<div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:10px">Hypoth&egrave;ses retenues</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">';
+  items.forEach(function(it){
+    h+='<div><div style="font-size:10px;color:var(--gris);margin-bottom:2px">'+it.label+'</div><div style="font-size:13px;font-weight:700;color:var(--noir)">'+it.val+'</div></div>';
+  });
+  h+='</div></div>';
+  box.innerHTML=h;
+}
+
 function renderRetraite(){
   const s=getActiveScpi();
   const init=+document.getElementById('ret-init').value,monthly=+document.getElementById('ret-monthly').value;
@@ -577,6 +592,14 @@ function renderRetraite(){
   renderChart(res.rows.map(r=>'An '+r.year),[
     {label:'Patrimoine constitué',data:res.rows.map(r=>Math.round(r.after)),color:'#C8832A'},
     {label:'Capital versé',data:res.rows.map((_,i)=>Math.round(init+monthly*12*(i+1))),color:'#2D7A5B'}
+  ]);
+
+  renderHypothesesBox([
+    {label:'Versement initial',val:fmt(init)+' \u20ac'},
+    {label:'Versements mensuels',val:fmt(monthly)+' \u20ac/mois'},
+    {label:'Dividendes r\u00e9investis',val:reinvest+' %'},
+    {label:'Horizon',val:horizon+' ans'},
+    {label:'TMI',val:tmi+' %'}
   ]);
 
   // Extra: stats + table
@@ -614,6 +637,12 @@ function renderNP(){
 
   document.getElementById('chartTitle').textContent='Répartition NP / US sur la PP';
   renderBarNP(res);
+
+  renderHypothesesBox([
+    {label:'Investissement nue-propri\u00e9t\u00e9',val:fmt(init)+' \u20ac'},
+    {label:'Dur\u00e9e d\u00e9membrement',val:duration+' ans'},
+    {label:'Cl\u00e9 NP',val:Math.round(res.npPct*100)+' %'}
+  ]);
 
   document.getElementById('extraContent').innerHTML=`
     <div class="np-grid fade-in">
@@ -661,6 +690,13 @@ function renderEntreprise(){
   renderChart(years.map(y=>'An '+y),[
     {label:"Revenus cumulés nets d'IS",data:years.map(y=>Math.round(res.revenusNets*y)),color:'#2D7A5B'},
     {label:"Investissement initial",data:years.map(()=>res.investUS),color:'#C8832A'}
+  ]);
+
+  renderHypothesesBox([
+    {label:'Investissement soci\u00e9t\u00e9 (US)',val:fmt(investUS)+' \u20ac'},
+    {label:'Investissement perso (NP)',val:fmt(investNPperso)+' \u20ac'},
+    {label:'Dur\u00e9e usufruit',val:duration+' ans'},
+    {label:'Taux IS',val:(isTaxPct*100)+' %'}
   ]);
 
   document.getElementById('extraContent').innerHTML=`
