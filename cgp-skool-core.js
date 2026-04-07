@@ -250,6 +250,7 @@ CGP.footer.render = function(el) {
     if (hasOrias) {
       center += '<div style="font-size:11px;color:' + color1 + ';font-weight:600">ORIAS n\u00b0 ' + e(p.orias) + ' \u00b7 <a href="https://www.orias.fr" target="_blank" style="color:' + color1 + ';text-decoration:none">www.orias.fr</a></div>';
     }
+    center += '</div>';
   }
   center += '</div>';
 
