@@ -78,6 +78,13 @@
 
 .disclaimer{font-size:10px;color:var(--gris);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--bord)}
 
+.ft-switch{position:relative;display:inline-block;width:38px;height:20px;flex-shrink:0}
+.ft-switch input{opacity:0;width:0;height:0}
+.ft-slider{position:absolute;cursor:pointer;inset:0;background:#d8d6d2;border-radius:20px;transition:0.2s}
+.ft-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.ft-switch input:checked + .ft-slider{background:var(--orange)}
+.ft-switch input:checked + .ft-slider:before{transform:translateX(18px)}
+.ft-switch input:disabled + .ft-slider{opacity:0.5;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -149,12 +156,12 @@
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-      <div id="fraisTransfertRow">
-        <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais de transfert</label></div>
-        <div style="display:flex;gap:6px;padding:0 8px;margin-bottom:8px">
-          <button type="button" id="ftBtnOui" onclick="setFraisTransfert(1)" style="flex:1;padding:8px;border:1.5px solid var(--orange);background:var(--orange);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;border-radius:7px;cursor:pointer">Oui &mdash; 1 %</button>
-          <button type="button" id="ftBtnNon" onclick="setFraisTransfert(0)" style="flex:1;padding:8px;border:1.5px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;border-radius:7px;cursor:pointer">Non &mdash; 0 %</button>
-        </div>
+      <div id="fraisTransfertRow" style="padding:8px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <label for="ftSwitch" style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;cursor:pointer">Frais de transfert (1 %)</label>
+        <label class="ft-switch">
+          <input type="checkbox" id="ftSwitch" checked onchange="onFraisTransfertSwitch(this)">
+          <span class="ft-slider"></span>
+        </label>
         <input type="hidden" id="pFraisTransfert" value="1">
       </div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
@@ -344,21 +351,13 @@ var TYPE_RULES={
   av:        {famille:'av', label:'Assurance Vie',badge:'AV',     fraisMax:0, seuilAns:0,  fraisEntreeMax:4.8, transfert:'Rachat total + r\u00e9investissement', interet:'Gestion libre, clause b\u00e9n\u00e9ficiaire', attention:'Fiscalit\u00e9 rachat (PFU ou bar\u00e8me)'}
 };
 
-function syncFraisTransfertButtons(v){
-  var bOui=document.getElementById('ftBtnOui');
-  var bNon=document.getElementById('ftBtnNon');
-  if(!bOui||!bNon)return;
-  var on=Number(v)>0;
-  bOui.style.background=on?'var(--orange)':'#fff';
-  bOui.style.color=on?'#fff':'var(--gris)';
-  bOui.style.borderColor=on?'var(--orange)':'var(--bord)';
-  bNon.style.background=on?'#fff':'var(--orange)';
-  bNon.style.color=on?'var(--gris)':'#fff';
-  bNon.style.borderColor=on?'var(--bord)':'var(--orange)';
+function syncFraisTransfertSwitch(v){
+  var sw=document.getElementById('ftSwitch');
+  if(!sw)return;
+  sw.checked=Number(v)>0;
 }
-function setFraisTransfert(v){
-  V('pFraisTransfert').value=String(v);
-  syncFraisTransfertButtons(v);
+function onFraisTransfertSwitch(el){
+  V('pFraisTransfert').value=el.checked?'1':'0';
   update();
 }
 
@@ -379,7 +378,8 @@ function onFamilleChange(){
     V('perTypeRow').style.display='';
     V('pTypePER').value='per';
     if(ftRow)ftRow.style.display='';
-    setFraisTransfert(1);
+    V('pFraisTransfert').value='1';
+    syncFraisTransfertSwitch(1);
     V('pFraisEntree').max='4.5';
     V('pContratA').value='PER Ancien';
     V('pContratB').value='PER Recommand\u00e9';
@@ -413,16 +413,18 @@ function update(){
   var rule=TYPE_RULES[type]||TYPE_RULES.per;
 
   // Anciennete > seuil : frais de transfert ne s'appliquent plus
+  var ftSwitchEl=document.getElementById('ftSwitch');
   if(anciennete>rule.seuilAns){
     fraisT=0;
     V('pFraisTransfert').value='0';
+    if(ftSwitchEl){ftSwitchEl.checked=false;ftSwitchEl.disabled=true;}
     V('ancienneteInfo').textContent='\u2713 '+rule.label+' > '+rule.seuilAns+' ans : frais de transfert = 0%';
     V('ancienneteInfo').style.display='block';
   }else{
+    if(ftSwitchEl){ftSwitchEl.disabled=false;}
     V('ancienneteInfo').textContent='Frais max '+rule.fraisMax+'% si < '+rule.seuilAns+' ans';
     V('ancienneteInfo').style.display='block';
   }
-  syncFraisTransfertButtons(fraisT);
 
   var horizon=parseInt(V('pHorizon').value)||10;
   var nomA=txt('pContratA');
