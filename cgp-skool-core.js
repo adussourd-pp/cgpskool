@@ -196,24 +196,69 @@ CGP.footer.render = function(el) {
   if (!nom) { el.style.display = 'none'; return; }
   var e = CGP.esc;
 
-  var left = '';
-  left += '<div style="font-size:16px;font-weight:700;color:#181614">' + e(nom) + '</div>';
-  if (p.cabinet) left += '<div style="font-size:11px;color:#6B6B6B;margin-top:2px">' + e(p.cabinet) + '</div>';
-  var contact = [];
-  if (p.tel) contact.push('\u260e ' + e(p.tel));
-  if (p.email) contact.push('\u2709 ' + e(p.email));
-  if (contact.length) left += '<div style="font-size:11px;color:#6B6B6B;margin-top:4px">' + contact.join(' \u00a0\u00a0 ') + '</div>';
+  // Couleurs personnalisees (fallback orange)
+  var color1 = p.color1 || p.pColor1 || '#D4622A';
+  var c1dim  = 'rgba(212,98,42,0.07)';
+  var c1bord = 'rgba(212,98,42,0.18)';
+  // Si couleur perso, regenerer dim/bord (approximatif via opacity)
+  if (p.color1 || p.pColor1) {
+    c1dim  = color1 + '14'; // ~8% alpha en hex
+    c1bord = color1 + '33'; // ~20% alpha en hex
+  }
 
-  var right = '';
-  if (img.logo) {
-    right = '<div style="width:52px;height:52px;border-radius:50%;background:#fff;border:1px solid #e5e5e5;display:flex;align-items:center;justify-content:center;overflow:hidden">'
-      + '<img src="' + img.logo + '" style="max-width:36px;max-height:36px;object-fit:contain">'
+  // Photo (gauche)
+  var photoBlock = '';
+  if (img.photo) {
+    photoBlock = '<div style="width:56px;height:56px;border-radius:50%;background:#fff;border:1.5px solid #e5e5e5;overflow:hidden;flex-shrink:0">'
+      + '<img src="' + img.photo + '" style="width:100%;height:100%;object-fit:cover">'
       + '</div>';
   }
 
-  el.innerHTML = '<div style="background:#F2F1EE;margin:28px -40px -40px -40px;padding:20px 40px;display:flex;align-items:center;justify-content:space-between">'
-    + '<div>' + left + '</div>'
-    + (right ? '<div>' + right + '</div>' : '')
+  // Bloc texte central
+  var center = '<div style="flex:1;min-width:0">';
+  center += '<div style="font-size:16px;font-weight:700;color:#181614;text-transform:uppercase;letter-spacing:0.02em">' + e(nom) + '</div>';
+  if (p.cabinet) center += '<div style="font-size:12px;color:#6B6B6B;margin-top:2px">' + e(p.cabinet) + '</div>';
+  var contact = [];
+  if (p.tel) contact.push('\u260e ' + e(p.tel));
+  if (p.email) contact.push('\u2709 ' + e(p.email));
+  if (contact.length) center += '<div style="font-size:11px;color:#6B6B6B;margin-top:4px">' + contact.join(' \u00a0\u00a0 ') + '</div>';
+
+  // Tags habilitations
+  var tags = [];
+  if (p.hImmo)  tags.push('TRANSACTION');
+  if (p.hIobsp) tags.push('IOBSP');
+  if (p.hIas)   tags.push('IAS');
+  if (p.hCif || p.hAgent) tags.push('AGENT LI\u00c9');
+  var hasTags = tags.length > 0;
+  var hasOrias = !!p.orias;
+
+  if (hasTags || hasOrias) {
+    center += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.08)">';
+    if (hasTags) {
+      center += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">';
+      tags.forEach(function(t) {
+        center += '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:' + color1 + ';background:' + c1dim + ';border:1px solid ' + c1bord + ';padding:3px 10px;border-radius:20px">' + t + '</span>';
+      });
+      center += '</div>';
+    }
+    if (hasOrias) {
+      center += '<div style="font-size:11px;color:' + color1 + ';font-weight:600">ORIAS n\u00b0 ' + e(p.orias) + ' \u00b7 <a href="https://www.orias.fr" target="_blank" style="color:' + color1 + ';text-decoration:none">www.orias.fr</a></div>';
+    }
+  }
+  center += '</div>';
+
+  // Logo cabinet (droite)
+  var right = '';
+  if (img.logo) {
+    right = '<div style="width:56px;height:56px;border-radius:50%;background:#fff;border:1.5px solid #e5e5e5;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">'
+      + '<img src="' + img.logo + '" style="max-width:40px;max-height:40px;object-fit:contain">'
+      + '</div>';
+  }
+
+  el.innerHTML = '<div style="background:#F2F1EE;margin:28px -40px -40px -40px;padding:20px 40px;display:flex;align-items:flex-start;gap:18px">'
+    + photoBlock
+    + center
+    + right
     + '</div>';
   el.style.display = '';
 };
