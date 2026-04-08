@@ -76,14 +76,14 @@
 .pyr-box.red .pyr-box-title{color:#dc3c28}
 
 /* Workflow steps */
-.wf-steps{display:flex;gap:0;margin:20px 0;overflow-x:auto}
-.wf-step{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;position:relative}
-.wf-num{width:24px;height:24px;border-radius:50%;border:2px solid #8B2020;color:#8B2020;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:6px;background:#fff;position:relative;z-index:2}
-.wf-pill{background:#8B2020;color:#fff;font-size:10px;font-weight:600;padding:6px 14px;border-radius:4px;text-align:center;white-space:nowrap;margin-bottom:8px;position:relative}
-.wf-pill::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);border:6px solid transparent;border-left:8px solid #8B2020}
+.wf-steps{display:flex;gap:0;margin:24px 0;overflow-x:auto}
+.wf-step{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;position:relative;padding:0 4px}
+.wf-num{width:34px;height:34px;border-radius:50%;border:2px solid #2D7A5B;color:#2D7A5B;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:10px;background:#fff;position:relative;z-index:2}
+.wf-pill{background:#2D7A5B;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:5px;text-align:center;white-space:nowrap;margin-bottom:10px;position:relative}
+.wf-pill::after{content:'';position:absolute;right:-9px;top:50%;transform:translateY(-50%);border:7px solid transparent;border-left:9px solid #2D7A5B}
 .wf-step:last-child .wf-pill::after{display:none}
-.wf-detail{font-size:10px;color:var(--gris);line-height:1.5;text-align:center;padding:0 4px}
-.wf-detail b{color:var(--noir);display:block;margin-bottom:2px}
+.wf-detail{font-size:11px;color:var(--gris);line-height:1.55;text-align:center;padding:0 4px}
+.wf-detail b{color:var(--noir);display:block;margin-bottom:3px;font-size:10px}
 
 /* Schema SCPI */
 .scpi-schema{display:flex;align-items:center;justify-content:center;gap:16px;margin:20px 0;flex-wrap:wrap}
@@ -522,6 +522,7 @@ function toggleBloc(){
 
 function loadAnnexes(){
   var html='';
+  var contentHtml='';
   var found=false;
   ANNEXE_MODULES.forEach(function(m){
     var key='cgpskool_state_'+m.id;
@@ -529,11 +530,34 @@ function loadAnnexes(){
     try{var raw=localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
     if(data){
       found=true;
-      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked> '+m.icon+' '+m.label+'</label>';
+      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
     }
   });
-  if(!found)html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune projection sauvegard\u00e9e</div>';
+  if(!found){
+    html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune projection sauvegard\u00e9e</div>';
+  }
   V('annexesList').innerHTML=html;
+  renderAnnexesContent();
+}
+
+function renderAnnexesContent(){
+  var checked=Array.from(V('annexesList').querySelectorAll('input[data-annexe]:checked')).map(function(i){return i.dataset.annexe;});
+  if(checked.length===0){
+    V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune projection s&#233;lectionn&#233;e. Lance une simulation depuis un module et reviens ici pour la joindre.</div>';
+    return;
+  }
+  var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  checked.forEach(function(id){
+    var m=ANNEXE_MODULES.find(function(x){return x.id===id});
+    if(!m)return;
+    html+='<div class="annexe-card">'
+      +'<div class="annexe-card-title">'+m.icon+' '+m.label+'</div>'
+      +'<div class="annexe-card-sub">Projection sauvegard&#233;e</div>'
+      +'</div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--gris);font-style:italic;margin-top:10px">'+checked.length+' projection'+(checked.length>1?'s':'')+' jointe'+(checked.length>1?'s':'')+' au dossier.</div>';
+  V('annexesContent').innerHTML=html;
 }
 
 function saveDossier(){
