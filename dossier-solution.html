@@ -130,7 +130,6 @@
           <option value="per">Plan &#201;pargne Retraite</option>
           <option value="scpi">SCPI</option>
           <option value="immo">Immobilier LMNP</option>
-          <option value="mixte">Multi-solutions</option>
         </select>
       </div>
       <div class="sf"><label>Assureur / Partenaire</label>
@@ -327,6 +326,62 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
               </div>
             </div>
           </div>
+
+          <!-- Schema Assurance Vie -->
+          <div id="schemaAV" style="display:none">
+            <div class="pyr-labels">
+              <div class="pyr-box orange">
+                <div class="pyr-box-title">Pendant 8 ans</div>
+                &#10003; Capitalisation libre : fonds euros + UC<br>
+                &#10003; Disponibilit&#233; totale (rachat partiel possible)<br>
+                &#10003; Arbitrages gratuits ou tr&#232;s peu co&#251;teux<br>
+                &#10003; Fiscalit&#233; diff&#233;r&#233;e tant qu'on ne rachete pas
+              </div>
+              <div class="pyr-box purple">
+                <div class="pyr-box-title">Apr&#232;s 8 ans</div>
+                &#10003; Abattement annuel sur les plus-values :<br>
+                &nbsp;&nbsp;&nbsp;&bull; <b>4 600 &euro;</b> (c&#233;libataire)<br>
+                &nbsp;&nbsp;&nbsp;&bull; <b>9 200 &euro;</b> (couple)<br>
+                &#10003; PFU r&#233;duit &agrave; <b>7,5 %</b> sur les versements &lt; 150k&euro;<br>
+                &#10003; Prélèvements sociaux : 17,2 %
+              </div>
+              <div class="pyr-box red">
+                <div class="pyr-box-title">Au d&#233;c&#232;s</div>
+                &#10003; Hors succession : transmission directe<br>
+                &#10003; Versements avant 70 ans : <b>152 500 &euro;</b> par b&#233;n&#233;ficiaire (art. 990 I)<br>
+                &#10003; Versements apr&#232;s 70 ans : <b>30 500 &euro;</b> tous b&#233;n&#233;ficiaires confondus<br>
+                &#10003; Clause b&#233;n&#233;ficiaire libre &amp; modifiable
+              </div>
+            </div>
+          </div>
+
+          <!-- Schema LMNP -->
+          <div id="schemaLMNP" style="display:none">
+            <div class="pyr-labels">
+              <div class="pyr-box orange">
+                <div class="pyr-box-title">Acquisition</div>
+                &#10003; Bien immobilier meubl&#233; (r&#233;sidence services, ancien r&#233;nov&#233;...)<br>
+                &#10003; Financement &agrave; cr&#233;dit possible (effet de levier bancaire)<br>
+                &#10003; Statut LMNP : Loueur Meubl&#233; Non Professionnel<br>
+                &#10003; Conditions : recettes locatives &lt; 23 000 &euro; OU &lt; 50% des revenus
+              </div>
+              <div class="pyr-box purple">
+                <div class="pyr-box-title">Pendant l'exploitation</div>
+                &#10003; Revenus : loyers per&#231;us (r&#233;gime BIC, pas foncier)<br>
+                &#10003; <b>Amortissement comptable</b> du bien et du mobilier (~ 25-30 ans)<br>
+                &#10003; D&#233;duction des charges r&#233;elles : taxe fonci&#232;re, gestion, int&#233;r&#234;ts...<br>
+                &#10003; R&#233;sultat fiscal souvent &agrave; <b>0 &euro;</b> pendant 15-20 ans
+              </div>
+              <div class="pyr-box red">
+                <div class="pyr-box-title">&Agrave; la revente</div>
+                &#10003; Plus-value des particuliers (et non BIC pro)<br>
+                &#10003; Abattements pour dur&#233;e de d&#233;tention :<br>
+                &nbsp;&nbsp;&nbsp;&bull; Exon&#233;ration IR &agrave; <b>22 ans</b><br>
+                &nbsp;&nbsp;&nbsp;&bull; Exon&#233;ration PS &agrave; <b>30 ans</b><br>
+                &#10003; Pas de reprise des amortissements pratiqu&#233;s
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -431,16 +486,6 @@ var TEMPLATES={
     frais:[['Frais de notaire','7 \u00e0 8 % (ancien) / 2 \u00e0 3 % (neuf)','Frais d\'acquisition standards'],['Frais d\'agence','3 \u00e0 5 %','Int\u00e9gr\u00e9s dans le prix FAI'],['Honoraires comptable','300 \u00e0 800 \u20ac/an','Obligatoire au r\u00e9gime r\u00e9el simplifi\u00e9'],['Gestion locative','6 \u00e0 10 % des loyers','Si d\u00e9l\u00e9gation \u00e0 une agence'],['CFE','Variable','Cotisation Fonci\u00e8re des Entreprises']],
     fraisNote:'La rentabilit\u00e9 nette tient compte de l\'ensemble de ces frais dans la projection.',
     etapes:[['S\u00e9lection du bien','Analyse du projet, capacit\u00e9 financement, objectifs de rendement'],['Montage financier','Simulation cr\u00e9dit, structure de d\u00e9tention, projection rentabilit\u00e9 10-20 ans'],['Acquisition','Compromis, financement, acte authentique chez le notaire'],['Mise en location','D\u00e9claration greffe, r\u00e9gime BIC r\u00e9el, choix comptable partenaire'],['Suivi annuel','Bilan locatif, d\u00e9claration fiscale BIC accompagn\u00e9e']]
-  },
-  mixte:{
-    type:'STRAT\u00c9GIE PATRIMONIALE GLOBALE',
-    title:'Votre strat\u00e9gie patrimoniale sur-mesure',
-    accompagnement:'Votre situation m\u00e9rite une approche globale, pas des produits vendus \u00e0 la pi\u00e8ce.<br><br>La strat\u00e9gie que je vous propose repose sur une vision d\'ensemble de votre patrimoine : <b>ce que vous avez, ce que vous construisez, ce que vous transmettrez</b>.<br><br><b>Les trois piliers de votre strat\u00e9gie :</b><br><br>\u2713 <b>Placements</b> \u2014 Faire fructifier votre \u00e9pargne sur des supports adapt\u00e9s<br>\u2713 <b>Financement</b> \u2014 Utiliser intelligemment le cr\u00e9dit pour amplifier votre patrimoine<br>\u2713 <b>Fiscalit\u00e9</b> \u2014 R\u00e9duire votre imp\u00f4t aujourd\'hui et organiser une transmission optimis\u00e9e demain<br><br>Mon engagement : une relation durable, un suivi actif, et une strat\u00e9gie qui \u00e9volue avec vous.',
-    contrat:'<b>Les solutions retenues pour votre dossier</b><br><br>\u2713 <b>Assurance vie (Vie Plus / Suravenir)</b> \u2014 \u00c9pargne flexible, fiscalit\u00e9 avantageuse<br>\u2713 <b>Plan \u00c9pargne Retraite</b> \u2014 D\u00e9duction fiscale imm\u00e9diate + pr\u00e9paration retraite<br>\u2713 <b>SCPI europ\u00e9ennes</b> \u2014 Immobilier sans gestion, revenus r\u00e9guliers<br>\u2713 <b>Immobilier LMNP</b> \u2014 Patrimoine tangible, revenus nets d\'imp\u00f4t<br>\u2713 <b>Capital-investissement (FCPR / FPCI)</b> \u2014 Diversification \u00e9conomie r\u00e9elle<br><br>Chaque brique a \u00e9t\u00e9 s\u00e9lectionn\u00e9e pour sa coh\u00e9rence avec votre profil.',
-    gestion:'<b>Allocation propos\u00e9e et logique de r\u00e9partition</b><br><br><b>Liquidit\u00e9</b> \u2014 Une partie reste accessible \u00e0 tout moment<br><b>Performance</b> \u2014 Une partie orient\u00e9e vers la croissance long terme<br><b>Protection / Transmission</b> \u2014 Une partie structur\u00e9e pour la fiscalit\u00e9 successorale<br><br>\u2192 <b>Horizon global : 5 \u00e0 20 ans</b><br>\u2192 <b>Objectif de rendement : 3 \u00e0 6 %</b><br><br><i>Objectifs indicatifs, non garantis.</i>',
-    frais:[['Assurance vie','4,8 % sur versements + 1 %/an','Moy. 10 ans : \u2248 1,48 %/an'],['PER','4,5 % sur versements + 1 %/an','Moy. 30 ans : \u2248 1,15 %/an'],['SCPI','8 \u00e0 12 % (int\u00e9gr\u00e9s au prix)','\u2248 10 % des loyers bruts'],['LMNP','2 \u00e0 8 % (notaire + agence)','Comptable requis au r\u00e9el']],
-    fraisNote:'L\'impact r\u00e9el des frais est analys\u00e9 dans chaque projection individuelle fournie en annexe.',
-    etapes:[['Validation strat\u00e9gie','Relecture du document, confirmation des priorit\u00e9s et allocation cible'],['Envoi documents','Envoi group\u00e9 pour toutes les solutions : pi\u00e8ce d\'identit\u00e9, RIB, justificatif'],['Signatures','Chaque enveloppe fait l\'objet d\'une signature s\u00e9par\u00e9e par e-mail'],['Mise en place','Solutions activ\u00e9es dans l\'ordre de priorit\u00e9 d\u00e9fini ensemble'],['Suivi global','RDV annuel couvrant l\'ensemble : performance, fiscalit\u00e9, arbitrages']]
   }
 };
 
@@ -498,11 +543,16 @@ function onTypeChange(){
   // Schema pedagogique selon le type
   var pyrEl=V('schemaPyramide');
   var scpiEl=V('schemaSCPI');
-  if(pyrEl&&scpiEl){
-    if(type==='scpi'){pyrEl.style.display='none';scpiEl.style.display='';V('schemaTitle').textContent='Comprendre la SCPI';}
-    else if(type==='per'){pyrEl.style.display='';scpiEl.style.display='none';V('schemaTitle').textContent='Comprendre le m\u00e9canisme retraite';}
-    else if(type==='av'){pyrEl.style.display='none';scpiEl.style.display='none';V('blocSchema').style.display='none';}
-    else{pyrEl.style.display='none';scpiEl.style.display='none';}
+  var avEl=V('schemaAV');
+  var lmnpEl=V('schemaLMNP');
+  if(pyrEl&&scpiEl&&avEl&&lmnpEl){
+    pyrEl.style.display='none';scpiEl.style.display='none';avEl.style.display='none';lmnpEl.style.display='none';
+    V('blocSchema').style.display='';
+    if(type==='scpi'){scpiEl.style.display='';V('schemaTitle').textContent='Comprendre la SCPI';}
+    else if(type==='per'){pyrEl.style.display='';V('schemaTitle').textContent='Comprendre le m\u00e9canisme retraite';}
+    else if(type==='av'){avEl.style.display='';V('schemaTitle').textContent='Comprendre l\'assurance vie';}
+    else if(type==='immo'){lmnpEl.style.display='';V('schemaTitle').textContent='Comprendre le LMNP';}
+    else{V('blocSchema').style.display='none';}
   }
   // Show/hide SCPI picker
   var scpiToggle=V('toggleSCPI');
