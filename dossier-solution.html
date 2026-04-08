@@ -225,6 +225,8 @@
       <label class="cb-row"><input type="checkbox" id="cbRelation" checked onchange="toggleBloc()"> Relation humaine</label>
       <label class="cb-row"><input type="checkbox" id="cbContrat" checked onchange="toggleBloc()"> Le contrat</label>
       <label class="cb-row"><input type="checkbox" id="cbGestion" checked onchange="toggleBloc()"> Mode de gestion</label>
+      <label class="cb-row" id="cbRowReinvest" style="display:none"><input type="checkbox" id="cbReinvest" onchange="toggleBloc()"> R&#233;investissement dividendes (SCPI)</label>
+      <label class="cb-row" id="cbRowLevier" style="display:none"><input type="checkbox" id="cbLevier" onchange="toggleBloc()"> Effet de levier cr&#233;dit (SCPI)</label>
       <label class="cb-row"><input type="checkbox" id="cbProfil" checked onchange="toggleBloc()"> Pour qui ?</label>
       <label class="cb-row"><input type="checkbox" id="cbResume" checked onchange="toggleBloc()"> En r&#233;sum&#233;</label>
       <label class="cb-row"><input type="checkbox" id="cbFrais" checked onchange="toggleBloc()"> Frais</label>
@@ -272,7 +274,7 @@
       <!-- ACCOMPAGNEMENT -->
       <div class="bloc" id="blocAccompagnement">
         <div class="bloc-tag">Accompagnement</div>
-        <div class="bloc-title">Une premi&#232;re &#233;tape structurante</div>
+        <div class="bloc-title" contenteditable="true" id="titleAccompagnement">Une premi&#232;re &#233;tape structurante</div>
         <div class="bloc-body" contenteditable="true" id="bodyAccompagnement">
 <b>L'assurance vie n'est pas un simple placement.</b> C'est la premi&#232;re pierre d'une strat&#233;gie patrimoniale compl&#232;te, pens&#233;e pour &#234;tre coh&#233;rente, personnalis&#233;e et durable.<br><br>
 Notre objectif est de vous aider &#224; faire fructifier intelligemment votre capital, tout en vous apportant une relation de confiance, humaine et suivie dans le temps.<br><br>
@@ -284,7 +286,7 @@ L'id&#233;e est de construire votre pyramide patrimoniale pas &#224; pas, en fon
       <!-- RELATION HUMAINE -->
       <div class="bloc" id="blocRelation">
         <div class="bloc-tag">Relation</div>
-        <div class="bloc-title">Une relation humaine et durable</div>
+        <div class="bloc-title" contenteditable="true" id="titleRelation">Une relation humaine et durable</div>
         <div class="bloc-body" contenteditable="true" id="bodyRelation">
 Nos clients ne recherchent pas seulement un contrat. Ils recherchent un interlocuteur de confiance, &#224; l'&#233;coute, disponible et r&#233;actif, capable de les guider dans la dur&#233;e.<br><br>
 <b>Vous b&#233;n&#233;ficiez de :</b><br>
@@ -301,7 +303,7 @@ Nos clients ne recherchent pas seulement un contrat. Ils recherchent un interloc
       <!-- CONTRAT -->
       <div class="bloc" id="blocContrat">
         <div class="bloc-tag">Le contrat</div>
-        <div class="bloc-title">Un contrat haut de gamme et &#233;volutif</div>
+        <div class="bloc-title" contenteditable="true" id="titleContrat">Un contrat haut de gamme et &#233;volutif</div>
         <div class="bloc-body" contenteditable="true" id="bodyContrat">
 Ce contrat est &#233;tabli avec <b>VIE PLUS</b>, filiale de Suravenir (Cr&#233;dit Mutuel Ark&#233;a Banque Priv&#233;e), acteur reconnu pour sa solidit&#233; financi&#232;re et son expertise en &#233;pargne patrimoniale.<br><br>
 &#10003; Architecture ouverte (plus de 300 supports financiers et immobiliers)<br>
@@ -317,7 +319,7 @@ En clair : un cadre d'investissement <b>flexible, haut de gamme et &#233;volutif
       <!-- MODE DE GESTION -->
       <div class="bloc" id="blocGestion">
         <div class="bloc-tag">Gestion</div>
-        <div class="bloc-title">Un mode de gestion clair et progressif</div>
+        <div class="bloc-title" contenteditable="true" id="titleGestion">Un mode de gestion clair et progressif</div>
         <div class="bloc-body" contenteditable="true" id="bodyGestion">
 <b>Objectif : Performance, s&#233;r&#233;nit&#233; et coh&#233;rence dans le temps</b><br><br>
 <b>Versement initial (VI)</b> : Amorcer le contrat avec une base solide suivant votre profil investisseur tout en allant chercher des opportunit&#233;s de march&#233;s.<br><br>
@@ -329,10 +331,48 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
         </div>
       </div>
 
+      <!-- RÉINVESTISSEMENT DIVIDENDES (SCPI seulement) -->
+      <div class="bloc" id="blocReinvest" style="display:none">
+        <div class="bloc-tag">Option</div>
+        <div class="bloc-title" contenteditable="true" id="titleReinvest">R&#233;investissement automatique des dividendes</div>
+        <div class="bloc-body" contenteditable="true" id="bodyReinvest">
+<b>Pourquoi choisir cette option ?</b><br><br>
+Les dividendes vers&#233;s par les SCPI peuvent &#234;tre soit <b>per&#231;us directement</b> (compl&#233;ment de revenu imm&#233;diat), soit <b>r&#233;investis automatiquement</b> pour acqu&#233;rir de nouvelles parts.<br><br>
+<b>Ce que le r&#233;investissement apporte :</b><br>
+&#10003; <b>Effet boule de neige</b> : les nouveaux dividendes g&#233;n&#232;rent eux-m&#234;mes des dividendes (capitalisation compos&#233;e)<br>
+&#10003; <b>Croissance acc&#233;l&#233;r&#233;e du patrimoine</b> sans effort suppl&#233;mentaire<br>
+&#10003; <b>Exon&#233;ration de la fiscalit&#233; sur les dividendes r&#233;investis</b> pour les SCPI europ&#233;ennes (pas de PS 17,2 %)<br>
+&#10003; <b>Lissage du prix d'acquisition</b> dans le temps (m&#233;thode DCA)<br>
+&#10003; <b>Constitution d'un patrimoine plus important</b> &#224; horizon 10-15 ans<br><br>
+&#8594; Recommand&#233; si vous n'avez pas besoin des revenus imm&#233;diatement et que votre objectif est de <b>maximiser la valeur finale du patrimoine</b>.
+        </div>
+      </div>
+
+      <!-- LEVIER CRÉDIT (SCPI seulement) -->
+      <div class="bloc" id="blocLevier" style="display:none">
+        <div class="bloc-tag">Option</div>
+        <div class="bloc-title" contenteditable="true" id="titleLevier">Effet de levier par le cr&#233;dit</div>
+        <div class="bloc-body" contenteditable="true" id="bodyLevier">
+<b>Pourquoi financer &#224; cr&#233;dit plut&#244;t qu'au comptant ?</b><br><br>
+Le financement &#224; cr&#233;dit permet de <b>multiplier l'effet patrimonial</b> de votre investissement SCPI en utilisant l'argent de la banque plut&#244;t que votre propre tr&#233;sorerie.<br><br>
+<b>Les avantages concrets :</b><br>
+&#10003; <b>Patrimoine multipli&#233;</b> : avec 20 000 &#8364; d'apport, vous pouvez acqu&#233;rir 100 000 &#8364; de parts (effet de levier &times; 5)<br>
+&#10003; <b>Loyers qui remboursent le cr&#233;dit</b> : les dividendes SCPI couvrent une partie importante de la mensualit&#233;<br>
+&#10003; <b>Int&#233;r&#234;ts d'emprunt d&#233;ductibles</b> des revenus fonciers (r&#233;duction d'imp&#244;t)<br>
+&#10003; <b>Protection assurance d&#233;c&#232;s-invalidit&#233; (ADI)</b> : en cas d'accident de la vie, le capital est soldé<br>
+&#10003; <b>Pr&#233;servation de votre tr&#233;sorerie</b> pour d'autres investissements ou projets<br><br>
+<b>Conditions typiques :</b><br>
+&#8226; Dur&#233;e : 15 &#224; 25 ans<br>
+&#8226; Apport : 10 &#224; 20 % du montant investi<br>
+&#8226; Taux nominal actuel : 4 &#224; 5,5 % selon la banque partenaire<br>
+&#8226; Diff&#233;r&#233; d'amortissement possible (6 &#224; 9 mois)
+        </div>
+      </div>
+
       <!-- PROFIL ADAPTÉ -->
       <div class="bloc" id="blocProfil">
         <div class="bloc-tag">Pour qui ?</div>
-        <div class="bloc-title">Une solution adapt&#233;e &#224; votre profil</div>
+        <div class="bloc-title" contenteditable="true" id="titleProfil">Une solution adapt&#233;e &#224; votre profil</div>
         <div class="bloc-body" contenteditable="true" id="bodyProfil">
 Cette solution s'adresse aux personnes qui souhaitent :<br><br>
 &#10003; <b>Faire fructifier leur &#233;pargne intelligemment</b> dans un cadre clair et transparent<br>
@@ -345,7 +385,7 @@ Cette solution s'adresse aux personnes qui souhaitent :<br><br>
       <!-- EN RÉSUMÉ -->
       <div class="bloc" id="blocResume">
         <div class="bloc-tag">En r&#233;sum&#233;</div>
-        <div class="bloc-title">Une bonne strat&#233;gie patrimoniale, c'est&#8230;</div>
+        <div class="bloc-title" contenteditable="true" id="titleResume">Une bonne strat&#233;gie patrimoniale, c'est&#8230;</div>
         <div class="bloc-body" contenteditable="true" id="bodyResume">
 &#10003; Une <b>vision globale et multi-solutions</b> (placements, immobilier, fiscalit&#233;)<br>
 &#10003; Un <b>contrat haut de gamme</b> et bien construit<br>
@@ -359,7 +399,7 @@ Ce contrat est le point de d&#233;part d'une strat&#233;gie patrimoniale compl&#
       <!-- FRAIS -->
       <div class="bloc" id="blocFrais">
         <div class="bloc-tag">Frais</div>
-        <div class="bloc-title">Les frais expliqu&#233;s simplement</div>
+        <div class="bloc-title" contenteditable="true" id="titleFrais">Les frais expliqu&#233;s simplement</div>
         <table class="frais-tbl" id="fraisTable">
           <thead><tr><th>Type de frais</th><th>Montant</th><th>D&#233;tail</th></tr></thead>
           <tbody>
@@ -394,7 +434,7 @@ Ce contrat est le point de d&#233;part d'une strat&#233;gie patrimoniale compl&#
       <!-- PROCHAINES ÉTAPES -->
       <div class="bloc" id="blocWorkflow">
         <div class="bloc-tag">Prochaines &#233;tapes</div>
-        <div class="bloc-title">Pour d&#233;marrer</div>
+        <div class="bloc-title" contenteditable="true" id="titleWorkflow">Pour d&#233;marrer</div>
         <div class="steps-list" id="stepsList">
           <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Document d'entr&#233;e en relation</div><div class="step-desc">Document sign&#233; au d&#233;marrage de la relation client</div></div>
           <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Recueil d'informations</div><div class="step-desc">Situation patrimoniale, objectifs et profil de risque compl&#233;t&#233;s</div></div>
@@ -410,7 +450,7 @@ Ce contrat est le point de d&#233;part d'une strat&#233;gie patrimoniale compl&#
       <!-- ANNEXES -->
       <div class="bloc" id="blocAnnexes">
         <div class="bloc-tag">Annexes</div>
-        <div class="bloc-title">Documents joints</div>
+        <div class="bloc-title" contenteditable="true" id="titleAnnexes">Documents joints</div>
         <div id="annexesContent">
           <div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>
         </div>
@@ -495,6 +535,10 @@ function updateGarde(){
   var type=V('pType').value;
   var typeLabels={av:'Dossier Solution \u2014 Assurance Vie',per:'Dossier Solution \u2014 PER',scpi:'Dossier Solution \u2014 SCPI',immo:'Dossier Solution \u2014 Immobilier LMNP'};
   var solMap={av:['AV'],per:['PER'],scpi:['SCPI_CASH'],immo:['LMNP']};
+  var el=V('pageHeader');
+  if(!el)return;
+  // Forcer un clear avant re-render (évite tout cache visuel)
+  el.innerHTML='';
   try{
     CGP.header.render('pageHeader',{
       tag:typeLabels[type]||'Dossier Solution',
@@ -502,7 +546,7 @@ function updateGarde(){
       clientId:'pClient',
       savedKey:'dossier-solution'
     });
-  }catch(e){}
+  }catch(e){console.warn('updateGarde header error:',e);}
 }
 
 function onTypeChange(){
@@ -542,6 +586,16 @@ function onTypeChange(){
   var scpiBloc=V('blocSCPISelection');
   if(scpiToggle)scpiToggle.style.display=type==='scpi'?'':'none';
   if(scpiBloc)scpiBloc.style.display=type==='scpi'?'':'none';
+  // Show/hide SCPI-only blocs (réinvestissement + levier)
+  var cbRowReinvest=V('cbRowReinvest'),cbRowLevier=V('cbRowLevier');
+  if(cbRowReinvest)cbRowReinvest.style.display=type==='scpi'?'':'none';
+  if(cbRowLevier)cbRowLevier.style.display=type==='scpi'?'':'none';
+  if(type!=='scpi'){
+    if(V('cbReinvest'))V('cbReinvest').checked=false;
+    if(V('cbLevier'))V('cbLevier').checked=false;
+    V('blocReinvest').style.display='none';
+    V('blocLevier').style.display='none';
+  }
   renderCustomSuggestions();
   updateGarde();
 }
