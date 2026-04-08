@@ -425,14 +425,17 @@ function recalc() {
   // Manager Galaxie    : 4+ branches actives
 
   function calcBranchesActives(actifsNiv1_precedents, vaMoyenneNiv1, vaManagerActif) {
-    // Règle PMR : une branche active = actif niv.1 ayant eu le temps de se développer
-    // On utilise les actifs de l'ANNÉE PRÉCÉDENTE (ils ont eu 1 an pour faire leur VA)
-    // et on estime la fraction dont la VA dépasse le seuil branche active (500k€)
-    // Un actif vaNiv1 "moyen" → proportion qui atteint vaManagerActif
+    // Règle PMR : une branche active = actif niv.1 ayant atteint le seuil VA Manager
+    // Hypothèse : la fraction des actifs qui dépassent le seuil suit le ratio
+    // VA moyenne / VA seuil. Un actif n'est "branche active" qu'au-delà d'1 an
+    // d'ancienneté en moyenne.
     if(actifsNiv1_precedents <= 0) return 0;
     var nbManagersEstimes = actifsNiv1_precedents * (vaMoyenneNiv1 / vaManagerActif);
-    return Math.min(4, Math.floor(nbManagersEstimes));
+    return Math.floor(nbManagersEstimes);
   }
+
+  // Tracking pour cap d'incrément année par année (pas de saut > +1 / an)
+  var branchesActivesPrec = (hasExistingActivity ? (branchesAn0Map[qualifActuelle] || 0) : 0);
 
   var rows = [];
   // Initialisation depuis la situation actuelle saisie
@@ -491,7 +494,11 @@ function recalc() {
       if(isManager) {
         // Branches calculées sur les actifs de l'année PRÉCÉDENTE
         // (ils ont eu 1 an pour développer leur VA et devenir Manager)
-        branchesActives = calcBranchesActives(prevActifsNiv1, vaNiv1, vaManagerActif);
+        var rawBranches = calcBranchesActives(prevActifsNiv1, vaNiv1, vaManagerActif);
+        // Cap : on ne peut gagner qu'au maximum +1 branche active par an
+        // (sinon on saute des qualifications, ce qui est irréaliste)
+        branchesActives = Math.min(rawBranches, branchesActivesPrec + 1);
+        if(branchesActives < 0) branchesActives = 0;
         tpc    = getTPC(vaOrga, branchesActives);
         qualif = getQualif(tpc, branchesActives);
       } else {
@@ -500,6 +507,7 @@ function recalc() {
         qualif = 'Consultant';
       }
     }
+    branchesActivesPrec = branchesActives;
 
     var vgpAnnuel    = vaPerso;
     // Titre : an0 avec activité → utiliser le titre saisi, sinon calculer
