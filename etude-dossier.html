@@ -6433,9 +6433,19 @@ function resetSteps(){
   steps.push({label:'Audit patrimonial', done:true, rdv:'R1'});
   steps.push({label:'Pr\u00e9sentation du bilan', done:false, rdv:'R2'});
   if(solsSelectionnees&&solsSelectionnees.length){
-    var sorted=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
-    sorted.forEach(function(sol,i){
-      var label=sol.produit||'Solution '+(i+1);
+    // Grouper par produit (un step par solution unique)
+    var sortedList=solsSelectionnees.slice().sort(function(a,b){return (a.etape||1)-(b.etape||1);});
+    var seenSol={}, uniqueSols=[];
+    sortedList.forEach(function(sol){
+      if(!seenSol[sol.produit]){
+        seenSol[sol.produit]=true;
+        uniqueSols.push(sol);
+      }
+    });
+    uniqueSols.forEach(function(sol,i){
+      // On ne nomme pas la solution devant le client : "Solution N — [label PDF]"
+      var pdfLabel=sol._labelPDF||clientLabel(sol.produit)||'';
+      var label='Solution '+(i+1)+(pdfLabel?' \u2014 '+pdfLabel:'');
       steps.push({label:label, done:false, date:'', rdv:'R3'});
     });
   }
