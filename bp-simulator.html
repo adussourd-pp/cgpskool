@@ -89,6 +89,22 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
 .empty-sub{font-size:13px;color:var(--gris);font-weight:300;max-width:280px;line-height:1.8}
 
 .sim-note{font-size:11px;color:var(--gris);border-top:1px solid var(--bord);padding-top:14px;margin-top:20px;line-height:1.7}
+
+/* Rappel PMR (panneau toggle dans sidebar) */
+.rappel-btn{width:100%;padding:8px 10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris-f);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s}
+.rappel-btn:hover{border-color:var(--orange);color:var(--orange)}
+.rappel-btn .arr{font-size:9px;transition:transform 0.2s}
+.rappel-btn.open .arr{transform:rotate(180deg)}
+.rappel-panel{display:none;background:var(--gris-l);border:1px solid var(--bord);border-radius:7px;padding:12px 14px;margin-top:6px;font-family:var(--sans)}
+.rappel-panel.open{display:block}
+.rappel-section-title{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:6px;margin-top:10px}
+.rappel-section-title:first-child{margin-top:0}
+.rappel-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:11px;border-bottom:1px solid rgba(0,0,0,0.05)}
+.rappel-row:last-child{border-bottom:none}
+.rappel-l{color:var(--gris-f)}
+.rappel-l small{font-size:9px;color:var(--gris);margin-left:4px}
+.rappel-v{font-weight:700;color:var(--orange);white-space:nowrap}
+.rappel-note{font-size:10px;color:var(--gris);font-style:italic;line-height:1.55;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.05)}
 </style>
 </head>
 <body>
@@ -142,10 +158,10 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
       </div>
       <div class="fg"><label>Titre actuel <small>(volume perso annuel)</small></label>
         <select class="fi" id="titreActuel" onchange="recalc()">
-          <option value="">Aucun (VA perso &lt; 500k&euro;)</option>
-          <option value="Senior">Senior (VA perso &gt; 500k&euro;)</option>
-          <option value="Major">Major (VA perso &gt; 1 M&euro;)</option>
-          <option value="Expert">Expert (VA perso &gt; 1,5 M&euro;)</option>
+          <option value="">Aucun (VA perso &lt; 500 000 &euro;)</option>
+          <option value="Senior">Senior (VA perso &#8805; 500 000 &euro;)</option>
+          <option value="Major">Major (VA perso &#8805; 1 000 000 &euro;)</option>
+          <option value="Expert">Expert (VA perso &#8805; 1 500 000 &euro;)</option>
         </select>
       </div>
       </div>
@@ -193,6 +209,29 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
         <div class="fi-row"><input type="number" id="tauxRec" value="0.4" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
       <div class="fg"><label>Encours moyen / client</label>
         <div class="fi-row"><input type="number" id="encoursClient" value="50000" step="5000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+    </div>
+
+    <button type="button" class="rappel-btn" onclick="this.classList.toggle('open');document.getElementById('rappelPmr').classList.toggle('open')">
+      <span>&#128203; Rappel PMR Prod&#233;mial</span><span class="arr">&#9660;</span>
+    </button>
+    <div class="rappel-panel" id="rappelPmr">
+      <div class="rappel-section-title">Qualifications &mdash; TPC</div>
+      <div class="rappel-row"><span class="rappel-l">Consultant</span><span class="rappel-v">5,0 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Manager <small>1 branche</small></span><span class="rappel-v">6,0 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Manager Plan&#232;te <small>2 br.</small></span><span class="rappel-v">6,5 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Manager &#201;toile <small>3 br.</small></span><span class="rappel-v">7,0 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Manager Constellation <small>4 br.</small></span><span class="rappel-v">7,5 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Manager Galaxie <small>5+ br.</small></span><span class="rappel-v">8,0 %</span></div>
+
+      <div class="rappel-section-title">Titres &mdash; Prime Qualit&#233; (sur VA perso)</div>
+      <div class="rappel-row"><span class="rappel-l">Senior <small>&#8805; 500 000 &euro;</small></span><span class="rappel-v">+1 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Major <small>&#8805; 1 000 000 &euro;</small></span><span class="rappel-v">+1 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Expert <small>&#8805; 1 500 000 &euro;</small></span><span class="rappel-v">+2 %</span></div>
+
+      <div class="rappel-note">
+        Branche active : ligne avec un consultant ayant atteint le seuil VA Manager (cf. param&#232;tre dans Hypoth&#232;ses PMR).<br>
+        Prime Qualit&#233; : sur enqu&#234;te satisfaction client positive + volume annuel atteint. S'ajoute au TPC.
+      </div>
     </div>
 
     <button class="sim-btn" onclick="recalc()">Calculer mon business plan &#8594;</button>
@@ -314,11 +353,11 @@ function getQualif(tpc, branchesActives) {
 }
 
 // ── Titres PMR (Volume Global Personnel annuel) ──
-// Senior > 0.5M€, Major > 1M€, Expert > 1.5M€ (+ enquête satisfaction positive supposée)
+// Senior >= 500k€, Major >= 1M€, Expert >= 1,5M€ (+ enquête satisfaction positive supposée)
 function getTitre(vgpAnnuel) {
-  if(vgpAnnuel > 1500000) return 'Expert';
-  if(vgpAnnuel > 1000000) return 'Major';
-  if(vgpAnnuel > 500000)  return 'Senior';
+  if(vgpAnnuel >= 1500000) return 'Expert';
+  if(vgpAnnuel >= 1000000) return 'Major';
+  if(vgpAnnuel >= 500000)  return 'Senior';
   return null;
 }
 
