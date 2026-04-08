@@ -147,10 +147,30 @@
 .scpi-arrow{font-size:18px;color:var(--orange);flex-shrink:0}
 .scpi-icons{display:flex;gap:8px;justify-content:center;margin:8px 0;font-size:20px}
 
-/* Print */
+/* Print — préserver les couleurs de fond (R23 : cibler uniquement les éléments colorés) */
 @media print{
   .bloc-body{border:none!important;padding:0!important}
   .bloc-body:hover,.bloc-body:focus{border:none!important;background:none!important}
+  .no-print,.schema-templates{display:none!important}
+  /* Préservation couleurs : fonds, headers de tables, badges, boxes colorées */
+  .feature-item,.summary-line,.annexe-item,.steps-list,.step-row,.step-row.done,.step-cb,
+  .pyr-box,.pyr-box.orange,.pyr-box.purple,.pyr-box.red,.pyr-level,
+  .frais-tbl,.frais-tbl thead tr,.frais-tbl tbody tr:nth-child(even),
+  .context-box,.scpi-box,.scpi-box.main,
+  #pageHeader,[style*="background"]{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  /* Garantir que les step-rows done gardent leur fond vert */
+  .step-row.done{background:rgba(45,122,91,0.07)!important}
+  .step-row.done .step-cb{background:#2D7A5B!important;border-color:#2D7A5B!important}
+  /* Header table frais : fond sombre */
+  .frais-tbl thead tr{background:var(--noir)!important}
+  .frais-tbl thead th{color:#fff!important}
+  /* pyr-box couleurs */
+  .pyr-box.orange{background:rgba(212,98,42,0.08)!important}
+  .pyr-box.purple{background:rgba(123,79,166,0.08)!important}
+  .pyr-box.red{background:rgba(220,60,40,0.08)!important}
 }
 </style>
 </head>
@@ -238,43 +258,9 @@
   <div class="cs-main">
     <div class="cs-page" id="pageContent">
 
-      <!-- PAGE DE GARDE -->
-      <div class="bloc" id="blocGarde" style="margin-bottom:48px">
-        <div class="garde-topbar"></div>
-        <div class="garde-wrap">
-          <!-- En-tête cabinet -->
-          <div class="garde-header">
-            <div>
-              <div class="garde-cabinet-name" id="gardeCabinetName"></div>
-              <div class="garde-cabinet-sub">Conseil en gestion de patrimoine</div>
-            </div>
-            <div class="garde-orias-block" id="gardeOriasBlock"></div>
-          </div>
-          <!-- Corps central -->
-          <div class="garde-center">
-            <div class="garde-center-inner">
-              <div class="garde-h1">Votre dossier</div>
-              <div class="garde-h1-alt" id="gardeTypeLabel">Assurance Vie</div>
-              <div class="garde-subtitle">Recommandation personnalis&#233;e</div>
-              <div class="garde-divider"></div>
-              <div class="garde-client-box">
-                <div class="garde-client-label">&#201;tabli pour</div>
-                <div class="garde-client-name" id="gardeClient">Nom du client</div>
-              </div>
-            </div>
-          </div>
-          <!-- Pied de page (bas) -->
-          <div class="garde-footer">
-            <div>
-              <div class="garde-footer-label">Date d'&#233;tablissement</div>
-              <div class="garde-footer-val" id="gardeDate"></div>
-            </div>
-            <div style="text-align:right">
-              <div class="garde-footer-label">Conseiller r&#233;f&#233;rent</div>
-              <div class="garde-footer-val" id="gardeConseiller"></div>
-            </div>
-          </div>
-        </div>
+      <!-- HEADER DISCRET (remplace la page de garde) -->
+      <div id="blocGarde">
+        <div id="pageHeader"></div>
       </div>
 
       <!-- ACCOMPAGNEMENT -->
@@ -457,21 +443,16 @@ function V(id){return document.getElementById(id)}
 
 function updateGarde(){
   var type=V('pType').value;
-  var typeLabels={av:'Assurance Vie',per:'Plan \u00c9pargne Retraite',scpi:'SCPI',immo:'Immobilier LMNP'};
-  V('gardeTypeLabel').textContent=typeLabels[type]||'';
-  V('gardeClient').textContent=V('pClient').value||'Nom du client';
-  V('gardeDate').textContent=V('pDate').value;
-  // Infos conseiller (en-tête cabinet)
-  var p=CGP.profil.load();
-  var nom=((p.prenom||'')+(p.nom?' '+p.nom:'')).trim();
-  V('gardeCabinetName').textContent=p.cabinet||nom||'';
-  V('gardeConseiller').textContent=nom||'';
-  // ORIAS + adresse cabinet (haut à droite)
-  var oriasParts=[];
-  if(p.orias)oriasParts.push('ORIAS n\u00b0 '+p.orias);
-  if(p.adresse)oriasParts.push(p.adresse);
-  if(p.cp||p.ville)oriasParts.push(((p.cp||'')+' '+(p.ville||'')).trim());
-  V('gardeOriasBlock').innerHTML=oriasParts.join('<br>');
+  var typeLabels={av:'Dossier Solution \u2014 Assurance Vie',per:'Dossier Solution \u2014 PER',scpi:'Dossier Solution \u2014 SCPI',immo:'Dossier Solution \u2014 Immobilier LMNP'};
+  var solMap={av:['AV'],per:['PER'],scpi:['SCPI_CASH'],immo:['LMNP']};
+  try{
+    CGP.header.render('pageHeader',{
+      tag:typeLabels[type]||'Dossier Solution',
+      solutions:solMap[type]||[],
+      clientId:'pClient',
+      savedKey:'dossier-solution'
+    });
+  }catch(e){}
 }
 
 function onTypeChange(){
@@ -528,9 +509,9 @@ var CUSTOM_ANNEXES=[]; // [{id, label, icon, sub}]
 
 // Suggestions par type de solution (hors projections sauvegardées)
 var ANNEXE_SUGGESTIONS={
-  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
+  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
   immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'}]
 };
 
