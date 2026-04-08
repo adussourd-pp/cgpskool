@@ -25,7 +25,9 @@
 .cb-row input{accent-color:var(--orange)}
 
 /* Page A4 editable blocks */
-.bloc{margin-bottom:44px;position:relative}
+.bloc{margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid rgba(0,0,0,0.08);position:relative}
+.bloc:last-of-type,.bloc#blocAnnexes{border-bottom:none;padding-bottom:0}
+#blocGarde{border-bottom:none;padding-bottom:0;margin-bottom:28px}
 .bloc-tag{font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
 .bloc-title{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--noir);margin-bottom:6px;line-height:1.3}
 .bloc-subtitle{font-size:13px;color:var(--gris);margin-bottom:22px;font-style:italic}
@@ -220,8 +222,11 @@
     <div class="sb-body open">
       <label class="cb-row"><input type="checkbox" id="cbGarde" checked onchange="toggleBloc()"> Page de garde</label>
       <label class="cb-row"><input type="checkbox" id="cbAccompagnement" checked onchange="toggleBloc()"> Accompagnement</label>
+      <label class="cb-row"><input type="checkbox" id="cbRelation" checked onchange="toggleBloc()"> Relation humaine</label>
       <label class="cb-row"><input type="checkbox" id="cbContrat" checked onchange="toggleBloc()"> Le contrat</label>
       <label class="cb-row"><input type="checkbox" id="cbGestion" checked onchange="toggleBloc()"> Mode de gestion</label>
+      <label class="cb-row"><input type="checkbox" id="cbProfil" checked onchange="toggleBloc()"> Pour qui ?</label>
+      <label class="cb-row"><input type="checkbox" id="cbResume" checked onchange="toggleBloc()"> En r&#233;sum&#233;</label>
       <label class="cb-row"><input type="checkbox" id="cbFrais" checked onchange="toggleBloc()"> Frais</label>
       <label class="cb-row"><input type="checkbox" id="cbSchema" checked onchange="toggleBloc()"> Sch&#233;ma p&#233;dagogique</label>
       <label class="cb-row"><input type="checkbox" id="cbWorkflow" checked onchange="toggleBloc()"> Workflow souscription</label>
@@ -276,7 +281,24 @@ L'id&#233;e est de construire votre pyramide patrimoniale pas &#224; pas, en fon
         </div>
       </div>
 
-      <!-- RELATION -->
+      <!-- RELATION HUMAINE -->
+      <div class="bloc" id="blocRelation">
+        <div class="bloc-tag">Relation</div>
+        <div class="bloc-title">Une relation humaine et durable</div>
+        <div class="bloc-body" contenteditable="true" id="bodyRelation">
+Nos clients ne recherchent pas seulement un contrat. Ils recherchent un interlocuteur de confiance, &#224; l'&#233;coute, disponible et r&#233;actif, capable de les guider dans la dur&#233;e.<br><br>
+<b>Vous b&#233;n&#233;ficiez de :</b><br>
+&#10003; <b>Ligne directe (WhatsApp)</b> pour vos questions patrimoniales ou administratives<br>
+&#10003; <b>Acc&#232;s &#224; mon calendrier en ligne</b> pour planifier vos rendez-vous<br>
+&#10003; <b>Suivi par e-mails</b> : actualit&#233;s, points de performance, opportunit&#233;s de march&#233;<br>
+&#10003; <b>Aide &#224; la d&#233;claration d'imp&#244;ts</b>, incluse dans mon accompagnement<br>
+&#10003; <b>Appui d'ing&#233;nieurs patrimoniaux</b> pour les aspects techniques (transmission, clause b&#233;n&#233;ficiaire, structuration, montage en soci&#233;t&#233;)<br>
+&#10003; <b>Acc&#232;s &#224; des opportunit&#233;s exclusives</b> (fonds premium, private equity, produits structur&#233;s, immobilier&#8230;) selon votre profil et votre contexte<br>
+&#10003; <b>R&#233;seau d'experts partenaires</b> : notaire, courtier, assureur, agent immobilier, avocat
+        </div>
+      </div>
+
+      <!-- CONTRAT -->
       <div class="bloc" id="blocContrat">
         <div class="bloc-tag">Le contrat</div>
         <div class="bloc-title">Un contrat haut de gamme et &#233;volutif</div>
@@ -304,6 +326,33 @@ En clair : un cadre d'investissement <b>flexible, haut de gamme et &#233;volutif
 &#8594; Horizon d'investissement : <b>5 ans minimum</b><br><br>
 Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la dur&#233;e, avec une strat&#233;gie solide, diversifi&#233;e et un suivi rigoureux dans le temps.<br><br>
 <i>NB : Objectif indicatif non garanti, d&#233;pendant de la performance des supports choisis et des conditions de march&#233;.</i>
+        </div>
+      </div>
+
+      <!-- PROFIL ADAPTÉ -->
+      <div class="bloc" id="blocProfil">
+        <div class="bloc-tag">Pour qui ?</div>
+        <div class="bloc-title">Une solution adapt&#233;e &#224; votre profil</div>
+        <div class="bloc-body" contenteditable="true" id="bodyProfil">
+Cette solution s'adresse aux personnes qui souhaitent :<br><br>
+&#10003; <b>Faire fructifier leur &#233;pargne intelligemment</b> dans un cadre clair et transparent<br>
+&#10003; <b>&#202;tre accompagn&#233;es dans le temps</b> par un interlocuteur unique et impliqu&#233;<br>
+&#10003; <b>Construire une strat&#233;gie patrimoniale compl&#232;te</b>, plut&#244;t qu'un placement isol&#233;<br>
+&#10003; <b>Garder la ma&#238;trise de leurs d&#233;cisions</b>, tout en profitant d'un conseil expert
+        </div>
+      </div>
+
+      <!-- EN RÉSUMÉ -->
+      <div class="bloc" id="blocResume">
+        <div class="bloc-tag">En r&#233;sum&#233;</div>
+        <div class="bloc-title">Une bonne strat&#233;gie patrimoniale, c'est&#8230;</div>
+        <div class="bloc-body" contenteditable="true" id="bodyResume">
+&#10003; Une <b>vision globale et multi-solutions</b> (placements, immobilier, fiscalit&#233;)<br>
+&#10003; Un <b>contrat haut de gamme</b> et bien construit<br>
+&#10003; Une <b>allocation sur mesure</b> adapt&#233;e &#224; vos objectifs<br>
+&#10003; Une strat&#233;gie de <b>s&#233;curisation et d'optimisation dans le temps</b><br>
+&#10003; Et un <b>accompagnement humain, constant et durable</b><br><br>
+Ce contrat est le point de d&#233;part d'une strat&#233;gie patrimoniale compl&#232;te, construite pas &#224; pas autour de vos projets, avec un partenaire ind&#233;pendant, impliqu&#233; et pr&#233;sent &#224; vos c&#244;t&#233;s dans la dur&#233;e.
         </div>
       </div>
 
@@ -498,7 +547,7 @@ function onTypeChange(){
 }
 
 function toggleBloc(){
-  var map={cbGarde:'blocGarde',cbAccompagnement:'blocAccompagnement',cbContrat:'blocContrat',cbGestion:'blocGestion',cbFrais:'blocFrais',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
+  var map={cbGarde:'blocGarde',cbAccompagnement:'blocAccompagnement',cbRelation:'blocRelation',cbContrat:'blocContrat',cbGestion:'blocGestion',cbProfil:'blocProfil',cbResume:'blocResume',cbFrais:'blocFrais',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
   Object.keys(map).forEach(function(cbId){
     var el=V(map[cbId]);
     if(el)el.style.display=V(cbId).checked?'':'none';
@@ -712,8 +761,11 @@ function saveDossier(){
     client:V('pClient').value,
     blocs:{
       accompagnement:V('bodyAccompagnement').innerHTML,
+      relation:V('bodyRelation').innerHTML,
       contrat:V('bodyContrat').innerHTML,
       gestion:V('bodyGestion').innerHTML,
+      profil:V('bodyProfil').innerHTML,
+      resume:V('bodyResume').innerHTML,
       schema:V('bodySchema').innerHTML
     },
     frais:Array.from(V('fraisTable').querySelectorAll('tbody tr')).map(function(tr){
@@ -723,7 +775,7 @@ function saveDossier(){
     checkboxes:{},
     customAnnexes:CUSTOM_ANNEXES
   };
-  ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
+  ['cbGarde','cbAccompagnement','cbRelation','cbContrat','cbGestion','cbProfil','cbResume','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
     state.checkboxes[id]=V(id).checked;
   });
   var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
@@ -743,8 +795,11 @@ function loadDossier(file){
       if(s.client)V('pClient').value=s.client;
       if(s.blocs){
         if(s.blocs.accompagnement)V('bodyAccompagnement').innerHTML=s.blocs.accompagnement;
+        if(s.blocs.relation)V('bodyRelation').innerHTML=s.blocs.relation;
         if(s.blocs.contrat)V('bodyContrat').innerHTML=s.blocs.contrat;
         if(s.blocs.gestion)V('bodyGestion').innerHTML=s.blocs.gestion;
+        if(s.blocs.profil)V('bodyProfil').innerHTML=s.blocs.profil;
+        if(s.blocs.resume)V('bodyResume').innerHTML=s.blocs.resume;
         if(s.blocs.schema)V('bodySchema').innerHTML=s.blocs.schema;
       }
       if(s.frais){
