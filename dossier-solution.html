@@ -202,18 +202,17 @@
       <div id="scpiChecklist" style="max-height:240px;overflow-y:auto"></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Annexes disponibles</div>
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Annexes du dossier</div>
     <div class="sb-body open">
-      <div id="annexesList">
-        <div style="font-size:11px;color:var(--gris);padding:4px 8px">Chargement...</div>
+      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px">Ajouter une annexe</div>
+      <div id="customSuggestions" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+      <div style="display:flex;gap:4px;margin-bottom:10px">
+        <input type="text" id="customAnnexeInput" placeholder="Autre (texte libre)" onkeydown="if(event.key==='Enter')addCustomAnnexe()" style="flex:1;padding:7px 9px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:11px;outline:none;min-width:0">
+        <button type="button" onclick="addCustomAnnexe()" style="padding:7px 12px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">+</button>
       </div>
-      <div style="border-top:1px solid var(--bord);margin-top:8px;padding-top:10px">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px">Ajouter une annexe</div>
-        <div id="customSuggestions" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
-        <div style="display:flex;gap:4px">
-          <input type="text" id="customAnnexeInput" placeholder="Ex : Bulletin souscription" onkeydown="if(event.key==='Enter')addCustomAnnexe()" style="flex:1;padding:7px 9px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:11px;outline:none;min-width:0">
-          <button type="button" onclick="addCustomAnnexe()" style="padding:7px 12px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">+</button>
-        </div>
+      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px;margin-top:10px">Annexes s&#233;lectionn&#233;es</div>
+      <div id="annexesList">
+        <div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe. Clique sur une suggestion ci-dessus pour l'ajouter.</div>
       </div>
     </div>
 
@@ -644,10 +643,10 @@ function toggleBloc(){
   });
 }
 
-// Annexes custom ajoutées manuellement
-var CUSTOM_ANNEXES=[]; // [{id, label, icon}]
+// Annexes sélectionnées (ajoutées au dossier)
+var CUSTOM_ANNEXES=[]; // [{id, label, icon, sub}]
 
-// Suggestions de rapid-add selon le type de solution
+// Suggestions par type de solution (hors projections sauvegardées)
 var ANNEXE_SUGGESTIONS={
   av:   [{label:'Fiche conseil + r\u00e9partition portefeuille',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
   per:  [{label:'Fiche conseil + allocation',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
@@ -655,79 +654,102 @@ var ANNEXE_SUGGESTIONS={
   immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'}]
 };
 
-function addCustomAnnexe(presetLabel,presetIcon){
+function escAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,'\\\'').replace(/"/g,'&quot;');}
+
+function addCustomAnnexe(presetLabel,presetIcon,presetSub){
   var inp=V('customAnnexeInput');
   var label=(presetLabel||(inp?inp.value:'')||'').trim();
   if(!label)return;
-  var icon=presetIcon||'\ud83d\udcce';
-  var id='custom_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
-  CUSTOM_ANNEXES.push({id:id,label:label,icon:icon});
-  if(inp)inp.value='';
-  loadAnnexes();
-}
-
-function removeCustomAnnexe(id){
-  CUSTOM_ANNEXES=CUSTOM_ANNEXES.filter(function(a){return a.id!==id;});
-  loadAnnexes();
-}
-
-function renderCustomSuggestions(){
-  var box=V('customSuggestions');
-  if(!box)return;
-  var type=V('pType').value;
-  var list=ANNEXE_SUGGESTIONS[type]||[];
-  box.innerHTML=list.map(function(s){
-    var lbl=(s.label||'').replace(/"/g,'&quot;');
-    return '<button type="button" onclick="addCustomAnnexe(\''+lbl+'\',\''+s.icon+'\')" style="padding:4px 9px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">+ '+s.icon+' '+s.label+'</button>';
-  }).join('');
-}
-
-function loadAnnexes(){
-  var html='';
-  var found=false;
-  ANNEXE_MODULES.forEach(function(m){
-    var key='cgpskool_state_'+m.id;
-    var data=null;
-    try{var raw=localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
-    if(data){
-      found=true;
-      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
-    }
-  });
-  // Annexes custom
-  CUSTOM_ANNEXES.forEach(function(a){
-    html+='<label class="cb-row" style="position:relative"><input type="checkbox" data-annexe-custom="'+a.id+'" checked onchange="renderAnnexesContent()"> '+a.icon+' '+a.label+' <button type="button" onclick="event.preventDefault();removeCustomAnnexe(\''+a.id+'\')" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:14px;padding:0 4px">&times;</button></label>';
-  });
-  if(!found && CUSTOM_ANNEXES.length===0){
-    html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe pour le moment</div>';
+  // Évite les doublons par label
+  if(CUSTOM_ANNEXES.some(function(a){return a.label===label})){
+    if(inp)inp.value='';
+    return;
   }
-  V('annexesList').innerHTML=html;
+  var icon=presetIcon||'\ud83d\udcce';
+  var sub=presetSub||'Document joint';
+  var id='annexe_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+  CUSTOM_ANNEXES.push({id:id,label:label,icon:icon,sub:sub});
+  if(inp)inp.value='';
+  renderAnnexesList();
   renderCustomSuggestions();
   renderAnnexesContent();
 }
 
+function removeCustomAnnexe(id){
+  CUSTOM_ANNEXES=CUSTOM_ANNEXES.filter(function(a){return a.id!==id;});
+  renderAnnexesList();
+  renderCustomSuggestions();
+  renderAnnexesContent();
+}
+
+// Rend la barre de pills "Ajouter une annexe" : projections sauvegardées + suggestions par type
+function renderCustomSuggestions(){
+  var box=V('customSuggestions');
+  if(!box)return;
+  var type=V('pType').value;
+  var pills=[];
+  // 1. Projections sauvegardées détectées dans localStorage
+  ANNEXE_MODULES.forEach(function(m){
+    var key='cgpskool_state_'+m.id;
+    var hasData=false;
+    try{hasData=!!localStorage.getItem(key);}catch(e){}
+    if(hasData && !CUSTOM_ANNEXES.some(function(a){return a.label===m.label})){
+      pills.push({label:m.label,icon:m.icon,sub:'Projection sauvegard\u00e9e'});
+    }
+  });
+  // 2. Suggestions par type de solution
+  var suggs=ANNEXE_SUGGESTIONS[type]||[];
+  suggs.forEach(function(s){
+    if(!CUSTOM_ANNEXES.some(function(a){return a.label===s.label})){
+      pills.push({label:s.label,icon:s.icon,sub:'Document joint'});
+    }
+  });
+  if(pills.length===0){
+    box.innerHTML='<div style="font-size:10px;color:var(--gris);font-style:italic;padding:2px 0">Toutes les suggestions sont d\u00e9j&#224; ajout&#233;es</div>';
+    return;
+  }
+  box.innerHTML=pills.map(function(p){
+    var lbl=escAttr(p.label);
+    var sub=escAttr(p.sub);
+    return '<button type="button" onclick="addCustomAnnexe(\''+lbl+'\',\''+p.icon+'\',\''+sub+'\')" style="padding:4px 9px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px;white-space:nowrap">+ '+p.icon+' '+p.label+'</button>';
+  }).join('');
+}
+
+// Rend la liste des annexes sélectionnées (avec × pour supprimer)
+function renderAnnexesList(){
+  var el=V('annexesList');
+  if(!el)return;
+  if(CUSTOM_ANNEXES.length===0){
+    el.innerHTML='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe. Clique sur une suggestion ci-dessus pour l\'ajouter.</div>';
+    return;
+  }
+  el.innerHTML=CUSTOM_ANNEXES.map(function(a){
+    return '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.2);border-radius:6px;margin-bottom:4px;font-size:11px">'
+      +'<span style="font-size:13px">'+a.icon+'</span>'
+      +'<span style="flex:1;color:var(--noir);font-weight:500">'+a.label+'</span>'
+      +'<button type="button" onclick="removeCustomAnnexe(\''+a.id+'\')" style="background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:14px;padding:0 4px;line-height:1">&times;</button>'
+      +'</div>';
+  }).join('');
+}
+
+function loadAnnexes(){
+  // Compatibilité retro : appelé au démarrage
+  renderCustomSuggestions();
+  renderAnnexesList();
+  renderAnnexesContent();
+}
+
 function renderAnnexesContent(){
-  var checkedAuto=Array.from(V('annexesList').querySelectorAll('input[data-annexe]:checked')).map(function(i){return i.dataset.annexe;});
-  var checkedCustom=Array.from(V('annexesList').querySelectorAll('input[data-annexe-custom]:checked')).map(function(i){return i.dataset.annexeCustom;});
-  var items=[];
-  checkedAuto.forEach(function(id){
-    var m=ANNEXE_MODULES.find(function(x){return x.id===id});
-    if(m)items.push({icon:m.icon,label:m.label,sub:'Projection sauvegard\u00e9e'});
-  });
-  checkedCustom.forEach(function(id){
-    var a=CUSTOM_ANNEXES.find(function(x){return x.id===id});
-    if(a)items.push({icon:a.icon,label:a.label,sub:'Document joint'});
-  });
-  if(items.length===0){
+  if(CUSTOM_ANNEXES.length===0){
     V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>';
     return;
   }
   var html='<div class="annexes-grid">';
-  items.forEach(function(it){
-    html+='<div class="annexe-item"><span class="icon">'+it.icon+'</span><div><div class="name">'+it.label+'</div><div class="status">'+it.sub+'</div></div></div>';
+  CUSTOM_ANNEXES.forEach(function(a){
+    html+='<div class="annexe-item"><span class="icon">'+a.icon+'</span><div><div class="name">'+a.label+'</div><div class="status">'+(a.sub||'Document joint')+'</div></div></div>';
   });
   html+='</div>';
-  html+='<div class="annexe-count">'+items.length+' annexe'+(items.length>1?'s':'')+' jointe'+(items.length>1?'s':'')+' au dossier.</div>';
+  html+='<div class="annexe-count">'+CUSTOM_ANNEXES.length+' annexe'+(CUSTOM_ANNEXES.length>1?'s':'')+' jointe'+(CUSTOM_ANNEXES.length>1?'s':'')+' au dossier.</div>';
   V('annexesContent').innerHTML=html;
 }
 
