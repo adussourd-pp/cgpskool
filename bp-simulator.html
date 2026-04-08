@@ -11,104 +11,84 @@
 <script src="cgp-skool-feedback.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+body { background: var(--paper); color: var(--noir); font-family: var(--sans); }
 
-/* Hero badge */
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(212,98,42,0.12); border: 1px solid rgba(212,98,42,0.25);
-  padding: 4px 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--orange); margin-bottom: 12px;
-}
+/* ── SIDEBAR (style standard scpi-simulator) ── */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fg label small{font-size:8px;color:var(--ink-30);font-weight:400;text-transform:none;letter-spacing:0}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--orange)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
 
-/* ── Sidebar overrides ── */
-.cs-sidebar { padding: 16px 14px; }
-.ps { margin-bottom: 20px; }
-/* cs-sidebar-lbl + accordion: see cgp-skool-layout.css */
-.pr { margin-bottom: 10px; }
-.pl { font-size: 11px; font-weight: 500; color: var(--ink-60); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-.pl small { font-size: 9px; color: var(--ink-30); }
-.iu { display: flex; border: 1px solid var(--rule-l); background: #fff; transition: border-color 0.2s; }
-.iu:focus-within { border-color: var(--orange); }
-.iu input { flex: 1; padding: 7px 10px; border: none; background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink); outline: none; min-width: 0; }
-.iu-u { padding: 0 10px; display: flex; align-items: center; font-size: 11px; font-weight: 600; color: var(--ink-30); background: var(--paper); border-left: 1px solid var(--rule-l); flex-shrink: 0; white-space: nowrap; }
-
-.btn-calc { width: 100%; padding: 10px; background: var(--orange); color: #fff; font-family: var(--sans); font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
-.btn-calc:hover { background: var(--orange-hover); }
+/* Bouton calculer (CTA orange) */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:14px}
+.sim-btn:hover{background:var(--orange-hover)}
 
 /* Note Prodémial */
-.pmr-note { background: var(--o-dim); border: 1px solid rgba(212,98,42,0.2); padding: 12px 14px; margin-bottom: 16px; font-size: 11px; line-height: 1.7; color: var(--ink-60); }
-.pmr-note strong { color: var(--orange); }
+.pmr-note{background:rgba(212,98,42,0.06);border-left:3px solid var(--orange);padding:11px 14px;margin-bottom:16px;font-size:11px;line-height:1.65;color:var(--gris-f);border-radius:0 7px 7px 0}
+.pmr-note strong{color:var(--orange)}
 
-/* ── Résultats ── */
+/* Bloc Situation actuelle (mise en avant) */
+.an0-box{background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);border-radius:9px;padding:12px 14px;margin-bottom:16px}
 
-/* Timeline progression */
-.timeline { margin-bottom: 24px; }
-.tl-header { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 14px; }
-.tl-track { position: relative; padding-left: 20px; }
-.tl-track::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 0; width: 1px; background: var(--rule-l); }
-.tl-year { position: relative; margin-bottom: 0; }
-.tl-year::before { content: ''; position: absolute; left: -15px; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--paper-2); border: 2px solid var(--rule-l); }
-.tl-year.active::before { background: var(--orange); border-color: var(--orange); }
-.tl-year.manager::before { background: var(--ink); border-color: var(--ink); }
+/* ── PAGE A4 (style standard) ── */
+/* KPI cards */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;transition:all 0.2s}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--orange);opacity:0;transition:opacity 0.2s}
+.kpi-card.reached::after{opacity:1}
+.kpi-card.reached{border-color:rgba(212,98,42,0.3)}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:10px}
+.kpi-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--noir);line-height:1;margin-bottom:5px}
+.kpi-sub{font-size:11px;color:var(--gris);font-weight:300}
+.kpi-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:10px;margin-top:6px}
+.kpi-badge.oui{background:rgba(45,122,91,0.12);color:#2D7A5B}
+.kpi-badge.non{background:var(--gris-l);color:var(--gris)}
 
-/* KPI barres */
-.kpi-bar-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule-l); }
-.kpi-bar-row:last-child { border-bottom: none; }
-.kpi-bar-lbl { font-size: 11px; color: var(--ink-60); width: 120px; flex-shrink: 0; }
-.kpi-bar-val { font-size: 12px; font-weight: 700; color: var(--ink); width: 90px; flex-shrink: 0; text-align: right; }
-.kpi-bar-track { flex: 1; height: 6px; background: var(--paper-2); border-radius: 0; overflow: hidden; }
-.kpi-bar-fill { height: 100%; background: var(--orange); transition: width 0.6s; }
-.kpi-bar-fill.green { background: #1a7a4a; }
-.kpi-bar-fill.blue { background: #2563eb; }
+/* Card générique (résultat) */
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+.card-title{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0}
 
-/* Section titre */
-.section-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-30); margin: 22px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rule-l); display: flex; align-items: center; gap: 8px; }
-.section-lbl span { width: 3px; height: 10px; background: var(--orange); display: inline-block; }
+/* Chart box */
+.chart-box{background:#fff;border:1.5px solid var(--bord);border-radius:14px;padding:24px;margin-bottom:24px}
+.chart-box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.chart-box-title{font-family:var(--sans);font-size:17px;font-weight:700;color:var(--noir)}
 
-/* Cards qualif */
-.qual-row { display: flex; gap: 3px; margin-bottom: 16px; flex-wrap: wrap; }
-.qual-card { flex: 1; min-width: 100px; background: #fff; border: 1px solid var(--rule-l); padding: 12px 14px; position: relative; overflow: hidden; }
-.qual-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--kc, var(--rule-l)); }
-.qual-card.reached::before { background: var(--orange); }
-.qual-card.reached { border-color: rgba(212,98,42,0.2); }
-.qual-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 6px; }
-.qual-val { font-family: var(--serif); font-size: 16px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); line-height: 1.1; }
-.qual-sub { font-size: 10px; color: var(--ink-30); margin-top: 2px; }
-.qual-badge { display: inline-block; font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; margin-top: 4px; }
-.qual-badge.oui { background: rgba(26,122,74,0.12); color: #1a7a4a; }
-.qual-badge.non { background: var(--paper-2); color: var(--ink-30); }
+/* Tableau projection */
+.tbl-wrap{overflow-x:auto}
+table.bp-tbl{width:100%;border-collapse:collapse;font-size:11px}
+table.bp-tbl th{background:var(--gris-l);color:var(--gris);padding:8px 8px;text-align:right;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--bord)}
+table.bp-tbl th:first-child{text-align:left}
+table.bp-tbl td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--bord);color:var(--gris-f);white-space:nowrap}
+table.bp-tbl td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+table.bp-tbl td.o{color:var(--orange);font-weight:700}
+table.bp-tbl td.g{color:#2D7A5B;font-weight:700}
+table.bp-tbl td.muted{color:var(--gris)}
+table.bp-tbl tr.subtotal td{background:var(--gris-l);font-style:italic}
+table.bp-tbl tr.total td{background:var(--gris-l);color:var(--noir);font-weight:700;border-bottom:none}
+table.bp-tbl tr.total td.o{color:var(--orange)}
 
-/* Tableau 5 ans */
-.tbl-block { background: #fff; border: 1px solid var(--rule-l); overflow: hidden; margin-bottom: 16px; }
-.tbl-block-header { padding: 12px 16px; border-bottom: 1px solid var(--rule-l); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); }
-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-table th { background: var(--paper); color: var(--ink); padding: 8px 12px; text-align: right; font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; }
-table th:first-child { text-align: left; }
-table td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--rule-l); color: var(--ink-60); }
-table td:first-child { text-align: left; font-weight: 600; color: var(--ink); font-size: 10px; }
-table td.o { color: var(--orange); font-weight: 700; }
-table td.g { color: #1a7a4a; font-weight: 700; }
-table td.muted { color: var(--ink-30); }
-table tr.subtotal td { background: var(--paper); font-style: italic; }
-table tr.total td { background: var(--paper); color: var(--ink); font-weight: 700; border-bottom: none; }
-table tr.total td.o { color: var(--orange-lt); }
-table tr:hover td { background: var(--paper); }
+/* KPI barres organisation */
+.kpi-bar-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bord)}
+.kpi-bar-row:last-child{border-bottom:none}
+.kpi-bar-lbl{font-size:11px;color:var(--gris);width:130px;flex-shrink:0}
+.kpi-bar-val{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--noir);width:90px;flex-shrink:0;text-align:right}
+.kpi-bar-track{flex:1;height:6px;background:var(--gris-l);border-radius:3px;overflow:hidden}
+.kpi-bar-fill{height:100%;background:var(--orange);transition:width 0.6s;border-radius:3px}
+.kpi-bar-fill.green{background:#2D7A5B}
+.kpi-bar-fill.blue{background:#2563eb}
 
-/* Chart */
-.chart-block { background: #fff; border: 1px solid var(--rule-l); padding: 18px 20px; margin-bottom: 16px; }
-.chart-title { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-30); margin-bottom: 14px; }
+/* Empty state */
+.empty-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 0;text-align:center;gap:10px}
+.empty-title{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)}
+.empty-sub{font-size:13px;color:var(--gris);font-weight:300;max-width:280px;line-height:1.8}
 
-/* Empty */
-.empty-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 420px; text-align: center; gap: 10px; }
-.empty-title { font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; color: var(--ink); }
-.empty-sub { font-size: 13px; color: var(--ink-60); font-weight: 300; max-width: 280px; line-height: 1.8; }
-
-.sim-note { font-size: 10.5px; color: var(--ink-30); border-top: 1px solid var(--rule-l); padding-top: 12px; margin-top: 20px; line-height: 1.7; }
-
-@media (max-width: 900px) {
-  .qual-row { grid-template-columns: 1fr 1fr; }
-}
+.sim-note{font-size:11px;color:var(--gris);border-top:1px solid var(--bord);padding-top:14px;margin-top:20px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -129,98 +109,99 @@ table tr:hover td { background: var(--paper); }
   <!-- Sidebar -->
   <div class="cs-sidebar">
 
+    <div class="fg" style="margin-bottom:14px">
+      <label>Nom du conseiller</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
     <div class="pmr-note">
-      Basé sur le <strong>Plan Marketing de Rémunération (PMR) Prodémial</strong>. Commission de vente = VA × TPC × PV. Passage Manager moyen en 18 mois avec ~27 clients.<br>
-      <strong style="color:var(--orange)">Nouveau :</strong> Si vous avez déjà une activité, renseignez votre situation actuelle en An 0.
+      Bas&#233; sur le <strong>Plan Marketing de R&#233;mun&#233;ration (PMR) Prod&#233;mial</strong>. Commission de vente = VA &times; TPC &times; PV. Passage Manager moyen en 18 mois avec ~27 clients.
     </div>
 
     <!-- ── AN 0 : SITUATION ACTUELLE ── -->
-    <div style="background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);padding:12px 14px;margin-bottom:16px">
-      <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)" style="color:var(--orange)"><span class="acc">&#9654;</span>Situation actuelle — An 0</div>
+    <div class="an0-box">
+      <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)" style="color:var(--orange)"><span class="acc">&#9654;</span>Situation actuelle &mdash; An 0</div>
       <div class="sb-body open">
-      <p style="font-size:10px;color:var(--ink-60);margin-bottom:12px;line-height:1.6">Renseignez vos chiffres réels si vous avez déjà une activité. Laissez à 0 si vous démarrez.</p>
-      <div class="pr"><div class="pl">VA personnelle actuelle <small>(An 0)</small></div>
-        <div class="iu"><input type="number" id="va0actuel" value="0" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Consultants niv.1 inscrits actuels</div>
-        <div class="iu"><input type="number" id="niv1Actuel" value="0" step="1" oninput="recalc()"><div class="iu-u">inscrits</div></div></div>
-      <div class="pr"><div class="pl">Consultants niv.1 actifs actuels</div>
-        <div class="iu"><input type="number" id="niv1ActifsActuel" value="0" step="1" oninput="recalc()"><div class="iu-u">actifs</div></div></div>
-      <div class="pr"><div class="pl">Consultants niv.2+ inscrits actuels</div>
-        <div class="iu"><input type="number" id="niv2Actuel" value="0" step="1" oninput="recalc()"><div class="iu-u">inscrits</div></div></div>
-      <div class="pr"><div class="pl">Consultants niv.2+ actifs actuels</div>
-        <div class="iu"><input type="number" id="niv2ActifsActuel" value="0" step="1" oninput="recalc()"><div class="iu-u">actifs</div></div></div>
-      <div class="pr"><div class="pl">Encours gérés actuels <small>(AV / PER)</small></div>
-        <div class="iu"><input type="number" id="encoursCumuleActuel" value="0" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Qualification actuelle</div>
-        <div class="iu" style="background:var(--paper)">
-          <select id="qualifActuelle" onchange="recalc()" style="flex:1;padding:7px 10px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink);outline:none">
-            <option value="consultant">Consultant (TPC 5%)</option>
-            <option value="manager">Manager (TPC 6%)</option>
-            <option value="planete">Manager Planète (TPC 6,5%)</option>
-            <option value="etoile">Manager Étoile (TPC 7%)</option>
-            <option value="constellation">Manager Constellation (TPC 7,5%)</option>
-            <option value="galaxie">Manager Galaxie (TPC 8%)</option>
-          </select>
-        </div>
+      <div style="font-size:10px;color:var(--gris);margin-bottom:10px;line-height:1.55">Renseignez vos chiffres r&#233;els si vous avez d&#233;j&#224; une activit&#233;. Laissez &#224; 0 si vous d&#233;marrez.</div>
+      <div class="fg"><label>VA personnelle actuelle <small>(An 0)</small></label>
+        <div class="fi-row"><input type="number" id="va0actuel" value="0" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>Consultants niv.1 inscrits</label>
+        <div class="fi-row"><input type="number" id="niv1Actuel" value="0" step="1" oninput="recalc()"><span class="fi-unit">inscrits</span></div></div>
+      <div class="fg"><label>Consultants niv.1 actifs</label>
+        <div class="fi-row"><input type="number" id="niv1ActifsActuel" value="0" step="1" oninput="recalc()"><span class="fi-unit">actifs</span></div></div>
+      <div class="fg"><label>Consultants niv.2+ inscrits</label>
+        <div class="fi-row"><input type="number" id="niv2Actuel" value="0" step="1" oninput="recalc()"><span class="fi-unit">inscrits</span></div></div>
+      <div class="fg"><label>Consultants niv.2+ actifs</label>
+        <div class="fi-row"><input type="number" id="niv2ActifsActuel" value="0" step="1" oninput="recalc()"><span class="fi-unit">actifs</span></div></div>
+      <div class="fg"><label>Encours g&#233;r&#233;s actuels <small>(AV / PER)</small></label>
+        <div class="fi-row"><input type="number" id="encoursCumuleActuel" value="0" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>Qualification actuelle</label>
+        <select class="fi" id="qualifActuelle" onchange="recalc()">
+          <option value="consultant">Consultant (TPC 5%)</option>
+          <option value="manager">Manager (TPC 6%)</option>
+          <option value="planete">Manager Plan&#232;te (TPC 6,5%)</option>
+          <option value="etoile">Manager &#201;toile (TPC 7%)</option>
+          <option value="constellation">Manager Constellation (TPC 7,5%)</option>
+          <option value="galaxie">Manager Galaxie (TPC 8%)</option>
+        </select>
       </div>
-      <div class="pr"><div class="pl">Titre actuel <small>(volume perso annuel)</small></div>
-        <div class="iu" style="background:var(--paper)">
-          <select id="titreActuel" onchange="recalc()" style="flex:1;padding:7px 10px;border:none;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink);outline:none">
-            <option value="">Aucun (VA perso &lt; 500k€)</option>
-            <option value="Senior">Senior (VA perso &gt; 500k€)</option>
-            <option value="Major">Major (VA perso &gt; 1 M€)</option>
-            <option value="Expert">Expert (VA perso &gt; 1,5 M€)</option>
-          </select>
-        </div>
+      <div class="fg"><label>Titre actuel <small>(volume perso annuel)</small></label>
+        <select class="fi" id="titreActuel" onchange="recalc()">
+          <option value="">Aucun (VA perso &lt; 500k&euro;)</option>
+          <option value="Senior">Senior (VA perso &gt; 500k&euro;)</option>
+          <option value="Major">Major (VA perso &gt; 1 M&euro;)</option>
+          <option value="Expert">Expert (VA perso &gt; 1,5 M&euro;)</option>
+        </select>
       </div>
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Projection — Activite personnelle</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Projection &mdash; Activit&#233; personnelle</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">VA cible An 1 <small>(ou base de croissance)</small></div>
-        <div class="iu"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Croissance VA perso / an</div>
-        <div class="iu"><input type="number" id="croissVA" value="25" step="5" oninput="recalc()"><div class="iu-u">%/an</div></div></div>
-      <div class="pr"><div class="pl">PV moyen (Point Valeur)</div>
-        <div class="iu"><input type="number" id="pvPerso" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+      <div class="fg"><label>VA cible An 1 <small>(base de croissance)</small></label>
+        <div class="fi-row"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>Croissance VA perso / an</label>
+        <div class="fi-row"><input type="number" id="croissVA" value="25" step="5" oninput="recalc()"><span class="fi-unit">% /an</span></div></div>
+      <div class="fg"><label>PV moyen (Point Valeur)</label>
+        <div class="fi-row"><input type="number" id="pvPerso" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation — Niveau 1</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveau 1</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">Consultants inscrits/an <small>(moyenne)</small></div>
-        <div class="iu"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><div class="iu-u">/ an</div></div></div>
-      <div class="pr"><div class="pl">Taux de parrainage <small>(top performers réseau Forman : 1 à 2)</small></div>
-        <div class="iu"><input type="number" id="tauxParrainage" value="1.5" step="0.5" min="0" oninput="recalc()"><div class="iu-u">/ actif / an</div></div></div>
-      <div class="pr"><div class="pl">Taux d'actifs</div>
-        <div class="iu"><input type="number" id="tauxActifs" value="62" step="5" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">VA moyenne / actif niv.1</div>
-        <div class="iu"><input type="number" id="vaNiv1" value="250000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">PV moyen équipe niv.1</div>
-        <div class="iu"><input type="number" id="pvNiv1" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+      <div class="fg"><label>Consultants inscrits/an <small>(moyenne)</small></label>
+        <div class="fi-row"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><span class="fi-unit">/ an</span></div></div>
+      <div class="fg"><label>Taux de parrainage <small>(top : 1 &#224; 2)</small></label>
+        <div class="fi-row"><input type="number" id="tauxParrainage" value="1.5" step="0.5" min="0" oninput="recalc()"><span class="fi-unit">/ actif</span></div></div>
+      <div class="fg"><label>Taux d'actifs</label>
+        <div class="fi-row"><input type="number" id="tauxActifs" value="62" step="5" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>VA moyenne / actif niv.1</label>
+        <div class="fi-row"><input type="number" id="vaNiv1" value="250000" step="25000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>PV moyen &#233;quipe niv.1</label>
+        <div class="fi-row"><input type="number" id="pvNiv1" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation — Niveaux 2+</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveaux 2+</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">VA moyenne / actif niv.2+</div>
-        <div class="iu"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">PV moyen équipe niv.2+</div>
-        <div class="iu"><input type="number" id="pvNiv2" value="0.4" step="0.05" oninput="recalc()"><div class="iu-u">coeff.</div></div></div>
+      <div class="fg"><label>VA moyenne / actif niv.2+</label>
+        <div class="fi-row"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>PV moyen &#233;quipe niv.2+</label>
+        <div class="fi-row"><input type="number" id="pvNiv2" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses PMR</div>
+    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypoth&#232;ses PMR</div>
     <div class="sb-body open">
-      <div class="pr"><div class="pl">Durée du business plan</div>
-        <div class="iu"><input type="number" id="duréePlan" value="7" min="3" max="10" step="1" oninput="recalc()"><div class="iu-u">ans</div></div></div>
-      <div class="pr"><div class="pl">VA moyenne / actif niv.1 Manager <small>(seuil branche active)</small></div>
-        <div class="iu"><input type="number" id="vaManagerActif" value="700000" step="50000" oninput="recalc()"><div class="iu-u">€</div></div></div>
-      <div class="pr"><div class="pl">Commission récurrente (encours UC)</div>
-        <div class="iu"><input type="number" id="tauxRec" value="0.4" step="0.1" oninput="recalc()"><div class="iu-u">%</div></div></div>
-      <div class="pr"><div class="pl">Encours moyen / client</div>
-        <div class="iu"><input type="number" id="encoursClient" value="50000" step="5000" oninput="recalc()"><div class="iu-u">€</div></div></div>
+      <div class="fg"><label>Dur&#233;e du business plan</label>
+        <div class="fi-row"><input type="number" id="duréePlan" value="7" min="3" max="10" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
+      <div class="fg"><label>VA Manager (seuil branche active)</label>
+        <div class="fi-row"><input type="number" id="vaManagerActif" value="700000" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
+      <div class="fg"><label>Commission r&#233;currente (encours UC)</label>
+        <div class="fi-row"><input type="number" id="tauxRec" value="0.4" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      <div class="fg"><label>Encours moyen / client</label>
+        <div class="fi-row"><input type="number" id="encoursClient" value="50000" step="5000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
     </div>
 
-    <button class="btn-calc" onclick="recalc()">Calculer mon business plan &#8594;</button>
+    <button class="sim-btn" onclick="recalc()">Calculer mon business plan &#8594;</button>
     <div style="height:1px;background:var(--bord);margin:10px 0"></div>
     <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
     <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
@@ -231,34 +212,38 @@ table tr:hover td { background: var(--paper); }
   <div class="cs-main">
   <div class="cs-page">
 
+    <!-- Header uniforme -->
+    <div id="pageHeader"></div>
+
     <div class="empty-panel" id="emptyPanel">
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="opacity:0.15">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="opacity:0.18">
         <path d="M8 44 L8 20 L16 20 L16 44" stroke="#181614" stroke-width="1.5" fill="none"/>
         <path d="M22 44 L22 12 L30 12 L30 44" stroke="#D4622A" stroke-width="1.5" fill="none"/>
         <path d="M36 44 L36 4 L44 4 L44 44" stroke="#181614" stroke-width="1.5" fill="none"/>
         <line x1="4" y1="44" x2="48" y2="44" stroke="#181614" stroke-width="1.5"/>
         <polyline points="8,38 22,28 36,18 44,10" stroke="#D4622A" stroke-width="1.2" fill="none" stroke-dasharray="3,2"/>
       </svg>
-      <div class="empty-title">Business Plan Prodémial</div>
-      <div class="empty-sub">Renseignez vos objectifs et lancez la projection sur 5 ans.</div>
+      <div class="empty-title">Business Plan Prod&#233;mial</div>
+      <div class="empty-sub">Renseignez vos objectifs et lancez la projection.</div>
     </div>
 
     <div id="results" style="display:none">
 
-      <div id="qualRow"></div>
+      <div id="qualRow" class="kpi-row"></div>
 
       <!-- Graphique CA -->
-      <div class="chart-block">
-        <div class="chart-title" id="caTitleLbl">Évolution du CA</div>
+      <div class="chart-box">
+        <div class="chart-box-header">
+          <div class="chart-box-title" id="caTitleLbl">&#201;volution du CA</div>
+        </div>
         <div style="height:220px;position:relative"><canvas id="caChart"></canvas></div>
       </div>
 
       <!-- Tableau principal -->
-      <div class="section-lbl"><span></span>Projection détaillée an par an</div>
-      <div class="tbl-block">
-        <div class="tbl-block-header">Business plan — Prodémial PMR</div>
-        <div style="overflow-x:auto">
-          <table>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Projection d&#233;taill&#233;e an par an</div>
+        <div class="tbl-wrap">
+          <table class="bp-tbl">
             <thead><tr id="tblHead"></tr></thead>
             <tbody id="tblBody"></tbody>
           </table>
@@ -266,15 +251,16 @@ table tr:hover td { background: var(--paper); }
       </div>
 
       <!-- KPIs barres organisation -->
-      <div class="section-lbl"><span></span>Croissance de l'organisation</div>
-      <div class="tbl-block" style="padding:16px 20px">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Croissance de l'organisation</div>
         <div id="orgBars"></div>
       </div>
 
       <!-- Commissions récurrentes -->
-      <div class="section-lbl"><span></span>Commissions récurrentes (encours)</div>
-      <div class="chart-block">
-        <div class="chart-title">Encours cumulé & commission récurrente annuelle estimée</div>
+      <div class="chart-box">
+        <div class="chart-box-header">
+          <div class="chart-box-title">Commissions r&#233;currentes (encours)</div>
+        </div>
         <div style="height:180px;position:relative"><canvas id="encChart"></canvas></div>
       </div>
 
@@ -355,7 +341,12 @@ function getPrimeQualite(titre, tpc, isManager) {
   return Math.max(0, primeEffective);
 }
 
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'BUSINESS PLAN',clientId:'clientNom',savedKey:'bp-simulator'});}catch(e){}
+}
+
 function recalc() {
+  renderHeader();
   var va0         = gv('va0', 500000);
   var croissVA    = gv('croissVA', 25) / 100;
   var pvPerso     = gv('pvPerso', 0.4);
