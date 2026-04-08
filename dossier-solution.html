@@ -149,9 +149,14 @@
 
 /* Print — préserver les couleurs de fond (R23 : cibler uniquement les éléments colorés) */
 @media print{
+  /* Neutraliser les scrollbars internes */
+  html,body{overflow:visible!important;height:auto!important}
+  .cs-app{display:block!important;min-height:0!important}
+  .cs-main{overflow:visible!important;height:auto!important;max-height:none!important;display:block!important;padding:0!important}
+  .cs-page{overflow:visible!important;padding:40px!important;max-width:100%!important}
   .bloc-body{border:none!important;padding:0!important}
   .bloc-body:hover,.bloc-body:focus{border:none!important;background:none!important}
-  .no-print,.schema-templates{display:none!important}
+  .no-print,.schema-templates,#cgp-feedback-btn{display:none!important}
   /* Préservation couleurs : fonds, headers de tables, badges, boxes colorées */
   .feature-item,.summary-line,.annexe-item,.steps-list,.step-row,.step-row.done,.step-cb,
   .pyr-box,.pyr-box.orange,.pyr-box.purple,.pyr-box.red,.pyr-level,
@@ -209,7 +214,6 @@
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open">
       <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="updateGarde()"></div>
-      <div class="sf"><label>Date</label><input type="text" id="pDate" oninput="updateGarde()"></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Blocs &#224; afficher</div>
@@ -506,10 +510,10 @@ var CUSTOM_ANNEXES=[]; // [{id, label, icon, sub}]
 
 // Suggestions par type de solution (hors projections sauvegardées)
 var ANNEXE_SUGGESTIONS={
-  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
   scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
-  immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'}]
+  immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'}]
 };
 
 function escAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,'\\\'').replace(/"/g,'&quot;');}
@@ -706,7 +710,6 @@ function saveDossier(){
   var state={
     type:V('pType').value,
     client:V('pClient').value,
-    date:V('pDate').value,
     blocs:{
       accompagnement:V('bodyAccompagnement').innerHTML,
       contrat:V('bodyContrat').innerHTML,
@@ -738,7 +741,6 @@ function loadDossier(file){
       var s=JSON.parse(e.target.result);
       if(s.type)V('pType').value=s.type;
       if(s.client)V('pClient').value=s.client;
-      if(s.date)V('pDate').value=s.date;
       if(s.blocs){
         if(s.blocs.accompagnement)V('bodyAccompagnement').innerHTML=s.blocs.accompagnement;
         if(s.blocs.contrat)V('bodyContrat').innerHTML=s.blocs.contrat;
@@ -805,8 +807,6 @@ function updateSCPICards(){
 
 // Init
 (function(){
-  var today=new Date();
-  V('pDate').value=today.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
   updateGarde();
   loadAnnexes();
   renderSCPIPicker();
