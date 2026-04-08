@@ -109,12 +109,6 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
   <!-- Sidebar -->
   <div class="cs-sidebar">
 
-    <div class="fg" style="margin-bottom:14px">
-      <label>Nom du conseiller</label>
-      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
-    </div>
-    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
-
     <div class="pmr-note">
       Bas&#233; sur le <strong>Plan Marketing de R&#233;mun&#233;ration (PMR) Prod&#233;mial</strong>. Commission de vente = VA &times; TPC &times; PV. Passage Manager moyen en 18 mois avec ~27 clients.
     </div>
@@ -342,7 +336,7 @@ function getPrimeQualite(titre, tpc, isManager) {
 }
 
 function renderHeader(){
-  try{CGP.header.render('pageHeader',{tag:'BUSINESS PLAN',clientId:'clientNom',savedKey:'bp-simulator'});}catch(e){}
+  try{CGP.header.render('pageHeader',{tag:'BUSINESS PLAN',hideClient:true,savedKey:'bp-simulator'});}catch(e){}
 }
 
 function recalc() {
@@ -561,75 +555,91 @@ function recalc() {
     return acc;
   }, '');
 
-  // ── Ligne de synthèse en haut ──
-  var synthHTML = '<div style="width:100%;background:var(--paper);border:1px solid var(--rule-l);padding:14px 16px;margin-bottom:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">'
-    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">TPC effectif max projeté</div>'
-    + '<div style="font-family:var(--serif);font-size:22px;color:var(--orange)">'+(tpcMaxEffectif*100).toFixed(1)+'%</div>'
-    + '<div style="font-size:10px;color:var(--ink-30)">TPC + Prime Qualité</div></div>'
-    + '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">Qualification terminale</div>'
-    + '<div style="font-family:var(--serif);font-size:18px;color:var(--ink)">'+lastRow.qualif+'</div>'
-    + '<div style="font-size:10px;color:var(--ink-30)">An '+dureePlan+'</div></div>'
-    + (titreMaxAtteint ? '<div style="flex:1;min-width:140px"><div style="font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);margin-bottom:4px">Titre max atteint</div>'
-    + '<div style="font-family:var(--serif);font-size:18px;color:var(--orange)">'+titreMaxAtteint+'</div>'
-    + '<div style="font-size:10px;color:var(--ink-30)">Prime Qualité '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div></div>' : '')
+  // ── Ligne de synthèse en haut (3 KPI cards standards) ──
+  var synthHTML = '<div class="kpi-row">'
+    + '<div class="kpi-card reached">'
+    +   '<div class="kpi-label">TPC effectif max proj.</div>'
+    +   '<div class="kpi-val" style="color:var(--orange)">'+(tpcMaxEffectif*100).toFixed(1)+'%</div>'
+    +   '<div class="kpi-sub">TPC + Prime Qualit\u00e9</div>'
+    + '</div>'
+    + '<div class="kpi-card reached">'
+    +   '<div class="kpi-label">Qualification terminale</div>'
+    +   '<div class="kpi-val">'+lastRow.qualif+'</div>'
+    +   '<div class="kpi-sub">An '+dureePlan+'</div>'
+    + '</div>'
+    + (titreMaxAtteint
+      ? '<div class="kpi-card reached">'
+      +   '<div class="kpi-label">Titre max atteint</div>'
+      +   '<div class="kpi-val" style="color:var(--orange)">'+titreMaxAtteint+'</div>'
+      +   '<div class="kpi-sub">Prime Qualit\u00e9 '+(titreMaxAtteint==='Expert'?'+2%':'+1%')+'</div>'
+      + '</div>'
+      : '')
     + '</div>';
 
-  // ── Nomenclature qualifications & titres (compacte) ──
+  // ── Nomenclature qualifications & titres ──
   var QUALIF_COLORS = {
-    'Consultant':'var(--ink-30)',
-    'Manager':'var(--ink)',
-    'Manager Planète':'var(--ink)',
-    'Manager Étoile':'var(--ink)',
-    'Manager Constellation':'var(--ink)',
+    'Consultant':'var(--gris)',
+    'Manager':'var(--noir)',
+    'Manager Plan\u00e8te':'var(--noir)',
+    'Manager \u00c9toile':'var(--noir)',
+    'Manager Constellation':'var(--noir)',
     'Manager Galaxie':'var(--orange)'
   };
-  var TITRE_COLORS = { 'Senior':'var(--ink)', 'Major':'var(--ink)', 'Expert':'var(--orange)' };
+  var TITRE_COLORS = { 'Senior':'var(--noir)', 'Major':'var(--noir)', 'Expert':'var(--orange)' };
 
+  // 2 colonnes côte à côte : Qualifications PMR + Titres Prime Qualité
   var nomenclHTML = synthHTML
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">'
 
-    // ── Qualifications ──
-    + '<div style="width:100%;display:flex;gap:0;flex-wrap:wrap;margin-bottom:3px">'
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);padding:10px 0 6px;border-bottom:1px solid var(--rule-l);margin-bottom:6px">Qualifications PMR</div>'
+    // ── Qualifications PMR ──
+    + '<div class="card" style="margin-bottom:0">'
+    + '<div class="card-title"><span class="dot"></span>Qualifications PMR</div>'
     + qualifs.map(function(q) {
       var reached = q.annee >= 0;
       var isCurrentAn0 = q.annee === 0 && hasExistingActivity;
       var matchRow = reached ? rows.find(function(r){ return r.an === q.annee; }) : null;
       var tpcReel = matchRow ? (matchRow.tpc*100).toFixed(1)+'%' : q.tpc;
       var pq = matchRow && matchRow.tpcEffectif > matchRow.tpc ? ' +'+((matchRow.tpcEffectif-matchRow.tpc)*100).toFixed(1)+'% PQ' : '';
-      var c = reached ? (QUALIF_COLORS[q.lbl]||'var(--ink)') : 'var(--ink-30)';
+      var c = reached ? (QUALIF_COLORS[q.lbl]||'var(--noir)') : 'var(--gris)';
       var badgeStyle = isCurrentAn0
         ? 'background:rgba(37,99,235,0.1);color:#2563eb'
-        : reached ? 'background:var(--o-dim);color:var(--orange)' : 'background:var(--paper-2);color:var(--ink-30)';
-      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+q.annee : '—';
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule-l);width:100%">'
+        : reached ? 'background:rgba(212,98,42,0.08);color:var(--orange)' : 'background:var(--gris-l);color:var(--gris)';
+      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+q.annee : '\u2014';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bord);font-family:var(--sans)">'
         +'<span style="font-size:12px;font-weight:600;color:'+c+'">'+q.lbl+'</span>'
         +'<span style="display:flex;align-items:center;gap:10px">'
-        +'<span style="font-size:11px;font-weight:700;color:var(--orange)">'+tpcReel+(pq?'<span style="font-size:9px;color:#1a7a4a">'+pq+'</span>':'')+'</span>'
-        +'<span style="font-size:9px;font-weight:700;padding:2px 8px;'+badgeStyle+'">'+badgeTxt+'</span>'
+        +'<span style="font-size:11px;font-weight:700;color:var(--orange);white-space:nowrap">'+tpcReel+(pq?' <span style="font-size:9px;color:#2D7A5B;font-weight:600">'+pq+'</span>':'')+'</span>'
+        +'<span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;'+badgeStyle+'">'+badgeTxt+'</span>'
         +'</span></div>';
     }).join('')
     + '</div>'
 
-    // ── Titres ──
-    + '<div style="width:100%;display:flex;gap:0;flex-wrap:wrap;margin-top:8px">'
-    + '<div style="width:100%;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-30);padding:10px 0 6px;border-bottom:1px solid var(--rule-l);margin-bottom:6px">Titres — Prime Qualité <span style="font-weight:400;font-style:italic;text-transform:none">(enquête satisfaction + volume annuel)</span></div>'
+    // ── Titres — Prime Qualité ──
+    + '<div class="card" style="margin-bottom:0">'
+    + '<div class="card-title"><span class="dot"></span>Titres &mdash; Prime Qualit\u00e9</div>'
+    + '<div style="font-size:10px;color:var(--gris);font-style:italic;margin-top:-8px;margin-bottom:8px">Enqu\u00eate satisfaction + volume annuel</div>'
     + titresData.map(function(t) {
       var reached = t.annee >= 0;
       var isCurrentAn0 = t.annee === 0 && hasExistingActivity;
       var matchRow = reached ? rows.find(function(r){ return r.an === t.annee; }) : null;
-      var c = reached ? (TITRE_COLORS[t.lbl]||'var(--ink)') : 'var(--ink-30)';
+      var c = reached ? (TITRE_COLORS[t.lbl]||'var(--noir)') : 'var(--gris)';
       var badgeStyle = isCurrentAn0
         ? 'background:rgba(37,99,235,0.1);color:#2563eb'
-        : reached ? 'background:var(--o-dim);color:var(--orange)' : 'background:var(--paper-2);color:var(--ink-30)';
-      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+t.annee : '—';
-      var tpcEff = matchRow ? ' → TPC eff. '+(matchRow.tpcEffectif*100).toFixed(1)+'%' : '';
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule-l);width:100%">'
-        +'<span style="font-size:12px;font-weight:600;color:'+c+'">'+t.lbl+'</span>'
-        +'<span style="display:flex;align-items:center;gap:10px">'
-        +'<span style="font-size:11px;color:var(--ink-60)">'+t.seuil+'<span style="font-weight:700;color:var(--orange);margin-left:6px">'+t.prime+tpcEff+'</span></span>'
-        +'<span style="font-size:9px;font-weight:700;padding:2px 8px;'+badgeStyle+'">'+badgeTxt+'</span>'
+        : reached ? 'background:rgba(212,98,42,0.08);color:var(--orange)' : 'background:var(--gris-l);color:var(--gris)';
+      var badgeTxt = isCurrentAn0 ? 'Actuel' : reached ? 'An '+t.annee : '\u2014';
+      var tpcEff = matchRow ? ' \u2192 TPC eff. '+(matchRow.tpcEffectif*100).toFixed(1)+'%' : '';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bord);font-family:var(--sans);gap:10px">'
+        +'<div style="min-width:0">'
+        +'<div style="font-size:12px;font-weight:600;color:'+c+'">'+t.lbl+'</div>'
+        +'<div style="font-size:10px;color:var(--gris);margin-top:2px">'+t.seuil+'</div>'
+        +'</div>'
+        +'<span style="display:flex;align-items:center;gap:8px;flex-shrink:0">'
+        +'<span style="font-size:11px;font-weight:700;color:var(--orange);white-space:nowrap">'+t.prime+tpcEff+'</span>'
+        +'<span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;'+badgeStyle+'">'+badgeTxt+'</span>'
         +'</span></div>';
     }).join('')
+    + '</div>'
+
     + '</div>';
 
   setHTML('qualRow', nomenclHTML);
@@ -637,12 +647,12 @@ function recalc() {
   // Tableau — en-têtes avec titre + qualification
   var headers = '<th>Indicateur</th>' + rows.map(function(r) {
     var isM = r.qualif !== 'Consultant';
-    var titreBadge = r.titre ? ' <span style="background:rgba(255,255,255,0.15);font-size:7px;padding:1px 4px;border-radius:2px">'+r.titre+'</span>' : '';
+    var titreBadge = r.titre ? ' <span style="background:rgba(0,0,0,0.06);color:var(--gris);font-size:7px;padding:1px 4px;border-radius:2px">'+r.titre+'</span>' : '';
     var isRealAn0 = r.an === 0 && r.isAn0;
-    var bg = isRealAn0 ? 'background:#2563eb' : isM ? 'background:var(--orange)' : '';
+    var bg = isRealAn0 ? 'background:rgba(37,99,235,0.08);color:#2563eb' : '';
     var label = isRealAn0 ? 'Actuel' : 'An '+r.an;
-    var sublabel = isRealAn0 ? '<br><span style="font-size:8px;opacity:0.85">Situation réelle</span>' :
-                  isM ? '<br><span style="font-size:8px;opacity:0.85">'+r.qualif+titreBadge+'</span>' : '';
+    var sublabel = isRealAn0 ? '<br><span style="font-size:8px;font-weight:400;color:#2563eb;opacity:0.85">R\u00e9el</span>' :
+                  isM ? '<br><span style="font-size:8px;font-weight:400;color:var(--gris)">'+r.qualif+titreBadge+'</span>' : '';
     return '<th style="'+bg+'">'+label+sublabel+'</th>';
   }).join('');
   setHTML('tblHead', headers);

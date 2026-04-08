@@ -366,7 +366,9 @@ CGP.header.render = function(target, opts) {
   }
   h += '</div>';
   h += '<div style="text-align:right;flex-shrink:0">';
-  h += '<div style="font-size:18px;font-weight:700;color:#0D0D0D;text-transform:uppercase;letter-spacing:0.02em">' + e(clientDisplay) + '</div>';
+  if (!opts.hideClient) {
+    h += '<div style="font-size:18px;font-weight:700;color:#0D0D0D;text-transform:uppercase;letter-spacing:0.02em">' + e(clientDisplay) + '</div>';
+  }
   h += '<div style="font-size:12px;color:#6B6B6B;font-weight:300;margin-top:2px">' + e(dateStr) + '</div>';
   h += '</div>';
   h += '</div>';
