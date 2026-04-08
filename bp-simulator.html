@@ -224,7 +224,7 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
       <div class="rappel-row"><span class="rappel-l">Manager Galaxie <small>5+ br.</small></span><span class="rappel-v">8,0 %</span></div>
 
       <div class="rappel-section-title">Titres &mdash; Prime Qualit&#233; (sur VA perso)</div>
-      <div class="rappel-row"><span class="rappel-l">Senior <small>&#8805; 500 000 &euro;</small></span><span class="rappel-v">+1 %</span></div>
+      <div class="rappel-row"><span class="rappel-l">Senior <small>&#8805; 500 000 &euro;</small></span><span class="rappel-v">+0,5 %</span></div>
       <div class="rappel-row"><span class="rappel-l">Major <small>&#8805; 1 000 000 &euro;</small></span><span class="rappel-v">+1 %</span></div>
       <div class="rappel-row"><span class="rappel-l">Expert <small>&#8805; 1 500 000 &euro;</small></span><span class="rappel-v">+2 %</span></div>
 
@@ -362,11 +362,14 @@ function getTitre(vgpAnnuel) {
 }
 
 // Prime Qualité (uniquement Managers) — taux selon Volume Global Personnel
-// Senior/Major : +1%, Expert : +2%, plafonnée à TPC + prime ≤ 7% ou 8%
+// Senior : +0,5%, Major : +1%, Expert : +2%, plafonnée à TPC + prime ≤ 8%
 function getPrimeQualite(titre, tpc, isManager) {
   if(!isManager || !titre) return 0;
-  var tauxPrime = (titre === 'Expert') ? 0.02 : 0.01;
-  var plafondTotal = (titre === 'Expert' || titre === 'Major') ? 0.08 : 0.07;
+  var tauxPrime = 0;
+  if(titre === 'Senior') tauxPrime = 0.005;
+  else if(titre === 'Major') tauxPrime = 0.01;
+  else if(titre === 'Expert') tauxPrime = 0.02;
+  var plafondTotal = (titre === 'Expert' || titre === 'Major') ? 0.08 : 0.075;
   // Plafonner pour ne pas dépasser le max
   var primeEffective = Math.min(tauxPrime, plafondTotal - tpc);
   return Math.max(0, primeEffective);
