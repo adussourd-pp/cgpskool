@@ -25,30 +25,72 @@
 .cb-row input{accent-color:var(--orange)}
 
 /* Page A4 editable blocks */
-.bloc{margin-bottom:24px;position:relative}
-.bloc-tag{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:8px}
-.bloc-title{font-family:var(--serif);font-size:20px;color:var(--noir);margin-bottom:10px}
-.bloc-body{font-size:13px;line-height:1.8;color:var(--gris);outline:none;min-height:40px;padding:8px 12px;border:1.5px solid transparent;border-radius:7px;transition:border-color 0.2s}
-.bloc-body:hover{border-color:var(--bord)}
-.bloc-body:focus{border-color:var(--orange);background:rgba(212,98,42,0.02)}
+.bloc{margin-bottom:44px;position:relative}
+.bloc-tag{font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.bloc-title{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--noir);margin-bottom:6px;line-height:1.3}
+.bloc-subtitle{font-size:13px;color:var(--gris);margin-bottom:22px;font-style:italic}
+.bloc-body{font-size:14px;line-height:1.75;color:var(--gris-f);outline:none;min-height:40px;padding:8px 0;border:1.5px solid transparent;border-radius:7px;transition:border-color 0.2s}
+.bloc-body:hover{border-color:var(--bord);padding:8px 12px}
+.bloc-body:focus{border-color:var(--orange);background:rgba(212,98,42,0.02);padding:8px 12px}
 .bloc-body b,.bloc-body strong{color:var(--noir);font-weight:600}
 
-/* Frais table */
-.frais-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
-.frais-tbl th{text-align:left;padding:8px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);background:var(--paper);border-bottom:1px solid var(--bord)}
-.frais-tbl td{padding:8px 10px;border-bottom:1px solid var(--bord);color:var(--noir)}
+/* Features grid (contrat) */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.feature-item{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;background:#fff;border:1px solid var(--bord);border-radius:4px;font-size:13px;color:var(--noir)}
+.feature-item .check{color:#2D7A5B;font-weight:700;flex-shrink:0}
+.summary-line{font-size:13px;color:var(--gris-f);font-style:italic;padding:14px 18px;background:rgba(212,98,42,0.07);border-radius:4px;margin-top:6px}
+
+/* Header document */
+.doc-header{border-bottom:1px solid var(--bord);padding-bottom:32px;margin-bottom:42px}
+.doc-header .context-box{background:#fff;border:1px solid var(--bord);border-left:3px solid var(--orange);padding:16px 20px;border-radius:2px;font-size:13px;color:var(--gris-f);line-height:1.6;margin-top:18px}
+.doc-header .context-box strong{color:var(--noir)}
+
+/* Frais table — header sombre */
+.frais-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--bord);border-radius:3px;overflow:hidden;margin-top:8px}
+.frais-tbl thead tr{background:var(--noir)}
+.frais-tbl thead th{color:#fff;text-align:left;padding:11px 14px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em}
+.frais-tbl tbody tr:nth-child(even){background:#fafaf8}
+.frais-tbl td{padding:12px 14px;border-bottom:1px solid var(--bord);color:var(--noir);vertical-align:middle}
+.frais-tbl tbody tr:last-child td{border-bottom:none}
 .frais-tbl td[contenteditable]{outline:none}
-.frais-tbl td[contenteditable]:focus{background:rgba(212,98,42,0.04)}
-.frais-tbl .frais-montant{font-weight:700;color:var(--orange)}
+.frais-tbl td[contenteditable]:focus{background:rgba(212,98,42,0.05)}
+.frais-tbl .frais-montant{font-weight:700;color:var(--orange);font-size:14px}
+.frais-tbl .frais-montant.zero{color:#2D7A5B}
+
+/* Steps container (Prochaine étape) */
+.steps-container{background:#fff;border:1px solid var(--bord);border-radius:4px;overflow:hidden;margin-top:8px}
+.steps-intro{padding:20px 24px;background:var(--noir);color:#fff}
+.steps-intro p{font-size:13px;line-height:1.6;opacity:0.92;margin:0}
+.steps-intro strong{opacity:1;font-size:14px}
+.steps-body{display:grid;grid-template-columns:1fr 1fr}
+.steps-col{padding:20px 22px}
+.steps-col:first-child{border-right:1px solid var(--bord)}
+.steps-col h4{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:14px}
+.step-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.step-item:last-child{margin-bottom:0}
+.step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--orange);color:var(--orange);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+.step-content .step-title{font-size:13px;font-weight:600;color:var(--noir);margin-bottom:2px}
+.step-content .step-desc{font-size:12px;color:var(--gris);line-height:1.5}
+.steps-footer{padding:14px 22px;border-top:1px solid var(--bord);background:#fafaf8;font-size:12px;color:var(--gris);font-style:italic}
+
+/* Signature block */
+.signature-block{margin-top:48px;padding-top:28px;border-top:1px solid var(--bord);display:flex;align-items:center;gap:18px}
+.signature-avatar{width:52px;height:52px;background:var(--noir);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-size:18px;flex-shrink:0;overflow:hidden}
+.signature-avatar img{width:100%;height:100%;object-fit:cover}
+.sig-info .name{font-weight:600;font-size:15px;color:var(--noir);margin-bottom:2px}
+.sig-info .role{font-size:12px;color:var(--gris)}
 
 /* Checklist */
 .check-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:var(--gris);line-height:1.6}
 .check-num{width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 
 /* Annexes preview */
-.annexe-card{background:var(--paper);border:1.5px solid var(--bord);border-radius:7px;padding:12px 16px;margin-bottom:8px}
-.annexe-card-title{font-size:12px;font-weight:600;color:var(--noir);margin-bottom:2px}
-.annexe-card-sub{font-size:10px;color:var(--gris)}
+.annexes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.annexe-item{background:#fff;border:1px solid var(--bord);padding:13px 16px;border-radius:3px;display:flex;align-items:center;gap:12px;font-size:13px}
+.annexe-item .icon{font-size:18px;flex-shrink:0}
+.annexe-item .name{font-weight:500;color:var(--noir);margin-bottom:1px}
+.annexe-item .status{font-size:11px;color:var(--gris)}
+.annexe-count{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px}
 
 /* Page de garde */
 .garde{text-align:center;padding:60px 40px;margin-bottom:24px}
@@ -161,8 +203,18 @@
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Annexes disponibles</div>
-    <div class="sb-body open" id="annexesList">
-      <div style="font-size:11px;color:var(--gris);padding:4px 8px">Chargement...</div>
+    <div class="sb-body open">
+      <div id="annexesList">
+        <div style="font-size:11px;color:var(--gris);padding:4px 8px">Chargement...</div>
+      </div>
+      <div style="border-top:1px solid var(--bord);margin-top:8px;padding-top:10px">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px">Ajouter une annexe</div>
+        <div id="customSuggestions" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
+        <div style="display:flex;gap:4px">
+          <input type="text" id="customAnnexeInput" placeholder="Ex : Bulletin souscription" onkeydown="if(event.key==='Enter')addCustomAnnexe()" style="flex:1;padding:7px 9px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:11px;outline:none;min-width:0">
+          <button type="button" onclick="addCustomAnnexe()" style="padding:7px 12px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">+</button>
+        </div>
+      </div>
     </div>
 
     <div style="border-top:1px solid var(--bord);margin-top:14px;padding-top:10px">
@@ -388,42 +440,44 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
       <!-- WORKFLOW SOUSCRIPTION -->
       <div class="bloc" id="blocWorkflow">
         <div class="bloc-tag">Processus</div>
-        <div class="bloc-title">Prochaine &#233;tape</div>
-        <div class="wf-steps" id="wfSteps">
-          <div class="wf-step">
-            <div class="wf-num">1</div>
-            <div class="wf-pill">Connaissance Client</div>
-            <div class="wf-detail"><b>Signature :</b>Document d'entr&#233;e en relation + Recueil d'information + Profil Investisseur</div>
+        <div class="bloc-title">On y est presque</div>
+        <div class="steps-container" id="stepsContainer">
+          <div class="steps-intro">
+            <p><strong>Vous avez maintenant toutes les cartes en main.</strong><br>
+            La suite est simple &mdash; je m'occupe de tout le c&#244;t&#233; administratif et technique. Voici ce dont j'ai besoin de votre part, et ce que je prends en charge dans la foul&#233;e.</p>
           </div>
-          <div class="wf-step">
-            <div class="wf-num">2</div>
-            <div class="wf-pill">Souscription</div>
-            <div class="wf-detail"><b>Envoi :</b>CNI/Passeport + Justificatif domicile + RIB/IBAN<br><b>Signature :</b>Fiche conseil + Bulletin souscription</div>
+          <div class="steps-body">
+            <div class="steps-col">
+              <h4>Ce que vous faites</h4>
+              <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Envoi des documents</div><div class="step-desc">Pi&#232;ce d'identit&#233; valide, RIB PDF, justificatif de domicile (&lt; 3 mois)</div></div></div>
+              <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Signature &#233;lectronique</div><div class="step-desc">Fiche Conseil + bulletin de souscription &mdash; envoy&#233;s par e-mail, sign&#233;s en 5 minutes</div></div></div>
+            </div>
+            <div class="steps-col">
+              <h4>Ce que je prends en charge</h4>
+              <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Ouverture du contrat</div><div class="step-desc">Confirmation par l'assureur / partenaire sous 5 &#224; 10 jours ouvr&#233;s</div></div></div>
+              <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Premier bilan &#224; 4 mois</div><div class="step-desc">Point performance + ajustement strat&#233;gique si n&#233;cessaire</div></div></div>
+              <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Suivi annuel</div><div class="step-desc">Revue compl&#232;te du contrat et de votre strat&#233;gie patrimoniale</div></div></div>
+            </div>
           </div>
-          <div class="wf-step">
-            <div class="wf-num">3</div>
-            <div class="wf-pill">Conformit&#233;</div>
-            <div class="wf-detail"><b>Validation</b> par le service conformit&#233; + le partenaire</div>
-          </div>
-          <div class="wf-step">
-            <div class="wf-num">4</div>
-            <div class="wf-pill">Ouverture</div>
-            <div class="wf-detail">Mail de confirmation + Pr&#233;l&#232;vement sous 3-5 jours</div>
-          </div>
-          <div class="wf-step">
-            <div class="wf-num">5</div>
-            <div class="wf-pill">Suivi</div>
-            <div class="wf-detail">Premier RDV &#224; 4 mois + Relev&#233;s p&#233;riodiques + RDV annuel</div>
-          </div>
+          <div class="steps-footer">Une question avant de d&#233;marrer ? Je suis disponible par t&#233;l&#233;phone ou message &mdash; r&#233;ponse sous 24h.</div>
         </div>
       </div>
 
       <!-- ANNEXES -->
       <div class="bloc" id="blocAnnexes">
         <div class="bloc-tag">Annexes</div>
-        <div class="bloc-title">Projections financi&#232;res</div>
+        <div class="bloc-title">Documents joints</div>
         <div id="annexesContent">
-          <div style="font-size:12px;color:var(--gris);font-style:italic">Aucune projection sauvegard&#233;e. Utilisez les simulateurs pour g&#233;n&#233;rer des projections.</div>
+          <div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>
+        </div>
+      </div>
+
+      <!-- SIGNATURE CONSEILLER -->
+      <div class="signature-block" id="signatureBlock">
+        <div class="signature-avatar" id="sigAvatar">AD</div>
+        <div class="sig-info">
+          <div class="name" id="sigName">Alexandre Dussourd</div>
+          <div class="role" id="sigRole">Conseiller en Gestion de Patrimoine</div>
         </div>
       </div>
 
@@ -513,6 +567,25 @@ function updateGarde(){
   V('gardeConseiller').textContent=nom||'';
   V('gardeCabinet').textContent=p.cabinet||'';
   V('gardeOrias').textContent=p.orias?'ORIAS n\u00b0 '+p.orias:'';
+  // Signature block (bas de page)
+  var sigName=V('sigName');
+  var sigRole=V('sigRole');
+  var sigAvatar=V('sigAvatar');
+  if(sigName)sigName.textContent=nom||'Votre nom';
+  if(sigRole){
+    var role='Conseiller en Gestion de Patrimoine';
+    if(p.cabinet)role+=' \u2014 '+p.cabinet;
+    sigRole.textContent=role;
+  }
+  if(sigAvatar){
+    var photo='';try{photo=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
+    if(photo){
+      sigAvatar.innerHTML='<img src="'+photo+'" alt="">';
+    } else {
+      var initials=((p.prenom||'').charAt(0)+(p.nom||'').charAt(0)).toUpperCase()||'A';
+      sigAvatar.innerHTML=initials;
+    }
+  }
 }
 
 function onTypeChange(){
@@ -559,6 +632,7 @@ function onTypeChange(){
   var scpiBloc=V('blocSCPISelection');
   if(scpiToggle)scpiToggle.style.display=type==='scpi'?'':'none';
   if(scpiBloc)scpiBloc.style.display=type==='scpi'?'':'none';
+  renderCustomSuggestions();
   updateGarde();
 }
 
@@ -570,9 +644,46 @@ function toggleBloc(){
   });
 }
 
+// Annexes custom ajoutées manuellement
+var CUSTOM_ANNEXES=[]; // [{id, label, icon}]
+
+// Suggestions de rapid-add selon le type de solution
+var ANNEXE_SUGGESTIONS={
+  av:   [{label:'Fiche conseil + r\u00e9partition portefeuille',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  per:  [{label:'Fiche conseil + allocation',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
+  immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'}]
+};
+
+function addCustomAnnexe(presetLabel,presetIcon){
+  var inp=V('customAnnexeInput');
+  var label=(presetLabel||(inp?inp.value:'')||'').trim();
+  if(!label)return;
+  var icon=presetIcon||'\ud83d\udcce';
+  var id='custom_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+  CUSTOM_ANNEXES.push({id:id,label:label,icon:icon});
+  if(inp)inp.value='';
+  loadAnnexes();
+}
+
+function removeCustomAnnexe(id){
+  CUSTOM_ANNEXES=CUSTOM_ANNEXES.filter(function(a){return a.id!==id;});
+  loadAnnexes();
+}
+
+function renderCustomSuggestions(){
+  var box=V('customSuggestions');
+  if(!box)return;
+  var type=V('pType').value;
+  var list=ANNEXE_SUGGESTIONS[type]||[];
+  box.innerHTML=list.map(function(s){
+    var lbl=(s.label||'').replace(/"/g,'&quot;');
+    return '<button type="button" onclick="addCustomAnnexe(\''+lbl+'\',\''+s.icon+'\')" style="padding:4px 9px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">+ '+s.icon+' '+s.label+'</button>';
+  }).join('');
+}
+
 function loadAnnexes(){
   var html='';
-  var contentHtml='';
   var found=false;
   ANNEXE_MODULES.forEach(function(m){
     var key='cgpskool_state_'+m.id;
@@ -583,30 +694,40 @@ function loadAnnexes(){
       html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
     }
   });
-  if(!found){
-    html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune projection sauvegard\u00e9e</div>';
+  // Annexes custom
+  CUSTOM_ANNEXES.forEach(function(a){
+    html+='<label class="cb-row" style="position:relative"><input type="checkbox" data-annexe-custom="'+a.id+'" checked onchange="renderAnnexesContent()"> '+a.icon+' '+a.label+' <button type="button" onclick="event.preventDefault();removeCustomAnnexe(\''+a.id+'\')" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:14px;padding:0 4px">&times;</button></label>';
+  });
+  if(!found && CUSTOM_ANNEXES.length===0){
+    html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe pour le moment</div>';
   }
   V('annexesList').innerHTML=html;
+  renderCustomSuggestions();
   renderAnnexesContent();
 }
 
 function renderAnnexesContent(){
-  var checked=Array.from(V('annexesList').querySelectorAll('input[data-annexe]:checked')).map(function(i){return i.dataset.annexe;});
-  if(checked.length===0){
-    V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune projection s&#233;lectionn&#233;e. Lance une simulation depuis un module et reviens ici pour la joindre.</div>';
+  var checkedAuto=Array.from(V('annexesList').querySelectorAll('input[data-annexe]:checked')).map(function(i){return i.dataset.annexe;});
+  var checkedCustom=Array.from(V('annexesList').querySelectorAll('input[data-annexe-custom]:checked')).map(function(i){return i.dataset.annexeCustom;});
+  var items=[];
+  checkedAuto.forEach(function(id){
+    var m=ANNEXE_MODULES.find(function(x){return x.id===id});
+    if(m)items.push({icon:m.icon,label:m.label,sub:'Projection sauvegard\u00e9e'});
+  });
+  checkedCustom.forEach(function(id){
+    var a=CUSTOM_ANNEXES.find(function(x){return x.id===id});
+    if(a)items.push({icon:a.icon,label:a.label,sub:'Document joint'});
+  });
+  if(items.length===0){
+    V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>';
     return;
   }
-  var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-  checked.forEach(function(id){
-    var m=ANNEXE_MODULES.find(function(x){return x.id===id});
-    if(!m)return;
-    html+='<div class="annexe-card">'
-      +'<div class="annexe-card-title">'+m.icon+' '+m.label+'</div>'
-      +'<div class="annexe-card-sub">Projection sauvegard&#233;e</div>'
-      +'</div>';
+  var html='<div class="annexes-grid">';
+  items.forEach(function(it){
+    html+='<div class="annexe-item"><span class="icon">'+it.icon+'</span><div><div class="name">'+it.label+'</div><div class="status">'+it.sub+'</div></div></div>';
   });
   html+='</div>';
-  html+='<div style="font-size:10px;color:var(--gris);font-style:italic;margin-top:10px">'+checked.length+' projection'+(checked.length>1?'s':'')+' jointe'+(checked.length>1?'s':'')+' au dossier.</div>';
+  html+='<div class="annexe-count">'+items.length+' annexe'+(items.length>1?'s':'')+' jointe'+(items.length>1?'s':'')+' au dossier.</div>';
   V('annexesContent').innerHTML=html;
 }
 
@@ -625,7 +746,8 @@ function saveDossier(){
       var tds=tr.querySelectorAll('td');
       return [tds[0].textContent,tds[1].textContent,tds[2].textContent];
     }),
-    checkboxes:{}
+    checkboxes:{},
+    customAnnexes:CUSTOM_ANNEXES
   };
   ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
     state.checkboxes[id]=V(id).checked;
@@ -660,6 +782,10 @@ function loadDossier(file){
       if(s.checkboxes){
         Object.keys(s.checkboxes).forEach(function(id){var el=V(id);if(el)el.checked=s.checkboxes[id];});
         toggleBloc();
+      }
+      if(s.customAnnexes&&Array.isArray(s.customAnnexes)){
+        CUSTOM_ANNEXES=s.customAnnexes;
+        loadAnnexes();
       }
       updateGarde();
     }catch(err){alert('Fichier invalide');}
