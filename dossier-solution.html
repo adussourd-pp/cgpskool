@@ -149,6 +149,14 @@
 .scpi-arrow{font-size:18px;color:var(--orange);flex-shrink:0}
 .scpi-icons{display:flex;gap:8px;justify-content:center;margin:8px 0;font-size:20px}
 
+/* Bloc "À vos côtés" — fusionne visuellement avec le footer (beige full-width) */
+#blocServices{background:#F2F1EE;margin:28px -40px 0 -40px;padding:18px 40px 16px;border-bottom:1px solid rgba(0,0,0,0.06)}
+#blocServices .svc-title{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9C9A96;margin-bottom:10px}
+#blocServices .svc-body{font-size:11.5px;color:#3a3835;line-height:1.75;font-family:var(--sans)}
+#blocServices .svc-body:focus{outline:none}
+/* Coller le footer conseiller au bloc services (pas de marge top) */
+#blocServices + #conseillerFooter > div{margin-top:0!important}
+
 /* Print — préserver les couleurs de fond (R23 : cibler uniquement les éléments colorés) */
 @media print{
   /* Neutraliser les scrollbars internes */
@@ -164,7 +172,7 @@
   .pyr-box,.pyr-box.orange,.pyr-box.purple,.pyr-box.red,.pyr-level,
   .frais-tbl,.frais-tbl thead tr,.frais-tbl tbody tr:nth-child(even),
   .context-box,.scpi-box,.scpi-box.main,
-  #pageHeader,[style*="background"]{
+  #blocServices,#pageHeader,[style*="background"]{
     -webkit-print-color-adjust:exact!important;
     print-color-adjust:exact!important;
   }
@@ -408,11 +416,11 @@ Le financement &#224; cr&#233;dit permet de <b>multiplier l'effet patrimonial</b
         </div>
       </div>
 
-      <!-- SERVICES INCLUS (mini-section compacte, juste avant la signature) -->
-      <div id="blocServices" style="background:rgba(212,98,42,0.05);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:16px 20px;margin:24px 0 10px">
-        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Avec moi, &#224; tout moment</div>
-        <div id="bodyServices" contenteditable="true" style="font-size:12px;color:var(--noir);line-height:1.7">
-&#10003; <b>Ligne directe WhatsApp</b> &amp; calendrier en ligne pour vos rendez-vous<br>
+      <!-- À VOS CÔTÉS — fusionne visuellement avec le footer -->
+      <div id="blocServices">
+        <div class="svc-title">&Agrave; vos c&#244;t&#233;s, en permanence</div>
+        <div id="bodyServices" contenteditable="true" class="svc-body">
+&#10003; <b>Ligne directe WhatsApp</b> &amp; calendrier en ligne pour les rendez-vous<br>
 &#10003; <b>Aide &#224; la d&#233;claration d'imp&#244;ts</b>, incluse dans l'accompagnement<br>
 &#10003; <b>Appui d'ing&#233;nieurs patrimoniaux</b> pour les sujets techniques (transmission, montage en soci&#233;t&#233;&#8230;)<br>
 &#10003; <b>R&#233;seau d'experts partenaires</b> : notaire, courtier, assureur, agent immobilier, avocat<br>
