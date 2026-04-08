@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGP Skool &#8212; Allocation Cible</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
+<style>
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--orange)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+.sl-val{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:2px}
+.sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
+
+/* Mode toggle (Durée fixe / Épuisement) */
+.mode-row{display:flex;gap:4px;margin-bottom:8px}
+.mode-btn{flex:1;padding:8px 4px;border:1.5px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.15s}
+.mode-btn.active{border-color:var(--orange);background:var(--orange);color:#fff}
+
+/* Cards */
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+.card-title{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);margin-bottom:14px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.card-title-l{display:flex;align-items:center;gap:8px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0}
+
+/* Hypothèses recap */
+.hyp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.hyp-item{display:flex;flex-direction:column;gap:2px}
+.hyp-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris)}
+.hyp-val{font-size:14px;font-weight:700;color:var(--noir);font-family:var(--sans)}
+
+/* Tables éditables */
+.alloc-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.alloc-tbl thead th{padding:8px 6px;text-align:right;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
+.alloc-tbl thead th:first-child{text-align:left;width:38%}
+.alloc-tbl tbody td{padding:6px 6px;text-align:right;color:var(--gris-f);border-bottom:1px solid var(--bord);vertical-align:middle}
+.alloc-tbl tbody td:first-child{text-align:left;font-weight:600;color:var(--noir)}
+.alloc-tbl input[type="text"],.alloc-tbl input[type="number"]{width:100%;padding:6px 8px;border:1px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none;text-align:right;box-sizing:border-box}
+.alloc-tbl input[type="text"]{text-align:left}
+.alloc-tbl input:focus{border-color:var(--orange)}
+.alloc-tbl .row-del{background:transparent;border:none;color:var(--gris);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.alloc-tbl .row-del:hover{color:var(--red,#dc2626)}
+.alloc-tbl tfoot td{padding:10px 6px;font-weight:700;color:var(--noir);border-top:2px solid var(--bord);background:var(--gris-l)}
+.alloc-tbl tfoot td:first-child{text-align:left}
+.alloc-tbl .err{color:#dc2626}
+.alloc-tbl .ok{color:#2da064}
+
+/* Bouton + Ajouter */
+.btn-add{margin-top:10px;padding:7px 14px;background:transparent;border:1.5px dashed var(--bord);color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.15s}
+.btn-add:hover{border-color:var(--orange);color:var(--orange);border-style:solid}
+
+/* Alerte */
+.alert{font-size:11px;padding:8px 12px;border-radius:7px;margin-top:10px}
+.alert.warn{background:rgba(240,167,56,0.08);border-left:3px solid #F0A738;color:#8a5a14}
+.alert.err{background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;color:#991b1b}
+
+/* Résultat final */
+.final-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.final-tbl thead th{padding:10px 8px;text-align:right;font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
+.final-tbl thead th:first-child{text-align:left}
+.final-tbl tbody td{padding:8px 8px;text-align:right;color:var(--noir);border-bottom:1px solid var(--bord)}
+.final-tbl tbody td:first-child{text-align:left;font-weight:600}
+.final-tbl tfoot td{padding:12px 8px;font-weight:700;font-size:14px;color:var(--noir);border-top:2px solid var(--bord);background:var(--gris-l)}
+.final-tbl tfoot td:first-child{text-align:left}
+.final-tbl tfoot .ok{color:#2da064}
+.final-tbl tfoot .err{color:#dc2626}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <div class="fg" style="margin-bottom:14px">
+      <label>Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Param&#232;tres g&#233;n&#233;raux</div>
+    <div class="sb-body open">
+      <div class="fg"><label>Versement initial brut</label>
+        <div class="fi-row"><input type="number" id="versementBrut" value="10000" min="0" step="500" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
+      </div>
+      <div class="fg"><label>Frais d'entr&#233;e</label>
+        <div class="fi-row"><input type="number" id="fraisEntree" value="2.5" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
+      </div>
+      <div class="fg"><label>Minimum par arbitrage</label>
+        <div class="fi-row"><input type="number" id="minArbitrage" value="50" min="0" step="10" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
+      </div>
+    </div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Programme d'arbitrage</div>
+    <div class="sb-body open">
+      <div class="fg"><label>Mode</label>
+        <div class="mode-row">
+          <button type="button" class="mode-btn active" id="modeBtnDuree" onclick="setMode('duree')">Dur&#233;e fixe</button>
+          <button type="button" class="mode-btn" id="modeBtnEpuise" onclick="setMode('epuise')">Jusqu'&#224; &#233;puisement</button>
+        </div>
+      </div>
+      <div class="fg" id="dureeRow">
+        <label>Dur&#233;e (mois)</label>
+        <div class="sl-val" id="vDuree">12 mois</div>
+        <input type="range" id="duree" min="3" max="24" step="1" value="12" oninput="onDureeChange()" style="width:100%;accent-color:var(--orange)">
+        <div class="sl-labs"><span>3</span><span>24</span></div>
+      </div>
+      <div class="fg"><label>P&#233;riodicit&#233;</label>
+        <select class="fi" id="periodicite" onchange="recalc()">
+          <option value="1">Mensuelle</option>
+          <option value="3">Trimestrielle</option>
+          <option value="6">Semestrielle</option>
+          <option value="12">Annuelle</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <!-- Header uniforme -->
+      <div id="pageHeader"></div>
+
+      <!-- HYPOTHÈSES -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-l"><span class="dot"></span>Hypoth&#232;ses retenues</div></div>
+        <div class="hyp-grid" id="hypGrid"></div>
+      </div>
+
+      <!-- ALLOCATION DÉPART -->
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-l"><span class="dot"></span>Allocation de d&#233;part</div>
+        </div>
+        <table class="alloc-tbl">
+          <thead><tr>
+            <th>Fonds</th>
+            <th>% initial</th>
+            <th>Montant &euro;</th>
+            <th>D&#233;sinv./arb.</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="departBody"></tbody>
+          <tfoot id="departFoot"></tfoot>
+        </table>
+        <button class="btn-add" onclick="addDepart()">+ Ajouter une ligne</button>
+        <div id="departAlerts"></div>
+      </div>
+
+      <!-- ALLOCATION CIBLE -->
+      <div class="card">
+        <div class="card-title">
+          <div class="card-title-l"><span class="dot"></span>Allocation cible des nouveaux fonds</div>
+        </div>
+        <table class="alloc-tbl">
+          <thead><tr>
+            <th>Fonds</th>
+            <th>% cible</th>
+            <th>&euro; r&#233;investi</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="cibleBody"></tbody>
+          <tfoot id="cibleFoot"></tfoot>
+        </table>
+        <button class="btn-add" onclick="addCible()">+ Ajouter une ligne</button>
+        <div id="cibleAlerts"></div>
+      </div>
+
+      <!-- ALLOCATION FINALE -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-l"><span class="dot"></span>Allocation finale apr&#232;s ex&#233;cution du programme</div></div>
+        <table class="final-tbl">
+          <thead><tr>
+            <th>Fonds</th>
+            <th>Montant &euro;</th>
+            <th>% final</th>
+          </tr></thead>
+          <tbody id="finalBody"></tbody>
+          <tfoot id="finalFoot"></tfoot>
+        </table>
+        <div id="finalAlerts"></div>
+      </div>
+
+      <!-- Footer conseiller -->
+      <div id="conseillerFooter"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── État ─────────────────────────────────────────────────────────
+var ALLOC = {
+  mode: 'duree', // 'duree' | 'epuise'
+  depart: [
+    {label:'Fonds Euros',      pct:95, montArb:750},
+    {label:'UC Actions Monde', pct:5,  montArb:0}
+  ],
+  cible: [
+    {label:'UC Actions Monde', pct:60},
+    {label:'UC Obligations',   pct:30},
+    {label:'UC SCPI',          pct:10}
+  ]
+};
+
+// ── Helpers ──────────────────────────────────────────────────────
+function fmt(n){return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Math.round(n||0));}
+function fmt1(n){return new Intl.NumberFormat('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1}).format(n||0);}
+function V(id){return document.getElementById(id);}
+function num(id){return parseFloat(V(id).value)||0;}
+
+// ── Header ───────────────────────────────────────────────────────
+function renderHeader(){
+  try{CGP.header.render('pageHeader',{tag:'ALLOCATION CIBLE',solutions:['AV'],clientId:'clientNom',savedKey:'allocation-cible'});}catch(e){}
+}
+
+// ── Mode (durée vs épuisement) ───────────────────────────────────
+function setMode(m){
+  ALLOC.mode = m;
+  V('modeBtnDuree').classList.toggle('active', m==='duree');
+  V('modeBtnEpuise').classList.toggle('active', m==='epuise');
+  V('dureeRow').style.display = m==='duree' ? '' : 'none';
+  recalc();
+}
+function onDureeChange(){
+  V('vDuree').textContent = V('duree').value + ' mois';
+  recalc();
+}
+
+// ── Tables (rendu sidebar inputs depuis ALLOC) ──────────────────
+function renderDepart(){
+  var tb = V('departBody');
+  tb.innerHTML = '';
+  ALLOC.depart.forEach(function(f, i){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="text" value="'+escAttr(f.label)+'" oninput="updateDepart('+i+',\'label\',this.value)"></td>'+
+      '<td><input type="number" min="0" max="100" step="0.1" value="'+f.pct+'" oninput="updateDepart('+i+',\'pct\',this.value)"></td>'+
+      '<td id="departMnt'+i+'">&mdash;</td>'+
+      '<td><input type="number" min="0" step="50" value="'+f.montArb+'" oninput="updateDepart('+i+',\'montArb\',this.value)"></td>'+
+      '<td><button type="button" class="row-del" onclick="delDepart('+i+')" title="Supprimer">&times;</button></td>';
+    tb.appendChild(tr);
+  });
+}
+function renderCible(){
+  var tb = V('cibleBody');
+  tb.innerHTML = '';
+  ALLOC.cible.forEach(function(f, i){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="text" value="'+escAttr(f.label)+'" oninput="updateCible('+i+',\'label\',this.value)"></td>'+
+      '<td><input type="number" min="0" max="100" step="0.1" value="'+f.pct+'" oninput="updateCible('+i+',\'pct\',this.value)"></td>'+
+      '<td id="cibleMnt'+i+'">&mdash;</td>'+
+      '<td><button type="button" class="row-del" onclick="delCible('+i+')" title="Supprimer">&times;</button></td>';
+    tb.appendChild(tr);
+  });
+}
+function escAttr(s){return String(s||'').replace(/"/g,'&quot;');}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── CRUD départ / cible ─────────────────────────────────────────
+function addDepart(){ALLOC.depart.push({label:'Nouveau fonds',pct:0,montArb:0});renderDepart();recalc();}
+function delDepart(i){ALLOC.depart.splice(i,1);renderDepart();recalc();}
+function updateDepart(i,k,v){
+  if(k==='label') ALLOC.depart[i].label = v;
+  else ALLOC.depart[i][k] = parseFloat(v)||0;
+  recalc();
+}
+function addCible(){ALLOC.cible.push({label:'Nouveau fonds',pct:0});renderCible();recalc();}
+function delCible(i){ALLOC.cible.splice(i,1);renderCible();recalc();}
+function updateCible(i,k,v){
+  if(k==='label') ALLOC.cible[i].label = v;
+  else ALLOC.cible[i][k] = parseFloat(v)||0;
+  recalc();
+}
+
+// ── CALCUL ───────────────────────────────────────────────────────
+function recalc(){
+  renderHeader();
+  var brut = num('versementBrut');
+  var frais = num('fraisEntree');
+  var minArb = num('minArbitrage');
+  var periodMois = parseInt(V('periodicite').value)||1;
+  var net = brut * (1 - frais/100);
+
+  // Montant initial par fonds départ
+  ALLOC.depart.forEach(function(f){
+    f.montInitial = (f.pct/100) * net;
+  });
+
+  // Nombre d'arbitrages selon mode
+  var nbArb;
+  if(ALLOC.mode === 'duree'){
+    var dureeMois = parseInt(V('duree').value)||12;
+    nbArb = Math.floor(dureeMois / periodMois);
+  } else {
+    // Mode épuisement : combien d'arbitrages pour vider le fonds le plus garni
+    nbArb = 0;
+    ALLOC.depart.forEach(function(f){
+      if(f.montArb > 0){
+        var n = Math.ceil(f.montInitial / f.montArb);
+        if(n > nbArb) nbArb = n;
+      }
+    });
+    // Plafond 24 mois / périodicité
+    var maxArb = Math.floor(24 / periodMois);
+    if(nbArb > maxArb) nbArb = maxArb;
+  }
+  if(nbArb < 1) nbArb = 1;
+
+  // Désinvesti par fonds départ (capé au montant disponible)
+  var totalDesinvesti = 0;
+  var alertesDepart = [];
+  ALLOC.depart.forEach(function(f, i){
+    var theorique = f.montArb * nbArb;
+    var capped = Math.min(theorique, f.montInitial);
+    f.desinvesti = capped;
+    f.reste = f.montInitial - capped;
+    totalDesinvesti += capped;
+    if(theorique > f.montInitial && f.montArb > 0){
+      alertesDepart.push({type:'warn', msg:'« '+f.label+' » : la poche serait épuisée avant la fin (désinvesti plafonné à '+fmt(capped)+' €)'});
+    }
+    if(f.montArb > 0 && f.montArb < minArb){
+      alertesDepart.push({type:'err', msg:'« '+f.label+' » : '+fmt(f.montArb)+' €/arbitrage est inférieur au minimum requis ('+fmt(minArb)+' €)'});
+    }
+  });
+
+  // Réinvesti par fonds cible
+  ALLOC.cible.forEach(function(f){
+    f.reinvesti = (f.pct/100) * totalDesinvesti;
+  });
+
+  // ── Rendu Hypothèses ─────────────────────────────────────────
+  var dureeText;
+  if(ALLOC.mode === 'duree'){
+    dureeText = (parseInt(V('duree').value)||12) + ' mois';
+  } else {
+    dureeText = nbArb + ' arb. (épuisement)';
+  }
+  var periodLbl = {1:'Mensuelle',3:'Trimestrielle',6:'Semestrielle',12:'Annuelle'}[periodMois];
+  V('hypGrid').innerHTML =
+    hypItem('Versement brut', fmt(brut)+' €')+
+    hypItem('Frais d\'entrée', fmt1(frais)+' %')+
+    hypItem('Net investi', fmt(net)+' €')+
+    hypItem('Programme', dureeText)+
+    hypItem('Périodicité', periodLbl)+
+    hypItem('Nb arbitrages', String(nbArb));
+
+  // ── Rendu Allocation départ ──────────────────────────────────
+  var totPctD = 0, totMntD = 0, totArbD = 0;
+  ALLOC.depart.forEach(function(f, i){
+    var el = V('departMnt'+i);
+    if(el) el.textContent = fmt(f.montInitial)+' €';
+    totPctD += f.pct;
+    totMntD += f.montInitial;
+    totArbD += f.montArb;
+  });
+  var pctOkD = Math.abs(totPctD - 100) < 0.01;
+  V('departFoot').innerHTML =
+    '<tr><td>TOTAL</td>'+
+    '<td class="'+(pctOkD?'ok':'err')+'">'+fmt1(totPctD)+' %</td>'+
+    '<td>'+fmt(totMntD)+' €</td>'+
+    '<td>'+fmt(totArbD)+' €</td>'+
+    '<td></td></tr>';
+  V('departAlerts').innerHTML = (pctOkD?'':'<div class="alert err">Le total doit faire 100 %.</div>') + alertesDepart.map(function(a){return '<div class="alert '+a.type+'">'+a.msg+'</div>';}).join('');
+
+  // ── Rendu Allocation cible ───────────────────────────────────
+  var totPctC = 0, totReinvC = 0;
+  ALLOC.cible.forEach(function(f, i){
+    var el = V('cibleMnt'+i);
+    if(el) el.textContent = fmt(f.reinvesti)+' €';
+    totPctC += f.pct;
+    totReinvC += f.reinvesti;
+  });
+  var pctOkC = Math.abs(totPctC - 100) < 0.01;
+  V('cibleFoot').innerHTML =
+    '<tr><td>TOTAL</td>'+
+    '<td class="'+(pctOkC?'ok':'err')+'">'+fmt1(totPctC)+' %</td>'+
+    '<td>'+fmt(totReinvC)+' €</td>'+
+    '<td></td></tr>';
+  V('cibleAlerts').innerHTML = pctOkC?'':'<div class="alert err">Le total doit faire 100 %.</div>';
+
+  // ── Allocation finale (merge par label) ──────────────────────
+  var merged = {};
+  var order = [];
+  ALLOC.depart.forEach(function(f){
+    if(f.reste > 0.5){
+      var k = (f.label||'').trim() || '(sans nom)';
+      if(merged[k] === undefined){merged[k]=0;order.push(k);}
+      merged[k] += f.reste;
+    }
+  });
+  ALLOC.cible.forEach(function(f){
+    if(f.reinvesti > 0.5){
+      var k = (f.label||'').trim() || '(sans nom)';
+      if(merged[k] === undefined){merged[k]=0;order.push(k);}
+      merged[k] += f.reinvesti;
+    }
+  });
+
+  var finalBody = '';
+  var totalFinal = 0;
+  order.forEach(function(k){
+    var mnt = merged[k];
+    totalFinal += mnt;
+    var pct = net>0 ? (mnt/net)*100 : 0;
+    finalBody += '<tr><td>'+escHtml(k)+'</td><td>'+fmt(mnt)+' €</td><td>'+fmt1(pct)+' %</td></tr>';
+  });
+  V('finalBody').innerHTML = finalBody || '<tr><td colspan="3" style="text-align:center;color:var(--gris);font-style:italic;padding:20px">Renseignez les allocations de départ et cible pour voir le résultat.</td></tr>';
+  var pctTotalFinal = net>0 ? (totalFinal/net)*100 : 0;
+  var finalOk = Math.abs(pctTotalFinal - 100) < 0.05;
+  V('finalFoot').innerHTML =
+    '<tr><td>TOTAL</td><td>'+fmt(totalFinal)+' €</td>'+
+    '<td class="'+(finalOk?'ok':'err')+'">'+fmt1(pctTotalFinal)+' %</td></tr>';
+  V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
+
+  CGP.project.autoSave('allocation-cible');
+}
+
+function hypItem(label, val){
+  return '<div class="hyp-item"><div class="hyp-label">'+label+'</div><div class="hyp-val">'+val+'</div></div>';
+}
+
+// ── Sauvegarde / chargement projet ───────────────────────────────
+CGP.project.registerModule('allocation-cible', {
+  getState: function(){
+    return {
+      clientNom: V('clientNom').value,
+      versementBrut: num('versementBrut'),
+      fraisEntree: num('fraisEntree'),
+      minArbitrage: num('minArbitrage'),
+      mode: ALLOC.mode,
+      duree: parseInt(V('duree').value)||12,
+      periodicite: V('periodicite').value,
+      depart: ALLOC.depart,
+      cible: ALLOC.cible
+    };
+  },
+  setState: function(d){
+    if(!d) return;
+    if(d.clientNom !== undefined) V('clientNom').value = d.clientNom;
+    if(d.versementBrut !== undefined) V('versementBrut').value = d.versementBrut;
+    if(d.fraisEntree !== undefined) V('fraisEntree').value = d.fraisEntree;
+    if(d.minArbitrage !== undefined) V('minArbitrage').value = d.minArbitrage;
+    if(d.duree !== undefined){V('duree').value = d.duree;V('vDuree').textContent = d.duree+' mois';}
+    if(d.periodicite !== undefined) V('periodicite').value = d.periodicite;
+    if(d.depart !== undefined) ALLOC.depart = d.depart;
+    if(d.cible !== undefined) ALLOC.cible = d.cible;
+    if(d.mode !== undefined) setMode(d.mode);
+    renderDepart();
+    renderCible();
+    recalc();
+  }
+});
+
+// ── Init ─────────────────────────────────────────────────────────
+renderDepart();
+renderCible();
+recalc();
+CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+
+</body>
+</html>
