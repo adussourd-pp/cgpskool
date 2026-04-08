@@ -360,7 +360,8 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
         <div class="bloc-tag">Prochaines &#233;tapes</div>
         <div class="bloc-title">Pour d&#233;marrer</div>
         <div class="steps-list" id="stepsList">
-          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Recueil d'informations</div><div class="step-desc">Document d'entr&#233;e en relation compl&#233;t&#233; et sign&#233;</div></div>
+          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Document d'entr&#233;e en relation</div><div class="step-desc">Document sign&#233; au d&#233;marrage de la relation client</div></div>
+          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Recueil d'informations</div><div class="step-desc">Situation patrimoniale, objectifs et profil de risque compl&#233;t&#233;s</div></div>
           <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Profil investisseur</div><div class="step-desc">Questionnaire de connaissance client sign&#233;</div></div>
           <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Envoi des documents</div><div class="step-desc">Pi&#232;ce d'identit&#233; valide, RIB PDF, justificatif de domicile (&lt; 3 mois)</div></div>
           <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Signature &#233;lectronique</div><div class="step-desc">Fiche conseil + bulletin de souscription &mdash; par e-mail</div></div>
@@ -379,14 +380,6 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
         </div>
       </div>
 
-      <!-- SIGNATURE CONSEILLER -->
-      <div class="signature-block" id="signatureBlock">
-        <div class="signature-avatar" id="sigAvatar">AD</div>
-        <div class="sig-info">
-          <div class="name" id="sigName">Alexandre Dussourd</div>
-          <div class="role" id="sigRole">Conseiller en Gestion de Patrimoine</div>
-        </div>
-      </div>
 
       <!-- SCPI SELECTION (visible quand type=scpi) -->
       <div class="bloc" id="blocSCPISelection" style="display:none">
@@ -479,25 +472,6 @@ function updateGarde(){
   if(p.adresse)oriasParts.push(p.adresse);
   if(p.cp||p.ville)oriasParts.push(((p.cp||'')+' '+(p.ville||'')).trim());
   V('gardeOriasBlock').innerHTML=oriasParts.join('<br>');
-  // Signature block (bas de page)
-  var sigName=V('sigName');
-  var sigRole=V('sigRole');
-  var sigAvatar=V('sigAvatar');
-  if(sigName)sigName.textContent=nom||'Votre nom';
-  if(sigRole){
-    var role='Conseiller en Gestion de Patrimoine';
-    if(p.cabinet)role+=' \u2014 '+p.cabinet;
-    sigRole.textContent=role;
-  }
-  if(sigAvatar){
-    var photo='';try{photo=localStorage.getItem('cgpskool_photo')||'';}catch(e){}
-    if(photo){
-      sigAvatar.innerHTML='<img src="'+photo+'" alt="">';
-    } else {
-      var initials=((p.prenom||'').charAt(0)+(p.nom||'').charAt(0)).toUpperCase()||'A';
-      sigAvatar.innerHTML=initials;
-    }
-  }
 }
 
 function onTypeChange(){
