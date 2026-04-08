@@ -204,9 +204,6 @@
           <option value="immo">Immobilier LMNP</option>
         </select>
       </div>
-      <div class="sf"><label>Assureur / Partenaire</label>
-        <input type="text" id="pAssureur" value="Vie Plus (Suravenir)" oninput="updateGarde()">
-      </div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
@@ -708,7 +705,6 @@ function renderAnnexesContent(){
 function saveDossier(){
   var state={
     type:V('pType').value,
-    assureur:V('pAssureur').value,
     client:V('pClient').value,
     date:V('pDate').value,
     blocs:{
@@ -741,7 +737,6 @@ function loadDossier(file){
     try{
       var s=JSON.parse(e.target.result);
       if(s.type)V('pType').value=s.type;
-      if(s.assureur)V('pAssureur').value=s.assureur;
       if(s.client)V('pClient').value=s.client;
       if(s.date)V('pDate').value=s.date;
       if(s.blocs){
