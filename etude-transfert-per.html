@@ -79,14 +79,11 @@
 
 .disclaimer{font-size:10px;color:var(--gris);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--bord)}
 
-.ft-switch{position:relative;display:inline-block;width:38px;height:20px;flex-shrink:0;cursor:pointer}
-.ft-switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}
-.ft-slider{position:absolute;inset:0;background:#d8d6d2;border-radius:20px;transition:background 0.2s;pointer-events:none}
-.ft-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
-.ft-switch input:checked ~ .ft-slider{background:var(--orange)}
-.ft-switch input:checked ~ .ft-slider:before{transform:translateX(18px)}
-.ft-switch input:disabled{cursor:not-allowed}
-.ft-switch input:disabled ~ .ft-slider{opacity:0.5}
+.ft-switch{position:relative;display:inline-block;width:38px;height:20px;flex-shrink:0;cursor:pointer;background:#d8d6d2;border-radius:20px;transition:background 0.2s;border:none;padding:0}
+.ft-switch::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.ft-switch.on{background:var(--orange)}
+.ft-switch.on::before{transform:translateX(18px)}
+.ft-switch.disabled{opacity:0.5;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -158,12 +155,9 @@
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
       <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-      <div id="fraisTransfertRow" style="padding:8px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <label for="ftSwitch" style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;cursor:pointer">Frais de transfert (1 %)</label>
-        <label class="ft-switch">
-          <input type="checkbox" id="ftSwitch" checked onchange="onFraisTransfertSwitch(this)">
-          <span class="ft-slider"></span>
-        </label>
+      <div id="fraisTransfertRow" style="padding:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer" onclick="toggleFraisTransfert()">
+        <span style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em">Frais de transfert (1 %)</span>
+        <button type="button" id="ftSwitch" class="ft-switch on" aria-label="Activer/d&#233;sactiver les frais de transfert"></button>
         <input type="hidden" id="pFraisTransfert" value="1">
       </div>
       <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
@@ -356,10 +350,14 @@ var TYPE_RULES={
 function syncFraisTransfertSwitch(v){
   var sw=document.getElementById('ftSwitch');
   if(!sw)return;
-  sw.checked=Number(v)>0;
+  if(Number(v)>0){sw.classList.add('on');}else{sw.classList.remove('on');}
 }
-function onFraisTransfertSwitch(el){
-  V('pFraisTransfert').value=el.checked?'1':'0';
+function toggleFraisTransfert(){
+  var sw=document.getElementById('ftSwitch');
+  if(!sw||sw.classList.contains('disabled'))return;
+  var newVal=sw.classList.contains('on')?'0':'1';
+  V('pFraisTransfert').value=newVal;
+  syncFraisTransfertSwitch(newVal);
   update();
 }
 
@@ -419,11 +417,11 @@ function update(){
   if(anciennete>rule.seuilAns){
     fraisT=0;
     V('pFraisTransfert').value='0';
-    if(ftSwitchEl){ftSwitchEl.checked=false;ftSwitchEl.disabled=true;}
+    if(ftSwitchEl){ftSwitchEl.classList.remove('on');ftSwitchEl.classList.add('disabled');}
     V('ancienneteInfo').textContent='\u2713 '+rule.label+' > '+rule.seuilAns+' ans : frais de transfert = 0%';
     V('ancienneteInfo').style.display='block';
   }else{
-    if(ftSwitchEl){ftSwitchEl.disabled=false;}
+    if(ftSwitchEl){ftSwitchEl.classList.remove('disabled');}
     V('ancienneteInfo').textContent='Frais max '+rule.fraisMax+'% si < '+rule.seuilAns+' ans';
     V('ancienneteInfo').style.display='block';
   }
