@@ -57,21 +57,18 @@
 .frais-tbl .frais-montant{font-weight:700;color:var(--orange);font-size:14px}
 .frais-tbl .frais-montant.zero{color:#2D7A5B}
 
-/* Steps container (Prochaine étape) */
-.steps-container{background:#fff;border:1px solid var(--bord);border-radius:4px;overflow:hidden;margin-top:8px}
-.steps-intro{padding:20px 24px;background:var(--noir);color:#fff}
-.steps-intro p{font-size:13px;line-height:1.6;opacity:0.92;margin:0}
-.steps-intro strong{opacity:1;font-size:14px}
-.steps-body{display:grid;grid-template-columns:1fr 1fr}
-.steps-col{padding:20px 22px}
-.steps-col:first-child{border-right:1px solid var(--bord)}
-.steps-col h4{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:14px}
-.step-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
-.step-item:last-child{margin-bottom:0}
-.step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--orange);color:var(--orange);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
-.step-content .step-title{font-size:13px;font-weight:600;color:var(--noir);margin-bottom:2px}
-.step-content .step-desc{font-size:12px;color:var(--gris);line-height:1.5}
-.steps-footer{padding:14px 22px;border-top:1px solid var(--bord);background:#fafaf8;font-size:12px;color:var(--gris);font-style:italic}
+/* Checklist "Prochaines étapes" (ex: Recueil d'infos, Profil, Envoi docs, etc.) */
+.steps-list{background:#fff;border:1px solid var(--bord);border-radius:4px;overflow:hidden;margin-top:8px}
+.step-row{display:grid;grid-template-columns:22px 1fr 1.2fr;gap:14px;padding:14px 18px;border-bottom:1px solid var(--bord);align-items:flex-start;cursor:pointer;transition:background 0.15s}
+.step-row:last-child{border-bottom:none}
+.step-row:hover{background:rgba(0,0,0,0.02)}
+.step-row.done{background:rgba(45,122,91,0.07)}
+.step-cb{width:18px;height:18px;border:1.5px solid var(--bord);border-radius:3px;background:#fff;flex-shrink:0;position:relative;margin-top:1px}
+.step-row.done .step-cb{background:#2D7A5B;border-color:#2D7A5B}
+.step-row.done .step-cb::after{content:'\2713';color:#fff;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.step-label{font-size:14px;font-weight:600;color:var(--noir);line-height:1.35}
+.step-row.done .step-label{color:#2D7A5B}
+.step-desc{font-size:12.5px;color:var(--gris);line-height:1.55}
 
 /* Signature block */
 .signature-block{margin-top:48px;padding-top:28px;border-top:1px solid var(--bord);display:flex;align-items:center;gap:18px}
@@ -93,12 +90,25 @@
 .annexe-count{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px}
 
 /* Page de garde */
-.garde{text-align:center;padding:60px 40px;margin-bottom:24px}
-.garde-type{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:12px}
-.garde-title{font-family:var(--serif);font-size:32px;color:var(--noir);margin-bottom:8px}
-.garde-client{font-size:18px;font-weight:300;color:var(--gris);margin-bottom:6px}
-.garde-date{font-size:13px;color:var(--gris)}
-.garde-rule{width:40px;height:2px;background:var(--orange);margin:20px auto 0}
+/* Page de garde — style uniforme avec etude-dossier */
+.garde-wrap{display:flex;flex-direction:column;min-height:820px;margin-bottom:24px}
+.garde-topbar{height:4px;background:var(--orange);border-radius:2px;margin-bottom:20px}
+.garde-header{display:flex;justify-content:space-between;align-items:center}
+.garde-cabinet-name{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)}
+.garde-cabinet-sub{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--gris);margin-top:2px}
+.garde-orias-block{text-align:right;font-size:11px;color:var(--gris);line-height:1.6}
+.garde-center{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 32px}
+.garde-center-inner{text-align:center;max-width:500px}
+.garde-h1{font-family:var(--serif);font-size:36px;font-weight:400;color:var(--noir);line-height:1.2}
+.garde-h1-alt{font-family:var(--serif);font-size:36px;font-weight:400;font-style:italic;color:var(--orange);line-height:1.2;margin-bottom:8px}
+.garde-subtitle{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--gris);margin-bottom:32px}
+.garde-divider{width:40px;height:2px;background:var(--noir);margin:0 auto 32px}
+.garde-client-box{border:1px solid var(--bord);border-radius:4px;padding:16px 24px;text-align:left;background:var(--gris-l)}
+.garde-client-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:6px}
+.garde-client-name{font-family:var(--sans);font-size:20px;font-weight:400;color:var(--noir)}
+.garde-footer{border-top:1px solid var(--bord);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.garde-footer-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px}
+.garde-footer-val{font-size:13px;font-weight:600;color:var(--noir)}
 
 /* Pyramide retraite */
 .pyramide{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
@@ -229,17 +239,40 @@
     <div class="cs-page" id="pageContent">
 
       <!-- PAGE DE GARDE -->
-      <div class="bloc" id="blocGarde">
-        <div class="garde">
-          <div class="garde-type" id="gardeType">ASSURANCE VIE</div>
-          <div class="garde-title">Notre accompagnement &amp; proposition</div>
-          <div class="garde-client" id="gardeClient">Client</div>
-          <div class="garde-date" id="gardeDate"></div>
-          <div class="garde-rule"></div>
-          <div style="margin-top:28px;font-size:12px;color:var(--gris);line-height:1.7">
-            <div style="font-weight:600;color:var(--noir)" id="gardeConseiller"></div>
-            <div id="gardeCabinet"></div>
-            <div id="gardeOrias" style="font-size:11px"></div>
+      <div class="bloc" id="blocGarde" style="margin-bottom:48px">
+        <div class="garde-topbar"></div>
+        <div class="garde-wrap">
+          <!-- En-tête cabinet -->
+          <div class="garde-header">
+            <div>
+              <div class="garde-cabinet-name" id="gardeCabinetName"></div>
+              <div class="garde-cabinet-sub">Conseil en gestion de patrimoine</div>
+            </div>
+            <div class="garde-orias-block" id="gardeOriasBlock"></div>
+          </div>
+          <!-- Corps central -->
+          <div class="garde-center">
+            <div class="garde-center-inner">
+              <div class="garde-h1">Votre dossier</div>
+              <div class="garde-h1-alt" id="gardeTypeLabel">Assurance Vie</div>
+              <div class="garde-subtitle">Recommandation personnalis&#233;e</div>
+              <div class="garde-divider"></div>
+              <div class="garde-client-box">
+                <div class="garde-client-label">&#201;tabli pour</div>
+                <div class="garde-client-name" id="gardeClient">Nom du client</div>
+              </div>
+            </div>
+          </div>
+          <!-- Pied de page (bas) -->
+          <div class="garde-footer">
+            <div>
+              <div class="garde-footer-label">Date d'&#233;tablissement</div>
+              <div class="garde-footer-val" id="gardeDate"></div>
+            </div>
+            <div style="text-align:right">
+              <div class="garde-footer-label">Conseiller r&#233;f&#233;rent</div>
+              <div class="garde-footer-val" id="gardeConseiller"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -309,156 +342,31 @@ Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la 
       <div class="bloc" id="blocSchema">
         <div class="bloc-tag">Compr&#233;hension</div>
         <div class="bloc-title" id="schemaTitle">Comprendre le m&#233;canisme</div>
-        <div id="schemaContent">
-          <!-- Pyramide retraite (PER) -->
-          <div id="schemaPyramide">
-            <div class="pyramide">
-              <div class="pyr-level" style="font-size:10px">R&#233;gime Suppl&#233;mentaire<br><span style="font-size:8px;opacity:0.7">Facultatif</span></div>
-              <div class="pyr-level">R&#233;gime Compl&#233;mentaire<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>
-              <div class="pyr-level">R&#233;gime de Base<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>
-            </div>
-            <div class="pyr-labels">
-              <div class="pyr-box orange">
-                <div class="pyr-box-title">Ce qu'on doit pr&#233;parer</div>
-                &#10003; Retraite par capitalisation : celle qu'on pr&#233;pare en investissant<br>
-                &#10003; Se fixer un objectif de compl&#233;ment de revenu et/ou de capital<br>
-                &#10003; Investissement r&#233;gulier dans le temps
-              </div>
-              <div class="pyr-box purple">
-                <div class="pyr-box-title">Ce qu'on aura</div>
-                &#10003; Retraite issue du r&#233;gime de base + compl&#233;mentaire<br>
-                &#10003; D&#233;ficit Retraite : diff&#233;rence entre dernier salaire et retraite<br>
-                &#10003; On perd <b>40 &#224; 50%</b> de nos derniers revenus mensuels
-              </div>
-              <div class="pyr-box red">
-                <div class="pyr-box-title">Ce dont on aura besoin</div>
-                &#10003; Besoins financiers &#224; la retraite : la retraite de base est-elle suffisante ?<br>
-                &#10003; D&#233;finir son train de vie (logement, alimentation, transport)<br>
-                &#10003; Tenir compte de ses projets et envies
-              </div>
-            </div>
-          </div>
-
-          <!-- Schema SCPI -->
-          <div id="schemaSCPI" style="display:none">
-            <div class="scpi-schema">
-              <div class="scpi-box">
-                <div style="font-size:28px;margin-bottom:6px">&#128100;</div>
-                <div class="scpi-box-title">Associ&#233;</div>
-                <div class="scpi-box-sub">Co-propri&#233;taire</div>
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-                <div class="scpi-arrow">&#8594;</div>
-                <div style="font-size:8px;color:var(--gris)">Souscription</div>
-                <div class="scpi-arrow">&#8592;</div>
-                <div style="font-size:8px;color:var(--gris)">Dividendes</div>
-              </div>
-              <div class="scpi-box main">
-                <div class="scpi-box-title">SCPI</div>
-                <div class="scpi-icons">&#127970; &#127978; &#127960; &#127961;</div>
-                <div class="scpi-box-sub">Bureaux, Commerces<br>H&#244;tels, Sant&#233;</div>
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-                <div class="scpi-arrow">&#8594;</div>
-                <div style="font-size:8px;color:var(--gris)">Agr&#233;ment</div>
-                <div class="scpi-arrow">&#8592;</div>
-                <div style="font-size:8px;color:var(--gris)">Gestion</div>
-              </div>
-              <div class="scpi-box">
-                <div style="font-size:22px;margin-bottom:6px">&#9881;</div>
-                <div class="scpi-box-title">Soci&#233;t&#233; de gestion</div>
-                <div class="scpi-box-sub">Gestion cl&#233; en main</div>
-              </div>
-            </div>
-            <div style="text-align:center;margin-top:8px">
-              <div class="scpi-box" style="display:inline-block">
-                <div class="scpi-box-title" style="color:#2B5EA7">AMF</div>
-                <div class="scpi-box-sub">Autorit&#233; des March&#233;s Financiers<br>Agr&#233;ment &amp; Contr&#244;le</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Schema Assurance Vie -->
-          <div id="schemaAV" style="display:none">
-            <div class="pyr-labels">
-              <div class="pyr-box orange">
-                <div class="pyr-box-title">Pendant 8 ans</div>
-                &#10003; Capitalisation libre : fonds euros + UC<br>
-                &#10003; Disponibilit&#233; totale (rachat partiel possible)<br>
-                &#10003; Arbitrages gratuits ou tr&#232;s peu co&#251;teux<br>
-                &#10003; Fiscalit&#233; diff&#233;r&#233;e tant qu'on ne rachete pas
-              </div>
-              <div class="pyr-box purple">
-                <div class="pyr-box-title">Apr&#232;s 8 ans</div>
-                &#10003; Abattement annuel sur les plus-values :<br>
-                &nbsp;&nbsp;&nbsp;&bull; <b>4 600 &euro;</b> (c&#233;libataire)<br>
-                &nbsp;&nbsp;&nbsp;&bull; <b>9 200 &euro;</b> (couple)<br>
-                &#10003; PFU r&#233;duit &agrave; <b>7,5 %</b> sur les versements &lt; 150k&euro;<br>
-                &#10003; Prélèvements sociaux : 17,2 %
-              </div>
-              <div class="pyr-box red">
-                <div class="pyr-box-title">Au d&#233;c&#232;s</div>
-                &#10003; Hors succession : transmission directe<br>
-                &#10003; Versements avant 70 ans : <b>152 500 &euro;</b> par b&#233;n&#233;ficiaire (art. 990 I)<br>
-                &#10003; Versements apr&#232;s 70 ans : <b>30 500 &euro;</b> tous b&#233;n&#233;ficiaires confondus<br>
-                &#10003; Clause b&#233;n&#233;ficiaire libre &amp; modifiable
-              </div>
-            </div>
-          </div>
-
-          <!-- Schema LMNP -->
-          <div id="schemaLMNP" style="display:none">
-            <div class="pyr-labels">
-              <div class="pyr-box orange">
-                <div class="pyr-box-title">Acquisition</div>
-                &#10003; Bien immobilier meubl&#233; (r&#233;sidence services, ancien r&#233;nov&#233;...)<br>
-                &#10003; Financement &agrave; cr&#233;dit possible (effet de levier bancaire)<br>
-                &#10003; Statut LMNP : Loueur Meubl&#233; Non Professionnel<br>
-                &#10003; Conditions : recettes locatives &lt; 23 000 &euro; OU &lt; 50% des revenus
-              </div>
-              <div class="pyr-box purple">
-                <div class="pyr-box-title">Pendant l'exploitation</div>
-                &#10003; Revenus : loyers per&#231;us (r&#233;gime BIC, pas foncier)<br>
-                &#10003; <b>Amortissement comptable</b> du bien et du mobilier (~ 25-30 ans)<br>
-                &#10003; D&#233;duction des charges r&#233;elles : taxe fonci&#232;re, gestion, int&#233;r&#234;ts...<br>
-                &#10003; R&#233;sultat fiscal souvent &agrave; <b>0 &euro;</b> pendant 15-20 ans
-              </div>
-              <div class="pyr-box red">
-                <div class="pyr-box-title">&Agrave; la revente</div>
-                &#10003; Plus-value des particuliers (et non BIC pro)<br>
-                &#10003; Abattements pour dur&#233;e de d&#233;tention :<br>
-                &nbsp;&nbsp;&nbsp;&bull; Exon&#233;ration IR &agrave; <b>22 ans</b><br>
-                &nbsp;&nbsp;&nbsp;&bull; Exon&#233;ration PS &agrave; <b>30 ans</b><br>
-                &#10003; Pas de reprise des amortissements pratiqu&#233;s
-              </div>
-            </div>
-          </div>
+        <div class="schema-templates no-print" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px">
+          <span style="font-size:10px;color:var(--gris);align-self:center;margin-right:2px">Ins&#233;rer un mod&#232;le :</span>
+          <button type="button" onclick="insertSchemaTemplate('av')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">Assurance Vie</button>
+          <button type="button" onclick="insertSchemaTemplate('per')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">PER</button>
+          <button type="button" onclick="insertSchemaTemplate('scpi')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">SCPI</button>
+          <button type="button" onclick="insertSchemaTemplate('lmnp')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">LMNP</button>
+          <button type="button" onclick="clearSchemaTemplate()" style="padding:4px 11px;border:1px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">Vider</button>
+        </div>
+        <div class="bloc-body" contenteditable="true" id="bodySchema" style="min-height:60px">
+          <div style="color:var(--gris);font-style:italic;font-size:13px">Ce bloc est vide. Clique sur un mod&#232;le ci-dessus ou saisis directement ton contenu ici.</div>
         </div>
       </div>
 
-      <!-- WORKFLOW SOUSCRIPTION -->
+      <!-- PROCHAINES ÉTAPES -->
       <div class="bloc" id="blocWorkflow">
-        <div class="bloc-tag">Processus</div>
-        <div class="bloc-title">On y est presque</div>
-        <div class="steps-container" id="stepsContainer">
-          <div class="steps-intro">
-            <p><strong>Vous avez maintenant toutes les cartes en main.</strong><br>
-            La suite est simple &mdash; je m'occupe de tout le c&#244;t&#233; administratif et technique. Voici ce dont j'ai besoin de votre part, et ce que je prends en charge dans la foul&#233;e.</p>
-          </div>
-          <div class="steps-body">
-            <div class="steps-col">
-              <h4>Ce que vous faites</h4>
-              <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Envoi des documents</div><div class="step-desc">Pi&#232;ce d'identit&#233; valide, RIB PDF, justificatif de domicile (&lt; 3 mois)</div></div></div>
-              <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Signature &#233;lectronique</div><div class="step-desc">Fiche Conseil + bulletin de souscription &mdash; envoy&#233;s par e-mail, sign&#233;s en 5 minutes</div></div></div>
-            </div>
-            <div class="steps-col">
-              <h4>Ce que je prends en charge</h4>
-              <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Ouverture du contrat</div><div class="step-desc">Confirmation par l'assureur / partenaire sous 5 &#224; 10 jours ouvr&#233;s</div></div></div>
-              <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Premier bilan &#224; 4 mois</div><div class="step-desc">Point performance + ajustement strat&#233;gique si n&#233;cessaire</div></div></div>
-              <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Suivi annuel</div><div class="step-desc">Revue compl&#232;te du contrat et de votre strat&#233;gie patrimoniale</div></div></div>
-            </div>
-          </div>
-          <div class="steps-footer">Une question avant de d&#233;marrer ? Je suis disponible par t&#233;l&#233;phone ou message &mdash; r&#233;ponse sous 24h.</div>
+        <div class="bloc-tag">Prochaines &#233;tapes</div>
+        <div class="bloc-title">Pour d&#233;marrer</div>
+        <div class="steps-list" id="stepsList">
+          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Recueil d'informations</div><div class="step-desc">Document d'entr&#233;e en relation compl&#233;t&#233; et sign&#233;</div></div>
+          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Profil investisseur</div><div class="step-desc">Questionnaire de connaissance client sign&#233;</div></div>
+          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Envoi des documents</div><div class="step-desc">Pi&#232;ce d'identit&#233; valide, RIB PDF, justificatif de domicile (&lt; 3 mois)</div></div>
+          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Signature &#233;lectronique</div><div class="step-desc">Fiche conseil + bulletin de souscription &mdash; par e-mail</div></div>
+          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Ouverture du contrat</div><div class="step-desc">Confirmation par l'assureur / partenaire sous 5 &#224; 10 jours ouvr&#233;s</div></div>
+          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Premier bilan &#224; 4 mois</div><div class="step-desc">Point performance, ajustement strat&#233;gie</div></div>
+          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Suivi annuel</div><div class="step-desc">Revue compl&#232;te du contrat et de la strat&#233;gie patrimoniale</div></div>
         </div>
       </div>
 
@@ -556,16 +464,21 @@ function V(id){return document.getElementById(id)}
 
 function updateGarde(){
   var type=V('pType').value;
-  var t=TEMPLATES[type]||TEMPLATES.av;
-  V('gardeType').textContent=t.type;
-  V('gardeClient').textContent=V('pClient').value||'Client';
+  var typeLabels={av:'Assurance Vie',per:'Plan \u00c9pargne Retraite',scpi:'SCPI',immo:'Immobilier LMNP'};
+  V('gardeTypeLabel').textContent=typeLabels[type]||'';
+  V('gardeClient').textContent=V('pClient').value||'Nom du client';
   V('gardeDate').textContent=V('pDate').value;
-  // Infos conseiller
+  // Infos conseiller (en-tête cabinet)
   var p=CGP.profil.load();
   var nom=((p.prenom||'')+(p.nom?' '+p.nom:'')).trim();
+  V('gardeCabinetName').textContent=p.cabinet||nom||'';
   V('gardeConseiller').textContent=nom||'';
-  V('gardeCabinet').textContent=p.cabinet||'';
-  V('gardeOrias').textContent=p.orias?'ORIAS n\u00b0 '+p.orias:'';
+  // ORIAS + adresse cabinet (haut à droite)
+  var oriasParts=[];
+  if(p.orias)oriasParts.push('ORIAS n\u00b0 '+p.orias);
+  if(p.adresse)oriasParts.push(p.adresse);
+  if(p.cp||p.ville)oriasParts.push(((p.cp||'')+' '+(p.ville||'')).trim());
+  V('gardeOriasBlock').innerHTML=oriasParts.join('<br>');
   // Signature block (bas de page)
   var sigName=V('sigName');
   var sigRole=V('sigRole');
@@ -590,7 +503,6 @@ function updateGarde(){
 function onTypeChange(){
   var type=V('pType').value;
   var t=TEMPLATES[type]||TEMPLATES.av;
-  V('gardeType').textContent=t.type;
   if(t.accompagnement)V('bodyAccompagnement').innerHTML=t.accompagnement;
   if(t.contrat)V('bodyContrat').innerHTML=t.contrat;
   if(t.gestion)V('bodyGestion').innerHTML=t.gestion;
@@ -612,19 +524,13 @@ function onTypeChange(){
     });
     V('wfSteps').innerHTML=wfHtml;
   }
-  // Schema pedagogique selon le type
-  var pyrEl=V('schemaPyramide');
-  var scpiEl=V('schemaSCPI');
-  var avEl=V('schemaAV');
-  var lmnpEl=V('schemaLMNP');
-  if(pyrEl&&scpiEl&&avEl&&lmnpEl){
-    pyrEl.style.display='none';scpiEl.style.display='none';avEl.style.display='none';lmnpEl.style.display='none';
-    V('blocSchema').style.display='';
-    if(type==='scpi'){scpiEl.style.display='';V('schemaTitle').textContent='Comprendre la SCPI';}
-    else if(type==='per'){pyrEl.style.display='';V('schemaTitle').textContent='Comprendre le m\u00e9canisme retraite';}
-    else if(type==='av'){avEl.style.display='';V('schemaTitle').textContent='Comprendre l\'assurance vie';}
-    else if(type==='immo'){lmnpEl.style.display='';V('schemaTitle').textContent='Comprendre le LMNP';}
-    else{V('blocSchema').style.display='none';}
+  // Titre + contenu du schéma selon le type
+  var titles={av:'Comprendre l\'assurance vie',per:'Comprendre le m\u00e9canisme retraite',scpi:'Comprendre la SCPI',immo:'Comprendre le LMNP'};
+  V('schemaTitle').textContent=titles[type]||'Comprendre le m\u00e9canisme';
+  // Auto-insert le template correspondant (remplace le contenu existant)
+  var tplKey=(type==='immo')?'lmnp':type;
+  if(SCHEMA_TEMPLATES[tplKey]){
+    insertSchemaTemplate(tplKey);
   }
   // Show/hide SCPI picker
   var scpiToggle=V('toggleSCPI');
@@ -648,8 +554,8 @@ var CUSTOM_ANNEXES=[]; // [{id, label, icon, sub}]
 
 // Suggestions par type de solution (hors projections sauvegardées)
 var ANNEXE_SUGGESTIONS={
-  av:   [{label:'Fiche conseil + r\u00e9partition portefeuille',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  per:  [{label:'Fiche conseil + allocation',icon:'\ud83d\udccb'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
+  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
   scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
   immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'}]
 };
@@ -739,6 +645,97 @@ function loadAnnexes(){
   renderAnnexesContent();
 }
 
+// Schémas pédagogiques disponibles (insertion à la demande)
+var SCHEMA_TEMPLATES={
+  av:'<div class="pyr-labels">'
+    +'<div class="pyr-box orange"><div class="pyr-box-title">Pendant 8 ans</div>'
+    +'\u2713 Capitalisation libre : fonds euros + UC<br>'
+    +'\u2713 Disponibilit\u00e9 totale (rachat partiel possible)<br>'
+    +'\u2713 Arbitrages gratuits ou tr\u00e8s peu co\u00fbteux<br>'
+    +'\u2713 Fiscalit\u00e9 diff\u00e9r\u00e9e tant qu\'on ne rachete pas</div>'
+    +'<div class="pyr-box purple"><div class="pyr-box-title">Apr\u00e8s 8 ans</div>'
+    +'\u2713 Abattement annuel sur les plus-values :<br>'
+    +'&nbsp;&nbsp;\u2022 <b>4 600 \u20ac</b> (c\u00e9libataire)<br>'
+    +'&nbsp;&nbsp;\u2022 <b>9 200 \u20ac</b> (couple)<br>'
+    +'\u2713 PFU r\u00e9duit \u00e0 <b>7,5 %</b> sur les versements &lt; 150k\u20ac<br>'
+    +'\u2713 Pr\u00e9l\u00e8vements sociaux : 17,2 %</div>'
+    +'<div class="pyr-box red"><div class="pyr-box-title">Au d\u00e9c\u00e8s</div>'
+    +'\u2713 Hors succession : transmission directe<br>'
+    +'\u2713 Versements avant 70 ans : <b>152 500 \u20ac</b> par b\u00e9n\u00e9ficiaire (art. 990 I)<br>'
+    +'\u2713 Versements apr\u00e8s 70 ans : <b>30 500 \u20ac</b> tous b\u00e9n\u00e9ficiaires confondus<br>'
+    +'\u2713 Clause b\u00e9n\u00e9ficiaire libre &amp; modifiable</div>'
+    +'</div>',
+  per:'<div class="pyramide">'
+    +'<div class="pyr-level" style="font-size:10px">R\u00e9gime Suppl\u00e9mentaire<br><span style="font-size:8px;opacity:0.7">Facultatif</span></div>'
+    +'<div class="pyr-level">R\u00e9gime Compl\u00e9mentaire<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>'
+    +'<div class="pyr-level">R\u00e9gime de Base<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>'
+    +'</div><div class="pyr-labels">'
+    +'<div class="pyr-box orange"><div class="pyr-box-title">Ce qu\'on doit pr\u00e9parer</div>'
+    +'\u2713 Retraite par capitalisation : celle qu\'on pr\u00e9pare en investissant<br>'
+    +'\u2713 Se fixer un objectif de compl\u00e9ment de revenu et/ou de capital<br>'
+    +'\u2713 Investissement r\u00e9gulier dans le temps</div>'
+    +'<div class="pyr-box purple"><div class="pyr-box-title">Ce qu\'on aura</div>'
+    +'\u2713 Retraite issue du r\u00e9gime de base + compl\u00e9mentaire<br>'
+    +'\u2713 D\u00e9ficit Retraite : diff\u00e9rence entre dernier salaire et retraite<br>'
+    +'\u2713 On perd <b>40 \u00e0 50%</b> de nos derniers revenus mensuels</div>'
+    +'<div class="pyr-box red"><div class="pyr-box-title">Ce dont on aura besoin</div>'
+    +'\u2713 Besoins financiers \u00e0 la retraite : la retraite de base est-elle suffisante ?<br>'
+    +'\u2713 D\u00e9finir son train de vie (logement, alimentation, transport)<br>'
+    +'\u2713 Tenir compte de ses projets et envies</div>'
+    +'</div>',
+  scpi:'<div class="scpi-schema">'
+    +'<div class="scpi-box"><div style="font-size:24px;margin-bottom:4px">\ud83d\udc64</div>'
+    +'<div class="scpi-box-title">Associ\u00e9</div><div class="scpi-box-sub">Co-propri\u00e9taire</div></div>'
+    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
+    +'<div class="scpi-arrow">\u2192</div><div style="font-size:8px;color:var(--gris)">Souscription</div>'
+    +'<div class="scpi-arrow">\u2190</div><div style="font-size:8px;color:var(--gris)">Dividendes</div></div>'
+    +'<div class="scpi-box main"><div class="scpi-box-title">SCPI</div>'
+    +'<div class="scpi-icons">\ud83c\udfe2 \ud83c\udfea \ud83c\udfe8 \ud83c\udfe9</div>'
+    +'<div class="scpi-box-sub">Bureaux, Commerces<br>H\u00f4tels, Sant\u00e9</div></div>'
+    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
+    +'<div class="scpi-arrow">\u2192</div><div style="font-size:8px;color:var(--gris)">Agr\u00e9ment</div>'
+    +'<div class="scpi-arrow">\u2190</div><div style="font-size:8px;color:var(--gris)">Gestion</div></div>'
+    +'<div class="scpi-box"><div style="font-size:20px;margin-bottom:4px">\u2699</div>'
+    +'<div class="scpi-box-title">Soci\u00e9t\u00e9 de gestion</div><div class="scpi-box-sub">Gestion cl\u00e9 en main</div></div>'
+    +'</div>'
+    +'<div style="text-align:center;margin-top:8px">'
+    +'<div class="scpi-box" style="display:inline-block">'
+    +'<div class="scpi-box-title" style="color:#2B5EA7">AMF</div>'
+    +'<div class="scpi-box-sub">Autorit\u00e9 des March\u00e9s Financiers<br>Agr\u00e9ment &amp; Contr\u00f4le</div></div></div>',
+  lmnp:'<div class="pyr-labels">'
+    +'<div class="pyr-box orange"><div class="pyr-box-title">Acquisition</div>'
+    +'\u2713 Bien immobilier meubl\u00e9 (r\u00e9sidence services, ancien r\u00e9nov\u00e9...)<br>'
+    +'\u2713 Financement \u00e0 cr\u00e9dit possible (effet de levier bancaire)<br>'
+    +'\u2713 Statut LMNP : Loueur Meubl\u00e9 Non Professionnel<br>'
+    +'\u2713 Conditions : recettes locatives &lt; 23 000 \u20ac OU &lt; 50% des revenus</div>'
+    +'<div class="pyr-box purple"><div class="pyr-box-title">Pendant l\'exploitation</div>'
+    +'\u2713 Revenus : loyers per\u00e7us (r\u00e9gime BIC, pas foncier)<br>'
+    +'\u2713 <b>Amortissement comptable</b> du bien et du mobilier (~ 25-30 ans)<br>'
+    +'\u2713 D\u00e9duction des charges r\u00e9elles : taxe fonci\u00e8re, gestion, int\u00e9r\u00eats...<br>'
+    +'\u2713 R\u00e9sultat fiscal souvent \u00e0 <b>0 \u20ac</b> pendant 15-20 ans</div>'
+    +'<div class="pyr-box red"><div class="pyr-box-title">\u00c0 la revente</div>'
+    +'\u2713 Plus-value des particuliers (et non BIC pro)<br>'
+    +'\u2713 Abattements pour dur\u00e9e de d\u00e9tention :<br>'
+    +'&nbsp;&nbsp;\u2022 Exon\u00e9ration IR \u00e0 <b>22 ans</b><br>'
+    +'&nbsp;&nbsp;\u2022 Exon\u00e9ration PS \u00e0 <b>30 ans</b><br>'
+    +'\u2713 Pas de reprise des amortissements pratiqu\u00e9s</div>'
+    +'</div>'
+};
+
+function toggleStep(el){
+  if(el&&el.classList)el.classList.toggle('done');
+}
+
+function insertSchemaTemplate(key){
+  var tpl=SCHEMA_TEMPLATES[key];
+  if(!tpl)return;
+  V('bodySchema').innerHTML=tpl;
+}
+
+function clearSchemaTemplate(){
+  V('bodySchema').innerHTML='<div style="color:var(--gris);font-style:italic;font-size:13px">Ce bloc est vide. Clique sur un mod\u00e8le ci-dessus ou saisis directement ton contenu ici.</div>';
+}
+
 function renderAnnexesContent(){
   if(CUSTOM_ANNEXES.length===0){
     V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>';
@@ -762,7 +759,8 @@ function saveDossier(){
     blocs:{
       accompagnement:V('bodyAccompagnement').innerHTML,
       contrat:V('bodyContrat').innerHTML,
-      gestion:V('bodyGestion').innerHTML
+      gestion:V('bodyGestion').innerHTML,
+      schema:V('bodySchema').innerHTML
     },
     frais:Array.from(V('fraisTable').querySelectorAll('tbody tr')).map(function(tr){
       var tds=tr.querySelectorAll('td');
@@ -795,6 +793,7 @@ function loadDossier(file){
         if(s.blocs.accompagnement)V('bodyAccompagnement').innerHTML=s.blocs.accompagnement;
         if(s.blocs.contrat)V('bodyContrat').innerHTML=s.blocs.contrat;
         if(s.blocs.gestion)V('bodyGestion').innerHTML=s.blocs.gestion;
+        if(s.blocs.schema)V('bodySchema').innerHTML=s.blocs.schema;
       }
       if(s.frais){
         var html='';
