@@ -268,14 +268,7 @@ try{if(sessionStorage.getItem('cgpskool_gate')==='ok')document.getElementById('g
 </nav>
 
 
-<div class="cs-app">
-  <div class="cs-sidebar">
-    <div class="cs-sidebar-lbl">Notre positionnement</div>
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
-  </div>
+<div class="cs-app" style="grid-template-columns:1fr">
   <div class="cs-main">
     <div class="cs-page" style="max-width:1200px;padding:0;border:none;box-shadow:none">
 
@@ -985,8 +978,6 @@ try{if(sessionStorage.getItem('cgpskool_gate')==='ok')document.getElementById('g
 </div>
 </div>
 
-<div id="conseillerFooter"></div>
-
 <!-- FOOTNOTES -->
 <div class="fns">
   <div class="fns-in">
@@ -1391,8 +1382,6 @@ function drawDonut(){
   ctx.fillText('Rémunération',cx,cy+7);
 }
 window.addEventListener('load',drawDonut);
-
-CGP.footer.render(document.getElementById('conseillerFooter'));
 
 CGP.project.registerModule('comparatif-cgp', {
   getState: function() {

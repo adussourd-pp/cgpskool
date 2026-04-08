@@ -147,10 +147,11 @@
         <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Junior</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--ink-60)"></div>Consultant</div>
         <div class="legend-item"><div class="legend-dot" style="background:#D4622A"></div>Manager</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Plan&#232;te <small>(1 mgr direct)</small></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2da064"></div>&#201;toile <small>(2 mgrs)</small></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7B4FA6"></div>Constellation <small>(3 mgrs)</small></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Galaxie <small>(4+ mgrs)</small></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div>Galaxie X &#233;toiles <small>(X galaxies en direct)</small></div>
       </div>
 
       <!-- Actions (hidden, kept for ID compatibility) -->
@@ -171,7 +172,7 @@
     <input type="text" id="modalPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('modalNom').focus()">
     <input type="text" id="modalNom" placeholder="Nom" onkeydown="if(event.key==='Enter')confirmAdd()">
     <select id="modalQualif" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
-      <option value="">Qualification auto (selon branches)</option>
+      <option value="">Qualification auto (selon &#233;quipe)</option>
       <option value="junior">Consultant Junior</option>
       <option value="consultant">Consultant</option>
       <option value="manager">Manager</option>
@@ -179,6 +180,10 @@
       <option value="etoile">Manager &#201;toile</option>
       <option value="constellation">Manager Constellation</option>
       <option value="galaxie">Manager Galaxie</option>
+      <option value="galaxie-1e">Manager Galaxie 1 &#233;toile</option>
+      <option value="galaxie-2e">Manager Galaxie 2 &#233;toiles</option>
+      <option value="galaxie-3e">Manager Galaxie 3 &#233;toiles</option>
+      <option value="galaxie-4e">Manager Galaxie 4 &#233;toiles</option>
     </select>
     <div class="add-actions">
       <button class="btn-dismiss" onclick="closeModal()">Annuler</button>
@@ -201,8 +206,21 @@ var QUALIFS=[
   {code:'planete',label:'Manager Plan\u00e8te'},
   {code:'etoile',label:'Manager \u00c9toile'},
   {code:'constellation',label:'Manager Constellation'},
-  {code:'galaxie',label:'Manager Galaxie'}
+  {code:'galaxie',label:'Manager Galaxie'},
+  {code:'galaxie-1e',label:'Manager Galaxie 1 \u00e9toile'},
+  {code:'galaxie-2e',label:'Manager Galaxie 2 \u00e9toiles'},
+  {code:'galaxie-3e',label:'Manager Galaxie 3 \u00e9toiles'},
+  {code:'galaxie-4e',label:'Manager Galaxie 4 \u00e9toiles'}
 ];
+
+// Vrai si la qualif "vaut" un manager (ou plus)
+function isManagerQualif(code){
+  return code && code !== 'junior' && code !== 'consultant';
+}
+// Vrai si la qualif est galaxie ou galaxie X etoiles
+function isGalaxieQualif(code){
+  return code === 'galaxie' || (code && code.indexOf('galaxie-') === 0);
+}
 
 function getQualif(node){
   // Si qualif manuelle, on l'utilise
@@ -211,17 +229,36 @@ function getQualif(node){
       if(QUALIFS[i].code===node.qualif) return QUALIFS[i];
     }
   }
-  // Sinon auto : basee sur branches actives
-  if(!node.children||node.children.length===0) return QUALIFS[1]; // Consultant
-  var branchesActives=0;
+  // Pas d'enfant = Consultant
+  if(!node.children||node.children.length===0) return QUALIFS[1];
+
+  // Compter les enfants directs qui sont managers (= ont eux-memes >=1 enfant)
+  // et ceux qui sont galaxie ou plus
+  var directManagers = 0;
+  var directGalaxies = 0;
   node.children.forEach(function(ch){
-    if(ch.children&&ch.children.length>0) branchesActives++;
+    var chQ = getQualif(ch);
+    if(isManagerQualif(chQ.code)){
+      directManagers++;
+      if(isGalaxieQualif(chQ.code)) directGalaxies++;
+    }
   });
-  if(branchesActives>=4) return QUALIFS[6]; // Galaxie
-  if(branchesActives===3) return QUALIFS[5]; // Constellation
-  if(branchesActives===2) return QUALIFS[4]; // Etoile
-  if(branchesActives===1) return QUALIFS[3]; // Planete
-  return QUALIFS[2]; // Manager
+
+  // Galaxies en direct => Galaxie X etoiles (prend le pas)
+  if(directGalaxies >= 1){
+    var idx = Math.min(directGalaxies, 4);
+    var code = 'galaxie-' + idx + 'e';
+    for(var j=0;j<QUALIFS.length;j++){
+      if(QUALIFS[j].code === code) return QUALIFS[j];
+    }
+  }
+
+  // Sinon, qualification selon nb de managers en direct
+  if(directManagers >= 4) return QUALIFS[6]; // Galaxie
+  if(directManagers === 3) return QUALIFS[5]; // Constellation
+  if(directManagers === 2) return QUALIFS[4]; // Etoile
+  if(directManagers === 1) return QUALIFS[3]; // Planete
+  return QUALIFS[2]; // Manager (au moins 1 consultant en dessous mais 0 manager)
 }
 
 var QUALIF_COLORS={
@@ -231,7 +268,11 @@ var QUALIF_COLORS={
   planete:'#2563eb',
   etoile:'#2da064',
   constellation:'#7B4FA6',
-  galaxie:'#d97706'
+  galaxie:'#d97706',
+  'galaxie-1e':'#b45309',
+  'galaxie-2e':'#92400e',
+  'galaxie-3e':'#78350f',
+  'galaxie-4e':'#451a03'
 };
 
 function V(id){return document.getElementById(id)}
