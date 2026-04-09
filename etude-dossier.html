@@ -7934,7 +7934,8 @@ function sauvegarderEtude(){
       ED:JSON.parse(JSON.stringify(ED)),
       solsSelectionnees:JSON.parse(JSON.stringify(solsSelectionnees)),
       comments:comments,
-      commentSwitches:commentSwitches
+      commentSwitches:commentSwitches,
+      precoConseille:JSON.parse(JSON.stringify(window._precoConseille||{}))
     };
     // Stocker la date de création si première sauvegarde
     if(!ED._dateCreation)ED._dateCreation=dateStr;
@@ -7991,6 +7992,8 @@ function chargerEtude(input){
             }
           });
         }
+        // Restaurer montants conseillés (épargne financière préconisée)
+        if(data.precoConseille)window._precoConseille=data.precoConseille;
         // Dates
         ED._dateCreation=data.dateCreation||'';
         ED._dateMAJ=data.dateMAJ||'';
