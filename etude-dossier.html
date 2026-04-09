@@ -7998,6 +7998,8 @@ function chargerEtude(input){
         // Re-render la section active
         var sec=currentSection||'situation';
         if(sec!=='import')renderSection(sec);
+        // Remplir les champs "Vérifier & compléter" depuis ED restauré
+        try{remplirVerification();}catch(e3){}
         goTo(sec);
         showNotif('\u00c9tude charg\u00e9e \u2014 '+((ED.c1.prenom||'')+' '+(ED.c1.nom||'')).trim());
       }catch(e2){console.warn('Chargement erreur parse:',e2);showNotif('Erreur lecture fichier');}
