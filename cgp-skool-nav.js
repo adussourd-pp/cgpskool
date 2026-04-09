@@ -112,9 +112,25 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  // Version discrète en bas de sidebar
+  function injectVersion() {
+    var sidebar = document.querySelector('.cs-sidebar');
+    if (!sidebar) return;
+    var v = document.createElement('div');
+    v.style.cssText = 'margin-top:auto;padding-top:12px;font-size:9px;color:rgba(0,0,0,0.2);text-align:center;font-family:var(--sans)';
+    v.textContent = 'v1.4 \u2014 9 avr. 2026';
+    v.className = 'no-print';
+    sidebar.appendChild(v);
+  }
+
+  function boot() {
     init();
+    injectVersion();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 })();
