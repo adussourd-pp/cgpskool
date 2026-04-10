@@ -933,7 +933,7 @@ select.span2{grid-column:span 2}
       <div class="fiscal-row"><span class="fr-l">Revenu imposable</span><span class="fr-v" id="fiRevImp">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Nombre de parts</span><span class="fr-v ed" id="fiParts" contenteditable="true">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">TMI</span><span class="fr-v"><span class="tmi-pill" id="fiTMI">&#8212;</span></span></div>
-      <div class="fiscal-row" style="padding:10px 0;background:rgba(192,57,43,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--red)">IR soumis au bareme</span><span class="fr-v" id="fiIrBareme" style="font-size:16px;font-weight:700;color:var(--red)">&#8212;</span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:rgba(192,57,43,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:14px;color:var(--red)">IR soumis au bar&#232;me</span><span class="fr-v" id="fiIrBareme" style="font-size:16px;font-weight:700;color:var(--red)">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Cr&#233;dits d'imp&#244;t</span><span class="fr-v" id="fiCredits">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Imp&#244;t net</span><span class="fr-v ed" id="fiIrNet" contenteditable="true">&#8212;</span></div>
       <div class="fiscal-row"><span class="fr-l">Pr&#233;l&#232;vements sociaux</span><span class="fr-v ed" id="fiPS" contenteditable="true">&#8212;</span></div>
@@ -955,6 +955,7 @@ select.span2{grid-column:span 2}
       <div class="fiscal-row"><span class="fr-l">Ann&#233;e d'imposition</span><span class="fr-v"><input class="fi" type="number" id="projAnnee" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:100px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233;</option></select></span></div>
       <div class="fiscal-row"><span class="fr-l">Nb enfants</span><span class="fr-v"><input class="fi" type="number" id="projEnfants" min="0" value="0" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange)"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
@@ -7444,6 +7445,8 @@ function initProjectionIR(){
     }
     var enf=document.getElementById('projEnfants');
     if(enf)enf.value=ED.nbEnfants||0;
+    var pp=document.getElementById('projParts');
+    if(pp)pp.value=ED.fiscal.parts||1;
     calcProjectionIR();
   }catch(e2){}
 }
@@ -7453,9 +7456,11 @@ function calcProjectionIR(){
     var rbg=n('projRBG')-n('projDeduc');
     if(rbg<0)rbg=0;
     var reduc=n('projReduc');
-    var sitmat=document.getElementById('projSitmat')?document.getElementById('projSitmat').value:'marie';
-    var nbEnf=n('projEnfants');
-    var res=calcIR(rbg,sitmat,nbEnf,false,reduc,0);
+    var parts=n('projParts')||1;
+    // Utilise le nb parts directement (comme sur l'avis d'imposition)
+    var res=calcIR(rbg,parts);
+    // Appliquer les réductions manuellement si saisies
+    if(reduc>0){res.irNet=Math.max(0,res.irNet-reduc);res.ir=res.irNet;}
     var el=document.getElementById('projFiscResultat');
     if(!el)return;
     var irActuel=(ED.fiscal.irnet||0);
