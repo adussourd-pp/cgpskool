@@ -958,7 +958,7 @@ select.span2{grid-column:span 2}
       <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange)"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
+      <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="this._manualOverride=true;calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
       <div class="fiscal-row"><span class="fr-l">D&#233;ductions</span><span class="fr-v"><input class="fi" type="number" id="projDeduc" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">R&#233;ductions IR</span><span class="fr-v"><input class="fi" type="number" id="projReduc" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div id="projFiscResultat"></div>
@@ -7454,6 +7454,13 @@ function initProjectionIR(){
 function calcProjectionIR(){
   try{
     var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+    // Auto-calc RBG depuis salaires si salaires saisis
+    var sal1=n('projSal1'),sal2=n('projSal2');
+    if(sal1>0||sal2>0){
+      var rbgAuto=Math.round((sal1+sal2)*0.9);
+      var rbgEl=document.getElementById('projRBG');
+      if(rbgEl&&!rbgEl._manualOverride)rbgEl.value=rbgAuto;
+    }
     var rbg=n('projRBG')-n('projDeduc');
     if(rbg<0)rbg=0;
     var reduc=n('projReduc');
