@@ -444,72 +444,118 @@ function rowT(k,v,cls){return '<div class="trame-row total"><span class="k">'+k+
 /* ===== IMPORT COLOSSEUM ===== */
 function parseColosseum(){
   var raw=V('iImportRaw').value;
-  if(!raw||!raw.trim()){return}
+  if(!raw||!raw.trim())return;
   var filled=0;
-  function extractNum(pattern){
-    var m=raw.match(pattern);
-    if(!m)return null;
-    var s=m[1].replace(/\s/g,'').replace(',','.');
-    return parseFloat(s)||0;
+  /* Helper: parse number from string "55 000 €" → 55000 */
+  function pn(s){if(!s)return null;var c=s.replace(/[^\d,.\-]/g,'').replace(',','.');return parseFloat(c)||0}
+  function setF(id,val){if(val!==null&&val!==undefined&&!isNaN(val)){V(id).value=val;filled++}}
+  function setS(id,val){if(val){V(id).value=val;filled++}}
+
+  /* Split into sections: Synthese / En Denormandie / En deficit foncier */
+  var sections={synth:'',deno:'',deficit:''};
+  var parts=raw.split(/\n(?=(?:En\s+Denormandie|En\s+d[e\u00e9]ficit\s+foncier|Synth[e\u00e8]se))/i);
+  parts.forEach(function(part){
+    var head=part.substring(0,60).toLowerCase();
+    if(/denormandie/.test(head))sections.deno=part;
+    else if(/d[e\u00e9]ficit/.test(head))sections.deficit=part;
+    else sections.synth+=part+'\n';
+  });
+
+  /* Generic extractor: find value after label on same line (tab or spaces) */
+  function findVal(text,label){
+    if(!text)return null;
+    var esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp(esc+'[^\\d\\n]*?([\\d][\\d\\s,.]*)', 'i');
+    var m=text.match(re);
+    return m?pn(m[1]):null;
   }
-  function setField(id,val){
-    if(val!==null&&val!==undefined){V(id).value=val;filled++}
+  /* Find 2 values (Nu / Meuble columns) after label */
+  function findVal2(text,label){
+    if(!text)return [null,null];
+    var esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp(esc+'[^\\d\\n]*?([\\d][\\d\\s,.]*)[^\\d\\n]*?([\\d][\\d\\s,.]*)', 'i');
+    var m=text.match(re);
+    if(m)return [pn(m[1]),pn(m[2])];
+    var single=findVal(text,label);
+    return [single,null];
   }
-  /* Prix FAI */
-  var prixFAI=extractNum(/prix\s*(?:du\s*bien\s*)?FAI[^:]*:\s*([\d\s,.]+)/i);
-  setField('iPrixFAI',prixFAI);
-  /* Frais notaire */
-  var fraisN=extractNum(/frais\s*(?:de\s*)?notaire[^:]*:\s*([\d\s,.]+)/i);
-  setField('iFraisNotaire',fraisN);
-  /* Travaux */
-  var travaux=extractNum(/(?:devis\s*)?travaux\s*(?:TTC)?[^:]*:\s*([\d\s,.]+)/i);
-  setField('iTravaux',travaux);
-  /* Frais commercialisation */
-  var fraisC=extractNum(/frais\s*(?:de\s*)?commercialisation[^:]*:\s*([\d\s,.]+)/i);
-  setField('iFraisComm',fraisC);
-  /* Budget mobilier */
-  var mobil=extractNum(/(?:budget\s*)?mobilier[^:]*:\s*([\d\s,.]+)/i);
-  setField('iMobilier',mobil);
-  /* Taux financement */
-  var taux=extractNum(/(?:taux\s*(?:nominal)?|pr[e\u00ea]t\s*de)\s*[^0-9]*([\d,.]+)\s*%/i);
-  setField('iTauxFin',taux);
-  /* Duree — cherche "sur X mois" ou "X mois" */
-  var dureeM=extractNum(/sur\s*([\d\s]+)\s*mois/i);
-  if(dureeM!==null){
-    var ans=Math.round(dureeM/12);
-    V('iDureeFin').value=ans<=17?'15':(ans<=22?'20':'25');filled++;
-  }
-  /* Loyer brut HC */
-  var loyerBrut=extractNum(/loyers?\s*bruts?\s*(?:hors\s*charges)?[^:]*:\s*([\d\s,.]+)/i);
-  setField('iLoyerNu',loyerBrut);
-  /* Loyer brut meuble (si present, sinon on met le meme +10%) */
-  var loyerBrutM=extractNum(/loyers?\s*bruts?\s*(?:hors\s*charges)?\s*meubl[e\u00e9][^:]*:\s*([\d\s,.]+)/i);
-  if(loyerBrutM!==null){setField('iLoyerMeuble',loyerBrutM)}
-  else if(loyerBrut!==null){setField('iLoyerMeuble',Math.round(loyerBrut*1.15))}
-  /* Charges copro */
-  var chargesC=extractNum(/charges?\s*(?:de\s*)?copropri[e\u00e9]t[e\u00e9][^:]*:\s*([\d\s,.]+)/i);
-  setField('iCharges',chargesC);
-  /* Taxe fonciere */
-  var taxeF=extractNum(/taxe\s*fonci[e\u00e8]re[^:]*:\s*([\d\s,.]+)/i);
-  setField('iTaxeFonciere',taxeF);
-  /* Assiette Denormandie */
-  var assiette=extractNum(/assiette[^:]*:\s*([\d\s,.]+)/i);
-  setField('iAssietteDeno',assiette);
+
+  var S=sections.synth;
+  var D=sections.deno;
+
+  /* === SYNTHESE (Nu/Meuble) === */
+  var prixFAI=findVal(S,'Prix du bien FAI');
+  setF('iPrixFAI',prixFAI);
+  setF('iFraisNotaire',findVal(S,'Frais de notaire'));
+  setF('iTravaux',findVal(S,'Devis travaux'));
+  setF('iFraisComm',findVal(S,'Frais de commercialisation'));
+  var mobil=findVal(S,'Mobilier');
+  if(mobil===null)mobil=findVal(S,'mobilier');
+  setF('iMobilier',mobil);
+  /* Taux + duree */
+  var mTaux=raw.match(/pr[e\u00ea]t\s+de\s+([\d,.]+)\s*%/i);
+  if(mTaux)setF('iTauxFin',pn(mTaux[1]));
+  var mDuree=raw.match(/sur\s+([\d\s]+)\s*mois/i);
+  if(mDuree){var ans=Math.round(pn(mDuree[1])/12);V('iDureeFin').value=ans<=17?'15':(ans<=22?'20':'25');filled++}
+  /* Loyers Nu / Meuble (from Synthese which has 2 columns) */
+  var loyers=findVal2(S,'Loyers bruts hors charges');
+  setF('iLoyerNu',loyers[0]);
+  if(loyers[1]!==null)setF('iLoyerMeuble',loyers[1]);
+  else if(loyers[0]!==null)setF('iLoyerMeuble',Math.round(loyers[0]*1.15));
+  /* Charges + taxe */
+  setF('iCharges',findVal(S,'Charges de copropri'));
+  setF('iTaxeFonciere',findVal(S,'Taxe fonci'));
   /* Surface */
-  var surface=extractNum(/surface[^:]*:\s*([\d\s,.]+)\s*m/i);
-  setField('iSurface',surface);
-  /* Ville */
-  var mVille=raw.match(/ville[^:]*:\s*([^\n]+)/i);
-  if(mVille){V('iVille').value=mVille[1].trim();filled++}
-  /* Detect Denormandie */
-  if(/denormandie/i.test(raw)){V('iEligibilite').value='denormandie';filled++}
-  else if(/lmnp|meubl/i.test(raw)){V('iEligibilite').value='lmnp';filled++}
+  var mSurf=raw.match(/([\d,.]+)\s*m\u00b2/);
+  if(!mSurf)mSurf=raw.match(/surface[^\d]*([\d,.]+)/i);
+  if(mSurf)setF('iSurface',pn(mSurf[1]));
+
+  /* === DENORMANDIE === */
+  if(D){
+    setS('iEligibilite','denormandie');
+    /* Travaux Deno (different du Synthese) */
+    var travauxDeno=findVal(D,'Devis travaux');
+    if(travauxDeno!==null)setF('iTravaux',travauxDeno);
+    /* Prix FAI Deno (peut differer) */
+    var prixDeno=findVal(D,'Prix du bien FAI');
+    if(prixDeno!==null)setF('iPrixFAI',prixDeno);
+    /* Frais notaire Deno */
+    var fnDeno=findVal(D,'Frais de notaire');
+    if(fnDeno!==null)setF('iFraisNotaire',fnDeno);
+    /* Assiette */
+    var mAss=D.match(/assiette[^:]*?:\s*([\d][\d\s,.]*)/i);
+    if(mAss)setF('iAssietteDeno',pn(mAss[1]));
+    else{
+      /* Budget global = assiette par defaut */
+      var budgetDeno=findVal(D,'Budget global');
+      if(budgetDeno!==null)setF('iAssietteDeno',budgetDeno);
+    }
+    /* Loyer brut nu Deno (ecrase le Synthese si present) */
+    var loyerDeno=findVal(D,'Loyers bruts hors charges');
+    if(loyerDeno!==null)setF('iLoyerNu',loyerDeno);
+    /* Charges Deno */
+    var chDeno=findVal(D,'Charges de copropri');
+    if(chDeno!==null)setF('iCharges',chDeno);
+    var tfDeno=findVal(D,'Taxe fonci');
+    if(tfDeno!==null)setF('iTaxeFonciere',tfDeno);
+    /* Loyer meuble from Synthese is kept (Deno = location nue) */
+  }
+  /* Deficit foncier detection */
+  else if(sections.deficit){
+    setS('iEligibilite','deficit');
+  }
+  /* LMNP si que Synthese avec colonnes meuble */
+  else if(loyers[1]!==null){
+    setS('iEligibilite','lmnp');
+  }
+
+  /* Frais commercialisation = 0 si pas trouve (pas dans Deno) */
+  if(!findVal(S,'Frais de commercialisation')&&!V('iFraisComm').value)V('iFraisComm').value='0';
+
   /* Status */
-  var st=V('importStatus');
-  st.style.display='';
-  st.style.color='#2D7A5B';
-  st.textContent='\u2713 '+filled+' champs remplis automatiquement';
-  setTimeout(function(){st.style.display='none'},5000);
+  var st=V('importStatus');st.style.display='';st.style.color='#2D7A5B';
+  st.textContent='\u2713 '+filled+' champs remplis'+(D?' (mode Denormandie detecte)':(sections.deficit?' (mode Deficit Foncier detecte)':' (mode LMNP)'));
+  setTimeout(function(){st.style.display='none'},8000);
 }
 
 function onModuleChange(){
