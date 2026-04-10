@@ -621,11 +621,6 @@ function calc(){
   var patrimoineNet=valeurAvecRevalo;
   var levier=effortCumule>0?(patrimoineNet/effortCumule):0;
 
-  /* Profil conseiller */
-  var profil={prenom:'',nom:'',cabinet:'',orias:'',tel:'',email:''};
-  try{var p=JSON.parse(localStorage.getItem('cgpskool_profil_v1')||'{}');profil.prenom=p.pPrenom||p.prenom||'';profil.nom=p.pNom||p.nom||'';profil.cabinet=p.pCabinet||p.cabinet||'';profil.tel=p.pTel||p.tel||'';profil.email=p.pEmail||p.email||'';}catch(e){}
-  var consulStr=profil.prenom||profil.nom?'<b>'+profil.prenom+' '+profil.nom+'</b>'+(profil.cabinet?' \u2014 '+profil.cabinet:''):'';
-
   V('navClient').textContent=nom;
   V('resultsEmpty').style.display='none';V('resultsContent').style.display='';
 
@@ -633,7 +628,7 @@ function calc(){
   var isDeno=elig==='denormandie'&&assietteDeno>0;
   V('trameDeno').style.display=isDeno?'':'none';
   if(isDeno){
-    V('denoConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+today();
+    V('denoConsul').innerHTML='Client : <b>'+nom+'</b> | '+today();
     V('denoPhaseTitle').textContent='Les '+dureeDeno+' premieres annees';
     V('denoGainTitle').textContent='Gain fiscal sur '+dureeDeno+' ans';
 
@@ -704,7 +699,7 @@ function calc(){
     var valFinLMNP=prixFAI*Math.pow(1+revalo,dureeFin);
     var fraisGestM=loyerBrutMeuble*0.075;
 
-    V('lmnpConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+ville+' | '+today()
+    V('lmnpConsul').innerHTML='Client : <b>'+nom+'</b> | '+ville+' | '+today()
       +(isDeno?'<br><i style="color:var(--orange)">Phase 2 : apres '+dureeDeno+' ans de Denormandie</i>':'');
 
     /* KPIs top */
