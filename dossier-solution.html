@@ -340,39 +340,33 @@
     <div class="trame" id="trameLMNP" style="display:none">
       <div class="trame-header">
         <div class="trame-title">Plan d'investissement — Location meublee longue duree</div>
+        <div class="trame-subtitle">Ancien renove — Programme Colosseum</div>
         <div class="trame-consul" id="lmnpConsul"></div>
       </div>
 
+      <!-- KPIs top -->
+      <div class="synth-kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px" id="lmnpKpis"></div>
+
+      <!-- 2 colonnes : Investissement / Revenus -->
       <div class="trame-2col">
-        <div>
-          <div class="trame-section">
-            <div class="trame-section-title">Type d'investissement</div>
-            <div id="lmnpType"></div>
-          </div>
-          <div class="trame-section">
-            <div class="trame-section-title">Investissement</div>
-            <div id="lmnpInvest"></div>
-          </div>
-          <div class="trame-section">
-            <div class="trame-section-title">Participation</div>
-            <div id="lmnpParticip"></div>
-          </div>
+        <div class="trame-section">
+          <div class="trame-section-title">Investissement</div>
+          <div id="lmnpInvest"></div>
         </div>
-        <div>
-          <div class="trame-section">
-            <div class="trame-section-title">A l'issue de la periode de financement</div>
-            <div id="lmnpIssue"></div>
-          </div>
-          <div class="trame-section">
-            <div class="trame-section-title">Recapitulatif</div>
-            <div id="lmnpRecap"></div>
-          </div>
+        <div class="trame-section">
+          <div class="trame-section-title">Revenus mensuels</div>
+          <div id="lmnpRevenus"></div>
         </div>
       </div>
 
-      <div class="trame-highlight" style="margin-top:14px">
-        <b>Avantage supplementaire :</b> Securite de la famille accrue grace a l'assurance deces invalidite (ADI) comprise dans le financement.
+      <!-- A l'issue du financement : 3 KPIs -->
+      <div class="trame-section">
+        <div class="trame-section-title" id="lmnpIssueTitle">A l'issue du financement</div>
+        <div class="synth-kpis" style="grid-template-columns:repeat(3,1fr)" id="lmnpIssueKpis"></div>
       </div>
+
+      <!-- Points cles -->
+      <div class="trame-highlight" id="lmnpPoints"></div>
     </div>
 
     <!-- PAGE 3 : SYNTHESE CONSOLIDEE -->
@@ -720,48 +714,53 @@ function calc(){
   var showLMNP=elig==='lmnp'||(isDeno&&stratPost==='lmnp');
   V('trameLMNP').style.display=showLMNP?'':'none';
   if(showLMNP){
-    var lmnpStart=isDeno?dureeDeno:0;
-    var lmnpDuree=isDeno?dureePost:dureeFin;
     var lmnpBudget=isDeno?budgetNu:budgetMeuble;
     var lmnpMens=mensApport;
     var lmnpLoyerNet=loyerNetMeuble;
     var lmnpEffort=lmnpMens-lmnpLoyerNet;
-
-    V('lmnpConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+today()
-      +(isDeno?'<br><i>Phase 2 : apres '+dureeDeno+' ans de Denormandie</i>':'');
-
-    /* Type */
-    var types=[{id:'neuf',label:'Residence de services dans le neuf'},{id:'ancien',label:'Residence de services dans l\'ancien'},{id:'coloc',label:'Colocation'},{id:'travaux',label:'Ancien avec travaux'}];
-    var typeMap={studio:'neuf',t1bis:'ancien',t2:'ancien',t3:'ancien',colocation:'coloc'};
-    var selType=typeMap[typeBien]||'ancien';
-    V('lmnpType').innerHTML=types.map(function(t){
-      var checked=t.id===selType?'&#9745;':'&#9744;';
-      return '<div style="font-size:12px;padding:3px 0;color:var(--noir)">'+checked+' '+t.label+'</div>';
-    }).join('');
-
-    V('lmnpInvest').innerHTML=row('Budget global','<b>'+fmtE(lmnpBudget)+'</b>')
-      +'<div style="font-size:10px;color:var(--gris);padding:2px 0;margin-bottom:4px">= prix d\'achat + frais d\'acte + frais de garantie + frais annexes</div>'
-      +row('Financement',fmtE(budgetFinance))
-      +rowT('Apport',fmtE(apport10),'or');
-
-    V('lmnpParticip').innerHTML=row('Mensualites',fmtE(Math.round(lmnpMens))+'/mois')
-      +row('Loyer ADI + securise',fmtE(Math.round(lmnpLoyerNet))+'/mois','gr')
-      +rowT('Effort mensuel',fmtE(Math.round(lmnpEffort))+'/mois','or');
-
     var valFinLMNP=prixFAI*Math.pow(1+revalo,dureeFin);
-    V('lmnpIssue').innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">'
-      +'La valeur du bien <b>sans revalorisation</b> est de : <b>'+fmtE(prixFAI)+'</b><br>'
-      +'La valeur du bien avec une revalorisation de <b>'+fmtP(revalo*100)+'</b>/an est de : <b style="color:var(--orange)">'+fmtE(Math.round(valFinLMNP))+'</b><br>'
-      +'Le CRD est <b>nul</b> (0 \u20ac)<br><br>'
-      +'A l\'issue du financement, la reserve d\'amortissement calculee par l\'expert comptable vous a permis de ne payer que <b>~0% de BIC</b> sur vos revenus locatifs.<br><br>'
-      +'En fin de cette periode, nous pourrons opter pour le regime du <b>micro BIC</b> : abattement de 50% sur vos revenus locatifs.'
-      +'</div>';
+    var fraisGestM=loyerBrutMeuble*0.075;
 
-    V('lmnpRecap').innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">'
-      +'Vous etes proprietaire d\'un logement qui, sans aucune revalorisation pendant '+dureeFin+' ans, vaudra <b>'+fmtE(prixFAI)+'</b>.<br><br>'
-      +'Avec une revalorisation de '+fmtP(revalo*100)+'/an, votre bien vaudra <b style="color:var(--orange)">'+fmtE(Math.round(valFinLMNP))+'</b>.<br><br>'
-      +'Le financement est entierement rembourse. Vous percevez desormais <b>'+fmtE(Math.round(lmnpLoyerNet))+'/mois de revenus nets</b>.'
-      +'</div>';
+    V('lmnpConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+ville+' | '+today()
+      +(isDeno?'<br><i style="color:var(--orange)">Phase 2 : apres '+dureeDeno+' ans de Denormandie</i>':'');
+
+    /* KPIs top */
+    V('lmnpKpis').innerHTML=''
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Budget global</div><div class="synth-kpi-val">'+fmtE(lmnpBudget)+'</div><div class="synth-kpi-sub">Apport '+fmtE(apport10)+' (10%)</div></div>'
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Mensualite</div><div class="synth-kpi-val">'+fmtE(Math.round(lmnpMens))+'</div><div class="synth-kpi-sub">/mois ADI comprise</div></div>'
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Effort mensuel</div><div class="synth-kpi-val" style="color:'+(lmnpEffort>0?'#D4622A':'#2D7A5B')+'">'+fmtE(Math.round(Math.abs(lmnpEffort)))+'</div><div class="synth-kpi-sub">/mois '+(lmnpEffort>0?'d\'effort':'de gain')+'</div></div>';
+
+    /* Investissement */
+    V('lmnpInvest').innerHTML=''
+      +row('Prix FAI',fmtE(prixFAI))
+      +row('Travaux TTC',fmtE(travaux))
+      +(fraisComm?row('Frais commercialisation',fmtE(fraisComm)):'')
+      +(mobilier?row('Mobilier',fmtE(mobilier)):'')
+      +row('Frais de notaire',fmtE(fraisNotaire))
+      +rowT('Budget total',fmtE(lmnpBudget),'or')
+      +row('Financement',fmtE(budgetFinance))
+      +row('Apport 10%',fmtE(apport10));
+
+    /* Revenus */
+    V('lmnpRevenus').innerHTML=''
+      +row('Loyer brut HC',fmtE(loyerBrutMeuble)+'/mois')
+      +row('Charges copro','-'+fmtE(charges)+'/mois','rd')
+      +row('Taxe fonciere','-'+fmtE(taxeF)+'/mois','rd')
+      +row('Frais gestion (7,5%)','-'+fmtE(Math.round(fraisGestM))+'/mois','rd')
+      +rowT('Loyer net',fmtE(Math.round(lmnpLoyerNet))+'/mois','gr');
+
+    /* Issue KPIs */
+    V('lmnpIssueTitle').textContent='A l\'issue du financement ('+dureeFin+' ans)';
+    V('lmnpIssueKpis').innerHTML=''
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Valeur du bien</div><div class="synth-kpi-val">'+fmtE(Math.round(valFinLMNP))+'</div><div class="synth-kpi-sub">revalo '+fmtP(revalo*100)+'/an</div></div>'
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Capital restant du</div><div class="synth-kpi-val" style="color:#2D7A5B">0 \u20ac</div><div class="synth-kpi-sub">pret rembourse</div></div>'
+      +'<div class="synth-kpi"><div class="synth-kpi-label">Revenu mensuel net</div><div class="synth-kpi-val" style="color:#2D7A5B">'+fmtE(Math.round(lmnpLoyerNet))+'</div><div class="synth-kpi-sub">/mois sans credit</div></div>';
+
+    /* Points cles */
+    V('lmnpPoints').innerHTML=''
+      +'\u2713 <b>Amortissement comptable</b> : ~0% de BIC sur vos revenus locatifs pendant 15-20 ans<br>'
+      +'\u2713 <b>ADI comprise</b> dans le financement (securite familiale)<br>'
+      +'\u2713 Apres amortissement : option <b>micro BIC</b> (abattement 50%)';
   }
 
   /* ========== TRAME SYNTHESE ========== */
