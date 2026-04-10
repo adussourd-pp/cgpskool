@@ -952,6 +952,9 @@ select.span2{grid-column:span 2}
           <label class="cz-switch"><input type="checkbox" id="projFiscPrint" onchange="var c=document.getElementById('projFiscCard');var l=document.getElementById('projFiscPDFLabel');if(c)c.classList.toggle('proj-print-visible',this.checked);if(l)l.textContent=this.checked?'Visible PDF':'Masqu\u00e9 du PDF'"><span class="cz-slider"></span></label>
         </div>
       </div>
+      <div class="fiscal-row"><span class="fr-l">Ann&#233;e d'imposition</span><span class="fr-v"><input class="fi" type="number" id="projAnnee" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
       <div class="fiscal-row"><span class="fr-l">D&#233;ductions</span><span class="fr-v"><input class="fi" type="number" id="projDeduc" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:100px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233;</option></select></span></div>
@@ -4156,6 +4159,11 @@ function rFiscal(){
   set('fiPlafPER',f.plafondPER?fmt(f.plafondPER)+' €':'—');
   const tot=(f.irnet||0)+(f.ps||0);
   set('fiTotal',tot?fmt(tot)+' €':'0 €');
+
+  // Pré-remplir la projection avec les données actuelles (si pas déjà saisi)
+  var pA=document.getElementById('projAnnee');if(pA&&!pA.value&&f.annee)pA.value=f.annee;
+  var pS1=document.getElementById('projSal1');if(pS1&&!pS1.value){var s1=ED.revenus.sal1||ED.revenus.c1||0;if(s1)pS1.value=s1;}
+  var pS2=document.getElementById('projSal2');if(pS2&&!pS2.value){var s2=ED.revenus.sal2||ED.revenus.c2||0;if(s2)pS2.value=s2;}
 
   // Levier impot badge
   var plafRet=ED.fiscal.parts?Math.round(ED.fiscal.parts*10064):10064;
