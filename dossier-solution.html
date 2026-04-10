@@ -94,6 +94,9 @@
   .trame-header{border-bottom-color:var(--orange)!important}
   .trame-section-title,.deno-bar-fill,.timeline-phase,.trame-option-num,.synth-kpi,.trame-highlight{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
+/* Champs vides a remplir : surbrillance jaune */
+.fi-warn,.fi-row-warn{border-color:#E8A317!important;background:rgba(232,163,23,0.08)!important}
+.fi-row-warn input{background:rgba(232,163,23,0.08)!important}
 </style>
 </head>
 <body>
@@ -151,7 +154,7 @@
       </div>
       <div class="grid2">
         <div class="fg"><label>Taux PAS</label><div class="fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="fi-unit">%</span></div></div>
-        <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
     </div>
 
@@ -177,7 +180,7 @@
         </div>
         <div class="grid2">
           <div class="fg"><label>Duree</label><div class="fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="fi-unit">ans</span></div></div>
-          <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
         </div>
         <div class="fg"><label>Capital restant du</label><div class="fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
       </div>
@@ -219,12 +222,12 @@
         </select></div>
       </div>
       <div class="grid2" id="wLoyers">
-        <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-        <div class="fg" id="wLoyerMeuble"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
+        <div class="fg" id="wLoyerMeuble"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
       <div class="grid2">
-        <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-        <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
+        <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
       <div class="fg" id="wAssiette"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
     </div>
@@ -565,6 +568,14 @@ function importMode(mode){
   setTimeout(function(){st.style.display='none'},8000);
 }
 
+/* Clear warn on input */
+document.addEventListener('input',function(e){
+  var el=e.target;if(!el)return;
+  var fiRow=el.closest('.fi-row-warn');
+  if(fiRow)fiRow.classList.remove('fi-row-warn');
+  el.classList.remove('fi-warn');
+});
+
 function onModuleChange(){
   var mod=V('pModule').value;
   ['viewHome','viewImmo','viewPlacement','viewBilan'].forEach(function(id){V(id).style.display='none'});
@@ -576,7 +587,34 @@ function togglePretFields(){V('pretFields').style.display=V('iPretToggle').check
 
 var chart1=null,chart2=null;
 
+function checkRequired(){
+  /* Champs requis selon le mode */
+  var elig=V('iEligibilite').value;
+  var always=['iNom','iRevNet','iPrixFAI','iTravaux','iTauxFin','iLoyerNu'];
+  var lmnpOnly=['iLoyerMeuble','iMobilier'];
+  var denoOnly=['iAssietteDeno'];
+  var ids=always.slice();
+  if(elig==='lmnp')ids=ids.concat(lmnpOnly);
+  if(elig==='denormandie')ids=ids.concat(denoOnly);
+  /* Clear previous */
+  document.querySelectorAll('.fi-warn,.fi-row-warn').forEach(function(el){el.classList.remove('fi-warn');el.classList.remove('fi-row-warn')});
+  var missing=0;
+  ids.forEach(function(id){
+    var el=V(id);if(!el)return;
+    var val=el.value.trim();
+    var empty=!val||val==='0';
+    if(empty){
+      var fiRow=el.closest('.fi-row');
+      if(fiRow){fiRow.classList.add('fi-row-warn')}
+      else{el.classList.add('fi-warn')}
+      missing++;
+    }
+  });
+  return missing;
+}
+
 function calc(){
+  checkRequired();
   /* === INPUTS === */
   var nom=V('iNom').value.trim()||'Client';
   var age=N('iAge');var situation=V('iSituation').value;
