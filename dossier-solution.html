@@ -4,880 +4,759 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>CGP Skool &#8212; Dossier Solution</title>
-<link rel="stylesheet" href="cgp-skool-theme.css">
-<link rel="stylesheet" href="cgp-skool-layout.css">
-<script src="cgp-skool-core.js"></script>
-<script src="cgp-skool-scpi-data.js"></script>
-<script src="cgp-skool-nav.js" defer></script>
-<script src="cgp-skool-feedback.js" defer></script>
+<title>CGP Skool OS — Dossier Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Sidebar overrides */
-.sf{padding:0 8px;margin-bottom:8px}
-.sf label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:3px}
-.sf input,.sf select,.sf textarea{
-  width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;
-  font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;resize:vertical
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--os-bg:#0F1117;--os-surface:#1A1D27;--os-border:#2A2D3A;
+--os-gold:#C49A6C;--os-gold-dim:rgba(196,154,108,0.15);--os-gold-glow:rgba(196,154,108,0.25);
+--os-blue:#4F8EF7;--os-text:#E8E9ED;--os-muted:#8B8FA8;
+--os-green:#22C55E;--os-warn:#F59E0B;--os-red:#EF4444;
+--os-sans:'Inter',system-ui,sans-serif;
 }
-.sf input:focus,.sf select:focus,.sf textarea:focus{border-color:var(--orange)}
-.sidebar-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;transition:all 0.2s}
-.sidebar-btn:hover{background:var(--orange-hover)}
-.cb-row{display:flex;align-items:center;gap:8px;padding:4px 8px;font-size:12px;color:var(--noir);cursor:pointer}
-.cb-row input{accent-color:var(--orange)}
+html,body{height:100%;font-family:var(--os-sans);background:var(--os-bg);color:var(--os-text);font-size:14px;line-height:1.6}
+a{color:var(--os-gold);text-decoration:none}
 
-/* Page A4 editable blocks */
-.bloc{margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid rgba(0,0,0,0.08);position:relative}
-.bloc:last-of-type,.bloc#blocAnnexes{border-bottom:none;padding-bottom:0}
-#blocGarde{border-bottom:none;padding-bottom:0;margin-bottom:28px}
-.bloc-tag{font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
-.bloc-title{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--noir);margin-bottom:6px;line-height:1.3}
-.bloc-subtitle{font-size:13px;color:var(--gris);margin-bottom:22px;font-style:italic}
-.bloc-body{font-size:14px;line-height:1.75;color:var(--gris-f);outline:none;min-height:40px;padding:8px 0;border:1.5px solid transparent;border-radius:7px;transition:border-color 0.2s}
-.bloc-body:hover{border-color:var(--bord);padding:8px 12px}
-.bloc-body:focus{border-color:var(--orange);background:rgba(212,98,42,0.02);padding:8px 12px}
-.bloc-body b,.bloc-body strong{color:var(--noir);font-weight:600}
+/* NAV */
+.os-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(15,17,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--os-border);display:flex;align-items:center;padding:0 24px;z-index:100}
+.os-nav-logo{font-size:16px;font-weight:700;letter-spacing:0.5px;color:var(--os-text)}
+.os-nav-logo span{color:var(--os-gold)}
+.os-nav-badge{margin-left:auto;font-size:12px;color:var(--os-muted);display:flex;align-items:center;gap:8px}
+.os-nav-back{font-size:13px;color:var(--os-muted);cursor:pointer;margin-left:24px;padding:6px 12px;border:1px solid var(--os-border);border-radius:6px;background:transparent;font-family:var(--os-sans);transition:all 0.2s}
+.os-nav-back:hover{color:var(--os-text);border-color:var(--os-gold)}
+.os-nav-home-link{font-size:13px;color:var(--os-muted);margin-left:16px;padding:6px 12px;border:1px solid var(--os-border);border-radius:6px;background:transparent;font-family:var(--os-sans);cursor:pointer;transition:all 0.2s;text-decoration:none}
+.os-nav-home-link:hover{color:var(--os-text);border-color:var(--os-gold)}
 
-/* Features grid (contrat) */
-.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.feature-item{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;background:#fff;border:1px solid var(--bord);border-radius:4px;font-size:13px;color:var(--noir)}
-.feature-item .check{color:#2D7A5B;font-weight:700;flex-shrink:0}
-.summary-line{font-size:13px;color:var(--gris-f);font-style:italic;padding:14px 18px;background:rgba(212,98,42,0.07);border-radius:4px;margin-top:6px}
+/* VIEWS */
+.os-view{display:none;padding-top:52px;min-height:100vh}
+.os-view.active{display:block}
 
-/* Header document */
-.doc-header{border-bottom:1px solid var(--bord);padding-bottom:32px;margin-bottom:42px}
-.doc-header .context-box{background:#fff;border:1px solid var(--bord);border-left:3px solid var(--orange);padding:16px 20px;border-radius:2px;font-size:13px;color:var(--gris-f);line-height:1.6;margin-top:18px}
-.doc-header .context-box strong{color:var(--noir)}
+/* HOME */
+.os-home{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:40px 24px}
+.os-home h1{font-size:32px;font-weight:700;margin-bottom:8px;text-align:center}
+.os-home h1 span{color:var(--os-gold)}
+.os-home p{font-size:15px;color:var(--os-muted);margin-bottom:48px;text-align:center}
+.os-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;width:100%}
+.os-card{background:var(--os-surface);border:1px solid var(--os-border);border-radius:16px;padding:32px 28px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.os-card:hover{border-color:var(--os-gold);transform:translateY(-4px);box-shadow:0 8px 32px rgba(196,154,108,0.15)}
+.os-card.disabled{opacity:0.5;cursor:default}
+.os-card.disabled:hover{border-color:var(--os-border);transform:none;box-shadow:none}
+.os-card-icon{font-size:36px;margin-bottom:16px}
+.os-card-title{font-size:18px;font-weight:600;margin-bottom:8px}
+.os-card-desc{font-size:13px;color:var(--os-muted);line-height:1.5}
+.os-card-badge{position:absolute;top:16px;right:16px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px}
+.os-card-badge.soon{background:rgba(139,143,168,0.15);color:var(--os-muted);border:1px solid rgba(139,143,168,0.2)}
+.os-card-badge.ready{background:rgba(34,197,94,0.12);color:var(--os-green);border:1px solid rgba(34,197,94,0.25)}
 
-/* Frais table — header sombre */
-.frais-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--bord);border-radius:3px;overflow:hidden;margin-top:8px}
-.frais-tbl thead tr{background:var(--noir)}
-.frais-tbl thead th{color:#fff;text-align:left;padding:11px 14px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em}
-.frais-tbl tbody tr:nth-child(even){background:#fafaf8}
-.frais-tbl td{padding:12px 14px;border-bottom:1px solid var(--bord);color:var(--noir);vertical-align:middle}
-.frais-tbl tbody tr:last-child td{border-bottom:none}
-.frais-tbl td[contenteditable]{outline:none}
-.frais-tbl td[contenteditable]:focus{background:rgba(212,98,42,0.05)}
-.frais-tbl .frais-montant{font-weight:700;color:var(--orange);font-size:14px}
-.frais-tbl .frais-montant.zero{color:#2D7A5B}
+/* PLACEHOLDER */
+.os-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);color:var(--os-muted);font-size:18px;gap:12px}
+.os-placeholder span{font-size:48px}
 
-/* Checklist "Prochaines étapes" (ex: Recueil d'infos, Profil, Envoi docs, etc.) */
-.steps-list{background:#fff;border:1px solid var(--bord);border-radius:4px;overflow:hidden;margin-top:8px}
-.step-row{display:grid;grid-template-columns:22px 1fr 1.2fr;gap:14px;padding:14px 18px;border-bottom:1px solid var(--bord);align-items:flex-start;cursor:pointer;transition:background 0.15s}
-.step-row:last-child{border-bottom:none}
-.step-row:hover{background:rgba(0,0,0,0.02)}
-.step-row.done{background:rgba(45,122,91,0.07)}
-.step-cb{width:18px;height:18px;border:1.5px solid var(--bord);border-radius:3px;background:#fff;flex-shrink:0;position:relative;margin-top:1px}
-.step-row.done .step-cb{background:#2D7A5B;border-color:#2D7A5B}
-.step-row.done .step-cb::after{content:'\2713';color:#fff;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-.step-label{font-size:14px;font-weight:600;color:var(--noir);line-height:1.35}
-.step-row.done .step-label{color:#2D7A5B}
-.step-desc{font-size:12.5px;color:var(--gris);line-height:1.55}
+/* LAYOUT IMMO */
+.os-layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 52px)}
+.os-sidebar{background:var(--os-surface);border-right:1px solid var(--os-border);padding:16px 0;overflow-y:auto;position:sticky;top:52px;height:calc(100vh - 52px)}
+.os-main{padding:28px 32px;overflow-y:auto}
 
-/* Signature block */
-.signature-block{margin-top:48px;padding-top:28px;border-top:1px solid var(--bord);display:flex;align-items:center;gap:18px}
-.signature-avatar{width:52px;height:52px;background:var(--noir);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-size:18px;flex-shrink:0;overflow:hidden}
-.signature-avatar img{width:100%;height:100%;object-fit:cover}
-.sig-info .name{font-weight:600;font-size:15px;color:var(--noir);margin-bottom:2px}
-.sig-info .role{font-size:12px;color:var(--gris)}
+/* SIDEBAR */
+.os-sb-section{border-bottom:1px solid var(--os-border)}
+.os-sb-lbl{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.16em;color:var(--os-muted);cursor:pointer;user-select:none;transition:color 0.2s}
+.os-sb-lbl:hover{color:var(--os-text)}
+.os-sb-lbl .arrow{font-size:8px;transition:transform 0.2s;color:var(--os-gold)}
+.os-sb-lbl.open .arrow{transform:rotate(90deg)}
+.os-sb-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.os-sb-body.open{max-height:2000px}
+.os-fg{padding:0 16px;margin-bottom:10px}
+.os-fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--os-muted);margin-bottom:4px}
+.os-fi{width:100%;padding:8px 10px;background:var(--os-bg);border:1.5px solid var(--os-border);border-radius:7px;font-family:var(--os-sans);font-size:13px;font-weight:500;color:var(--os-text);outline:none;transition:border-color 0.2s}
+.os-fi:focus{border-color:var(--os-gold)}
+.os-fi::placeholder{color:rgba(139,143,168,0.5)}
+select.os-fi{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B8FA8' d='M3 5l3 3 3-3z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+select.os-fi option{background:var(--os-surface);color:var(--os-text)}
+.os-fi-row{display:flex;border:1.5px solid var(--os-border);border-radius:7px;overflow:hidden;transition:border-color 0.2s}
+.os-fi-row:focus-within{border-color:var(--os-gold)}
+.os-fi-row input{flex:1;padding:8px 10px;background:var(--os-bg);border:none;font-family:var(--os-sans);font-size:13px;font-weight:500;color:var(--os-text);outline:none;min-width:0}
+.os-fi-unit{padding:8px 10px;font-size:11px;color:var(--os-muted);background:rgba(42,45,58,0.5);border-left:1px solid var(--os-border);display:flex;align-items:center}
+.os-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;margin-bottom:10px}
+.os-grid2 .os-fg{padding:0;margin-bottom:0}
+.os-toggle-row{display:flex;align-items:center;gap:8px;padding:4px 16px 10px;font-size:12px;color:var(--os-muted)}
+.os-toggle-row input{accent-color:var(--os-gold)}
+.os-sb-btn{display:block;width:calc(100% - 32px);margin:12px 16px;padding:11px;background:var(--os-gold);color:#fff;border:none;border-radius:8px;font-family:var(--os-sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
+.os-sb-btn:hover{background:#b8894f;transform:translateY(-1px)}
 
-/* Checklist */
-.check-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:var(--gris);line-height:1.6}
-.check-num{width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+/* RESULTS */
+.os-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--os-muted);text-align:center;gap:12px}
+.os-empty span{font-size:48px;opacity:0.4}
+.os-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.os-header-left h2{font-size:22px;font-weight:700}
+.os-header-left .sub{font-size:13px;color:var(--os-muted);margin-top:2px}
+.os-header-right{text-align:right}
+.os-header-right .date{font-size:12px;color:var(--os-muted)}
+.os-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.os-badge-green{background:rgba(34,197,94,0.12);color:var(--os-green);border:1px solid rgba(34,197,94,0.25)}
+.os-badge-warn{background:rgba(245,158,11,0.12);color:var(--os-warn);border:1px solid rgba(245,158,11,0.25)}
+.os-badge-red{background:rgba(239,68,68,0.12);color:var(--os-red);border:1px solid rgba(239,68,68,0.25)}
+.os-badge-blue{background:rgba(79,142,247,0.12);color:var(--os-blue);border:1px solid rgba(79,142,247,0.25)}
 
-/* Annexes preview */
-.annexes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.annexe-item{background:#fff;border:1px solid var(--bord);padding:13px 16px;border-radius:3px;display:flex;align-items:center;gap:12px;font-size:13px}
-.annexe-item .icon{font-size:18px;flex-shrink:0}
-.annexe-item .name{font-weight:500;color:var(--noir);margin-bottom:1px}
-.annexe-item .status{font-size:11px;color:var(--gris)}
-.annexe-count{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px}
+/* KPI */
+.os-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.os-kpi{background:var(--os-surface);border:1px solid var(--os-border);border-radius:12px;padding:18px 20px}
+.os-kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--os-muted);margin-bottom:6px}
+.os-kpi-val{font-size:28px;font-weight:700;color:var(--os-blue);line-height:1.2}
+.os-kpi-sub{font-size:11px;color:var(--os-muted);margin-top:4px}
 
-/* Page de garde */
-/* Page de garde — style uniforme avec etude-dossier */
-.garde-wrap{display:flex;flex-direction:column;min-height:820px;margin-bottom:24px}
-.garde-topbar{height:4px;background:var(--orange);border-radius:2px;margin-bottom:20px}
-.garde-header{display:flex;justify-content:space-between;align-items:center}
-.garde-cabinet-name{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--noir)}
-.garde-cabinet-sub{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--gris);margin-top:2px}
-.garde-orias-block{text-align:right;font-size:11px;color:var(--gris);line-height:1.6}
-.garde-center{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 32px}
-.garde-center-inner{text-align:center;max-width:500px}
-.garde-h1{font-family:var(--serif);font-size:36px;font-weight:400;color:var(--noir);line-height:1.2}
-.garde-h1-alt{font-family:var(--serif);font-size:36px;font-weight:400;font-style:italic;color:var(--orange);line-height:1.2;margin-bottom:8px}
-.garde-subtitle{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--gris);margin-bottom:32px}
-.garde-divider{width:40px;height:2px;background:var(--noir);margin:0 auto 32px}
-.garde-client-box{border:1px solid var(--bord);border-radius:4px;padding:16px 24px;text-align:left;background:var(--gris-l)}
-.garde-client-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:6px}
-.garde-client-name{font-family:var(--sans);font-size:20px;font-weight:400;color:var(--noir)}
-.garde-footer{border-top:1px solid var(--bord);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
-.garde-footer-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:4px}
-.garde-footer-val{font-size:13px;font-weight:600;color:var(--noir)}
+/* CARDS */
+.os-card-r{background:var(--os-surface);border:1px solid var(--os-border);border-radius:12px;padding:22px 24px;margin-bottom:20px}
+.os-card-title-r{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.os-card-title-r::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--os-gold);flex-shrink:0}
+.os-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(42,45,58,0.6);font-size:13px}
+.os-row:last-child{border-bottom:none}
+.os-row-k{color:var(--os-muted)}
+.os-row-v{font-weight:600}
+.os-row-v.gold{color:var(--os-gold)}
+.os-row-v.blue{color:var(--os-blue)}
+.os-row-v.green{color:var(--os-green)}
+.os-row-v.red{color:var(--os-red)}
 
-/* Pyramide retraite */
-.pyramide{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
-.pyr-level{text-align:center;padding:10px 0;color:#fff;font-size:11px;font-weight:600;position:relative}
-.pyr-level:nth-child(1){width:40%;background:#7B4FA6;border-radius:6px 6px 0 0}
-.pyr-level:nth-child(2){width:55%;background:#9B6FC6}
-.pyr-level:nth-child(3){width:70%;background:#B490D6;border-radius:0 0 6px 6px}
-.pyr-brace{position:absolute;right:-14px;top:0;bottom:0;width:10px;border-right:2px solid var(--orange);border-top:2px solid var(--orange);border-bottom:2px solid var(--orange);border-radius:0 6px 6px 0}
-.pyr-labels{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
-.pyr-box{padding:14px 16px;border-radius:8px;font-size:11px;line-height:1.6;color:var(--noir)}
-.pyr-box.orange{background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15)}
-.pyr-box.purple{background:rgba(123,79,166,0.06);border:1px solid rgba(123,79,166,0.15)}
-.pyr-box.red{background:rgba(220,80,60,0.06);border:1px solid rgba(220,80,60,0.15)}
-.pyr-box-title{font-size:12px;font-weight:700;margin-bottom:6px}
-.pyr-box.orange .pyr-box-title{color:var(--orange)}
-.pyr-box.purple .pyr-box-title{color:#7B4FA6}
-.pyr-box.red .pyr-box-title{color:#dc3c28}
+/* PROGRESS */
+.os-progress{margin:10px 0}
+.os-progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.os-progress-bar{height:8px;background:var(--os-bg);border-radius:4px;overflow:hidden;position:relative}
+.os-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease}
+.os-progress-threshold{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--os-red);border-radius:1px}
 
-/* Workflow steps */
-.wf-steps{display:flex;gap:0;margin:24px 0;overflow-x:auto}
-.wf-step{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;position:relative;padding:0 4px}
-.wf-num{width:34px;height:34px;border-radius:50%;border:2px solid #2D7A5B;color:#2D7A5B;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:10px;background:#fff;position:relative;z-index:2}
-.wf-pill{background:#2D7A5B;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:5px;text-align:center;white-space:nowrap;margin-bottom:10px;position:relative}
-.wf-pill::after{content:'';position:absolute;right:-9px;top:50%;transform:translateY(-50%);border:7px solid transparent;border-left:9px solid #2D7A5B}
-.wf-step:last-child .wf-pill::after{display:none}
-.wf-detail{font-size:11px;color:var(--gris);line-height:1.55;text-align:center;padding:0 4px}
-.wf-detail b{color:var(--noir);display:block;margin-bottom:3px;font-size:10px}
+/* TABLE */
+.os-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.os-tbl thead th{background:var(--os-bg);color:var(--os-muted);text-align:left;padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--os-border)}
+.os-tbl tbody td{padding:10px 14px;border-bottom:1px solid rgba(42,45,58,0.4);color:var(--os-text)}
+.os-tbl tbody tr:nth-child(even){background:rgba(15,17,23,0.4)}
+.os-tbl .val{font-weight:600}
+.os-tbl .gold{color:var(--os-gold)}
+.os-tbl .green{color:var(--os-green)}
+.os-tbl .red{color:var(--os-red)}
+.os-tbl .blue{color:var(--os-blue)}
 
-/* Schema SCPI */
-.scpi-schema{display:flex;align-items:center;justify-content:center;gap:16px;margin:20px 0;flex-wrap:wrap}
-.scpi-box{border:1.5px solid var(--bord);border-radius:10px;padding:14px 18px;text-align:center;min-width:100px;position:relative}
-.scpi-box-title{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:4px}
-.scpi-box-sub{font-size:9px;color:var(--gris)}
-.scpi-box.main{border-color:#8B2020;background:rgba(139,32,32,0.03)}
-.scpi-box.main .scpi-box-title{color:#8B2020}
-.scpi-arrow{font-size:18px;color:var(--orange);flex-shrink:0}
-.scpi-icons{display:flex;gap:8px;justify-content:center;margin:8px 0;font-size:20px}
+/* EQUATION */
+.os-eq{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;flex-wrap:wrap}
+.os-eq-box{background:var(--os-bg);border:1px solid var(--os-border);border-radius:10px;padding:14px 20px;text-align:center;min-width:120px}
+.os-eq-box .label{font-size:10px;color:var(--os-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.os-eq-box .val{font-size:20px;font-weight:700}
+.os-eq-op{font-size:22px;color:var(--os-muted);font-weight:300}
 
-/* Bloc "À vos côtés" — fusionne visuellement avec le footer (beige full-width) */
-#blocServices{background:#F2F1EE;margin:28px -40px 0 -40px;padding:18px 40px 16px;border-bottom:1px solid rgba(0,0,0,0.06)}
-#blocServices .svc-title{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9C9A96;margin-bottom:10px}
-#blocServices .svc-body{font-size:11.5px;color:#3a3835;line-height:1.75;font-family:var(--sans)}
-#blocServices .svc-body:focus{outline:none}
-/* Coller le footer conseiller au bloc services (pas de marge top) */
-#blocServices + #conseillerFooter > div{margin-top:0!important}
+/* DENO CARDS */
+.os-deno-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.os-deno-card{border:1px solid var(--os-border);border-radius:10px;padding:18px;text-align:center;background:var(--os-bg);transition:border-color 0.2s}
+.os-deno-card.best{border-color:var(--os-gold);box-shadow:0 0 20px rgba(196,154,108,0.1)}
+.os-deno-dur{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--os-muted);margin-bottom:8px}
+.os-deno-rate{font-size:14px;font-weight:700;color:var(--os-gold);margin-bottom:10px}
+.os-deno-total{font-size:22px;font-weight:700;color:var(--os-blue);margin-bottom:4px}
+.os-deno-sub{font-size:11px;color:var(--os-muted)}
 
-/* Print — préserver les couleurs de fond (R23 : cibler uniquement les éléments colorés) */
+/* GRID2 RESULTS */
+.os-results-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+
+/* CHARTS */
+.os-chart-wrap{position:relative;max-height:280px;margin:12px auto;display:flex;justify-content:center}
+
+/* PRINT */
 @media print{
-  /* Neutraliser les scrollbars internes */
-  html,body{overflow:visible!important;height:auto!important}
-  .cs-app{display:block!important;min-height:0!important}
-  .cs-main{overflow:visible!important;height:auto!important;max-height:none!important;display:block!important;padding:0!important}
-  .cs-page{overflow:visible!important;padding:40px!important;max-width:100%!important}
-  .bloc-body{border:none!important;padding:0!important}
-  .bloc-body:hover,.bloc-body:focus{border:none!important;background:none!important}
-  .no-print,.schema-templates,#cgp-feedback-btn{display:none!important}
-  /* Préservation couleurs : fonds, headers de tables, badges, boxes colorées */
-  .feature-item,.summary-line,.annexe-item,.steps-list,.step-row,.step-row.done,.step-cb,
-  .pyr-box,.pyr-box.orange,.pyr-box.purple,.pyr-box.red,.pyr-level,
-  .frais-tbl,.frais-tbl thead tr,.frais-tbl tbody tr:nth-child(even),
-  .context-box,.scpi-box,.scpi-box.main,
-  #blocServices,#pageHeader,[style*="background"]{
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  /* Garantir que les step-rows done gardent leur fond vert */
-  .step-row.done{background:rgba(45,122,91,0.07)!important}
-  .step-row.done .step-cb{background:#2D7A5B!important;border-color:#2D7A5B!important}
-  /* Header table frais : fond sombre */
-  .frais-tbl thead tr{background:var(--noir)!important}
-  .frais-tbl thead th{color:#fff!important}
-  /* pyr-box couleurs */
-  .pyr-box.orange{background:rgba(212,98,42,0.08)!important}
-  .pyr-box.purple{background:rgba(123,79,166,0.08)!important}
-  .pyr-box.red{background:rgba(220,60,40,0.08)!important}
+  body{background:#fff!important;color:#111!important}
+  .os-nav,.os-sidebar,.os-sb-btn,.os-nav-back,.os-nav-home-link,#viewHome,#viewPlacement,#viewBilan{display:none!important}
+  .os-view{display:block!important;padding-top:0!important}
+  .os-layout{display:block!important}
+  .os-main{padding:20px!important}
+  .os-card-r{border-color:#ddd!important;break-inside:avoid}
+  .os-kpi{border-color:#ddd!important}
+  .os-badge,.os-kpi,.os-progress-fill,.os-deno-card.best,.os-tbl thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="cs-nav">
-  <div class="cs-nav-inner">
-    <a class="cs-logo" href="index.html">
-      <div class="cs-logo-mark"><span>C</span></div>
-      <span class="cs-logo-name">CGP Skool</span>
-    </a>
-    <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
-    </div>
+<nav class="os-nav">
+  <div class="os-nav-logo">CGP <span>Skool</span> OS</div>
+  <div class="os-nav-badge">
+    <span id="navClient"></span>
   </div>
+  <a class="os-nav-home-link" href="index.html">Accueil CGP Skool</a>
+  <button class="os-nav-back" id="btnBack" style="display:none" onclick="showView('home')">Retour</button>
 </nav>
 
-<div class="cs-app">
-  <!-- SIDEBAR -->
-  <div class="cs-sidebar">
-
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Solution</div>
-    <div class="sb-body open">
-      <div class="sf"><label>Type de solution</label>
-        <select id="pType" onchange="onTypeChange()">
-          <option value="av">Assurance Vie</option>
-          <option value="per">Plan &#201;pargne Retraite</option>
-          <option value="scpi">SCPI</option>
-          <option value="immo">Immobilier LMNP</option>
-        </select>
+<!-- HOME -->
+<div id="viewHome" class="os-view active">
+  <div class="os-home">
+    <h1>Dossier <span>Solution</span></h1>
+    <p>Selectionnez un module pour construire votre dossier client</p>
+    <div class="os-cards">
+      <div class="os-card" onclick="showView('placement')">
+        <span class="os-card-badge soon">Bientot</span>
+        <div class="os-card-icon">&#128176;</div>
+        <div class="os-card-title">Placement</div>
+        <div class="os-card-desc">Assurance Vie, PER, SCPI — analyse et presentation client des solutions de placement</div>
       </div>
-    </div>
-
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
-    <div class="sb-body open">
-      <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="updateGarde()"></div>
-    </div>
-
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Blocs &#224; afficher</div>
-    <div class="sb-body open">
-      <label class="cb-row"><input type="checkbox" id="cbGarde" checked onchange="toggleBloc()"> Page de garde</label>
-      <label class="cb-row"><input type="checkbox" id="cbContrat" checked onchange="toggleBloc()"> Le contrat</label>
-      <label class="cb-row"><input type="checkbox" id="cbGestion" checked onchange="toggleBloc()"> Mode de gestion</label>
-      <label class="cb-row" id="cbRowReinvest" style="display:none"><input type="checkbox" id="cbReinvest" onchange="toggleBloc()"> R&#233;investissement dividendes (SCPI)</label>
-      <label class="cb-row" id="cbRowLevier" style="display:none"><input type="checkbox" id="cbLevier" onchange="toggleBloc()"> Effet de levier cr&#233;dit (SCPI)</label>
-      <label class="cb-row"><input type="checkbox" id="cbFrais" checked onchange="toggleBloc()"> Frais</label>
-      <label class="cb-row"><input type="checkbox" id="cbSchema" checked onchange="toggleBloc()"> Sch&#233;ma p&#233;dagogique</label>
-      <label class="cb-row"><input type="checkbox" id="cbWorkflow" checked onchange="toggleBloc()"> Workflow souscription</label>
-      <label class="cb-row"><input type="checkbox" id="cbAnnexes" checked onchange="toggleBloc()"> Annexes projections</label>
-    </div>
-
-    <div class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)" id="toggleSCPI" style="display:none"><span class="acc">&#9654;</span>SCPI s&#233;lectionn&#233;es</div>
-    <div class="sb-body" id="scpiPickerBody">
-      <div id="scpiChecklist" style="max-height:240px;overflow-y:auto"></div>
-    </div>
-
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Annexes du dossier</div>
-    <div class="sb-body open">
-      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px">Ajouter une annexe</div>
-      <div id="customSuggestions" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
-      <div style="display:flex;gap:4px;margin-bottom:10px">
-        <input type="text" id="customAnnexeInput" placeholder="Autre (texte libre)" onkeydown="if(event.key==='Enter')addCustomAnnexe()" style="flex:1;padding:7px 9px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:11px;outline:none;min-width:0">
-        <button type="button" onclick="addCustomAnnexe()" style="padding:7px 12px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">+</button>
+      <div class="os-card" onclick="showView('immo')">
+        <span class="os-card-badge ready">Disponible</span>
+        <div class="os-card-icon">&#127968;</div>
+        <div class="os-card-title">Immobilier</div>
+        <div class="os-card-desc">Denormandie, LMNP, Deficit Foncier — analyse complete du projet immobilier Colosseum</div>
       </div>
-      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:5px;margin-top:10px">Annexes s&#233;lectionn&#233;es</div>
-      <div id="annexesList">
-        <div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe. Clique sur une suggestion ci-dessus pour l'ajouter.</div>
+      <div class="os-card disabled">
+        <span class="os-card-badge soon">Bientot</span>
+        <div class="os-card-icon">&#128202;</div>
+        <div class="os-card-title">Bilan Patrimonial</div>
+        <div class="os-card-desc">Vision consolidee du patrimoine, projections et recommandations globales</div>
       </div>
-    </div>
-
-    <div style="border-top:1px solid var(--bord);margin-top:14px;padding-top:10px">
-      <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-      <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;border-radius:0" onclick="saveDossier()">&#128190; Sauvegarder</button>
-      <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center;border-radius:0">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="loadDossier(this.files[0]);this.value=''"></label>
-    </div>
-
-  </div>
-
-  <!-- MAIN -->
-  <div class="cs-main">
-    <div class="cs-page" id="pageContent">
-
-      <!-- HEADER DISCRET (remplace la page de garde) -->
-      <div id="blocGarde">
-        <div id="pageHeader"></div>
-      </div>
-
-      <!-- CONTRAT -->
-      <div class="bloc" id="blocContrat">
-        <div class="bloc-tag">Le contrat</div>
-        <div class="bloc-title" contenteditable="true" id="titleContrat">Un contrat haut de gamme et &#233;volutif</div>
-        <div class="bloc-body" contenteditable="true" id="bodyContrat">
-Ce contrat est &#233;tabli avec <b>VIE PLUS</b>, filiale de Suravenir (Cr&#233;dit Mutuel Ark&#233;a Banque Priv&#233;e), acteur reconnu pour sa solidit&#233; financi&#232;re et son expertise en &#233;pargne patrimoniale.<br><br>
-&#10003; Architecture ouverte (plus de 300 supports financiers et immobiliers)<br>
-&#10003; +60 soci&#233;t&#233;s de gestion partenaires ind&#233;pendantes<br>
-&#10003; Fonds en euros garanti<br>
-&#10003; Offre immobili&#232;re compl&#232;te : SCPI, SCI, OPCI<br>
-&#10003; Capital-investissement (fonds priv&#233;s / non cot&#233;s)<br>
-&#10003; Obligations dat&#233;es et produits structur&#233;s exclusifs<br><br>
-En clair : un cadre d'investissement <b>flexible, haut de gamme et &#233;volutif</b>, capable de s'adapter &#224; votre profil, &#224; vos objectifs et au contexte &#233;conomique.
-        </div>
-      </div>
-
-      <!-- MODE DE GESTION -->
-      <div class="bloc" id="blocGestion">
-        <div class="bloc-tag">Gestion</div>
-        <div class="bloc-title" contenteditable="true" id="titleGestion">Un mode de gestion clair et progressif</div>
-        <div class="bloc-body" contenteditable="true" id="bodyGestion">
-<b>Objectif : Performance, s&#233;r&#233;nit&#233; et coh&#233;rence dans le temps</b><br><br>
-<b>Versement initial (VI)</b> : Amorcer le contrat avec une base solide suivant votre profil investisseur tout en allant chercher des opportunit&#233;s de march&#233;s.<br><br>
-<b>Versements programm&#233;s (VP)</b> : Investir progressivement sur des fonds actions pour aller chercher de la performance dans la dur&#233;e (m&#233;thode DCA).<br><br>
-<b>Versements compl&#233;mentaires (VC)</b> : Renforcer la performance au fil du temps selon les opportunit&#233;s, les arbitrages et l'&#233;volution des march&#233;s.<br><br>
-&#8594; Horizon d'investissement : <b>5 ans minimum</b><br><br>
-Notre ambition : aller chercher entre <b>3 et 5 % nets de tous frais</b> sur la dur&#233;e, avec une strat&#233;gie solide, diversifi&#233;e et un suivi rigoureux dans le temps.<br><br>
-<i>NB : Objectif indicatif non garanti, d&#233;pendant de la performance des supports choisis et des conditions de march&#233;.</i>
-        </div>
-      </div>
-
-      <!-- RÉINVESTISSEMENT DIVIDENDES (SCPI seulement) -->
-      <div class="bloc" id="blocReinvest" style="display:none">
-        <div class="bloc-tag">Option</div>
-        <div class="bloc-title" contenteditable="true" id="titleReinvest">R&#233;investissement automatique des dividendes</div>
-        <div class="bloc-body" contenteditable="true" id="bodyReinvest">
-<b>Pourquoi choisir cette option ?</b><br><br>
-Les dividendes vers&#233;s par les SCPI peuvent &#234;tre soit <b>per&#231;us directement</b> (compl&#233;ment de revenu imm&#233;diat), soit <b>r&#233;investis automatiquement</b> pour acqu&#233;rir de nouvelles parts.<br><br>
-<b>Ce que le r&#233;investissement apporte :</b><br>
-&#10003; <b>Effet boule de neige</b> : les nouveaux dividendes g&#233;n&#232;rent eux-m&#234;mes des dividendes (capitalisation compos&#233;e)<br>
-&#10003; <b>Croissance acc&#233;l&#233;r&#233;e du patrimoine</b> sans effort suppl&#233;mentaire<br>
-&#10003; <b>Exon&#233;ration de la fiscalit&#233; sur les dividendes r&#233;investis</b> pour les SCPI europ&#233;ennes (pas de PS 17,2 %)<br>
-&#10003; <b>Lissage du prix d'acquisition</b> dans le temps (m&#233;thode DCA)<br>
-&#10003; <b>Constitution d'un patrimoine plus important</b> &#224; horizon 10-15 ans<br><br>
-&#8594; Recommand&#233; si vous n'avez pas besoin des revenus imm&#233;diatement et que votre objectif est de <b>maximiser la valeur finale du patrimoine</b>.
-        </div>
-      </div>
-
-      <!-- LEVIER CRÉDIT (SCPI seulement) -->
-      <div class="bloc" id="blocLevier" style="display:none">
-        <div class="bloc-tag">Option</div>
-        <div class="bloc-title" contenteditable="true" id="titleLevier">Effet de levier par le cr&#233;dit</div>
-        <div class="bloc-body" contenteditable="true" id="bodyLevier">
-<b>Pourquoi financer &#224; cr&#233;dit plut&#244;t qu'au comptant ?</b><br><br>
-Le financement &#224; cr&#233;dit permet de <b>multiplier l'effet patrimonial</b> de votre investissement SCPI en utilisant l'argent de la banque plut&#244;t que votre propre tr&#233;sorerie.<br><br>
-<b>Les avantages concrets :</b><br>
-&#10003; <b>Patrimoine multipli&#233;</b> : avec 20 000 &#8364; d'apport, vous pouvez acqu&#233;rir 100 000 &#8364; de parts (effet de levier &times; 5)<br>
-&#10003; <b>Loyers qui remboursent le cr&#233;dit</b> : les dividendes SCPI couvrent une partie importante de la mensualit&#233;<br>
-&#10003; <b>Int&#233;r&#234;ts d'emprunt d&#233;ductibles</b> des revenus fonciers (r&#233;duction d'imp&#244;t)<br>
-&#10003; <b>Protection assurance d&#233;c&#232;s-invalidit&#233; (ADI)</b> : en cas d'accident de la vie, le capital est soldé<br>
-&#10003; <b>Pr&#233;servation de votre tr&#233;sorerie</b> pour d'autres investissements ou projets<br><br>
-<b>Conditions typiques :</b><br>
-&#8226; Dur&#233;e : 15 &#224; 25 ans<br>
-&#8226; Apport : 10 &#224; 20 % du montant investi<br>
-&#8226; Taux nominal actuel : 4 &#224; 5,5 % selon la banque partenaire<br>
-&#8226; Diff&#233;r&#233; d'amortissement possible (6 &#224; 9 mois)
-        </div>
-      </div>
-
-      <!-- FRAIS -->
-      <div class="bloc" id="blocFrais">
-        <div class="bloc-tag">Frais</div>
-        <div class="bloc-title" contenteditable="true" id="titleFrais">Les frais expliqu&#233;s simplement</div>
-        <table class="frais-tbl" id="fraisTable">
-          <thead><tr><th>Type de frais</th><th>Montant</th><th>D&#233;tail</th></tr></thead>
-          <tbody>
-            <tr><td>Frais sur versement</td><td class="frais-montant" contenteditable="true">4,8 %</td><td contenteditable="true">R&#233;mun&#233;ration du conseil, suivi et accompagnement dans le temps</td></tr>
-            <tr><td>Frais de gestion</td><td class="frais-montant" contenteditable="true">1 % /an</td><td contenteditable="true">Li&#233;s &#224; l'assureur (standard de march&#233;)</td></tr>
-            <tr><td>Frais d'arbitrage</td><td class="frais-montant" contenteditable="true">0 %</td><td contenteditable="true">R&#233;allocation libre sans surco&#251;t</td></tr>
-            <tr><td>Frais de sortie</td><td class="frais-montant" contenteditable="true">0 %</td><td contenteditable="true">Capital libre, sans p&#233;nalit&#233;</td></tr>
-            <tr><td>Frais pilot&#233;s</td><td class="frais-montant" contenteditable="true">0 %</td><td contenteditable="true">Gestion libre, sans surcouche</td></tr>
-          </tbody>
-        </table>
-        <div style="font-size:11px;color:var(--gris);margin-top:8px;font-style:italic" id="fraisNote">&#8594; Moyenne globale sur 10 ans : &#8776; 1,48 %/an tous frais confondus</div>
-      </div>
-
-      <!-- PROCHAINES ETAPES -->
-      <!-- SCHEMA PEDAGOGIQUE -->
-      <div class="bloc" id="blocSchema">
-        <div class="bloc-tag">Compr&#233;hension</div>
-        <div class="bloc-title" id="schemaTitle">Comprendre le m&#233;canisme</div>
-        <div class="schema-templates no-print" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px">
-          <span style="font-size:10px;color:var(--gris);align-self:center;margin-right:2px">Ins&#233;rer un mod&#232;le :</span>
-          <button type="button" onclick="insertSchemaTemplate('av')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">Assurance Vie</button>
-          <button type="button" onclick="insertSchemaTemplate('per')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">PER</button>
-          <button type="button" onclick="insertSchemaTemplate('scpi')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">SCPI</button>
-          <button type="button" onclick="insertSchemaTemplate('lmnp')" style="padding:4px 11px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">LMNP</button>
-          <button type="button" onclick="clearSchemaTemplate()" style="padding:4px 11px;border:1px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px">Vider</button>
-        </div>
-        <div class="bloc-body" contenteditable="true" id="bodySchema" style="min-height:60px">
-          <div style="color:var(--gris);font-style:italic;font-size:13px">Ce bloc est vide. Clique sur un mod&#232;le ci-dessus ou saisis directement ton contenu ici.</div>
-        </div>
-      </div>
-
-      <!-- PROCHAINES ÉTAPES -->
-      <div class="bloc" id="blocWorkflow">
-        <div class="bloc-tag">Prochaines &#233;tapes</div>
-        <div class="bloc-title" contenteditable="true" id="titleWorkflow">Pour d&#233;marrer</div>
-        <div class="steps-list" id="stepsList">
-          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Document d'entr&#233;e en relation</div><div class="step-desc">Document sign&#233; au d&#233;marrage de la relation client</div></div>
-          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Recueil d'informations</div><div class="step-desc">Situation patrimoniale, objectifs et profil de risque compl&#233;t&#233;s</div></div>
-          <div class="step-row done" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Profil investisseur</div><div class="step-desc">Questionnaire de connaissance client sign&#233;</div></div>
-          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Envoi des documents</div><div class="step-desc">Pi&#232;ce d'identit&#233; valide, RIB PDF, justificatif de domicile (&lt; 3 mois)</div></div>
-          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Signature &#233;lectronique</div><div class="step-desc">Fiche conseil + bulletin de souscription &mdash; par e-mail</div></div>
-          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Ouverture du contrat</div><div class="step-desc">Confirmation par l'assureur / partenaire sous 5 &#224; 10 jours ouvr&#233;s</div></div>
-          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Premier bilan &#224; 4 mois</div><div class="step-desc">Point performance, ajustement strat&#233;gie</div></div>
-          <div class="step-row" onclick="toggleStep(this)"><div class="step-cb"></div><div class="step-label">Suivi annuel</div><div class="step-desc">Revue compl&#232;te du contrat et de la strat&#233;gie patrimoniale</div></div>
-        </div>
-      </div>
-
-      <!-- ANNEXES -->
-      <div class="bloc" id="blocAnnexes">
-        <div class="bloc-tag">Annexes</div>
-        <div class="bloc-title" contenteditable="true" id="titleAnnexes">Documents joints</div>
-        <div id="annexesContent">
-          <div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>
-        </div>
-      </div>
-
-
-      <!-- SCPI SELECTION (visible quand type=scpi) -->
-      <div class="bloc" id="blocSCPISelection" style="display:none">
-        <div class="bloc-tag">S&#233;lection</div>
-        <div class="bloc-title">SCPI recommand&#233;es</div>
-        <div id="scpiCardsContent" style="display:flex;flex-direction:column;gap:8px"></div>
-        <div id="scpiTotalRow" style="display:none;margin-top:12px;padding:12px 16px;background:var(--paper);border-radius:7px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Total investi</span>
-          <span id="scpiTotalVal" style="font-size:18px;font-weight:700;color:var(--orange)">0 &#8364;</span>
-        </div>
-      </div>
-
-      <!-- À VOS CÔTÉS — fusionne visuellement avec le footer -->
-      <div id="blocServices">
-        <div class="svc-title">&Agrave; vos c&#244;t&#233;s</div>
-        <div id="bodyServices" contenteditable="true" class="svc-body">
-&#10003; <b>Ligne directe WhatsApp</b> &amp; calendrier en ligne pour les rendez-vous<br>
-&#10003; <b>Aide &#224; la d&#233;claration d'imp&#244;ts</b>, incluse dans l'accompagnement<br>
-&#10003; <b>Appui d'ing&#233;nieurs patrimoniaux</b> pour les sujets techniques (transmission, montage en soci&#233;t&#233;&#8230;)<br>
-&#10003; <b>R&#233;seau d'experts partenaires</b> : notaire, courtier, assureur, agent immobilier, avocat<br>
-&#10003; <b>Acc&#232;s &#224; des opportunit&#233;s exclusives</b> (fonds premium, private equity, produits structur&#233;s&#8230;)
-        </div>
-      </div>
-
-      <!-- PIED DE PAGE CONSEILLER -->
-      <div id="conseillerFooter"></div>
-
     </div>
   </div>
 </div>
 
+<!-- PLACEMENT (placeholder) -->
+<div id="viewPlacement" class="os-view">
+  <div class="os-placeholder">
+    <span>&#128176;</span>
+    <div>Module Placement</div>
+    <div style="font-size:14px">&#128284; En cours de developpement</div>
+  </div>
+</div>
+
+<!-- BILAN (placeholder) -->
+<div id="viewBilan" class="os-view">
+  <div class="os-placeholder">
+    <span>&#128202;</span>
+    <div>Bilan Patrimonial</div>
+    <div style="font-size:14px">&#128284; En cours de developpement</div>
+  </div>
+</div>
+
+<!-- IMMOBILIER -->
+<div id="viewImmo" class="os-view">
+  <div class="os-layout">
+    <!-- SIDEBAR -->
+    <aside class="os-sidebar">
+
+      <!-- CLIENT -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Client</div>
+        <div class="os-sb-body open">
+          <div class="os-fg"><label>Prenom Nom</label><input class="os-fi" type="text" id="iNom" placeholder="Ex: Jean Dupont"></div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Age</label><div class="os-fi-row"><input type="number" id="iAge" placeholder="35"><span class="os-fi-unit">ans</span></div></div>
+            <div class="os-fg"><label>Situation</label>
+              <select class="os-fi" id="iSituation">
+                <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
+                <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
+              </select>
+            </div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Revenu brut annuel</label><div class="os-fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+            <div class="os-fg"><label>Revenu net mensuel</label><div class="os-fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Taux PAS</label><div class="os-fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="os-fi-unit">%</span></div></div>
+            <div class="os-fg"><label>Impots mensuels</label><div class="os-fi-row"><input type="number" id="iImpots" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CO-INVESTISSEUR -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Co-investisseur</div>
+        <div class="os-sb-body">
+          <div class="os-toggle-row"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()"> <span>Activer co-investisseur</span></div>
+          <div id="coFields" style="display:none">
+            <div class="os-fg"><label>Prenom Nom</label><input class="os-fi" type="text" id="iCoNom" placeholder="Ex: Marie Dupont"></div>
+            <div class="os-grid2">
+              <div class="os-fg"><label>Revenu brut annuel</label><div class="os-fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+              <div class="os-fg"><label>Revenu net mensuel</label><div class="os-fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRET RP -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Pret RP en cours</div>
+        <div class="os-sb-body">
+          <div class="os-toggle-row"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()"> <span>Pret en cours</span></div>
+          <div id="pretFields" style="display:none">
+            <div class="os-grid2">
+              <div class="os-fg"><label>Montant emprunte</label><div class="os-fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+              <div class="os-fg"><label>Taux nominal</label><div class="os-fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="os-fi-unit">%</span></div></div>
+            </div>
+            <div class="os-grid2">
+              <div class="os-fg"><label>Duree totale</label><div class="os-fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="os-fi-unit">ans</span></div></div>
+              <div class="os-fg"><label>Mensualite</label><div class="os-fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+            </div>
+            <div class="os-fg"><label>Capital restant du</label><div class="os-fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EPARGNE -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Epargne</div>
+        <div class="os-sb-body open">
+          <div class="os-fg"><label>Epargne disponible</label><div class="os-fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+        </div>
+      </div>
+
+      <!-- PROJET -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Projet immobilier</div>
+        <div class="os-sb-body open">
+          <div class="os-grid2">
+            <div class="os-fg"><label>Ville</label><input class="os-fi" type="text" id="iVille" placeholder="Ex: Limoges"></div>
+            <div class="os-fg"><label>Type de bien</label>
+              <select class="os-fi" id="iTypeBien">
+                <option value="studio">Studio</option><option value="t1bis">T1bis</option>
+                <option value="t2">T2</option><option value="t3">T3</option>
+                <option value="colocation">Colocation</option>
+              </select>
+            </div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Surface Carrez</label><div class="os-fi-row"><input type="number" id="iSurface" placeholder="0"><span class="os-fi-unit">m&#178;</span></div></div>
+            <div class="os-fg"><label>Eligibilite</label>
+              <select class="os-fi" id="iEligibilite">
+                <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option>
+                <option value="deficit">Deficit Foncier</option>
+              </select>
+            </div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Prix FAI</label><div class="os-fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+            <div class="os-fg"><label>Frais de notaire</label><div class="os-fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Travaux TTC</label><div class="os-fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+            <div class="os-fg"><label>Frais commercialisation</label><div class="os-fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+          </div>
+          <div class="os-fg"><label>Budget mobilier</label><div class="os-fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Taux financement</label><div class="os-fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="os-fi-unit">%</span></div></div>
+            <div class="os-fg"><label>Duree</label>
+              <select class="os-fi" id="iDureeFin">
+                <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
+              </select>
+            </div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Loyer brut HC nu</label><div class="os-fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+            <div class="os-fg"><label>Loyer brut HC meuble</label><div class="os-fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+          </div>
+          <div class="os-grid2">
+            <div class="os-fg"><label>Charges copro</label><div class="os-fi-row"><input type="number" id="iCharges" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+            <div class="os-fg"><label>Taxe fonciere</label><div class="os-fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+          </div>
+          <div class="os-fg"><label>Assiette Denormandie eligible</label><div class="os-fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+        </div>
+      </div>
+
+      <!-- SCENARIO ALT -->
+      <div class="os-sb-section">
+        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Scenario alternatif</div>
+        <div class="os-sb-body">
+          <div class="os-toggle-row"><input type="checkbox" id="iAltToggle"> <span>Comparer un 2e scenario</span></div>
+          <div id="altFields" style="display:none">
+            <div class="os-fg"><label>Ville</label><input class="os-fi" type="text" id="iAltVille" placeholder="Ex: Poitiers"></div>
+            <div class="os-grid2">
+              <div class="os-fg"><label>Budget</label><div class="os-fi-row"><input type="number" id="iAltBudget" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+              <div class="os-fg"><label>Effort mensuel</label><div class="os-fi-row"><input type="number" id="iAltEffort" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+            </div>
+            <div class="os-grid2">
+              <div class="os-fg"><label>Mensualite</label><div class="os-fi-row"><input type="number" id="iAltMens" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+              <div class="os-fg"><label>Loyer net</label><div class="os-fi-row"><input type="number" id="iAltLoyer" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+            </div>
+            <div class="os-toggle-row"><input type="checkbox" id="iAltDeno"> <span>Eligible Denormandie</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOUTON -->
+      <button class="os-sb-btn" onclick="calc()">&#9654; Analyser le projet</button>
+
+    </aside>
+
+    <!-- MAIN RESULTS -->
+    <main class="os-main">
+      <div id="resultsEmpty" class="os-empty">
+        <span>&#127968;</span>
+        <div style="font-size:16px;font-weight:600">Analyse immobiliere</div>
+        <div style="font-size:13px">Renseignez les donnees client et projet dans la sidebar, puis cliquez sur <b>Analyser</b></div>
+      </div>
+
+      <div id="resultsContent" style="display:none">
+
+        <!-- HEADER -->
+        <div class="os-header" id="rHeader">
+          <div class="os-header-left">
+            <h2 id="rClientName">—</h2>
+            <div class="sub" id="rClientSub">—</div>
+          </div>
+          <div class="os-header-right">
+            <div id="rBadge"></div>
+            <div class="date" id="rDate"></div>
+          </div>
+        </div>
+
+        <!-- KPIS -->
+        <div class="os-kpis" id="rKpis">
+          <div class="os-kpi"><div class="os-kpi-label">Budget total meuble</div><div class="os-kpi-val" id="kBudget">—</div><div class="os-kpi-sub" id="kBudgetSub">—</div></div>
+          <div class="os-kpi"><div class="os-kpi-label">Effort meuble / apport</div><div class="os-kpi-val" id="kEffort">—</div><div class="os-kpi-sub" id="kEffortSub">—</div></div>
+          <div class="os-kpi"><div class="os-kpi-label">Rendement brut</div><div class="os-kpi-val" id="kRendement">—</div><div class="os-kpi-sub" id="kRendementSub">—</div></div>
+          <div class="os-kpi"><div class="os-kpi-label">Endettement apres</div><div class="os-kpi-val" id="kEndettement">—</div><div class="os-kpi-sub" id="kEndettementSub">—</div></div>
+        </div>
+
+        <!-- PROFIL CLIENT + SYNTHESE PROJET -->
+        <div class="os-results-grid">
+          <div class="os-card-r">
+            <div class="os-card-title-r">Profil client</div>
+            <div id="rProfil"></div>
+          </div>
+          <div class="os-card-r">
+            <div class="os-card-title-r">Synthese du projet</div>
+            <div id="rProjet"></div>
+          </div>
+        </div>
+
+        <!-- CAPACITE FINANCIERE -->
+        <div class="os-card-r">
+          <div class="os-card-title-r">Capacite financiere — Endettement</div>
+          <div id="rEndettement"></div>
+        </div>
+
+        <!-- COMPARATIF NU VS MEUBLE -->
+        <div class="os-card-r">
+          <div class="os-card-title-r">Comparatif Nu vs Meuble</div>
+          <div style="overflow-x:auto" id="rComparatif"></div>
+        </div>
+
+        <!-- EFFORT MENSUEL -->
+        <div class="os-card-r">
+          <div class="os-card-title-r">Effort mensuel net</div>
+          <div id="rEffort"></div>
+        </div>
+
+        <!-- DENORMANDIE -->
+        <div class="os-card-r" id="rDenoCard" style="display:none">
+          <div class="os-card-title-r">Reduction Denormandie</div>
+          <div id="rDeno"></div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="os-results-grid">
+          <div class="os-card-r">
+            <div class="os-card-title-r">Repartition du budget</div>
+            <div class="os-chart-wrap"><canvas id="chartBudget"></canvas></div>
+          </div>
+          <div class="os-card-r">
+            <div class="os-card-title-r">Comparaison des efforts</div>
+            <div class="os-chart-wrap"><canvas id="chartEffort"></canvas></div>
+          </div>
+        </div>
+
+        <!-- SCENARIO ALT -->
+        <div class="os-card-r" id="rAltCard" style="display:none">
+          <div class="os-card-title-r">Comparaison des scenarios</div>
+          <div id="rAlt"></div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+</div>
+
 <script>
-var TEMPLATES={
-  av:{
-    type:'ASSURANCE VIE',
-    title:'Notre accompagnement & proposition',
-    accompagnement:'L\'assurance vie reste le placement pr\u00e9f\u00e9r\u00e9 des Fran\u00e7ais \u2014 et pour cause. Bien utilis\u00e9e, elle est bien plus qu\'un compte \u00e9pargne : c\'est le socle de toute strat\u00e9gie patrimoniale solide.<br><br>Mon r\u00f4le n\'est pas de vous vendre un contrat. C\'est de comprendre votre situation, vos objectifs et vos contraintes pour construire avec vous une solution coh\u00e9rente, \u00e9volutive et durable.<br><br>Ce que vous gagnez en travaillant avec moi :<br>\u2713 <b>Une strat\u00e9gie sur-mesure</b>, align\u00e9e avec votre profil et vos projets de vie<br>\u2713 <b>Un suivi actif dans la dur\u00e9e</b> \u2014 pas un contrat ouvert et oubli\u00e9<br>\u2713 <b>La transparence totale</b> sur les frais, les rendements et les arbitrages<br>\u2713 <b>Un interlocuteur humain</b>, joignable directement sur WhatsApp<br><br>Cette solution s\'inscrit dans une vision globale de votre patrimoine, articul\u00e9e autour de trois leviers : <b>placements / financement / fiscalit\u00e9</b>.',
-    contrat:'Le contrat retenu est <b>Vie Plus</b>, propos\u00e9 par <b>Suravenir</b> (filiale du Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e) \u2014 l\'un des assureurs les plus solides du march\u00e9 ind\u00e9pendant.<br><br>\u2713 <b>Architecture ouverte</b> \u2014 300+ supports financiers et immobiliers<br>\u2713 <b>+60 soci\u00e9t\u00e9s de gestion</b> partenaires ind\u00e9pendantes<br>\u2713 <b>Fonds en euros garanti</b> avec capital prot\u00e9g\u00e9<br>\u2713 <b>Offre immobili\u00e8re compl\u00e8te</b> : SCPI, SCI, OPCI<br>\u2713 <b>Capital-investissement</b> : private equity accessible d\u00e8s 25 \u20ac<br>\u2713 <b>Produits structur\u00e9s et obligations dat\u00e9es</b> exclusifs<br><br>En clair : un contrat haut de gamme, normalement r\u00e9serv\u00e9 aux grandes banques priv\u00e9es, accessible sans condition de fortune.',
-    gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et coh\u00e9rence dans le temps</b><br><br><b>Versement initial (VI)</b> \u2014 Poser une base solide d\u00e8s l\'ouverture. Supports s\u00e9lectionn\u00e9s selon le contexte de march\u00e9.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e et profiter de la m\u00e9thode DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer la position selon les opportunit\u00e9s de march\u00e9.<br><br>\u2192 <b>Horizon conseill\u00e9 : 5 ans minimum</b><br>\u2192 <b>Ambition de rendement : 3 \u00e0 5 % nets</b> de frais de gestion<br><br><i>Objectif indicatif, non garanti. Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.</i>',
-    frais:[['Frais sur versement','4,8 %','R\u00e9mun\u00e9ration du conseil, de l\'analyse et de l\'accompagnement'],['Frais de gestion','1 %/an','Pr\u00e9lev\u00e9s par l\'assureur sur l\'encours'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre entre supports'],['Frais de sortie','0 %','Capital disponible \u00e0 tout moment'],['Frais de gestion pilot\u00e9e','0 %','Gestion libre et ind\u00e9pendante']],
-    fraisNote:'Co\u00fbt moyen sur 10 ans : \u2248 1,48 %/an tous frais confondus (source : grille Finzzle)',
-    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9 valide, RIB PDF, justificatif de domicile < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition Suravenir par e-mail'],['Ouverture du contrat','Confirmation par l\'assureur sous 5-10 jours ouvr\u00e9s'],['Premier bilan \u00e0 4 mois','Point performance, ajustement strat\u00e9gie'],['Suivi annuel','Revue compl\u00e8te du contrat et strat\u00e9gie patrimoniale']]
-  },
-  per:{
-    type:'PLAN \u00c9PARGNE RETRAITE',
-    title:'Mon accompagnement & proposition',
-    accompagnement:'Le Plan \u00c9pargne Retraite, c\'est l\'outil le plus puissant dont vous disposez aujourd\'hui pour agir sur <b>deux leviers simultan\u00e9ment</b> : r\u00e9duire votre imposition d\u00e8s cette ann\u00e9e, et construire un revenu compl\u00e9mentaire pour la retraite.<br><br>Avec un taux de remplacement moyen qui baisse d\'ann\u00e9e en ann\u00e9e, les r\u00e9gimes obligatoires ne maintiendront plus votre niveau de vie. C\'est ce qu\'on appelle le <b>d\u00e9ficit retraite</b>.<br><br>Le PER vous permet de reprendre la main sur cet \u00e9cart, \u00e0 votre rythme, avec un avantage fiscal imm\u00e9diat.<br><br><b>Concr\u00e8tement :</b><br>\u2713 Chaque euro vers\u00e9 est <b>d\u00e9ductible de votre revenu imposable</b><br>\u2713 L\'\u00e9conomie d\'imp\u00f4t est imm\u00e9diate<br>\u2713 Le capital fructifie sur le long terme<br>\u2713 \u00c0 la retraite : capital ou rente selon votre choix<br><br>Mon ambition : <b>3 \u00e0 5 % nets</b> de tous frais sur la dur\u00e9e. <i>Objectif indicatif, non garanti.</i>',
-    contrat:'Le contrat retenu est <b>Vie Plus</b>, propos\u00e9 par <b>Suravenir</b> (filiale du Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e).<br><br>\u2713 <b>Architecture ouverte</b> \u2014 300+ supports financiers et immobiliers<br>\u2713 <b>+60 soci\u00e9t\u00e9s de gestion</b> partenaires ind\u00e9pendantes<br>\u2713 <b>Fonds en euros garanti</b> pour la partie s\u00e9curis\u00e9e<br>\u2713 <b>Offre immobili\u00e8re compl\u00e8te</b> : SCPI, SCI, OPCI<br>\u2713 <b>Capital-investissement</b> : FCPR accessibles d\u00e8s 25 \u20ac<br>\u2713 <b>Produits structur\u00e9s exclusifs</b><br><br>Un cadre d\'investissement flexible et haut de gamme, sans les contraintes d\'un contrat bancaire classique.',
-    gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et optimisation fiscale dans le temps</b><br><br><b>Versement initial (VI)</b> \u2014 Amorcer le contrat avec une base solide selon le contexte de march\u00e9.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e via la m\u00e9thode DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer au fil du temps, notamment en fin d\'ann\u00e9e pour maximiser la d\u00e9duction fiscale.<br><br>\u2192 <b>Horizon : jusqu\'\u00e0 la retraite</b> (minimum 5 ans)<br>\u2192 <b>D\u00e9duction fiscale : jusqu\'\u00e0 10 % des revenus</b> nets',
-    frais:[['Frais sur versement','4,5 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 % /an','Li\u00e9s \u00e0 l\'assureur (norme du march\u00e9)'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre sans surco\u00fbt'],['Frais de sortie','0 %','Capital libre, sans p\u00e9nalit\u00e9'],['Frais pilot\u00e9s','0 %','Gestion libre et ind\u00e9pendante']],
-    fraisNote:'\u2192 Moyenne globale sur 30 ans : \u2248 1,15 %/an tous frais confondus',
-    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9 valide, RIB au format PDF, justificatif de domicile (moins de 3 mois)'],['Signature \u00e9lectronique','Fiche Conseil + proposition de souscription par e-mail'],['Confirmation','Confirmation d\'ouverture du contrat par l\'assureur'],['Premier suivi \u00e0 3 mois','Bilan performance, ajustement strat\u00e9gie'],['Suivi annuel structur\u00e9','D\u00e9claration d\'imp\u00f4ts en avril, correction en septembre, bilan complet oct-nov']]
-  },
-  scpi:{
-    type:'SCPI DE RENDEMENT',
-    title:'Notre accompagnement & proposition',
-    accompagnement:'La SCPI vous permet d\'investir dans l\'immobilier professionnel \u2014 bureaux, commerces, logistique, sant\u00e9, h\u00f4tellerie \u2014 <b>sans aucune contrainte de gestion</b>. Pas de locataire \u00e0 g\u00e9rer, pas de travaux, pas d\'impay\u00e9 \u00e0 g\u00e9rer seul.<br><br>Vous d\u00e9l\u00e9guez tout \u00e0 des gestionnaires professionnels agr\u00e9\u00e9s par l\'AMF, et vous percevez des <b>dividendes trimestriels</b> r\u00e9guliers.<br><br>\u2713 <b>Diversification</b> sur plusieurs types d\'actifs et zones g\u00e9ographiques<br>\u2713 <b>Revenu compl\u00e9mentaire</b> vers\u00e9 automatiquement chaque trimestre<br>\u2713 <b>Gestion 100 % d\u00e9l\u00e9gu\u00e9e</b> \u2014 encadr\u00e9e, transparente, audit\u00e9e<br>\u2713 <b>Flexibilit\u00e9 d\'acquisition</b> : comptant, \u00e0 cr\u00e9dit ou en d\u00e9membrement<br><br>Notre ambition : un <b>rendement de 5 \u00e0 6 % brut de fiscalit\u00e9</b>, net de frais de gestion. <i>Objectif indicatif, non garanti.</i>',
-    contrat:'<b>Pourquoi nous privil\u00e9gions les SCPI europ\u00e9ennes et internationales</b><br><br>Les SCPI que nous s\u00e9lectionnons investissent majoritairement <b>hors de France</b>. Avantage fiscal concret : les revenus ne sont <b>pas soumis aux pr\u00e9l\u00e8vements sociaux fran\u00e7ais (17,2 %)</b>.<br><br><b>Aide \u00e0 la d\u00e9claration d\'imp\u00f4ts incluse</b><br><br>Les revenus SCPI doivent \u00eatre d\u00e9clar\u00e9s chaque ann\u00e9e. Je m\'en occupe avec vous :<br>\u2713 <b>R\u00e9capitulatif fiscal clair</b> transmis avant chaque d\u00e9claration<br>\u2713 <b>Identification des cases</b> \u00e0 remplir selon votre situation<br>\u2713 <b>Analyse de l\'impact fiscal</b> selon votre TMI<br>\u2713 <b>V\u00e9rification crois\u00e9e</b> IFU / montants \u00e0 d\u00e9clarer',
-    gestion:'<b>Objectif : revenu r\u00e9gulier, constitution de patrimoine et s\u00e9r\u00e9nit\u00e9</b><br><br><b>Acquisition au comptant</b> \u2014 G\u00e9n\u00e9rer un revenu compl\u00e9mentaire imm\u00e9diat, avec un rendement optimis\u00e9.<br><br><b>Acquisition \u00e0 cr\u00e9dit</b> \u2014 Utiliser l\'effet de levier bancaire pour acquérir un patrimoine plus important.<br><br><b>D\u00e9membrement</b> \u2014 Acheter l\'usufruit (revenus temporaires) ou la nue-propri\u00e9t\u00e9 (valorisation long terme).<br><br>\u2192 <b>Horizon recommand\u00e9 : 8 \u00e0 10 ans minimum</b><br>\u2192 <b>D\u00e9lai de jouissance : 3 \u00e0 6 mois</b>',
-    frais:[['Frais de gestion','\u2248 10 % /an des loyers bruts','Pr\u00e9lev\u00e9s avant versement des dividendes. Le rendement de 6 % est d\u00e9j\u00e0 net de ces frais.'],['Frais de souscription','8 % \u00e0 12 %','Int\u00e9gr\u00e9s dans le prix de la part. N\'impactent qu\'en cas de revente.']],
-    fraisNote:'Dans une optique de d\u00e9tention long terme ou de transmission, les frais de souscription ne vous impactent pas.',
-    etapes:[['S\u00e9lection des SCPI','Choix des SCPI adapt\u00e9es \u00e0 votre profil et objectifs'],['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB, justificatif de domicile'],['Signature \u00e9lectronique','Bulletin de souscription par e-mail'],['D\u00e9lai de jouissance','3 \u00e0 6 mois selon les SCPI (premier versement de dividendes)'],['Suivi annuel','Bilan performance + aide d\u00e9claration fiscale']]
-  },
-  immo:{
-    type:'IMMOBILIER LMNP',
-    title:'Proposition d\'investissement immobilier',
-    accompagnement:'L\'investissement immobilier locatif en <b>LMNP (Loueur Meubl\u00e9 Non Professionnel)</b> est l\'un des rares dispositifs qui combine \u00e0 la fois <b>revenus r\u00e9guliers, avantage fiscal significatif et constitution de patrimoine tangible</b>.<br><br>Le principe : vous achetez un bien meubl\u00e9, vous le louez, et l\'amortissement comptable du bien vous permet de percevoir des loyers <b>quasiment d\u00e9fiscalis\u00e9s pendant 10 \u00e0 20 ans</b>.<br><br>\u2713 <b>Revenus locatifs nets d\'imp\u00f4t</b> gr\u00e2ce au r\u00e9gime r\u00e9el simplifi\u00e9<br>\u2713 <b>Amortissement du bien</b> : la charge comptable efface fiscalement les loyers<br>\u2713 <b>Patrimoine immobilier tangible</b>, transmissible<br>\u2713 <b>Gestion simplifi\u00e9e</b> selon le format choisi (avec ou sans exploitant)',
-    contrat:'<b>Trois formats d\'investissement selon votre profil</b><br><br><b>LMNP sans exploitant</b> \u2014 Vous g\u00e9rez la location directement (ou via une agence). Plus de libert\u00e9, meilleure rentabilit\u00e9 brute.<br><br><b>LMNP en colocation meubl\u00e9e</b> \u2014 Plusieurs locataires dans un m\u00eame bien. Rentabilit\u00e9 maximis\u00e9e, vacance locative r\u00e9duite.<br><br><b>LMNP en r\u00e9sidence de services</b> \u2014 Bail commercial avec exploitant professionnel. Loyers garantis, gestion 100 % d\u00e9l\u00e9gu\u00e9e.<br><br>\u2713 R\u00e9gime fiscal : <b>BIC r\u00e9el simplifi\u00e9</b><br>\u2713 R\u00e9cup\u00e9ration de TVA possible en neuf<br>\u2713 Financement \u00e0 cr\u00e9dit pour maximiser l\'effet de levier',
-    gestion:'<b>Objectif : revenus nets d\'imp\u00f4t et valorisation \u00e0 long terme</b><br><br><b>Financement</b> \u2014 Apport ou cr\u00e9dit immobilier selon votre capacit\u00e9. Le cr\u00e9dit maximise l\'effet de levier.<br><br><b>Structure de d\u00e9tention</b> \u2014 En direct, en SCI \u00e0 l\'IS ou en SCI transparente selon votre situation.<br><br><b>Strat\u00e9gie de sortie</b> \u2014 Revente, transmission ou basculement en nue-propri\u00e9t\u00e9.<br><br>\u2192 <b>Horizon conseill\u00e9 : 10 ans minimum</b><br>\u2192 <b>Rentabilit\u00e9 brute cible : 5 \u00e0 8 %</b><br><br><i>Objectif indicatif, non garanti.</i>',
-    frais:[['Frais de notaire','7 \u00e0 8 % (ancien) / 2 \u00e0 3 % (neuf)','Frais d\'acquisition standards'],['Frais d\'agence','3 \u00e0 5 %','Int\u00e9gr\u00e9s dans le prix FAI'],['Honoraires comptable','300 \u00e0 800 \u20ac/an','Obligatoire au r\u00e9gime r\u00e9el simplifi\u00e9'],['Gestion locative','6 \u00e0 10 % des loyers','Si d\u00e9l\u00e9gation \u00e0 une agence'],['CFE','Variable','Cotisation Fonci\u00e8re des Entreprises']],
-    fraisNote:'La rentabilit\u00e9 nette tient compte de l\'ensemble de ces frais dans la projection.',
-    etapes:[['S\u00e9lection du bien','Analyse du projet, capacit\u00e9 financement, objectifs de rendement'],['Montage financier','Simulation cr\u00e9dit, structure de d\u00e9tention, projection rentabilit\u00e9 10-20 ans'],['Acquisition','Compromis, financement, acte authentique chez le notaire'],['Mise en location','D\u00e9claration greffe, r\u00e9gime BIC r\u00e9el, choix comptable partenaire'],['Suivi annuel','Bilan locatif, d\u00e9claration fiscale BIC accompagn\u00e9e']]
-  }
-};
-
-var ANNEXE_MODULES=[
-  {id:'scpi-simulator',label:'Projection SCPI Cash',icon:'\ud83d\udcc8'},
-  {id:'scpi-financement',label:'Projection SCPI Cr\u00e9dit',icon:'\ud83c\udfe6'},
-  {id:'immo-simulator',label:'Projection Immobilier LMNP',icon:'\ud83c\udfe0'},
-  {id:'etude-transfert-per',label:'Comparaison PER / AV',icon:'\ud83d\udd04'},
-  {id:'simulateur-avance-av',label:'Avance sur Assurance Vie',icon:'\ud83d\udcb6'},
-  {id:'interets-composes',label:'Capitalisation',icon:'\ud83e\uddee'},
-  {id:'per-vs-av',label:'Matrice PER vs AV',icon:'\u2696\ufe0f'}
-];
-
+/* ===== UTILITIES ===== */
 function V(id){return document.getElementById(id)}
+function N(id){return parseFloat(V(id).value)||0}
+function fmt(n,d){if(n==null||isNaN(n))return '0';return Number(n).toLocaleString('fr-FR',{minimumFractionDigits:d||0,maximumFractionDigits:d||0})}
+function fmtE(n){return fmt(n)+' \u20ac'}
+function fmtP(n,d){return fmt(n,d===undefined?1:d)+' %'}
+function pmt(rate,nper,pv){if(!rate||!nper||!pv)return 0;var r=rate/100/12;var n=nper*12;return pv*r/(1-Math.pow(1+r,-n))}
+function today(){var d=new Date();return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}
 
-function updateGarde(){
-  var type=V('pType').value;
-  var typeLabels={av:'Dossier Solution \u2014 Assurance Vie',per:'Dossier Solution \u2014 PER',scpi:'Dossier Solution \u2014 SCPI',immo:'Dossier Solution \u2014 Immobilier LMNP'};
-  var solMap={av:['AV'],per:['PER'],scpi:['SCPI_CASH'],immo:['LMNP']};
-  var el=V('pageHeader');
-  if(!el)return;
-  // Forcer un clear avant re-render (évite tout cache visuel)
-  el.innerHTML='';
-  try{
-    CGP.header.render('pageHeader',{
-      tag:typeLabels[type]||'Dossier Solution',
-      solutions:solMap[type]||[],
-      clientId:'pClient',
-      savedKey:'dossier-solution'
-    });
-  }catch(e){console.warn('updateGarde header error:',e);}
+/* ===== NAVIGATION ===== */
+function showView(id){
+  var map={home:'viewHome',placement:'viewPlacement',immo:'viewImmo',bilan:'viewBilan'};
+  var views=document.querySelectorAll('.os-view');
+  for(var i=0;i<views.length;i++)views[i].classList.remove('active');
+  var el=V(map[id]);if(el)el.classList.add('active');
+  V('btnBack').style.display=id==='home'?'none':'';
 }
 
-function onTypeChange(){
-  var type=V('pType').value;
-  var t=TEMPLATES[type]||TEMPLATES.av;
-  if(t.contrat)V('bodyContrat').innerHTML=t.contrat;
-  if(t.gestion)V('bodyGestion').innerHTML=t.gestion;
-  if(t.frais){
-    var html='';
-    t.frais.forEach(function(r){
-      html+='<tr><td>'+r[0]+'</td><td class="frais-montant" contenteditable="true">'+r[1]+'</td><td contenteditable="true">'+r[2]+'</td></tr>';
-    });
-    V('fraisTable').querySelector('tbody').innerHTML=html;
-  }
-  // Frais note
-  var noteEl=V('fraisNote');
-  if(noteEl)noteEl.textContent=t.fraisNote||'\u2192 Moyenne globale sur 10 ans : \u2248 1,48 %/an tous frais confondus';
-  // Workflow visuel
-  if(t.etapes){
-    var wfHtml='';
-    t.etapes.forEach(function(e,i){
-      wfHtml+='<div class="wf-step"><div class="wf-num">'+(i+1)+'</div><div class="wf-pill">'+e[0]+'</div><div class="wf-detail">'+e[1]+'</div></div>';
-    });
-    V('wfSteps').innerHTML=wfHtml;
-  }
-  // Titre + contenu du schéma selon le type
-  var titles={av:'Comprendre l\'assurance vie',per:'Comprendre le m\u00e9canisme retraite',scpi:'Comprendre la SCPI',immo:'Comprendre le LMNP'};
-  V('schemaTitle').textContent=titles[type]||'Comprendre le m\u00e9canisme';
-  // Auto-insert le template correspondant (remplace le contenu existant)
-  var tplKey=(type==='immo')?'lmnp':type;
-  if(SCHEMA_TEMPLATES[tplKey]){
-    insertSchemaTemplate(tplKey);
-  }
-  // Show/hide SCPI picker
-  var scpiToggle=V('toggleSCPI');
-  var scpiBloc=V('blocSCPISelection');
-  if(scpiToggle)scpiToggle.style.display=type==='scpi'?'':'none';
-  if(scpiBloc)scpiBloc.style.display=type==='scpi'?'':'none';
-  // Show/hide SCPI-only blocs (réinvestissement + levier)
-  var cbRowReinvest=V('cbRowReinvest'),cbRowLevier=V('cbRowLevier');
-  if(cbRowReinvest)cbRowReinvest.style.display=type==='scpi'?'':'none';
-  if(cbRowLevier)cbRowLevier.style.display=type==='scpi'?'':'none';
-  if(type!=='scpi'){
-    if(V('cbReinvest'))V('cbReinvest').checked=false;
-    if(V('cbLevier'))V('cbLevier').checked=false;
-    V('blocReinvest').style.display='none';
-    V('blocLevier').style.display='none';
-  }
-  renderCustomSuggestions();
-  updateGarde();
+/* ===== SIDEBAR TOGGLES ===== */
+function togSb(lbl){
+  lbl.classList.toggle('open');
+  var body=lbl.nextElementSibling;
+  if(body)body.classList.toggle('open');
 }
+function toggleCoFields(){V('coFields').style.display=V('iCoToggle').checked?'':'none'}
+function togglePretFields(){V('pretFields').style.display=V('iPretToggle').checked?'':'none'}
 
-function toggleBloc(){
-  var map={cbGarde:'blocGarde',cbContrat:'blocContrat',cbGestion:'blocGestion',cbReinvest:'blocReinvest',cbLevier:'blocLevier',cbFrais:'blocFrais',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
-  Object.keys(map).forEach(function(cbId){
-    var el=V(map[cbId]);
-    if(el)el.style.display=V(cbId).checked?'':'none';
-  });
-}
+/* ===== CHARTS ===== */
+var chartBudget=null,chartEffort=null;
 
-// Annexes sélectionnées (ajoutées au dossier)
-var CUSTOM_ANNEXES=[]; // [{id, label, icon, sub}]
-
-// Suggestions par type de solution (hors projections sauvegardées)
-var ANNEXE_SUGGESTIONS={
-  av:   [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  per:  [{label:'Fiche conseil',icon:'\ud83d\udccb'},{label:'R\u00e9partition portefeuille',icon:'\ud83d\udcca'},{label:'DIC',icon:'\ud83d\udd0d'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Conditions g\u00e9n\u00e9rales',icon:'\ud83d\udcc4'}],
-  scpi: [{label:'Bulletin de souscription SCPI',icon:'\ud83d\udcdd'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'},{label:'Note d\'information',icon:'\ud83d\udcc4'},{label:'DIC SCPI',icon:'\ud83d\udd0d'}],
-  immo: [{label:'Descriptif du programme / lot',icon:'\ud83c\udfe0'},{label:'Plan du bien',icon:'\ud83d\udcd0'},{label:'Notice du promoteur',icon:'\ud83d\udcc4'},{label:'Bulletin trimestriel',icon:'\ud83d\udcc5'}]
-};
-
-function escAttr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,'\\\'').replace(/"/g,'&quot;');}
-
-function addCustomAnnexe(presetLabel,presetIcon,presetSub){
-  var inp=V('customAnnexeInput');
-  var label=(presetLabel||(inp?inp.value:'')||'').trim();
-  if(!label)return;
-  // Évite les doublons par label
-  if(CUSTOM_ANNEXES.some(function(a){return a.label===label})){
-    if(inp)inp.value='';
-    return;
-  }
-  var icon=presetIcon||'\ud83d\udcce';
-  var sub=presetSub||'Document joint';
-  var id='annexe_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
-  CUSTOM_ANNEXES.push({id:id,label:label,icon:icon,sub:sub});
-  if(inp)inp.value='';
-  renderAnnexesList();
-  renderCustomSuggestions();
-  renderAnnexesContent();
-}
-
-function removeCustomAnnexe(id){
-  CUSTOM_ANNEXES=CUSTOM_ANNEXES.filter(function(a){return a.id!==id;});
-  renderAnnexesList();
-  renderCustomSuggestions();
-  renderAnnexesContent();
-}
-
-// Rend la barre de pills "Ajouter une annexe" : projections sauvegardées + suggestions par type
-function renderCustomSuggestions(){
-  var box=V('customSuggestions');
-  if(!box)return;
-  var type=V('pType').value;
-  var pills=[];
-  // 1. Projections sauvegardées détectées dans localStorage
-  ANNEXE_MODULES.forEach(function(m){
-    var key='cgpskool_state_'+m.id;
-    var hasData=false;
-    try{hasData=!!localStorage.getItem(key);}catch(e){}
-    if(hasData && !CUSTOM_ANNEXES.some(function(a){return a.label===m.label})){
-      pills.push({label:m.label,icon:m.icon,sub:'Projection sauvegard\u00e9e'});
-    }
-  });
-  // 2. Suggestions par type de solution
-  var suggs=ANNEXE_SUGGESTIONS[type]||[];
-  suggs.forEach(function(s){
-    if(!CUSTOM_ANNEXES.some(function(a){return a.label===s.label})){
-      pills.push({label:s.label,icon:s.icon,sub:'Document joint'});
-    }
-  });
-  if(pills.length===0){
-    box.innerHTML='<div style="font-size:10px;color:var(--gris);font-style:italic;padding:2px 0">Toutes les suggestions sont d\u00e9j&#224; ajout&#233;es</div>';
-    return;
-  }
-  box.innerHTML=pills.map(function(p){
-    var lbl=escAttr(p.label);
-    var sub=escAttr(p.sub);
-    return '<button type="button" onclick="addCustomAnnexe(\''+lbl+'\',\''+p.icon+'\',\''+sub+'\')" style="padding:4px 9px;border:1px solid var(--bord);background:var(--gris-l);color:var(--noir);font-family:var(--sans);font-size:10px;cursor:pointer;border-radius:10px;white-space:nowrap">+ '+p.icon+' '+p.label+'</button>';
-  }).join('');
-}
-
-// Rend la liste des annexes sélectionnées (avec × pour supprimer)
-function renderAnnexesList(){
-  var el=V('annexesList');
-  if(!el)return;
-  if(CUSTOM_ANNEXES.length===0){
-    el.innerHTML='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune annexe. Clique sur une suggestion ci-dessus pour l\'ajouter.</div>';
-    return;
-  }
-  el.innerHTML=CUSTOM_ANNEXES.map(function(a){
-    return '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.2);border-radius:6px;margin-bottom:4px;font-size:11px">'
-      +'<span style="font-size:13px">'+a.icon+'</span>'
-      +'<span style="flex:1;color:var(--noir);font-weight:500">'+a.label+'</span>'
-      +'<button type="button" onclick="removeCustomAnnexe(\''+a.id+'\')" style="background:transparent;border:none;color:var(--gris);cursor:pointer;font-size:14px;padding:0 4px;line-height:1">&times;</button>'
-      +'</div>';
-  }).join('');
-}
-
-function loadAnnexes(){
-  // Compatibilité retro : appelé au démarrage
-  renderCustomSuggestions();
-  renderAnnexesList();
-  renderAnnexesContent();
-}
-
-// Schémas pédagogiques disponibles (insertion à la demande)
-var SCHEMA_TEMPLATES={
-  av:'<div class="pyr-labels">'
-    +'<div class="pyr-box orange"><div class="pyr-box-title">Pendant 8 ans</div>'
-    +'\u2713 Capitalisation libre : fonds euros + UC<br>'
-    +'\u2713 Disponibilit\u00e9 totale (rachat partiel possible)<br>'
-    +'\u2713 Arbitrages gratuits ou tr\u00e8s peu co\u00fbteux<br>'
-    +'\u2713 Fiscalit\u00e9 diff\u00e9r\u00e9e tant qu\'on ne rachete pas</div>'
-    +'<div class="pyr-box purple"><div class="pyr-box-title">Apr\u00e8s 8 ans</div>'
-    +'\u2713 Abattement annuel sur les plus-values :<br>'
-    +'&nbsp;&nbsp;\u2022 <b>4 600 \u20ac</b> (c\u00e9libataire)<br>'
-    +'&nbsp;&nbsp;\u2022 <b>9 200 \u20ac</b> (couple)<br>'
-    +'\u2713 PFU r\u00e9duit \u00e0 <b>7,5 %</b> sur les versements &lt; 150k\u20ac<br>'
-    +'\u2713 Pr\u00e9l\u00e8vements sociaux : 17,2 %</div>'
-    +'<div class="pyr-box red"><div class="pyr-box-title">Au d\u00e9c\u00e8s</div>'
-    +'\u2713 Hors succession : transmission directe<br>'
-    +'\u2713 Versements avant 70 ans : <b>152 500 \u20ac</b> par b\u00e9n\u00e9ficiaire (art. 990 I)<br>'
-    +'\u2713 Versements apr\u00e8s 70 ans : <b>30 500 \u20ac</b> tous b\u00e9n\u00e9ficiaires confondus<br>'
-    +'\u2713 Clause b\u00e9n\u00e9ficiaire libre &amp; modifiable</div>'
-    +'</div>',
-  per:'<div class="pyramide">'
-    +'<div class="pyr-level" style="font-size:10px">R\u00e9gime Suppl\u00e9mentaire<br><span style="font-size:8px;opacity:0.7">Facultatif</span></div>'
-    +'<div class="pyr-level">R\u00e9gime Compl\u00e9mentaire<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>'
-    +'<div class="pyr-level">R\u00e9gime de Base<br><span style="font-size:8px;opacity:0.7">Obligatoire</span></div>'
-    +'</div><div class="pyr-labels">'
-    +'<div class="pyr-box orange"><div class="pyr-box-title">Ce qu\'on doit pr\u00e9parer</div>'
-    +'\u2713 Retraite par capitalisation : celle qu\'on pr\u00e9pare en investissant<br>'
-    +'\u2713 Se fixer un objectif de compl\u00e9ment de revenu et/ou de capital<br>'
-    +'\u2713 Investissement r\u00e9gulier dans le temps</div>'
-    +'<div class="pyr-box purple"><div class="pyr-box-title">Ce qu\'on aura</div>'
-    +'\u2713 Retraite issue du r\u00e9gime de base + compl\u00e9mentaire<br>'
-    +'\u2713 D\u00e9ficit Retraite : diff\u00e9rence entre dernier salaire et retraite<br>'
-    +'\u2713 On perd <b>40 \u00e0 50%</b> de nos derniers revenus mensuels</div>'
-    +'<div class="pyr-box red"><div class="pyr-box-title">Ce dont on aura besoin</div>'
-    +'\u2713 Besoins financiers \u00e0 la retraite : la retraite de base est-elle suffisante ?<br>'
-    +'\u2713 D\u00e9finir son train de vie (logement, alimentation, transport)<br>'
-    +'\u2713 Tenir compte de ses projets et envies</div>'
-    +'</div>',
-  scpi:'<div class="scpi-schema">'
-    +'<div class="scpi-box"><div style="font-size:24px;margin-bottom:4px">\ud83d\udc64</div>'
-    +'<div class="scpi-box-title">Associ\u00e9</div><div class="scpi-box-sub">Co-propri\u00e9taire</div></div>'
-    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
-    +'<div class="scpi-arrow">\u2192</div><div style="font-size:8px;color:var(--gris)">Souscription</div>'
-    +'<div class="scpi-arrow">\u2190</div><div style="font-size:8px;color:var(--gris)">Dividendes</div></div>'
-    +'<div class="scpi-box main"><div class="scpi-box-title">SCPI</div>'
-    +'<div class="scpi-icons">\ud83c\udfe2 \ud83c\udfea \ud83c\udfe8 \ud83c\udfe9</div>'
-    +'<div class="scpi-box-sub">Bureaux, Commerces<br>H\u00f4tels, Sant\u00e9</div></div>'
-    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
-    +'<div class="scpi-arrow">\u2192</div><div style="font-size:8px;color:var(--gris)">Agr\u00e9ment</div>'
-    +'<div class="scpi-arrow">\u2190</div><div style="font-size:8px;color:var(--gris)">Gestion</div></div>'
-    +'<div class="scpi-box"><div style="font-size:20px;margin-bottom:4px">\u2699</div>'
-    +'<div class="scpi-box-title">Soci\u00e9t\u00e9 de gestion</div><div class="scpi-box-sub">Gestion cl\u00e9 en main</div></div>'
-    +'</div>'
-    +'<div style="text-align:center;margin-top:8px">'
-    +'<div class="scpi-box" style="display:inline-block">'
-    +'<div class="scpi-box-title" style="color:#2B5EA7">AMF</div>'
-    +'<div class="scpi-box-sub">Autorit\u00e9 des March\u00e9s Financiers<br>Agr\u00e9ment &amp; Contr\u00f4le</div></div></div>',
-  lmnp:'<div class="pyr-labels">'
-    +'<div class="pyr-box orange"><div class="pyr-box-title">Acquisition</div>'
-    +'\u2713 Bien immobilier meubl\u00e9 (r\u00e9sidence services, ancien r\u00e9nov\u00e9...)<br>'
-    +'\u2713 Financement \u00e0 cr\u00e9dit possible (effet de levier bancaire)<br>'
-    +'\u2713 Statut LMNP : Loueur Meubl\u00e9 Non Professionnel<br>'
-    +'\u2713 Conditions : recettes locatives &lt; 23 000 \u20ac OU &lt; 50% des revenus</div>'
-    +'<div class="pyr-box purple"><div class="pyr-box-title">Pendant l\'exploitation</div>'
-    +'\u2713 Revenus : loyers per\u00e7us (r\u00e9gime BIC, pas foncier)<br>'
-    +'\u2713 <b>Amortissement comptable</b> du bien et du mobilier (~ 25-30 ans)<br>'
-    +'\u2713 D\u00e9duction des charges r\u00e9elles : taxe fonci\u00e8re, gestion, int\u00e9r\u00eats...<br>'
-    +'\u2713 R\u00e9sultat fiscal souvent \u00e0 <b>0 \u20ac</b> pendant 15-20 ans</div>'
-    +'<div class="pyr-box red"><div class="pyr-box-title">\u00c0 la revente</div>'
-    +'\u2713 Plus-value des particuliers (et non BIC pro)<br>'
-    +'\u2713 Abattements pour dur\u00e9e de d\u00e9tention :<br>'
-    +'&nbsp;&nbsp;\u2022 Exon\u00e9ration IR \u00e0 <b>22 ans</b><br>'
-    +'&nbsp;&nbsp;\u2022 Exon\u00e9ration PS \u00e0 <b>30 ans</b><br>'
-    +'\u2713 Pas de reprise des amortissements pratiqu\u00e9s</div>'
-    +'</div>'
-};
-
-function toggleStep(el){
-  if(el&&el.classList)el.classList.toggle('done');
-}
-
-function insertSchemaTemplate(key){
-  var tpl=SCHEMA_TEMPLATES[key];
-  if(!tpl)return;
-  V('bodySchema').innerHTML=tpl;
-}
-
-function clearSchemaTemplate(){
-  V('bodySchema').innerHTML='<div style="color:var(--gris);font-style:italic;font-size:13px">Ce bloc est vide. Clique sur un mod\u00e8le ci-dessus ou saisis directement ton contenu ici.</div>';
-}
-
-function renderAnnexesContent(){
-  if(CUSTOM_ANNEXES.length===0){
-    V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Aucune annexe s&#233;lectionn&#233;e.</div>';
-    return;
-  }
-  var html='<div class="annexes-grid">';
-  CUSTOM_ANNEXES.forEach(function(a){
-    html+='<div class="annexe-item"><span class="icon">'+a.icon+'</span><div><div class="name">'+a.label+'</div><div class="status">'+(a.sub||'Document joint')+'</div></div></div>';
-  });
-  html+='</div>';
-  html+='<div class="annexe-count">'+CUSTOM_ANNEXES.length+' annexe'+(CUSTOM_ANNEXES.length>1?'s':'')+' jointe'+(CUSTOM_ANNEXES.length>1?'s':'')+' au dossier.</div>';
-  V('annexesContent').innerHTML=html;
-}
-
-function saveDossier(){
-  var state={
-    type:V('pType').value,
-    client:V('pClient').value,
-    blocs:{
-      contrat:V('bodyContrat').innerHTML,
-      gestion:V('bodyGestion').innerHTML,
-      reinvest:V('bodyReinvest').innerHTML,
-      levier:V('bodyLevier').innerHTML,
-      schema:V('bodySchema').innerHTML,
-      services:V('bodyServices').innerHTML
+function renderCharts(data){
+  /* Budget doughnut */
+  var ctx1=V('chartBudget');
+  if(chartBudget)chartBudget.destroy();
+  chartBudget=new Chart(ctx1,{
+    type:'doughnut',
+    data:{
+      labels:['Prix FAI','Frais notaire','Travaux','Mobilier','Frais comm.'],
+      datasets:[{data:[data.prixFAI,data.fraisNotaire,data.travaux,data.mobilier,data.fraisComm],
+        backgroundColor:['#4F8EF7','#C49A6C','#22C55E','#F59E0B','#8B8FA8'],
+        borderColor:'#1A1D27',borderWidth:2}]
     },
-    frais:Array.from(V('fraisTable').querySelectorAll('tbody tr')).map(function(tr){
-      var tds=tr.querySelectorAll('td');
-      return [tds[0].textContent,tds[1].textContent,tds[2].textContent];
-    }),
-    checkboxes:{},
-    customAnnexes:CUSTOM_ANNEXES
-  };
-  ['cbGarde','cbContrat','cbGestion','cbReinvest','cbLevier','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
-    state.checkboxes[id]=V(id).checked;
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{color:'#8B8FA8',font:{family:'Inter',size:11},padding:12}},
+        tooltip:{backgroundColor:'#1A1D27',titleColor:'#E8E9ED',bodyColor:'#E8E9ED',borderColor:'#2A2D3A',borderWidth:1}}
+    }
   });
-  var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='dossier-solution-'+(V('pClient').value||'client').replace(/\s+/g,'-')+'.json';
-  a.click();
+
+  /* Effort bar */
+  var ctx2=V('chartEffort');
+  if(chartEffort)chartEffort.destroy();
+  chartEffort=new Chart(ctx2,{
+    type:'bar',
+    data:{
+      labels:['Nu sans apport','Meuble sans apport','Nu avec apport','Meuble avec apport'],
+      datasets:[{label:'Effort mensuel (\u20ac)',
+        data:[data.effortNu,data.effortMeuble,data.effortNuA,data.effortMeubleA],
+        backgroundColor:['#4F8EF7','#C49A6C','#4F8EF799','#C49A6C99'],
+        borderRadius:6}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:true,
+      scales:{x:{grid:{color:'#2A2D3A'},ticks:{color:'#8B8FA8',font:{family:'Inter'}}},
+              y:{grid:{display:false},ticks:{color:'#E8E9ED',font:{family:'Inter',size:11}}}},
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:'#1A1D27',titleColor:'#E8E9ED',bodyColor:'#E8E9ED',borderColor:'#2A2D3A',borderWidth:1}}
+    }
+  });
 }
 
-function loadDossier(file){
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var s=JSON.parse(e.target.result);
-      if(s.type)V('pType').value=s.type;
-      if(s.client)V('pClient').value=s.client;
-      if(s.blocs){
-        if(s.blocs.contrat)V('bodyContrat').innerHTML=s.blocs.contrat;
-        if(s.blocs.gestion)V('bodyGestion').innerHTML=s.blocs.gestion;
-        if(s.blocs.reinvest)V('bodyReinvest').innerHTML=s.blocs.reinvest;
-        if(s.blocs.levier)V('bodyLevier').innerHTML=s.blocs.levier;
-        if(s.blocs.schema)V('bodySchema').innerHTML=s.blocs.schema;
-        if(s.blocs.services)V('bodyServices').innerHTML=s.blocs.services;
-      }
-      if(s.frais){
-        var html='';
-        s.frais.forEach(function(r){html+='<tr><td>'+r[0]+'</td><td class="frais-montant" contenteditable="true">'+r[1]+'</td><td contenteditable="true">'+r[2]+'</td></tr>';});
-        V('fraisTable').querySelector('tbody').innerHTML=html;
-      }
-      if(s.checkboxes){
-        Object.keys(s.checkboxes).forEach(function(id){var el=V(id);if(el)el.checked=s.checkboxes[id];});
-        toggleBloc();
-      }
-      if(s.customAnnexes&&Array.isArray(s.customAnnexes)){
-        CUSTOM_ANNEXES=s.customAnnexes;
-        loadAnnexes();
-      }
-      updateGarde();
-    }catch(err){alert('Fichier invalide');}
-  };
-  reader.readAsText(file);
-}
+/* ===== MAIN CALC ===== */
+function calc(){
+  /* --- Inputs --- */
+  var nom=V('iNom').value.trim()||'Client';
+  var age=N('iAge');
+  var situation=V('iSituation').value;
+  var sitLabels={marie:'Marie(e)',pacse:'Pacse(e)',union:'Union libre',celibataire:'Celibataire'};
+  var revBrut=N('iRevBrut');
+  var revNet=N('iRevNet');
+  var tauxPAS=N('iTauxPAS');
+  var impots=N('iImpots');
+  var hasCo=V('iCoToggle').checked;
+  var coNom=hasCo?V('iCoNom').value.trim():'';
+  var coRevBrut=hasCo?N('iCoRevBrut'):0;
+  var coRevNet=hasCo?N('iCoRevNet'):0;
+  var hasPret=V('iPretToggle').checked;
+  var pretMens=hasPret?N('iPretMens'):0;
+  var pretCRD=hasPret?N('iPretCRD'):0;
+  var pretMontant=hasPret?N('iPretMontant'):0;
+  var pretTaux=hasPret?N('iPretTaux'):0;
+  var pretDuree=hasPret?N('iPretDuree'):0;
+  var epargne=N('iEpargne');
+  var ville=V('iVille').value.trim()||'—';
+  var typeBien=V('iTypeBien').value;
+  var typeLabels={studio:'Studio',t1bis:'T1bis',t2:'T2',t3:'T3',colocation:'Colocation'};
+  var surface=N('iSurface');
+  var eligibilite=V('iEligibilite').value;
+  var eligLabels={denormandie:'Denormandie',lmnp:'LMNP',deficit:'Deficit Foncier'};
+  var prixFAI=N('iPrixFAI');
+  var fraisNotaire=N('iFraisNotaire');
+  var travaux=N('iTravaux');
+  var fraisComm=N('iFraisComm');
+  var mobilier=N('iMobilier');
+  var tauxFin=N('iTauxFin');
+  var dureeFin=parseInt(V('iDureeFin').value)||20;
+  var loyerBrutNu=N('iLoyerNu');
+  var loyerBrutMeuble=N('iLoyerMeuble');
+  var charges=N('iCharges');
+  var taxeFonciere=N('iTaxeFonciere');
+  var assietteDeno=N('iAssietteDeno');
 
-// SCPI Picker
-function renderSCPIPicker(){
-  if(!window.CGP||!CGP.SCPI_DATA)return;
-  var html='';
-  CGP.SCPI_DATA.forEach(function(s,i){
-    html+='<label style="display:flex;align-items:center;gap:6px;padding:5px 8px;font-size:11px;cursor:pointer;border-bottom:1px solid var(--bord)">';
-    html+='<input type="checkbox" data-scpi-idx="'+i+'" onchange="updateSCPICards()" style="accent-color:var(--orange)">';
-    html+='<span style="flex:1;color:var(--noir);font-weight:500">'+CGP.esc(s.name)+'</span>';
-    html+='<span style="color:var(--orange);font-weight:600;font-size:10px">'+(s.yieldGross*100).toFixed(2)+'%</span>';
-    html+='</label>';
-  });
-  V('scpiChecklist').innerHTML=html;
-}
+  /* --- Calculs --- */
+  var budgetNu=prixFAI+fraisNotaire+travaux+fraisComm;
+  var budgetMeuble=budgetNu+mobilier;
+  var fraisGestNu=loyerBrutNu*0.075;
+  var fraisGestMeuble=loyerBrutMeuble*0.075;
+  var loyerNetNu=loyerBrutNu-charges-taxeFonciere-fraisGestNu;
+  var loyerNetMeuble=loyerBrutMeuble-charges-taxeFonciere-fraisGestMeuble;
+  var mensNu=pmt(tauxFin,dureeFin,budgetNu);
+  var mensMeuble=pmt(tauxFin,dureeFin,budgetMeuble);
+  var apport10Nu=budgetNu*0.10;
+  var apport10Meuble=budgetMeuble*0.10;
+  var mensNuA=pmt(tauxFin,dureeFin,budgetNu-apport10Nu);
+  var mensMeubleA=pmt(tauxFin,dureeFin,budgetMeuble-apport10Meuble);
+  var effortNu=mensNu-loyerNetNu;
+  var effortMeuble=mensMeuble-loyerNetMeuble;
+  var effortNuA=mensNuA-loyerNetNu;
+  var effortMeubleA=mensMeubleA-loyerNetMeuble;
+  var totalRevNet=revNet+coRevNet;
+  var endAvant=totalRevNet>0?(pretMens/totalRevNet*100):0;
+  var endApresNu=totalRevNet>0?((pretMens+mensNu)/totalRevNet*100):0;
+  var endApresMeuble=totalRevNet>0?((pretMens+mensMeuble)/totalRevNet*100):0;
+  var endApresMeubleA=totalRevNet>0?((pretMens+mensMeubleA)/totalRevNet*100):0;
+  var rdtBrutNu=prixFAI>0?((loyerBrutNu*12)/prixFAI*100):0;
+  var rdtBrutMeuble=prixFAI>0?((loyerBrutMeuble*12)/prixFAI*100):0;
+  /* Denormandie */
+  var deno6=assietteDeno*0.12,deno9=assietteDeno*0.18,deno12=assietteDeno*0.21;
 
-function updateSCPICards(){
-  if(!window.CGP||!CGP.SCPI_DATA)return;
-  var cards='';var total=0;var totalYield=0;var totalWeight=0;
-  V('scpiChecklist').querySelectorAll('input[type=checkbox]:checked').forEach(function(cb){
-    var idx=+cb.dataset.scpiIdx;
-    var s=CGP.SCPI_DATA[idx];if(!s)return;
-    var parts=100;var montant=parts*s.price;
-    total+=montant;totalYield+=s.yieldGross*montant;totalWeight+=montant;
-    cards+='<div style="background:#fff;border:1.5px solid var(--bord);border-radius:7px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">';
-    cards+='<div><div style="font-size:13px;font-weight:600;color:var(--noir)">'+CGP.esc(s.name)+'</div>';
-    cards+='<div style="font-size:10px;color:var(--gris)">'+CGP.esc(s.manager)+' \u2014 '+CGP.esc(s.theme)+'</div></div>';
-    cards+='<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--orange)">'+(s.yieldGross*100).toFixed(2)+'%</div>';
-    cards+='<div style="font-size:10px;color:var(--gris)">'+s.price+' \u20ac/part</div></div>';
-    cards+='</div>';
-  });
-  V('scpiCardsContent').innerHTML=cards||'<div style="font-size:12px;color:var(--gris);font-style:italic">S\u00e9lectionnez des SCPI dans la sidebar</div>';
-  if(total>0){
-    var avgYield=totalWeight>0?(totalYield/totalWeight*100).toFixed(2):'0';
-    V('scpiTotalRow').style.display='flex';
-    V('scpiTotalVal').textContent=CGP.fmt(total)+' \u20ac (rdt moy. '+avgYield+'%)';
+  /* --- Nav badge --- */
+  V('navClient').textContent=nom;
+
+  /* --- Show results --- */
+  V('resultsEmpty').style.display='none';
+  V('resultsContent').style.display='';
+
+  /* --- Header --- */
+  V('rClientName').textContent=nom;
+  V('rClientSub').textContent=(age?age+' ans, ':'')+sitLabels[situation]+' | '+ville+' — '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2';
+  V('rDate').textContent=today();
+  var badgeClass=eligibilite==='denormandie'?'os-badge-green':(eligibilite==='lmnp'?'os-badge-blue':'os-badge-warn');
+  V('rBadge').innerHTML='<span class="os-badge '+badgeClass+'">'+(eligLabels[eligibilite]||eligibilite)+'</span>';
+
+  /* --- KPIs --- */
+  V('kBudget').textContent=fmtE(budgetMeuble);
+  V('kBudgetSub').textContent='Nu : '+fmtE(budgetNu);
+  V('kEffort').textContent=fmtE(Math.round(effortMeubleA));
+  V('kEffortSub').textContent='Sans apport : '+fmtE(Math.round(effortMeuble));
+  V('kRendement').textContent=fmtP(rdtBrutMeuble);
+  V('kRendementSub').textContent='Nu : '+fmtP(rdtBrutNu);
+  var endColor=endApresMeuble>35?'color:var(--os-red)':(endApresMeuble>30?'color:var(--os-warn)':'color:var(--os-green)');
+  V('kEndettement').innerHTML='<span style="'+endColor+'">'+fmtP(endApresMeuble)+'</span>';
+  V('kEndettementSub').textContent='Avant projet : '+fmtP(endAvant);
+
+  /* --- Profil client --- */
+  var pHtml='';
+  pHtml+='<div class="os-row"><span class="os-row-k">Revenu brut annuel</span><span class="os-row-v blue">'+fmtE(revBrut)+'</span></div>';
+  pHtml+='<div class="os-row"><span class="os-row-k">Revenu net mensuel</span><span class="os-row-v">'+fmtE(revNet)+'</span></div>';
+  if(hasCo){
+    pHtml+='<div class="os-row"><span class="os-row-k">Co-investisseur</span><span class="os-row-v">'+coNom+' — '+fmtE(coRevNet)+'/mois</span></div>';
+    pHtml+='<div class="os-row"><span class="os-row-k">Revenus nets cumules</span><span class="os-row-v blue">'+fmtE(totalRevNet)+'/mois</span></div>';
+  }
+  pHtml+='<div class="os-row"><span class="os-row-k">Taux PAS</span><span class="os-row-v">'+fmtP(tauxPAS)+'</span></div>';
+  pHtml+='<div class="os-row"><span class="os-row-k">Impots mensuels</span><span class="os-row-v">'+fmtE(impots)+'</span></div>';
+  if(hasPret){
+    pHtml+='<div class="os-row"><span class="os-row-k">Pret RP — mensualite</span><span class="os-row-v gold">'+fmtE(pretMens)+'/mois</span></div>';
+    pHtml+='<div class="os-row"><span class="os-row-k">Pret RP — CRD</span><span class="os-row-v">'+fmtE(pretCRD)+'</span></div>';
+  }
+  pHtml+='<div class="os-row"><span class="os-row-k">Epargne disponible</span><span class="os-row-v green">'+fmtE(epargne)+'</span></div>';
+  V('rProfil').innerHTML=pHtml;
+
+  /* --- Synthese projet --- */
+  var jHtml='';
+  jHtml+='<div class="os-row"><span class="os-row-k">Ville</span><span class="os-row-v">'+ville+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Type / Surface</span><span class="os-row-v">'+(typeLabels[typeBien]||typeBien)+' — '+surface+' m\u00b2</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Prix FAI</span><span class="os-row-v">'+fmtE(prixFAI)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Frais de notaire</span><span class="os-row-v">'+fmtE(fraisNotaire)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Travaux TTC</span><span class="os-row-v">'+fmtE(travaux)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Frais commercialisation</span><span class="os-row-v">'+fmtE(fraisComm)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Budget mobilier</span><span class="os-row-v">'+fmtE(mobilier)+'</span></div>';
+  jHtml+='<div class="os-row" style="border-top:1px solid var(--os-border);margin-top:6px;padding-top:10px"><span class="os-row-k" style="font-weight:700;color:var(--os-text)">Budget global nu</span><span class="os-row-v blue">'+fmtE(budgetNu)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k" style="font-weight:700;color:var(--os-text)">Budget global meuble</span><span class="os-row-v gold">'+fmtE(budgetMeuble)+'</span></div>';
+  jHtml+='<div class="os-row"><span class="os-row-k">Financement</span><span class="os-row-v">'+fmtP(tauxFin,2)+' sur '+dureeFin+' ans</span></div>';
+  V('rProjet').innerHTML=jHtml;
+
+  /* --- Endettement --- */
+  function progBar(label,pct,threshold){
+    var color=pct>threshold?'var(--os-red)':(pct>threshold-5?'var(--os-warn)':'var(--os-green)');
+    var w=Math.min(pct,100);
+    return '<div class="os-progress">'
+      +'<div class="os-progress-label"><span>'+label+'</span><span style="font-weight:600;color:'+color+'">'+fmtP(pct)+'</span></div>'
+      +'<div class="os-progress-bar"><div class="os-progress-fill" style="width:'+w+'%;background:'+color+'"></div>'
+      +'<div class="os-progress-threshold" style="left:'+threshold+'%"></div></div></div>';
+  }
+  var eHtml=progBar('Endettement actuel (pret RP)',endAvant,35);
+  eHtml+=progBar('Apres projet — Nu sans apport',endApresNu,35);
+  eHtml+=progBar('Apres projet — Meuble sans apport',endApresMeuble,35);
+  eHtml+=progBar('Apres projet — Meuble avec apport 10%',endApresMeubleA,35);
+  eHtml+='<div style="font-size:11px;color:var(--os-muted);margin-top:8px">Seuil bancaire : 35% (ligne rouge). Revenus nets pris en compte : '+fmtE(totalRevNet)+'/mois</div>';
+  V('rEndettement').innerHTML=eHtml;
+
+  /* --- Comparatif --- */
+  var tHtml='<table class="os-tbl"><thead><tr><th></th><th>Nu sans apport</th><th>Meuble sans apport</th><th>Nu avec apport 10%</th><th>Meuble avec apport 10%</th></tr></thead><tbody>';
+  function tr(label,a,b,c,d,cls){return '<tr><td>'+label+'</td><td class="val '+(cls||'')+'">'+a+'</td><td class="val '+(cls||'')+'">'+b+'</td><td class="val '+(cls||'')+'">'+c+'</td><td class="val '+(cls||'')+'">'+d+'</td></tr>'}
+  tHtml+=tr('Budget finance',fmtE(budgetNu),fmtE(budgetMeuble),fmtE(budgetNu-apport10Nu),fmtE(budgetMeuble-apport10Meuble));
+  tHtml+=tr('Apport','0 \u20ac','0 \u20ac',fmtE(apport10Nu),fmtE(apport10Meuble));
+  tHtml+=tr('Mensualite credit',fmtE(Math.round(mensNu)),fmtE(Math.round(mensMeuble)),fmtE(Math.round(mensNuA)),fmtE(Math.round(mensMeubleA)),'blue');
+  tHtml+=tr('Loyer brut HC',fmtE(loyerBrutNu),fmtE(loyerBrutMeuble),fmtE(loyerBrutNu),fmtE(loyerBrutMeuble));
+  tHtml+=tr('Charges + TF + gestion',fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)),fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)));
+  tHtml+=tr('Loyer net',fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),'green');
+  var efCls=function(v){return v>0?'red':'green'};
+  tHtml+=tr('Effort mensuel net',fmtE(Math.round(effortNu)),fmtE(Math.round(effortMeuble)),fmtE(Math.round(effortNuA)),fmtE(Math.round(effortMeubleA)));
+  tHtml+=tr('Endettement',fmtP(endApresNu),fmtP(endApresMeuble),fmtP(totalRevNet>0?((pretMens+mensNuA)/totalRevNet*100):0),fmtP(endApresMeubleA));
+  tHtml+='</tbody></table>';
+  V('rComparatif').innerHTML=tHtml;
+
+  /* --- Effort equation (meuble avec apport = scenario recommande) --- */
+  var eqSign=effortMeubleA>=0?'\u2212':'+';
+  var eqLabel=effortMeubleA>=0?'Effort':'Gain';
+  var eqColor=effortMeubleA>=0?'var(--os-warn)':'var(--os-green)';
+  V('rEffort').innerHTML='<div style="font-size:12px;color:var(--os-muted);margin-bottom:10px">Scenario recommande : Meuble avec apport 10% ('+fmtE(Math.round(apport10Meuble))+')</div>'
+    +'<div class="os-eq">'
+    +'<div class="os-eq-box"><div class="label">Mensualite</div><div class="val" style="color:var(--os-blue)">'+fmtE(Math.round(mensMeubleA))+'</div></div>'
+    +'<div class="os-eq-op">\u2212</div>'
+    +'<div class="os-eq-box"><div class="label">Loyer net meuble</div><div class="val" style="color:var(--os-green)">'+fmtE(Math.round(loyerNetMeuble))+'</div></div>'
+    +'<div class="os-eq-op">=</div>'
+    +'<div class="os-eq-box" style="border-color:'+eqColor+'"><div class="label">'+eqLabel+' mensuel</div><div class="val" style="color:'+eqColor+'">'+fmtE(Math.round(Math.abs(effortMeubleA)))+'</div></div>'
+    +'</div>';
+
+  /* --- Denormandie --- */
+  if(eligibilite==='denormandie'&&assietteDeno>0){
+    V('rDenoCard').style.display='';
+    V('rDeno').innerHTML='<div style="font-size:12px;color:var(--os-muted);margin-bottom:12px">Assiette eligible : <b style="color:var(--os-text)">'+fmtE(assietteDeno)+'</b> (prix + travaux dans la limite de 300 000 \u20ac)</div>'
+      +'<div class="os-deno-grid">'
+      +'<div class="os-deno-card"><div class="os-deno-dur">6 ans</div><div class="os-deno-rate">12 %</div><div class="os-deno-total">'+fmtE(Math.round(deno6))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno6/6))+'/an soit '+fmtE(Math.round(deno6/72))+'/mois</div></div>'
+      +'<div class="os-deno-card best"><div class="os-deno-dur">9 ans</div><div class="os-deno-rate">18 %</div><div class="os-deno-total">'+fmtE(Math.round(deno9))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno9/9))+'/an soit '+fmtE(Math.round(deno9/108))+'/mois</div></div>'
+      +'<div class="os-deno-card"><div class="os-deno-dur">12 ans</div><div class="os-deno-rate">21 %</div><div class="os-deno-total">'+fmtE(Math.round(deno12))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno12/12))+'/an soit '+fmtE(Math.round(deno12/144))+'/mois</div></div>'
+      +'</div>';
   }else{
-    V('scpiTotalRow').style.display='none';
+    V('rDenoCard').style.display='none';
+  }
+
+  /* --- Charts --- */
+  renderCharts({prixFAI:prixFAI,fraisNotaire:fraisNotaire,travaux:travaux,mobilier:mobilier,fraisComm:fraisComm,
+    effortNu:Math.round(effortNu),effortMeuble:Math.round(effortMeuble),effortNuA:Math.round(effortNuA),effortMeubleA:Math.round(effortMeubleA)});
+
+  /* --- Scenario alt --- */
+  var hasAlt=V('iAltToggle').checked;
+  if(hasAlt){
+    V('altFields').style.display='';
+    V('rAltCard').style.display='';
+    var altVille=V('iAltVille').value.trim()||'—';
+    var altBudget=N('iAltBudget');
+    var altMens=N('iAltMens');
+    var altLoyer=N('iAltLoyer');
+    var altEffort=N('iAltEffort');
+    var altDeno=V('iAltDeno').checked;
+    V('rAlt').innerHTML='<table class="os-tbl"><thead><tr><th></th><th>'+ville+' (principal)</th><th>'+altVille+' (alternatif)</th></tr></thead><tbody>'
+      +'<tr><td>Budget</td><td class="val">'+fmtE(budgetMeuble)+'</td><td class="val">'+fmtE(altBudget)+'</td></tr>'
+      +'<tr><td>Mensualite</td><td class="val blue">'+fmtE(Math.round(mensMeubleA))+'</td><td class="val blue">'+fmtE(altMens)+'</td></tr>'
+      +'<tr><td>Loyer net</td><td class="val green">'+fmtE(Math.round(loyerNetMeuble))+'</td><td class="val green">'+fmtE(altLoyer)+'</td></tr>'
+      +'<tr><td>Effort mensuel</td><td class="val '+(effortMeubleA>0?'red':'green')+'">'+fmtE(Math.round(effortMeubleA))+'</td><td class="val '+(altEffort>0?'red':'green')+'">'+fmtE(altEffort)+'</td></tr>'
+      +'<tr><td>Denormandie</td><td>'+(eligibilite==='denormandie'?'<span class="os-badge os-badge-green">Oui</span>':'<span class="os-badge os-badge-red">Non</span>')+'</td>'
+      +'<td>'+(altDeno?'<span class="os-badge os-badge-green">Oui</span>':'<span class="os-badge os-badge-red">Non</span>')+'</td></tr>'
+      +'</tbody></table>';
+  }else{
+    V('rAltCard').style.display='none';
   }
 }
 
-// Init
+/* ===== INIT ===== */
 (function(){
-  updateGarde();
-  loadAnnexes();
-  renderSCPIPicker();
-  CGP.footer.render(V('conseillerFooter'));
+  /* Alt toggle */
+  V('iAltToggle').addEventListener('change',function(){
+    V('altFields').style.display=this.checked?'':'none';
+  });
 })();
 </script>
 </body>
