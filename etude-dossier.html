@@ -7509,18 +7509,6 @@ function recalcProjTotal(){
   }catch(e){}
 }
 function updateIRDiff(){recalcProjTotal();}
-// legacy compat
-var _legacyUpdateIRDiff=function(){
-    var inp=document.getElementById('projIRoverride')||document.getElementById('projIRbareme');
-    var val=document.getElementById('projIRdiffVal');
-    if(!inp||!val)return;
-    var irNetFinal=+inp.value||0;
-    var irActuel=(ED.fiscal.irnet||0);
-    var diff=irNetFinal-irActuel;
-    val.style.color=diff>0?'var(--red)':diff<0?'var(--green)':'var(--gris)';
-    val.textContent=(diff>0?'+':'')+fmt(diff)+' \u20ac';
-  }catch(e){}
-}
 // ── GÉNÉRATION COMPTE RENDU ──
 function selectCRTile(type){
   ['R1','R2','R3'].forEach(function(t){
