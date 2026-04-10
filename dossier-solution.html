@@ -142,70 +142,24 @@
     <div class="sb-body open">
       <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iNom" placeholder="Jean Dupont"></div>
       <div class="grid2">
-        <div class="fg"><label>Age</label><div class="fi-row"><input type="number" id="iAge" placeholder="35"><span class="fi-unit">ans</span></div></div>
-        <div class="fg"><label>Situation</label><select class="fi" id="iSituation">
-          <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
-          <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
+        <div class="fg"><label>Foyer</label><select class="fi" id="iFoyer">
+          <option value="seul">Personne seule</option><option value="couple">Couple</option>
         </select></div>
+        <div class="fg"><label>Revenu net mensuel foyer</label><div class="fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
       <div class="grid2">
-        <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="fg"><label>Prets existants</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
+        <div class="fg"><label>Loyers percus</label><div class="fi-row"><input type="number" id="iLoyerExist" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
-      <div class="grid2">
-        <div class="fg"><label>Taux PAS</label><div class="fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="fi-unit">%</span></div></div>
-        <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
-      </div>
-    </div>
-
-    <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Co-investisseur</label>
-    <div class="sb-body">
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()" style="accent-color:var(--orange)"> Activer</div>
-      <div id="coFields" style="display:none">
-        <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iCoNom" placeholder="Marie Dupont"></div>
-        <div class="grid2">
-          <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Pret RP en cours</label>
-    <div class="sb-body">
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()" style="accent-color:var(--orange)"> Pret en cours</div>
-      <div id="pretFields" style="display:none">
-        <div class="grid2">
-          <div class="fg"><label>Montant emprunte</label><div class="fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          <div class="fg"><label>Taux nominal</label><div class="fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Duree</label><div class="fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="fi-unit">ans</span></div></div>
-          <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
-        </div>
-        <div class="fg"><label>Capital restant du</label><div class="fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-      </div>
-    </div>
-
-    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Epargne</label>
-    <div class="sb-body open">
-      <div class="fg"><label>Epargne disponible</label><div class="fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
     </div>
 
     <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Projet immobilier</label>
     <div class="sb-body open">
       <div class="grid2">
         <div class="fg"><label>Ville</label><input class="fi" type="text" id="iVille" placeholder="Limoges"></div>
-        <div class="fg"><label>Type de bien</label><select class="fi" id="iTypeBien">
-          <option value="studio">Studio</option><option value="t1bis">T1bis</option>
-          <option value="t2">T2</option><option value="t3">T3</option><option value="colocation">Colocation</option>
-        </select></div>
-      </div>
-      <div class="grid2">
         <div class="fg"><label>Surface Carrez</label><div class="fi-row"><input type="number" id="iSurface" placeholder="0"><span class="fi-unit">m&#178;</span></div></div>
-        <div class="fg"><label>Mode fiscal</label><select class="fi" id="iEligibilite" onchange="setMode(this.value)" disabled style="opacity:0.7">
-          <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option><option value="deficit">Deficit Foncier</option>
-        </select></div>
       </div>
+      <div class="fg" style="display:none"><select class="fi" id="iEligibilite"><option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option><option value="deficit">Deficit Foncier</option></select></div>
       <div class="grid2">
         <div class="fg"><label>Prix FAI</label><div class="fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
         <div class="fg"><label>Frais de notaire</label><div class="fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
@@ -229,7 +183,6 @@
         <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
         <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/mois</span></div></div>
       </div>
-      <div class="fg" id="wAssiette"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
     </div>
 
     <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Strategie fiscale</label>
@@ -450,10 +403,8 @@ function setMode(mode){
   V('wFraisComm').style.display=isLmnp?'':'none';
   V('wMobilier').style.display=isLmnp?'':'none';
   V('wLoyerMeuble').style.display=isLmnp?'':'none';
-  V('wAssiette').style.display=isDeno?'':'none';
   /* Reset hidden fields to 0 */
   if(!isLmnp){V('iFraisComm').value='0';V('iMobilier').value='0';V('iLoyerMeuble').value='0'}
-  if(!isDeno){V('iAssietteDeno').value='0'}
   /* Highlight active button */
   var btns=document.querySelectorAll('.mode-btn');
   for(var i=0;i<btns.length;i++){btns[i].style.background='#fff';btns[i].style.borderColor='';btns[i].style.color='var(--noir)'}
@@ -535,10 +486,7 @@ function importMode(mode){
     setF('iLoyerNu',findVal(src,'Loyers bruts hors charges'));
     setF('iCharges',findVal(src,'Charges de copropri'));
     setF('iTaxeFonciere',findVal(src,'Taxe fonci'));
-    /* Assiette */
-    var mAss=src.match(/assiette[^:]*?:\s*([\d][\d\s,.]*)/i);
-    if(mAss)setF('iAssietteDeno',pn(mAss[1]));
-    else{var bg=findVal(src,'Budget global');if(bg!==null)setF('iAssietteDeno',bg)}
+    /* Assiette auto-calculee dans calc() — plus de champ input */
     /* Loyer meuble depuis Synthese pour la phase 2 switch LMNP */
     var loyerM=findVal2(S,'Loyers bruts hors charges');
     if(loyerM[1]!==null)V('iLoyerMeuble').value=loyerM[1];
@@ -582,8 +530,7 @@ function onModuleChange(){
   V({home:'viewHome',immo:'viewImmo',placement:'viewPlacement',bilan:'viewBilan'}[mod]||'viewHome').style.display='';
   V('sidebarImmo').style.display=mod==='immo'?'':'none';
 }
-function toggleCoFields(){V('coFields').style.display=V('iCoToggle').checked?'':'none'}
-function togglePretFields(){V('pretFields').style.display=V('iPretToggle').checked?'':'none'}
+/* legacy stubs removed - simplified client section */
 
 var chart1=null,chart2=null;
 
@@ -592,7 +539,7 @@ function checkRequired(){
   var elig=V('iEligibilite').value;
   var always=['iNom','iRevNet','iPrixFAI','iTravaux','iTauxFin','iLoyerNu'];
   var lmnpOnly=['iLoyerMeuble','iMobilier'];
-  var denoOnly=['iAssietteDeno'];
+  var denoOnly=[];
   var ids=always.slice();
   if(elig==='lmnp')ids=ids.concat(lmnpOnly);
   if(elig==='denormandie')ids=ids.concat(denoOnly);
@@ -617,21 +564,19 @@ function calc(){
   checkRequired();
   /* === INPUTS === */
   var nom=V('iNom').value.trim()||'Client';
-  var age=N('iAge');var situation=V('iSituation').value;
-  var revBrut=N('iRevBrut');var revNet=N('iRevNet');var tauxPAS=N('iTauxPAS');var impots=N('iImpots');
-  var hasCo=V('iCoToggle').checked;var coNom=hasCo?V('iCoNom').value.trim():'';
-  var coRevNet=hasCo?N('iCoRevNet'):0;
-  var hasPret=V('iPretToggle').checked;var pretMens=hasPret?N('iPretMens'):0;
-  var epargne=N('iEpargne');
-  var ville=V('iVille').value.trim()||'\u2014';var typeBien=V('iTypeBien').value;
-  var typeLabels={studio:'Studio',t1bis:'T1bis',t2:'T2',t3:'T3',colocation:'Colocation'};
+  var foyer=V('iFoyer').value;
+  var revNet=N('iRevNet');
+  var pretMens=N('iPretMens');
+  var loyerExist=N('iLoyerExist');
+  var ville=V('iVille').value.trim()||'\u2014';
   var surface=N('iSurface');var elig=V('iEligibilite').value;
   var prixFAI=N('iPrixFAI');var fraisNotaire=N('iFraisNotaire');var travaux=N('iTravaux');
   var fraisComm=N('iFraisComm');var mobilier=N('iMobilier');
   var tauxFin=N('iTauxFin');var dureeFin=parseInt(V('iDureeFin').value)||20;
   var loyerBrutNu=N('iLoyerNu');var loyerBrutMeuble=N('iLoyerMeuble');
   var charges=N('iCharges');var taxeF=N('iTaxeFonciere');
-  var assietteDeno=N('iAssietteDeno');
+  /* Assiette Denormandie = auto-calcul (plafond 300k) */
+  var assietteDeno=Math.min(prixFAI+fraisNotaire+travaux,300000);
   var dureeDeno=parseInt(V('iDureeDeno').value)||12;
   var stratPost=V('iStratPost').value;
   var revalo=N('iRevalo')/100;
@@ -803,7 +748,7 @@ function calc(){
 
   /* ========== TRAME SYNTHESE ========== */
   V('trameSynth').style.display='';
-  V('synthSubtitle').textContent=nom+' | '+ville+' \u2014 '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2 | '+today();
+  V('synthSubtitle').textContent=nom+' | '+ville+' \u2014 '+surface+' m\u00b2 | '+today();
 
   /* Timeline */
   if(isDeno&&dureePost>0){
@@ -909,7 +854,7 @@ function calc(){
 }
 
 (function(){
-  V('iAltToggle')&&V('iAltToggle').addEventListener('change',function(){var f=V('altFields');if(f)f.style.display=this.checked?'':'none'});
+  /* init */
   try{CGP.footer.render(V('conseillerFooter'))}catch(e){}
 })();
 </script>
