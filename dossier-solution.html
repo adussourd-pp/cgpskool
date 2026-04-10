@@ -121,6 +121,18 @@
 
   <div id="sidebarImmo" style="display:none">
 
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Import Colosseum</label>
+    <div class="sb-body open">
+      <div class="fg"><label>Collez le texte brut Colosseum ici</label>
+        <textarea class="fi" id="iImportRaw" rows="6" placeholder="Prix du bien FAI : 69 000 &#8364;&#10;Frais de notaire : 5 520 &#8364;&#10;Devis travaux TTC : 48 652 &#8364;&#10;..." style="resize:vertical;font-size:11px;line-height:1.4"></textarea>
+      </div>
+      <div style="display:flex;gap:6px;padding:0 14px 8px">
+        <button style="flex:1;padding:8px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer" onclick="parseColosseum()">&#9654; Importer</button>
+        <button style="padding:8px 12px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer" onclick="V('iImportRaw').value=''">Vider</button>
+      </div>
+      <div id="importStatus" style="padding:0 14px 6px;font-size:10px;color:var(--gris);display:none"></div>
+    </div>
+
     <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Client</label>
     <div class="sb-body open">
       <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iNom" placeholder="Jean Dupont"></div>
@@ -428,6 +440,77 @@ function crd(rate,nper,pv,months){if(!rate||!nper||!pv)return 0;var r=rate/100/1
 function today(){return new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}
 function row(k,v,cls){return '<div class="trame-row"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
 function rowT(k,v,cls){return '<div class="trame-row total"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
+
+/* ===== IMPORT COLOSSEUM ===== */
+function parseColosseum(){
+  var raw=V('iImportRaw').value;
+  if(!raw||!raw.trim()){return}
+  var filled=0;
+  function extractNum(pattern){
+    var m=raw.match(pattern);
+    if(!m)return null;
+    var s=m[1].replace(/\s/g,'').replace(',','.');
+    return parseFloat(s)||0;
+  }
+  function setField(id,val){
+    if(val!==null&&val!==undefined){V(id).value=val;filled++}
+  }
+  /* Prix FAI */
+  var prixFAI=extractNum(/prix\s*(?:du\s*bien\s*)?FAI[^:]*:\s*([\d\s,.]+)/i);
+  setField('iPrixFAI',prixFAI);
+  /* Frais notaire */
+  var fraisN=extractNum(/frais\s*(?:de\s*)?notaire[^:]*:\s*([\d\s,.]+)/i);
+  setField('iFraisNotaire',fraisN);
+  /* Travaux */
+  var travaux=extractNum(/(?:devis\s*)?travaux\s*(?:TTC)?[^:]*:\s*([\d\s,.]+)/i);
+  setField('iTravaux',travaux);
+  /* Frais commercialisation */
+  var fraisC=extractNum(/frais\s*(?:de\s*)?commercialisation[^:]*:\s*([\d\s,.]+)/i);
+  setField('iFraisComm',fraisC);
+  /* Budget mobilier */
+  var mobil=extractNum(/(?:budget\s*)?mobilier[^:]*:\s*([\d\s,.]+)/i);
+  setField('iMobilier',mobil);
+  /* Taux financement */
+  var taux=extractNum(/(?:taux\s*(?:nominal)?|pr[e\u00ea]t\s*de)\s*[^0-9]*([\d,.]+)\s*%/i);
+  setField('iTauxFin',taux);
+  /* Duree — cherche "sur X mois" ou "X mois" */
+  var dureeM=extractNum(/sur\s*([\d\s]+)\s*mois/i);
+  if(dureeM!==null){
+    var ans=Math.round(dureeM/12);
+    V('iDureeFin').value=ans<=17?'15':(ans<=22?'20':'25');filled++;
+  }
+  /* Loyer brut HC */
+  var loyerBrut=extractNum(/loyers?\s*bruts?\s*(?:hors\s*charges)?[^:]*:\s*([\d\s,.]+)/i);
+  setField('iLoyerNu',loyerBrut);
+  /* Loyer brut meuble (si present, sinon on met le meme +10%) */
+  var loyerBrutM=extractNum(/loyers?\s*bruts?\s*(?:hors\s*charges)?\s*meubl[e\u00e9][^:]*:\s*([\d\s,.]+)/i);
+  if(loyerBrutM!==null){setField('iLoyerMeuble',loyerBrutM)}
+  else if(loyerBrut!==null){setField('iLoyerMeuble',Math.round(loyerBrut*1.15))}
+  /* Charges copro */
+  var chargesC=extractNum(/charges?\s*(?:de\s*)?copropri[e\u00e9]t[e\u00e9][^:]*:\s*([\d\s,.]+)/i);
+  setField('iCharges',chargesC);
+  /* Taxe fonciere */
+  var taxeF=extractNum(/taxe\s*fonci[e\u00e8]re[^:]*:\s*([\d\s,.]+)/i);
+  setField('iTaxeFonciere',taxeF);
+  /* Assiette Denormandie */
+  var assiette=extractNum(/assiette[^:]*:\s*([\d\s,.]+)/i);
+  setField('iAssietteDeno',assiette);
+  /* Surface */
+  var surface=extractNum(/surface[^:]*:\s*([\d\s,.]+)\s*m/i);
+  setField('iSurface',surface);
+  /* Ville */
+  var mVille=raw.match(/ville[^:]*:\s*([^\n]+)/i);
+  if(mVille){V('iVille').value=mVille[1].trim();filled++}
+  /* Detect Denormandie */
+  if(/denormandie/i.test(raw)){V('iEligibilite').value='denormandie';filled++}
+  else if(/lmnp|meubl/i.test(raw)){V('iEligibilite').value='lmnp';filled++}
+  /* Status */
+  var st=V('importStatus');
+  st.style.display='';
+  st.style.color='#2D7A5B';
+  st.textContent='\u2713 '+filled+' champs remplis automatiquement';
+  setTimeout(function(){st.style.display='none'},5000);
+}
 
 function onModuleChange(){
   var mod=V('pModule').value;
