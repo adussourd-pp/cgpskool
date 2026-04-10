@@ -4,470 +4,358 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>CGP Skool OS — Dossier Solution</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>CGP Skool — Dossier Solution Immobilier</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
---os-bg:#0F1117;--os-surface:#1A1D27;--os-border:#2A2D3A;
---os-gold:#C49A6C;--os-gold-dim:rgba(196,154,108,0.15);--os-gold-glow:rgba(196,154,108,0.25);
---os-blue:#4F8EF7;--os-text:#E8E9ED;--os-muted:#8B8FA8;
---os-green:#22C55E;--os-warn:#F59E0B;--os-red:#EF4444;
---os-sans:'Inter',system-ui,sans-serif;
-}
-html,body{height:100%;font-family:var(--os-sans);background:var(--os-bg);color:var(--os-text);font-size:14px;line-height:1.6}
-a{color:var(--os-gold);text-decoration:none}
+/* Home cards */
+.home-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:40px 20px}
+.home-wrap h1{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--noir);margin-bottom:6px;text-align:center}
+.home-wrap h1 em{color:var(--orange);font-style:italic}
+.home-wrap p{font-size:14px;color:var(--gris);margin-bottom:40px;text-align:center}
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:720px;width:100%}
+.home-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:28px 22px;cursor:pointer;transition:all 0.25s;position:relative}
+.home-card:hover{border-color:var(--orange);box-shadow:0 6px 24px rgba(212,98,42,0.1);transform:translateY(-3px)}
+.home-card.disabled{opacity:0.45;cursor:default}
+.home-card.disabled:hover{border-color:var(--bord);box-shadow:none;transform:none}
+.home-card-icon{font-size:32px;margin-bottom:12px}
+.home-card-title{font-size:16px;font-weight:700;color:var(--noir);margin-bottom:6px}
+.home-card-desc{font-size:12px;color:var(--gris);line-height:1.5}
+.home-card-tag{position:absolute;top:12px;right:12px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em}
+.home-card-tag.ok{background:var(--green-l);color:var(--green);border:1px solid rgba(45,122,91,0.2)}
+.home-card-tag.soon{background:var(--gris-l);color:var(--gris);border:1px solid var(--bord)}
 
-/* NAV */
-.os-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(15,17,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--os-border);display:flex;align-items:center;padding:0 24px;z-index:100}
-.os-nav-logo{font-size:16px;font-weight:700;letter-spacing:0.5px;color:var(--os-text)}
-.os-nav-logo span{color:var(--os-gold)}
-.os-nav-badge{margin-left:auto;font-size:12px;color:var(--os-muted);display:flex;align-items:center;gap:8px}
-.os-nav-back{font-size:13px;color:var(--os-muted);cursor:pointer;margin-left:24px;padding:6px 12px;border:1px solid var(--os-border);border-radius:6px;background:transparent;font-family:var(--os-sans);transition:all 0.2s}
-.os-nav-back:hover{color:var(--os-text);border-color:var(--os-gold)}
-.os-nav-home-link{font-size:13px;color:var(--os-muted);margin-left:16px;padding:6px 12px;border:1px solid var(--os-border);border-radius:6px;background:transparent;font-family:var(--os-sans);cursor:pointer;transition:all 0.2s;text-decoration:none}
-.os-nav-home-link:hover{color:var(--os-text);border-color:var(--os-gold)}
+/* Results overrides (inside cs-page) */
+.r-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--bord)}
+.r-header h2{font-family:var(--sans);font-size:20px;font-weight:700;color:var(--noir)}
+.r-header .sub{font-size:12px;color:var(--gris);margin-top:2px}
+.r-header .date{font-size:11px;color:var(--gris)}
+.r-badge{display:inline-block;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600}
+.r-badge.green{background:var(--green-l);color:var(--green)}
+.r-badge.orange{background:var(--ambre-l);color:var(--orange)}
+.r-badge.blue{background:var(--blue-l);color:var(--blue)}
 
-/* VIEWS */
-.os-view{display:none;padding-top:52px;min-height:100vh}
-.os-view.active{display:block}
+/* KPIs */
+.r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.r-kpi{background:#fff;border:1.5px solid var(--bord);border-radius:8px;padding:16px}
+.r-kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
+.r-kpi-val{font-size:24px;font-weight:700;color:var(--orange);line-height:1.2}
+.r-kpi-sub{font-size:10px;color:var(--gris);margin-top:3px}
 
-/* HOME */
-.os-home{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:40px 24px}
-.os-home h1{font-size:32px;font-weight:700;margin-bottom:8px;text-align:center}
-.os-home h1 span{color:var(--os-gold)}
-.os-home p{font-size:15px;color:var(--os-muted);margin-bottom:48px;text-align:center}
-.os-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;width:100%}
-.os-card{background:var(--os-surface);border:1px solid var(--os-border);border-radius:16px;padding:32px 28px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
-.os-card:hover{border-color:var(--os-gold);transform:translateY(-4px);box-shadow:0 8px 32px rgba(196,154,108,0.15)}
-.os-card.disabled{opacity:0.5;cursor:default}
-.os-card.disabled:hover{border-color:var(--os-border);transform:none;box-shadow:none}
-.os-card-icon{font-size:36px;margin-bottom:16px}
-.os-card-title{font-size:18px;font-weight:600;margin-bottom:8px}
-.os-card-desc{font-size:13px;color:var(--os-muted);line-height:1.5}
-.os-card-badge{position:absolute;top:16px;right:16px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px}
-.os-card-badge.soon{background:rgba(139,143,168,0.15);color:var(--os-muted);border:1px solid rgba(139,143,168,0.2)}
-.os-card-badge.ready{background:rgba(34,197,94,0.12);color:var(--os-green);border:1px solid rgba(34,197,94,0.25)}
+/* Card result */
+.r-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:18px 22px;margin-bottom:16px}
+.r-card-title{font-size:13px;font-weight:700;color:var(--noir);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.r-card-title::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:13px}
+.r-row:last-child{border-bottom:none}
+.r-k{color:var(--gris)}
+.r-v{font-weight:600;color:var(--noir)}
+.r-v.or{color:var(--orange)}
+.r-v.gr{color:var(--green)}
+.r-v.rd{color:var(--red)}
+.r-v.bl{color:var(--blue)}
+.r-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 
-/* PLACEHOLDER */
-.os-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 52px);color:var(--os-muted);font-size:18px;gap:12px}
-.os-placeholder span{font-size:48px}
+/* Progress bars */
+.r-prog{margin:10px 0}
+.r-prog-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.r-prog-bar{height:7px;background:var(--gris-l);border-radius:4px;overflow:hidden;position:relative}
+.r-prog-fill{height:100%;border-radius:4px;transition:width 0.4s}
+.r-prog-seuil{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--red);border-radius:1px}
 
-/* LAYOUT IMMO */
-.os-layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 52px)}
-.os-sidebar{background:var(--os-surface);border-right:1px solid var(--os-border);padding:16px 0;overflow-y:auto;position:sticky;top:52px;height:calc(100vh - 52px)}
-.os-main{padding:28px 32px;overflow-y:auto}
+/* Table */
+.r-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.r-tbl thead th{background:var(--noir);color:#fff;text-align:left;padding:9px 12px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em}
+.r-tbl tbody td{padding:9px 12px;border-bottom:1px solid var(--bord);color:var(--noir)}
+.r-tbl tbody tr:nth-child(even){background:#fafaf8}
+.r-tbl .v{font-weight:600}
+.r-tbl .or{color:var(--orange)}
+.r-tbl .gr{color:var(--green)}
+.r-tbl .rd{color:var(--red)}
 
-/* SIDEBAR */
-.os-sb-section{border-bottom:1px solid var(--os-border)}
-.os-sb-lbl{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.16em;color:var(--os-muted);cursor:pointer;user-select:none;transition:color 0.2s}
-.os-sb-lbl:hover{color:var(--os-text)}
-.os-sb-lbl .arrow{font-size:8px;transition:transform 0.2s;color:var(--os-gold)}
-.os-sb-lbl.open .arrow{transform:rotate(90deg)}
-.os-sb-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
-.os-sb-body.open{max-height:2000px}
-.os-fg{padding:0 16px;margin-bottom:10px}
-.os-fg label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--os-muted);margin-bottom:4px}
-.os-fi{width:100%;padding:8px 10px;background:var(--os-bg);border:1.5px solid var(--os-border);border-radius:7px;font-family:var(--os-sans);font-size:13px;font-weight:500;color:var(--os-text);outline:none;transition:border-color 0.2s}
-.os-fi:focus{border-color:var(--os-gold)}
-.os-fi::placeholder{color:rgba(139,143,168,0.5)}
-select.os-fi{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B8FA8' d='M3 5l3 3 3-3z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-select.os-fi option{background:var(--os-surface);color:var(--os-text)}
-.os-fi-row{display:flex;border:1.5px solid var(--os-border);border-radius:7px;overflow:hidden;transition:border-color 0.2s}
-.os-fi-row:focus-within{border-color:var(--os-gold)}
-.os-fi-row input{flex:1;padding:8px 10px;background:var(--os-bg);border:none;font-family:var(--os-sans);font-size:13px;font-weight:500;color:var(--os-text);outline:none;min-width:0}
-.os-fi-unit{padding:8px 10px;font-size:11px;color:var(--os-muted);background:rgba(42,45,58,0.5);border-left:1px solid var(--os-border);display:flex;align-items:center}
-.os-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;margin-bottom:10px}
-.os-grid2 .os-fg{padding:0;margin-bottom:0}
-.os-toggle-row{display:flex;align-items:center;gap:8px;padding:4px 16px 10px;font-size:12px;color:var(--os-muted)}
-.os-toggle-row input{accent-color:var(--os-gold)}
-.os-sb-btn{display:block;width:calc(100% - 32px);margin:12px 16px;padding:11px;background:var(--os-gold);color:#fff;border:none;border-radius:8px;font-family:var(--os-sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
-.os-sb-btn:hover{background:#b8894f;transform:translateY(-1px)}
+/* Equation */
+.r-eq{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+.r-eq-box{border:1.5px solid var(--bord);border-radius:8px;padding:12px 18px;text-align:center;min-width:110px;background:#fff}
+.r-eq-box .lbl{font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px}
+.r-eq-box .val{font-size:18px;font-weight:700}
+.r-eq-op{font-size:20px;color:var(--gris);font-weight:300}
 
-/* RESULTS */
-.os-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--os-muted);text-align:center;gap:12px}
-.os-empty span{font-size:48px;opacity:0.4}
-.os-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
-.os-header-left h2{font-size:22px;font-weight:700}
-.os-header-left .sub{font-size:13px;color:var(--os-muted);margin-top:2px}
-.os-header-right{text-align:right}
-.os-header-right .date{font-size:12px;color:var(--os-muted)}
-.os-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
-.os-badge-green{background:rgba(34,197,94,0.12);color:var(--os-green);border:1px solid rgba(34,197,94,0.25)}
-.os-badge-warn{background:rgba(245,158,11,0.12);color:var(--os-warn);border:1px solid rgba(245,158,11,0.25)}
-.os-badge-red{background:rgba(239,68,68,0.12);color:var(--os-red);border:1px solid rgba(239,68,68,0.25)}
-.os-badge-blue{background:rgba(79,142,247,0.12);color:var(--os-blue);border:1px solid rgba(79,142,247,0.25)}
+/* Denormandie */
+.r-deno-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.r-deno{border:1.5px solid var(--bord);border-radius:8px;padding:16px;text-align:center;background:#fff}
+.r-deno.best{border-color:var(--orange);box-shadow:0 0 16px rgba(212,98,42,0.08)}
+.r-deno-dur{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:6px}
+.r-deno-rate{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:8px}
+.r-deno-total{font-size:20px;font-weight:700;color:var(--noir);margin-bottom:3px}
+.r-deno-sub{font-size:10px;color:var(--gris)}
 
-/* KPI */
-.os-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.os-kpi{background:var(--os-surface);border:1px solid var(--os-border);border-radius:12px;padding:18px 20px}
-.os-kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--os-muted);margin-bottom:6px}
-.os-kpi-val{font-size:28px;font-weight:700;color:var(--os-blue);line-height:1.2}
-.os-kpi-sub{font-size:11px;color:var(--os-muted);margin-top:4px}
+/* Chart */
+.r-chart-wrap{position:relative;max-height:260px;margin:10px auto;display:flex;justify-content:center}
 
-/* CARDS */
-.os-card-r{background:var(--os-surface);border:1px solid var(--os-border);border-radius:12px;padding:22px 24px;margin-bottom:20px}
-.os-card-title-r{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.os-card-title-r::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--os-gold);flex-shrink:0}
-.os-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(42,45,58,0.6);font-size:13px}
-.os-row:last-child{border-bottom:none}
-.os-row-k{color:var(--os-muted)}
-.os-row-v{font-weight:600}
-.os-row-v.gold{color:var(--os-gold)}
-.os-row-v.blue{color:var(--os-blue)}
-.os-row-v.green{color:var(--os-green)}
-.os-row-v.red{color:var(--os-red)}
+/* Placeholder */
+.r-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--gris);gap:10px}
+.r-placeholder span{font-size:42px;opacity:0.3}
 
-/* PROGRESS */
-.os-progress{margin:10px 0}
-.os-progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
-.os-progress-bar{height:8px;background:var(--os-bg);border-radius:4px;overflow:hidden;position:relative}
-.os-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease}
-.os-progress-threshold{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--os-red);border-radius:1px}
+/* Empty state */
+.r-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--gris);text-align:center;gap:10px}
+.r-empty span{font-size:42px;opacity:0.3}
 
-/* TABLE */
-.os-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.os-tbl thead th{background:var(--os-bg);color:var(--os-muted);text-align:left;padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--os-border)}
-.os-tbl tbody td{padding:10px 14px;border-bottom:1px solid rgba(42,45,58,0.4);color:var(--os-text)}
-.os-tbl tbody tr:nth-child(even){background:rgba(15,17,23,0.4)}
-.os-tbl .val{font-weight:600}
-.os-tbl .gold{color:var(--os-gold)}
-.os-tbl .green{color:var(--os-green)}
-.os-tbl .red{color:var(--os-red)}
-.os-tbl .blue{color:var(--os-blue)}
-
-/* EQUATION */
-.os-eq{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;flex-wrap:wrap}
-.os-eq-box{background:var(--os-bg);border:1px solid var(--os-border);border-radius:10px;padding:14px 20px;text-align:center;min-width:120px}
-.os-eq-box .label{font-size:10px;color:var(--os-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
-.os-eq-box .val{font-size:20px;font-weight:700}
-.os-eq-op{font-size:22px;color:var(--os-muted);font-weight:300}
-
-/* DENO CARDS */
-.os-deno-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
-.os-deno-card{border:1px solid var(--os-border);border-radius:10px;padding:18px;text-align:center;background:var(--os-bg);transition:border-color 0.2s}
-.os-deno-card.best{border-color:var(--os-gold);box-shadow:0 0 20px rgba(196,154,108,0.1)}
-.os-deno-dur{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--os-muted);margin-bottom:8px}
-.os-deno-rate{font-size:14px;font-weight:700;color:var(--os-gold);margin-bottom:10px}
-.os-deno-total{font-size:22px;font-weight:700;color:var(--os-blue);margin-bottom:4px}
-.os-deno-sub{font-size:11px;color:var(--os-muted)}
-
-/* GRID2 RESULTS */
-.os-results-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-
-/* CHARTS */
-.os-chart-wrap{position:relative;max-height:280px;margin:12px auto;display:flex;justify-content:center}
-
-/* PRINT */
+/* Print */
 @media print{
-  body{background:#fff!important;color:#111!important}
-  .os-nav,.os-sidebar,.os-sb-btn,.os-nav-back,.os-nav-home-link,#viewHome,#viewPlacement,#viewBilan{display:none!important}
-  .os-view{display:block!important;padding-top:0!important}
-  .os-layout{display:block!important}
-  .os-main{padding:20px!important}
-  .os-card-r{border-color:#ddd!important;break-inside:avoid}
-  .os-kpi{border-color:#ddd!important}
-  .os-badge,.os-kpi,.os-progress-fill,.os-deno-card.best,.os-tbl thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .r-kpi,.r-badge,.r-prog-fill,.r-deno.best,.r-tbl thead th,[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .r-tbl thead th{background:var(--noir)!important;color:#fff!important}
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="os-nav">
-  <div class="os-nav-logo">CGP <span>Skool</span> OS</div>
-  <div class="os-nav-badge">
-    <span id="navClient"></span>
-  </div>
-  <a class="os-nav-home-link" href="index.html">Accueil CGP Skool</a>
-  <button class="os-nav-back" id="btnBack" style="display:none" onclick="showView('home')">Retour</button>
-</nav>
-
-<!-- HOME -->
-<div id="viewHome" class="os-view active">
-  <div class="os-home">
-    <h1>Dossier <span>Solution</span></h1>
-    <p>Selectionnez un module pour construire votre dossier client</p>
-    <div class="os-cards">
-      <div class="os-card" onclick="showView('placement')">
-        <span class="os-card-badge soon">Bientot</span>
-        <div class="os-card-icon">&#128176;</div>
-        <div class="os-card-title">Placement</div>
-        <div class="os-card-desc">Assurance Vie, PER, SCPI — analyse et presentation client des solutions de placement</div>
-      </div>
-      <div class="os-card" onclick="showView('immo')">
-        <span class="os-card-badge ready">Disponible</span>
-        <div class="os-card-icon">&#127968;</div>
-        <div class="os-card-title">Immobilier</div>
-        <div class="os-card-desc">Denormandie, LMNP, Deficit Foncier — analyse complete du projet immobilier Colosseum</div>
-      </div>
-      <div class="os-card disabled">
-        <span class="os-card-badge soon">Bientot</span>
-        <div class="os-card-icon">&#128202;</div>
-        <div class="os-card-title">Bilan Patrimonial</div>
-        <div class="os-card-desc">Vision consolidee du patrimoine, projections et recommandations globales</div>
-      </div>
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div class="cs-nav-actions">
+      <span id="navClient" style="font-size:12px;color:var(--fog-2)"></span>
+      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
     </div>
   </div>
-</div>
+</nav>
 
-<!-- PLACEMENT (placeholder) -->
-<div id="viewPlacement" class="os-view">
-  <div class="os-placeholder">
-    <span>&#128176;</span>
-    <div>Module Placement</div>
-    <div style="font-size:14px">&#128284; En cours de developpement</div>
-  </div>
-</div>
+<div class="cs-app">
+  <!-- SIDEBAR -->
+  <aside class="cs-sidebar" id="sidebar">
 
-<!-- BILAN (placeholder) -->
-<div id="viewBilan" class="os-view">
-  <div class="os-placeholder">
-    <span>&#128202;</span>
-    <div>Bilan Patrimonial</div>
-    <div style="font-size:14px">&#128284; En cours de developpement</div>
-  </div>
-</div>
+    <!-- Module selector -->
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Module</label>
+    <div class="sb-body open">
+      <div class="fg"><select class="fi" id="pModule" onchange="onModuleChange()">
+        <option value="home">Accueil</option>
+        <option value="immo">&#127968; Immobilier</option>
+        <option value="placement">&#128176; Placement</option>
+        <option value="bilan">&#128202; Bilan Patrimonial</option>
+      </select></div>
+    </div>
 
-<!-- IMMOBILIER -->
-<div id="viewImmo" class="os-view">
-  <div class="os-layout">
-    <!-- SIDEBAR -->
-    <aside class="os-sidebar">
+    <!-- IMMOBILIER INPUTS -->
+    <div id="sidebarImmo" style="display:none">
 
-      <!-- CLIENT -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Client</div>
-        <div class="os-sb-body open">
-          <div class="os-fg"><label>Prenom Nom</label><input class="os-fi" type="text" id="iNom" placeholder="Ex: Jean Dupont"></div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Age</label><div class="os-fi-row"><input type="number" id="iAge" placeholder="35"><span class="os-fi-unit">ans</span></div></div>
-            <div class="os-fg"><label>Situation</label>
-              <select class="os-fi" id="iSituation">
-                <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
-                <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
-              </select>
-            </div>
+      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Client</label>
+      <div class="sb-body open">
+        <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iNom" placeholder="Ex: Jean Dupont"></div>
+        <div class="grid2">
+          <div class="fg"><label>Age</label><div class="fi-row"><input type="number" id="iAge" placeholder="35"><span class="fi-unit">ans</span></div></div>
+          <div class="fg"><label>Situation</label>
+            <select class="fi" id="iSituation">
+              <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
+              <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
+            </select>
           </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Revenu brut annuel</label><div class="os-fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-            <div class="os-fg"><label>Revenu net mensuel</label><div class="os-fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Taux PAS</label><div class="os-fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="os-fi-unit">%</span></div></div>
-            <div class="os-fg"><label>Impots mensuels</label><div class="os-fi-row"><input type="number" id="iImpots" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+          <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Taux PAS</label><div class="fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="fi-unit">%</span></div></div>
+          <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        </div>
+      </div>
+
+      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Co-investisseur</label>
+      <div class="sb-body">
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()" style="accent-color:var(--orange)"> Activer</div>
+        <div id="coFields" style="display:none">
+          <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iCoNom" placeholder="Ex: Marie Dupont"></div>
+          <div class="grid2">
+            <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+            <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
           </div>
         </div>
       </div>
 
-      <!-- CO-INVESTISSEUR -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Co-investisseur</div>
-        <div class="os-sb-body">
-          <div class="os-toggle-row"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()"> <span>Activer co-investisseur</span></div>
-          <div id="coFields" style="display:none">
-            <div class="os-fg"><label>Prenom Nom</label><input class="os-fi" type="text" id="iCoNom" placeholder="Ex: Marie Dupont"></div>
-            <div class="os-grid2">
-              <div class="os-fg"><label>Revenu brut annuel</label><div class="os-fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-              <div class="os-fg"><label>Revenu net mensuel</label><div class="os-fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-            </div>
+      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Pret RP en cours</label>
+      <div class="sb-body">
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()" style="accent-color:var(--orange)"> Pret en cours</div>
+        <div id="pretFields" style="display:none">
+          <div class="grid2">
+            <div class="fg"><label>Montant emprunte</label><div class="fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+            <div class="fg"><label>Taux nominal</label><div class="fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
           </div>
+          <div class="grid2">
+            <div class="fg"><label>Duree totale</label><div class="fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="fi-unit">ans</span></div></div>
+            <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          </div>
+          <div class="fg"><label>Capital restant du</label><div class="fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
         </div>
       </div>
 
-      <!-- PRET RP -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Pret RP en cours</div>
-        <div class="os-sb-body">
-          <div class="os-toggle-row"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()"> <span>Pret en cours</span></div>
-          <div id="pretFields" style="display:none">
-            <div class="os-grid2">
-              <div class="os-fg"><label>Montant emprunte</label><div class="os-fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-              <div class="os-fg"><label>Taux nominal</label><div class="os-fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="os-fi-unit">%</span></div></div>
-            </div>
-            <div class="os-grid2">
-              <div class="os-fg"><label>Duree totale</label><div class="os-fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="os-fi-unit">ans</span></div></div>
-              <div class="os-fg"><label>Mensualite</label><div class="os-fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-            </div>
-            <div class="os-fg"><label>Capital restant du</label><div class="os-fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
+      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Epargne</label>
+      <div class="sb-body open">
+        <div class="fg"><label>Epargne disponible</label><div class="fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+
+      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Projet immobilier</label>
+      <div class="sb-body open">
+        <div class="grid2">
+          <div class="fg"><label>Ville</label><input class="fi" type="text" id="iVille" placeholder="Ex: Limoges"></div>
+          <div class="fg"><label>Type de bien</label>
+            <select class="fi" id="iTypeBien">
+              <option value="studio">Studio</option><option value="t1bis">T1bis</option>
+              <option value="t2">T2</option><option value="t3">T3</option>
+              <option value="colocation">Colocation</option>
+            </select>
           </div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Surface Carrez</label><div class="fi-row"><input type="number" id="iSurface" placeholder="0"><span class="fi-unit">m&#178;</span></div></div>
+          <div class="fg"><label>Eligibilite</label>
+            <select class="fi" id="iEligibilite">
+              <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option>
+              <option value="deficit">Deficit Foncier</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Prix FAI</label><div class="fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+          <div class="fg"><label>Frais de notaire</label><div class="fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Travaux TTC</label><div class="fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+          <div class="fg"><label>Frais commercialisation</label><div class="fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        </div>
+        <div class="fg"><label>Budget mobilier</label><div class="fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="grid2">
+          <div class="fg"><label>Taux financement</label><div class="fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
+          <div class="fg"><label>Duree</label>
+            <select class="fi" id="iDureeFin">
+              <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          <div class="fg"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        </div>
+        <div class="fg"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+
+      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Scenario alternatif</label>
+      <div class="sb-body">
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iAltToggle" style="accent-color:var(--orange)"> Comparer</div>
+        <div id="altFields" style="display:none">
+          <div class="fg"><label>Ville</label><input class="fi" type="text" id="iAltVille" placeholder="Ex: Poitiers"></div>
+          <div class="grid2">
+            <div class="fg"><label>Budget</label><div class="fi-row"><input type="number" id="iAltBudget" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+            <div class="fg"><label>Effort mensuel</label><div class="fi-row"><input type="number" id="iAltEffort" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iAltMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+            <div class="fg"><label>Loyer net</label><div class="fi-row"><input type="number" id="iAltLoyer" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iAltDeno" style="accent-color:var(--orange)"> Eligible Denormandie</div>
         </div>
       </div>
 
-      <!-- EPARGNE -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Epargne</div>
-        <div class="os-sb-body open">
-          <div class="os-fg"><label>Epargne disponible</label><div class="os-fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-        </div>
+      <!-- Bouton -->
+      <div style="border-top:1px solid var(--bord);margin-top:10px;padding:10px 14px 0">
+        <button style="width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s" onclick="calc()">&#9654; Analyser le projet</button>
       </div>
 
-      <!-- PROJET -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl open" onclick="togSb(this)"><span class="arrow">&#9654;</span> Projet immobilier</div>
-        <div class="os-sb-body open">
-          <div class="os-grid2">
-            <div class="os-fg"><label>Ville</label><input class="os-fi" type="text" id="iVille" placeholder="Ex: Limoges"></div>
-            <div class="os-fg"><label>Type de bien</label>
-              <select class="os-fi" id="iTypeBien">
-                <option value="studio">Studio</option><option value="t1bis">T1bis</option>
-                <option value="t2">T2</option><option value="t3">T3</option>
-                <option value="colocation">Colocation</option>
-              </select>
-            </div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Surface Carrez</label><div class="os-fi-row"><input type="number" id="iSurface" placeholder="0"><span class="os-fi-unit">m&#178;</span></div></div>
-            <div class="os-fg"><label>Eligibilite</label>
-              <select class="os-fi" id="iEligibilite">
-                <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option>
-                <option value="deficit">Deficit Foncier</option>
-              </select>
-            </div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Prix FAI</label><div class="os-fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-            <div class="os-fg"><label>Frais de notaire</label><div class="os-fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Travaux TTC</label><div class="os-fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-            <div class="os-fg"><label>Frais commercialisation</label><div class="os-fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-          </div>
-          <div class="os-fg"><label>Budget mobilier</label><div class="os-fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Taux financement</label><div class="os-fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="os-fi-unit">%</span></div></div>
-            <div class="os-fg"><label>Duree</label>
-              <select class="os-fi" id="iDureeFin">
-                <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
-              </select>
-            </div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Loyer brut HC nu</label><div class="os-fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-            <div class="os-fg"><label>Loyer brut HC meuble</label><div class="os-fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-          </div>
-          <div class="os-grid2">
-            <div class="os-fg"><label>Charges copro</label><div class="os-fi-row"><input type="number" id="iCharges" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-            <div class="os-fg"><label>Taxe fonciere</label><div class="os-fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-          </div>
-          <div class="os-fg"><label>Assiette Denormandie eligible</label><div class="os-fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-        </div>
-      </div>
+    </div><!-- /sidebarImmo -->
 
-      <!-- SCENARIO ALT -->
-      <div class="os-sb-section">
-        <div class="os-sb-lbl" onclick="togSb(this)"><span class="arrow">&#9654;</span> Scenario alternatif</div>
-        <div class="os-sb-body">
-          <div class="os-toggle-row"><input type="checkbox" id="iAltToggle"> <span>Comparer un 2e scenario</span></div>
-          <div id="altFields" style="display:none">
-            <div class="os-fg"><label>Ville</label><input class="os-fi" type="text" id="iAltVille" placeholder="Ex: Poitiers"></div>
-            <div class="os-grid2">
-              <div class="os-fg"><label>Budget</label><div class="os-fi-row"><input type="number" id="iAltBudget" placeholder="0"><span class="os-fi-unit">&#8364;</span></div></div>
-              <div class="os-fg"><label>Effort mensuel</label><div class="os-fi-row"><input type="number" id="iAltEffort" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-            </div>
-            <div class="os-grid2">
-              <div class="os-fg"><label>Mensualite</label><div class="os-fi-row"><input type="number" id="iAltMens" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-              <div class="os-fg"><label>Loyer net</label><div class="os-fi-row"><input type="number" id="iAltLoyer" placeholder="0"><span class="os-fi-unit">&#8364;/m</span></div></div>
-            </div>
-            <div class="os-toggle-row"><input type="checkbox" id="iAltDeno"> <span>Eligible Denormandie</span></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="cs-main">
+
+    <!-- HOME VIEW -->
+    <div id="viewHome" class="cs-page">
+      <div class="home-wrap">
+        <h1>Dossier <em>Solution</em></h1>
+        <p>Selectionnez un module pour construire votre dossier client</p>
+        <div class="home-grid">
+          <div class="home-card" onclick="V('pModule').value='placement';onModuleChange()">
+            <span class="home-card-tag soon">Bientot</span>
+            <div class="home-card-icon">&#128176;</div>
+            <div class="home-card-title">Placement</div>
+            <div class="home-card-desc">Assurance Vie, PER, SCPI — presentation client des solutions de placement</div>
+          </div>
+          <div class="home-card" onclick="V('pModule').value='immo';onModuleChange()">
+            <span class="home-card-tag ok">Disponible</span>
+            <div class="home-card-icon">&#127968;</div>
+            <div class="home-card-title">Immobilier</div>
+            <div class="home-card-desc">Denormandie, LMNP, Deficit Foncier — analyse du projet immobilier</div>
+          </div>
+          <div class="home-card disabled">
+            <span class="home-card-tag soon">Bientot</span>
+            <div class="home-card-icon">&#128202;</div>
+            <div class="home-card-title">Bilan Patrimonial</div>
+            <div class="home-card-desc">Vision consolidee du patrimoine et recommandations globales</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- BOUTON -->
-      <button class="os-sb-btn" onclick="calc()">&#9654; Analyser le projet</button>
+    <!-- IMMOBILIER VIEW -->
+    <div id="viewImmo" class="cs-page" style="display:none">
+      <div id="cs-nav-actions"></div>
 
-    </aside>
-
-    <!-- MAIN RESULTS -->
-    <main class="os-main">
-      <div id="resultsEmpty" class="os-empty">
+      <div id="resultsEmpty" class="r-empty">
         <span>&#127968;</span>
-        <div style="font-size:16px;font-weight:600">Analyse immobiliere</div>
-        <div style="font-size:13px">Renseignez les donnees client et projet dans la sidebar, puis cliquez sur <b>Analyser</b></div>
+        <div style="font-size:15px;font-weight:600;color:var(--noir)">Analyse immobiliere</div>
+        <div style="font-size:12px">Renseignez les donnees dans la sidebar puis cliquez <b>Analyser</b></div>
       </div>
 
       <div id="resultsContent" style="display:none">
-
-        <!-- HEADER -->
-        <div class="os-header" id="rHeader">
-          <div class="os-header-left">
-            <h2 id="rClientName">—</h2>
-            <div class="sub" id="rClientSub">—</div>
-          </div>
-          <div class="os-header-right">
-            <div id="rBadge"></div>
-            <div class="date" id="rDate"></div>
-          </div>
+        <div class="r-header" id="rHeader">
+          <div><h2 id="rClientName">—</h2><div class="sub" id="rClientSub">—</div></div>
+          <div style="text-align:right"><div id="rBadge"></div><div class="date" id="rDate"></div></div>
         </div>
-
-        <!-- KPIS -->
-        <div class="os-kpis" id="rKpis">
-          <div class="os-kpi"><div class="os-kpi-label">Budget total meuble</div><div class="os-kpi-val" id="kBudget">—</div><div class="os-kpi-sub" id="kBudgetSub">—</div></div>
-          <div class="os-kpi"><div class="os-kpi-label">Effort meuble / apport</div><div class="os-kpi-val" id="kEffort">—</div><div class="os-kpi-sub" id="kEffortSub">—</div></div>
-          <div class="os-kpi"><div class="os-kpi-label">Rendement brut</div><div class="os-kpi-val" id="kRendement">—</div><div class="os-kpi-sub" id="kRendementSub">—</div></div>
-          <div class="os-kpi"><div class="os-kpi-label">Endettement apres</div><div class="os-kpi-val" id="kEndettement">—</div><div class="os-kpi-sub" id="kEndettementSub">—</div></div>
+        <div class="r-kpis" id="rKpis">
+          <div class="r-kpi"><div class="r-kpi-label">Budget total meuble</div><div class="r-kpi-val" id="kBudget">—</div><div class="r-kpi-sub" id="kBudgetSub">—</div></div>
+          <div class="r-kpi"><div class="r-kpi-label">Effort meuble / apport</div><div class="r-kpi-val" id="kEffort">—</div><div class="r-kpi-sub" id="kEffortSub">—</div></div>
+          <div class="r-kpi"><div class="r-kpi-label">Rendement brut</div><div class="r-kpi-val" id="kRendement">—</div><div class="r-kpi-sub" id="kRendementSub">—</div></div>
+          <div class="r-kpi"><div class="r-kpi-label">Endettement apres</div><div class="r-kpi-val" id="kEndettement">—</div><div class="r-kpi-sub" id="kEndettementSub">—</div></div>
         </div>
-
-        <!-- PROFIL CLIENT + SYNTHESE PROJET -->
-        <div class="os-results-grid">
-          <div class="os-card-r">
-            <div class="os-card-title-r">Profil client</div>
-            <div id="rProfil"></div>
-          </div>
-          <div class="os-card-r">
-            <div class="os-card-title-r">Synthese du projet</div>
-            <div id="rProjet"></div>
-          </div>
+        <div class="r-grid2">
+          <div class="r-card"><div class="r-card-title">Profil client</div><div id="rProfil"></div></div>
+          <div class="r-card"><div class="r-card-title">Synthese du projet</div><div id="rProjet"></div></div>
         </div>
-
-        <!-- CAPACITE FINANCIERE -->
-        <div class="os-card-r">
-          <div class="os-card-title-r">Capacite financiere — Endettement</div>
-          <div id="rEndettement"></div>
+        <div class="r-card"><div class="r-card-title">Capacite financiere — Endettement</div><div id="rEndettement"></div></div>
+        <div class="r-card"><div class="r-card-title">Comparatif Nu vs Meuble</div><div style="overflow-x:auto" id="rComparatif"></div></div>
+        <div class="r-card"><div class="r-card-title">Effort mensuel net</div><div id="rEffort"></div></div>
+        <div class="r-card" id="rDenoCard" style="display:none"><div class="r-card-title">Reduction Denormandie</div><div id="rDeno"></div></div>
+        <div class="r-grid2">
+          <div class="r-card"><div class="r-card-title">Repartition du budget</div><div class="r-chart-wrap"><canvas id="chartBudget"></canvas></div></div>
+          <div class="r-card"><div class="r-card-title">Comparaison des efforts</div><div class="r-chart-wrap"><canvas id="chartEffort"></canvas></div></div>
         </div>
-
-        <!-- COMPARATIF NU VS MEUBLE -->
-        <div class="os-card-r">
-          <div class="os-card-title-r">Comparatif Nu vs Meuble</div>
-          <div style="overflow-x:auto" id="rComparatif"></div>
-        </div>
-
-        <!-- EFFORT MENSUEL -->
-        <div class="os-card-r">
-          <div class="os-card-title-r">Effort mensuel net</div>
-          <div id="rEffort"></div>
-        </div>
-
-        <!-- DENORMANDIE -->
-        <div class="os-card-r" id="rDenoCard" style="display:none">
-          <div class="os-card-title-r">Reduction Denormandie</div>
-          <div id="rDeno"></div>
-        </div>
-
-        <!-- CHARTS -->
-        <div class="os-results-grid">
-          <div class="os-card-r">
-            <div class="os-card-title-r">Repartition du budget</div>
-            <div class="os-chart-wrap"><canvas id="chartBudget"></canvas></div>
-          </div>
-          <div class="os-card-r">
-            <div class="os-card-title-r">Comparaison des efforts</div>
-            <div class="os-chart-wrap"><canvas id="chartEffort"></canvas></div>
-          </div>
-        </div>
-
-        <!-- SCENARIO ALT -->
-        <div class="os-card-r" id="rAltCard" style="display:none">
-          <div class="os-card-title-r">Comparaison des scenarios</div>
-          <div id="rAlt"></div>
-        </div>
-
+        <div class="r-card" id="rAltCard" style="display:none"><div class="r-card-title">Comparaison des scenarios</div><div id="rAlt"></div></div>
       </div>
-    </main>
 
-  </div>
+      <div id="conseillerFooter"></div>
+    </div>
+
+    <!-- PLACEMENT PLACEHOLDER -->
+    <div id="viewPlacement" class="cs-page" style="display:none">
+      <div class="r-placeholder"><span>&#128176;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Module Placement</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
+    </div>
+
+    <!-- BILAN PLACEHOLDER -->
+    <div id="viewBilan" class="cs-page" style="display:none">
+      <div class="r-placeholder"><span>&#128202;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Bilan Patrimonial</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
+    </div>
+
+  </main>
 </div>
 
 <script>
@@ -481,28 +369,23 @@ function pmt(rate,nper,pv){if(!rate||!nper||!pv)return 0;var r=rate/100/12;var n
 function today(){var d=new Date();return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}
 
 /* ===== NAVIGATION ===== */
-function showView(id){
-  var map={home:'viewHome',placement:'viewPlacement',immo:'viewImmo',bilan:'viewBilan'};
-  var views=document.querySelectorAll('.os-view');
-  for(var i=0;i<views.length;i++)views[i].classList.remove('active');
-  var el=V(map[id]);if(el)el.classList.add('active');
-  V('btnBack').style.display=id==='home'?'none':'';
+function onModuleChange(){
+  var mod=V('pModule').value;
+  var views=['viewHome','viewImmo','viewPlacement','viewBilan'];
+  views.forEach(function(id){V(id).style.display='none'});
+  var map={home:'viewHome',immo:'viewImmo',placement:'viewPlacement',bilan:'viewBilan'};
+  V(map[mod]||'viewHome').style.display='';
+  V('sidebarImmo').style.display=mod==='immo'?'':'none';
+  V('navClient').textContent=mod==='immo'?(V('iNom').value.trim()||''):'';
 }
 
 /* ===== SIDEBAR TOGGLES ===== */
-function togSb(lbl){
-  lbl.classList.toggle('open');
-  var body=lbl.nextElementSibling;
-  if(body)body.classList.toggle('open');
-}
 function toggleCoFields(){V('coFields').style.display=V('iCoToggle').checked?'':'none'}
 function togglePretFields(){V('pretFields').style.display=V('iPretToggle').checked?'':'none'}
 
 /* ===== CHARTS ===== */
 var chartBudget=null,chartEffort=null;
-
 function renderCharts(data){
-  /* Budget doughnut */
   var ctx1=V('chartBudget');
   if(chartBudget)chartBudget.destroy();
   chartBudget=new Chart(ctx1,{
@@ -510,17 +393,15 @@ function renderCharts(data){
     data:{
       labels:['Prix FAI','Frais notaire','Travaux','Mobilier','Frais comm.'],
       datasets:[{data:[data.prixFAI,data.fraisNotaire,data.travaux,data.mobilier,data.fraisComm],
-        backgroundColor:['#4F8EF7','#C49A6C','#22C55E','#F59E0B','#8B8FA8'],
-        borderColor:'#1A1D27',borderWidth:2}]
+        backgroundColor:['#D4622A','#2D7A5B','#2B5EA7','#E8855A','#6B6B6B'],
+        borderColor:'#fff',borderWidth:2}]
     },
     options:{
       responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{position:'bottom',labels:{color:'#8B8FA8',font:{family:'Inter',size:11},padding:12}},
-        tooltip:{backgroundColor:'#1A1D27',titleColor:'#E8E9ED',bodyColor:'#E8E9ED',borderColor:'#2A2D3A',borderWidth:1}}
+      plugins:{legend:{position:'bottom',labels:{color:'#6B6B6B',font:{family:'Inter',size:11},padding:12}},
+        tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}}
     }
   });
-
-  /* Effort bar */
   var ctx2=V('chartEffort');
   if(chartEffort)chartEffort.destroy();
   chartEffort=new Chart(ctx2,{
@@ -529,234 +410,189 @@ function renderCharts(data){
       labels:['Nu sans apport','Meuble sans apport','Nu avec apport','Meuble avec apport'],
       datasets:[{label:'Effort mensuel (\u20ac)',
         data:[data.effortNu,data.effortMeuble,data.effortNuA,data.effortMeubleA],
-        backgroundColor:['#4F8EF7','#C49A6C','#4F8EF799','#C49A6C99'],
-        borderRadius:6}]
+        backgroundColor:['#D4622A','#2D7A5B','#E8855A','#2B5EA7'],
+        borderRadius:4}]
     },
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:true,
-      scales:{x:{grid:{color:'#2A2D3A'},ticks:{color:'#8B8FA8',font:{family:'Inter'}}},
-              y:{grid:{display:false},ticks:{color:'#E8E9ED',font:{family:'Inter',size:11}}}},
-      plugins:{legend:{display:false},
-        tooltip:{backgroundColor:'#1A1D27',titleColor:'#E8E9ED',bodyColor:'#E8E9ED',borderColor:'#2A2D3A',borderWidth:1}}
+      scales:{x:{grid:{color:'#EDE8DF'},ticks:{color:'#6B6B6B',font:{family:'Inter'}}},
+              y:{grid:{display:false},ticks:{color:'#0D0D0D',font:{family:'Inter',size:11}}}},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}}
     }
   });
 }
 
 /* ===== MAIN CALC ===== */
 function calc(){
-  /* --- Inputs --- */
   var nom=V('iNom').value.trim()||'Client';
-  var age=N('iAge');
-  var situation=V('iSituation').value;
+  var age=N('iAge');var situation=V('iSituation').value;
   var sitLabels={marie:'Marie(e)',pacse:'Pacse(e)',union:'Union libre',celibataire:'Celibataire'};
-  var revBrut=N('iRevBrut');
-  var revNet=N('iRevNet');
-  var tauxPAS=N('iTauxPAS');
-  var impots=N('iImpots');
-  var hasCo=V('iCoToggle').checked;
-  var coNom=hasCo?V('iCoNom').value.trim():'';
-  var coRevBrut=hasCo?N('iCoRevBrut'):0;
-  var coRevNet=hasCo?N('iCoRevNet'):0;
-  var hasPret=V('iPretToggle').checked;
-  var pretMens=hasPret?N('iPretMens'):0;
-  var pretCRD=hasPret?N('iPretCRD'):0;
-  var pretMontant=hasPret?N('iPretMontant'):0;
-  var pretTaux=hasPret?N('iPretTaux'):0;
-  var pretDuree=hasPret?N('iPretDuree'):0;
+  var revBrut=N('iRevBrut');var revNet=N('iRevNet');var tauxPAS=N('iTauxPAS');var impots=N('iImpots');
+  var hasCo=V('iCoToggle').checked;var coNom=hasCo?V('iCoNom').value.trim():'';
+  var coRevBrut=hasCo?N('iCoRevBrut'):0;var coRevNet=hasCo?N('iCoRevNet'):0;
+  var hasPret=V('iPretToggle').checked;var pretMens=hasPret?N('iPretMens'):0;var pretCRD=hasPret?N('iPretCRD'):0;
   var epargne=N('iEpargne');
-  var ville=V('iVille').value.trim()||'—';
-  var typeBien=V('iTypeBien').value;
+  var ville=V('iVille').value.trim()||'\u2014';var typeBien=V('iTypeBien').value;
   var typeLabels={studio:'Studio',t1bis:'T1bis',t2:'T2',t3:'T3',colocation:'Colocation'};
-  var surface=N('iSurface');
-  var eligibilite=V('iEligibilite').value;
+  var surface=N('iSurface');var eligibilite=V('iEligibilite').value;
   var eligLabels={denormandie:'Denormandie',lmnp:'LMNP',deficit:'Deficit Foncier'};
-  var prixFAI=N('iPrixFAI');
-  var fraisNotaire=N('iFraisNotaire');
-  var travaux=N('iTravaux');
-  var fraisComm=N('iFraisComm');
-  var mobilier=N('iMobilier');
-  var tauxFin=N('iTauxFin');
-  var dureeFin=parseInt(V('iDureeFin').value)||20;
-  var loyerBrutNu=N('iLoyerNu');
-  var loyerBrutMeuble=N('iLoyerMeuble');
-  var charges=N('iCharges');
-  var taxeFonciere=N('iTaxeFonciere');
-  var assietteDeno=N('iAssietteDeno');
+  var prixFAI=N('iPrixFAI');var fraisNotaire=N('iFraisNotaire');var travaux=N('iTravaux');
+  var fraisComm=N('iFraisComm');var mobilier=N('iMobilier');
+  var tauxFin=N('iTauxFin');var dureeFin=parseInt(V('iDureeFin').value)||20;
+  var loyerBrutNu=N('iLoyerNu');var loyerBrutMeuble=N('iLoyerMeuble');
+  var charges=N('iCharges');var taxeFonciere=N('iTaxeFonciere');var assietteDeno=N('iAssietteDeno');
 
-  /* --- Calculs --- */
+  /* Calculs */
   var budgetNu=prixFAI+fraisNotaire+travaux+fraisComm;
   var budgetMeuble=budgetNu+mobilier;
-  var fraisGestNu=loyerBrutNu*0.075;
-  var fraisGestMeuble=loyerBrutMeuble*0.075;
+  var fraisGestNu=loyerBrutNu*0.075;var fraisGestMeuble=loyerBrutMeuble*0.075;
   var loyerNetNu=loyerBrutNu-charges-taxeFonciere-fraisGestNu;
   var loyerNetMeuble=loyerBrutMeuble-charges-taxeFonciere-fraisGestMeuble;
-  var mensNu=pmt(tauxFin,dureeFin,budgetNu);
-  var mensMeuble=pmt(tauxFin,dureeFin,budgetMeuble);
-  var apport10Nu=budgetNu*0.10;
-  var apport10Meuble=budgetMeuble*0.10;
+  var mensNu=pmt(tauxFin,dureeFin,budgetNu);var mensMeuble=pmt(tauxFin,dureeFin,budgetMeuble);
+  var apport10Nu=budgetNu*0.10;var apport10Meuble=budgetMeuble*0.10;
   var mensNuA=pmt(tauxFin,dureeFin,budgetNu-apport10Nu);
   var mensMeubleA=pmt(tauxFin,dureeFin,budgetMeuble-apport10Meuble);
-  var effortNu=mensNu-loyerNetNu;
-  var effortMeuble=mensMeuble-loyerNetMeuble;
-  var effortNuA=mensNuA-loyerNetNu;
-  var effortMeubleA=mensMeubleA-loyerNetMeuble;
+  var effortNu=mensNu-loyerNetNu;var effortMeuble=mensMeuble-loyerNetMeuble;
+  var effortNuA=mensNuA-loyerNetNu;var effortMeubleA=mensMeubleA-loyerNetMeuble;
   var totalRevNet=revNet+coRevNet;
   var endAvant=totalRevNet>0?(pretMens/totalRevNet*100):0;
-  var endApresNu=totalRevNet>0?((pretMens+mensNu)/totalRevNet*100):0;
   var endApresMeuble=totalRevNet>0?((pretMens+mensMeuble)/totalRevNet*100):0;
+  var endApresNu=totalRevNet>0?((pretMens+mensNu)/totalRevNet*100):0;
   var endApresMeubleA=totalRevNet>0?((pretMens+mensMeubleA)/totalRevNet*100):0;
   var rdtBrutNu=prixFAI>0?((loyerBrutNu*12)/prixFAI*100):0;
   var rdtBrutMeuble=prixFAI>0?((loyerBrutMeuble*12)/prixFAI*100):0;
-  /* Denormandie */
-  var deno6=assietteDeno*0.12,deno9=assietteDeno*0.18,deno12=assietteDeno*0.21;
+  var deno6=assietteDeno*0.12;var deno9=assietteDeno*0.18;var deno12=assietteDeno*0.21;
 
-  /* --- Nav badge --- */
+  /* Nav */
   V('navClient').textContent=nom;
+  V('resultsEmpty').style.display='none';V('resultsContent').style.display='';
 
-  /* --- Show results --- */
-  V('resultsEmpty').style.display='none';
-  V('resultsContent').style.display='';
-
-  /* --- Header --- */
+  /* Header */
   V('rClientName').textContent=nom;
-  V('rClientSub').textContent=(age?age+' ans, ':'')+sitLabels[situation]+' | '+ville+' — '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2';
+  V('rClientSub').textContent=(age?age+' ans, ':'')+sitLabels[situation]+' | '+ville+' \u2014 '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2';
   V('rDate').textContent=today();
-  var badgeClass=eligibilite==='denormandie'?'os-badge-green':(eligibilite==='lmnp'?'os-badge-blue':'os-badge-warn');
-  V('rBadge').innerHTML='<span class="os-badge '+badgeClass+'">'+(eligLabels[eligibilite]||eligibilite)+'</span>';
+  var bc=eligibilite==='denormandie'?'green':(eligibilite==='lmnp'?'blue':'orange');
+  V('rBadge').innerHTML='<span class="r-badge '+bc+'">'+(eligLabels[eligibilite]||eligibilite)+'</span>';
 
-  /* --- KPIs --- */
-  V('kBudget').textContent=fmtE(budgetMeuble);
-  V('kBudgetSub').textContent='Nu : '+fmtE(budgetNu);
-  V('kEffort').textContent=fmtE(Math.round(effortMeubleA));
-  V('kEffortSub').textContent='Sans apport : '+fmtE(Math.round(effortMeuble));
-  V('kRendement').textContent=fmtP(rdtBrutMeuble);
-  V('kRendementSub').textContent='Nu : '+fmtP(rdtBrutNu);
-  var endColor=endApresMeuble>35?'color:var(--os-red)':(endApresMeuble>30?'color:var(--os-warn)':'color:var(--os-green)');
-  V('kEndettement').innerHTML='<span style="'+endColor+'">'+fmtP(endApresMeuble)+'</span>';
+  /* KPIs */
+  V('kBudget').textContent=fmtE(budgetMeuble);V('kBudgetSub').textContent='Nu : '+fmtE(budgetNu);
+  V('kEffort').textContent=fmtE(Math.round(effortMeubleA));V('kEffortSub').textContent='Sans apport : '+fmtE(Math.round(effortMeuble));
+  V('kRendement').textContent=fmtP(rdtBrutMeuble);V('kRendementSub').textContent='Nu : '+fmtP(rdtBrutNu);
+  var ec=endApresMeuble>35?'color:#C0392B':(endApresMeuble>30?'color:#D4622A':'color:#2D7A5B');
+  V('kEndettement').innerHTML='<span style="'+ec+'">'+fmtP(endApresMeuble)+'</span>';
   V('kEndettementSub').textContent='Avant projet : '+fmtP(endAvant);
 
-  /* --- Profil client --- */
-  var pHtml='';
-  pHtml+='<div class="os-row"><span class="os-row-k">Revenu brut annuel</span><span class="os-row-v blue">'+fmtE(revBrut)+'</span></div>';
-  pHtml+='<div class="os-row"><span class="os-row-k">Revenu net mensuel</span><span class="os-row-v">'+fmtE(revNet)+'</span></div>';
+  /* Profil */
+  var p='';
+  p+='<div class="r-row"><span class="r-k">Revenu brut annuel</span><span class="r-v or">'+fmtE(revBrut)+'</span></div>';
+  p+='<div class="r-row"><span class="r-k">Revenu net mensuel</span><span class="r-v">'+fmtE(revNet)+'</span></div>';
   if(hasCo){
-    pHtml+='<div class="os-row"><span class="os-row-k">Co-investisseur</span><span class="os-row-v">'+coNom+' — '+fmtE(coRevNet)+'/mois</span></div>';
-    pHtml+='<div class="os-row"><span class="os-row-k">Revenus nets cumules</span><span class="os-row-v blue">'+fmtE(totalRevNet)+'/mois</span></div>';
+    p+='<div class="r-row"><span class="r-k">Co-investisseur</span><span class="r-v">'+coNom+' \u2014 '+fmtE(coRevNet)+'/mois</span></div>';
+    p+='<div class="r-row"><span class="r-k">Revenus nets cumules</span><span class="r-v or">'+fmtE(totalRevNet)+'/mois</span></div>';
   }
-  pHtml+='<div class="os-row"><span class="os-row-k">Taux PAS</span><span class="os-row-v">'+fmtP(tauxPAS)+'</span></div>';
-  pHtml+='<div class="os-row"><span class="os-row-k">Impots mensuels</span><span class="os-row-v">'+fmtE(impots)+'</span></div>';
+  p+='<div class="r-row"><span class="r-k">Taux PAS</span><span class="r-v">'+fmtP(tauxPAS)+'</span></div>';
+  p+='<div class="r-row"><span class="r-k">Impots mensuels</span><span class="r-v">'+fmtE(impots)+'</span></div>';
   if(hasPret){
-    pHtml+='<div class="os-row"><span class="os-row-k">Pret RP — mensualite</span><span class="os-row-v gold">'+fmtE(pretMens)+'/mois</span></div>';
-    pHtml+='<div class="os-row"><span class="os-row-k">Pret RP — CRD</span><span class="os-row-v">'+fmtE(pretCRD)+'</span></div>';
+    p+='<div class="r-row"><span class="r-k">Pret RP — mensualite</span><span class="r-v or">'+fmtE(pretMens)+'/mois</span></div>';
+    p+='<div class="r-row"><span class="r-k">Pret RP — CRD</span><span class="r-v">'+fmtE(pretCRD)+'</span></div>';
   }
-  pHtml+='<div class="os-row"><span class="os-row-k">Epargne disponible</span><span class="os-row-v green">'+fmtE(epargne)+'</span></div>';
-  V('rProfil').innerHTML=pHtml;
+  p+='<div class="r-row"><span class="r-k">Epargne disponible</span><span class="r-v gr">'+fmtE(epargne)+'</span></div>';
+  V('rProfil').innerHTML=p;
 
-  /* --- Synthese projet --- */
-  var jHtml='';
-  jHtml+='<div class="os-row"><span class="os-row-k">Ville</span><span class="os-row-v">'+ville+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Type / Surface</span><span class="os-row-v">'+(typeLabels[typeBien]||typeBien)+' — '+surface+' m\u00b2</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Prix FAI</span><span class="os-row-v">'+fmtE(prixFAI)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Frais de notaire</span><span class="os-row-v">'+fmtE(fraisNotaire)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Travaux TTC</span><span class="os-row-v">'+fmtE(travaux)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Frais commercialisation</span><span class="os-row-v">'+fmtE(fraisComm)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Budget mobilier</span><span class="os-row-v">'+fmtE(mobilier)+'</span></div>';
-  jHtml+='<div class="os-row" style="border-top:1px solid var(--os-border);margin-top:6px;padding-top:10px"><span class="os-row-k" style="font-weight:700;color:var(--os-text)">Budget global nu</span><span class="os-row-v blue">'+fmtE(budgetNu)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k" style="font-weight:700;color:var(--os-text)">Budget global meuble</span><span class="os-row-v gold">'+fmtE(budgetMeuble)+'</span></div>';
-  jHtml+='<div class="os-row"><span class="os-row-k">Financement</span><span class="os-row-v">'+fmtP(tauxFin,2)+' sur '+dureeFin+' ans</span></div>';
-  V('rProjet').innerHTML=jHtml;
+  /* Projet */
+  var j='';
+  j+='<div class="r-row"><span class="r-k">Ville</span><span class="r-v">'+ville+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Type / Surface</span><span class="r-v">'+(typeLabels[typeBien]||typeBien)+' \u2014 '+surface+' m\u00b2</span></div>';
+  j+='<div class="r-row"><span class="r-k">Prix FAI</span><span class="r-v">'+fmtE(prixFAI)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Frais de notaire</span><span class="r-v">'+fmtE(fraisNotaire)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Travaux TTC</span><span class="r-v">'+fmtE(travaux)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Frais comm.</span><span class="r-v">'+fmtE(fraisComm)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Budget mobilier</span><span class="r-v">'+fmtE(mobilier)+'</span></div>';
+  j+='<div class="r-row" style="border-top:1.5px solid var(--bord);margin-top:4px;padding-top:8px"><span class="r-k" style="font-weight:700;color:var(--noir)">Budget global nu</span><span class="r-v or">'+fmtE(budgetNu)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k" style="font-weight:700;color:var(--noir)">Budget global meuble</span><span class="r-v or">'+fmtE(budgetMeuble)+'</span></div>';
+  j+='<div class="r-row"><span class="r-k">Financement</span><span class="r-v">'+fmtP(tauxFin,2)+' sur '+dureeFin+' ans</span></div>';
+  V('rProjet').innerHTML=j;
 
-  /* --- Endettement --- */
-  function progBar(label,pct,threshold){
-    var color=pct>threshold?'var(--os-red)':(pct>threshold-5?'var(--os-warn)':'var(--os-green)');
+  /* Endettement */
+  function progBar(label,pct,seuil){
+    var c=pct>seuil?'#C0392B':(pct>seuil-5?'#D4622A':'#2D7A5B');
     var w=Math.min(pct,100);
-    return '<div class="os-progress">'
-      +'<div class="os-progress-label"><span>'+label+'</span><span style="font-weight:600;color:'+color+'">'+fmtP(pct)+'</span></div>'
-      +'<div class="os-progress-bar"><div class="os-progress-fill" style="width:'+w+'%;background:'+color+'"></div>'
-      +'<div class="os-progress-threshold" style="left:'+threshold+'%"></div></div></div>';
+    return '<div class="r-prog"><div class="r-prog-lbl"><span>'+label+'</span><span style="font-weight:600;color:'+c+'">'+fmtP(pct)+'</span></div>'
+      +'<div class="r-prog-bar"><div class="r-prog-fill" style="width:'+w+'%;background:'+c+'"></div>'
+      +'<div class="r-prog-seuil" style="left:'+seuil+'%"></div></div></div>';
   }
-  var eHtml=progBar('Endettement actuel (pret RP)',endAvant,35);
-  eHtml+=progBar('Apres projet — Nu sans apport',endApresNu,35);
-  eHtml+=progBar('Apres projet — Meuble sans apport',endApresMeuble,35);
-  eHtml+=progBar('Apres projet — Meuble avec apport 10%',endApresMeubleA,35);
-  eHtml+='<div style="font-size:11px;color:var(--os-muted);margin-top:8px">Seuil bancaire : 35% (ligne rouge). Revenus nets pris en compte : '+fmtE(totalRevNet)+'/mois</div>';
-  V('rEndettement').innerHTML=eHtml;
+  var eH=progBar('Endettement actuel (pret RP)',endAvant,35);
+  eH+=progBar('Apres projet \u2014 Nu sans apport',endApresNu,35);
+  eH+=progBar('Apres projet \u2014 Meuble sans apport',endApresMeuble,35);
+  eH+=progBar('Apres projet \u2014 Meuble avec apport 10%',endApresMeubleA,35);
+  eH+='<div style="font-size:10px;color:var(--gris);margin-top:6px">Seuil bancaire : 35% (ligne rouge). Revenus nets : '+fmtE(totalRevNet)+'/mois</div>';
+  V('rEndettement').innerHTML=eH;
 
-  /* --- Comparatif --- */
-  var tHtml='<table class="os-tbl"><thead><tr><th></th><th>Nu sans apport</th><th>Meuble sans apport</th><th>Nu avec apport 10%</th><th>Meuble avec apport 10%</th></tr></thead><tbody>';
-  function tr(label,a,b,c,d,cls){return '<tr><td>'+label+'</td><td class="val '+(cls||'')+'">'+a+'</td><td class="val '+(cls||'')+'">'+b+'</td><td class="val '+(cls||'')+'">'+c+'</td><td class="val '+(cls||'')+'">'+d+'</td></tr>'}
-  tHtml+=tr('Budget finance',fmtE(budgetNu),fmtE(budgetMeuble),fmtE(budgetNu-apport10Nu),fmtE(budgetMeuble-apport10Meuble));
-  tHtml+=tr('Apport','0 \u20ac','0 \u20ac',fmtE(apport10Nu),fmtE(apport10Meuble));
-  tHtml+=tr('Mensualite credit',fmtE(Math.round(mensNu)),fmtE(Math.round(mensMeuble)),fmtE(Math.round(mensNuA)),fmtE(Math.round(mensMeubleA)),'blue');
-  tHtml+=tr('Loyer brut HC',fmtE(loyerBrutNu),fmtE(loyerBrutMeuble),fmtE(loyerBrutNu),fmtE(loyerBrutMeuble));
-  tHtml+=tr('Charges + TF + gestion',fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)),fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)));
-  tHtml+=tr('Loyer net',fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),'green');
-  var efCls=function(v){return v>0?'red':'green'};
-  tHtml+=tr('Effort mensuel net',fmtE(Math.round(effortNu)),fmtE(Math.round(effortMeuble)),fmtE(Math.round(effortNuA)),fmtE(Math.round(effortMeubleA)));
-  tHtml+=tr('Endettement',fmtP(endApresNu),fmtP(endApresMeuble),fmtP(totalRevNet>0?((pretMens+mensNuA)/totalRevNet*100):0),fmtP(endApresMeubleA));
-  tHtml+='</tbody></table>';
-  V('rComparatif').innerHTML=tHtml;
+  /* Comparatif */
+  function tr(label,a,b,c,d,cls){return '<tr><td>'+label+'</td><td class="v '+(cls||'')+'">'+a+'</td><td class="v '+(cls||'')+'">'+b+'</td><td class="v '+(cls||'')+'">'+c+'</td><td class="v '+(cls||'')+'">'+d+'</td></tr>'}
+  var t='<table class="r-tbl"><thead><tr><th></th><th>Nu sans apport</th><th>Meuble sans apport</th><th>Nu avec apport</th><th>Meuble avec apport</th></tr></thead><tbody>';
+  t+=tr('Budget finance',fmtE(budgetNu),fmtE(budgetMeuble),fmtE(budgetNu-apport10Nu),fmtE(budgetMeuble-apport10Meuble));
+  t+=tr('Apport','0 \u20ac','0 \u20ac',fmtE(apport10Nu),fmtE(apport10Meuble));
+  t+=tr('Mensualite',fmtE(Math.round(mensNu)),fmtE(Math.round(mensMeuble)),fmtE(Math.round(mensNuA)),fmtE(Math.round(mensMeubleA)),'or');
+  t+=tr('Loyer brut HC',fmtE(loyerBrutNu),fmtE(loyerBrutMeuble),fmtE(loyerBrutNu),fmtE(loyerBrutMeuble));
+  t+=tr('Charges totales',fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)),fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)));
+  t+=tr('Loyer net',fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),'gr');
+  t+=tr('Effort net',fmtE(Math.round(effortNu)),fmtE(Math.round(effortMeuble)),fmtE(Math.round(effortNuA)),fmtE(Math.round(effortMeubleA)));
+  t+=tr('Endettement',fmtP(endApresNu),fmtP(endApresMeuble),fmtP(totalRevNet>0?((pretMens+mensNuA)/totalRevNet*100):0),fmtP(endApresMeubleA));
+  t+='</tbody></table>';
+  V('rComparatif').innerHTML=t;
 
-  /* --- Effort equation (meuble avec apport = scenario recommande) --- */
-  var eqSign=effortMeubleA>=0?'\u2212':'+';
+  /* Effort equation */
   var eqLabel=effortMeubleA>=0?'Effort':'Gain';
-  var eqColor=effortMeubleA>=0?'var(--os-warn)':'var(--os-green)';
-  V('rEffort').innerHTML='<div style="font-size:12px;color:var(--os-muted);margin-bottom:10px">Scenario recommande : Meuble avec apport 10% ('+fmtE(Math.round(apport10Meuble))+')</div>'
-    +'<div class="os-eq">'
-    +'<div class="os-eq-box"><div class="label">Mensualite</div><div class="val" style="color:var(--os-blue)">'+fmtE(Math.round(mensMeubleA))+'</div></div>'
-    +'<div class="os-eq-op">\u2212</div>'
-    +'<div class="os-eq-box"><div class="label">Loyer net meuble</div><div class="val" style="color:var(--os-green)">'+fmtE(Math.round(loyerNetMeuble))+'</div></div>'
-    +'<div class="os-eq-op">=</div>'
-    +'<div class="os-eq-box" style="border-color:'+eqColor+'"><div class="label">'+eqLabel+' mensuel</div><div class="val" style="color:'+eqColor+'">'+fmtE(Math.round(Math.abs(effortMeubleA)))+'</div></div>'
+  var eqColor=effortMeubleA>=0?'#D4622A':'#2D7A5B';
+  V('rEffort').innerHTML='<div style="font-size:11px;color:var(--gris);margin-bottom:8px">Scenario recommande : Meuble avec apport 10% ('+fmtE(Math.round(apport10Meuble))+')</div>'
+    +'<div class="r-eq">'
+    +'<div class="r-eq-box"><div class="lbl">Mensualite</div><div class="val" style="color:#D4622A">'+fmtE(Math.round(mensMeubleA))+'</div></div>'
+    +'<div class="r-eq-op">\u2212</div>'
+    +'<div class="r-eq-box"><div class="lbl">Loyer net meuble</div><div class="val" style="color:#2D7A5B">'+fmtE(Math.round(loyerNetMeuble))+'</div></div>'
+    +'<div class="r-eq-op">=</div>'
+    +'<div class="r-eq-box" style="border-color:'+eqColor+'"><div class="lbl">'+eqLabel+' mensuel</div><div class="val" style="color:'+eqColor+'">'+fmtE(Math.round(Math.abs(effortMeubleA)))+'</div></div>'
     +'</div>';
 
-  /* --- Denormandie --- */
+  /* Denormandie */
   if(eligibilite==='denormandie'&&assietteDeno>0){
     V('rDenoCard').style.display='';
-    V('rDeno').innerHTML='<div style="font-size:12px;color:var(--os-muted);margin-bottom:12px">Assiette eligible : <b style="color:var(--os-text)">'+fmtE(assietteDeno)+'</b> (prix + travaux dans la limite de 300 000 \u20ac)</div>'
-      +'<div class="os-deno-grid">'
-      +'<div class="os-deno-card"><div class="os-deno-dur">6 ans</div><div class="os-deno-rate">12 %</div><div class="os-deno-total">'+fmtE(Math.round(deno6))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno6/6))+'/an soit '+fmtE(Math.round(deno6/72))+'/mois</div></div>'
-      +'<div class="os-deno-card best"><div class="os-deno-dur">9 ans</div><div class="os-deno-rate">18 %</div><div class="os-deno-total">'+fmtE(Math.round(deno9))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno9/9))+'/an soit '+fmtE(Math.round(deno9/108))+'/mois</div></div>'
-      +'<div class="os-deno-card"><div class="os-deno-dur">12 ans</div><div class="os-deno-rate">21 %</div><div class="os-deno-total">'+fmtE(Math.round(deno12))+'</div><div class="os-deno-sub">'+fmtE(Math.round(deno12/12))+'/an soit '+fmtE(Math.round(deno12/144))+'/mois</div></div>'
+    V('rDeno').innerHTML='<div style="font-size:11px;color:var(--gris);margin-bottom:10px">Assiette eligible : <b style="color:var(--noir)">'+fmtE(assietteDeno)+'</b></div>'
+      +'<div class="r-deno-grid">'
+      +'<div class="r-deno"><div class="r-deno-dur">6 ans</div><div class="r-deno-rate">12 %</div><div class="r-deno-total">'+fmtE(Math.round(deno6))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno6/6))+'/an soit '+fmtE(Math.round(deno6/72))+'/mois</div></div>'
+      +'<div class="r-deno best"><div class="r-deno-dur">9 ans</div><div class="r-deno-rate">18 %</div><div class="r-deno-total">'+fmtE(Math.round(deno9))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno9/9))+'/an soit '+fmtE(Math.round(deno9/108))+'/mois</div></div>'
+      +'<div class="r-deno"><div class="r-deno-dur">12 ans</div><div class="r-deno-rate">21 %</div><div class="r-deno-total">'+fmtE(Math.round(deno12))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno12/12))+'/an soit '+fmtE(Math.round(deno12/144))+'/mois</div></div>'
       +'</div>';
-  }else{
-    V('rDenoCard').style.display='none';
-  }
+  }else{V('rDenoCard').style.display='none'}
 
-  /* --- Charts --- */
+  /* Charts */
   renderCharts({prixFAI:prixFAI,fraisNotaire:fraisNotaire,travaux:travaux,mobilier:mobilier,fraisComm:fraisComm,
     effortNu:Math.round(effortNu),effortMeuble:Math.round(effortMeuble),effortNuA:Math.round(effortNuA),effortMeubleA:Math.round(effortMeubleA)});
 
-  /* --- Scenario alt --- */
+  /* Scenario alt */
   var hasAlt=V('iAltToggle').checked;
   if(hasAlt){
-    V('altFields').style.display='';
-    V('rAltCard').style.display='';
-    var altVille=V('iAltVille').value.trim()||'—';
-    var altBudget=N('iAltBudget');
-    var altMens=N('iAltMens');
-    var altLoyer=N('iAltLoyer');
-    var altEffort=N('iAltEffort');
-    var altDeno=V('iAltDeno').checked;
-    V('rAlt').innerHTML='<table class="os-tbl"><thead><tr><th></th><th>'+ville+' (principal)</th><th>'+altVille+' (alternatif)</th></tr></thead><tbody>'
-      +'<tr><td>Budget</td><td class="val">'+fmtE(budgetMeuble)+'</td><td class="val">'+fmtE(altBudget)+'</td></tr>'
-      +'<tr><td>Mensualite</td><td class="val blue">'+fmtE(Math.round(mensMeubleA))+'</td><td class="val blue">'+fmtE(altMens)+'</td></tr>'
-      +'<tr><td>Loyer net</td><td class="val green">'+fmtE(Math.round(loyerNetMeuble))+'</td><td class="val green">'+fmtE(altLoyer)+'</td></tr>'
-      +'<tr><td>Effort mensuel</td><td class="val '+(effortMeubleA>0?'red':'green')+'">'+fmtE(Math.round(effortMeubleA))+'</td><td class="val '+(altEffort>0?'red':'green')+'">'+fmtE(altEffort)+'</td></tr>'
-      +'<tr><td>Denormandie</td><td>'+(eligibilite==='denormandie'?'<span class="os-badge os-badge-green">Oui</span>':'<span class="os-badge os-badge-red">Non</span>')+'</td>'
-      +'<td>'+(altDeno?'<span class="os-badge os-badge-green">Oui</span>':'<span class="os-badge os-badge-red">Non</span>')+'</td></tr>'
+    V('altFields').style.display='';V('rAltCard').style.display='';
+    var aV=V('iAltVille').value.trim()||'\u2014';var aB=N('iAltBudget');
+    var aM=N('iAltMens');var aL=N('iAltLoyer');var aE=N('iAltEffort');var aD=V('iAltDeno').checked;
+    V('rAlt').innerHTML='<table class="r-tbl"><thead><tr><th></th><th>'+ville+'</th><th>'+aV+'</th></tr></thead><tbody>'
+      +'<tr><td>Budget</td><td class="v">'+fmtE(budgetMeuble)+'</td><td class="v">'+fmtE(aB)+'</td></tr>'
+      +'<tr><td>Mensualite</td><td class="v or">'+fmtE(Math.round(mensMeubleA))+'</td><td class="v or">'+fmtE(aM)+'</td></tr>'
+      +'<tr><td>Loyer net</td><td class="v gr">'+fmtE(Math.round(loyerNetMeuble))+'</td><td class="v gr">'+fmtE(aL)+'</td></tr>'
+      +'<tr><td>Effort</td><td class="v">'+ fmtE(Math.round(effortMeubleA))+'</td><td class="v">'+fmtE(aE)+'</td></tr>'
+      +'<tr><td>Denormandie</td><td>'+(eligibilite==='denormandie'?'<span class="r-badge green">Oui</span>':'<span class="r-badge orange">Non</span>')+'</td>'
+      +'<td>'+(aD?'<span class="r-badge green">Oui</span>':'<span class="r-badge orange">Non</span>')+'</td></tr>'
       +'</tbody></table>';
-  }else{
-    V('rAltCard').style.display='none';
-  }
+  }else{V('rAltCard').style.display='none'}
+
+  /* Footer conseiller */
+  try{CGP.footer.render(V('conseillerFooter'))}catch(e){}
 }
 
 /* ===== INIT ===== */
 (function(){
-  /* Alt toggle */
-  V('iAltToggle').addEventListener('change',function(){
-    V('altFields').style.display=this.checked?'':'none';
-  });
+  V('iAltToggle').addEventListener('change',function(){V('altFields').style.display=this.checked?'':'none'});
+  try{CGP.footer.render(V('conseillerFooter'))}catch(e){}
 })();
 </script>
 </body>
