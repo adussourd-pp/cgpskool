@@ -11,11 +11,11 @@
 <script src="cgp-skool-nav.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* Home cards */
+/* === HOME === */
 .home-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:40px 20px}
 .home-wrap h1{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--noir);margin-bottom:6px;text-align:center}
 .home-wrap h1 em{color:var(--orange);font-style:italic}
-.home-wrap p{font-size:14px;color:var(--gris);margin-bottom:40px;text-align:center}
+.home-wrap>p{font-size:14px;color:var(--gris);margin-bottom:40px;text-align:center}
 .home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:720px;width:100%}
 .home-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:28px 22px;cursor:pointer;transition:all 0.25s;position:relative}
 .home-card:hover{border-color:var(--orange);box-shadow:0 6px 24px rgba(212,98,42,0.1);transform:translateY(-3px)}
@@ -28,570 +28,709 @@
 .home-card-tag.ok{background:var(--green-l);color:var(--green);border:1px solid rgba(45,122,91,0.2)}
 .home-card-tag.soon{background:var(--gris-l);color:var(--gris);border:1px solid var(--bord)}
 
-/* Results overrides (inside cs-page) */
-.r-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--bord)}
-.r-header h2{font-family:var(--sans);font-size:20px;font-weight:700;color:var(--noir)}
-.r-header .sub{font-size:12px;color:var(--gris);margin-top:2px}
-.r-header .date{font-size:11px;color:var(--gris)}
-.r-badge{display:inline-block;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600}
-.r-badge.green{background:var(--green-l);color:var(--green)}
-.r-badge.orange{background:var(--ambre-l);color:var(--orange)}
-.r-badge.blue{background:var(--blue-l);color:var(--blue)}
+/* === TRAME A4 === */
+.trame{background:#fff;border:1.5px solid var(--bord);border-radius:4px;padding:36px 40px;margin-bottom:24px;page-break-inside:avoid;position:relative}
+.trame-header{border-bottom:3px solid var(--orange);padding-bottom:14px;margin-bottom:20px}
+.trame-title{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--noir)}
+.trame-subtitle{font-size:11px;color:var(--gris);margin-top:2px}
+.trame-consul{font-size:11px;color:var(--gris);margin-top:8px}
+.trame-consul b{color:var(--noir)}
 
-/* KPIs */
-.r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.r-kpi{background:#fff;border:1.5px solid var(--bord);border-radius:8px;padding:16px}
-.r-kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
-.r-kpi-val{font-size:24px;font-weight:700;color:var(--orange);line-height:1.2}
-.r-kpi-sub{font-size:10px;color:var(--gris);margin-top:3px}
+.trame-section{margin-bottom:18px}
+.trame-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--noir);background:var(--gris-l);padding:6px 10px;margin-bottom:10px;border-left:3px solid var(--orange)}
 
-/* Card result */
-.r-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:18px 22px;margin-bottom:16px}
-.r-card-title{font-size:13px;font-weight:700;color:var(--noir);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.r-card-title::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
-.r-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.05);font-size:13px}
-.r-row:last-child{border-bottom:none}
-.r-k{color:var(--gris)}
-.r-v{font-weight:600;color:var(--noir)}
-.r-v.or{color:var(--orange)}
-.r-v.gr{color:var(--green)}
-.r-v.rd{color:var(--red)}
-.r-v.bl{color:var(--blue)}
-.r-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.trame-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.trame-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.trame-box{border:1.5px solid var(--bord);border-radius:4px;padding:14px 16px}
+.trame-box-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:8px}
+.trame-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(0,0,0,0.04)}
+.trame-row:last-child{border-bottom:none}
+.trame-row .k{color:var(--gris)}
+.trame-row .v{font-weight:600;color:var(--noir)}
+.trame-row .v.or{color:var(--orange)}
+.trame-row .v.gr{color:var(--green)}
+.trame-row .v.rd{color:var(--red)}
+.trame-row.total{border-top:1.5px solid var(--bord);margin-top:4px;padding-top:8px}
+.trame-row.total .k,.trame-row.total .v{font-weight:700;font-size:13px}
+.trame-highlight{background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15);border-radius:4px;padding:12px 16px;margin:10px 0;font-size:12px;color:var(--noir);line-height:1.6}
+.trame-highlight b{color:var(--orange)}
 
-/* Progress bars */
-.r-prog{margin:10px 0}
-.r-prog-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
-.r-prog-bar{height:7px;background:var(--gris-l);border-radius:4px;overflow:hidden;position:relative}
-.r-prog-fill{height:100%;border-radius:4px;transition:width 0.4s}
-.r-prog-seuil{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--red);border-radius:1px}
+/* Barre reduction Denormandie */
+.deno-bar-wrap{display:flex;align-items:flex-end;gap:0;height:80px;margin:12px 0}
+.deno-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.deno-bar-fill{width:70%;border-radius:3px 3px 0 0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-height:20px}
+.deno-bar-label{font-size:9px;color:var(--gris);margin-top:4px;font-weight:600}
 
-/* Table */
-.r-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.r-tbl thead th{background:var(--noir);color:#fff;text-align:left;padding:9px 12px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em}
-.r-tbl tbody td{padding:9px 12px;border-bottom:1px solid var(--bord);color:var(--noir)}
-.r-tbl tbody tr:nth-child(even){background:#fafaf8}
-.r-tbl .v{font-weight:600}
-.r-tbl .or{color:var(--orange)}
-.r-tbl .gr{color:var(--green)}
-.r-tbl .rd{color:var(--red)}
+/* 3 options post-Deno */
+.trame-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.trame-option{border:1.5px solid var(--bord);border-radius:6px;padding:14px;font-size:11px;line-height:1.6}
+.trame-option.active{border-color:var(--orange);background:rgba(212,98,42,0.03)}
+.trame-option-num{font-size:10px;font-weight:700;color:#fff;background:var(--orange);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.trame-option-title{font-size:12px;font-weight:700;color:var(--noir);margin-bottom:6px}
 
-/* Equation */
-.r-eq{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
-.r-eq-box{border:1.5px solid var(--bord);border-radius:8px;padding:12px 18px;text-align:center;min-width:110px;background:#fff}
-.r-eq-box .lbl{font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px}
-.r-eq-box .val{font-size:18px;font-weight:700}
-.r-eq-op{font-size:20px;color:var(--gris);font-weight:300}
+/* Timeline */
+.timeline{display:flex;height:36px;border-radius:4px;overflow:hidden;margin:12px 0;font-size:10px;font-weight:600;color:#fff}
+.timeline-phase{display:flex;align-items:center;justify-content:center;padding:0 10px;white-space:nowrap}
 
-/* Denormandie */
-.r-deno-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-.r-deno{border:1.5px solid var(--bord);border-radius:8px;padding:16px;text-align:center;background:#fff}
-.r-deno.best{border-color:var(--orange);box-shadow:0 0 16px rgba(212,98,42,0.08)}
-.r-deno-dur{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gris);margin-bottom:6px}
-.r-deno-rate{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:8px}
-.r-deno-total{font-size:20px;font-weight:700;color:var(--noir);margin-bottom:3px}
-.r-deno-sub{font-size:10px;color:var(--gris)}
+/* KPI row synthese */
+.synth-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.synth-kpi{border:1.5px solid var(--bord);border-radius:6px;padding:14px;text-align:center}
+.synth-kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:4px}
+.synth-kpi-val{font-size:20px;font-weight:700;color:var(--orange)}
+.synth-kpi-sub{font-size:10px;color:var(--gris);margin-top:2px}
 
-/* Chart */
-.r-chart-wrap{position:relative;max-height:260px;margin:10px auto;display:flex;justify-content:center}
+/* Chart wrap */
+.trame-chart{max-height:200px;margin:10px auto;display:flex;justify-content:center}
 
 /* Placeholder */
 .r-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--gris);gap:10px}
 .r-placeholder span{font-size:42px;opacity:0.3}
-
-/* Empty state */
 .r-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--gris);text-align:center;gap:10px}
 .r-empty span{font-size:42px;opacity:0.3}
 
 /* Print */
 @media print{
-  .r-kpi,.r-badge,.r-prog-fill,.r-deno.best,.r-tbl thead th,[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .r-tbl thead th{background:var(--noir)!important;color:#fff!important}
+  .trame{border:none!important;padding:24px 0!important;box-shadow:none!important}
+  .trame-header{border-bottom-color:var(--orange)!important}
+  .trame-section-title,.deno-bar-fill,.timeline-phase,.trame-option-num,.synth-kpi,.trame-highlight{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav class="cs-nav">
-  <div class="cs-nav-inner">
-    <a class="cs-logo" href="index.html">
-      <div class="cs-logo-mark"><span>C</span></div>
-      <span class="cs-logo-name">CGP Skool</span>
-    </a>
-    <div style="flex:1"></div>
-    <div class="cs-nav-actions">
-      <span id="navClient" style="font-size:12px;color:var(--fog-2)"></span>
-      <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
-    </div>
+<nav class="cs-nav"><div class="cs-nav-inner">
+  <a class="cs-logo" href="index.html"><div class="cs-logo-mark"><span>C</span></div><span class="cs-logo-name">CGP Skool</span></a>
+  <div style="flex:1"></div>
+  <div class="cs-nav-actions">
+    <span id="navClient" style="font-size:12px;color:var(--fog-2)"></span>
+    <a class="cs-btn-ghost" href="index.html" style="text-decoration:none">&#8592; Accueil</a>
   </div>
-</nav>
+</div></nav>
 
 <div class="cs-app">
-  <!-- SIDEBAR -->
-  <aside class="cs-sidebar" id="sidebar">
+<aside class="cs-sidebar" id="sidebar">
 
-    <!-- Module selector -->
-    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Module</label>
+  <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Module</label>
+  <div class="sb-body open">
+    <div class="fg"><select class="fi" id="pModule" onchange="onModuleChange()">
+      <option value="home">Accueil</option>
+      <option value="immo">&#127968; Immobilier</option>
+      <option value="placement">&#128176; Placement</option>
+      <option value="bilan">&#128202; Bilan Patrimonial</option>
+    </select></div>
+  </div>
+
+  <div id="sidebarImmo" style="display:none">
+
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Client</label>
     <div class="sb-body open">
-      <div class="fg"><select class="fi" id="pModule" onchange="onModuleChange()">
-        <option value="home">Accueil</option>
-        <option value="immo">&#127968; Immobilier</option>
-        <option value="placement">&#128176; Placement</option>
-        <option value="bilan">&#128202; Bilan Patrimonial</option>
+      <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iNom" placeholder="Jean Dupont"></div>
+      <div class="grid2">
+        <div class="fg"><label>Age</label><div class="fi-row"><input type="number" id="iAge" placeholder="35"><span class="fi-unit">ans</span></div></div>
+        <div class="fg"><label>Situation</label><select class="fi" id="iSituation">
+          <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
+          <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
+        </select></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Taux PAS</label><div class="fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="fi-unit">%</span></div></div>
+        <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+      </div>
+    </div>
+
+    <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Co-investisseur</label>
+    <div class="sb-body">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()" style="accent-color:var(--orange)"> Activer</div>
+      <div id="coFields" style="display:none">
+        <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iCoNom" placeholder="Marie Dupont"></div>
+        <div class="grid2">
+          <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+          <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Pret RP en cours</label>
+    <div class="sb-body">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()" style="accent-color:var(--orange)"> Pret en cours</div>
+      <div id="pretFields" style="display:none">
+        <div class="grid2">
+          <div class="fg"><label>Montant emprunte</label><div class="fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+          <div class="fg"><label>Taux nominal</label><div class="fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Duree</label><div class="fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="fi-unit">ans</span></div></div>
+          <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        </div>
+        <div class="fg"><label>Capital restant du</label><div class="fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+    </div>
+
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Epargne</label>
+    <div class="sb-body open">
+      <div class="fg"><label>Epargne disponible</label><div class="fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+    </div>
+
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Projet immobilier</label>
+    <div class="sb-body open">
+      <div class="grid2">
+        <div class="fg"><label>Ville</label><input class="fi" type="text" id="iVille" placeholder="Limoges"></div>
+        <div class="fg"><label>Type de bien</label><select class="fi" id="iTypeBien">
+          <option value="studio">Studio</option><option value="t1bis">T1bis</option>
+          <option value="t2">T2</option><option value="t3">T3</option><option value="colocation">Colocation</option>
+        </select></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Surface Carrez</label><div class="fi-row"><input type="number" id="iSurface" placeholder="0"><span class="fi-unit">m&#178;</span></div></div>
+        <div class="fg"><label>Eligibilite</label><select class="fi" id="iEligibilite">
+          <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option><option value="deficit">Deficit Foncier</option>
+        </select></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Prix FAI</label><div class="fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="fg"><label>Frais de notaire</label><div class="fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Travaux TTC</label><div class="fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="fg"><label>Frais commercialisation</label><div class="fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+      <div class="fg"><label>Budget mobilier</label><div class="fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      <div class="grid2">
+        <div class="fg"><label>Taux financement</label><div class="fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
+        <div class="fg"><label>Duree financement</label><select class="fi" id="iDureeFin">
+          <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
+        </select></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+      </div>
+      <div class="fg"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+    </div>
+
+    <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Strategie fiscale</label>
+    <div class="sb-body open">
+      <div class="fg"><label>Duree Denormandie</label><select class="fi" id="iDureeDeno">
+        <option value="6">6 ans (12%)</option><option value="9">9 ans (18%)</option><option value="12" selected>12 ans (21%)</option>
       </select></div>
+      <div class="fg"><label>Apres Denormandie</label><select class="fi" id="iStratPost">
+        <option value="lmnp" selected>Switch LMNP meuble</option><option value="nu">Conserver location nue</option><option value="revente">Revendre</option>
+      </select></div>
+      <div class="fg"><label>Revalorisation annuelle</label><div class="fi-row"><input type="number" id="iRevalo" step="0.1" value="1.5" placeholder="1.5"><span class="fi-unit">%</span></div></div>
     </div>
 
-    <!-- IMMOBILIER INPUTS -->
-    <div id="sidebarImmo" style="display:none">
+    <div style="border-top:1px solid var(--bord);margin-top:10px;padding:10px 14px 0">
+      <button style="width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="calc()">&#9654; Analyser le projet</button>
+    </div>
 
-      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Client</label>
-      <div class="sb-body open">
-        <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iNom" placeholder="Ex: Jean Dupont"></div>
-        <div class="grid2">
-          <div class="fg"><label>Age</label><div class="fi-row"><input type="number" id="iAge" placeholder="35"><span class="fi-unit">ans</span></div></div>
-          <div class="fg"><label>Situation</label>
-            <select class="fi" id="iSituation">
-              <option value="marie">Marie(e)</option><option value="pacse">Pacse(e)</option>
-              <option value="union">Union libre</option><option value="celibataire">Celibataire</option>
-            </select>
+  </div>
+</aside>
+
+<main class="cs-main">
+
+<!-- HOME -->
+<div id="viewHome" class="cs-page">
+  <div class="home-wrap">
+    <h1>Dossier <em>Solution</em></h1>
+    <p>Selectionnez un module pour construire votre dossier client</p>
+    <div class="home-grid">
+      <div class="home-card" onclick="V('pModule').value='placement';onModuleChange()">
+        <span class="home-card-tag soon">Bientot</span>
+        <div class="home-card-icon">&#128176;</div>
+        <div class="home-card-title">Placement</div>
+        <div class="home-card-desc">Assurance Vie, PER, SCPI</div>
+      </div>
+      <div class="home-card" onclick="V('pModule').value='immo';onModuleChange()">
+        <span class="home-card-tag ok">Disponible</span>
+        <div class="home-card-icon">&#127968;</div>
+        <div class="home-card-title">Immobilier</div>
+        <div class="home-card-desc">Denormandie, LMNP, Deficit Foncier</div>
+      </div>
+      <div class="home-card disabled">
+        <span class="home-card-tag soon">Bientot</span>
+        <div class="home-card-icon">&#128202;</div>
+        <div class="home-card-title">Bilan Patrimonial</div>
+        <div class="home-card-desc">Vision consolidee du patrimoine</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMMOBILIER -->
+<div id="viewImmo" class="cs-page" style="display:none">
+  <div id="cs-nav-actions"></div>
+
+  <div id="resultsEmpty" class="r-empty">
+    <span>&#127968;</span>
+    <div style="font-size:15px;font-weight:600;color:var(--noir)">Analyse immobiliere</div>
+    <div style="font-size:12px">Renseignez les donnees puis cliquez <b>Analyser</b></div>
+  </div>
+
+  <div id="resultsContent" style="display:none">
+
+    <!-- PAGE 1 : TRAME DENORMANDIE -->
+    <div class="trame" id="trameDeno" style="display:none">
+      <div class="trame-header">
+        <div class="trame-title">Plan d'investissement — Dispositif Denormandie</div>
+        <div class="trame-consul" id="denoConsul"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title" id="denoPhaseTitle">Les 12 premieres annees</div>
+        <div class="trame-2col">
+          <div class="trame-box">
+            <div class="trame-box-title">Investissement</div>
+            <div id="denoInvest"></div>
           </div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Taux PAS</label><div class="fi-row"><input type="number" id="iTauxPAS" step="0.1" placeholder="0"><span class="fi-unit">%</span></div></div>
-          <div class="fg"><label>Impots mensuels</label><div class="fi-row"><input type="number" id="iImpots" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+          <div class="trame-box">
+            <div class="trame-box-title" id="denoGainTitle">Gain fiscal sur 12 ans</div>
+            <div id="denoGain"></div>
+          </div>
         </div>
       </div>
 
-      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Co-investisseur</label>
-      <div class="sb-body">
-        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iCoToggle" onchange="toggleCoFields()" style="accent-color:var(--orange)"> Activer</div>
-        <div id="coFields" style="display:none">
-          <div class="fg"><label>Prenom Nom</label><input class="fi" type="text" id="iCoNom" placeholder="Ex: Marie Dupont"></div>
-          <div class="grid2">
-            <div class="fg"><label>Revenu brut annuel</label><div class="fi-row"><input type="number" id="iCoRevBrut" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-            <div class="fg"><label>Revenu net mensuel</label><div class="fi-row"><input type="number" id="iCoRevNet" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          </div>
-        </div>
+      <div class="trame-section">
+        <div class="trame-section-title">Participation avant impact fiscal</div>
+        <div id="denoAvant"></div>
       </div>
 
-      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Pret RP en cours</label>
-      <div class="sb-body">
-        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iPretToggle" onchange="togglePretFields()" style="accent-color:var(--orange)"> Pret en cours</div>
-        <div id="pretFields" style="display:none">
-          <div class="grid2">
-            <div class="fg"><label>Montant emprunte</label><div class="fi-row"><input type="number" id="iPretMontant" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-            <div class="fg"><label>Taux nominal</label><div class="fi-row"><input type="number" id="iPretTaux" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Duree totale</label><div class="fi-row"><input type="number" id="iPretDuree" placeholder="0"><span class="fi-unit">ans</span></div></div>
-            <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iPretMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-          </div>
-          <div class="fg"><label>Capital restant du</label><div class="fi-row"><input type="number" id="iPretCRD" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        </div>
+      <div class="trame-section">
+        <div class="trame-section-title">Repartition de la reduction d'impot</div>
+        <div class="deno-bar-wrap" id="denoBarChart"></div>
       </div>
 
-      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Epargne</label>
-      <div class="sb-body open">
-        <div class="fg"><label>Epargne disponible</label><div class="fi-row"><input type="number" id="iEpargne" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      <div class="trame-section">
+        <div class="trame-section-title">Participation apres impact fiscal</div>
+        <div id="denoApres"></div>
+        <div class="trame-highlight" id="denoHighlight"></div>
       </div>
 
-      <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Projet immobilier</label>
-      <div class="sb-body open">
-        <div class="grid2">
-          <div class="fg"><label>Ville</label><input class="fi" type="text" id="iVille" placeholder="Ex: Limoges"></div>
-          <div class="fg"><label>Type de bien</label>
-            <select class="fi" id="iTypeBien">
-              <option value="studio">Studio</option><option value="t1bis">T1bis</option>
-              <option value="t2">T2</option><option value="t3">T3</option>
-              <option value="colocation">Colocation</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Surface Carrez</label><div class="fi-row"><input type="number" id="iSurface" placeholder="0"><span class="fi-unit">m&#178;</span></div></div>
-          <div class="fg"><label>Eligibilite</label>
-            <select class="fi" id="iEligibilite">
-              <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option>
-              <option value="deficit">Deficit Foncier</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Prix FAI</label><div class="fi-row"><input type="number" id="iPrixFAI" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          <div class="fg"><label>Frais de notaire</label><div class="fi-row"><input type="number" id="iFraisNotaire" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Travaux TTC</label><div class="fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-          <div class="fg"><label>Frais commercialisation</label><div class="fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        </div>
-        <div class="fg"><label>Budget mobilier</label><div class="fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        <div class="grid2">
-          <div class="fg"><label>Taux financement</label><div class="fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
-          <div class="fg"><label>Duree</label>
-            <select class="fi" id="iDureeFin">
-              <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-          <div class="fg"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-          <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-        </div>
-        <div class="fg"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      <div class="trame-section">
+        <div class="trame-section-title" id="denoPostTitle">Apres 12 ans : 3 possibilites</div>
+        <div class="trame-options" id="denoOptions"></div>
       </div>
 
-      <label class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Scenario alternatif</label>
-      <div class="sb-body">
-        <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iAltToggle" style="accent-color:var(--orange)"> Comparer</div>
-        <div id="altFields" style="display:none">
-          <div class="fg"><label>Ville</label><input class="fi" type="text" id="iAltVille" placeholder="Ex: Poitiers"></div>
-          <div class="grid2">
-            <div class="fg"><label>Budget</label><div class="fi-row"><input type="number" id="iAltBudget" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-            <div class="fg"><label>Effort mensuel</label><div class="fi-row"><input type="number" id="iAltEffort" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Mensualite</label><div class="fi-row"><input type="number" id="iAltMens" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-            <div class="fg"><label>Loyer net</label><div class="fi-row"><input type="number" id="iAltLoyer" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 14px 8px;font-size:12px;color:var(--gris)"><input type="checkbox" id="iAltDeno" style="accent-color:var(--orange)"> Eligible Denormandie</div>
-        </div>
-      </div>
-
-      <!-- Bouton -->
-      <div style="border-top:1px solid var(--bord);margin-top:10px;padding:10px 14px 0">
-        <button style="width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s" onclick="calc()">&#9654; Analyser le projet</button>
-      </div>
-
-    </div><!-- /sidebarImmo -->
-
-  </aside>
-
-  <!-- MAIN -->
-  <main class="cs-main">
-
-    <!-- HOME VIEW -->
-    <div id="viewHome" class="cs-page">
-      <div class="home-wrap">
-        <h1>Dossier <em>Solution</em></h1>
-        <p>Selectionnez un module pour construire votre dossier client</p>
-        <div class="home-grid">
-          <div class="home-card" onclick="V('pModule').value='placement';onModuleChange()">
-            <span class="home-card-tag soon">Bientot</span>
-            <div class="home-card-icon">&#128176;</div>
-            <div class="home-card-title">Placement</div>
-            <div class="home-card-desc">Assurance Vie, PER, SCPI — presentation client des solutions de placement</div>
-          </div>
-          <div class="home-card" onclick="V('pModule').value='immo';onModuleChange()">
-            <span class="home-card-tag ok">Disponible</span>
-            <div class="home-card-icon">&#127968;</div>
-            <div class="home-card-title">Immobilier</div>
-            <div class="home-card-desc">Denormandie, LMNP, Deficit Foncier — analyse du projet immobilier</div>
-          </div>
-          <div class="home-card disabled">
-            <span class="home-card-tag soon">Bientot</span>
-            <div class="home-card-icon">&#128202;</div>
-            <div class="home-card-title">Bilan Patrimonial</div>
-            <div class="home-card-desc">Vision consolidee du patrimoine et recommandations globales</div>
-          </div>
-        </div>
+      <div class="trame-highlight" style="margin-top:14px">
+        <b>Avantage supplementaire :</b> Securite de la famille accrue grace a l'assurance deces invalidite (ADI) comprise dans le financement.
       </div>
     </div>
 
-    <!-- IMMOBILIER VIEW -->
-    <div id="viewImmo" class="cs-page" style="display:none">
-      <div id="cs-nav-actions"></div>
-
-      <div id="resultsEmpty" class="r-empty">
-        <span>&#127968;</span>
-        <div style="font-size:15px;font-weight:600;color:var(--noir)">Analyse immobiliere</div>
-        <div style="font-size:12px">Renseignez les donnees dans la sidebar puis cliquez <b>Analyser</b></div>
+    <!-- PAGE 2 : TRAME LMNP -->
+    <div class="trame" id="trameLMNP" style="display:none">
+      <div class="trame-header">
+        <div class="trame-title">Plan d'investissement — Location meublee longue duree</div>
+        <div class="trame-consul" id="lmnpConsul"></div>
       </div>
 
-      <div id="resultsContent" style="display:none">
-        <div class="r-header" id="rHeader">
-          <div><h2 id="rClientName">—</h2><div class="sub" id="rClientSub">—</div></div>
-          <div style="text-align:right"><div id="rBadge"></div><div class="date" id="rDate"></div></div>
+      <div class="trame-2col">
+        <div>
+          <div class="trame-section">
+            <div class="trame-section-title">Type d'investissement</div>
+            <div id="lmnpType"></div>
+          </div>
+          <div class="trame-section">
+            <div class="trame-section-title">Investissement</div>
+            <div id="lmnpInvest"></div>
+          </div>
+          <div class="trame-section">
+            <div class="trame-section-title">Participation</div>
+            <div id="lmnpParticip"></div>
+          </div>
         </div>
-        <div class="r-kpis" id="rKpis">
-          <div class="r-kpi"><div class="r-kpi-label">Budget total meuble</div><div class="r-kpi-val" id="kBudget">—</div><div class="r-kpi-sub" id="kBudgetSub">—</div></div>
-          <div class="r-kpi"><div class="r-kpi-label">Effort meuble / apport</div><div class="r-kpi-val" id="kEffort">—</div><div class="r-kpi-sub" id="kEffortSub">—</div></div>
-          <div class="r-kpi"><div class="r-kpi-label">Rendement brut</div><div class="r-kpi-val" id="kRendement">—</div><div class="r-kpi-sub" id="kRendementSub">—</div></div>
-          <div class="r-kpi"><div class="r-kpi-label">Endettement apres</div><div class="r-kpi-val" id="kEndettement">—</div><div class="r-kpi-sub" id="kEndettementSub">—</div></div>
+        <div>
+          <div class="trame-section">
+            <div class="trame-section-title">A l'issue de la periode de financement</div>
+            <div id="lmnpIssue"></div>
+          </div>
+          <div class="trame-section">
+            <div class="trame-section-title">Recapitulatif</div>
+            <div id="lmnpRecap"></div>
+          </div>
         </div>
-        <div class="r-grid2">
-          <div class="r-card"><div class="r-card-title">Profil client</div><div id="rProfil"></div></div>
-          <div class="r-card"><div class="r-card-title">Synthese du projet</div><div id="rProjet"></div></div>
-        </div>
-        <div class="r-card"><div class="r-card-title">Capacite financiere — Endettement</div><div id="rEndettement"></div></div>
-        <div class="r-card"><div class="r-card-title">Comparatif Nu vs Meuble</div><div style="overflow-x:auto" id="rComparatif"></div></div>
-        <div class="r-card"><div class="r-card-title">Effort mensuel net</div><div id="rEffort"></div></div>
-        <div class="r-card" id="rDenoCard" style="display:none"><div class="r-card-title">Reduction Denormandie</div><div id="rDeno"></div></div>
-        <div class="r-grid2">
-          <div class="r-card"><div class="r-card-title">Repartition du budget</div><div class="r-chart-wrap"><canvas id="chartBudget"></canvas></div></div>
-          <div class="r-card"><div class="r-card-title">Comparaison des efforts</div><div class="r-chart-wrap"><canvas id="chartEffort"></canvas></div></div>
-        </div>
-        <div class="r-card" id="rAltCard" style="display:none"><div class="r-card-title">Comparaison des scenarios</div><div id="rAlt"></div></div>
       </div>
 
-      <div id="conseillerFooter"></div>
+      <div class="trame-highlight" style="margin-top:14px">
+        <b>Avantage supplementaire :</b> Securite de la famille accrue grace a l'assurance deces invalidite (ADI) comprise dans le financement.
+      </div>
     </div>
 
-    <!-- PLACEMENT PLACEHOLDER -->
-    <div id="viewPlacement" class="cs-page" style="display:none">
-      <div class="r-placeholder"><span>&#128176;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Module Placement</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
+    <!-- PAGE 3 : SYNTHESE CONSOLIDEE -->
+    <div class="trame" id="trameSynth" style="display:none">
+      <div class="trame-header">
+        <div class="trame-title">Synthese du projet — Vision globale</div>
+        <div class="trame-subtitle" id="synthSubtitle"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Timeline du projet</div>
+        <div id="synthTimeline"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Comparaison des phases</div>
+        <div class="trame-2col" id="synthPhases"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Bilan global</div>
+        <div class="synth-kpis" id="synthKpis"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Detail cumule</div>
+        <div id="synthDetail"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Patrimoine constitue</div>
+        <div id="synthPatri"></div>
+      </div>
+
+      <div class="trame-section">
+        <div class="trame-section-title">Visualisation</div>
+        <div class="trame-2col">
+          <div><div class="trame-chart"><canvas id="chartSynth1"></canvas></div></div>
+          <div><div class="trame-chart"><canvas id="chartSynth2"></canvas></div></div>
+        </div>
+      </div>
     </div>
 
-    <!-- BILAN PLACEHOLDER -->
-    <div id="viewBilan" class="cs-page" style="display:none">
-      <div class="r-placeholder"><span>&#128202;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Bilan Patrimonial</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
-    </div>
+  </div>
+  <div id="conseillerFooter"></div>
+</div>
 
-  </main>
+<!-- PLACEHOLDERS -->
+<div id="viewPlacement" class="cs-page" style="display:none">
+  <div class="r-placeholder"><span>&#128176;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Module Placement</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
+</div>
+<div id="viewBilan" class="cs-page" style="display:none">
+  <div class="r-placeholder"><span>&#128202;</span><div style="font-size:15px;font-weight:600;color:var(--noir)">Bilan Patrimonial</div><div style="font-size:13px">&#128284; En cours de developpement</div></div>
+</div>
+
+</main>
 </div>
 
 <script>
-/* ===== UTILITIES ===== */
 function V(id){return document.getElementById(id)}
 function N(id){return parseFloat(V(id).value)||0}
 function fmt(n,d){if(n==null||isNaN(n))return '0';return Number(n).toLocaleString('fr-FR',{minimumFractionDigits:d||0,maximumFractionDigits:d||0})}
 function fmtE(n){return fmt(n)+' \u20ac'}
 function fmtP(n,d){return fmt(n,d===undefined?1:d)+' %'}
 function pmt(rate,nper,pv){if(!rate||!nper||!pv)return 0;var r=rate/100/12;var n=nper*12;return pv*r/(1-Math.pow(1+r,-n))}
-function today(){var d=new Date();return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}
+function crd(rate,nper,pv,months){if(!rate||!nper||!pv)return 0;var r=rate/100/12;var n=nper*12;var m=pmt(rate,nper,pv);var bal=pv;for(var i=0;i<months;i++){bal=bal*(1+r)-m}return Math.max(bal,0)}
+function today(){return new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}
+function row(k,v,cls){return '<div class="trame-row"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
+function rowT(k,v,cls){return '<div class="trame-row total"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
 
-/* ===== NAVIGATION ===== */
 function onModuleChange(){
   var mod=V('pModule').value;
-  var views=['viewHome','viewImmo','viewPlacement','viewBilan'];
-  views.forEach(function(id){V(id).style.display='none'});
-  var map={home:'viewHome',immo:'viewImmo',placement:'viewPlacement',bilan:'viewBilan'};
-  V(map[mod]||'viewHome').style.display='';
+  ['viewHome','viewImmo','viewPlacement','viewBilan'].forEach(function(id){V(id).style.display='none'});
+  V({home:'viewHome',immo:'viewImmo',placement:'viewPlacement',bilan:'viewBilan'}[mod]||'viewHome').style.display='';
   V('sidebarImmo').style.display=mod==='immo'?'':'none';
-  V('navClient').textContent=mod==='immo'?(V('iNom').value.trim()||''):'';
 }
-
-/* ===== SIDEBAR TOGGLES ===== */
 function toggleCoFields(){V('coFields').style.display=V('iCoToggle').checked?'':'none'}
 function togglePretFields(){V('pretFields').style.display=V('iPretToggle').checked?'':'none'}
 
-/* ===== CHARTS ===== */
-var chartBudget=null,chartEffort=null;
-function renderCharts(data){
-  var ctx1=V('chartBudget');
-  if(chartBudget)chartBudget.destroy();
-  chartBudget=new Chart(ctx1,{
-    type:'doughnut',
-    data:{
-      labels:['Prix FAI','Frais notaire','Travaux','Mobilier','Frais comm.'],
-      datasets:[{data:[data.prixFAI,data.fraisNotaire,data.travaux,data.mobilier,data.fraisComm],
-        backgroundColor:['#D4622A','#2D7A5B','#2B5EA7','#E8855A','#6B6B6B'],
-        borderColor:'#fff',borderWidth:2}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{position:'bottom',labels:{color:'#6B6B6B',font:{family:'Inter',size:11},padding:12}},
-        tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}}
-    }
-  });
-  var ctx2=V('chartEffort');
-  if(chartEffort)chartEffort.destroy();
-  chartEffort=new Chart(ctx2,{
-    type:'bar',
-    data:{
-      labels:['Nu sans apport','Meuble sans apport','Nu avec apport','Meuble avec apport'],
-      datasets:[{label:'Effort mensuel (\u20ac)',
-        data:[data.effortNu,data.effortMeuble,data.effortNuA,data.effortMeubleA],
-        backgroundColor:['#D4622A','#2D7A5B','#E8855A','#2B5EA7'],
-        borderRadius:4}]
-    },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:true,
-      scales:{x:{grid:{color:'#EDE8DF'},ticks:{color:'#6B6B6B',font:{family:'Inter'}}},
-              y:{grid:{display:false},ticks:{color:'#0D0D0D',font:{family:'Inter',size:11}}}},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}}
-    }
-  });
-}
+var chart1=null,chart2=null;
 
-/* ===== MAIN CALC ===== */
 function calc(){
+  /* === INPUTS === */
   var nom=V('iNom').value.trim()||'Client';
   var age=N('iAge');var situation=V('iSituation').value;
-  var sitLabels={marie:'Marie(e)',pacse:'Pacse(e)',union:'Union libre',celibataire:'Celibataire'};
   var revBrut=N('iRevBrut');var revNet=N('iRevNet');var tauxPAS=N('iTauxPAS');var impots=N('iImpots');
   var hasCo=V('iCoToggle').checked;var coNom=hasCo?V('iCoNom').value.trim():'';
-  var coRevBrut=hasCo?N('iCoRevBrut'):0;var coRevNet=hasCo?N('iCoRevNet'):0;
-  var hasPret=V('iPretToggle').checked;var pretMens=hasPret?N('iPretMens'):0;var pretCRD=hasPret?N('iPretCRD'):0;
+  var coRevNet=hasCo?N('iCoRevNet'):0;
+  var hasPret=V('iPretToggle').checked;var pretMens=hasPret?N('iPretMens'):0;
   var epargne=N('iEpargne');
   var ville=V('iVille').value.trim()||'\u2014';var typeBien=V('iTypeBien').value;
   var typeLabels={studio:'Studio',t1bis:'T1bis',t2:'T2',t3:'T3',colocation:'Colocation'};
-  var surface=N('iSurface');var eligibilite=V('iEligibilite').value;
-  var eligLabels={denormandie:'Denormandie',lmnp:'LMNP',deficit:'Deficit Foncier'};
+  var surface=N('iSurface');var elig=V('iEligibilite').value;
   var prixFAI=N('iPrixFAI');var fraisNotaire=N('iFraisNotaire');var travaux=N('iTravaux');
   var fraisComm=N('iFraisComm');var mobilier=N('iMobilier');
   var tauxFin=N('iTauxFin');var dureeFin=parseInt(V('iDureeFin').value)||20;
   var loyerBrutNu=N('iLoyerNu');var loyerBrutMeuble=N('iLoyerMeuble');
-  var charges=N('iCharges');var taxeFonciere=N('iTaxeFonciere');var assietteDeno=N('iAssietteDeno');
+  var charges=N('iCharges');var taxeF=N('iTaxeFonciere');
+  var assietteDeno=N('iAssietteDeno');
+  var dureeDeno=parseInt(V('iDureeDeno').value)||12;
+  var stratPost=V('iStratPost').value;
+  var revalo=N('iRevalo')/100;
 
-  /* Calculs */
+  /* === CALCULS === */
   var budgetNu=prixFAI+fraisNotaire+travaux+fraisComm;
   var budgetMeuble=budgetNu+mobilier;
-  var fraisGestNu=loyerBrutNu*0.075;var fraisGestMeuble=loyerBrutMeuble*0.075;
-  var loyerNetNu=loyerBrutNu-charges-taxeFonciere-fraisGestNu;
-  var loyerNetMeuble=loyerBrutMeuble-charges-taxeFonciere-fraisGestMeuble;
-  var mensNu=pmt(tauxFin,dureeFin,budgetNu);var mensMeuble=pmt(tauxFin,dureeFin,budgetMeuble);
-  var apport10Nu=budgetNu*0.10;var apport10Meuble=budgetMeuble*0.10;
-  var mensNuA=pmt(tauxFin,dureeFin,budgetNu-apport10Nu);
-  var mensMeubleA=pmt(tauxFin,dureeFin,budgetMeuble-apport10Meuble);
-  var effortNu=mensNu-loyerNetNu;var effortMeuble=mensMeuble-loyerNetMeuble;
-  var effortNuA=mensNuA-loyerNetNu;var effortMeubleA=mensMeubleA-loyerNetMeuble;
-  var totalRevNet=revNet+coRevNet;
-  var endAvant=totalRevNet>0?(pretMens/totalRevNet*100):0;
-  var endApresMeuble=totalRevNet>0?((pretMens+mensMeuble)/totalRevNet*100):0;
-  var endApresNu=totalRevNet>0?((pretMens+mensNu)/totalRevNet*100):0;
-  var endApresMeubleA=totalRevNet>0?((pretMens+mensMeubleA)/totalRevNet*100):0;
-  var rdtBrutNu=prixFAI>0?((loyerBrutNu*12)/prixFAI*100):0;
-  var rdtBrutMeuble=prixFAI>0?((loyerBrutMeuble*12)/prixFAI*100):0;
-  var deno6=assietteDeno*0.12;var deno9=assietteDeno*0.18;var deno12=assietteDeno*0.21;
+  var fraisGNu=loyerBrutNu*0.075;var fraisGM=loyerBrutMeuble*0.075;
+  var loyerNetNu=loyerBrutNu-charges-taxeF-fraisGNu;
+  var loyerNetMeuble=loyerBrutMeuble-charges-taxeF-fraisGM;
+  var mensNu=pmt(tauxFin,dureeFin,budgetNu);
+  var mensMeuble=pmt(tauxFin,dureeFin,budgetMeuble);
+  var apport10=budgetNu*0.10;
+  var budgetFinance=budgetNu-apport10;
+  var mensApport=pmt(tauxFin,dureeFin,budgetFinance);
+  /* Denormandie */
+  var tauxDeno={6:0.12,9:0.18,12:0.21}[dureeDeno]||0.21;
+  var reductionTotale=assietteDeno*tauxDeno;
+  var reductionAn=dureeDeno>0?reductionTotale/dureeDeno:0;
+  var reductionMois=reductionAn/12;
+  /* Participations phase 1 (Deno = location nue) */
+  var particAvant=mensApport-loyerNetNu;
+  var particApres=mensApport-loyerNetNu-reductionMois;
+  /* Phase 2 */
+  var dureePost=dureeFin-dureeDeno;
+  var crdAtSwitch=crd(tauxFin,dureeFin,budgetFinance,dureeDeno*12);
+  /* Valeur bien */
+  var valeurSansRevalo=prixFAI;
+  var valeurAvecRevalo=prixFAI*Math.pow(1+revalo,dureeFin);
+  var valeurAtDeno=prixFAI*Math.pow(1+revalo,dureeDeno);
+  /* Totaux 20 ans */
+  var totalMens=mensApport*12*dureeFin;
+  var totalLoyersP1=loyerBrutNu*12*dureeDeno;
+  var totalChargesP1=(charges+taxeF+fraisGNu)*12*dureeDeno;
+  var totalLoyersP2=(stratPost==='lmnp'?loyerBrutMeuble:loyerBrutNu)*12*dureePost;
+  var totalChargesP2=(charges+taxeF+(stratPost==='lmnp'?fraisGM:fraisGNu))*12*dureePost;
+  var totalLoyers=totalLoyersP1+totalLoyersP2;
+  var totalCharges=totalChargesP1+totalChargesP2;
+  var totalGainFiscal=elig==='denormandie'?reductionTotale:0;
+  var effortCumule=totalMens-(totalLoyers-totalCharges)-totalGainFiscal;
+  var effortMoyMois=effortCumule/(dureeFin*12);
+  var patrimoineNet=valeurAvecRevalo;
+  var levier=effortCumule>0?(patrimoineNet/effortCumule):0;
 
-  /* Nav */
+  /* Profil conseiller */
+  var profil={prenom:'',nom:'',cabinet:'',orias:'',tel:'',email:''};
+  try{var p=JSON.parse(localStorage.getItem('cgpskool_profil_v1')||'{}');profil.prenom=p.pPrenom||p.prenom||'';profil.nom=p.pNom||p.nom||'';profil.cabinet=p.pCabinet||p.cabinet||'';profil.tel=p.pTel||p.tel||'';profil.email=p.pEmail||p.email||'';}catch(e){}
+  var consulStr=profil.prenom||profil.nom?'<b>'+profil.prenom+' '+profil.nom+'</b>'+(profil.cabinet?' \u2014 '+profil.cabinet:''):'';
+
   V('navClient').textContent=nom;
   V('resultsEmpty').style.display='none';V('resultsContent').style.display='';
 
-  /* Header */
-  V('rClientName').textContent=nom;
-  V('rClientSub').textContent=(age?age+' ans, ':'')+sitLabels[situation]+' | '+ville+' \u2014 '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2';
-  V('rDate').textContent=today();
-  var bc=eligibilite==='denormandie'?'green':(eligibilite==='lmnp'?'blue':'orange');
-  V('rBadge').innerHTML='<span class="r-badge '+bc+'">'+(eligLabels[eligibilite]||eligibilite)+'</span>';
+  /* ========== TRAME DENORMANDIE ========== */
+  var isDeno=elig==='denormandie'&&assietteDeno>0;
+  V('trameDeno').style.display=isDeno?'':'none';
+  if(isDeno){
+    V('denoConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+today();
+    V('denoPhaseTitle').textContent='Les '+dureeDeno+' premieres annees';
+    V('denoGainTitle').textContent='Gain fiscal sur '+dureeDeno+' ans';
+
+    V('denoInvest').innerHTML=row('Investissement (logement + frais)',fmtE(budgetNu))
+      +row('Financement',fmtE(budgetFinance))
+      +rowT('Apport',fmtE(apport10),'or');
+
+    V('denoGain').innerHTML=row('Base de reduction',fmtE(assietteDeno))
+      +row('Taux de reduction',fmtP(tauxDeno*100,0))
+      +rowT('Reduction totale',fmtE(Math.round(reductionTotale)),'gr');
+
+    V('denoAvant').innerHTML=row('Mensualites (ADI comprise)',fmtE(Math.round(mensApport))+'/mois')
+      +row('Loyer moyen net mensuel (70% du loyer)',fmtE(Math.round(loyerNetNu))+'/mois')
+      +rowT('Votre participation',fmtE(Math.round(particAvant))+'/mois','or');
+
+    /* Barre reduction */
+    var bars='';
+    [{dur:6,taux:12,h:40},{dur:9,taux:18,h:60},{dur:12,taux:21,h:80}].forEach(function(b){
+      var active=b.dur===dureeDeno;
+      var color=active?'#D4622A':'#6B6B6B';
+      bars+='<div class="deno-bar"><div class="deno-bar-fill" style="height:'+b.h+'px;background:'+color+'">'+b.taux+'%</div><div class="deno-bar-label">'+b.dur+' ans</div></div>';
+    });
+    V('denoBarChart').innerHTML=bars;
+
+    V('denoApres').innerHTML=row('Mensualites (ADI comprise)',fmtE(Math.round(mensApport))+'/mois')
+      +row('Loyer moyen net mensuel',fmtE(Math.round(loyerNetNu))+'/mois')
+      +row('Reduction impot',fmtE(Math.round(reductionMois))+'/mois','gr')
+      +rowT('Votre participation',fmtE(Math.round(particApres))+'/mois','or');
+
+    V('denoHighlight').innerHTML='<b>Mensualites retenues :</b> duree de '+dureeFin+' ans, taux a '+fmtP(tauxFin,2)+', Assurance Deces Invalidite incluse, mensualite de <b>'+fmtE(Math.round(mensApport))+'</b>.<br>'
+      +'<b>Loyer retenu :</b> net a '+fmtE(Math.round(loyerNetNu))+', soit deduction de '+fmtP(7.5,1)+' de charges de gestion, de la taxe fonciere et des charges de copropriete.';
+
+    /* 3 options post */
+    V('denoPostTitle').textContent='Apres '+dureeDeno+' ans : 3 possibilites';
+    var loyerNetNuPost=loyerNetNu; /* simplifie */
+    var mensAtPost=mensApport; /* meme pret continue */
+    var effortNuPost=mensAtPost-loyerNetNuPost;
+    var effortLmnpPost=mensAtPost-loyerNetMeuble;
+    var capitalRevente=valeurAtDeno-crdAtSwitch;
+    var actCls=function(s){return s===stratPost?' active':''};
+
+    V('denoOptions').innerHTML=''
+      +'<div class="trame-option'+actCls('nu')+'"><div class="trame-option-num">1</div><div class="trame-option-title">Conserver en location nue</div>'
+      +row('Mensualites',fmtE(Math.round(mensAtPost))+'/mois')
+      +row('Loyer net',fmtE(Math.round(loyerNetNuPost))+'/mois')
+      +row('Participation',fmtE(Math.round(effortNuPost))+'/mois','or')
+      +'</div>'
+      +'<div class="trame-option'+actCls('lmnp')+'"><div class="trame-option-num">2</div><div class="trame-option-title">Transformer en meuble (LMNP)</div>'
+      +'<div style="font-size:11px;color:var(--gris);line-height:1.5;margin-bottom:6px">Beneficier d\'un statut fiscal avantageux : amortissement du bien, loyers quasi defiscalises pendant 10-15 ans.</div>'
+      +row('Loyer meuble net',fmtE(Math.round(loyerNetMeuble))+'/mois','gr')
+      +row('Effort',fmtE(Math.round(effortLmnpPost))+'/mois','or')
+      +'</div>'
+      +'<div class="trame-option'+actCls('revente')+'"><div class="trame-option-num">3</div><div class="trame-option-title">Revendre a '+dureeDeno+' ans</div>'
+      +row('Valeur estimee',fmtE(Math.round(valeurAtDeno)))
+      +row('Solde financement',fmtE(Math.round(crdAtSwitch)))
+      +rowT('Capital disponible',fmtE(Math.round(capitalRevente)),'gr')
+      +'</div>';
+  }
+
+  /* ========== TRAME LMNP ========== */
+  var showLMNP=elig==='lmnp'||(isDeno&&stratPost==='lmnp');
+  V('trameLMNP').style.display=showLMNP?'':'none';
+  if(showLMNP){
+    var lmnpStart=isDeno?dureeDeno:0;
+    var lmnpDuree=isDeno?dureePost:dureeFin;
+    var lmnpBudget=isDeno?budgetNu:budgetMeuble;
+    var lmnpMens=mensApport;
+    var lmnpLoyerNet=loyerNetMeuble;
+    var lmnpEffort=lmnpMens-lmnpLoyerNet;
+
+    V('lmnpConsul').innerHTML=(consulStr?'Consultant : '+consulStr+'<br>':'')+'Client : <b>'+nom+'</b> | '+today()
+      +(isDeno?'<br><i>Phase 2 : apres '+dureeDeno+' ans de Denormandie</i>':'');
+
+    /* Type */
+    var types=[{id:'neuf',label:'Residence de services dans le neuf'},{id:'ancien',label:'Residence de services dans l\'ancien'},{id:'coloc',label:'Colocation'},{id:'travaux',label:'Ancien avec travaux'}];
+    var typeMap={studio:'neuf',t1bis:'ancien',t2:'ancien',t3:'ancien',colocation:'coloc'};
+    var selType=typeMap[typeBien]||'ancien';
+    V('lmnpType').innerHTML=types.map(function(t){
+      var checked=t.id===selType?'&#9745;':'&#9744;';
+      return '<div style="font-size:12px;padding:3px 0;color:var(--noir)">'+checked+' '+t.label+'</div>';
+    }).join('');
+
+    V('lmnpInvest').innerHTML=row('Budget global','<b>'+fmtE(lmnpBudget)+'</b>')
+      +'<div style="font-size:10px;color:var(--gris);padding:2px 0;margin-bottom:4px">= prix d\'achat + frais d\'acte + frais de garantie + frais annexes</div>'
+      +row('Financement',fmtE(budgetFinance))
+      +rowT('Apport',fmtE(apport10),'or');
+
+    V('lmnpParticip').innerHTML=row('Mensualites',fmtE(Math.round(lmnpMens))+'/mois')
+      +row('Loyer ADI + securise',fmtE(Math.round(lmnpLoyerNet))+'/mois','gr')
+      +rowT('Effort mensuel',fmtE(Math.round(lmnpEffort))+'/mois','or');
+
+    var valFinLMNP=prixFAI*Math.pow(1+revalo,dureeFin);
+    V('lmnpIssue').innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">'
+      +'La valeur du bien <b>sans revalorisation</b> est de : <b>'+fmtE(prixFAI)+'</b><br>'
+      +'La valeur du bien avec une revalorisation de <b>'+fmtP(revalo*100)+'</b>/an est de : <b style="color:var(--orange)">'+fmtE(Math.round(valFinLMNP))+'</b><br>'
+      +'Le CRD est <b>nul</b> (0 \u20ac)<br><br>'
+      +'A l\'issue du financement, la reserve d\'amortissement calculee par l\'expert comptable vous a permis de ne payer que <b>~0% de BIC</b> sur vos revenus locatifs.<br><br>'
+      +'En fin de cette periode, nous pourrons opter pour le regime du <b>micro BIC</b> : abattement de 50% sur vos revenus locatifs.'
+      +'</div>';
+
+    V('lmnpRecap').innerHTML='<div style="font-size:12px;color:var(--gris-f);line-height:1.7">'
+      +'Vous etes proprietaire d\'un logement qui, sans aucune revalorisation pendant '+dureeFin+' ans, vaudra <b>'+fmtE(prixFAI)+'</b>.<br><br>'
+      +'Avec une revalorisation de '+fmtP(revalo*100)+'/an, votre bien vaudra <b style="color:var(--orange)">'+fmtE(Math.round(valFinLMNP))+'</b>.<br><br>'
+      +'Le financement est entierement rembourse. Vous percevez desormais <b>'+fmtE(Math.round(lmnpLoyerNet))+'/mois de revenus nets</b>.'
+      +'</div>';
+  }
+
+  /* ========== TRAME SYNTHESE ========== */
+  V('trameSynth').style.display='';
+  V('synthSubtitle').textContent=nom+' | '+ville+' \u2014 '+(typeLabels[typeBien]||typeBien)+' '+surface+' m\u00b2 | '+today();
+
+  /* Timeline */
+  if(isDeno&&dureePost>0){
+    var pct1=Math.round(dureeDeno/dureeFin*100);
+    V('synthTimeline').innerHTML='<div class="timeline">'
+      +'<div class="timeline-phase" style="width:'+pct1+'%;background:#D4622A">Denormandie ('+dureeDeno+' ans)</div>'
+      +'<div class="timeline-phase" style="width:'+(100-pct1)+'%;background:#2D7A5B">'+(stratPost==='lmnp'?'LMNP':'Location nue')+' ('+dureePost+' ans)</div>'
+      +'</div>';
+  }else{
+    var lbl2=elig==='lmnp'?'LMNP':'Location';
+    V('synthTimeline').innerHTML='<div class="timeline"><div class="timeline-phase" style="width:100%;background:'+(elig==='lmnp'?'#2D7A5B':'#D4622A')+'">'+lbl2+' ('+dureeFin+' ans)</div></div>';
+  }
+
+  /* Phases */
+  var ph='';
+  if(isDeno){
+    ph+='<div class="trame-box"><div class="trame-box-title">Phase 1 : Denormandie ('+dureeDeno+' ans)</div>'
+      +row('Mensualite',fmtE(Math.round(mensApport))+'/mois')
+      +row('Loyer net (nu)',fmtE(Math.round(loyerNetNu))+'/mois')
+      +row('Reduction impot',fmtE(Math.round(reductionMois))+'/mois','gr')
+      +rowT('Participation nette',fmtE(Math.round(particApres))+'/mois','or')
+      +'</div>';
+    if(stratPost==='lmnp'){
+      ph+='<div class="trame-box"><div class="trame-box-title">Phase 2 : LMNP ('+dureePost+' ans)</div>'
+        +row('Mensualite',fmtE(Math.round(mensApport))+'/mois')
+        +row('Loyer net (meuble)',fmtE(Math.round(loyerNetMeuble))+'/mois','gr')
+        +row('Fiscalite','~0 \u20ac (amortissement)','gr')
+        +rowT('Effort net',fmtE(Math.round(mensApport-loyerNetMeuble))+'/mois','or')
+        +'</div>';
+    }else{
+      ph+='<div class="trame-box"><div class="trame-box-title">Phase 2 : Location nue ('+dureePost+' ans)</div>'
+        +row('Mensualite',fmtE(Math.round(mensApport))+'/mois')
+        +row('Loyer net',fmtE(Math.round(loyerNetNu))+'/mois')
+        +rowT('Effort net',fmtE(Math.round(mensApport-loyerNetNu))+'/mois','or')
+        +'</div>';
+    }
+  }else{
+    ph+='<div class="trame-box"><div class="trame-box-title">LMNP ('+dureeFin+' ans)</div>'
+      +row('Mensualite',fmtE(Math.round(mensApport))+'/mois')
+      +row('Loyer net (meuble)',fmtE(Math.round(loyerNetMeuble))+'/mois','gr')
+      +row('Fiscalite','~0 \u20ac (amortissement)','gr')
+      +rowT('Effort net',fmtE(Math.round(mensApport-loyerNetMeuble))+'/mois','or')
+      +'</div>';
+    ph+='<div class="trame-box"><div class="trame-box-title">A l\'issue du financement</div>'
+      +row('Valeur du bien',fmtE(Math.round(valeurAvecRevalo)))
+      +row('CRD','0 \u20ac','gr')
+      +rowT('Patrimoine net',fmtE(Math.round(valeurAvecRevalo)),'gr')
+      +'</div>';
+  }
+  V('synthPhases').innerHTML=ph;
 
   /* KPIs */
-  V('kBudget').textContent=fmtE(budgetMeuble);V('kBudgetSub').textContent='Nu : '+fmtE(budgetNu);
-  V('kEffort').textContent=fmtE(Math.round(effortMeubleA));V('kEffortSub').textContent='Sans apport : '+fmtE(Math.round(effortMeuble));
-  V('kRendement').textContent=fmtP(rdtBrutMeuble);V('kRendementSub').textContent='Nu : '+fmtP(rdtBrutNu);
-  var ec=endApresMeuble>35?'color:#C0392B':(endApresMeuble>30?'color:#D4622A':'color:#2D7A5B');
-  V('kEndettement').innerHTML='<span style="'+ec+'">'+fmtP(endApresMeuble)+'</span>';
-  V('kEndettementSub').textContent='Avant projet : '+fmtP(endAvant);
+  V('synthKpis').innerHTML=''
+    +'<div class="synth-kpi"><div class="synth-kpi-label">Effort total verse</div><div class="synth-kpi-val">'+fmtE(Math.round(Math.max(effortCumule,0)))+'</div><div class="synth-kpi-sub">sur '+dureeFin+' ans</div></div>'
+    +'<div class="synth-kpi"><div class="synth-kpi-label">Gain fiscal total</div><div class="synth-kpi-val" style="color:#2D7A5B">'+fmtE(Math.round(totalGainFiscal))+'</div><div class="synth-kpi-sub">Denormandie '+dureeDeno+' ans</div></div>'
+    +'<div class="synth-kpi"><div class="synth-kpi-label">Patrimoine final</div><div class="synth-kpi-val">'+fmtE(Math.round(patrimoineNet))+'</div><div class="synth-kpi-sub">revalo '+fmtP(revalo*100)+'/an</div></div>'
+    +'<div class="synth-kpi"><div class="synth-kpi-label">Effort moyen/mois</div><div class="synth-kpi-val">'+fmtE(Math.round(Math.max(effortMoyMois,0)))+'</div><div class="synth-kpi-sub">'+fmtE(Math.round(apport10))+' d\'apport</div></div>';
 
-  /* Profil */
-  var p='';
-  p+='<div class="r-row"><span class="r-k">Revenu brut annuel</span><span class="r-v or">'+fmtE(revBrut)+'</span></div>';
-  p+='<div class="r-row"><span class="r-k">Revenu net mensuel</span><span class="r-v">'+fmtE(revNet)+'</span></div>';
-  if(hasCo){
-    p+='<div class="r-row"><span class="r-k">Co-investisseur</span><span class="r-v">'+coNom+' \u2014 '+fmtE(coRevNet)+'/mois</span></div>';
-    p+='<div class="r-row"><span class="r-k">Revenus nets cumules</span><span class="r-v or">'+fmtE(totalRevNet)+'/mois</span></div>';
-  }
-  p+='<div class="r-row"><span class="r-k">Taux PAS</span><span class="r-v">'+fmtP(tauxPAS)+'</span></div>';
-  p+='<div class="r-row"><span class="r-k">Impots mensuels</span><span class="r-v">'+fmtE(impots)+'</span></div>';
-  if(hasPret){
-    p+='<div class="r-row"><span class="r-k">Pret RP — mensualite</span><span class="r-v or">'+fmtE(pretMens)+'/mois</span></div>';
-    p+='<div class="r-row"><span class="r-k">Pret RP — CRD</span><span class="r-v">'+fmtE(pretCRD)+'</span></div>';
-  }
-  p+='<div class="r-row"><span class="r-k">Epargne disponible</span><span class="r-v gr">'+fmtE(epargne)+'</span></div>';
-  V('rProfil').innerHTML=p;
+  /* Detail */
+  V('synthDetail').innerHTML=''
+    +row('Total mensualites versees ('+dureeFin+' ans)',fmtE(Math.round(totalMens)))
+    +row('Total loyers percus (bruts)',fmtE(Math.round(totalLoyers)),'gr')
+    +row('Total charges deduites (TF+copro+gestion)',fmtE(Math.round(totalCharges)),'rd')
+    +row('Total gain fiscal Denormandie',fmtE(Math.round(totalGainFiscal)),'gr')
+    +rowT('Effort net reel cumule',fmtE(Math.round(Math.max(effortCumule,0))),'or')
+    +rowT('Effort moyen mensuel reel',fmtE(Math.round(Math.max(effortMoyMois,0)))+'/mois','or');
 
-  /* Projet */
-  var j='';
-  j+='<div class="r-row"><span class="r-k">Ville</span><span class="r-v">'+ville+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Type / Surface</span><span class="r-v">'+(typeLabels[typeBien]||typeBien)+' \u2014 '+surface+' m\u00b2</span></div>';
-  j+='<div class="r-row"><span class="r-k">Prix FAI</span><span class="r-v">'+fmtE(prixFAI)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Frais de notaire</span><span class="r-v">'+fmtE(fraisNotaire)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Travaux TTC</span><span class="r-v">'+fmtE(travaux)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Frais comm.</span><span class="r-v">'+fmtE(fraisComm)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Budget mobilier</span><span class="r-v">'+fmtE(mobilier)+'</span></div>';
-  j+='<div class="r-row" style="border-top:1.5px solid var(--bord);margin-top:4px;padding-top:8px"><span class="r-k" style="font-weight:700;color:var(--noir)">Budget global nu</span><span class="r-v or">'+fmtE(budgetNu)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k" style="font-weight:700;color:var(--noir)">Budget global meuble</span><span class="r-v or">'+fmtE(budgetMeuble)+'</span></div>';
-  j+='<div class="r-row"><span class="r-k">Financement</span><span class="r-v">'+fmtP(tauxFin,2)+' sur '+dureeFin+' ans</span></div>';
-  V('rProjet').innerHTML=j;
-
-  /* Endettement */
-  function progBar(label,pct,seuil){
-    var c=pct>seuil?'#C0392B':(pct>seuil-5?'#D4622A':'#2D7A5B');
-    var w=Math.min(pct,100);
-    return '<div class="r-prog"><div class="r-prog-lbl"><span>'+label+'</span><span style="font-weight:600;color:'+c+'">'+fmtP(pct)+'</span></div>'
-      +'<div class="r-prog-bar"><div class="r-prog-fill" style="width:'+w+'%;background:'+c+'"></div>'
-      +'<div class="r-prog-seuil" style="left:'+seuil+'%"></div></div></div>';
-  }
-  var eH=progBar('Endettement actuel (pret RP)',endAvant,35);
-  eH+=progBar('Apres projet \u2014 Nu sans apport',endApresNu,35);
-  eH+=progBar('Apres projet \u2014 Meuble sans apport',endApresMeuble,35);
-  eH+=progBar('Apres projet \u2014 Meuble avec apport 10%',endApresMeubleA,35);
-  eH+='<div style="font-size:10px;color:var(--gris);margin-top:6px">Seuil bancaire : 35% (ligne rouge). Revenus nets : '+fmtE(totalRevNet)+'/mois</div>';
-  V('rEndettement').innerHTML=eH;
-
-  /* Comparatif */
-  function tr(label,a,b,c,d,cls){return '<tr><td>'+label+'</td><td class="v '+(cls||'')+'">'+a+'</td><td class="v '+(cls||'')+'">'+b+'</td><td class="v '+(cls||'')+'">'+c+'</td><td class="v '+(cls||'')+'">'+d+'</td></tr>'}
-  var t='<table class="r-tbl"><thead><tr><th></th><th>Nu sans apport</th><th>Meuble sans apport</th><th>Nu avec apport</th><th>Meuble avec apport</th></tr></thead><tbody>';
-  t+=tr('Budget finance',fmtE(budgetNu),fmtE(budgetMeuble),fmtE(budgetNu-apport10Nu),fmtE(budgetMeuble-apport10Meuble));
-  t+=tr('Apport','0 \u20ac','0 \u20ac',fmtE(apport10Nu),fmtE(apport10Meuble));
-  t+=tr('Mensualite',fmtE(Math.round(mensNu)),fmtE(Math.round(mensMeuble)),fmtE(Math.round(mensNuA)),fmtE(Math.round(mensMeubleA)),'or');
-  t+=tr('Loyer brut HC',fmtE(loyerBrutNu),fmtE(loyerBrutMeuble),fmtE(loyerBrutNu),fmtE(loyerBrutMeuble));
-  t+=tr('Charges totales',fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)),fmtE(Math.round(charges+taxeFonciere+fraisGestNu)),fmtE(Math.round(charges+taxeFonciere+fraisGestMeuble)));
-  t+=tr('Loyer net',fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),fmtE(Math.round(loyerNetNu)),fmtE(Math.round(loyerNetMeuble)),'gr');
-  t+=tr('Effort net',fmtE(Math.round(effortNu)),fmtE(Math.round(effortMeuble)),fmtE(Math.round(effortNuA)),fmtE(Math.round(effortMeubleA)));
-  t+=tr('Endettement',fmtP(endApresNu),fmtP(endApresMeuble),fmtP(totalRevNet>0?((pretMens+mensNuA)/totalRevNet*100):0),fmtP(endApresMeubleA));
-  t+='</tbody></table>';
-  V('rComparatif').innerHTML=t;
-
-  /* Effort equation */
-  var eqLabel=effortMeubleA>=0?'Effort':'Gain';
-  var eqColor=effortMeubleA>=0?'#D4622A':'#2D7A5B';
-  V('rEffort').innerHTML='<div style="font-size:11px;color:var(--gris);margin-bottom:8px">Scenario recommande : Meuble avec apport 10% ('+fmtE(Math.round(apport10Meuble))+')</div>'
-    +'<div class="r-eq">'
-    +'<div class="r-eq-box"><div class="lbl">Mensualite</div><div class="val" style="color:#D4622A">'+fmtE(Math.round(mensMeubleA))+'</div></div>'
-    +'<div class="r-eq-op">\u2212</div>'
-    +'<div class="r-eq-box"><div class="lbl">Loyer net meuble</div><div class="val" style="color:#2D7A5B">'+fmtE(Math.round(loyerNetMeuble))+'</div></div>'
-    +'<div class="r-eq-op">=</div>'
-    +'<div class="r-eq-box" style="border-color:'+eqColor+'"><div class="lbl">'+eqLabel+' mensuel</div><div class="val" style="color:'+eqColor+'">'+fmtE(Math.round(Math.abs(effortMeubleA)))+'</div></div>'
-    +'</div>';
-
-  /* Denormandie */
-  if(eligibilite==='denormandie'&&assietteDeno>0){
-    V('rDenoCard').style.display='';
-    V('rDeno').innerHTML='<div style="font-size:11px;color:var(--gris);margin-bottom:10px">Assiette eligible : <b style="color:var(--noir)">'+fmtE(assietteDeno)+'</b></div>'
-      +'<div class="r-deno-grid">'
-      +'<div class="r-deno"><div class="r-deno-dur">6 ans</div><div class="r-deno-rate">12 %</div><div class="r-deno-total">'+fmtE(Math.round(deno6))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno6/6))+'/an soit '+fmtE(Math.round(deno6/72))+'/mois</div></div>'
-      +'<div class="r-deno best"><div class="r-deno-dur">9 ans</div><div class="r-deno-rate">18 %</div><div class="r-deno-total">'+fmtE(Math.round(deno9))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno9/9))+'/an soit '+fmtE(Math.round(deno9/108))+'/mois</div></div>'
-      +'<div class="r-deno"><div class="r-deno-dur">12 ans</div><div class="r-deno-rate">21 %</div><div class="r-deno-total">'+fmtE(Math.round(deno12))+'</div><div class="r-deno-sub">'+fmtE(Math.round(deno12/12))+'/an soit '+fmtE(Math.round(deno12/144))+'/mois</div></div>'
-      +'</div>';
-  }else{V('rDenoCard').style.display='none'}
+  /* Patrimoine */
+  V('synthPatri').innerHTML=''
+    +row('Valeur du bien (sans revalorisation)',fmtE(valeurSansRevalo))
+    +row('Valeur du bien (avec revalo '+fmtP(revalo*100)+'/an)',fmtE(Math.round(valeurAvecRevalo)),'or')
+    +row('Capital restant du (a '+dureeFin+' ans)','0 \u20ac','gr')
+    +rowT('Patrimoine net constitue',fmtE(Math.round(patrimoineNet)),'gr')
+    +(levier>1?'<div class="trame-highlight"><b>Ratio d\'enrichissement :</b> pour '+fmtE(Math.round(Math.max(effortCumule,0)))+' d\'effort total, vous constituez un patrimoine de <b>'+fmtE(Math.round(patrimoineNet))+'</b>. Effet de levier : <b>x'+fmt(levier,1)+'</b></div>':'');
 
   /* Charts */
-  renderCharts({prixFAI:prixFAI,fraisNotaire:fraisNotaire,travaux:travaux,mobilier:mobilier,fraisComm:fraisComm,
-    effortNu:Math.round(effortNu),effortMeuble:Math.round(effortMeuble),effortNuA:Math.round(effortNuA),effortMeubleA:Math.round(effortMeubleA)});
+  if(chart1)chart1.destroy();if(chart2)chart2.destroy();
+  var ctx1=V('chartSynth1');
+  chart1=new Chart(ctx1,{type:'bar',data:{
+    labels:['Effort verse','Gain fiscal','Patrimoine net'],
+    datasets:[{data:[Math.round(Math.max(effortCumule,0)),Math.round(totalGainFiscal),Math.round(patrimoineNet)],
+      backgroundColor:['#D4622A','#2D7A5B','#2B5EA7'],borderRadius:4}]
+  },options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}},scales:{y:{grid:{color:'#EDE8DF'},ticks:{color:'#6B6B6B',font:{family:'Inter'}}},x:{grid:{display:false},ticks:{color:'#0D0D0D',font:{family:'Inter',size:10}}}}}});
 
-  /* Scenario alt */
-  var hasAlt=V('iAltToggle').checked;
-  if(hasAlt){
-    V('altFields').style.display='';V('rAltCard').style.display='';
-    var aV=V('iAltVille').value.trim()||'\u2014';var aB=N('iAltBudget');
-    var aM=N('iAltMens');var aL=N('iAltLoyer');var aE=N('iAltEffort');var aD=V('iAltDeno').checked;
-    V('rAlt').innerHTML='<table class="r-tbl"><thead><tr><th></th><th>'+ville+'</th><th>'+aV+'</th></tr></thead><tbody>'
-      +'<tr><td>Budget</td><td class="v">'+fmtE(budgetMeuble)+'</td><td class="v">'+fmtE(aB)+'</td></tr>'
-      +'<tr><td>Mensualite</td><td class="v or">'+fmtE(Math.round(mensMeubleA))+'</td><td class="v or">'+fmtE(aM)+'</td></tr>'
-      +'<tr><td>Loyer net</td><td class="v gr">'+fmtE(Math.round(loyerNetMeuble))+'</td><td class="v gr">'+fmtE(aL)+'</td></tr>'
-      +'<tr><td>Effort</td><td class="v">'+ fmtE(Math.round(effortMeubleA))+'</td><td class="v">'+fmtE(aE)+'</td></tr>'
-      +'<tr><td>Denormandie</td><td>'+(eligibilite==='denormandie'?'<span class="r-badge green">Oui</span>':'<span class="r-badge orange">Non</span>')+'</td>'
-      +'<td>'+(aD?'<span class="r-badge green">Oui</span>':'<span class="r-badge orange">Non</span>')+'</td></tr>'
-      +'</tbody></table>';
-  }else{V('rAltCard').style.display='none'}
+  /* Cashflow annuel */
+  var cfLabels=[];var cfData=[];
+  for(var y=1;y<=dureeFin;y++){
+    cfLabels.push('A'+y);
+    var inDeno=isDeno&&y<=dureeDeno;
+    var loyerAn=inDeno?(loyerNetNu*12):(stratPost==='lmnp'?loyerNetMeuble*12:loyerNetNu*12);
+    var redAn=inDeno?reductionAn:0;
+    var mensAn=mensApport*12;
+    var cf=loyerAn+redAn-mensAn;
+    cfData.push(Math.round(cf));
+  }
+  var ctx2=V('chartSynth2');
+  chart2=new Chart(ctx2,{type:'line',data:{
+    labels:cfLabels,
+    datasets:[{label:'Cashflow annuel net',data:cfData,borderColor:'#D4622A',backgroundColor:'rgba(212,98,42,0.1)',fill:true,tension:0.3,pointRadius:2}]
+  },options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#fff',bodyColor:'#fff'}},scales:{y:{grid:{color:'#EDE8DF'},ticks:{color:'#6B6B6B',font:{family:'Inter'}}},x:{grid:{display:false},ticks:{color:'#6B6B6B',font:{family:'Inter',size:9}}}}}});
 
-  /* Footer conseiller */
   try{CGP.footer.render(V('conseillerFooter'))}catch(e){}
 }
 
-/* ===== INIT ===== */
 (function(){
-  V('iAltToggle').addEventListener('change',function(){V('altFields').style.display=this.checked?'':'none'});
+  V('iAltToggle')&&V('iAltToggle').addEventListener('change',function(){var f=V('altFields');if(f)f.style.display=this.checked?'':'none'});
   try{CGP.footer.render(V('conseillerFooter'))}catch(e){}
 })();
 </script>
