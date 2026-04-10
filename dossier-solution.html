@@ -123,12 +123,14 @@
 
     <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Import Colosseum</label>
     <div class="sb-body open">
-      <div class="fg"><label>Collez le texte brut Colosseum ici</label>
-        <textarea class="fi" id="iImportRaw" rows="6" placeholder="Prix du bien FAI : 69 000 &#8364;&#10;Frais de notaire : 5 520 &#8364;&#10;Devis travaux TTC : 48 652 &#8364;&#10;..." style="resize:vertical;font-size:11px;line-height:1.4"></textarea>
+      <div class="fg"><label>Collez le texte brut Colosseum</label>
+        <textarea class="fi" id="iImportRaw" rows="5" placeholder="Collez ici le texte copie depuis Colosseum (Synthese + Denormandie + Deficit Foncier)..." style="resize:vertical;font-size:11px;line-height:1.4"></textarea>
       </div>
-      <div style="display:flex;gap:6px;padding:0 14px 8px">
-        <button style="flex:1;padding:8px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer" onclick="parseColosseum()">&#9654; Importer</button>
-        <button style="padding:8px 12px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;cursor:pointer" onclick="V('iImportRaw').value=''">Vider</button>
+      <div style="padding:0 14px 4px"><label style="display:block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:5px">Importer en mode</label></div>
+      <div style="display:flex;gap:4px;padding:0 14px 8px">
+        <button class="mode-btn" id="btnModeLmnp" onclick="importMode('lmnp')" style="flex:1;padding:7px 4px;border:1.5px solid var(--bord);background:#fff;color:var(--noir);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;transition:all 0.2s">LMNP</button>
+        <button class="mode-btn" id="btnModeDeno" onclick="importMode('denormandie')" style="flex:1;padding:7px 4px;border:1.5px solid var(--bord);background:#fff;color:var(--noir);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;transition:all 0.2s">Denormandie</button>
+        <button class="mode-btn" id="btnModeDeficit" onclick="importMode('deficit')" style="flex:1;padding:7px 4px;border:1.5px solid var(--bord);background:#fff;color:var(--noir);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:4px;transition:all 0.2s">Deficit Foncier</button>
       </div>
       <div id="importStatus" style="padding:0 14px 6px;font-size:10px;color:var(--gris);display:none"></div>
     </div>
@@ -197,7 +199,7 @@
       </div>
       <div class="grid2">
         <div class="fg"><label>Surface Carrez</label><div class="fi-row"><input type="number" id="iSurface" placeholder="0"><span class="fi-unit">m&#178;</span></div></div>
-        <div class="fg"><label>Eligibilite</label><select class="fi" id="iEligibilite">
+        <div class="fg"><label>Mode fiscal</label><select class="fi" id="iEligibilite" onchange="setMode(this.value)" disabled style="opacity:0.7">
           <option value="denormandie">Denormandie</option><option value="lmnp">LMNP</option><option value="deficit">Deficit Foncier</option>
         </select></div>
       </div>
@@ -207,24 +209,24 @@
       </div>
       <div class="grid2">
         <div class="fg"><label>Travaux TTC</label><div class="fi-row"><input type="number" id="iTravaux" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
-        <div class="fg"><label>Frais commercialisation</label><div class="fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+        <div class="fg" id="wFraisComm"><label>Frais commercialisation</label><div class="fi-row"><input type="number" id="iFraisComm" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
       </div>
-      <div class="fg"><label>Budget mobilier</label><div class="fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      <div class="fg" id="wMobilier"><label>Budget mobilier</label><div class="fi-row"><input type="number" id="iMobilier" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
       <div class="grid2">
         <div class="fg"><label>Taux financement</label><div class="fi-row"><input type="number" id="iTauxFin" step="0.01" placeholder="0"><span class="fi-unit">%</span></div></div>
         <div class="fg"><label>Duree financement</label><select class="fi" id="iDureeFin">
           <option value="15">15 ans</option><option value="20" selected>20 ans</option><option value="25">25 ans</option>
         </select></div>
       </div>
-      <div class="grid2">
+      <div class="grid2" id="wLoyers">
         <div class="fg"><label>Loyer brut HC nu</label><div class="fi-row"><input type="number" id="iLoyerNu" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
-        <div class="fg"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
+        <div class="fg" id="wLoyerMeuble"><label>Loyer brut HC meuble</label><div class="fi-row"><input type="number" id="iLoyerMeuble" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
       </div>
       <div class="grid2">
         <div class="fg"><label>Charges copro</label><div class="fi-row"><input type="number" id="iCharges" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
         <div class="fg"><label>Taxe fonciere</label><div class="fi-row"><input type="number" id="iTaxeFonciere" placeholder="0"><span class="fi-unit">&#8364;/m</span></div></div>
       </div>
-      <div class="fg"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
+      <div class="fg" id="wAssiette"><label>Assiette Denormandie</label><div class="fi-row"><input type="number" id="iAssietteDeno" placeholder="0"><span class="fi-unit">&#8364;</span></div></div>
     </div>
 
     <label class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Strategie fiscale</label>
@@ -441,27 +443,52 @@ function today(){return new Date().toLocaleDateString('fr-FR',{day:'2-digit',mon
 function row(k,v,cls){return '<div class="trame-row"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
 function rowT(k,v,cls){return '<div class="trame-row total"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'}
 
-/* ===== IMPORT COLOSSEUM ===== */
-function parseColosseum(){
-  var raw=V('iImportRaw').value;
-  if(!raw||!raw.trim())return;
-  var filled=0;
-  /* Helper: parse number from string "55 000 €" → 55000 */
-  function pn(s){if(!s)return null;var c=s.replace(/[^\d,.\-]/g,'').replace(',','.');return parseFloat(c)||0}
-  function setF(id,val){if(val!==null&&val!==undefined&&!isNaN(val)){V(id).value=val;filled++}}
-  function setS(id,val){if(val){V(id).value=val;filled++}}
+/* ===== MODE & FIELD VISIBILITY ===== */
+function setMode(mode){
+  V('iEligibilite').value=mode;
+  /* Show/hide fields per mode */
+  var isLmnp=mode==='lmnp';
+  var isDeno=mode==='denormandie';
+  var isDef=mode==='deficit';
+  V('wFraisComm').style.display=isLmnp?'':'none';
+  V('wMobilier').style.display=isLmnp?'':'none';
+  V('wLoyerMeuble').style.display=isLmnp?'':'none';
+  V('wAssiette').style.display=isDeno?'':'none';
+  /* Reset hidden fields to 0 */
+  if(!isLmnp){V('iFraisComm').value='0';V('iMobilier').value='0';V('iLoyerMeuble').value='0'}
+  if(!isDeno){V('iAssietteDeno').value='0'}
+  /* Highlight active button */
+  var btns=document.querySelectorAll('.mode-btn');
+  for(var i=0;i<btns.length;i++){btns[i].style.background='#fff';btns[i].style.borderColor='';btns[i].style.color='var(--noir)'}
+  var activeBtn={lmnp:'btnModeLmnp',denormandie:'btnModeDeno',deficit:'btnModeDeficit'}[mode];
+  if(activeBtn){V(activeBtn).style.background='var(--orange)';V(activeBtn).style.borderColor='var(--orange)';V(activeBtn).style.color='#fff'}
+  /* Show/hide strategie fiscale section based on mode */
+}
 
-  /* Split into sections: Synthese / En Denormandie / En deficit foncier */
+/* ===== IMPORT COLOSSEUM ===== */
+function pn(s){if(!s)return null;var c=String(s).replace(/[^\d,.\-]/g,'').replace(',','.');return parseFloat(c)||0}
+
+function importMode(mode){
+  var raw=V('iImportRaw').value;
+  if(!raw||!raw.trim()){setMode(mode);return}
+  setMode(mode);
+  var filled=0;
+  function setF(id,val){if(val!==null&&val!==undefined&&!isNaN(val)){V(id).value=val;filled++}}
+
+  /* Split into sections */
   var sections={synth:'',deno:'',deficit:''};
-  var parts=raw.split(/\n(?=(?:En\s+Denormandie|En\s+d[e\u00e9]ficit\s+foncier|Synth[e\u00e8]se))/i);
+  var parts=raw.split(/\n(?=En\s+(?:Denormandie|[Dd][e\u00e9]ficit\s+[Ff]oncier))/);
   parts.forEach(function(part){
-    var head=part.substring(0,60).toLowerCase();
+    var head=part.substring(0,80).toLowerCase();
     if(/denormandie/.test(head))sections.deno=part;
     else if(/d[e\u00e9]ficit/.test(head))sections.deficit=part;
     else sections.synth+=part+'\n';
   });
 
-  /* Generic extractor: find value after label on same line (tab or spaces) */
+  /* Choose source section based on mode */
+  var src=mode==='denormandie'?sections.deno:mode==='deficit'?sections.deficit:'';
+  var S=sections.synth;
+
   function findVal(text,label){
     if(!text)return null;
     var esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -469,92 +496,78 @@ function parseColosseum(){
     var m=text.match(re);
     return m?pn(m[1]):null;
   }
-  /* Find 2 values (Nu / Meuble columns) after label */
   function findVal2(text,label){
     if(!text)return [null,null];
     var esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     var re=new RegExp(esc+'[^\\d\\n]*?([\\d][\\d\\s,.]*)[^\\d\\n]*?([\\d][\\d\\s,.]*)', 'i');
     var m=text.match(re);
     if(m)return [pn(m[1]),pn(m[2])];
-    var single=findVal(text,label);
-    return [single,null];
+    return [findVal(text,label),null];
   }
 
-  var S=sections.synth;
-  var D=sections.deno;
-
-  /* === SYNTHESE (Nu/Meuble) === */
-  var prixFAI=findVal(S,'Prix du bien FAI');
-  setF('iPrixFAI',prixFAI);
-  setF('iFraisNotaire',findVal(S,'Frais de notaire'));
-  setF('iTravaux',findVal(S,'Devis travaux'));
-  setF('iFraisComm',findVal(S,'Frais de commercialisation'));
-  var mobil=findVal(S,'Mobilier');
-  if(mobil===null)mobil=findVal(S,'mobilier');
-  setF('iMobilier',mobil);
-  /* Taux + duree */
+  /* Taux + duree (global, meme pour tous les modes) */
   var mTaux=raw.match(/pr[e\u00ea]t\s+de\s+([\d,.]+)\s*%/i);
   if(mTaux)setF('iTauxFin',pn(mTaux[1]));
   var mDuree=raw.match(/sur\s+([\d\s]+)\s*mois/i);
   if(mDuree){var ans=Math.round(pn(mDuree[1])/12);V('iDureeFin').value=ans<=17?'15':(ans<=22?'20':'25');filled++}
-  /* Loyers Nu / Meuble (from Synthese which has 2 columns) */
-  var loyers=findVal2(S,'Loyers bruts hors charges');
-  setF('iLoyerNu',loyers[0]);
-  if(loyers[1]!==null)setF('iLoyerMeuble',loyers[1]);
-  else if(loyers[0]!==null)setF('iLoyerMeuble',Math.round(loyers[0]*1.15));
-  /* Charges + taxe */
-  setF('iCharges',findVal(S,'Charges de copropri'));
-  setF('iTaxeFonciere',findVal(S,'Taxe fonci'));
   /* Surface */
   var mSurf=raw.match(/([\d,.]+)\s*m\u00b2/);
-  if(!mSurf)mSurf=raw.match(/surface[^\d]*([\d,.]+)/i);
   if(mSurf)setF('iSurface',pn(mSurf[1]));
 
-  /* === DENORMANDIE === */
-  if(D){
-    setS('iEligibilite','denormandie');
-    /* Travaux Deno (different du Synthese) */
-    var travauxDeno=findVal(D,'Devis travaux');
-    if(travauxDeno!==null)setF('iTravaux',travauxDeno);
-    /* Prix FAI Deno (peut differer) */
-    var prixDeno=findVal(D,'Prix du bien FAI');
-    if(prixDeno!==null)setF('iPrixFAI',prixDeno);
-    /* Frais notaire Deno */
-    var fnDeno=findVal(D,'Frais de notaire');
-    if(fnDeno!==null)setF('iFraisNotaire',fnDeno);
+  if(mode==='lmnp'){
+    /* LMNP : lire depuis Synthese (colonnes Nu/Meuble) */
+    setF('iPrixFAI',findVal(S,'Prix du bien FAI'));
+    setF('iFraisNotaire',findVal(S,'Frais de notaire'));
+    setF('iTravaux',findVal(S,'Devis travaux'));
+    setF('iFraisComm',findVal(S,'Frais de commercialisation'));
+    var mobil=findVal(S,'Mobilier');
+    if(mobil===null)mobil=findVal(S,'mobilier');
+    setF('iMobilier',mobil);
+    var loyers=findVal2(S,'Loyers bruts hors charges');
+    setF('iLoyerNu',loyers[0]);
+    if(loyers[1]!==null)setF('iLoyerMeuble',loyers[1]);
+    else if(loyers[0]!==null)setF('iLoyerMeuble',Math.round(loyers[0]*1.15));
+    setF('iCharges',findVal(S,'Charges de copropri'));
+    setF('iTaxeFonciere',findVal(S,'Taxe fonci'));
+  }
+  else if(mode==='denormandie'&&src){
+    /* DENORMANDIE : lire depuis section "En Denormandie" */
+    setF('iPrixFAI',findVal(src,'Prix du bien FAI'));
+    setF('iFraisNotaire',findVal(src,'Frais de notaire'));
+    setF('iTravaux',findVal(src,'Devis travaux'));
+    setF('iLoyerNu',findVal(src,'Loyers bruts hors charges'));
+    setF('iCharges',findVal(src,'Charges de copropri'));
+    setF('iTaxeFonciere',findVal(src,'Taxe fonci'));
     /* Assiette */
-    var mAss=D.match(/assiette[^:]*?:\s*([\d][\d\s,.]*)/i);
+    var mAss=src.match(/assiette[^:]*?:\s*([\d][\d\s,.]*)/i);
     if(mAss)setF('iAssietteDeno',pn(mAss[1]));
-    else{
-      /* Budget global = assiette par defaut */
-      var budgetDeno=findVal(D,'Budget global');
-      if(budgetDeno!==null)setF('iAssietteDeno',budgetDeno);
-    }
-    /* Loyer brut nu Deno (ecrase le Synthese si present) */
-    var loyerDeno=findVal(D,'Loyers bruts hors charges');
-    if(loyerDeno!==null)setF('iLoyerNu',loyerDeno);
-    /* Charges Deno */
-    var chDeno=findVal(D,'Charges de copropri');
-    if(chDeno!==null)setF('iCharges',chDeno);
-    var tfDeno=findVal(D,'Taxe fonci');
-    if(tfDeno!==null)setF('iTaxeFonciere',tfDeno);
-    /* Loyer meuble from Synthese is kept (Deno = location nue) */
+    else{var bg=findVal(src,'Budget global');if(bg!==null)setF('iAssietteDeno',bg)}
+    /* Loyer meuble depuis Synthese pour la phase 2 switch LMNP */
+    var loyerM=findVal2(S,'Loyers bruts hors charges');
+    if(loyerM[1]!==null)V('iLoyerMeuble').value=loyerM[1];
   }
-  /* Deficit foncier detection */
-  else if(sections.deficit){
-    setS('iEligibilite','deficit');
+  else if(mode==='deficit'&&src){
+    /* DEFICIT FONCIER : lire depuis section "En deficit foncier" */
+    setF('iPrixFAI',findVal(src,'Prix du bien FAI'));
+    setF('iFraisNotaire',findVal(src,'Frais de notaire'));
+    setF('iTravaux',findVal(src,'Devis travaux'));
+    setF('iLoyerNu',findVal(src,'Loyers bruts hors charges'));
+    setF('iCharges',findVal(src,'Charges de copropri'));
+    setF('iTaxeFonciere',findVal(src,'Taxe fonci'));
   }
-  /* LMNP si que Synthese avec colonnes meuble */
-  else if(loyers[1]!==null){
-    setS('iEligibilite','lmnp');
+  else{
+    /* Fallback si section manquante: lire Synthese */
+    setF('iPrixFAI',findVal(S,'Prix du bien FAI'));
+    setF('iFraisNotaire',findVal(S,'Frais de notaire'));
+    setF('iTravaux',findVal(S,'Devis travaux'));
+    setF('iLoyerNu',findVal(S,'Loyers bruts hors charges'));
+    setF('iCharges',findVal(S,'Charges de copropri'));
+    setF('iTaxeFonciere',findVal(S,'Taxe fonci'));
   }
 
-  /* Frais commercialisation = 0 si pas trouve (pas dans Deno) */
-  if(!findVal(S,'Frais de commercialisation')&&!V('iFraisComm').value)V('iFraisComm').value='0';
-
-  /* Status */
+  var modeLabels={lmnp:'LMNP',denormandie:'Denormandie',deficit:'Deficit Foncier'};
   var st=V('importStatus');st.style.display='';st.style.color='#2D7A5B';
-  st.textContent='\u2713 '+filled+' champs remplis'+(D?' (mode Denormandie detecte)':(sections.deficit?' (mode Deficit Foncier detecte)':' (mode LMNP)'));
+  st.textContent='\u2713 '+filled+' champs remplis en mode '+modeLabels[mode];
   setTimeout(function(){st.style.display='none'},8000);
 }
 
