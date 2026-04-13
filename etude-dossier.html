@@ -711,12 +711,12 @@ select.span2{grid-column:span 2}
         <button onclick="addVerifActif()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter un actif</button>
 
         <!-- Passifs -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Passifs</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Passifs <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--gris)">(montants annuels)</span></div>
         <div id="vPassifsBlock" style="margin-bottom:8px"></div>
         <button onclick="addVerifPassif()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter un passif</button>
 
         <!-- Charges -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Charges</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Charges <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--gris)">(montants annuels)</span></div>
         <div id="vChargesBlock" style="margin-bottom:8px"></div>
         <button onclick="addVerifCharge()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter une charge</button>
 
@@ -7869,7 +7869,7 @@ function addVerifActif(){
 }
 function renderVerifPassifs(){
   var el=document.getElementById('vPassifsBlock');if(!el)return;
-  var h='';
+  var h='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 28px;gap:6px;margin-bottom:4px"><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">D\u00e9signation</span><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Titulaire</span><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">\u00c9ch\u00e9ance /an</span><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">CRD</span><span></span></div>';
   (ED.passifs||[]).forEach(function(p,i){
     h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
     h+='<input class="fi" id="vPas'+i+'Nom" value="'+((p.nom||'').replace(/"/g,'&quot;'))+'">';
@@ -7887,7 +7887,7 @@ function addVerifPassif(){
 }
 function renderVerifCharges(){
   var el=document.getElementById('vChargesBlock');if(!el)return;
-  var h='';
+  var h='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px"><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">D\u00e9signation</span><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Titulaire</span><span style="font-size:9px;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Montant /an</span><span></span></div>';
   (ED.chargesDetail||[]).forEach(function(c,i){
     h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
     h+='<input class="fi" id="vChr'+i+'Nom" value="'+((c.nom||'').replace(/"/g,'&quot;'))+'" placeholder="Libell\u00e9">';
