@@ -715,6 +715,11 @@ select.span2{grid-column:span 2}
         <div id="vPassifsBlock" style="margin-bottom:8px"></div>
         <button onclick="addVerifPassif()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter un passif</button>
 
+        <!-- Charges -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Charges</div>
+        <div id="vChargesBlock" style="margin-bottom:8px"></div>
+        <button onclick="addVerifCharge()" style="border:none;background:none;color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);margin-bottom:14px">+ Ajouter une charge</button>
+
         <!-- Objectifs -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Objectifs</div>
         <div id="vObjectifsBlock" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px"></div>
@@ -2455,7 +2460,7 @@ let ED = {
   sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[],
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
-  revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesCredit:0,
+  revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesDetail:[], chargesCredit:0,
   consultant:'', contactMail:'', contactTel:'', orias:'', adressePro:'', villePro:'', dateEntree:'',
   fiscal:{annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,salBruts:0,abattement:0,revImposable:0,irBareme:0,reductions:0,credits:0,txMoyen:0,rfr:0,plafondPER:0,solde:0,deductions:0},
   retraite:{age1:64,age2:64,pension1:2500,pension2:2000},
@@ -3153,16 +3158,33 @@ function parseTextRI(txt){
 
     // Épargne mensuelle estimée
     var revM = revMens();
-    // Charges (non-crédit) from CHARGES sub-section
+    // Charges (non-credit) from CHARGES sub-section
     ED.charges = 0;
+    ED.chargesDetail = [];
     var chSection = (s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i)||['',''])[1];
     var chRows = parsePipeTable(chSection);
+    var SKIP_CH = /^(designation|d\u00e9signation|total|d\u00e9penses courantes|depenses courantes|d\u00e9penses ouvrant|depenses ouvrant|charges)$/i;
     chRows.forEach(function(cols){
-      if(/^total$/i.test((cols[0]||'').trim())){
-        var chVals = cols.slice(1).map(pEur).filter(function(v){return v>0;});
-        if(chVals.length) ED.charges = Math.round(Math.max.apply(null, chVals) / 12);
+      var nom = (cols[0]||'').trim();
+      if(!nom || nom.length<2 || SKIP_CH.test(nom)) return;
+      if(/^total$/i.test(nom)) return;
+      var nums = cols.slice(1).map(pEur).filter(function(v){return v>0;});
+      if(nums.length){
+        var montant = Math.max.apply(null, nums);
+        ED.chargesDetail.push({nom:nom, montant:montant, titulaire:'C1'});
       }
     });
+    if(ED.chargesDetail.length){
+      ED.charges = Math.round(ED.chargesDetail.reduce(function(s,c){return s+(c.montant||0);},0) / 12);
+    } else {
+      // Fallback : lire le total si pas de lignes individuelles
+      chRows.forEach(function(cols){
+        if(/^total$/i.test((cols[0]||'').trim())){
+          var chVals = cols.slice(1).map(pEur).filter(function(v){return v>0;});
+          if(chVals.length) ED.charges = Math.round(Math.max.apply(null, chVals) / 12);
+        }
+      });
+    }
 
     ED.epMens = Math.max(0, Math.round(revM * 0.20));
 
@@ -3352,12 +3374,30 @@ function parseTextRI(txt){
     ED.revenus.c1=ED.revenus.sal1; ED.revenus.c2=ED.revenus.sal2; ED.revenus.compl=ED.revenus.fonc;
   }
   ED.charges=0;
+  ED.chargesDetail=[];
   if(chPart2){
+    var SKIP_CH2=/^(designation|d\u00e9signation|total|d\u00e9penses courantes|depenses courantes|d\u00e9penses ouvrant|depenses ouvrant|charges)$/i;
     chPart2[1].split('\n').forEach(function(line){
       if(line.indexOf('\t')<0)return;
       var p=line.split('\t').map(function(x){return x.trim();});
-      if(/^total$/i.test(p[0].trim())){var vals=p.slice(1).map(pEur2).filter(function(v){return v>0;});if(vals.length)ED.charges=Math.max.apply(null,vals)/12;}
+      var nom=p[0].trim();
+      if(!nom||nom.length<2||SKIP_CH2.test(nom))return;
+      if(/^total$/i.test(nom))return;
+      var vals=p.slice(1).map(pEur2).filter(function(v){return v>0;});
+      if(vals.length){
+        ED.chargesDetail.push({nom:nom, montant:Math.max.apply(null,vals), titulaire:'C1'});
+      }
     });
+    if(ED.chargesDetail.length){
+      ED.charges=Math.round(ED.chargesDetail.reduce(function(s,c){return s+(c.montant||0);},0)/12);
+    } else {
+      // Fallback total
+      chPart2[1].split('\n').forEach(function(line){
+        if(line.indexOf('\t')<0)return;
+        var p=line.split('\t').map(function(x){return x.trim();});
+        if(/^total$/i.test(p[0].trim())){var vals=p.slice(1).map(pEur2).filter(function(v){return v>0;});if(vals.length)ED.charges=Math.max.apply(null,vals)/12;}
+      });
+    }
   }
   var totalRevMatch2=full2.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[\u20ac$]/i);
   var totalRevAn2=totalRevMatch2?pEur2(totalRevMatch2[1]):0;
@@ -4259,8 +4299,9 @@ function rFinancement(){
     h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Analyse du foyer</div>';
     h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
     if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Charges crédit /mois</span><span class="fr-v">'+fmt(chrCredit)+' €/mois</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Reste à vivre</span><span class="fr-v">'+fmt(rav)+' €/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Charges cr\u00e9dit /mois</span><span class="fr-v">'+fmt(chrCredit)+' \u20ac/mois</span></div>';
+    if(ED.charges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois</span><span class="fr-v">'+fmt(Math.round(ED.charges))+' \u20ac/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Reste \u00e0 vivre</span><span class="fr-v">'+fmt(revM-chrCredit-Math.round(ED.charges||0))+' \u20ac/mois</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Taux d\'endettement</span><span class="fr-v" style="color:'+col+';font-weight:700">'+endett.toFixed(1)+' %</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" style="color:'+(capa>0?'var(--green)':'var(--red)')+'">'+fmt(capa)+' €/mois</span></div>';
     h+='</div>';
@@ -7756,7 +7797,7 @@ function remplirVerification(){
     if(isC){s('vC2Civ',ED.c2.civ);s('vC2Prenom',ED.c2.prenom);s('vC2Nom',ED.c2.nom);s('vC2Dob',ED.c2.dob);s('vC2CSP',ED.c2.sitpro);s('vC2Prof',ED.c2.profession);s('vC2Societe',ED.c2.societe);s('vC2Sal',ED.revenus.sal2||ED.revenus.c2||'');}
     s('vSitmat',ED.sitmat);s('vRegime',ED.convention);s('vLogement',ED.logement);s('vAdresse',ED.adresse);s('vNbEnfants',ED.nbEnfants||0);
     s('vFonc',ED.revenus.fonc||'');s('vBIC',ED.revenus.bic||'');s('vAutres',ED.revenus.compl||'');
-    renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifObjectifs();
+    renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifCharges();renderVerifObjectifs();
     // Impôts
     s('vFiscAnnee',ED.fiscal.annee);s('vFiscRBG',ED.fiscal.rbg||'');s('vFiscRevImp',ED.fiscal.revImposable||'');
     s('vFiscParts',ED.fiscal.parts||'');s('vFiscTMI',ED.fiscal.tmi||'');s('vFiscIRNet',ED.fiscal.irnet||'');
@@ -7834,6 +7875,24 @@ function renderVerifPassifs(){
 function addVerifPassif(){
   ED.passifs.push({nom:'',crd:0,echeance:0,titulaire:'Commun'});
   renderVerifPassifs();
+}
+function renderVerifCharges(){
+  var el=document.getElementById('vChargesBlock');if(!el)return;
+  var h='';
+  (ED.chargesDetail||[]).forEach(function(c,i){
+    h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
+    h+='<input class="fi" id="vChr'+i+'Nom" value="'+((c.nom||'').replace(/"/g,'&quot;'))+'" placeholder="Libell\u00e9">';
+    h+='<select class="fi" id="vChr'+i+'Tit"><option'+(c.titulaire==='C1'?' selected':'')+'>C1</option><option'+(c.titulaire==='C2'?' selected':'')+'>C2</option><option'+(c.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<input class="fi" type="number" id="vChr'+i+'Mt" value="'+(c.montant||0)+'" placeholder="Montant/an">';
+    h+='<button onclick="ED.chargesDetail.splice('+i+',1);renderVerifCharges()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+function addVerifCharge(){
+  if(!ED.chargesDetail)ED.chargesDetail=[];
+  ED.chargesDetail.push({nom:'',montant:0,titulaire:'C1'});
+  renderVerifCharges();
 }
 function renderVerifObjectifs(){
   var el=document.getElementById('vObjectifsBlock');if(!el)return;
@@ -7915,7 +7974,21 @@ function appliquerVerification(){
     ED.passifs=newPassifs;
     // Charges credit
     ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-    // Impôts
+    // Charges (non-credit)
+    var newCharges=[];
+    var chrNoms=document.querySelectorAll('[id^="vChr"][id$="Nom"]');
+    chrNoms.forEach(function(el){
+      var idx=el.id.replace('vChr','').replace('Nom','');
+      var nom=el.value.trim();
+      var titEl=document.getElementById('vChr'+idx+'Tit');
+      var mtEl=document.getElementById('vChr'+idx+'Mt');
+      var tit=titEl?(titEl.value||'C1'):'C1';
+      var mt=mtEl?+(mtEl.value)||0:0;
+      if(nom)newCharges.push({nom:nom,titulaire:tit,montant:mt});
+    });
+    ED.chargesDetail=newCharges;
+    ED.charges=Math.round(ED.chargesDetail.reduce(function(s,c){return s+(c.montant||0);},0)/12);
+    // Impots
     ED.fiscal.annee=v('vFiscAnnee');ED.fiscal.rbg=n('vFiscRBG');ED.fiscal.revImposable=n('vFiscRevImp');
     ED.fiscal.parts=+(document.getElementById('vFiscParts')?document.getElementById('vFiscParts').value:1)||1;
     ED.fiscal.tmi=n('vFiscTMI');ED.fiscal.irnet=n('vFiscIRNet');ED.fiscal.ps=n('vFiscPS');
