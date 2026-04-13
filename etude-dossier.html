@@ -7908,11 +7908,14 @@ function renderVerifObjectifs(){
   var allObjs=['Faire fructifier un capital','Pr\u00e9parer sa retraite','Optimiser son IR','Se cr\u00e9er un compl\u00e9ment de revenus','Prot\u00e9ger son conjoint','R\u00e9organiser son patrimoine','Cr\u00e9er un patrimoine immobilier','Optimiser la transmission','Investir via le financement','\u00c9pargne / capitalisation'];
   // Mapper les objectifs du RI vers les objectifs Copernic
   var objMap={'se constituer un patrimoine immobilier':'Cr\u00e9er un patrimoine immobilier','pr\u00e9parer votre retraite':'Pr\u00e9parer sa retraite','optimiser la fiscalit\u00e9 de vos revenus':'Optimiser son IR','optimiser la rentabilit\u00e9 de vos placements financiers':'Faire fructifier un capital','optimiser la rentabilit\u00e9 de votre patrimoine':'R\u00e9organiser son patrimoine','optimiser la rentabilit\u00e9 de votre patrimoine immobilier locatif':'R\u00e9organiser son patrimoine','compl\u00e9ter vos revenus r\u00e9guli\u00e8rement':'Se cr\u00e9er un compl\u00e9ment de revenus','disposer de revenus ponctuellement':'Se cr\u00e9er un compl\u00e9ment de revenus','transmettre votre patrimoine':'Optimiser la transmission','optimiser la fiscalit\u00e9 de la transmission':'Optimiser la transmission','prot\u00e9ger votre conjoint survivant':'Prot\u00e9ger son conjoint','prot\u00e9ger vos proches':'Prot\u00e9ger son conjoint','se constituer une \u00e9pargne financi\u00e8re':'\u00c9pargne / capitalisation','diversifier votre patrimoine':'R\u00e9organiser son patrimoine','accompagner vos enfants':'Prot\u00e9ger son conjoint','se pr\u00e9munir contre les accidents de la vie':'Prot\u00e9ger son conjoint','r\u00e9organiser votre patrimoine':'R\u00e9organiser son patrimoine'};
-  // Mapper ED.objectifs
+  // Mapper ED.objectifs en conservant l'ordre d'import
   var mapped=[];
   (ED.objectifs||[]).forEach(function(o){var m=objMap[o.toLowerCase()]||o;if(mapped.indexOf(m)<0)mapped.push(m);});
+  // Trier : d'abord les objectifs importes (dans leur ordre), puis le reste
+  var sorted=mapped.slice();
+  allObjs.forEach(function(o){if(sorted.indexOf(o)<0)sorted.push(o);});
   var h='';
-  allObjs.forEach(function(o){
+  sorted.forEach(function(o){
     var ck=mapped.indexOf(o)>=0;
     h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="vObjCheck" value="'+o+'" '+(ck?'checked':'')+' style="accent-color:var(--orange)">'+o+'</label>';
   });
