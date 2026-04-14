@@ -223,18 +223,24 @@ function isGalaxieQualif(code){
   return code === 'galaxie' || (code && code.indexOf('galaxie-') === 0);
 }
 
-function getQualif(node){
-  // Si qualif manuelle, on l'utilise
-  if(node.qualif){
-    for(var i=0;i<QUALIFS.length;i++){
-      if(QUALIFS[i].code===node.qualif) return QUALIFS[i];
-    }
+function qualifByCode(code){
+  for(var i=0;i<QUALIFS.length;i++){
+    if(QUALIFS[i].code===code) return QUALIFS[i];
   }
-  // Pas d'enfant = Consultant
-  if(!node.children||node.children.length===0) return QUALIFS[1];
+  return null;
+}
 
-  // Compter les enfants directs qui sont managers (= ont eux-memes >=1 enfant)
-  // et ceux qui sont galaxie ou plus
+function getQualif(node){
+  // Pas d'enfant : qualif manuelle si definie, sinon Consultant
+  if(!node.children||node.children.length===0){
+    if(node.qualif){
+      var qManual0 = qualifByCode(node.qualif);
+      if(qManual0) return qManual0;
+    }
+    return QUALIFS[1]; // Consultant
+  }
+
+  // Compter les enfants directs qui sont managers, et ceux qui sont galaxie+
   var directManagers = 0;
   var directGalaxies = 0;
   node.children.forEach(function(ch){
@@ -245,22 +251,27 @@ function getQualif(node){
     }
   });
 
-  // Galaxies en direct => Galaxie X etoiles (prend le pas)
+  // Les qualifs Manager+ (Planete / Etoile / Constellation / Galaxie / Galaxie X etoiles)
+  // dependent de la structure et prennent TOUJOURS le pas sur la qualif manuelle.
+
+  // Galaxies en direct => Galaxie X etoiles
   if(directGalaxies >= 1){
     var idx = Math.min(directGalaxies, 4);
-    var code = 'galaxie-' + idx + 'e';
-    for(var j=0;j<QUALIFS.length;j++){
-      if(QUALIFS[j].code === code) return QUALIFS[j];
-    }
+    var q = qualifByCode('galaxie-' + idx + 'e');
+    if(q) return q;
   }
-
-  // Sinon, qualification selon nb de managers en direct
   if(directManagers >= 4) return QUALIFS[6]; // Galaxie
   if(directManagers === 3) return QUALIFS[5]; // Constellation
   if(directManagers === 2) return QUALIFS[4]; // Etoile
   if(directManagers === 1) return QUALIFS[3]; // Planete
+
   // 0 manager direct : le passage Manager depend du volume, pas de la lignee.
-  // On reste Consultant ; la qualif Manager doit etre mise a la main.
+  // On applique la qualif manuelle si elle est definie (permet de forcer Manager),
+  // sinon Consultant.
+  if(node.qualif){
+    var qManual = qualifByCode(node.qualif);
+    if(qManual) return qManual;
+  }
   return QUALIFS[1]; // Consultant
 }
 
