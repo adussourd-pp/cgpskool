@@ -157,14 +157,6 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
           <option value="galaxie">Manager Galaxie (TPC 8%)</option>
         </select>
       </div>
-      <div class="fg"><label>Titre actuel <small>(volume perso annuel)</small></label>
-        <select class="fi" id="titreActuel" onchange="recalc()">
-          <option value="">Aucun (VA perso &lt; 500 000 &euro;)</option>
-          <option value="Senior">Senior (VA perso &#8805; 500 000 &euro;)</option>
-          <option value="Major">Major (VA perso &#8805; 1 000 000 &euro;)</option>
-          <option value="Expert">Expert (VA perso &#8805; 1 500 000 &euro;)</option>
-        </select>
-      </div>
       </div>
     </div>
 
@@ -409,8 +401,6 @@ function recalc() {
   var encoursCumuleActuel= gv('encoursCumuleActuel', 0);
   var qualifActuelleEl   = document.getElementById('qualifActuelle');
   var qualifActuelle     = qualifActuelleEl ? qualifActuelleEl.value : 'consultant';
-  var titreActuelEl      = document.getElementById('titreActuel');
-  var titreActuel        = titreActuelEl ? titreActuelEl.value : '';
 
   // TPC depuis qualification actuelle saisie
   var tpcAn0Map = { consultant:0.05, manager:0.06, planete:0.065, etoile:0.07, constellation:0.075, galaxie:0.08 };
@@ -514,8 +504,9 @@ function recalc() {
     branchesActivesPrec = branchesActives;
 
     var vgpAnnuel    = vaPerso;
-    // Titre : an0 avec activité → utiliser le titre saisi, sinon calculer
-    var titre        = (an === 0 && hasExistingActivity && titreActuel) ? titreActuel : (isManager ? getTitre(vgpAnnuel) : null);
+    // Titre : toujours derive du volume personnel (seuils PMR fixes).
+    // Senior >= 500k / Major >= 1M / Expert >= 1,5M.
+    var titre        = isManager ? getTitre(vgpAnnuel) : null;
     var primeQualite = getPrimeQualite(titre, tpc, isManager);
     var tpcEffectif  = tpc + primeQualite;
 
@@ -688,7 +679,6 @@ CGP.project.registerModule('bp-simulator', {
       niv2ActifsActuel: +document.getElementById('niv2ActifsActuel').value,
       encoursCumuleActuel: +document.getElementById('encoursCumuleActuel').value,
       qualifActuelle: document.getElementById('qualifActuelle').value,
-      titreActuel: document.getElementById('titreActuel').value,
       va0: +document.getElementById('va0').value,
       croissVA: +document.getElementById('croissVA').value,
       pvPerso: +document.getElementById('pvPerso').value,
@@ -713,7 +703,6 @@ CGP.project.registerModule('bp-simulator', {
     if (d.niv2ActifsActuel !== undefined) document.getElementById('niv2ActifsActuel').value = d.niv2ActifsActuel;
     if (d.encoursCumuleActuel !== undefined) document.getElementById('encoursCumuleActuel').value = d.encoursCumuleActuel;
     if (d.qualifActuelle !== undefined) document.getElementById('qualifActuelle').value = d.qualifActuelle;
-    if (d.titreActuel !== undefined) document.getElementById('titreActuel').value = d.titreActuel;
     if (d.va0 !== undefined) document.getElementById('va0').value = d.va0;
     if (d.croissVA !== undefined) document.getElementById('croissVA').value = d.croissVA;
     if (d.pvPerso !== undefined) document.getElementById('pvPerso').value = d.pvPerso;
