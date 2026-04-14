@@ -259,7 +259,9 @@ function getQualif(node){
   if(directManagers === 3) return QUALIFS[5]; // Constellation
   if(directManagers === 2) return QUALIFS[4]; // Etoile
   if(directManagers === 1) return QUALIFS[3]; // Planete
-  return QUALIFS[2]; // Manager (au moins 1 consultant en dessous mais 0 manager)
+  // 0 manager direct : le passage Manager depend du volume, pas de la lignee.
+  // On reste Consultant ; la qualif Manager doit etre mise a la main.
+  return QUALIFS[1]; // Consultant
 }
 
 var QUALIF_COLORS={
