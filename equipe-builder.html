@@ -21,8 +21,9 @@
 .stat-pill b{color:var(--ink);font-weight:700}
 .stat-pill.orange b{color:var(--orange)}
 
-/* Tree container */
-.tree-wrap{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px 0}
+/* Tree container : permet le defilement horizontal quand l'arbre est large */
+.tree-wrap{display:block;overflow-x:auto;overflow-y:visible;padding:20px 0;margin:0 -20px}
+.tree-inner{display:flex;flex-direction:column;align-items:center;gap:0;min-width:max-content;padding:0 20px}
 
 /* Node */
 .node-group{display:flex;flex-direction:column;align-items:center}
@@ -481,7 +482,7 @@ function render(){
   }
 
   start.style.display='none';
-  wrap.style.display='flex';
+  wrap.style.display='block';
   stats.style.display='flex';
   leg.style.display='flex';
   acts.style.display='flex';
@@ -499,8 +500,9 @@ function render(){
   V('statBranches').textContent=branchesActives;
   V('statQualif').textContent=rootQ.label;
 
-  // Tree
-  wrap.innerHTML=renderNode(tree,[],0);
+  // Tree (enveloppe dans .tree-inner pour permettre le scroll horizontal
+  // quand l'arborescence est plus large que la page)
+  wrap.innerHTML='<div class="tree-inner">'+renderNode(tree,[],0)+'</div>';
 
   CGP.project.autoSave('equipe-builder');
 }
