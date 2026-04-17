@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>CGP Skool &mdash; Productivite</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
+<script src="cgp-skool-feedback.js" defer></script>
+<style>
+/* ── Sidebar inputs ── */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+
+/* ── Semaine nav ── */
+.week-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.week-nav button{background:#fff;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:16px;width:32px;height:32px;border-radius:7px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.week-nav button:hover{border-color:var(--orange);color:var(--orange)}
+.week-label{font-size:11px;font-weight:700;color:var(--noir);text-align:center;flex:1;line-height:1.3}
+
+/* ── Objectif ── */
+.goal-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.goal-val{font-size:12px;font-weight:700;color:var(--orange);min-width:32px;text-align:right}
+.goal-bar-wrap{height:5px;background:rgba(0,0,0,0.06);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.goal-bar{height:100%;background:var(--orange);border-radius:3px;transition:width 0.4s ease}
+
+/* ── Grid ── */
+.tracker-wrap{overflow-x:auto}
+.tracker-grid{border-collapse:collapse;width:100%;min-width:540px}
+
+/* Header row (days) */
+.tracker-grid thead th{padding:6px 4px;text-align:center;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);border-bottom:2px solid var(--bord)}
+.tracker-grid thead th:first-child{text-align:left;width:200px;min-width:140px}
+.tracker-grid thead th.th-today{color:var(--orange)}
+
+/* Category rows */
+.tracker-grid tbody tr.cat-header td{background:var(--gris-l);padding:6px 8px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-30);border-bottom:1px solid var(--bord)}
+.tracker-grid tbody tr.cat-header td:first-child{padding-left:10px}
+
+/* Action rows */
+.tracker-grid tbody tr.action-row td{border-bottom:1px solid var(--bord);vertical-align:middle}
+.tracker-grid tbody tr.action-row:hover td{background:rgba(212,98,42,0.03)}
+.tracker-grid tbody tr.action-row td:first-child{padding:8px 10px;font-size:12px;font-weight:500;color:var(--gris-f)}
+.action-icon{font-size:14px;margin-right:6px}
+.action-pts{font-size:9px;font-weight:600;color:var(--ink-30);background:rgba(0,0,0,0.04);padding:2px 5px;border-radius:4px;margin-left:4px}
+
+/* Counter cell */
+.counter-cell{padding:5px 3px;text-align:center}
+.counter{display:inline-flex;align-items:center;gap:3px}
+.counter button{width:22px;height:22px;border:none;border-radius:5px;background:rgba(0,0,0,0.05);color:var(--gris);font-size:14px;font-weight:600;cursor:pointer;line-height:1;transition:all 0.1s;font-family:var(--sans);flex-shrink:0}
+.counter button:hover{background:var(--orange);color:#fff}
+.counter-val{min-width:22px;text-align:center;font-size:13px;font-weight:700;color:var(--noir);font-family:var(--sans)}
+.counter-val.zero{color:rgba(0,0,0,0.18)}
+
+/* Score row */
+.tracker-grid tfoot tr.score-row td{padding:8px 4px;text-align:center;border-top:2px solid var(--bord)}
+.tracker-grid tfoot tr.score-row td:first-child{text-align:left;padding-left:10px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris)}
+.score-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;font-size:13px;font-weight:800;font-family:var(--sans);color:#fff}
+.score-0{background:#D1D5DB}
+.score-low{background:#EF4444}
+.score-med{background:#F59E0B}
+.score-good{background:#F0A738}
+.score-great{background:#10B981}
+
+/* KPI cards */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;text-align:center}
+.kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--noir);line-height:1;font-family:var(--sans)}
+.kpi-val.orange{color:var(--orange)}
+.kpi-val.green{color:var(--green)}
+.kpi-sub{font-size:10px;color:var(--gris);margin-top:3px}
+
+/* Chart bars */
+.chart-wrap{display:flex;align-items:flex-end;gap:4px;height:64px;margin:0 0 4px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar-wrap{width:100%;display:flex;justify-content:center;align-items:flex-end;height:52px}
+.chart-bar{width:100%;max-width:28px;border-radius:4px 4px 0 0;transition:height 0.4s ease;min-height:2px}
+.chart-day{font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.04em}
+.chart-day.today{color:var(--orange)}
+
+/* Section title */
+.sec-lbl{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-30);margin:0 0 12px}
+.divider{height:1px;background:var(--bord);margin:20px 0}
+
+/* Page header */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--bord)}
+.ph-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.ph-title{font-size:20px;font-weight:700;color:var(--noir);font-family:var(--sans);line-height:1.2}
+.ph-date{font-size:12px;font-weight:300;color:var(--gris)}
+
+/* Today column highlight */
+.tracker-grid .today-col{background:rgba(212,98,42,0.04)}
+
+/* Streak */
+.streak-fire{font-size:20px;line-height:1}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)" title="Semaine precedente">&#8249;</button>
+      <div class="week-label" id="weekLabel">Chargement...</div>
+      <button onclick="changeWeek(1)" title="Semaine suivante">&#8250;</button>
+    </div>
+
+    <div class="goal-row">
+      <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);flex:1">Objectif semaine</span>
+      <span class="goal-val" id="goalDisplay">350</span>
+    </div>
+    <input type="range" id="weeklyGoal" min="50" max="700" step="25" value="350"
+      style="width:100%;accent-color:var(--orange);margin-bottom:4px"
+      oninput="onGoalChange()">
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink-30);margin-bottom:6px">
+      <span>50</span><span>700</span>
+    </div>
+    <div class="goal-bar-wrap"><div class="goal-bar" id="goalBar" style="width:0%"></div></div>
+
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Poids des actions</div>
+    <div class="sb-body open" id="weightsBody">
+      <!-- injected by JS -->
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="height:1px;background:var(--bord);margin-bottom:12px"></div>
+    <button onclick="resetWeek()" style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px" title="Remettre a zero la semaine courante">&#9100; Effacer semaine</button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <div class="ph-tag">Productivite</div>
+          <div class="ph-title" id="pageTitle">Semaine du...</div>
+        </div>
+        <div style="text-align:right">
+          <div class="ph-date" id="pageDate"></div>
+          <div id="streakDisplay" style="margin-top:4px"></div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card"><div class="kpi-label">Score semaine</div><div class="kpi-val orange" id="kpiWeek">0</div><div class="kpi-sub" id="kpiWeekSub">/ 350 pts</div></div>
+        <div class="kpi-card"><div class="kpi-label">Moy. / jour</div><div class="kpi-val" id="kpiAvg">0</div><div class="kpi-sub">pts / jour actif</div></div>
+        <div class="kpi-card"><div class="kpi-label">Meilleur jour</div><div class="kpi-val green" id="kpiBest">0</div><div class="kpi-sub" id="kpiBestDay">--</div></div>
+        <div class="kpi-card"><div class="kpi-label">Streak</div><div class="kpi-val" id="kpiStreak">0</div><div class="kpi-sub">jours consecutifs</div></div>
+      </div>
+
+      <!-- Mini chart -->
+      <div class="sec-lbl">Productivite par jour</div>
+      <div class="chart-wrap" id="chartWrap"></div>
+      <div style="display:flex;gap:4px;margin-bottom:20px" id="chartLabels"></div>
+
+      <div class="divider"></div>
+
+      <!-- Tracker grid -->
+      <div class="sec-lbl">Detail des actions</div>
+      <div class="tracker-wrap">
+        <table class="tracker-grid">
+          <thead id="gridHead"></thead>
+          <tbody id="gridBody"></tbody>
+          <tfoot id="gridFoot"></tfoot>
+        </table>
+      </div>
+
+      <div id="conseillerFooter"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ACTIONS ──────────────────────────────────────────────────
+var ACTIONS = [
+  { id:'conv',  cat:'Prospection', icon:'&#128172;', label:'Nouvelle conversation',   pts:5  },
+  { id:'r1',    cat:'Prospection', icon:'&#128197;', label:'Prise de R1',              pts:15 },
+  { id:'inv',   cat:'Prospection', icon:'&#128226;', label:'Invitation metier (DM/PO)',pts:10 },
+  { id:'rel',   cat:'Prospection', icon:'&#128260;', label:'Suivi / Relance',           pts:3  },
+  { id:'sign',  cat:'Resultats',   icon:'&#9989;',   label:'Signature client',          pts:30 },
+  { id:'insc',  cat:'Resultats',   icon:'&#127775;', label:'Inscrit',                   pts:40 },
+  { id:'pro',   cat:'Developpement', icon:'&#127891;', label:'Professionnalisation',    pts:8  },
+  { id:'lead',  cat:'Developpement', icon:'&#129351;', label:'Leadership / Coaching',   pts:12 }
+];
+
+var DAY_NAMES = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+var DAY_FULL  = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+var MONTH_NAMES = ['jan.','fev.','mar.','avr.','mai','juin','juil.','aout','sept.','oct.','nov.','dec.'];
+
+// ── STATE ─────────────────────────────────────────────────────
+var state = {
+  weekOffset: 0,   // 0 = current week
+  goal: 350,
+  weights: {},     // id -> pts override
+  history: {}      // 'YYYY-Www' -> { 'YYYY-MM-DD': { conv:0, r1:0, ... } }
+};
+
+var STORE_KEY = 'cgpskool_productivite_v1';
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      var saved = JSON.parse(raw);
+      if (saved.goal !== undefined) state.goal = saved.goal;
+      if (saved.weights) state.weights = saved.weights;
+      if (saved.history) state.history = saved.history;
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      goal: state.goal,
+      weights: state.weights,
+      history: state.history
+    }));
+  } catch(e) {}
+}
+
+// ── DATE HELPERS ──────────────────────────────────────────────
+function getMonday(date) {
+  var d = new Date(date);
+  var day = d.getDay();
+  var diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function dateStr(d) {
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var dd = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
+}
+
+function weekKey(monday) {
+  var jan1 = new Date(monday.getFullYear(), 0, 1);
+  var weekNum = Math.ceil((((monday - jan1) / 86400000) + jan1.getDay() + 1) / 7);
+  return monday.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
+}
+
+function formatDate(d) {
+  return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
+}
+
+function getCurrentMonday() {
+  var now = new Date();
+  now.setDate(now.getDate() + state.weekOffset * 7);
+  return getMonday(now);
+}
+
+function getWeekDays() {
+  var monday = getCurrentMonday();
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+  return days;
+}
+
+function isToday(d) {
+  var now = new Date();
+  return dateStr(d) === dateStr(now);
+}
+
+// ── POINTS ───────────────────────────────────────────────────
+function getPoints(actionId) {
+  if (state.weights[actionId] !== undefined) return state.weights[actionId];
+  var a = ACTIONS.find(function(x){ return x.id === actionId; });
+  return a ? a.pts : 0;
+}
+
+function getDayScore(dayKey) {
+  var wk = weekKey(getCurrentMonday());
+  var week = state.history[wk];
+  if (!week || !week[dayKey]) return 0;
+  var day = week[dayKey];
+  var total = 0;
+  ACTIONS.forEach(function(a) { total += (day[a.id] || 0) * getPoints(a.id); });
+  return Math.min(total, 100);
+}
+
+function getDayRaw(dayKey) {
+  var wk = weekKey(getCurrentMonday());
+  var week = state.history[wk];
+  if (!week || !week[dayKey]) return {};
+  return week[dayKey];
+}
+
+function getVal(dayKey, actionId) {
+  var wk = weekKey(getCurrentMonday());
+  if (!state.history[wk]) return 0;
+  if (!state.history[wk][dayKey]) return 0;
+  return state.history[wk][dayKey][actionId] || 0;
+}
+
+function setVal(dayKey, actionId, val) {
+  var wk = weekKey(getCurrentMonday());
+  if (!state.history[wk]) state.history[wk] = {};
+  if (!state.history[wk][dayKey]) state.history[wk][dayKey] = {};
+  state.history[wk][dayKey][actionId] = Math.max(0, val);
+}
+
+// ── STREAK ────────────────────────────────────────────────────
+function computeStreak() {
+  var streak = 0;
+  var d = new Date();
+  for (var i = 0; i < 60; i++) {
+    var key = dateStr(d);
+    var score = 0;
+    Object.keys(state.history).forEach(function(wk) {
+      var week = state.history[wk];
+      if (week[key]) {
+        ACTIONS.forEach(function(a) { score += (week[key][a.id] || 0) * getPoints(a.id); });
+      }
+    });
+    score = Math.min(score, 100);
+    if (i === 0 && score === 0) { d.setDate(d.getDate() - 1); continue; }
+    if (score >= 30) streak++;
+    else break;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// ── SCORE COLOR ───────────────────────────────────────────────
+function scoreClass(s) {
+  if (s === 0) return 'score-0';
+  if (s < 30)  return 'score-low';
+  if (s < 55)  return 'score-med';
+  if (s < 75)  return 'score-good';
+  return 'score-great';
+}
+
+function scoreBarColor(s) {
+  if (s === 0)  return '#D1D5DB';
+  if (s < 30)   return '#EF4444';
+  if (s < 55)   return '#F59E0B';
+  if (s < 75)   return '#F0A738';
+  return '#10B981';
+}
+
+// ── RENDER WEIGHTS SIDEBAR ────────────────────────────────────
+function renderWeightsSidebar() {
+  var body = document.getElementById('weightsBody');
+  var html = '';
+  ACTIONS.forEach(function(a) {
+    var pts = getPoints(a.id);
+    html += '<div class="fg" style="margin-bottom:8px">';
+    html += '<label>' + a.icon + ' ' + a.label + '</label>';
+    html += '<div style="display:flex;align-items:center;gap:6px">';
+    html += '<input type="number" min="0" max="200" value="' + pts + '"';
+    html += ' style="padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;width:70px;color:var(--noir);background:#fff;outline:none"';
+    html += ' oninput="onWeightChange(\'' + a.id + '\', this.value)">';
+    html += '<span style="font-size:10px;color:var(--gris)">pts</span>';
+    html += '</div></div>';
+  });
+  body.innerHTML = html;
+}
+
+// ── RENDER GRID ───────────────────────────────────────────────
+function renderGrid() {
+  var days = getWeekDays();
+
+  // Head
+  var head = '<tr><th></th>';
+  days.forEach(function(d) {
+    var cls = isToday(d) ? ' th-today' : '';
+    head += '<th class="' + cls + '">' + DAY_NAMES[d.getDay()] + '<br><span style="font-size:11px;font-weight:400">' + d.getDate() + '</span></th>';
+  });
+  head += '</tr>';
+  document.getElementById('gridHead').innerHTML = head;
+
+  // Body
+  var cats = [];
+  var catSeen = {};
+  ACTIONS.forEach(function(a) { if (!catSeen[a.cat]) { cats.push(a.cat); catSeen[a.cat] = true; } });
+
+  var body = '';
+  cats.forEach(function(cat) {
+    body += '<tr class="cat-header"><td colspan="8">' + cat + '</td></tr>';
+    ACTIONS.filter(function(a){ return a.cat === cat; }).forEach(function(a) {
+      body += '<tr class="action-row">';
+      body += '<td>' + a.icon + ' ' + a.label + '<span class="action-pts">' + getPoints(a.id) + 'pts</span></td>';
+      days.forEach(function(d) {
+        var key = dateStr(d);
+        var val = getVal(key, a.id);
+        var tdCls = isToday(d) ? ' today-col' : '';
+        body += '<td class="counter-cell' + tdCls + '">';
+        body += '<div class="counter">';
+        body += '<button onclick="adjust(\'' + key + '\',\'' + a.id + '\',-1)">&#8722;</button>';
+        body += '<span class="counter-val' + (val === 0 ? ' zero' : '') + '" id="cv_' + key + '_' + a.id + '">' + val + '</span>';
+        body += '<button onclick="adjust(\'' + key + '\',\'' + a.id + '\',1)">+</button>';
+        body += '</div></td>';
+      });
+      body += '</tr>';
+    });
+  });
+  document.getElementById('gridBody').innerHTML = body;
+
+  // Foot scores
+  var foot = '<tr class="score-row"><td>Score / 100</td>';
+  days.forEach(function(d) {
+    var key = dateStr(d);
+    var sc = getDayScore(key);
+    var cls = scoreClass(sc);
+    var tdCls = isToday(d) ? ' today-col' : '';
+    foot += '<td class="' + tdCls + '"><span class="score-badge ' + cls + '" id="score_' + key + '">' + sc + '</span></td>';
+  });
+  foot += '</tr>';
+  document.getElementById('gridFoot').innerHTML = foot;
+}
+
+// ── RENDER CHART ──────────────────────────────────────────────
+function renderChart() {
+  var days = getWeekDays();
+  var scores = days.map(function(d){ return getDayScore(dateStr(d)); });
+  var maxS = Math.max.apply(null, scores.concat([10]));
+
+  var chartHtml = '';
+  var labelHtml = '';
+  days.forEach(function(d, i) {
+    var sc = scores[i];
+    var pct = maxS > 0 ? (sc / 100) : 0;
+    var barH = Math.round(pct * 52);
+    var color = scoreBarColor(sc);
+    var todayCls = isToday(d) ? ' today' : '';
+    chartHtml += '<div class="chart-col">';
+    chartHtml += '<div class="chart-bar-wrap"><div class="chart-bar" style="height:' + barH + 'px;background:' + color + '"></div></div>';
+    chartHtml += '</div>';
+    labelHtml += '<div class="chart-col"><span class="chart-day' + todayCls + '">' + DAY_NAMES[d.getDay()] + '</span></div>';
+  });
+  document.getElementById('chartWrap').innerHTML = chartHtml;
+  document.getElementById('chartLabels').innerHTML = labelHtml;
+}
+
+// ── RENDER KPIs ───────────────────────────────────────────────
+function renderKPIs() {
+  var days = getWeekDays();
+  var scores = days.map(function(d){ return getDayScore(dateStr(d)); });
+  var activeDays = scores.filter(function(s){ return s > 0; });
+  var weekTotal = scores.reduce(function(s, x){ return s + x; }, 0);
+  var avg = activeDays.length > 0 ? Math.round(weekTotal / activeDays.length) : 0;
+  var best = Math.max.apply(null, scores);
+  var bestIdx = scores.indexOf(best);
+  var streak = computeStreak();
+  var goal = state.goal;
+
+  document.getElementById('kpiWeek').textContent = weekTotal;
+  document.getElementById('kpiWeekSub').textContent = '/ ' + goal + ' pts';
+  document.getElementById('kpiAvg').textContent = avg;
+  document.getElementById('kpiBest').textContent = best;
+  document.getElementById('kpiBestDay').textContent = best > 0 ? DAY_FULL[days[bestIdx].getDay()] : '--';
+  document.getElementById('kpiStreak').textContent = streak;
+  document.getElementById('kpiStreak').className = 'kpi-val' + (streak >= 5 ? ' green' : streak >= 3 ? ' orange' : '');
+
+  // Streak fire display
+  var streakEl = document.getElementById('streakDisplay');
+  if (streak >= 3) {
+    streakEl.innerHTML = '<span style="font-size:13px;color:var(--orange);font-weight:600">' + streak + ' jours</span> &#128293;';
+  } else {
+    streakEl.innerHTML = '';
+  }
+
+  // Goal bar
+  var pct = Math.min((weekTotal / goal) * 100, 100);
+  document.getElementById('goalBar').style.width = pct + '%';
+  document.getElementById('goalBar').style.background = pct >= 100 ? 'var(--green)' : 'var(--orange)';
+  document.getElementById('goalDisplay').textContent = goal;
+}
+
+// ── RENDER HEADER ─────────────────────────────────────────────
+function renderHeader() {
+  var monday = getCurrentMonday();
+  var sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  var wk = weekKey(monday);
+  var weekNum = wk.split('-W')[1];
+
+  document.getElementById('weekLabel').textContent = 'Sem. ' + weekNum + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
+  document.getElementById('pageTitle').textContent = 'Semaine ' + weekNum + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
+  document.getElementById('pageDate').textContent = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+}
+
+// ── FULL RENDER ───────────────────────────────────────────────
+function render() {
+  renderHeader();
+  renderGrid();
+  renderChart();
+  renderKPIs();
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────
+function adjust(dayKey, actionId, delta) {
+  var cur = getVal(dayKey, actionId);
+  setVal(dayKey, actionId, cur + delta);
+  saveState();
+
+  // Update cell
+  var valEl = document.getElementById('cv_' + dayKey + '_' + actionId);
+  var newVal = getVal(dayKey, actionId);
+  if (valEl) {
+    valEl.textContent = newVal;
+    valEl.className = 'counter-val' + (newVal === 0 ? ' zero' : '');
+  }
+
+  // Update score badge
+  var sc = getDayScore(dayKey);
+  var scoreEl = document.getElementById('score_' + dayKey);
+  if (scoreEl) {
+    scoreEl.textContent = sc;
+    scoreEl.className = 'score-badge ' + scoreClass(sc);
+  }
+
+  renderChart();
+  renderKPIs();
+}
+
+function changeWeek(delta) {
+  state.weekOffset += delta;
+  render();
+}
+
+function onGoalChange() {
+  state.goal = parseInt(document.getElementById('weeklyGoal').value) || 350;
+  saveState();
+  renderKPIs();
+  document.getElementById('goalDisplay').textContent = state.goal;
+}
+
+function onWeightChange(actionId, val) {
+  var n = parseInt(val);
+  if (!isNaN(n) && n >= 0) {
+    state.weights[actionId] = n;
+    saveState();
+    render();
+  }
+}
+
+function resetWeek() {
+  if (!confirm('Effacer toutes les donnees de cette semaine ?')) return;
+  var wk = weekKey(getCurrentMonday());
+  delete state.history[wk];
+  saveState();
+  render();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+loadState();
+document.getElementById('weeklyGoal').value = state.goal;
+renderWeightsSidebar();
+render();
+CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+
+</body>
+</html>
