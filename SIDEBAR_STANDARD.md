@@ -1,7 +1,8 @@
 # Nomenclature standard de la sidebar
 
 Référence unique pour normaliser la sidebar de tous les modules CGP Skool.
-Basée sur `scpi-financement.html` et `suivi-contrat.html`.
+Basée sur `scpi-financement.html`, `suivi-contrat.html`, `scpi-simulator.html`
+et `etude-transfert-per.html`.
 
 ---
 
@@ -9,8 +10,12 @@ Basée sur `scpi-financement.html` et `suivi-contrat.html`.
 
 ```
 ┌─────────────────────────────┐
-│ 1. Identité client          │  ← fg / input simple, pas de toggle
-│    (séparateur discret)     │
+│ 0. Choix initial (option.)  │  ← tabs boutons, sans toggle
+│    "Type de projection",    │    (ex: scpi-simulator, transfert-per)
+│    "Famille de contrat"…    │
+├─────────────────────────────┤
+│ 1. Identité client          │  ← fg / input (toggle ouvert OU
+│    (séparateur discret)     │    bloc simple sans toggle)
 ├─────────────────────────────┤
 │ 2. Toggles métier           │  ← cs-sidebar-lbl + sb-body
 │    (1 à N selon module)     │
@@ -41,7 +46,84 @@ d'actions bas vers le pied.
 
 ---
 
-## 2. Bloc client (haut, sans toggle)
+## 1bis. Choix initial hors toggle (optionnel)
+
+Certains modules imposent un choix structurant **avant même de renseigner
+le client** : type de projection, famille de contrat, profil, etc. Ce
+choix pilote l'affichage du reste du module et doit être visible en
+permanence.
+
+### Règles
+
+- **Toujours au-dessus du bloc client**, sans aucun toggle
+- Rendu en **boutons-onglets** (2 ou 3 max), pas en menu déroulant
+- Le bouton actif utilise l'orange de la marque
+- Un `<select>` `display:none` peut être conservé en coulisses pour la
+  compatibilité JS (la sélection est lue via `.value`)
+
+### HTML
+
+```html
+<div class="fg" style="margin-bottom:14px">
+  <label>Type de projection</label>
+  <div class="mode-tabs">
+    <div class="mode-tab active" onclick="setMode('a',this)">
+      <span class="mode-icon">📈</span>Option A
+    </div>
+    <div class="mode-tab" onclick="setMode('b',this)">
+      <span class="mode-icon">🔀</span>Option B
+    </div>
+    <div class="mode-tab" onclick="setMode('c',this)">
+      <span class="mode-icon">🏢</span>Option C
+    </div>
+  </div>
+</div>
+```
+
+### CSS local
+
+```css
+.mode-tabs{display:grid;grid-template-columns:repeat(var(--n,3),1fr);
+  gap:6px}
+.mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;
+  background:#fff;color:var(--gris);font-size:11px;cursor:pointer;
+  text-align:center;transition:all 0.2s;font-family:var(--sans);
+  font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--orange);color:var(--orange);
+  background:rgba(212,98,42,0.08);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
+```
+
+Pour 2 options, changer `grid-template-columns:1fr 1fr` (pattern utilisé
+dans `etude-transfert-per.html` sous le nom `.fam-tabs`).
+
+### JS
+
+```js
+function setMode(m, el){
+  currentMode = m;
+  document.querySelectorAll('.mode-tab').forEach(function(t){
+    t.classList.remove('active');
+  });
+  el.classList.add('active');
+  // ... afficher/masquer les blocs liés
+  update();
+}
+```
+
+### Exemples existants
+
+| Module | Label | Options |
+|---|---|---|
+| `scpi-simulator` | Type de projection | Plan Retraite / Nue-propriété / Entreprise |
+| `etude-transfert-per` | Famille de contrat | PER / Assurance Vie |
+
+---
+
+## 2. Bloc client (haut)
+
+### Variante A — bloc simple sans toggle (recommandé si pas de progression)
 
 ```html
 <div class="fg" style="margin-bottom:14px">
@@ -52,8 +134,24 @@ d'actions bas vers le pied.
 <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 ```
 
+### Variante B — toggle ouvert par défaut (si module avec progression)
+
+```html
+<div class="cs-sidebar-lbl open" data-step="client"
+     onclick="openStep('client', this)">
+  <span class="acc">▶</span>Client
+</div>
+<div class="sb-body open" id="body_client">
+  <div class="fg"><label>Nom du client</label>
+    <input class="fi" type="text" id="clientNom" placeholder="Prénom Nom"
+           oninput="renderHeader();updateProgress()">
+  </div>
+</div>
+```
+
 - `id` libre mais préféré : `fClient1` (scpi-financement) ou `clientNom` (autres)
-- Séparateur discret sous le bloc client
+- Variante B est utilisée dès qu'il y a un compteur `prog-count`, pour
+  que "Client" compte comme une étape validable.
 
 ---
 
@@ -308,7 +406,8 @@ Remplacer `NOM-DU-MODULE` par l'ID utilisé dans
 
 Avant commit d'un nouveau module ou refonte :
 
-- [ ] Bloc client en haut (sans toggle, séparateur dessous)
+- [ ] Si un choix structurant doit précéder tout le reste : `.mode-tabs` / `.fam-tabs` au-dessus du client, sans toggle
+- [ ] Bloc client en haut (bloc simple OU toggle ouvert `data-step="client"`)
 - [ ] Toggles métier avec `cs-sidebar-lbl` + `sb-body`
 - [ ] Pas d'emoji dans les titres de toggles
 - [ ] Accent `▶` présent dans chaque toggle
@@ -327,22 +426,22 @@ Avant commit d'un nouveau module ou refonte :
 
 ## 9. Modules à migrer (état des lieux)
 
-| Module | Client haut | Toggles | Progression | Boutons bas | Reset |
-|---|---|---|---|---|---|
-| scpi-financement | ✓ | ✓ | ✓ compteur | ✓ 4 boutons | ✓ |
-| suivi-contrat | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
-| allocation-cible | ✓ | ✓ | — | 3 boutons | ✗ à ajouter |
-| productivite | ? | ? | — | ? | ? |
-| bp-simulator | ? | ? | — | ? | ? |
-| scpi-simulator | ? | ? | — | ? | ? |
-| per-vs-av | ? | ? | — | ? | ? |
-| immo-simulator | ? | ? | — | ? | ? |
-| interets-composes | ? | ? | — | ? | ? |
-| simulateur-avance-av | ? | ? | — | ? | ? |
-| etude-transfert-per | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
-| comparatif-cgp | ? | ? | — | ? | ? |
-| equipe-builder | ? | ? | — | ? | ? |
-| etude-dossier | ✗ (structure différente) | — | ✓ sections | — | — |
+| Module | Choix initial | Client | Toggles | Progression | Boutons bas | Reset |
+|---|---|---|---|---|---|---|
+| scpi-financement | — | ✓ toggle | ✓ | ✓ compteur | ✓ 4 boutons | ✓ |
+| suivi-contrat | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
+| scpi-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
+| etude-transfert-per | ✓ `.fam-tabs` (2) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
+| allocation-cible | — | ✓ | ✓ | — | 3 boutons | ✗ à ajouter |
+| productivite | ? | ? | ? | — | ? | ? |
+| bp-simulator | ? | ? | ? | — | ? | ? |
+| per-vs-av | ? | ? | ? | — | ? | ? |
+| immo-simulator | ? | ? | ? | — | ? | ? |
+| interets-composes | ? | ? | ? | — | ? | ? |
+| simulateur-avance-av | ? | ? | ? | — | ? | ? |
+| comparatif-cgp | ? | ? | ? | — | ? | ? |
+| equipe-builder | ? | ? | ? | — | ? | ? |
+| etude-dossier | — | ✗ (structure différente) | — | ✓ sections | — | — |
 
 Les modules marqués `?` doivent être audités et alignés.
 `etude-dossier` reste à part (application principale multi-section, pas un
