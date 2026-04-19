@@ -27,6 +27,10 @@
 .tree-pan{position:absolute;top:50%;left:50%;will-change:transform;transition:none}
 .tree-inner{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px}
 .tree-hint{position:absolute;bottom:10px;right:14px;font-size:10px;color:var(--ink-30);pointer-events:none;background:rgba(255,255,255,0.7);padding:4px 10px;border-radius:12px;letter-spacing:0.04em}
+.tree-zoom{position:absolute;top:12px;right:14px;display:flex;flex-direction:column;gap:4px;z-index:5}
+.tree-zoom button{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--rule-l);background:#fff;color:var(--ink-60);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;padding:0;line-height:1}
+.tree-zoom button:hover{border-color:var(--orange);color:var(--orange)}
+.tree-zoom-level{font-size:9px;font-weight:600;color:var(--ink-30);text-align:center;letter-spacing:0.04em;padding:2px 0}
 
 /* Node */
 .node-group{display:flex;flex-direction:column;align-items:center}
@@ -415,38 +419,55 @@ function getInitials(node){
 
 var esc=CGP.esc;
 
-/* Pan (drag) sur la vue infinie de l'arborescence */
-var _panX=0,_panY=0,_panStartX=0,_panStartY=0,_panDragging=false,_panWrapEl=null;
+/* Pan (drag) + Zoom sur la vue infinie de l'arborescence */
+var _panX=0,_panY=0,_panScale=1,_panStartX=0,_panStartY=0,_panDragging=false,_panWrapEl=null;
+var ZOOM_MIN=0.3,ZOOM_MAX=2.5;
 
 function applyPan(){
   if(!_panWrapEl)return;
   var pane=_panWrapEl.querySelector('.tree-pan');
   if(!pane)return;
-  pane.style.transform='translate(calc(-50% + '+_panX+'px), calc(-50% + '+_panY+'px))';
+  pane.style.transform='translate(calc(-50% + '+_panX+'px), calc(-50% + '+_panY+'px)) scale('+_panScale+')';
+  var lvl=document.getElementById('zoomLevel');
+  if(lvl)lvl.textContent=Math.round(_panScale*100)+'%';
 }
 
 function centerOnRoot(){
-  // Au premier rendu : on centre sur le noeud racine (moi)
-  _panX=0;_panY=0;
-  // Decaler vers le haut pour laisser de la place aux enfants en-dessous
+  _panX=0;_panY=0;_panScale=1;
   if(_panWrapEl){
     var h=_panWrapEl.clientHeight||480;
-    _panY=-h/2+120; // racine a ~120px du haut
+    _panY=-h/2+120;
   }
   applyPan();
 }
+
+function zoomBy(factor,cx,cy){
+  var newScale=Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,_panScale*factor));
+  if(newScale===_panScale)return;
+  if(cx!==undefined&&cy!==undefined&&_panWrapEl){
+    // Zoom autour du point (cx,cy) relatif au wrap
+    var rect=_panWrapEl.getBoundingClientRect();
+    var ox=cx-rect.left-rect.width/2;
+    var oy=cy-rect.top-rect.height/2;
+    var ratio=newScale/_panScale;
+    _panX=ox-(ox-_panX)*ratio;
+    _panY=oy-(oy-_panY)*ratio;
+  }
+  _panScale=newScale;
+  applyPan();
+}
+
+function zoomReset(){centerOnRoot();}
 
 function setupPan(wrap){
   _panWrapEl=wrap;
   centerOnRoot();
 
-  // Evite de re-attacher les listeners a chaque render
   if(wrap._panBound)return;
   wrap._panBound=true;
 
   wrap.addEventListener('pointerdown',function(e){
-    // Ne pas lancer le pan si on clique sur un bouton / action
-    if(e.target.closest('.node-act,.add-child-btn,button,input'))return;
+    if(e.target.closest('.node-act,.add-child-btn,button,input,.tree-zoom'))return;
     _panDragging=true;
     _panStartX=e.clientX-_panX;
     _panStartY=e.clientY-_panY;
@@ -468,6 +489,12 @@ function setupPan(wrap){
   wrap.addEventListener('pointerup',endPan);
   wrap.addEventListener('pointercancel',endPan);
   wrap.addEventListener('pointerleave',endPan);
+
+  wrap.addEventListener('wheel',function(e){
+    e.preventDefault();
+    var factor=e.deltaY<0?1.1:1/1.1;
+    zoomBy(factor,e.clientX,e.clientY);
+  },{passive:false});
 }
 
 function renderNode(node,path,depth){
@@ -558,8 +585,15 @@ function render(){
   V('statBranches').textContent=branchesActives;
   V('statQualif').textContent=rootQ.label;
 
-  // Tree : rendu dans .tree-pan (pannable) -> .tree-inner
-  wrap.innerHTML='<div class="tree-pan"><div class="tree-inner">'+renderNode(tree,[],0)+'</div></div><div class="tree-hint">Glissez pour naviguer</div>';
+  // Tree : rendu dans .tree-pan (pannable + zoom) -> .tree-inner
+  wrap.innerHTML='<div class="tree-pan"><div class="tree-inner">'+renderNode(tree,[],0)+'</div></div>'
+    +'<div class="tree-zoom">'
+    +'<button onclick="zoomBy(1.2)" title="Zoomer">+</button>'
+    +'<div class="tree-zoom-level" id="zoomLevel">100%</div>'
+    +'<button onclick="zoomBy(1/1.2)" title="D\u00e9zoomer">\u2212</button>'
+    +'<button onclick="zoomReset()" title="R\u00e9initialiser" style="font-size:11px">\u21bb</button>'
+    +'</div>'
+    +'<div class="tree-hint">Glissez pour naviguer &middot; Molette pour zoomer</div>';
   setupPan(wrap);
 
   CGP.project.autoSave('equipe-builder');
