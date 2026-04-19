@@ -46,6 +46,13 @@ select.fi{cursor:pointer}
 .btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
 .btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
+/* Bouton action + compteur etapes */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
+.sim-btn:hover{background:var(--orange-hover)}
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:var(--green)}
+
 /* Main A4 content */
 /* cs-main override */
 .cs-main{background:#ECEAE6}
@@ -118,16 +125,17 @@ select.fi{cursor:pointer}
 <div class="cs-app">
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
-    <!-- 1. Bloc client (sans toggle) -->
-    <div class="fg" style="margin-bottom:14px">
-      <label>Nom du client</label>
-      <input class="fi" type="text" id="pClient" placeholder="Pr&#233;nom Nom" oninput="update()">
+    <!-- Toggle Client (ouvert par defaut) -->
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client', this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
+      <div class="fg"><label>Nom du client</label>
+        <input class="fi" type="text" id="pClient" placeholder="Pr&#233;nom Nom" oninput="update()">
+      </div>
     </div>
-    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <!-- 2. Toggles m&#233;tier -->
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
-    <div class="sb-body open">
+    <!-- Toggles m&#233;tier -->
+    <div class="cs-sidebar-lbl" data-step="actuel" onclick="openStep('actuel', this)"><span class="acc">&#9654;</span>Contrat actuel</div>
+    <div class="sb-body" id="body_actuel">
       <div class="fg"><label>Famille</label>
         <select class="fi" id="pFamille" onchange="onFamilleChange()">
           <option value="per">Plan &#201;pargne Retraite</option>
@@ -175,8 +183,8 @@ select.fi{cursor:pointer}
       <div id="ancienneteInfo" style="font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="nouveau" onclick="openStep('nouveau', this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
+    <div class="sb-body" id="body_nouveau">
       <div class="fg"><label>Contrat recommand&#233;</label><input class="fi" type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
       <div id="fraisTransfertRow" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px" onclick="toggleFraisTransfert()">
         <span style="font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Frais de transfert (1 %)</span>
@@ -205,6 +213,10 @@ select.fi{cursor:pointer}
         <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
       </div>
     </div>
+
+    <!-- Bouton d'action + compteur etapes -->
+    <button class="sim-btn" onclick="runTransfert()">Lancer la projection &#8594;</button>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 3 &#233;tapes valid&#233;es</div>
 
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
@@ -606,10 +618,50 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
 
 // loadProfil supprime — gere par CGP.footer.render() dans core.js
 
+/* ---- Progression (accordeon strict + compteur) ---- */
+var _stepOpened={client:true, actuel:false, nouveau:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=document.getElementById('pClient');return !!(v&&v.value.trim())}
+  if(id==='actuel'){
+    var cap=document.getElementById('pCapital'), nom=document.getElementById('pContratA');
+    return !!(cap&&Number(cap.value)>0) && !!(nom&&nom.value.trim());
+  }
+  if(id==='nouveau'){var n=document.getElementById('pContratB');return !!(n&&n.value.trim())}
+  return false;
+}
+function updateProgress(){
+  var steps=['client','actuel','nouveau'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 3 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===3);}
+}
+document.addEventListener('input', function(e){
+  if(e.target&&(e.target.id==='pClient'||e.target.id==='pCapital'||e.target.id==='pContratA'||e.target.id==='pContratB')){updateProgress()}
+});
+function runTransfert(){update();updateProgress();}
+
 (function(){
   CGP.footer.render(document.getElementById('conseillerFooter'));
   updateTypeEncart();
   update();
+  updateProgress();
 })();
 
 // Export PDF — utilise CGP.pdf.print() (canvas→PNG automatique via core.js)
