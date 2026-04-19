@@ -429,7 +429,7 @@ Avant commit d'un nouveau module ou refonte :
 | Module | Choix initial | Client | Toggles | Progression | Boutons bas | Reset |
 |---|---|---|---|---|---|---|
 | scpi-financement | — | ✓ toggle | ✓ | ✓ compteur | ✓ 4 boutons | ✓ |
-| suivi-contrat | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
+| suivi-contrat | ✓ `.mode-tabs` (4) | ✗ (via import) | ✓ | — (live) | ✓ 4 boutons | ✓ |
 | scpi-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
 | etude-transfert-per | ✓ `.fam-tabs` (2) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
 | allocation-cible | ✓ `.mode-tabs` (2) | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |

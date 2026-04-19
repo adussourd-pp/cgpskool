@@ -28,6 +28,13 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 .btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 .btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer}
 
+/* Mode tabs (choix initial type de contrat - cf. SIDEBAR_STANDARD) */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.mode-tab{padding:10px 4px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:10px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
+
 /* Page header */
 .ph-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
 .ph-title{font-size:22px;font-weight:700;color:var(--noir);font-family:var(--sans);line-height:1.2;margin-bottom:4px}
@@ -115,8 +122,23 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
 
-    <div class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Coller l'import Ariane</div>
-    <div class="sb-body">
+    <!-- Type de contrat (choix initial, sans toggle) -->
+    <div class="fg" style="margin-bottom:14px">
+      <label>Type de contrat</label>
+      <div class="mode-tabs">
+        <div class="mode-tab active" id="catTabAv" onclick="setCategorie('Assurance-vie')"><span class="mode-icon">&#128737;</span>Assurance vie</div>
+        <div class="mode-tab" id="catTabPer" onclick="setCategorie('PER')"><span class="mode-icon">&#128200;</span>PER</div>
+        <div class="mode-tab" id="catTabPea" onclick="setCategorie('PEA')"><span class="mode-icon">&#128202;</span>PEA</div>
+        <div class="mode-tab" id="catTabCto" onclick="setCategorie('Compte-titres')"><span class="mode-icon">&#128179;</span>CTO</div>
+      </div>
+      <select id="kCat" style="display:none" onchange="renderAll()">
+        <option>Assurance-vie</option><option>PER</option><option>PEA</option><option>Compte-titres</option>
+      </select>
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
+    <div class="cs-sidebar-lbl" data-step="import" onclick="openStep('import',this)"><span class="acc">&#9654;</span>Coller l'import Ariane</div>
+    <div class="sb-body" id="body_import">
       <div class="fg">
         <textarea class="fi" id="rawExport" rows="10" placeholder="Copiez-collez ici l'export complet de la fiche contrat Ariane..."></textarea>
       </div>
@@ -125,20 +147,15 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 
       <!-- Donnees importees (visible apres parsing) -->
       <div id="importedDataPanel" style="display:none;margin-top:12px">
-        <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)" style="color:#0F6B3F;background:rgba(15,107,63,0.1);border-radius:6px;padding:7px 10px;margin-bottom:0">
+        <div class="cs-sidebar-lbl" data-step="imported" onclick="openStep('imported',this)" style="color:#0F6B3F;background:rgba(15,107,63,0.1);border-radius:6px;padding:7px 10px;margin-bottom:0">
           <span class="acc">&#9654;</span>&#10003; Donn&eacute;es import&eacute;es
         </div>
-        <div class="sb-body open" style="padding-top:8px">
+        <div class="sb-body" style="padding-top:8px" id="body_imported">
           <div class="id-group">Client</div>
           <div class="fg"><label>Nom complet</label><input class="fi" type="text" id="cNom" placeholder="M. Jean DUPONT" oninput="renderAll()"></div>
           <input type="hidden" id="cAge"><input type="hidden" id="cTel"><input type="hidden" id="cEmail">
 
           <div class="id-group">Contrat</div>
-          <div class="fg"><label>Cat&eacute;gorie</label>
-            <select class="fi" id="kCat" onchange="renderAll()">
-              <option>Assurance-vie</option><option>PER</option><option>PEA</option><option>Compte-titres</option>
-            </select>
-          </div>
           <div class="fg"><label>Compagnie</label><input class="fi" type="text" id="kCompagnie" oninput="renderAll()"></div>
           <div class="fg"><label>Prestation</label><input class="fi" type="text" id="kPrestation" oninput="renderAll()"></div>
           <div class="grid2">
@@ -246,6 +263,33 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 </div>
 
 <script>
+/* ---- Choix initial : type de contrat (tabs hors toggle) ---- */
+function setCategorie(v){
+  var sel=document.getElementById('kCat');
+  if(sel){sel.value=v;}
+  var map={'Assurance-vie':'catTabAv','PER':'catTabPer','PEA':'catTabPea','Compte-titres':'catTabCto'};
+  ['catTabAv','catTabPer','catTabPea','catTabCto'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.classList.remove('active');
+  });
+  var on=document.getElementById(map[v]); if(on) on.classList.add('active');
+  if(typeof renderAll==='function') renderAll();
+}
+
+/* ---- Accordeon strict entre les 2 toggles ---- */
+function openStep(id, el){
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+}
+
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
@@ -293,10 +337,10 @@ function parseAll(){
     // Categorie : extraire la valeur puis mapper au dropdown
     var cat=grab(new RegExp('Cat[eé]gorie\\s+de\\s+la\\s+prestation\\s*:\\s*(.+?)'+NEXT,'i'));
     if(cat){
-      if(/vie/i.test(cat))setV('kCat','Assurance-vie');
-      else if(/PER/i.test(cat))setV('kCat','PER');
-      else if(/PEA/i.test(cat))setV('kCat','PEA');
-      else if(/compte/i.test(cat))setV('kCat','Compte-titres');
+      if(/vie/i.test(cat))setCategorie('Assurance-vie');
+      else if(/PER/i.test(cat))setCategorie('PER');
+      else if(/PEA/i.test(cat))setCategorie('PEA');
+      else if(/compte/i.test(cat))setCategorie('Compte-titres');
     }
     // Prestation : exclure "Categorie de la prestation" via lookbehind negatif.
     // Pas de \b car le texte est souvent concatene (ex: "Assurance-viePrestation" sans boundary).
@@ -776,7 +820,7 @@ function collectState(){
 function applyState(s){
   if(!s)return;
   if(s.client){setV('cNom',s.client.nom);setV('cAge',s.client.age);setV('cTel',s.client.tel);setV('cEmail',s.client.email);}
-  if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);setV('kCat',s.contrat.cat);}
+  if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);if(s.contrat.cat)setCategorie(s.contrat.cat);}
   if(s.valo){setV('vVal',s.valo.valo);setV('vVersNets',s.valo.versNets);setV('vRachats',s.valo.rachats);}
   if(s.alloc)STATE.allocation=s.alloc;
   if(s.allocComms)STATE.allocComms=s.allocComms;
