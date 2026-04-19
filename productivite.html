@@ -116,6 +116,22 @@
 /* Today column highlight */
 .tracker-grid .today-col{background:rgba(212,98,42,0.04)}
 
+/* Rappel bareme (panneau toggle dans sidebar, style bp-simulator) */
+.rappel-btn{width:100%;padding:8px 10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris-f);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s;margin-bottom:6px}
+.rappel-btn:hover{border-color:var(--orange);color:var(--orange)}
+.rappel-btn .arr{font-size:9px;transition:transform 0.2s}
+.rappel-btn.open .arr{transform:rotate(180deg)}
+.rappel-panel{display:none;background:var(--gris-l);border:1px solid var(--bord);border-radius:7px;padding:12px 14px;margin-bottom:10px;font-family:var(--sans)}
+.rappel-panel.open{display:block}
+.rappel-section-title{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:6px;margin-top:10px}
+.rappel-section-title:first-child{margin-top:0}
+.rappel-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:11px;border-bottom:1px solid rgba(0,0,0,0.05)}
+.rappel-row:last-child{border-bottom:none}
+.rappel-l{color:var(--gris-f)}
+.rappel-l small{font-size:9px;color:var(--gris);margin-left:4px}
+.rappel-v{font-weight:700;color:var(--orange);white-space:nowrap}
+.rappel-note{font-size:10px;color:var(--gris);font-style:italic;line-height:1.55;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.05)}
+
 /* Notes semaine */
 .notes-wrap{background:#FFFBF5;border:1px dashed #E6CFA8;border-radius:10px;padding:14px 16px;margin-bottom:20px}
 .notes-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
@@ -194,9 +210,27 @@
 
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Poids des actions</div>
-    <div class="sb-body open" id="weightsBody">
-      <!-- injected by JS -->
+    <button type="button" class="rappel-btn" onclick="this.classList.toggle('open');document.getElementById('rappelPts').classList.toggle('open')">
+      <span>&#128203; Rappel du bar&egrave;me</span><span class="arr">&#9660;</span>
+    </button>
+    <div class="rappel-panel" id="rappelPts">
+      <div class="rappel-section-title">Prospection</div>
+      <div class="rappel-row"><span class="rappel-l">&#128197; Prise de R1</span><span class="rappel-v">15&nbsp;pts</span></div>
+      <div class="rappel-row"><span class="rappel-l">&#128226; Invitation m&eacute;tier</span><span class="rappel-v">15&nbsp;pts</span></div>
+      <div class="rappel-row"><span class="rappel-l">&#128172; Nouvelle conversation</span><span class="rappel-v">10&nbsp;pts</span></div>
+      <div class="rappel-row"><span class="rappel-l">&#128260; Suivi / Relance</span><span class="rappel-v">5&nbsp;pts</span></div>
+
+      <div class="rappel-section-title">R&eacute;sultats</div>
+      <div class="rappel-row"><span class="rappel-l">&#9989; Signature client</span><span class="rappel-v">20&nbsp;pts</span></div>
+      <div class="rappel-row"><span class="rappel-l">&#127775; Inscrit</span><span class="rappel-v">20&nbsp;pts</span></div>
+
+      <div class="rappel-section-title">D&eacute;veloppement</div>
+      <div class="rappel-row"><span class="rappel-l">&#129351; Leadership / Coaching</span><span class="rappel-v">8&nbsp;pts</span></div>
+      <div class="rappel-row"><span class="rappel-l">&#127891; Professionnalisation</span><span class="rappel-v">7&nbsp;pts</span></div>
+
+      <div class="rappel-note">
+        Somme = <strong>100&nbsp;pts</strong> si toutes les actions sont r&eacute;alis&eacute;es une fois dans la journ&eacute;e. Cible par d&eacute;faut&nbsp;: 250&nbsp;pts / semaine (~50&nbsp;pts/jour sur 5 jours ouvr&eacute;s).
+      </div>
     </div>
 
     <div style="flex:1"></div>
@@ -455,24 +489,6 @@ function scoreBarColor(s) {
   if (s < 55)   return '#F59E0B';
   if (s < 75)   return '#F0A738';
   return '#10B981';
-}
-
-// ── RENDER WEIGHTS SIDEBAR ────────────────────────────────────
-function renderWeightsSidebar() {
-  var body = document.getElementById('weightsBody');
-  var html = '';
-  ACTIONS.forEach(function(a) {
-    var pts = getPoints(a.id);
-    html += '<div class="fg" style="margin-bottom:8px">';
-    html += '<label>' + a.icon + ' ' + a.label + '</label>';
-    html += '<div style="display:flex;align-items:center;gap:6px">';
-    html += '<input type="number" min="0" max="200" value="' + pts + '"';
-    html += ' style="padding:6px 8px;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:12px;width:70px;color:var(--noir);background:#fff;outline:none"';
-    html += ' oninput="onWeightChange(\'' + a.id + '\', this.value)">';
-    html += '<span style="font-size:10px;color:var(--gris)">pts</span>';
-    html += '</div></div>';
-  });
-  body.innerHTML = html;
 }
 
 // ── RENDER GRID ───────────────────────────────────────────────
@@ -765,15 +781,6 @@ function onGoalChange() {
   document.getElementById('goalDisplay').textContent = state.goal;
 }
 
-function onWeightChange(actionId, val) {
-  var n = parseInt(val);
-  if (!isNaN(n) && n >= 0) {
-    state.weights[actionId] = n;
-    saveState();
-    render();
-  }
-}
-
 function resetWeek() {
   if (!confirm('Effacer toutes les donnees de cette semaine ?')) return;
   var wk = weekKey(getCurrentMonday());
@@ -882,7 +889,6 @@ function exportAllWeeks() {
 // ── INIT ──────────────────────────────────────────────────────
 loadState();
 document.getElementById('weeklyGoal').value = state.goal;
-renderWeightsSidebar();
 render();
 CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
