@@ -22,10 +22,19 @@
 .sl-val{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:2px}
 .sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
 
-/* Mode toggle (Durée fixe / Épuisement) */
-.mode-row{display:flex;gap:4px;margin-bottom:8px}
-.mode-btn{flex:1;padding:8px 4px;border:1.5px solid var(--bord);background:#fff;color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.15s}
-.mode-btn.active{border-color:var(--orange);background:var(--orange);color:#fff}
+/* Mode tabs (choix initial - cf. SIDEBAR_STANDARD) */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:11px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
+
+/* Bouton action + compteur etapes */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
+.sim-btn:hover{background:var(--orange-hover)}
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:#2D7A5B}
 
 /* Cards */
 .card{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:18px 20px;margin-bottom:18px}
@@ -113,14 +122,26 @@
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
 
+    <!-- Mode (choix initial, sans toggle) -->
     <div class="fg" style="margin-bottom:14px">
-      <label>Nom du client</label>
-      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+      <label>Mode du programme</label>
+      <div class="mode-tabs">
+        <div class="mode-tab active" id="modeBtnDuree" onclick="setMode('duree',this)"><span class="mode-icon">&#128197;</span>Dur&#233;e fixe</div>
+        <div class="mode-tab" id="modeBtnEpuise" onclick="setMode('epuise',this)"><span class="mode-icon">&#8987;</span>Jusqu'&#224; &#233;puisement</div>
+      </div>
     </div>
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Param&#232;tres g&#233;n&#233;raux</div>
-    <div class="sb-body open">
+    <!-- Client toggle (ouvert par defaut) -->
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
+      <div class="fg"><label>Nom du client</label>
+        <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
+      </div>
+    </div>
+
+    <div class="cs-sidebar-lbl" data-step="params" onclick="openStep('params',this)"><span class="acc">&#9654;</span>Param&#232;tres g&#233;n&#233;raux</div>
+    <div class="sb-body" id="body_params">
       <div class="fg"><label>Versement initial brut</label>
         <div class="fi-row"><input type="number" id="versementBrut" value="10000" min="0" step="500" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
       </div>
@@ -132,14 +153,8 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Programme d'arbitrage</div>
-    <div class="sb-body open">
-      <div class="fg"><label>Mode</label>
-        <div class="mode-row">
-          <button type="button" class="mode-btn active" id="modeBtnDuree" onclick="setMode('duree')">Dur&#233;e fixe</button>
-          <button type="button" class="mode-btn" id="modeBtnEpuise" onclick="setMode('epuise')">Jusqu'&#224; &#233;puisement</button>
-        </div>
-      </div>
+    <div class="cs-sidebar-lbl" data-step="programme" onclick="openStep('programme',this)"><span class="acc">&#9654;</span>Programme d'arbitrage</div>
+    <div class="sb-body" id="body_programme">
       <div class="fg" id="dureeRow">
         <label>Dur&#233;e (mois)</label>
         <div class="sl-val" id="vDuree">12 mois</div>
@@ -156,17 +171,21 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Allocation de d&#233;part</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="depart" onclick="openStep('depart',this)"><span class="acc">&#9654;</span>Allocation de d&#233;part</div>
+    <div class="sb-body" id="body_depart">
       <div id="sbDepartBody"></div>
       <button class="btn-add" onclick="addDepart()" style="width:100%">+ Ajouter un fonds</button>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Allocation cible</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="cible" onclick="openStep('cible',this)"><span class="acc">&#9654;</span>Allocation cible</div>
+    <div class="sb-body" id="body_cible">
       <div id="sbCibleBody"></div>
       <button class="btn-add" onclick="addCible()" style="width:100%">+ Ajouter un fonds</button>
     </div>
+
+    <!-- Bouton d'action + compteur etapes -->
+    <button class="sim-btn" onclick="recalc()">Lancer le calcul &#8594;</button>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
 
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
@@ -280,8 +299,42 @@ function setMode(m){
   ALLOC.mode = m;
   V('modeBtnDuree').classList.toggle('active', m==='duree');
   V('modeBtnEpuise').classList.toggle('active', m==='epuise');
-  V('dureeRow').style.display = m==='duree' ? '' : 'none';
+  var dR=V('dureeRow'); if(dR) dR.style.display = m==='duree' ? '' : 'none';
   recalc();
+}
+
+// ── Progression (accordeon strict + compteur) ─────────────────────
+var _stepOpened={client:true, params:false, programme:false, depart:false, cible:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=V('clientNom');return !!(v&&v.value.trim())}
+  if(id==='params'){return num('versementBrut')>0}
+  if(id==='programme')return true;
+  if(id==='depart'){return ALLOC.depart.some(function(f){return f.pct>0})}
+  if(id==='cible'){return ALLOC.cible.some(function(f){return f.pct>0})}
+  return false;
+}
+function updateProgress(){
+  var steps=['client','params','programme','depart','cible'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=V('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===5);}
 }
 function onDureeChange(){
   V('vDuree').textContent = V('duree').value + ' mois';
@@ -503,6 +556,7 @@ function recalc(){
   V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
 
   CGP.project.autoSave('allocation-cible');
+  updateProgress();
 }
 
 function hypItem(label, val){
@@ -551,6 +605,7 @@ function resetModule(){
 renderDepart();
 renderCible();
 recalc();
+updateProgress();
 CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
 
