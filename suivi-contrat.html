@@ -81,7 +81,17 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 @media print{ .skip-print{ display:none !important; } }
 
 /* R23 : preserve colors/backgrounds at PDF export (Chrome/Edge sinon strip) */
-.card,.kpi,.card-title .n,.ph-tag,.tbl th,.tbl tfoot td,.tbl .pos,.tbl .neg,.tbl .mut,.kpi-v.orange,.kpi-v.green,.comm,.eq,.btn-primary,.btn-pdf,.parse-status,.sri-chip,[style*="background"]{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+.card,.kpi,.card-title .n,.ph-tag,.tbl th,.tbl tfoot td,.tbl .pos,.tbl .neg,.tbl .mut,.kpi-v.orange,.kpi-v.green,.comm,.eq,.btn-primary,.btn-pdf,.parse-status,.sri-chip,.gauge-bar,.gauge-seg,.gauge-dot,[style*="background"]{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+
+/* Asset class gauge */
+.gauge-wrap{margin-top:14px}
+.gauge-bar{display:flex;width:100%;height:18px;border-radius:9px;overflow:hidden;background:var(--gris-l);border:1px solid var(--bord)}
+.gauge-seg{height:100%;transition:flex .3s;position:relative}
+.gauge-seg[title]:hover{opacity:0.85}
+.gauge-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:11px}
+.gauge-item{display:flex;align-items:center;gap:6px;color:var(--gris-f)}
+.gauge-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.gauge-item b{color:var(--noir);font-weight:700}
 </style>
 </head>
 <body>
@@ -203,8 +213,8 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
           </label>
         </div>
         <table class="tbl" id="allocTbl"></table>
-        <div class="card-sub">Analyse de l'allocation</div>
-        <div id="allocAnalysis" style="font-size:12px;color:var(--gris-f);line-height:1.7"></div>
+        <div class="card-sub">R&eacute;partition par classe d'actifs</div>
+        <div id="allocAnalysis"></div>
       </div>
 
       <!-- 4. CONTEXTE MACRO / G&Eacute;OPOLITIQUE (optionnel) -->
@@ -514,6 +524,36 @@ function renderHeadTbl(){
   document.getElementById('headTbl').innerHTML=h;
 }
 
+// Classification support -> classe d'actif
+var ASSET_CLASSES=[
+  {id:'fondsE',   label:'Fonds \u20ac / Securitaire', color:'#10B981'},
+  {id:'oblig',    label:'Obligations',                color:'#3B82F6'},
+  {id:'struct',   label:'Produits structur\u00e9s',    color:'#8B5CF6'},
+  {id:'actions',  label:'Actions',                    color:'#F59E0B'},
+  {id:'scpi',     label:'SCPI / Immo',                color:'#EC4899'},
+  {id:'pe',       label:'Private Equity',             color:'#EF4444'},
+  {id:'autres',   label:'Autres',                     color:'#6B7280'}
+];
+function classifyAsset(a){
+  var lbl=(a.label||'').toLowerCase();
+  var sri=parseInt(a.sri)||0;
+  // SCPI / Immobilier
+  if(/\bscpi\b|immobilier|\bopci\b|pierre\s+papier/.test(lbl)) return 'scpi';
+  // Private Equity
+  if(/private\s+equity|capital\s+invest|\bfpci\b|\bfcpr\b|\bfip\b|\bfcpi\b/.test(lbl)) return 'pe';
+  // Produits structures
+  if(/structur|autocall|phoenix|exceltis|athena|barri[eè]re|rendement\s+(juin|juil|aout|sept|oct|nov|dec|janv|fev|mars|avril|mai|\d{4})/.test(lbl)) return 'struct';
+  // Obligations
+  if(/\boblig|\bbond\b|high\s+yield|investment\s+grade|\bdette\b|souverain|govies|cr[eé]dit\s+(?:euro|ig|hy|corporate)/.test(lbl)) return 'oblig';
+  // Actions (AVANT fonds euro pour eviter les faux-match "Fund A-Euro", "Safety Fund", "World Equity")
+  if(/action|equity|growth|value|tech(?:nology)?|dividend|world|global|thematic|safety\s+fund|smart|small\s+cap|mid\s+cap|nasdaq|s\&p|msci|[eé]mergent|fidelity|amundi|lyxor|blackrock|pictet|carmignac|ishares|xtrackers/.test(lbl)) return 'actions';
+  // Fonds euro / securitaire : SRI 1 OU pattern explicite (pas juste "euro" car trop large)
+  if(sri===1||/tr[eé]sorerie|mon[eé]taire|actif\s+g[eé]n[eé]ral|fonds?\s+euros?\b|support\s+euros?\b|fonds?\s+garanti|fonds?\s+s[eé]cur/.test(lbl)) return 'fondsE';
+  // UC SRI >= 4 sans match specifique -> actions (par defaut UC risquee)
+  if(sri>=4) return 'actions';
+  return 'autres';
+}
+
 function sumVersBruts(){
   // Somme des versements client (flux externes sortants) depuis les mouvements
   var total=0;
@@ -613,16 +653,46 @@ function renderAlloc(){
 
   var sriMoy=sriW>0?(sriSum/sriW):0;
   var nbSupports=STATE.allocation.length;
-  var analysis='<strong>R\u00e9partition :</strong> Fonds \u20ac '+fmtPct(poidsFondsE,1)+' / UC '+fmtPct(poidsUC,1)+' \u00b7 ';
-  analysis+='<strong>SRI moyen pond\u00e9r\u00e9 :</strong> '+fmt(sriMoy,1)+' / 7 \u00b7 ';
-  analysis+='<strong>Diversification :</strong> '+nbSupports+' support'+(nbSupports>1?'s':'');
-  // Top concentration
+
+  // Repartition par classe d'actif
+  var byClass={};
+  ASSET_CLASSES.forEach(function(c){byClass[c.id]=0;});
+  STATE.allocation.forEach(function(a){
+    var cid=classifyAsset(a);
+    byClass[cid]+=(a.poids||0);
+  });
+  var totalW=0;
+  ASSET_CLASSES.forEach(function(c){totalW+=byClass[c.id];});
+
+  var html='';
+  if(totalW>0){
+    html+='<div class="gauge-wrap"><div class="gauge-bar">';
+    ASSET_CLASSES.forEach(function(c){
+      var w=byClass[c.id];
+      if(w>0.01){
+        html+='<div class="gauge-seg" style="flex:'+w+';background:'+c.color+'" title="'+esc(c.label)+' : '+fmtPct(w,1)+'"></div>';
+      }
+    });
+    html+='</div><div class="gauge-legend">';
+    ASSET_CLASSES.forEach(function(c){
+      var w=byClass[c.id];
+      if(w>0.01){
+        html+='<div class="gauge-item"><span class="gauge-dot" style="background:'+c.color+'"></span>'+esc(c.label)+' <b>'+fmtPct(w,1)+'</b></div>';
+      }
+    });
+    html+='</div></div>';
+  }
+
+  html+='<div style="margin-top:12px;font-size:11px;color:var(--gris-f);line-height:1.7">';
+  html+='<strong>SRI moyen pond\u00e9r\u00e9 :</strong> '+fmt(sriMoy,1)+' / 7 \u00b7 ';
+  html+='<strong>Diversification :</strong> '+nbSupports+' support'+(nbSupports>1?'s':'');
   if(STATE.allocation.length>0){
     var top=STATE.allocation.slice().sort(function(a,b){return (b.poids||0)-(a.poids||0);}).slice(0,3);
     var topPct=top.reduce(function(s,x){return s+(x.poids||0);},0);
-    analysis+=' \u2014 Top 3 supports : '+fmtPct(topPct,1)+' du portefeuille.';
+    html+=' \u2014 Top 3 supports : '+fmtPct(topPct,1);
   }
-  document.getElementById('allocAnalysis').innerHTML=analysis;
+  html+='</div>';
+  document.getElementById('allocAnalysis').innerHTML=html;
 }
 
 function renderMouv(){
