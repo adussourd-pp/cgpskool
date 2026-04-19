@@ -59,6 +59,18 @@
 .btn-add{margin-top:10px;padding:7px 14px;background:transparent;border:1.5px dashed var(--bord);color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.15s}
 .btn-add:hover{border-color:var(--orange);color:var(--orange);border-style:solid}
 
+/* Rangees editables dans la sidebar */
+.sb-row{background:#fff;border:1.5px solid var(--bord);border-radius:8px;padding:8px 10px 10px;margin-bottom:8px;position:relative}
+.sb-row input[type=text]{width:100%;padding:4px 2px;border:none;border-bottom:1px solid transparent;background:transparent;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--noir);outline:none;box-sizing:border-box;margin-bottom:6px}
+.sb-row input[type=text]:focus{border-bottom-color:var(--orange)}
+.sb-row-inputs{display:flex;gap:5px;align-items:center}
+.sb-row-inputs .inp{flex:1;display:flex;align-items:center;background:var(--gris-l);border:1px solid var(--bord);border-radius:6px}
+.sb-row-inputs .inp input{flex:1;min-width:0;padding:5px 7px;border:none;outline:none;background:transparent;font-size:11px;color:var(--noir);font-family:var(--sans);font-weight:600}
+.sb-row-inputs .inp .u{font-size:9px;color:var(--gris);padding-right:6px;white-space:nowrap}
+.sb-row-del{position:absolute;top:6px;right:8px;background:transparent;border:none;color:var(--gris);font-size:14px;line-height:1;cursor:pointer;padding:2px 4px}
+.sb-row-del:hover{color:#dc2626}
+.sb-row-lbl{font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.05em;margin-top:-2px;margin-bottom:2px}
+
 /* Alerte */
 .alert{font-size:11px;padding:8px 12px;border-radius:7px;margin-top:10px}
 .alert.warn{background:rgba(240,167,56,0.08);border-left:3px solid #F0A738;color:#8a5a14}
@@ -138,6 +150,18 @@
       </div>
     </div>
 
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Allocation de d&#233;part</div>
+    <div class="sb-body open">
+      <div id="sbDepartBody"></div>
+      <button class="btn-add" onclick="addDepart()" style="width:100%">+ Ajouter un fonds</button>
+    </div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Allocation cible</div>
+    <div class="sb-body open">
+      <div id="sbCibleBody"></div>
+      <button class="btn-add" onclick="addCible()" style="width:100%">+ Ajouter un fonds</button>
+    </div>
+
     <div style="height:1px;background:var(--bord);margin:10px 0"></div>
     <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
     <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
@@ -168,12 +192,10 @@
             <th>% initial</th>
             <th>Montant &euro;</th>
             <th>D&#233;sinv./arb.</th>
-            <th></th>
           </tr></thead>
           <tbody id="departBody"></tbody>
           <tfoot id="departFoot"></tfoot>
         </table>
-        <button class="btn-add" onclick="addDepart()">+ Ajouter une ligne</button>
         <div id="departAlerts"></div>
       </div>
 
@@ -187,12 +209,10 @@
             <th>Fonds</th>
             <th>% cible</th>
             <th>&euro; r&#233;investi</th>
-            <th></th>
           </tr></thead>
           <tbody id="cibleBody"></tbody>
           <tfoot id="cibleFoot"></tfoot>
         </table>
-        <button class="btn-add" onclick="addCible()">+ Ajouter une ligne</button>
         <div id="cibleAlerts"></div>
       </div>
 
@@ -257,31 +277,60 @@ function onDureeChange(){
   recalc();
 }
 
-// ── Tables (rendu sidebar inputs depuis ALLOC) ──────────────────
+// ── Sidebar editable + A4 read-only ─────────────────────────────
 function renderDepart(){
+  // Sidebar (editable)
+  var sb = V('sbDepartBody');
+  sb.innerHTML = '';
+  ALLOC.depart.forEach(function(f, i){
+    var d = document.createElement('div');
+    d.className = 'sb-row';
+    d.innerHTML =
+      '<button type="button" class="sb-row-del" onclick="delDepart('+i+')" title="Supprimer">&times;</button>'+
+      '<input type="text" value="'+escAttr(f.label)+'" oninput="updateDepart('+i+',\'label\',this.value)">'+
+      '<div class="sb-row-inputs">'+
+        '<div class="inp"><input type="number" min="0" max="100" step="1" value="'+f.pct+'" oninput="updateDepart('+i+',\'pct\',this.value)"><span class="u">%</span></div>'+
+        '<div class="inp"><input type="number" min="0" step="50" value="'+f.montArb+'" oninput="updateDepart('+i+',\'montArb\',this.value)"><span class="u">&euro;/arb</span></div>'+
+      '</div>';
+    sb.appendChild(d);
+  });
+  // A4 (read-only)
   var tb = V('departBody');
   tb.innerHTML = '';
   ALLOC.depart.forEach(function(f, i){
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><input type="text" value="'+escAttr(f.label)+'" oninput="updateDepart('+i+',\'label\',this.value)"></td>'+
-      '<td><input type="number" min="0" max="100" step="0.1" value="'+f.pct+'" oninput="updateDepart('+i+',\'pct\',this.value)"></td>'+
+      '<td>'+escHtml(f.label)+'</td>'+
+      '<td>'+Math.round(f.pct)+' %</td>'+
       '<td id="departMnt'+i+'">&mdash;</td>'+
-      '<td><input type="number" min="0" step="50" value="'+f.montArb+'" oninput="updateDepart('+i+',\'montArb\',this.value)"></td>'+
-      '<td><button type="button" class="row-del" onclick="delDepart('+i+')" title="Supprimer">&times;</button></td>';
+      '<td>'+fmt(f.montArb)+' &euro;</td>';
     tb.appendChild(tr);
   });
 }
 function renderCible(){
+  // Sidebar (editable)
+  var sb = V('sbCibleBody');
+  sb.innerHTML = '';
+  ALLOC.cible.forEach(function(f, i){
+    var d = document.createElement('div');
+    d.className = 'sb-row';
+    d.innerHTML =
+      '<button type="button" class="sb-row-del" onclick="delCible('+i+')" title="Supprimer">&times;</button>'+
+      '<input type="text" value="'+escAttr(f.label)+'" oninput="updateCible('+i+',\'label\',this.value)">'+
+      '<div class="sb-row-inputs">'+
+        '<div class="inp"><input type="number" min="0" max="100" step="1" value="'+f.pct+'" oninput="updateCible('+i+',\'pct\',this.value)"><span class="u">%</span></div>'+
+      '</div>';
+    sb.appendChild(d);
+  });
+  // A4 (read-only)
   var tb = V('cibleBody');
   tb.innerHTML = '';
   ALLOC.cible.forEach(function(f, i){
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><input type="text" value="'+escAttr(f.label)+'" oninput="updateCible('+i+',\'label\',this.value)"></td>'+
-      '<td><input type="number" min="0" max="100" step="0.1" value="'+f.pct+'" oninput="updateCible('+i+',\'pct\',this.value)"></td>'+
-      '<td id="cibleMnt'+i+'">&mdash;</td>'+
-      '<td><button type="button" class="row-del" onclick="delCible('+i+')" title="Supprimer">&times;</button></td>';
+      '<td>'+escHtml(f.label)+'</td>'+
+      '<td>'+Math.round(f.pct)+' %</td>'+
+      '<td id="cibleMnt'+i+'">&mdash;</td>';
     tb.appendChild(tr);
   });
 }
@@ -388,10 +437,9 @@ function recalc(){
   var pctOkD = Math.abs(totPctD - 100) < 0.01;
   V('departFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
-    '<td class="'+(pctOkD?'ok':'err')+'">'+fmt1(totPctD)+' %</td>'+
+    '<td class="'+(pctOkD?'ok':'err')+'">'+Math.round(totPctD)+' %</td>'+
     '<td>'+fmt(totMntD)+' €</td>'+
-    '<td>'+fmt(totArbD)+' €</td>'+
-    '<td></td></tr>';
+    '<td>'+fmt(totArbD)+' €</td></tr>';
   V('departAlerts').innerHTML = (pctOkD?'':'<div class="alert err">Le total doit faire 100 %.</div>') + alertesDepart.map(function(a){return '<div class="alert '+a.type+'">'+a.msg+'</div>';}).join('');
 
   // ── Rendu Allocation cible ───────────────────────────────────
@@ -405,9 +453,8 @@ function recalc(){
   var pctOkC = Math.abs(totPctC - 100) < 0.01;
   V('cibleFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
-    '<td class="'+(pctOkC?'ok':'err')+'">'+fmt1(totPctC)+' %</td>'+
-    '<td>'+fmt(totReinvC)+' €</td>'+
-    '<td></td></tr>';
+    '<td class="'+(pctOkC?'ok':'err')+'">'+Math.round(totPctC)+' %</td>'+
+    '<td>'+fmt(totReinvC)+' €</td></tr>';
   V('cibleAlerts').innerHTML = pctOkC?'':'<div class="alert err">Le total doit faire 100 %.</div>';
 
   // ── Allocation finale (merge par label) ──────────────────────
@@ -434,14 +481,14 @@ function recalc(){
     var mnt = merged[k];
     totalFinal += mnt;
     var pct = net>0 ? (mnt/net)*100 : 0;
-    finalBody += '<tr><td>'+escHtml(k)+'</td><td>'+fmt(mnt)+' €</td><td>'+fmt1(pct)+' %</td></tr>';
+    finalBody += '<tr><td>'+escHtml(k)+'</td><td>'+fmt(mnt)+' €</td><td>'+Math.round(pct)+' %</td></tr>';
   });
   V('finalBody').innerHTML = finalBody || '<tr><td colspan="3" style="text-align:center;color:var(--gris);font-style:italic;padding:20px">Renseignez les allocations de départ et cible pour voir le résultat.</td></tr>';
   var pctTotalFinal = net>0 ? (totalFinal/net)*100 : 0;
   var finalOk = Math.abs(pctTotalFinal - 100) < 0.05;
   V('finalFoot').innerHTML =
     '<tr><td>TOTAL</td><td>'+fmt(totalFinal)+' €</td>'+
-    '<td class="'+(finalOk?'ok':'err')+'">'+fmt1(pctTotalFinal)+' %</td></tr>';
+    '<td class="'+(finalOk?'ok':'err')+'">'+Math.round(pctTotalFinal)+' %</td></tr>';
   V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
 
   CGP.project.autoSave('allocation-cible');
