@@ -30,13 +30,19 @@ body { background: #ECEAE6; }
 .fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
 .fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
 
-.tog-row { display: flex; gap: 3px; }
-.tog { flex: 1; padding: 7px 3px; font-family: var(--sans); font-size: 11px; font-weight: 600; border: 1px solid var(--rule-l); background: #fff; color: var(--ink-60); cursor: pointer; transition: all 0.15s; text-align: center; }
-.tog:hover { border-color: var(--orange); color: var(--orange); }
-.tog.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+/* Mode tabs (choix initial type investissement - cf. SIDEBAR_STANDARD) */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:11px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
 
-.btn-sim{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:10px;flex-shrink:0}
-.btn-sim:hover{background:var(--orange-hover)}
+/* Bouton action + compteur etapes */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
+.sim-btn:hover{background:var(--orange-hover)}
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:#2D7A5B}
 
 /* Boutons bas (SIDEBAR_STANDARD section 7) */
 .btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
@@ -137,16 +143,16 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
     <!-- Type d'investissement (choix initial, sans toggle) -->
     <div class="fg" style="margin-bottom:14px">
       <label>Type d'investissement</label>
-      <div class="tog-row">
-        <button class="tog mode-tab active" onclick="setMode('mono',this)">Sans exploit.</button>
-        <button class="tog mode-tab" onclick="setMode('coloc',this)">Colocation</button>
-        <button class="tog mode-tab" onclick="setMode('resid',this)">Resid. Serv.</button>
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('mono',this)"><span class="mode-icon">&#127968;</span>Sans exploit.</div>
+        <div class="mode-tab" onclick="setMode('coloc',this)"><span class="mode-icon">&#128101;</span>Colocation</div>
+        <div class="mode-tab" onclick="setMode('resid',this)"><span class="mode-icon">&#127976;</span>Resid. Serv.</div>
       </div>
     </div>
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
       <div class="fg"><label>Nom du client</label>
         <div class="fi-row"><input type="text" id="immoClient" placeholder="Nom Pr&#233;nom" oninput="renderHeader()"><span class="fi-unit">&#128100;</span></div></div>
       <div class="fg"><label>Revenus annuels nets</label>
@@ -155,8 +161,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fi-row"><input type="number" id="immoChg" value="0" step="50"><span class="fi-unit">&#8364;</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Bien immobilier</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="bien" onclick="openStep('bien',this)"><span class="acc">&#9654;</span>Bien immobilier</div>
+    <div class="sb-body" id="body_bien">
       <div id="B-mono">
         <div class="fg"><label>Prix de vente TTC (foncier + immo)</label>
           <div class="fi-row"><input type="number" id="prixTotal" value="200000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
@@ -201,8 +207,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Revenus locatifs</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="revenus" onclick="openStep('revenus',this)"><span class="acc">&#9654;</span>Revenus locatifs</div>
+    <div class="sb-body" id="body_revenus">
       <div id="R-mono">
         <div class="fg"><label>Loyer mensuel (hors charges)</label>
           <div class="fi-row"><input type="number" id="loyerM" value="700" step="50" oninput="recalc()"><span class="fi-unit">€/mois</span></div></div>
@@ -227,8 +233,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fi-row"><input type="number" id="revaloV" value="0" step="0.5" oninput="recalc()"><span class="fi-unit">%/an</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Charges annuelles</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="charges" onclick="openStep('charges',this)"><span class="acc">&#9654;</span>Charges annuelles</div>
+    <div class="sb-body" id="body_charges">
       <div class="fg"><label>Charges de copropriété (propriétaire)</label>
         <div class="fi-row"><input type="number" id="cCopro" value="180" step="50" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
       <div class="fg"><label>Taxe foncière</label>
@@ -247,8 +253,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fi-row"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Financement</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="fin" onclick="openStep('fin',this)"><span class="acc">&#9654;</span>Financement</div>
+    <div class="sb-body" id="body_fin">
       <div class="fg"><label>Apport personnel</label>
         <div class="fi-row"><input type="number" id="apport" value="10000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
       <div class="fg"><label>Frais de dossier / courtage</label>
@@ -273,7 +279,7 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
+    <div class="cs-sidebar-lbl" onclick="openStep(null,this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
     <div class="sb-body">
       <div class="fg"><label>Dur&#233;e amortissement immobilier</label>
         <div class="fi-row"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
@@ -281,8 +287,9 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fi-row"><input type="number" id="durAmM" value="10" min="5" max="15" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
     </div>
 
-    <!-- Bouton d'action principal -->
-    <button class="btn-sim" onclick="recalc()">Calculer la projection &#8594;</button>
+    <!-- Bouton d'action principal + compteur etapes -->
+    <button class="sim-btn" onclick="recalc()">Calculer la projection &#8594;</button>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
 
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
@@ -327,6 +334,51 @@ var toggleAcc=CGP.toggleAcc;
 var mode = 'mono';
 var chartInst = null;
 
+/* ---- Progression (accordeon strict + compteur) ---- */
+var _stepOpened={client:true, bien:false, revenus:false, charges:false, fin:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=document.getElementById('immoClient');return !!(v&&v.value.trim())}
+  if(id==='bien'){
+    var fieldId = mode==='coloc'?'prixFAI' : (mode==='resid'?'prixTotalR':'prixTotal');
+    var v=document.getElementById(fieldId); return !!(v&&Number(v.value)>0);
+  }
+  if(id==='revenus'){
+    var fieldId = mode==='coloc'?'loyerCh' : (mode==='resid'?'loyerAHT':'loyerM');
+    var v=document.getElementById(fieldId); return !!(v&&Number(v.value)>0);
+  }
+  if(id==='charges')return true;
+  if(id==='fin'){var v=document.getElementById('tauxN');return !!(v&&Number(v.value)>0)}
+  return false;
+}
+function updateProgress(){
+  var steps=['client','bien','revenus','charges','fin'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===5);}
+}
+document.addEventListener('input', function(e){
+  if(!e.target||!e.target.id)return;
+  var ids=['immoClient','prixTotal','prixFAI','prixTotalR','loyerM','loyerCh','loyerAHT','tauxN'];
+  if(ids.indexOf(e.target.id)>=0)updateProgress();
+});
+
 function gv(id, def) { var el=document.getElementById(id); return el ? (parseFloat(el.value)||0) : (def||0); }
 var fmt=CGP.fmt;
 function fmtE(n) { return fmt(n)+' €'; }
@@ -339,7 +391,7 @@ function setV(id,v) { var el=document.getElementById(id); if(el) el.value=v; }
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   // Affichage blocs
   ['mono','coloc','resid'].forEach(k => {
     var s = (k===m)?'':'none';
@@ -370,6 +422,7 @@ function setMode(m, btn) {
     setV('adi1',0.15); setV('adi2',0.15); setV('q1',50); setV('q2',50);
   }
   recalc();
+  updateProgress();
 }
 
 function dRow(l,v,cls) { return '<div class="dr"><span class="l">'+l+'</span><span class="v'+(cls?' '+cls:'')+'">'+v+'</span></div>'; }
@@ -709,6 +762,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ['B-mono','R-mono'].forEach(id => { var el=document.getElementById(id); if(el) el.style.display=''; });
   ['B-coloc','R-coloc','B-resid','R-resid'].forEach(id => { var el=document.getElementById(id); if(el) el.style.display='none'; });
   recalc();
+  updateProgress();
 });
 
 // Footer conseiller

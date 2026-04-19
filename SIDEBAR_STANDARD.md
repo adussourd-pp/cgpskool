@@ -434,7 +434,7 @@ Avant commit d'un nouveau module ou refonte :
 | etude-transfert-per | ✓ `.fam-tabs` (2) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
 | allocation-cible | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
 | per-vs-av | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
-| immo-simulator | ✓ `.tog-row` (3) | ✓ toggle | ✓ | — (live) | ✓ 4 boutons | ✓ |
+| immo-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | productivite | ? | ? | ? | — | ? | ? |
 | bp-simulator | ? | ? | ? | — | ? | ? |
 | interets-composes | ? | ? | ? | — | ? | ? |
