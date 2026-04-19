@@ -319,7 +319,114 @@ p.hero-desc {
 .daily-cta-arrow{font-size:16px;transition:transform 0.2s}
 .daily-strip:hover .daily-cta-arrow{transform:translateX(3px)}
 @media (max-width:720px){.daily-strip{padding:20px 24px}.daily-inner{gap:16px}.daily-score{font-size:34px}.daily-cta{width:100%;justify-content:center}}
+
+/* ── AGENDA — événements Forman / Prodémial ── */
+.events-section{background:#F2F1EE;padding:44px 52px 40px;border-bottom:1px solid var(--rule-l)}
+.events-inner{max-width:1100px;margin:0 auto}
+.events-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.events-label{font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-30)}
+.events-sub{font-size:12px;color:var(--ink-60);font-weight:300;max-width:480px;line-height:1.6}
+.events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.event-card{position:relative;background:#fff;border:1px solid var(--rule-l);padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;transition:border-color 0.2s,box-shadow 0.2s}
+.event-card:hover{border-color:rgba(212,98,42,0.35);box-shadow:0 4px 16px rgba(212,98,42,0.06)}
+.event-card.featured{border-color:rgba(212,98,42,0.35)}
+.event-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)}
+.event-card.passed{opacity:0.48}
+.event-card.going{border-color:var(--orange);background:rgba(212,98,42,0.04)}
+.event-month{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange)}
+.event-host{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;background:rgba(24,22,20,0.05);color:var(--ink-60);align-self:flex-start}
+.event-host.forman{background:rgba(43,94,167,0.1);color:#2B5EA7}
+.event-host.prodemial{background:var(--o-dim);color:var(--orange)}
+.event-title{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--ink);line-height:1.25}
+.event-desc{font-size:12px;color:var(--ink-60);font-weight:300;line-height:1.55;flex:1}
+.event-check{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding-top:8px;border-top:1px solid var(--rule-l);margin-top:4px}
+.event-check input{position:absolute;opacity:0;pointer-events:none}
+.event-check-track{position:relative;display:inline-block;width:34px;height:20px;background:rgba(0,0,0,0.12);border-radius:20px;transition:background 0.2s;flex-shrink:0}
+.event-check-dot{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform 0.2s}
+.event-check input:checked + .event-check-track{background:var(--orange)}
+.event-check input:checked + .event-check-track .event-check-dot{transform:translateX(14px)}
+.event-check-lbl{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);transition:color 0.2s}
+.event-check input:checked ~ .event-check-lbl{color:var(--orange)}
+.event-card.passed .event-check{pointer-events:none;opacity:0.6}
+@media (max-width:720px){.events-section{padding:32px 24px 28px}.events-head{flex-direction:column;align-items:flex-start;gap:6px}}
 </style>
+
+<section class="events-section">
+  <div class="events-inner">
+    <div class="events-head">
+      <div>
+        <div class="events-label">Agenda &mdash; Forman &amp; Prod&eacute;mial</div>
+        <div class="events-sub" style="margin-top:6px">Les rendez-vous &agrave; ne pas manquer. Coche &laquo;&nbsp;J'y vais&nbsp;&raquo; pour noter tes choix (m&eacute;moris&eacute; localement).</div>
+      </div>
+    </div>
+    <div class="events-grid" id="eventsGrid"></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var EVENTS = [
+    { id:'udp-janv',    month:'D\u00e9but janvier', sort:1, host:'Forman',    title:'Universit\u00e9 du Patrimoine',  desc:"Le temps fort de l'ann\u00e9e \u2014 la plus grosse \u00e9dition, formation et retrouvailles.", featured:true },
+    { id:'forum-janv',  month:'Fin janvier',        sort:2, host:'Prod\u00e9mial', title:'Forum du Patrimoine',             desc:'Forum Prod\u00e9mial : partenaires, nouveaut\u00e9s, ateliers produit.' },
+    { id:'udp-avril',   month:'Avril',              sort:3, host:'Forman',    title:'Universit\u00e9 du Patrimoine',  desc:"\u00c9dition de printemps \u2014 formations m\u00e9tier et actualit\u00e9 fiscale." },
+    { id:'udp-rentree', month:'Fin ao\u00fbt / d\u00e9but septembre', sort:4, host:'Forman', title:'UDP \u2014 La Rentr\u00e9e', desc:"Lancement de la saison : feuille de route, objectifs, inspirations." },
+    { id:'convention',  month:'Fin septembre',      sort:5, host:'Prod\u00e9mial', title:'Convention Nationale',            desc:'Grand-messe annuelle Prod\u00e9mial \u2014 strat\u00e9gie, qualifications, c\u00e9l\u00e9brations.' }
+  ];
+  var STORE = 'cgpskool_events_v1';
+  function load(){ try{return JSON.parse(localStorage.getItem(STORE))||{};}catch(e){return {};} }
+  function save(s){ try{localStorage.setItem(STORE, JSON.stringify(s));}catch(e){} }
+
+  // Ordre du mois dans l'annee (0-11) pour savoir si passe
+  var MONTH_ORDER = { 'udp-janv':0, 'forum-janv':0, 'udp-avril':3, 'udp-rentree':8, 'convention':8 };
+  function isPassed(id){
+    var now = new Date();
+    var m = MONTH_ORDER[id];
+    if(m === undefined) return false;
+    // Considerer passe si on est dans un mois strictement posterieur
+    return now.getMonth() > m;
+  }
+
+  function render(){
+    var state = load();
+    var grid = document.getElementById('eventsGrid');
+    if(!grid) return;
+    grid.innerHTML = EVENTS.map(function(ev){
+      var checked = !!state[ev.id];
+      var passed = isPassed(ev.id);
+      var hostCls = ev.host === 'Forman' ? 'forman' : 'prodemial';
+      var classes = 'event-card' + (ev.featured?' featured':'') + (passed?' passed':'') + (checked?' going':'');
+      return '<article class="'+classes+'" data-event="'+ev.id+'">'+
+        '<div class="event-month">'+ev.month+'</div>'+
+        '<span class="event-host '+hostCls+'">'+ev.host+'</span>'+
+        '<div class="event-title">'+ev.title+'</div>'+
+        '<div class="event-desc">'+ev.desc+'</div>'+
+        '<label class="event-check">'+
+          '<input type="checkbox" '+(checked?'checked':'')+' onchange="window.__toggleEvent(\''+ev.id+'\',this.checked,this)">'+
+          '<span class="event-check-track"><span class="event-check-dot"></span></span>'+
+          '<span class="event-check-lbl">'+(checked?"J'y vais \u2713":"J'y vais")+'</span>'+
+        '</label>'+
+      '</article>';
+    }).join('');
+  }
+
+  window.__toggleEvent = function(id, val, inputEl){
+    var state = load();
+    if(val) state[id] = true; else delete state[id];
+    save(state);
+    // Maj visuelle sans re-render complet
+    var card = inputEl.closest('.event-card');
+    if(card) card.classList.toggle('going', val);
+    var lbl = card ? card.querySelector('.event-check-lbl') : null;
+    if(lbl) lbl.textContent = val ? "J'y vais \u2713" : "J'y vais";
+  };
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
+  }
+})();
+</script>
 
 <div class="tools-section">
   <div class="tools-inner">
