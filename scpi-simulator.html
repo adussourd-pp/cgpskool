@@ -67,6 +67,11 @@
 .sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
 .sim-btn:hover{background:var(--orange-hover)}
 
+/* Compteur etapes (SIDEBAR_STANDARD.md section 5) */
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:var(--green)}
+
 /* Boutons bas (SIDEBAR_STANDARD.md section 7) */
 .btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
 .btn-pdf:hover{opacity:0.85}
@@ -252,14 +257,15 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <!-- SIDEBAR -->
 <div class="cs-sidebar">
 
-  <div class="fg" style="margin-bottom:14px">
-    <label>Nom du client</label>
-    <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+  <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+  <div class="sb-body open" id="body_client">
+    <div class="fg"><label>Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
+    </div>
   </div>
-  <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type de projection</div>
-  <div class="sb-body open">
+  <div class="cs-sidebar-lbl" data-step="type" onclick="openStep('type',this)"><span class="acc">&#9654;</span>Type de projection</div>
+  <div class="sb-body" id="body_type">
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">&#128200;</span>Plan Retraite SCPI</div>
       <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">&#128256;</span>Nue-propri&#233;t&#233;</div>
@@ -267,8 +273,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
   </div>
 
-  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>SCPI</div>
-  <div class="sb-body open">
+  <div class="cs-sidebar-lbl" data-step="scpi" onclick="openStep('scpi',this)"><span class="acc">&#9654;</span>SCPI</div>
+  <div class="sb-body" id="body_scpi">
     <div class="source-toggle">
       <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">&#128203; Gamme SCPI</button>
       <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">&#9997;&#65039; Taux personnalis&#233;</button>
@@ -283,7 +289,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
         <div class="fg" style="margin-bottom:8px">
           <label>Taux de distribution</label>
           <div class="fi-row">
-            <input type="number" id="custom-gross" value="6.00" min="0.1" max="20" step="0.1">
+            <input type="number" id="custom-gross" value="6.00" min="0.1" max="20" step="0.1" oninput="updateProgress()">
             <span class="fi-unit">%</span>
           </div>
         </div>
@@ -295,8 +301,8 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     </div>
   </div>
 
-  <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Plan d'investissement</div>
-  <div class="sb-body open">
+  <div class="cs-sidebar-lbl" data-step="plan" onclick="openStep('plan',this)"><span class="acc">&#9654;</span>Plan d'investissement</div>
+  <div class="sb-body" id="body_plan">
 
     <!-- RETRAITE -->
     <div id="inputs-retraite">
@@ -363,6 +369,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
   </div>
 
   <button class="sim-btn" onclick="runSimulation()">Lancer la projection &rarr;</button>
+  <div class="prog-count" id="progCount"><strong>0</strong> / 4 &eacute;tapes valid&eacute;es</div>
 
   <div style="flex:1;min-height:16px"></div>
   <div style="height:1px;background:var(--bord);margin:12px 0"></div>
@@ -417,7 +424,43 @@ let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi
 
 var toggleAcc=CGP.toggleAcc;
 
-function init(){renderSCPIList(SCPI_DATA)}
+/* ── Progression (accordeon strict + compteur) ── */
+var _stepOpened={client:true,type:false,scpi:false,plan:false};
+function openStep(id,el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open',open);
+    }else{
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=document.getElementById('clientNom');return !!(v&&v.value.trim())}
+  if(id==='type')return true;
+  if(id==='scpi'){
+    if(sourceMode==='custom'){var g=document.getElementById('custom-gross');return !!(g&&Number(g.value)>0)}
+    return !!selectedSCPI;
+  }
+  if(id==='plan')return true;
+  return false;
+}
+function updateProgress(){
+  var steps=['client','type','scpi','plan'],done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 4 &eacute;tapes valid&eacute;es';
+    c.classList.toggle('full',done===4);}
+}
+
+function init(){renderSCPIList(SCPI_DATA);updateProgress();}
 
 function renderSCPIList(list){
   document.getElementById('scpiList').innerHTML=list.map(s=>`
@@ -440,6 +483,7 @@ function selectSCPI(id){
   document.querySelectorAll('.scpi-card').forEach(c=>c.classList.remove('selected'));
   const el=document.getElementById('scpi-'+id);
   if(el)el.classList.add('selected');
+  updateProgress();
 }
 
 function setSource(mode){
@@ -448,6 +492,7 @@ function setSource(mode){
   document.getElementById('srcBtnCustom').className='src-btn'+(mode==='custom'?' active':'');
   document.getElementById('scpiPickerPanel').style.display=mode==='scpi'?'block':'none';
   document.getElementById('customRatePanel').style.display=mode==='custom'?'block':'none';
+  updateProgress();
 }
 
 function getActiveScpi(){
@@ -473,6 +518,7 @@ function setMode(mode,el){
   document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   ['retraite','np','entreprise'].forEach(m=>document.getElementById('inputs-'+m).style.display=m===mode?'block':'none');
+  updateProgress();
 }
 
 function updateEntDur(v){document.getElementById('ent-dur-val').textContent=v+' ans';}
