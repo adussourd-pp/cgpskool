@@ -432,11 +432,11 @@ Avant commit d'un nouveau module ou refonte :
 | suivi-contrat | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
 | scpi-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
 | etude-transfert-per | ✓ `.fam-tabs` (2) | ✓ toggle | ✓ | ✓ compteur 3/3 | ✓ 4 boutons | ✓ |
-| allocation-cible | — | ✓ | ✓ | — | 3 boutons | ✗ à ajouter |
+| allocation-cible | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
+| per-vs-av | — | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
+| immo-simulator | ✓ `.tog-row` (3) | ✓ toggle | ✓ | — (live) | ✓ 4 boutons | ✓ |
 | productivite | ? | ? | ? | — | ? | ? |
 | bp-simulator | ? | ? | ? | — | ? | ? |
-| per-vs-av | ? | ? | ? | — | ? | ? |
-| immo-simulator | ? | ? | ? | — | ? | ? |
 | interets-composes | ? | ? | ? | — | ? | ? |
 | simulateur-avance-av | ? | ? | ? | — | ? | ? |
 | comparatif-cgp | ? | ? | ? | — | ? | ? |

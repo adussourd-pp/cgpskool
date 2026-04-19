@@ -188,6 +188,14 @@
 @media (max-width: 700px) {
   .comparison-grid { grid-template-columns: 1fr; }
 }
+
+/* Boutons bas (SIDEBAR_STANDARD section 7) */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:14px;flex-shrink:0}
+.sim-btn:hover{background:var(--orange-hover)}
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 </style>
 </head>
 <body>
@@ -270,11 +278,18 @@
       </div>
     </div>
 
-    <button style="width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:14px" onclick="recalc()">Lancer la projection &#8594;</button>
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <!-- Bouton d'action principal -->
+    <button class="sim-btn" onclick="recalc()">Lancer la projection &#8594;</button>
+
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
 
   </div>
 
@@ -763,6 +778,12 @@ CGP.project.registerModule('per-vs-av', {
     recalc();
   }
 });
+
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?')) return;
+  try{localStorage.removeItem('cgpskool_state_per-vs-av');}catch(e){}
+  location.reload();
+}
 </script>
 </body>
 </html>

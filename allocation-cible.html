@@ -76,6 +76,12 @@
 .alert.warn{background:rgba(240,167,56,0.08);border-left:3px solid #F0A738;color:#8a5a14}
 .alert.err{background:rgba(220,38,38,0.06);border-left:3px solid #dc2626;color:#991b1b}
 
+/* Boutons bas (SIDEBAR_STANDARD section 7) */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+
 /* Résultat final */
 .final-tbl{width:100%;border-collapse:collapse;font-size:13px}
 .final-tbl thead th{padding:10px 8px;text-align:right;font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
@@ -162,10 +168,15 @@
       <button class="btn-add" onclick="addCible()" style="width:100%">+ Ajouter un fonds</button>
     </div>
 
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
   </div>
 
   <!-- MAIN -->
@@ -529,6 +540,12 @@ CGP.project.registerModule('allocation-cible', {
     recalc();
   }
 });
+
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?')) return;
+  try{localStorage.removeItem('cgpskool_state_allocation-cible');}catch(e){}
+  location.reload();
+}
 
 // ── Init ─────────────────────────────────────────────────────────
 renderDepart();
