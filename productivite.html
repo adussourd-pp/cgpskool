@@ -99,6 +99,23 @@
 
 /* Streak */
 .streak-fire{font-size:20px;line-height:1}
+
+/* Evolution chart (multi-semaines) */
+.evo-wrap{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:16px 18px;margin-bottom:20px}
+.evo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.evo-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--noir)}
+.evo-legend{display:flex;gap:12px;font-size:10px;color:var(--gris)}
+.evo-legend span{display:inline-flex;align-items:center;gap:4px}
+.evo-legend i{width:10px;height:2px;display:inline-block;border-radius:1px}
+.evo-svg{width:100%;height:140px;display:block}
+.evo-grid-line{stroke:rgba(0,0,0,0.06);stroke-width:1}
+.evo-goal-line{stroke:var(--orange);stroke-width:1;stroke-dasharray:3,3;opacity:0.55}
+.evo-line{fill:none;stroke:var(--orange);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.evo-area{fill:url(#evoGrad);opacity:0.25}
+.evo-dot{fill:#fff;stroke:var(--orange);stroke-width:2}
+.evo-dot.current{fill:var(--orange)}
+.evo-label{font-size:9px;fill:var(--gris);font-family:var(--sans)}
+.evo-val{font-size:10px;fill:var(--noir);font-weight:700;font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -179,6 +196,26 @@
       <div class="chart-wrap" id="chartWrap"></div>
       <div style="display:flex;gap:4px;margin-bottom:20px" id="chartLabels"></div>
 
+      <!-- Evolution multi-semaines -->
+      <div class="evo-wrap">
+        <div class="evo-head">
+          <div class="evo-title">Evolution — 8 dernieres semaines</div>
+          <div class="evo-legend">
+            <span><i style="background:var(--orange)"></i>Score hebdo</span>
+            <span><i style="background:var(--orange);opacity:0.55"></i>Objectif</span>
+          </div>
+        </div>
+        <svg class="evo-svg" id="evoSvg" viewBox="0 0 600 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="evoGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D4622A" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#D4622A" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <g id="evoContent"></g>
+        </svg>
+      </div>
+
       <div class="divider"></div>
 
       <!-- Tracker grid -->
@@ -198,15 +235,16 @@
 
 <script>
 // ── ACTIONS ──────────────────────────────────────────────────
+// Somme = 100 : faire tout 1x dans la journee = 100 pts
 var ACTIONS = [
   { id:'conv',  cat:'Prospection', icon:'&#128172;', label:'Nouvelle conversation',   pts:5  },
   { id:'r1',    cat:'Prospection', icon:'&#128197;', label:'Prise de R1',              pts:15 },
-  { id:'inv',   cat:'Prospection', icon:'&#128226;', label:'Invitation metier (DM/PO)',pts:10 },
-  { id:'rel',   cat:'Prospection', icon:'&#128260;', label:'Suivi / Relance',           pts:3  },
-  { id:'sign',  cat:'Resultats',   icon:'&#9989;',   label:'Signature client',          pts:30 },
-  { id:'insc',  cat:'Resultats',   icon:'&#127775;', label:'Inscrit',                   pts:40 },
-  { id:'pro',   cat:'Developpement', icon:'&#127891;', label:'Professionnalisation',    pts:8  },
-  { id:'lead',  cat:'Developpement', icon:'&#129351;', label:'Leadership / Coaching',   pts:12 }
+  { id:'inv',   cat:'Prospection', icon:'&#128226;', label:'Invitation metier (DM/PO)',pts:15 },
+  { id:'rel',   cat:'Prospection', icon:'&#128260;', label:'Suivi / Relance',           pts:5  },
+  { id:'sign',  cat:'Resultats',   icon:'&#9989;',   label:'Signature client',          pts:20 },
+  { id:'insc',  cat:'Resultats',   icon:'&#127775;', label:'Inscrit',                   pts:25 },
+  { id:'pro',   cat:'Developpement', icon:'&#127891;', label:'Professionnalisation',    pts:7  },
+  { id:'lead',  cat:'Developpement', icon:'&#129351;', label:'Leadership / Coaching',   pts:8  }
 ];
 
 var DAY_NAMES = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -464,6 +502,83 @@ function renderChart() {
   document.getElementById('chartLabels').innerHTML = labelHtml;
 }
 
+// ── RENDER EVOLUTION (8 dernieres semaines) ───────────────────
+function getWeekTotalFor(monday) {
+  var total = 0;
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    var key = dateStr(d);
+    var score = 0;
+    Object.keys(state.history).forEach(function(wk) {
+      var week = state.history[wk];
+      if (week[key]) {
+        ACTIONS.forEach(function(a) { score += (week[key][a.id] || 0) * getPoints(a.id); });
+      }
+    });
+    total += Math.min(score, 100);
+  }
+  return total;
+}
+
+function renderEvolution() {
+  var N = 8;
+  var baseMonday = getCurrentMonday();
+  var weeks = [];
+  for (var i = N - 1; i >= 0; i--) {
+    var m = new Date(baseMonday);
+    m.setDate(baseMonday.getDate() - i * 7);
+    weeks.push({ monday: m, total: getWeekTotalFor(m) });
+  }
+
+  var W = 600, H = 140;
+  var padL = 30, padR = 10, padT = 14, padB = 22;
+  var innerW = W - padL - padR;
+  var innerH = H - padT - padB;
+  var maxY = Math.max(state.goal, 100);
+  weeks.forEach(function(w){ if (w.total > maxY) maxY = w.total; });
+  maxY = Math.ceil(maxY / 100) * 100;
+
+  var stepX = innerW / (N - 1);
+  function x(i) { return padL + i * stepX; }
+  function y(v) { return padT + innerH - (v / maxY) * innerH; }
+
+  var html = '';
+
+  // grid lines (4 horizontales)
+  for (var g = 0; g <= 4; g++) {
+    var gy = padT + (innerH / 4) * g;
+    var gv = Math.round(maxY - (maxY / 4) * g);
+    html += '<line class="evo-grid-line" x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '"/>';
+    html += '<text class="evo-label" x="' + (padL - 6) + '" y="' + (gy + 3) + '" text-anchor="end">' + gv + '</text>';
+  }
+
+  // ligne objectif
+  html += '<line class="evo-goal-line" x1="' + padL + '" y1="' + y(state.goal) + '" x2="' + (W - padR) + '" y2="' + y(state.goal) + '"/>';
+
+  // area + line
+  var pts = weeks.map(function(w, i){ return x(i) + ',' + y(w.total); }).join(' ');
+  var areaPath = 'M' + x(0) + ',' + y(0) + ' L' + weeks.map(function(w, i){ return x(i) + ',' + y(w.total); }).join(' L') + ' L' + x(N-1) + ',' + y(0) + ' Z';
+  html += '<path class="evo-area" d="' + areaPath + '"/>';
+  html += '<polyline class="evo-line" points="' + pts + '"/>';
+
+  // dots + labels
+  weeks.forEach(function(w, i) {
+    var cx = x(i), cy = y(w.total);
+    var isCurrent = (i === N - 1);
+    html += '<circle class="evo-dot' + (isCurrent ? ' current' : '') + '" cx="' + cx + '" cy="' + cy + '" r="' + (isCurrent ? 4.5 : 3.5) + '"/>';
+    if (isCurrent || w.total > 0) {
+      html += '<text class="evo-val" x="' + cx + '" y="' + (cy - 8) + '" text-anchor="middle">' + w.total + '</text>';
+    }
+    // label x-axis : semaine
+    var wk = weekKey(w.monday);
+    var wNum = wk.split('-W')[1];
+    html += '<text class="evo-label" x="' + cx + '" y="' + (H - 6) + '" text-anchor="middle">S' + wNum + '</text>';
+  });
+
+  document.getElementById('evoContent').innerHTML = html;
+}
+
 // ── RENDER KPIs ───────────────────────────────────────────────
 function renderKPIs() {
   var days = getWeekDays();
@@ -516,6 +631,7 @@ function render() {
   renderHeader();
   renderGrid();
   renderChart();
+  renderEvolution();
   renderKPIs();
 }
 
@@ -542,6 +658,7 @@ function adjust(dayKey, actionId, delta) {
   }
 
   renderChart();
+  renderEvolution();
   renderKPIs();
 }
 
@@ -554,6 +671,7 @@ function onGoalChange() {
   state.goal = parseInt(document.getElementById('weeklyGoal').value) || 350;
   saveState();
   renderKPIs();
+  renderEvolution();
   document.getElementById('goalDisplay').textContent = state.goal;
 }
 
