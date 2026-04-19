@@ -157,6 +157,100 @@
 .modal-actions { display: flex; gap: 8px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule-l); }
 .btn-ghost-ink { display: inline-flex; align-items: center; padding: 10px 18px; border: 1px solid var(--rule-l); background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-60); cursor: pointer; transition: all 0.2s; }
 .btn-ghost-ink:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ── Menu dans la top-nav ── */
+.top-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 28px;
+}
+.top-menu-item {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  padding: 4px 6px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.top-menu-item:hover { color: #fff; }
+.top-menu-item.active { color: var(--orange); border-bottom-color: var(--orange); }
+.top-menu-sep { color: rgba(255,255,255,0.15); font-size: 10px; user-select: none; }
+@media (max-width: 900px) {
+  .top-menu { display: none; }
+}
+
+/* ── Fold/unfold sections (Acces, Agenda, Ma journée) ── */
+.fold-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+}
+.fold-chevron {
+  margin-left: auto;
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+[data-fold].closed .fold-chevron { transform: rotate(-90deg); }
+.fold-body {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.2s ease;
+  max-height: 2000px;
+  opacity: 1;
+}
+[data-fold].closed .fold-body {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0 !important;
+}
+.fold-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+[data-fold].closed .fold-preview { opacity: 1; pointer-events: auto; }
+
+/* Mini chip pour events cochés (aperçu Agenda plié) */
+.mini-event-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+}
+.mini-event-chip.forman { background: rgba(168,85,247,0.18); color: #c4b5fd; }
+.mini-event-chip.prodemial { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.mini-event-more {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.04em;
+}
 </style>
 </head>
 <body>
@@ -167,6 +261,17 @@
       <div class="cs-logo-mark"><span>C</span></div>
       <span class="cs-logo-name">CGP Skool</span>
     </a>
+    <nav class="top-menu" id="topMenu">
+      <a href="#formation" class="top-menu-item" data-target="formation">Formation</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#mon-activite" class="top-menu-item" data-target="mon-activite">Mon activit&eacute;</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#simulateurs" class="top-menu-item" data-target="simulateurs">Simulateurs</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#suivi" class="top-menu-item" data-target="suivi">Suivi</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#analyse" class="top-menu-item" data-target="analyse">Analyse</a>
+    </nav>
     <div style="flex:1"></div>
     <div class="cs-nav-actions">
       <button class="cs-btn-ghost missing" id="btnProfil" onclick="openProfil()">⚙ Mon profil</button>
@@ -174,71 +279,91 @@
   </div>
 </nav>
 
-<div class="hero">
+<div class="hero" data-fold="acces">
   <div class="hero-body">
-    <div class="hero-title">&#128279; Acc&egrave;s</div>
-    <div class="hero-piliers">
-      <a href="https://my.prodemial.fr" target="_blank" class="pilier-btn">
-        <span class="pilier-icon">&#128202;</span>
-        <div class="pilier-text">
-          <div class="pilier-name">my.prodemial.fr</div>
-          <div class="pilier-sub">Mon espace</div>
-        </div>
-      </a>
-      <a href="https://asso-forman.fr" target="_blank" class="pilier-btn">
-        <span class="pilier-icon">&#127891;</span>
-        <div class="pilier-text">
-          <div class="pilier-name">asso-forman.fr</div>
-          <div class="pilier-sub">Agenda &amp; formation</div>
-        </div>
-      </a>
-      <a href="https://www.skool.com/cgp-skool-1992" target="_blank" class="pilier-btn">
-        <span class="pilier-icon">&#127941;</span>
-        <div class="pilier-text">
-          <div class="pilier-name">Onboarding CGP Skool</div>
-          <div class="pilier-sub">skool.com</div>
-        </div>
-      </a>
+    <button class="fold-header" onclick="toggleFold('acces')" type="button">
+      <span class="hero-title">&#128279; Acc&egrave;s</span>
+      <span class="fold-preview"></span>
+      <span class="fold-chevron">&#9662;</span>
+    </button>
+    <div class="fold-body" style="margin-top:12px">
+      <div class="hero-piliers">
+        <a href="https://my.prodemial.fr" target="_blank" class="pilier-btn">
+          <span class="pilier-icon">&#128202;</span>
+          <div class="pilier-text">
+            <div class="pilier-name">my.prodemial.fr</div>
+            <div class="pilier-sub">Mon espace</div>
+          </div>
+        </a>
+        <a href="https://asso-forman.fr" target="_blank" class="pilier-btn">
+          <span class="pilier-icon">&#127891;</span>
+          <div class="pilier-text">
+            <div class="pilier-name">asso-forman.fr</div>
+            <div class="pilier-sub">Agenda &amp; formation</div>
+          </div>
+        </a>
+        <a href="https://www.skool.com/cgp-skool-1992" target="_blank" class="pilier-btn">
+          <span class="pilier-icon">&#127941;</span>
+          <div class="pilier-text">
+            <div class="pilier-name">Onboarding CGP Skool</div>
+            <div class="pilier-sub">skool.com</div>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- AGENDA Forman / Prodemial -->
-<section class="events-section">
-  <div class="events-inner">
-    <div class="events-head">
-      <div class="events-label">&#128197; Agenda</div>
-      <div class="events-sub">Forman &amp; Prod&eacute;mial</div>
+<section class="events-section" data-fold="agenda" id="agenda">
+  <div class="events-inner" style="flex-direction:column;align-items:stretch;gap:0">
+    <button class="fold-header" onclick="toggleFold('agenda')" type="button">
+      <div class="events-head" style="display:flex;align-items:baseline;gap:12px">
+        <div class="events-label">&#128197; Agenda</div>
+        <div class="events-sub" style="max-width:none">Forman &amp; Prod&eacute;mial</div>
+      </div>
+      <span class="fold-preview" id="agendaPreview"></span>
+      <span class="fold-chevron">&#9662;</span>
+    </button>
+    <div class="fold-body" style="margin-top:14px">
+      <div class="events-grid" id="eventsGrid"></div>
     </div>
-    <div class="events-grid" id="eventsGrid"></div>
   </div>
 </section>
 
 <!-- BANDEAU PRODUCTIVITE DU JOUR -->
-<a href="productivite.html" class="daily-strip" id="dailyStrip">
-  <div class="daily-inner">
-    <div class="daily-left">
-      <div class="daily-tag">&#9889; Ma journ&eacute;e</div>
-      <div class="daily-title" id="dailyDate">Aujourd'hui</div>
-      <div class="daily-sub" id="dailySub">Suivez votre productivit&eacute; quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
-    </div>
-    <div class="daily-mid">
-      <div class="daily-week-block">
-        <div class="daily-week-head">
-          <span class="daily-week-lbl">Semaine</span>
-          <span class="daily-streak" id="dailyStreak"></span>
+<section class="daily-strip" id="dailyStrip" data-fold="journee">
+  <div class="daily-inner" style="flex-direction:column;align-items:stretch;gap:0">
+    <button class="fold-header" onclick="toggleFold('journee')" type="button">
+      <span class="daily-tag" style="margin-bottom:0">&#9889; Ma journ&eacute;e</span>
+      <span class="fold-preview" id="journeePreview"></span>
+      <span class="fold-chevron">&#9662;</span>
+    </button>
+    <div class="fold-body" style="margin-top:12px">
+      <div class="daily-inner" style="margin:0">
+        <div class="daily-left">
+          <div class="daily-title" id="dailyDate">Aujourd'hui</div>
+          <div class="daily-sub" id="dailySub">Suivez votre productivit&eacute; quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
         </div>
-        <div class="daily-week-val"><span id="dailyWeekTotal">0</span> / <span id="dailyWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="dailyWeekPct">0&nbsp;%</span></div>
-        <div class="daily-week-bar"><span id="dailyWeekBar" style="width:0%"></span></div>
-        <div class="daily-days" id="dailyDays"></div>
+        <div class="daily-mid">
+          <div class="daily-week-block">
+            <div class="daily-week-head">
+              <span class="daily-week-lbl">Semaine</span>
+              <span class="daily-streak" id="dailyStreak"></span>
+            </div>
+            <div class="daily-week-val"><span id="dailyWeekTotal">0</span> / <span id="dailyWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="dailyWeekPct">0&nbsp;%</span></div>
+            <div class="daily-week-bar"><span id="dailyWeekBar" style="width:0%"></span></div>
+            <div class="daily-days" id="dailyDays"></div>
+          </div>
+        </div>
+        <a href="productivite.html" class="daily-cta">
+          <span class="daily-cta-txt">Compl&eacute;ter ma journ&eacute;e</span>
+          <span class="daily-cta-arrow">&rarr;</span>
+        </a>
       </div>
     </div>
-    <div class="daily-cta">
-      <span class="daily-cta-txt">Compl&eacute;ter ma journ&eacute;e</span>
-      <span class="daily-cta-arrow">&rarr;</span>
-    </div>
   </div>
-</a>
+</section>
 <style>
 .daily-strip{display:block;background:#1D1A16;padding:24px 52px;border-top:1px solid rgba(212,98,42,0.18);text-decoration:none;color:inherit}
 .daily-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
@@ -297,7 +422,6 @@
 .event-check input:checked + .event-check-track .event-check-dot{transform:translateX(12px)}
 .event-check-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.55);transition:color 0.2s}
 .event-check input:checked ~ .event-check-lbl{color:var(--orange)}
-.event-card.passed .event-check{pointer-events:none}
 @media (max-width:900px){.events-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:720px){.events-section{padding:18px 24px}.events-inner{flex-direction:column;align-items:flex-start}.events-sub{max-width:100%}}
 </style>
@@ -356,17 +480,120 @@
     if(card) card.classList.toggle('going', val);
     var lbl = card ? card.querySelector('.event-check-lbl') : null;
     if(lbl) lbl.textContent = val ? "J'y vais \u2713" : "J'y vais";
+    updateAgendaPreview();
   };
 
+  // Aperçu des events cochés (mini-chips dans le header plié)
+  function updateAgendaPreview(){
+    var el = document.getElementById('agendaPreview');
+    if(!el) return;
+    var state = load();
+    var checked = EVENTS.filter(function(ev){return !!state[ev.id];});
+    if(checked.length === 0){ el.innerHTML = ''; return; }
+    var MAX = 3;
+    var shown = checked.slice(0, MAX);
+    var html = shown.map(function(ev){
+      var cls = ev.host === 'Forman' ? 'forman' : 'prodemial';
+      var short = ev.month.replace('Début ','').replace('Fin ','').replace('début ','').replace('fin ','');
+      return '<span class="mini-event-chip '+cls+'">'+short+' &middot; '+ev.host+'</span>';
+    }).join('');
+    if(checked.length > MAX){
+      html += '<span class="mini-event-more">+'+(checked.length - MAX)+'</span>';
+    }
+    el.innerHTML = html;
+  }
+  window.__updateAgendaPreview = updateAgendaPreview;
+
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', render);
+    document.addEventListener('DOMContentLoaded', function(){ render(); updateAgendaPreview(); });
   } else {
     render();
+    updateAgendaPreview();
   }
 })();
 </script>
 
-<div class="tools-section">
+<script>
+/* ── Fold/unfold des 3 bandes (Accès, Agenda, Ma journée) ── */
+(function(){
+  var FOLD_KEY = 'cgpskool_fold_v1';
+  function load(){
+    try { return JSON.parse(localStorage.getItem(FOLD_KEY)||'{}') || {}; } catch(e){ return {}; }
+  }
+  function save(s){
+    try { localStorage.setItem(FOLD_KEY, JSON.stringify(s)); } catch(e){}
+  }
+  window.toggleFold = function(id){
+    var el = document.querySelector('[data-fold="'+id+'"]');
+    if(!el) return;
+    var closed = el.classList.toggle('closed');
+    var state = load();
+    state[id] = closed;
+    save(state);
+  };
+  function init(){
+    var state = load();
+    ['acces','agenda','journee'].forEach(function(id){
+      var el = document.querySelector('[data-fold="'+id+'"]');
+      if(!el) return;
+      if(state[id]) el.classList.add('closed');
+    });
+    updateJourneePreview();
+  }
+  function updateJourneePreview(){
+    var el = document.getElementById('journeePreview');
+    if(!el) return;
+    var dateEl = document.getElementById('dailyDate');
+    var totalEl = document.getElementById('dailyWeekTotal');
+    var goalEl = document.getElementById('dailyWeekGoal');
+    var pctEl = document.getElementById('dailyWeekPct');
+    var parts = [];
+    if(dateEl && dateEl.textContent && dateEl.textContent !== "Aujourd'hui") parts.push(dateEl.textContent);
+    if(totalEl && goalEl) parts.push(totalEl.textContent + ' / ' + goalEl.textContent + ' pts');
+    if(pctEl) parts.push(pctEl.textContent);
+    el.textContent = parts.join(' \u00b7 ');
+  }
+  window.__updateJourneePreview = updateJourneePreview;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+/* ── Scroll-spy sur le top-menu ── */
+(function(){
+  function scrollSpy(){
+    var items = document.querySelectorAll('.top-menu-item');
+    if(!items.length) return;
+    var scrollY = window.scrollY + 120; // offset pour la nav fixe
+    var activeId = null;
+    items.forEach(function(it){
+      var target = document.getElementById(it.dataset.target);
+      if(!target) return;
+      var top = target.offsetTop;
+      if(top <= scrollY) activeId = it.dataset.target;
+    });
+    items.forEach(function(it){
+      it.classList.toggle('active', it.dataset.target === activeId);
+    });
+  }
+  window.addEventListener('scroll', scrollSpy, {passive:true});
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scrollSpy);
+  else scrollSpy();
+
+  // Smooth scroll sur clic
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.top-menu-item');
+    if(!a) return;
+    var id = a.dataset.target;
+    var target = id ? document.getElementById(id) : null;
+    if(!target) return;
+    e.preventDefault();
+    var y = target.getBoundingClientRect().top + window.scrollY - 70;
+    window.scrollTo({top:y, behavior:'smooth'});
+  });
+})();
+</script>
+
+<div class="tools-section" id="analyse">
   <div class="tools-inner">
     <div class="tools-label">Analyse &amp; pr&#233;conisation</div>
     <div class="tools-grid">
@@ -402,7 +629,7 @@
   </div>
 </div>
 
-<div class="tools-section" style="border-top:1px solid var(--rule-l)">
+<div class="tools-section" id="suivi" style="border-top:1px solid var(--rule-l)">
   <div class="tools-inner">
     <div class="tools-label">Suivi &amp; optimisation de contrats</div>
     <div class="tools-grid">
@@ -463,7 +690,7 @@
   </div>
 </div>
 
-<div class="tools-section" style="border-top:1px solid var(--rule-l)">
+<div class="tools-section" id="simulateurs" style="border-top:1px solid var(--rule-l)">
   <div class="tools-inner">
     <div class="tools-label">Simulateurs &amp; projections</div>
     <div class="tools-grid">
@@ -537,7 +764,7 @@
   </div>
 </div>
 
-<div class="tools-section" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+<div class="tools-section" id="formation" style="background:var(--bg);border-top:1px solid var(--rule-d)">
   <div class="tools-inner">
     <div class="tools-label" style="color:var(--orange);font-weight:700">Formation</div>
     <p style="font-size:13px;color:var(--white);font-weight:300;max-width:560px;line-height:1.8;margin:0 0 20px">R&#233;visez vos habilitations et les formations continues &mdash; IAS, IOBSP, CIF, immobilier, agent li&#233;.</p>
@@ -560,7 +787,7 @@
   </div>
 </div>
 
-<div class="tools-section" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+<div class="tools-section" id="mon-activite" style="background:var(--bg);border-top:1px solid var(--rule-d)">
   <div class="tools-inner">
     <div class="tools-label" style="color:var(--fog-2)">Mon activit&#233;</div>
     <p style="font-size:12px;color:var(--fog-2);font-weight:300;max-width:560px;line-height:1.8;margin:0 0 20px">Outils d&#233;di&#233;s &#224; <em style="color:var(--orange-lt)">votre croissance de conseiller Prod&#233;mial</em> &mdash; projection de revenus PMR, qualifications, animation d'&#233;quipe.</p>
@@ -858,6 +1085,7 @@ document.addEventListener('DOMContentLoaded',function(){loadProfil();if(new URLS
       else if(streak>=1)streakEl.innerHTML='\uD83C\uDF31 '+streak+' jour'+(streak>1?'s':'');
       else streakEl.innerHTML='';
     }
+    if(typeof window.__updateJourneePreview === 'function') window.__updateJourneePreview();
   }
 
   document.addEventListener('DOMContentLoaded',refresh);
