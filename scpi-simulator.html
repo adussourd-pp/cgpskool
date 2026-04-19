@@ -257,19 +257,20 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <!-- SIDEBAR -->
 <div class="cs-sidebar">
 
-  <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
-  <div class="sb-body open" id="body_client">
-    <div class="fg"><label>Nom du client</label>
-      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
-    </div>
-  </div>
-
-  <div class="cs-sidebar-lbl" data-step="type" onclick="openStep('type',this)"><span class="acc">&#9654;</span>Type de projection</div>
-  <div class="sb-body" id="body_type">
+  <!-- Type de projection (choix initial, sans toggle) -->
+  <div class="fg" style="margin-bottom:14px">
+    <label>Type de projection</label>
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">&#128200;</span>Plan Retraite SCPI</div>
       <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">&#128256;</span>Nue-propri&#233;t&#233;</div>
       <div class="mode-tab" onclick="setMode('entreprise',this)"><span class="mode-icon">&#127970;</span>Montage Entreprise</div>
+    </div>
+  </div>
+
+  <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+  <div class="sb-body open" id="body_client">
+    <div class="fg"><label>Nom du client</label>
+      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
     </div>
   </div>
 
@@ -369,7 +370,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
   </div>
 
   <button class="sim-btn" onclick="runSimulation()">Lancer la projection &rarr;</button>
-  <div class="prog-count" id="progCount"><strong>0</strong> / 4 &eacute;tapes valid&eacute;es</div>
+  <div class="prog-count" id="progCount"><strong>0</strong> / 3 &eacute;tapes valid&eacute;es</div>
 
   <div style="flex:1;min-height:16px"></div>
   <div style="height:1px;background:var(--bord);margin:12px 0"></div>
@@ -425,7 +426,7 @@ let currentMode='retraite',selectedSCPI=null,chartInstance=null,sourceMode='scpi
 var toggleAcc=CGP.toggleAcc;
 
 /* ── Progression (accordeon strict + compteur) ── */
-var _stepOpened={client:true,type:false,scpi:false,plan:false};
+var _stepOpened={client:true,scpi:false,plan:false};
 function openStep(id,el){
   if(id)_stepOpened[id]=true;
   document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
@@ -444,7 +445,6 @@ function openStep(id,el){
 function isStepComplete(id){
   if(!_stepOpened[id])return false;
   if(id==='client'){var v=document.getElementById('clientNom');return !!(v&&v.value.trim())}
-  if(id==='type')return true;
   if(id==='scpi'){
     if(sourceMode==='custom'){var g=document.getElementById('custom-gross');return !!(g&&Number(g.value)>0)}
     return !!selectedSCPI;
@@ -453,11 +453,11 @@ function isStepComplete(id){
   return false;
 }
 function updateProgress(){
-  var steps=['client','type','scpi','plan'],done=0;
+  var steps=['client','scpi','plan'],done=0;
   steps.forEach(function(id){if(isStepComplete(id))done++});
   var c=document.getElementById('progCount');
-  if(c){c.innerHTML='<strong>'+done+'</strong> / 4 &eacute;tapes valid&eacute;es';
-    c.classList.toggle('full',done===4);}
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 3 &eacute;tapes valid&eacute;es';
+    c.classList.toggle('full',done===3);}
 }
 
 function init(){renderSCPIList(SCPI_DATA);updateProgress();}
