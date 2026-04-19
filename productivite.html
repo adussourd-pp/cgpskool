@@ -144,9 +144,9 @@
 
     <div class="goal-row">
       <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);flex:1">Objectif semaine</span>
-      <span class="goal-val" id="goalDisplay">350</span>
+      <span class="goal-val" id="goalDisplay">250</span>
     </div>
-    <input type="range" id="weeklyGoal" min="50" max="700" step="25" value="350"
+    <input type="range" id="weeklyGoal" min="50" max="700" step="25" value="250"
       style="width:100%;accent-color:var(--orange);margin-bottom:4px"
       oninput="onGoalChange()">
     <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink-30);margin-bottom:6px">
@@ -185,7 +185,7 @@
 
       <!-- KPIs -->
       <div class="kpi-row" id="kpiRow">
-        <div class="kpi-card"><div class="kpi-label">Score semaine</div><div class="kpi-val orange" id="kpiWeek">0</div><div class="kpi-sub" id="kpiWeekSub">/ 350 pts</div></div>
+        <div class="kpi-card"><div class="kpi-label">Score semaine</div><div class="kpi-val orange" id="kpiWeek">0</div><div class="kpi-sub" id="kpiWeekSub">/ 250 pts</div></div>
         <div class="kpi-card"><div class="kpi-label">Moy. / jour</div><div class="kpi-val" id="kpiAvg">0</div><div class="kpi-sub">pts / jour actif</div></div>
         <div class="kpi-card"><div class="kpi-label">Meilleur jour</div><div class="kpi-val green" id="kpiBest">0</div><div class="kpi-sub" id="kpiBestDay">--</div></div>
         <div class="kpi-card"><div class="kpi-label">Streak</div><div class="kpi-val" id="kpiStreak">0</div><div class="kpi-sub">jours consecutifs</div></div>
@@ -236,13 +236,14 @@
 <script>
 // ── ACTIONS ──────────────────────────────────────────────────
 // Somme = 100 : faire tout 1x dans la journee = 100 pts
+// Cible semaine par defaut 250 pts = 50 pts/jour x 5 jours ouvres
 var ACTIONS = [
-  { id:'conv',  cat:'Prospection', icon:'&#128172;', label:'Nouvelle conversation',   pts:5  },
+  { id:'conv',  cat:'Prospection', icon:'&#128172;', label:'Nouvelle conversation',   pts:10 },
   { id:'r1',    cat:'Prospection', icon:'&#128197;', label:'Prise de R1',              pts:15 },
   { id:'inv',   cat:'Prospection', icon:'&#128226;', label:'Invitation metier (DM/PO)',pts:15 },
   { id:'rel',   cat:'Prospection', icon:'&#128260;', label:'Suivi / Relance',           pts:5  },
   { id:'sign',  cat:'Resultats',   icon:'&#9989;',   label:'Signature client',          pts:20 },
-  { id:'insc',  cat:'Resultats',   icon:'&#127775;', label:'Inscrit',                   pts:25 },
+  { id:'insc',  cat:'Resultats',   icon:'&#127775;', label:'Inscrit',                   pts:20 },
   { id:'pro',   cat:'Developpement', icon:'&#127891;', label:'Professionnalisation',    pts:7  },
   { id:'lead',  cat:'Developpement', icon:'&#129351;', label:'Leadership / Coaching',   pts:8  }
 ];
@@ -254,7 +255,7 @@ var MONTH_NAMES = ['jan.','fev.','mar.','avr.','mai','juin','juil.','aout','sept
 // ── STATE ─────────────────────────────────────────────────────
 var state = {
   weekOffset: 0,   // 0 = current week
-  goal: 350,
+  goal: 250,       // 5 jours ouvres x 50 pts/jour
   weights: {},     // id -> pts override
   history: {}      // 'YYYY-Www' -> { 'YYYY-MM-DD': { conv:0, r1:0, ... } }
 };
@@ -668,7 +669,7 @@ function changeWeek(delta) {
 }
 
 function onGoalChange() {
-  state.goal = parseInt(document.getElementById('weeklyGoal').value) || 350;
+  state.goal = parseInt(document.getElementById('weeklyGoal').value) || 250;
   saveState();
   renderKPIs();
   renderEvolution();
