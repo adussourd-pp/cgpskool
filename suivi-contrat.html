@@ -76,6 +76,9 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 .parse-status.ok{background:#E7F7EF;color:#0F6B3F;border:1px solid #B5E6CC}
 .parse-status.err{background:#FDEEEC;color:#991B1B;border:1px solid #F5C6C6}
 .parse-status.info{background:#EDF2FB;color:#1E40AF;border:1px solid #C6D9F5}
+
+/* Skip print toggle */
+@media print{ .skip-print{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -193,7 +196,13 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 
       <!-- 3. ALLOCATION -->
       <div class="card">
-        <div class="card-title"><span class="n">3</span>Allocation actuelle</div>
+        <div class="card-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px"><span class="n">3</span>Allocation actuelle</div>
+          <label class="no-print" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--gris);text-transform:none;letter-spacing:0;cursor:pointer">
+            <input type="checkbox" id="allocComments" onchange="renderAlloc();saveLocal()">
+            Commentaires par ligne
+          </label>
+        </div>
         <table class="tbl" id="allocTbl"></table>
         <div class="card-sub">Analyse de l'allocation</div>
         <div id="allocAnalysis" style="font-size:12px;color:var(--gris-f);line-height:1.7"></div>
@@ -214,28 +223,10 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         </div>
       </div>
 
-      <!-- 5. COMMENTAIRE -->
+      <!-- 5. COMMENTAIRE LIBRE -->
       <div class="card">
         <div class="card-title"><span class="n">5</span>Commentaire du conseiller</div>
-        <div class="card-sub">Performance vs objectif / march&eacute;</div>
-        <div class="comm" contenteditable="true" id="cPerf" data-placeholder="Analyse de la performance..." oninput="saveLocal()"></div>
-        <div class="card-sub">Coh&eacute;rence de l'allocation avec le profil</div>
-        <div class="comm" contenteditable="true" id="cAlloc" data-placeholder="L'allocation est-elle adapt&eacute;e au profil investisseur ?" oninput="saveLocal()"></div>
-        <div class="card-sub">Points d'attention</div>
-        <div class="comm" contenteditable="true" id="cWarn" data-placeholder="Concentration, SRI &eacute;lev&eacute;, dates de rappel..." oninput="saveLocal()"></div>
-        <div class="card-sub">Pistes d'optimisation (prochain point)</div>
-        <div class="comm" contenteditable="true" id="cOptim" data-placeholder="Arbitrages, versements compl&eacute;mentaires, diversification..." oninput="saveLocal()"></div>
-      </div>
-
-      <!-- 6. NOTE GLOBALE -->
-      <div class="card">
-        <div class="card-title"><span class="n">6</span>&#128203; Note globale &mdash; Synth&egrave;se du point annuel</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-          <div class="fg" style="margin-bottom:0"><label>R&eacute;dig&eacute;e le</label><input class="fi" type="text" id="ngDate" placeholder="JJ/MM/AAAA" oninput="saveLocal()"></div>
-          <div class="fg" style="margin-bottom:0"><label>Par</label><input class="fi" type="text" id="ngAuthor" placeholder="Nom conseiller" oninput="saveLocal()"></div>
-          <div class="fg" style="margin-bottom:0"><label>Prochain point</label><input class="fi" type="text" id="ngNext" placeholder="JJ/MM/AAAA" oninput="saveLocal()"></div>
-        </div>
-        <div class="comm" contenteditable="true" id="ngText" data-placeholder="Conclusion du rendez-vous annuel, d&eacute;cisions prises, prochaines &eacute;tapes..." style="min-height:90px" oninput="saveLocal()"></div>
+        <div class="comm" contenteditable="true" id="cNote" data-placeholder="Performance, coh&eacute;rence de l'allocation, points d'attention, pistes d'optimisation, conclusion du point annuel..." style="min-height:120px" oninput="saveLocal()"></div>
       </div>
 
       <!-- ANNEXE - Historique des mouvements -->
@@ -285,46 +276,54 @@ function parseAll(){
   if(!raw||raw.length<100){setStatus('err','Collez d\'abord l\'export complet du contrat.');return;}
 
   try{
-    // --- Client (nom complet : titre + prenom + NOM) ---
-    // Pattern 1 : "M./Mme/Mlle Prenom NOM" ou "M./Mme/Mlle Jean-Louis LE NOM"
-    var mNom=raw.match(/(M\.|Mme\.?|Mlle\.?)\s+([A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+)*)/);
-    if(mNom){
-      setV('cNom',(mNom[1]+' '+mNom[2]+' '+mNom[3]).trim());
-    } else {
-      // Pattern 2 fallback : ligne "Prenom NOM" seule (apres "Souscripteur" ou "Client" ou en debut)
-      var mNom2=raw.match(/(?:Souscripteur|Client)\s*:?\s*\n?\s*([A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+)*)/);
-      if(mNom2) setV('cNom',(mNom2[1]+' '+mNom2[2]).trim());
-    }
+    // --- Contact ---
     var mAge=raw.match(/(\d{1,3})\s*ans?\b/);if(mAge)setV('cAge',mAge[1]);
     var mTel=raw.match(/(?:phone|T[eé]l[\.\s:]*)[\s+]*((?:\+?33|0)[\s\.\-]?[1-9](?:[\s\.\-]?\d{2}){4})/i);
     if(mTel)setV('cTel',mTel[1].replace(/[\s\.\-]/g,' ').trim());
     var mMail=raw.match(/(?:email\s*)?([A-Za-z0-9_.\+\-]+@[A-Za-z0-9\.\-]+\.[A-Za-z]{2,})/);
     if(mMail)setV('cEmail',mMail[1]);
 
-    // --- Contrat ---
-    var mCat=raw.match(/Cat[eé]gorie\s+de\s+la\s+prestation\s*:\s*([^\n\r]+?)(?=Prestation|Compagnie|$)/i);
-    if(mCat){var cat=mCat[1].trim().replace(/[^A-Za-z\u00C0-\u017F\-\s]/g,'').trim();
+    // --- Contrat (format Apicil : champs souvent concatenes sur une seule ligne) ---
+    // Delimiteur : ':' (fin d'un champ = debut du suivant). On capture jusqu'au prochain nom de champ connu.
+    var NEXT='(?=\\s*(?:Prestation|Compagnie|Num[eé]ro|Date\\s+d|[EÉ]tat|Souscripteur|Valorisation|Versements|Rachats|Gain|SRI|Libell|Nantissement|Horizon|Clause|D[eé]nouement|Mouvement|Option|Assurance\\s+Vie|Autres|caract|allocation|mouvements|$))';
+    function grab(re){var m=raw.match(re);return m?m[1].trim():'';}
+
+    // Categorie : extraire la valeur puis mapper au dropdown
+    var cat=grab(new RegExp('Cat[eé]gorie\\s+de\\s+la\\s+prestation\\s*:\\s*(.+?)'+NEXT,'i'));
+    if(cat){
       if(/vie/i.test(cat))setV('kCat','Assurance-vie');
       else if(/PER/i.test(cat))setV('kCat','PER');
       else if(/PEA/i.test(cat))setV('kCat','PEA');
       else if(/compte/i.test(cat))setV('kCat','Compte-titres');
     }
-    // Prestation : ancre en debut de ligne pour eviter le match sur "Categorie de la prestation"
-    var mPresta=raw.match(/(?:^|\n)\s*Prestation\s*:\s*([^\n\r]+)/i);
-    if(mPresta)setV('kPrestation',mPresta[1].trim());
-    var mCompa=raw.match(/(?:^|\n)\s*Compagnie\s*:\s*([^\n\r]+)/i);
-    if(mCompa)setV('kCompagnie',mCompa[1].trim());
-    var mNum=raw.match(/Num[eé]ro\s+de\s+contrat\s*:\s*(\S+)/i);
-    if(mNum)setV('kNum',mNum[1].trim());
+    // Prestation : exclure "Categorie de la prestation" via lookbehind negatif.
+    // Pas de \b car le texte est souvent concatene (ex: "Assurance-viePrestation" sans boundary).
+    var pres=grab(new RegExp('(?<!e\\s+la\\s+)Prestation\\s*:\\s*(.+?)'+NEXT,'i'));
+    if(pres)setV('kPrestation',pres);
+    var comp=grab(new RegExp('Compagnie\\s*:\\s*(.+?)'+NEXT,'i'));
+    if(comp)setV('kCompagnie',comp);
+    var nn=grab(new RegExp('Num[eé]ro\\s+de\\s+contrat\\s*:\\s*(\\S+?)'+NEXT,'i'));
+    if(nn)setV('kNum',nn);
     var mOpen=raw.match(/Date\s+d[\'\u2019]ouverture\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
     if(mOpen)setV('kOpen',mOpen[1]);
-    var mSri=raw.match(/SRI(?:\s+du\s+contrat)?\s*:\s*(\d)/i);
+    var mSri=raw.match(/\bSRI\s*:\s*(\d)/);
     if(mSri)setV('kSri',mSri[1]);
 
-    // --- Valorisation ---
+    // --- Client (nom complet) ---
+    // Pattern 1 : "M./Mme/Mlle Prenom NOM"
+    var mNom=raw.match(/(M\.|Mme\.?|Mlle\.?)\s+([A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+)*)/);
+    if(mNom){
+      setV('cNom',(mNom[1]+' '+mNom[2]+' '+mNom[3]).trim());
+    } else {
+      // Pattern 2 : "Souscripteur :" puis (apres un eventuel "chevron_right") "Prenom NOM"
+      var mNom2=raw.match(/Souscripteur\s*:[\s\S]{0,40}?([A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F]{2,}(?:[\-\s]+[A-Z\u00C0-\u017F]{2,})*)/);
+      if(mNom2) setV('cNom',(mNom2[1]+' '+mNom2[2]).trim());
+    }
+
+    // --- Valorisation / versements / rachats ---
     var mVal=raw.match(/Valorisation\s*:\s*([\d\s\u00a0\u202f]+[\d,\.]+)\s*\u20ac/i);
     if(mVal)setV('vVal',parseFr(mVal[1]));
-    var mValDate=raw.match(/Valorisation.*?au\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+    var mValDate=raw.match(/Valorisation[\s\S]*?au\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
     if(mValDate)setV('kArret',mValDate[1]);
     var mVersNets=raw.match(/Versements\s+nets\s*:\s*([\d\s\u00a0\u202f]+[\d,\.]+)\s*\u20ac/i);
     if(mVersNets)setV('vVersNets',parseFr(mVersNets[1]));
@@ -567,7 +566,7 @@ function renderSynth(){
   var kpi='';
   kpi+='<div class="kpi"><div class="kpi-l">Valorisation</div><div class="kpi-v orange">'+fmtE(valo)+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div><div class="kpi-s">'+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
-  kpi+='<div class="kpi"><div class="kpi-l">TRI annualis\u00e9</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div><div class="kpi-s">sur vers. bruts investis</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">TRI annualis\u00e9</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">Dur\u00e9e de d\u00e9tention</div><div class="kpi-v">'+dureeTxt+'</div></div>';
   document.getElementById('kpiGrid').innerHTML=kpi;
 
@@ -582,8 +581,7 @@ function renderSynth(){
     ['Valorisation actuelle','<strong>'+fmtE(valo)+'</strong>'],
     ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
     ['Dur\u00e9e de d\u00e9tention',dureeTxt],
-    ['<strong>TRI annualis\u00e9 (XIRR sur vers. bruts)</strong>','<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>'],
-    ['Performance annualis\u00e9e simple',dureeAns>0?fmtPct(perfSimple,2):'\u2014']
+    ['<strong>TRI annualis\u00e9</strong>','<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>']
   ]);
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
   document.getElementById('synthTbl').innerHTML=h;
@@ -594,8 +592,9 @@ function renderAlloc(){
   STATE.allocation.forEach(function(a){total+=a.valTot||0;});
   if(total<=0)total=num('vVal');
 
+  var showCmt=(document.getElementById('allocComments')||{}).checked;
   var h='<thead><tr><th>Support</th><th>ISIN</th><th class="c">SRI</th><th class="r">Poids</th><th class="r">PMA</th><th class="r">+/- value</th><th class="r">Perf.</th></tr></thead><tbody>';
-  STATE.allocation.forEach(function(a){
+  STATE.allocation.forEach(function(a,i){
     var pctPerf=a.perf||0;
     var plusVal=a.plusVal||0;
     var perfCls=pctPerf>=0?'pos':'neg';
@@ -608,11 +607,14 @@ function renderAlloc(){
     h+='<td class="r '+(plusVal>=0?'pos':'neg')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</td>';
     h+='<td class="r '+perfCls+'">'+(pctPerf>=0?'+':'')+fmtPct(pctPerf,2)+'</td>';
     h+='</tr>';
+    if(showCmt){
+      var saved=(STATE.allocComms||{})[a.isin||a.label]||'';
+      h+='<tr class="alloc-cmt-row"><td colspan="7" style="padding:2px 8px 8px;border-bottom:1px solid var(--bord)"><div class="comm" contenteditable="true" id="ac_'+i+'" data-placeholder="Commentaire..." oninput="saveAllocComm('+i+');saveLocal()" style="padding:5px 10px;min-height:24px;font-size:11px">'+esc(saved)+'</div></td></tr>';
+    }
 
-    // Agr\u00e9gations
+    // Agregations
     var s=parseInt(a.sri)||0;var w=a.poids||0;
     if(s>0){sriSum+=s*w;sriW+=w;}
-    // Fonds \u20ac = SRI 1 g\u00e9n\u00e9ralement, ou libell\u00e9 contenant "euro" / "tresorerie"
     if(s===1||/euro|tresorerie|tr\u00e9sorerie|actif g[eé]n[eé]ral/i.test(a.label))poidsFondsE+=w;
     else poidsUC+=w;
   });
@@ -661,27 +663,32 @@ function toggleCtxInclude(){
   card.style.opacity=cb.checked?'1':'0.5';
 }
 
+function saveAllocComm(i){
+  var a=STATE.allocation[i];if(!a)return;
+  var el=document.getElementById('ac_'+i);if(!el)return;
+  STATE.allocComms=STATE.allocComms||{};
+  STATE.allocComms[a.isin||a.label]=el.innerHTML;
+}
+
 function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
 
 // ══════════════════════════════════════════════════════════════
 // PERSIST
 // ══════════════════════════════════════════════════════════════
 function collectState(){
-  var mouvComms={};
-  document.querySelectorAll('[id^="mc_"]').forEach(function(el,i){
-    var m=STATE.movements.filter(function(x){return x.amount>=1000&&(/^Arbitrage\s+volontaire/i.test(x.type)||/^Versement\s+Libre/i.test(x.type)||/^Souscription|^Adh|^Ouverture/i.test(x.type));})[i];
-    if(m)mouvComms[m.dateFr+'_'+m.amount]=el.innerHTML;
-  });
+  var cb=document.getElementById('ctxInclude');
+  var cbAlloc=document.getElementById('allocComments');
   return {
     client:{nom:V('cNom'),age:V('cAge'),tel:V('cTel'),email:V('cEmail')},
     contrat:{compagnie:V('kCompagnie'),prestation:V('kPrestation'),num:V('kNum'),sri:V('kSri'),open:V('kOpen'),arret:V('kArret'),cat:V('kCat')},
     valo:{valo:V('vVal'),versNets:V('vVersNets'),rachats:V('vRachats')},
     alloc:STATE.allocation,
+    allocComms:STATE.allocComms||{},
+    allocCommentsOn:!!(cbAlloc&&cbAlloc.checked),
     movs:STATE.movements.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr};}),
-    comms:{perf:document.getElementById('cPerf').innerHTML,alloc:document.getElementById('cAlloc').innerHTML,warn:document.getElementById('cWarn').innerHTML,optim:document.getElementById('cOptim').innerHTML,ctx:(document.getElementById('cCtx')||{}).innerHTML||''},
-    ctxImp:(function(){var o={};for(var i=0;i<DEFAULT_CTX.length;i++){var el=document.getElementById('ctxImp_'+i);if(el)o[i]=el.innerHTML;}return o;})(),
-    noteGlobale:{date:V('ngDate'),author:V('ngAuthor'),next:V('ngNext'),text:(document.getElementById('ngText')||{}).innerHTML||''},
-    mouvComms:mouvComms,
+    cNote:(document.getElementById('cNote')||{}).innerHTML||'',
+    cCtx:(document.getElementById('cCtx')||{}).innerHTML||'',
+    ctxInclude:!(cb&&!cb.checked),
     raw:V('rawExport')
   };
 }
@@ -692,23 +699,26 @@ function applyState(s){
   if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);setV('kCat',s.contrat.cat);}
   if(s.valo){setV('vVal',s.valo.valo);setV('vVersNets',s.valo.versNets);setV('vRachats',s.valo.rachats);}
   if(s.alloc)STATE.allocation=s.alloc;
+  if(s.allocComms)STATE.allocComms=s.allocComms;
   if(s.movs)STATE.movements=s.movs.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr,dateObj:parseDateFr(m.dateFr)};});
-  STATE.mouvComms=s.mouvComms||{};
   if(s.raw)setV('rawExport',s.raw);
-  if(s.comms){
-    document.getElementById('cPerf').innerHTML=s.comms.perf||'';
-    document.getElementById('cAlloc').innerHTML=s.comms.alloc||'';
-    document.getElementById('cWarn').innerHTML=s.comms.warn||'';
-    document.getElementById('cOptim').innerHTML=s.comms.optim||'';
-    var ctxEl=document.getElementById('cCtx');if(ctxEl)ctxEl.innerHTML=s.comms.ctx||'';
+  // Compat : si anciens comms, les concatener dans cNote
+  var cNoteEl=document.getElementById('cNote');
+  if(cNoteEl){
+    if(s.cNote){cNoteEl.innerHTML=s.cNote;}
+    else if(s.comms){
+      var parts=[];
+      ['perf','alloc','warn','optim'].forEach(function(k){if(s.comms[k])parts.push(s.comms[k]);});
+      if(s.noteGlobale&&s.noteGlobale.text)parts.push(s.noteGlobale.text);
+      cNoteEl.innerHTML=parts.join('<br><br>');
+    }
   }
-  if(s.ctxImp){
-    Object.keys(s.ctxImp).forEach(function(k){var el=document.getElementById('ctxImp_'+k);if(el)el.innerHTML=s.ctxImp[k]||'';});
-  }
-  if(s.noteGlobale){
-    setV('ngDate',s.noteGlobale.date);setV('ngAuthor',s.noteGlobale.author);setV('ngNext',s.noteGlobale.next);
-    var ngT=document.getElementById('ngText');if(ngT)ngT.innerHTML=s.noteGlobale.text||'';
-  }
+  var ctxEl=document.getElementById('cCtx');
+  if(ctxEl)ctxEl.innerHTML=s.cCtx||(s.comms&&s.comms.ctx)||'';
+  var cbCtx=document.getElementById('ctxInclude');
+  if(cbCtx&&s.ctxInclude===false)cbCtx.checked=false;
+  var cbAC=document.getElementById('allocComments');
+  if(cbAC&&s.allocCommentsOn)cbAC.checked=true;
 }
 
 function saveLocal(){try{localStorage.setItem(STORE_KEY,JSON.stringify(collectState()));}catch(e){}}
@@ -731,33 +741,8 @@ function resetAll(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// CONTEXTE MACRO / GEOPOLITIQUE
-// ══════════════════════════════════════════════════════════════
-var DEFAULT_CTX=[
-  {dim:'Taux & inflation',      faits:'Hausse BCE 2022-23 (+450 pb), pic inflation zone euro 10,6 % (oct. 2022), desinflation 2024, baisses BCE amorcees mi-2024'},
-  {dim:'Marches actions',       faits:'Rebond 2023-24 porte par l\'IA (Nasdaq +40 % en 2023), correction tech debut 2025, rotation value'},
-  {dim:'Marches taux / credit', faits:'Courbe inversee 2023, repentification 2024-25, spreads IG stables, conditions favorables aux produits structures'},
-  {dim:'Geopolitique',          faits:'Guerre Ukraine (fev. 2022+), Israel-Gaza (oct. 2023+), tensions Taiwan, election US 2024, vague tarifaire 2025'},
-  {dim:'France / Europe',       faits:'Degradation note France, instabilite budgetaire, reforme retraites, spreads OAT/Bund elargis'},
-  {dim:'Risques contrat',       faits:'(a completer selon supports detenus)'}
-];
-function renderCtx(){
-  var tb=document.getElementById('ctxBody');if(!tb)return;
-  var h='';
-  DEFAULT_CTX.forEach(function(r,i){
-    h+='<tr>';
-    h+='<td class="lbl" style="vertical-align:top">'+esc(r.dim)+'</td>';
-    h+='<td style="vertical-align:top;font-size:11px;color:var(--gris-f);line-height:1.6">'+esc(r.faits)+'</td>';
-    h+='<td style="vertical-align:top"><div class="comm" contenteditable="true" id="ctxImp_'+i+'" data-placeholder="..." oninput="saveLocal()" style="min-height:32px;font-size:11px"></div></td>';
-    h+='</tr>';
-  });
-  tb.innerHTML=h;
-}
-
-// ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
-renderCtx();
 loadLocal();
 renderAll();
 if(typeof CGP!=='undefined'&&CGP.footer)CGP.footer.render(document.getElementById('conseillerFooter'));
