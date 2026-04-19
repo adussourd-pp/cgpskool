@@ -132,10 +132,6 @@ details summary{user-select:none}
 input.fmt-input{font-variant-numeric:tabular-nums;letter-spacing:0.01em}
 details summary span.arr{display:inline-block;transition:transform 0.2s;font-style:normal}
 details[open] summary span.arr{transform:rotate(90deg)}
-.step-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#D4622A;margin-left:auto;flex-shrink:0;transition:background 0.25s ease,box-shadow 0.25s ease}
-.step-dot.done{background:#2D7A5B}
-.cs-sidebar-lbl[data-step]{display:flex;align-items:center;gap:7px}
-.cs-sidebar-lbl[data-step] .acc{margin-right:3px}
 .prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
 .prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
 .prog-count.full strong{color:var(--green)}
@@ -160,7 +156,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
 <div class="cs-app">
 <div class="cs-sidebar">
 
-  <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client<span class="step-dot" id="dot_client"></span></div>
+  <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
   <div class="sb-body open" id="body_client">
   <div class="fg"><label>Nom du client</label><input class="fi" type="text" id="fClient1" placeholder="Nom Pr&#233;nom" oninput="updateHeader()"></div>
   <div class="fg" id="client2row" style="display:none"><label>Co-emprunteur</label><input class="fi" type="text" id="fClient2" placeholder="Nom Pr&#233;nom" oninput="updateHeader()"></div>
@@ -171,7 +167,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
   </div>
   </div>
 
-  <div class="cs-sidebar-lbl" data-step="endet" onclick="openStep('endet',this)"><span class="acc">&#9654;</span>Calcul d'endettement<span class="step-dot" id="dot_endet"></span></div>
+  <div class="cs-sidebar-lbl" data-step="endet" onclick="openStep('endet',this)"><span class="acc">&#9654;</span>Calcul d'endettement</div>
   <div class="sb-body" id="body_endet">
   <div class="fg"><label>Profil emprunteur</label>
     <select class="fi" id="fProfil" onchange="onProfil()">
@@ -224,7 +220,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
   </div>
   </div>
 
-  <div class="cs-sidebar-lbl" data-step="scpi" onclick="openStep('scpi',this)"><span class="acc">&#9654;</span>SCPI &#224; financer<span class="step-dot" id="dot_scpi"></span></div>
+  <div class="cs-sidebar-lbl" data-step="scpi" onclick="openStep('scpi',this)"><span class="acc">&#9654;</span>SCPI &#224; financer</div>
   <div class="sb-body" id="body_scpi">
     <div id="scpiList"></div>
     <button class="scpi-add" onclick="addSCPI()">+ Ajouter une SCPI</button>
@@ -234,7 +230,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
     </div>
   </div>
 
-  <div class="cs-sidebar-lbl" data-step="fin" onclick="openStep('fin',this)"><span class="acc">&#9654;</span>Conditions de financement<span class="step-dot" id="dot_fin"></span></div>
+  <div class="cs-sidebar-lbl" data-step="fin" onclick="openStep('fin',this)"><span class="acc">&#9654;</span>Conditions de financement</div>
   <div class="sb-body" id="body_fin">
   <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);margin-bottom:6px">Partenaire bancaire</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px">
@@ -356,12 +352,7 @@ function isStepComplete(id){
 }
 function updateProgress(){
   var steps=['client','endet','scpi','fin'],done=0;
-  steps.forEach(function(id){
-    var dot=document.getElementById('dot_'+id);
-    if(!dot)return;
-    if(isStepComplete(id)){dot.classList.add('done');done++}
-    else dot.classList.remove('done');
-  });
+  steps.forEach(function(id){if(isStepComplete(id))done++});
   var c=document.getElementById('progCount');
   if(c){c.innerHTML='<strong>'+done+'</strong> / 4 &#233;tapes valid&#233;es';
     c.classList.toggle('full',done===4);}
