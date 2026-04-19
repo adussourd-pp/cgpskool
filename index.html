@@ -271,12 +271,15 @@ p.hero-desc {
       <div class="daily-sub" id="dailySub">Suivez votre productivit&eacute; quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
     </div>
     <div class="daily-mid">
-      <div class="daily-score-wrap">
-        <div class="daily-score" id="dailyScore">0</div>
-        <div class="daily-score-lbl">%</div>
+      <div class="daily-week-block">
+        <div class="daily-week-head">
+          <span class="daily-week-lbl">Semaine</span>
+          <span class="daily-streak" id="dailyStreak"></span>
+        </div>
+        <div class="daily-week-val"><span id="dailyWeekTotal">0</span> / <span id="dailyWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="dailyWeekPct">0&nbsp;%</span></div>
+        <div class="daily-week-bar"><span id="dailyWeekBar" style="width:0%"></span></div>
+        <div class="daily-days" id="dailyDays"></div>
       </div>
-      <div class="daily-week" id="dailyWeek"></div>
-      <div class="daily-streak" id="dailyStreak"></div>
     </div>
     <div class="daily-cta">
       <span class="daily-cta-txt">Compl&eacute;ter ma journ&eacute;e</span>
@@ -293,20 +296,24 @@ p.hero-desc {
 .daily-title{font-family:var(--serif);font-size:20px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:4px}
 .daily-sub{font-size:12px;color:rgba(255,255,255,0.5);font-weight:300;max-width:420px;line-height:1.5}
 .daily-mid{display:flex;align-items:center;gap:18px}
-.daily-score-wrap{display:flex;align-items:baseline;gap:4px}
-.daily-score{font-family:var(--sans);font-size:42px;font-weight:800;color:#fff;line-height:1}
-.daily-score.low{color:#EF4444}
-.daily-score.med{color:#F59E0B}
-.daily-score.good{color:#F0A738}
-.daily-score.great{color:#10B981}
-.daily-score-lbl{font-size:13px;color:rgba(255,255,255,0.4);font-weight:400}
-.daily-week{display:flex;flex-direction:column;gap:2px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.3;min-width:110px}
-.daily-week-lbl{font-size:8px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35)}
-.daily-week-val{font-size:12px;color:#fff;font-weight:600}
-.daily-week-val .pct{color:var(--orange)}
-.daily-week-bar{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;margin-top:2px}
+.daily-week-block{display:flex;flex-direction:column;gap:6px;min-width:260px}
+.daily-week-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.daily-week-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+.daily-week-val{font-size:18px;font-weight:700;color:#fff;font-family:var(--sans);line-height:1.1}
+.daily-week-val .pct{color:var(--orange);font-weight:700}
+.daily-week-val .sep{color:rgba(255,255,255,0.25);margin:0 2px}
+.daily-week-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
 .daily-week-bar > span{display:block;height:100%;background:var(--orange);transition:width 0.4s}
-.daily-streak{font-size:12px;color:var(--orange);font-weight:600;white-space:nowrap}
+.daily-days{display:flex;gap:6px;margin-top:2px}
+.daily-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35)}
+.daily-day-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.12);background:transparent;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);transition:all 0.15s}
+.daily-day.has .daily-day-dot{background:var(--orange);border-color:var(--orange);color:#fff}
+.daily-day.partial .daily-day-dot{background:rgba(212,98,42,0.35);border-color:rgba(212,98,42,0.45);color:#fff}
+.daily-day.full .daily-day-dot{background:#10B981;border-color:#10B981;color:#fff}
+.daily-day.today .daily-day-dot{box-shadow:0 0 0 2px rgba(212,98,42,0.35)}
+.daily-day.today{color:var(--orange)}
+.daily-day.future .daily-day-dot{border-style:dashed;border-color:rgba(255,255,255,0.08)}
+.daily-streak{font-size:11px;color:var(--orange);font-weight:600;white-space:nowrap}
 .daily-cta{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--orange);color:#fff;font-size:13px;font-weight:600;border-radius:6px;transition:background 0.15s}
 .daily-strip:hover .daily-cta{background:var(--orange-hover)}
 .daily-cta-arrow{font-size:16px;transition:transform 0.2s}
@@ -757,18 +764,38 @@ document.addEventListener('DOMContentLoaded',function(){loadProfil();if(new URLS
     var dateEl=document.getElementById('dailyDate');
     if(dateEl)dateEl.textContent=DAY_FULL[now.getDay()]+' '+now.getDate()+' '+MONTH_NAMES[now.getMonth()];
 
-    var scoreEl=document.getElementById('dailyScore');
-    if(scoreEl){scoreEl.textContent=score;scoreEl.className='daily-score '+scoreClass(score);}
+    var goal=(state.goal!==undefined?state.goal:250);
+    var weekTotal=getWeekTotal(state);
+    var weekPct=goal>0?Math.round((weekTotal/goal)*100):0;
+    var barPct=Math.min(weekPct,100);
 
-    var weekEl=document.getElementById('dailyWeek');
-    if(weekEl){
-      var goal=(state.goal!==undefined?state.goal:250);
-      var weekTotal=getWeekTotal(state);
-      var weekPct=goal>0?Math.round((weekTotal/goal)*100):0;
-      var barPct=Math.min(weekPct,100);
-      weekEl.innerHTML='<div class="daily-week-lbl">Semaine</div>'+
-        '<div class="daily-week-val">'+weekTotal+' / '+goal+' pts &middot; <span class="pct">'+weekPct+' %</span></div>'+
-        '<div class="daily-week-bar"><span style="width:'+barPct+'%"></span></div>';
+    var wt=document.getElementById('dailyWeekTotal');if(wt)wt.textContent=weekTotal;
+    var wg=document.getElementById('dailyWeekGoal');if(wg)wg.textContent=goal;
+    var wp=document.getElementById('dailyWeekPct');if(wp)wp.textContent=weekPct+'\u00a0%';
+    var wb=document.getElementById('dailyWeekBar');if(wb)wb.style.width=barPct+'%';
+
+    // 7 jours de la semaine avec dots colores selon le score
+    var daysEl=document.getElementById('dailyDays');
+    if(daysEl){
+      var DAY_LETTERS=['L','M','M','J','V','S','D'];
+      var monday=getMonday(new Date());
+      var todayKey=dateKey(new Date());
+      var h='';
+      for(var i=0;i<7;i++){
+        var d=new Date(monday);d.setDate(monday.getDate()+i);
+        var k=dateKey(d);
+        var s=getDayScore(state,k);
+        var cls='daily-day';
+        var isFuture=d>now&&k!==todayKey;
+        if(isFuture)cls+=' future';
+        else if(s>=75)cls+=' full';
+        else if(s>=30)cls+=' has';
+        else if(s>0)cls+=' partial';
+        if(k===todayKey)cls+=' today';
+        var dotContent=s>0?s:(isFuture?'':'&middot;');
+        h+='<div class="'+cls+'"><div class="daily-day-dot">'+dotContent+'</div>'+DAY_LETTERS[i]+'</div>';
+      }
+      daysEl.innerHTML=h;
     }
 
     var subEl=document.getElementById('dailySub');
