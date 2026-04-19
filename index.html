@@ -177,6 +177,23 @@
 .top-menu-item:hover,
 .top-menu-item.active { color: #fff; }
 .top-menu-sep { color: rgba(255,255,255,0.15); font-size: 10px; user-select: none; }
+.top-menu-ext { margin-left: 0; gap: 6px; }
+.top-menu-ext .top-menu-item.ext {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.7);
+}
+.top-menu-ext .top-menu-item.ext:hover {
+  border-color: rgba(212,98,42,0.45);
+  color: #fff;
+  background: rgba(212,98,42,0.08);
+}
+@media (max-width: 1100px) {
+  .top-menu-ext { display: none; }
+}
 @media (max-width: 900px) {
   .top-menu { display: none; }
 }
@@ -272,54 +289,23 @@
       <a href="#mon-activite" class="top-menu-item" data-target="mon-activite">Mon activit&eacute;</a>
     </nav>
     <div style="flex:1"></div>
+    <nav class="top-menu top-menu-ext">
+      <a href="https://my.prodemial.fr" target="_blank" class="top-menu-item ext">&#128202; my.prodemial</a>
+      <a href="https://asso-forman.fr" target="_blank" class="top-menu-item ext">&#127891; asso-forman</a>
+      <a href="https://www.skool.com/cgp-skool-1992" target="_blank" class="top-menu-item ext">&#127941; Onboarding</a>
+    </nav>
     <div class="cs-nav-actions">
       <button class="cs-btn-ghost missing" id="btnProfil" onclick="openProfil()">⚙ Mon profil</button>
     </div>
   </div>
 </nav>
 
-<div class="hero" data-fold="acces">
-  <div class="hero-body">
-    <button class="fold-header" onclick="toggleFold('acces')" type="button">
-      <span class="hero-title">&#128279; Acc&egrave;s</span>
-      <span class="fold-preview"></span>
-      <span class="fold-chevron">&#9662;</span>
-    </button>
-    <div class="fold-body" style="margin-top:12px">
-      <div class="hero-piliers">
-        <a href="https://my.prodemial.fr" target="_blank" class="pilier-btn">
-          <span class="pilier-icon">&#128202;</span>
-          <div class="pilier-text">
-            <div class="pilier-name">my.prodemial.fr</div>
-            <div class="pilier-sub">Mon espace</div>
-          </div>
-        </a>
-        <a href="https://asso-forman.fr" target="_blank" class="pilier-btn">
-          <span class="pilier-icon">&#127891;</span>
-          <div class="pilier-text">
-            <div class="pilier-name">asso-forman.fr</div>
-            <div class="pilier-sub">Agenda &amp; formation</div>
-          </div>
-        </a>
-        <a href="https://www.skool.com/cgp-skool-1992" target="_blank" class="pilier-btn">
-          <span class="pilier-icon">&#127941;</span>
-          <div class="pilier-text">
-            <div class="pilier-name">Onboarding CGP Skool</div>
-            <div class="pilier-sub">skool.com</div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- AGENDA Forman / Prodemial -->
 <section class="events-section" data-fold="agenda" id="agenda">
   <div class="events-inner" style="flex-direction:column;align-items:stretch;gap:0">
     <button class="fold-header" onclick="toggleFold('agenda')" type="button">
       <div class="events-head" style="display:flex;align-items:baseline;gap:12px">
-        <div class="events-label">&#128197; Agenda</div>
-        <div class="events-sub" style="max-width:none">Forman &amp; Prod&eacute;mial</div>
+        <div class="events-label">&#128197; &Eacute;v&egrave;nements</div>
       </div>
       <span class="fold-preview" id="agendaPreview"></span>
       <span class="fold-chevron">&#9662;</span>
@@ -533,7 +519,7 @@
   };
   function init(){
     var state = load();
-    ['acces','agenda','journee'].forEach(function(id){
+    ['agenda','journee'].forEach(function(id){
       var el = document.querySelector('[data-fold="'+id+'"]');
       if(!el) return;
       if(state[id]) el.classList.add('closed');
