@@ -513,10 +513,7 @@ select.span2{grid-column:span 2}
 <div class="app">
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
-  <div class="sidebar-lbl" style="display:flex;align-items:center;justify-content:space-between">
-    <span>&#201;tude de dossier</span>
-    <button onclick="if(confirm('R\u00e9initialiser toute l\'\u00e9tude ?'))resetAll()" style="border:1px solid var(--bord);background:#fff;color:var(--red);cursor:pointer;font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;font-family:var(--sans)" title="R&#233;initialiser l'&#233;tude">R&#233;init.</button>
-  </div>
+  <div class="sidebar-lbl">&#201;tude de dossier</div>
   <div id="edNavWrap">
   <div id="progressBar" style="padding:0 10px 8px">
     <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-bottom:4px"><span id="progressLbl">0 / 8</span><span id="progressPct">0%</span></div>
@@ -563,18 +560,24 @@ select.span2{grid-column:span 2}
   </div><!-- /edNavWrap -->
   <div class="sidebar-divider"></div>
   <button class="step-btn" data-sec="compterendu" onclick="goTo('compterendu')"><span class="step-dot"></span>Compte rendu</button>
-  <div style="padding:8px 10px;margin-top:8px;display:flex;flex-direction:column;gap:6px">
-    <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:10px;font-size:13px">&#11015; Exporter PDF</button>
-    <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:8px;font-size:12px">&#128194; Charger une &#233;tude</button>
-    <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
-    <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center"></div>
-  </div>
   <div class="sidebar-divider"></div>
   <div class="client-mini" id="clientMini" style="display:none">
     <div class="client-mini-name" id="cmName">&#8212;</div>
     <div class="client-mini-detail" id="cmDetail">&#8212;</div>
   </div>
+
+  <!-- Spacer + boutons bas (SIDEBAR_STANDARD) -->
+  <div style="flex:1;min-height:16px"></div>
+  <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+  <div style="padding:0 10px;display:flex;flex-direction:column;gap:4px">
+    <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:11px;font-size:13px">&#11015; Exporter PDF</button>
+    <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:10px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:10px;font-size:12px">&#128194; Charger une &#233;tude</button>
+    <input type="file" id="chargerEtudeInput" accept=".json" style="display:none" onchange="chargerEtude(this)">
+    <button class="btn btn-secondary" onclick="if(confirm('R\u00e9initialiser toute l\'\u00e9tude ?'))resetAll()" style="width:100%;justify-content:center;padding:10px;font-size:12px;color:#EF4444">&#9096; R&#233;initialiser</button>
+    <div id="etudeLastSave" style="font-size:10px;color:var(--gris);text-align:center;margin-top:4px"></div>
+  </div>
+  <div style="margin-top:12px;padding-top:8px;font-size:9px;color:rgba(0,0,0,0.2);text-align:center;font-family:var(--sans)" class="no-print">v1.4 &mdash; 9 avr. 2026</div>
 </aside>
 
 <!-- ── MAIN ── -->
