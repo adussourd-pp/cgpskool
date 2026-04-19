@@ -418,7 +418,12 @@ function parseMovements(raw){
 
 function showImportedPanel(){
   var p=document.getElementById('importedDataPanel');
-  if(p)p.style.display='';
+  if(!p)return;
+  p.style.display='';
+  var lbl=p.querySelector('.cs-sidebar-lbl');
+  var body=p.querySelector('.sb-body');
+  if(lbl)lbl.classList.add('open');
+  if(body)body.classList.add('open');
 }
 
 function setStatus(cls,msg){
