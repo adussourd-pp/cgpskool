@@ -590,8 +590,8 @@ function renderSynth(){
   var kpi='';
   kpi+='<div class="kpi"><div class="kpi-l">Valorisation</div><div class="kpi-v orange">'+fmtE(valo)+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div><div class="kpi-s">'+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
-  var triSubLbl=dureeAns>0?('TRI sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')):'';
-  kpi+='<div class="kpi"><div class="kpi-l">Rendement annuel</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div><div class="kpi-s">'+triSubLbl+'</div></div>';
+  var triSubLbl=dureeAns>0&&triPct!==null?('TRI annualis\u00e9 : '+(triPct>=0?'+':'')+fmtPct(triPct,2)):'';
+  kpi+='<div class="kpi"><div class="kpi-l">Perf. totale</div><div class="kpi-v orange">'+(plusValPct>=0?'+':'')+fmtPct(plusValPct,2)+'</div><div class="kpi-s">'+triSubLbl+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">Dur\u00e9e de d\u00e9tention</div><div class="kpi-v">'+dureeTxt+'</div></div>';
   document.getElementById('kpiGrid').innerHTML=kpi;
 
