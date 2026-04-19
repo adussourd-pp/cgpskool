@@ -35,7 +35,11 @@
 /* Node */
 .node-group{display:flex;flex-direction:column;align-items:center}
 .node-bubble{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:10px 16px;cursor:default;transition:all 0.2s;min-width:160px}
+.node-bubble[draggable=true]{cursor:grab}
+.node-bubble[draggable=true]:active{cursor:grabbing}
 .node-bubble:hover{border-color:rgba(212,98,42,0.35)}
+.node-bubble.drop-target{border-color:var(--orange)!important;border-style:dashed;background:rgba(212,98,42,0.06);box-shadow:0 0 0 3px rgba(212,98,42,0.12)}
+.node-bubble.dragging{opacity:0.4}
 .node-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff}
 .node-info{display:flex;flex-direction:column;gap:1px}
 .node-name{font-size:13px;font-weight:600;color:var(--ink)}
@@ -466,8 +470,13 @@ function setupPan(wrap){
   if(wrap._panBound)return;
   wrap._panBound=true;
 
+  // Annule le pan quand HTML5 drag demarre (sur une branche draggable)
+  wrap.addEventListener('dragstart',function(){_panDragging=false;wrap.classList.remove('grabbing');});
+
   wrap.addEventListener('pointerdown',function(e){
     if(e.target.closest('.node-act,.add-child-btn,button,input,.tree-zoom'))return;
+    // Les bulles draggables geren leur propre drag (HTML5)
+    if(e.target.closest('.node-bubble[draggable=true]'))return;
     _panDragging=true;
     _panStartX=e.clientX-_panX;
     _panStartY=e.clientY-_panY;
@@ -497,6 +506,54 @@ function setupPan(wrap){
   },{passive:false});
 }
 
+/* Drag & drop : intervertir des branches soeurs (le sous-arbre suit) */
+function onDragStart(e,path){
+  e.stopPropagation();
+  _panDragging=false;
+  if(_panWrapEl)_panWrapEl.classList.remove('grabbing');
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',JSON.stringify(path));
+  e.currentTarget.classList.add('dragging');
+}
+function onDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.node-bubble.drop-target').forEach(function(el){el.classList.remove('drop-target');});
+}
+function onDragOver(e,targetPath){
+  // Ne mettre en surbrillance que si c'est un noeud soeur
+  var raw;try{raw=e.dataTransfer.getData('text/plain');}catch(_){}
+  // (en dragover on ne peut souvent pas lire les donnees sur certains navigateurs)
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drop-target');
+}
+function onDragLeave(e){
+  e.currentTarget.classList.remove('drop-target');
+}
+function onDrop(e,targetPath){
+  e.preventDefault();e.stopPropagation();
+  e.currentTarget.classList.remove('drop-target');
+  var raw;try{raw=e.dataTransfer.getData('text/plain');}catch(_){return;}
+  if(!raw)return;
+  var srcPath;try{srcPath=JSON.parse(raw);}catch(_){return;}
+  swapBranches(srcPath,targetPath);
+}
+function swapBranches(srcPath,tgtPath){
+  if(!srcPath||!tgtPath)return;
+  if(srcPath.length===0||tgtPath.length===0)return; // pas la racine
+  if(JSON.stringify(srcPath)===JSON.stringify(tgtPath))return;
+  var srcParent=srcPath.slice(0,-1);
+  var tgtParent=tgtPath.slice(0,-1);
+  if(JSON.stringify(srcParent)!==JSON.stringify(tgtParent))return; // soeurs seulement
+  var parent=getNode(srcParent);
+  if(!parent||!parent.children)return;
+  var si=srcPath[srcPath.length-1],ti=tgtPath[tgtPath.length-1];
+  var tmp=parent.children[si];
+  parent.children[si]=parent.children[ti];
+  parent.children[ti]=tmp;
+  saveTree();render();
+}
+
 function renderNode(node,path,depth){
   var q=getQualif(node);
   var qColor=QUALIF_COLORS[q.code]||'var(--ink-60)';
@@ -508,7 +565,13 @@ function renderNode(node,path,depth){
   var isRoot=path.length===0;
 
   var html='<div class="node-group">';
-  html+='<div class="node-bubble" style="border-color:'+qColor+';'+(isRoot?'border-width:2px':'border-width:1.5px')+'">';
+  var dragAttrs=isRoot?'':' draggable="true"'
+    +' ondragstart="onDragStart(event,'+pathStr+')"'
+    +' ondragend="onDragEnd(event)"'
+    +' ondragover="onDragOver(event,'+pathStr+')"'
+    +' ondragleave="onDragLeave(event)"'
+    +' ondrop="onDrop(event,'+pathStr+')"';
+  html+='<div class="node-bubble"'+dragAttrs+' data-path="'+pathStr.replace(/"/g,'&quot;')+'" style="border-color:'+qColor+';'+(isRoot?'border-width:2px':'border-width:1.5px')+'">';
   html+='<div class="node-avatar" style="background:'+qColor+'">'+getInitials(node)+'</div>';
   html+='<div class="node-info">';
   html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+'</div>';
