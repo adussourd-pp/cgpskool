@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>CGP Skool &mdash; Suivi de contrat</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
+<script src="cgp-skool-feedback.js" defer></script>
+<style>
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5}
+
+/* Boutons sidebar */
+.btn-primary{width:100%;padding:11px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border-radius:0;margin-bottom:4px}
+.btn-primary:hover{background:var(--orange-hover)}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer}
+
+/* Page header */
+.ph-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.ph-title{font-size:22px;font-weight:700;color:var(--noir);font-family:var(--sans);line-height:1.2;margin-bottom:4px}
+.ph-sub{font-size:12px;color:var(--gris);font-weight:300}
+.page-hdr{border-bottom:1px solid var(--bord);padding-bottom:16px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.page-hdr .hdr-r{text-align:right;font-size:11px;color:var(--gris)}
+
+/* Card */
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:16px 18px;margin-bottom:16px;break-inside:avoid}
+.card-title{font-size:13px;font-weight:700;color:var(--noir);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700}
+.card-sub{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);margin:10px 0 6px}
+
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 8px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:var(--gris-l);border-bottom:1px solid var(--bord)}
+.tbl th.r,.tbl td.r{text-align:right}
+.tbl th.c,.tbl td.c{text-align:center}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--bord);color:var(--noir)}
+.tbl td.lbl{font-weight:600;color:var(--gris-f)}
+.tbl tfoot td{font-weight:700;background:var(--gris-l);padding:9px 8px;border-top:2px solid var(--bord)}
+.tbl .pos{color:#10B981;font-weight:600}
+.tbl .neg{color:#EF4444;font-weight:600}
+.tbl .mut{color:var(--gris)}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1.5px solid var(--bord);border-radius:9px;padding:11px 12px}
+.kpi-l{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);margin-bottom:3px}
+.kpi-v{font-size:17px;font-weight:800;color:var(--noir);font-family:var(--sans);line-height:1.2}
+.kpi-v.orange{color:var(--orange)}
+.kpi-v.green{color:#10B981}
+.kpi-s{font-size:10px;color:var(--gris);margin-top:2px}
+
+/* Edit zones */
+.comm{background:#FFFBF5;border:1px dashed #E6CFA8;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--gris-f);line-height:1.6;outline:none;min-height:40px}
+.comm:focus{border-color:var(--orange);background:#fff;border-style:solid}
+.comm:empty:before{content:attr(data-placeholder);color:var(--ink-30);font-style:italic}
+
+/* Mini equation */
+.eq{background:#F7F5F1;border-left:3px solid var(--orange);padding:10px 14px;margin:8px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gris-f);line-height:1.7;overflow-x:auto}
+.eq strong{color:var(--noir)}
+
+/* Parse status */
+.parse-status{font-size:10px;padding:6px 10px;border-radius:6px;margin-top:8px;line-height:1.4}
+.parse-status.ok{background:#E7F7EF;color:#0F6B3F;border:1px solid #B5E6CC}
+.parse-status.err{background:#FDEEEC;color:#991B1B;border:1px solid #F5C6C6}
+.parse-status.info{background:#EDF2FB;color:#1E40AF;border:1px solid #C6D9F5}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Import de l'export</div>
+    <div class="sb-body open">
+      <div class="fg">
+        <label>Coller l'export Apicil / Primonial / autre</label>
+        <textarea class="fi" id="rawExport" rows="8" placeholder="Copiez-collez ici le contenu de la fiche contrat..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="parseAll()">&#9889; Analyser l'export</button>
+      <div id="parseStatus"></div>
+    </div>
+
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open">
+      <div class="fg"><label>Nom complet</label><input class="fi" type="text" id="cNom" placeholder="M. Jean DUPONT" oninput="renderAll()"></div>
+      <div class="grid2">
+        <div class="fg"><label>&#194;ge</label><input class="fi" type="number" id="cAge" oninput="renderAll()"></div>
+        <div class="fg"><label>T&eacute;l.</label><input class="fi" type="text" id="cTel" oninput="renderAll()"></div>
+      </div>
+      <div class="fg"><label>Email</label><input class="fi" type="email" id="cEmail" oninput="renderAll()"></div>
+    </div>
+
+    <div class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat</div>
+    <div class="sb-body">
+      <div class="fg"><label>Compagnie</label><input class="fi" type="text" id="kCompagnie" oninput="renderAll()"></div>
+      <div class="fg"><label>Prestation / Libell&eacute;</label><input class="fi" type="text" id="kPrestation" oninput="renderAll()"></div>
+      <div class="grid2">
+        <div class="fg"><label>N&deg; contrat</label><input class="fi" type="text" id="kNum" oninput="renderAll()"></div>
+        <div class="fg"><label>SRI</label><input class="fi" type="number" min="1" max="7" id="kSri" oninput="renderAll()"></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Date d'ouverture</label><input class="fi" type="text" id="kOpen" placeholder="JJ/MM/AAAA" oninput="renderAll()"></div>
+        <div class="fg"><label>Date d'arr&ecirc;t&eacute;</label><input class="fi" type="text" id="kArret" placeholder="JJ/MM/AAAA" oninput="renderAll()"></div>
+      </div>
+      <div class="fg"><label>Cat&eacute;gorie</label>
+        <select class="fi" id="kCat" onchange="renderAll()">
+          <option>Assurance-vie</option>
+          <option>PER</option>
+          <option>PEA</option>
+          <option>Compte-titres</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="cs-sidebar-lbl" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Valorisation</div>
+    <div class="sb-body">
+      <div class="fg"><label>Valorisation</label>
+        <div class="fi-row"><input type="number" id="vVal" step="0.01" oninput="renderAll()"><span class="fi-unit">&euro;</span></div>
+      </div>
+      <div class="fg"><label>Versements nets (base Apicil)</label>
+        <div class="fi-row"><input type="number" id="vVersNets" step="0.01" oninput="renderAll()"><span class="fi-unit">&euro;</span></div>
+      </div>
+      <div class="fg"><label>Rachats bruts</label>
+        <div class="fi-row"><input type="number" id="vRachats" step="0.01" value="0" oninput="renderAll()"><span class="fi-unit">&euro;</span></div>
+      </div>
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="saveAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="display:block;text-align:center;cursor:pointer;margin-bottom:4px">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="loadAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetAll()" style="color:#EF4444">&#9100; R&eacute;initialiser</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <div class="page-hdr">
+        <div>
+          <div class="ph-tag">Annexe de suivi &mdash; <span id="hTag">Contrat</span></div>
+          <div class="ph-title" id="hTitle">Contrat n&deg; &mdash;</div>
+          <div class="ph-sub" id="hSub">&mdash;</div>
+        </div>
+        <div class="hdr-r">
+          <div id="hDate">&mdash;</div>
+          <div style="margin-top:3px" id="hAuthor">&mdash;</div>
+        </div>
+      </div>
+
+      <!-- 1. EN-T&Ecirc;TE -->
+      <div class="card">
+        <div class="card-title"><span class="n">1</span>En-t&ecirc;te contrat</div>
+        <table class="tbl" id="headTbl"></table>
+      </div>
+
+      <!-- 2. SYNTH&Egrave;SE -->
+      <div class="card">
+        <div class="card-title"><span class="n">2</span>Synth&egrave;se financi&egrave;re</div>
+        <div class="kpi-grid" id="kpiGrid"></div>
+        <table class="tbl" id="synthTbl"></table>
+      </div>
+
+      <!-- 3. ALLOCATION -->
+      <div class="card">
+        <div class="card-title"><span class="n">3</span>Allocation actuelle</div>
+        <table class="tbl" id="allocTbl"></table>
+        <div class="card-sub">Analyse de l'allocation</div>
+        <div id="allocAnalysis" style="font-size:12px;color:var(--gris-f);line-height:1.7"></div>
+      </div>
+
+      <!-- 4. MOUVEMENTS SIGNIFICATIFS -->
+      <div class="card">
+        <div class="card-title"><span class="n">4</span>Mouvements significatifs (&ge; 1 000 &euro;)</div>
+        <table class="tbl" id="movTbl"></table>
+      </div>
+
+      <!-- 5. COMMENTAIRE -->
+      <div class="card">
+        <div class="card-title"><span class="n">5</span>Commentaire du conseiller</div>
+        <div class="card-sub">Performance vs objectif / march&eacute;</div>
+        <div class="comm" contenteditable="true" id="cPerf" data-placeholder="Analyse de la performance..." oninput="saveLocal()"></div>
+        <div class="card-sub">Coh&eacute;rence de l'allocation avec le profil</div>
+        <div class="comm" contenteditable="true" id="cAlloc" data-placeholder="L'allocation est-elle adapt&eacute;e au profil investisseur ?" oninput="saveLocal()"></div>
+        <div class="card-sub">Points d'attention</div>
+        <div class="comm" contenteditable="true" id="cWarn" data-placeholder="Concentration, SRI &eacute;lev&eacute;, dates de rappel..." oninput="saveLocal()"></div>
+        <div class="card-sub">Pistes d'optimisation (prochain point)</div>
+        <div class="comm" contenteditable="true" id="cOptim" data-placeholder="Arbitrages, versements compl&eacute;mentaires, diversification..." oninput="saveLocal()"></div>
+      </div>
+
+      <!-- 6. M&Eacute;THODE TRI -->
+      <div class="card">
+        <div class="card-title"><span class="n">6</span>M&eacute;thode de calcul du TRI (XIRR)</div>
+        <div style="font-size:12px;color:var(--gris-f);line-height:1.7;margin-bottom:8px">
+          R&eacute;solution de <strong>&Sigma; F<sub>i</sub> / (1 + r)<sup>(d<sub>i</sub> &minus; d<sub>0</sub>)/365</sup> = 0</strong> par Newton-Raphson.
+        </div>
+        <div class="card-sub">Flux retenus (externes uniquement)</div>
+        <div style="font-size:11px;color:var(--gris-f);line-height:1.6" id="triFlowsNote">&mdash;</div>
+        <div class="card-sub">Flux exclus</div>
+        <div style="font-size:11px;color:var(--gris);line-height:1.6">OST sans impact fiscal, arbitrages automatiques et volontaires, versements d'int&eacute;r&ecirc;ts (mouvements internes au contrat).</div>
+        <div class="eq" id="triEq">&mdash;</div>
+      </div>
+
+      <div id="conseillerFooter"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+var STATE = {
+  allocation: [],   // [{label,isin,sri,poids,pma,plusVal,perf,valTot,date}]
+  movements: [],    // [{type,amount,dateFr,dateObj}]
+  tri: null,        // {rate, flows:[{date,amount,label}], error}
+  syntheseCalc: {}  // {dureeAns, dureeMois, perfSimple, plusVal, plusValPct}
+};
+var STORE_KEY = 'cgpskool_suivi_contrat_v1';
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function V(id){var e=document.getElementById(id);return e?e.value:'';}
+function setV(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
+function num(id){return parseFloat(V(id).toString().replace(/\s/g,'').replace(',','.'))||0;}
+function fmt(n,d){var dd=d||0;return (n||0).toLocaleString('fr-FR',{minimumFractionDigits:dd,maximumFractionDigits:dd});}
+function fmtE(n){return fmt(n,2)+'\u00a0\u20ac';}
+function fmtPct(n,d){var dd=(d===undefined)?2:d;return (n||0).toLocaleString('fr-FR',{minimumFractionDigits:dd,maximumFractionDigits:dd})+'\u00a0%';}
+function parseFr(s){if(!s)return 0;return parseFloat(s.toString().replace(/\s/g,'').replace(/\u00a0/g,'').replace(/\u202f/g,'').replace('€','').replace('%','').replace(',','.').trim())||0;}
+function parseDateFr(s){if(!s)return null;var m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1]);}
+function dateFmt(d){if(!d)return '';return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+
+// ══════════════════════════════════════════════════════════════
+// PARSER (Apicil + formats similaires)
+// ══════════════════════════════════════════════════════════════
+function parseAll(){
+  var raw=document.getElementById('rawExport').value;
+  if(!raw||raw.length<100){setStatus('err','Collez d\'abord l\'export complet du contrat.');return;}
+
+  try{
+    // --- Client ---
+    var mNom=raw.match(/(M\.|Mme|Mlle)\s+([A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F\-]+)+)/);
+    if(mNom)setV('cNom',mNom[0]);
+    var mAge=raw.match(/(\d{1,3})\s*ans?\b/);if(mAge)setV('cAge',mAge[1]);
+    var mTel=raw.match(/(?:phone|T[eé]l[\.\s:]*)[\s+]*((?:\+?33|0)[\s\.\-]?[1-9](?:[\s\.\-]?\d{2}){4})/i);
+    if(mTel)setV('cTel',mTel[1].replace(/[\s\.\-]/g,' ').trim());
+    var mMail=raw.match(/(?:email\s*)?([A-Za-z0-9_.\+\-]+@[A-Za-z0-9\.\-]+\.[A-Za-z]{2,})/);
+    if(mMail)setV('cEmail',mMail[1]);
+
+    // --- Contrat ---
+    var mCat=raw.match(/Cat[eé]gorie\s+de\s+la\s+prestation\s*:\s*([^\n\r]+?)(?=Prestation|Compagnie|$)/i);
+    if(mCat){var cat=mCat[1].trim().replace(/[^A-Za-z\u00C0-\u017F\-\s]/g,'').trim();
+      if(/vie/i.test(cat))setV('kCat','Assurance-vie');
+      else if(/PER/i.test(cat))setV('kCat','PER');
+      else if(/PEA/i.test(cat))setV('kCat','PEA');
+      else if(/compte/i.test(cat))setV('kCat','Compte-titres');
+    }
+    var mPresta=raw.match(/Prestation\s*:\s*([^\n\r]+?)(?=Compagnie|Num[eé]ro|$)/i);
+    if(mPresta)setV('kPrestation',mPresta[1].trim());
+    var mCompa=raw.match(/Compagnie\s*:\s*([^\n\r]+?)(?=Num[eé]ro|Date|$)/i);
+    if(mCompa)setV('kCompagnie',mCompa[1].trim());
+    var mNum=raw.match(/Num[eé]ro\s+de\s+contrat\s*:\s*(\S+)/i);
+    if(mNum)setV('kNum',mNum[1].trim());
+    var mOpen=raw.match(/Date\s+d[\'\u2019]ouverture\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
+    if(mOpen)setV('kOpen',mOpen[1]);
+    var mSri=raw.match(/SRI(?:\s+du\s+contrat)?\s*:\s*(\d)/i);
+    if(mSri)setV('kSri',mSri[1]);
+
+    // --- Valorisation ---
+    var mVal=raw.match(/Valorisation\s*:\s*([\d\s\u00a0\u202f]+[\d,\.]+)\s*\u20ac/i);
+    if(mVal)setV('vVal',parseFr(mVal[1]));
+    var mValDate=raw.match(/Valorisation.*?au\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+    if(mValDate)setV('kArret',mValDate[1]);
+    var mVersNets=raw.match(/Versements\s+nets\s*:\s*([\d\s\u00a0\u202f]+[\d,\.]+)\s*\u20ac/i);
+    if(mVersNets)setV('vVersNets',parseFr(mVersNets[1]));
+    var mRachats=raw.match(/Rachats\s+Bruts?\s*:\s*([\d\s\u00a0\u202f]+[\d,\.]+)\s*\u20ac/i);
+    if(mRachats)setV('vRachats',parseFr(mRachats[1]));
+
+    // --- Allocation (lignes tab-s\u00e9par\u00e9es ou lignes-supports) ---
+    STATE.allocation=parseAllocation(raw);
+
+    // --- Mouvements (blocs de 4 lignes : Type / Valid\u00e9 / Montant / Date) ---
+    STATE.movements=parseMovements(raw);
+
+    renderAll();
+    setStatus('ok','Export analys\u00e9 : '+STATE.allocation.length+' support(s), '+STATE.movements.length+' mouvement(s) d\u00e9tect\u00e9(s).');
+  }catch(e){
+    setStatus('err','Erreur pendant l\'analyse : '+e.message);
+  }
+}
+
+function parseAllocation(raw){
+  var out=[];
+  var lines=raw.split(/\r?\n/);
+  lines.forEach(function(L){
+    L=L.trim();if(!L||/^TOTAL/i.test(L))return;
+    // Ligne avec tabulations
+    var parts=L.split(/\t/);
+    if(parts.length>=7){
+      var isin=(parts[1]||'').trim();
+      if(/^[A-Z]{2}[A-Z0-9]{9}\d$|^[A-Z0-9]{10,12}$/.test(isin)||/^FR[C0-9]{10}|^LU\d+/.test(isin)){
+        out.push({
+          label:parts[0].trim(),isin:isin,sri:parts[2]||'',date:parts[3]||'',
+          nbParts:parseFr(parts[4]),valeurUnit:parseFr(parts[5]),
+          valTot:parseFr(parts[6]),poids:parseFr(parts[7]),
+          pma:parseFr(parts[8]),plusVal:parseFr(parts[9]),perf:parseFr(parts[10])
+        });
+      }
+    }
+  });
+  // Fallback : chercher ISIN + stats dans du texte libre
+  if(out.length===0){
+    var re=/([A-Z][A-Za-z0-9&\.\-\(\)\/\s]{5,60})[\s\t]+([A-Z]{2}[A-Z0-9]{9}\d|FR[C0-9]{10}|LU\d{10})[\s\t]+(\d)[\s\t]+(\d{1,2}\/\d{1,2}\/\d{4})[\s\t]+([\d,\.]+)[\s\t]+([\d\s\u00a0,\.]+)\s*\u20ac[\s\t]+([\d\s\u00a0,\.]+)\s*\u20ac[\s\t]+([\d,\.]+)\s*%[\s\t]+([\d\s\u00a0,\.]+)\s*\u20ac[\s\t]+(-?[\d\s\u00a0,\.]+)\s*\u20ac[\s\t]+(-?[\d,\.]+)\s*%/g;
+    var m;
+    while((m=re.exec(raw))!==null){
+      out.push({label:m[1].trim(),isin:m[2],sri:m[3],date:m[4],nbParts:parseFr(m[5]),valeurUnit:parseFr(m[6]),valTot:parseFr(m[7]),poids:parseFr(m[8]),pma:parseFr(m[9]),plusVal:parseFr(m[10]),perf:parseFr(m[11])});
+    }
+  }
+  return out;
+}
+
+function parseMovements(raw){
+  var out=[];
+  // Nettoyage : on enl\u00e8ve "expand_less" / "Valid\u00e9" et on reconstitue les blocs
+  var lines=raw.split(/\r?\n/).map(function(l){return l.trim();}).filter(function(l){return l&&!/^expand_|^Tout /i.test(l);});
+  var KNOWN=[
+    'Versement Programm',
+    'Versement Libre Compl',
+    'OST sans impact fiscal',
+    'Arbitrage volontaire',
+    'Arbitrage automatique',
+    'Versements int',
+    'Souscription\/Adh',
+    'Souscription',
+    'Rachat partiel',
+    'Rachat total',
+    'Rachat'
+  ];
+  function matchType(s){
+    for(var i=0;i<KNOWN.length;i++){var re=new RegExp('^'+KNOWN[i],'i');if(re.test(s))return s;}
+    return null;
+  }
+  for(var i=0;i<lines.length;i++){
+    var t=matchType(lines[i]);
+    if(!t)continue;
+    // Cherche montant + date dans les 4 prochaines lignes
+    var amount=null,dateFr=null;
+    for(var j=i+1;j<Math.min(i+6,lines.length);j++){
+      var L=lines[j];
+      if(amount===null){var ma=L.match(/^([\d\s\u00a0,\.]+)\s*\u20ac$/);if(ma){amount=parseFr(ma[1]);continue;}}
+      if(dateFr===null){var md=L.match(/^(\d{1,2}\/\d{1,2}\/\d{4})$/);if(md){dateFr=md[1];break;}}
+    }
+    if(amount!==null&&dateFr){
+      out.push({type:t,amount:amount,dateFr:dateFr,dateObj:parseDateFr(dateFr)});
+    }
+  }
+  // Tri chronologique
+  out.sort(function(a,b){return a.dateObj-b.dateObj;});
+  return out;
+}
+
+function setStatus(cls,msg){
+  var el=document.getElementById('parseStatus');
+  if(!el)return;
+  el.className='parse-status '+cls;
+  el.textContent=msg;
+}
+
+// ══════════════════════════════════════════════════════════════
+// XIRR (Newton-Raphson)
+// ══════════════════════════════════════════════════════════════
+function isExternalFlow(type){
+  // Flux externes = versements client (sortie) et rachats (entr\u00e9e)
+  if(/^OST/i.test(type))return false;
+  if(/^Arbitrage/i.test(type))return false;
+  if(/^Versements?\s+int/i.test(type))return false;
+  if(/^Versement\s+Programm/i.test(type))return 'in';  // versement client
+  if(/^Versement\s+Libre/i.test(type))return 'in';
+  if(/^Souscription/i.test(type))return 'in';
+  if(/^Adh/i.test(type))return 'in';
+  if(/^Ouverture/i.test(type))return 'in';
+  if(/^Rachat/i.test(type))return 'out';
+  return false;
+}
+
+function xirr(flows,guess){
+  if(flows.length<2)return null;
+  var d0=flows[0].date;
+  var r=(guess===undefined)?0.1:guess;
+  for(var iter=0;iter<200;iter++){
+    var npv=0,dnpv=0;
+    for(var i=0;i<flows.length;i++){
+      var t=(flows[i].date-d0)/(86400000*365);
+      var v=Math.pow(1+r,t);
+      npv+=flows[i].amount/v;
+      dnpv-=t*flows[i].amount/(v*(1+r));
+    }
+    if(Math.abs(dnpv)<1e-10)break;
+    var newR=r-npv/dnpv;
+    if(isNaN(newR)||!isFinite(newR))break;
+    if(Math.abs(newR-r)<1e-8)return newR;
+    r=newR;
+  }
+  return r;
+}
+
+function computeTri(){
+  var dateArret=parseDateFr(V('kArret'));
+  var valo=num('vVal');
+  if(!dateArret||valo<=0){STATE.tri={error:'Date d\'arr\u00eat\u00e9 ou valorisation manquante'};return;}
+
+  var flows=[];
+  STATE.movements.forEach(function(m){
+    var side=isExternalFlow(m.type);
+    if(!side||!m.dateObj)return;
+    flows.push({
+      date:m.dateObj,
+      amount:(side==='in')?-m.amount:+m.amount,
+      label:m.type+' '+m.dateFr
+    });
+  });
+  // Valorisation finale = flux positif
+  flows.push({date:dateArret,amount:+valo,label:'Valorisation finale '+V('kArret')});
+  flows.sort(function(a,b){return a.date-b.date;});
+
+  var r=xirr(flows);
+  STATE.tri={rate:r,flows:flows};
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════
+function renderAll(){
+  renderHeader();
+  renderHeadTbl();
+  computeTri();
+  renderSynth();
+  renderAlloc();
+  renderMouv();
+  renderTriEq();
+  saveLocal();
+}
+
+function renderHeader(){
+  var cat=V('kCat')||'Contrat';
+  document.getElementById('hTag').textContent=cat.toUpperCase();
+  document.getElementById('hTitle').textContent='Contrat n\u00b0 '+(V('kNum')||'\u2014')+' \u2014 '+(V('kPrestation')||'\u2014');
+  document.getElementById('hSub').textContent=(V('kCompagnie')||'\u2014');
+
+  var arret=V('kArret');
+  document.getElementById('hDate').textContent=arret?('Arr\u00eat\u00e9 au '+arret):'\u2014';
+
+  // Profil conseiller
+  try{
+    var p=CGP.profil.load();
+    var nom=(p.prenom||'')+' '+(p.nom||'');
+    document.getElementById('hAuthor').textContent=nom.trim()?('R\u00e9dig\u00e9 par '+nom.trim()):'\u2014';
+  }catch(e){}
+}
+
+function renderHeadTbl(){
+  var rows=[
+    ['Client',V('cNom')+(V('cAge')?' \u2014 '+V('cAge')+' ans':'')],
+    ['Contact',[V('cTel'),V('cEmail')].filter(Boolean).join(' \u00b7 ')],
+    ['Compagnie / Prestation',V('kCompagnie')+' \u2014 '+V('kPrestation')],
+    ['N\u00b0 contrat',V('kNum')],
+    ['Date d\'ouverture',V('kOpen')],
+    ['Date d\'arr\u00eat\u00e9',V('kArret')],
+    ['SRI du contrat',V('kSri')?(V('kSri')+' / 7'):'']
+  ];
+  var h='';rows.forEach(function(r){h+='<tr><td class="lbl" style="width:38%">'+esc(r[0])+'</td><td>'+esc(r[1]||'\u2014')+'</td></tr>';});
+  document.getElementById('headTbl').innerHTML=h;
+}
+
+function renderSynth(){
+  var valo=num('vVal'),vNets=num('vVersNets'),rach=num('vRachats');
+  var plusVal=valo-vNets;
+  var plusValPct=vNets>0?(plusVal/vNets)*100:0;
+
+  var dOpen=parseDateFr(V('kOpen'));
+  var dArret=parseDateFr(V('kArret'));
+  var dureeAns=0,dureeTxt='\u2014';
+  if(dOpen&&dArret){
+    var days=(dArret-dOpen)/86400000;
+    dureeAns=days/365.25;
+    var ans=Math.floor(dureeAns);
+    var mois=Math.round((dureeAns-ans)*12);
+    dureeTxt=ans+' an'+(ans>1?'s':'')+' '+mois+' mois';
+  }
+  var perfSimple=dureeAns>0?((Math.pow(valo/vNets,1/dureeAns)-1)*100):0;
+  var triPct=(STATE.tri&&STATE.tri.rate!==null&&STATE.tri.rate!==undefined&&!isNaN(STATE.tri.rate))?(STATE.tri.rate*100):null;
+
+  STATE.syntheseCalc={dureeAns:dureeAns,dureeTxt:dureeTxt,perfSimple:perfSimple,plusVal:plusVal,plusValPct:plusValPct,triPct:triPct};
+
+  // KPI cards
+  var kpi='';
+  kpi+='<div class="kpi"><div class="kpi-l">Valorisation</div><div class="kpi-v orange">'+fmtE(valo)+'</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div><div class="kpi-s">'+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">TRI annualis\u00e9</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div><div class="kpi-s">XIRR / money-weighted</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">Dur\u00e9e de d\u00e9tention</div><div class="kpi-v">'+dureeTxt+'</div></div>';
+  document.getElementById('kpiGrid').innerHTML=kpi;
+
+  // Table synth\u00e8se
+  var rows=[
+    ['Valorisation actuelle',fmtE(valo)],
+    ['Versements nets (vers. \u2013 rachats)',fmtE(vNets)],
+    ['Rachats bruts',fmtE(rach)],
+    ['+/- value latente',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
+    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
+    ['<strong>TRI annualis\u00e9 (XIRR)</strong>','<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>'],
+    ['Performance annualis\u00e9e simple',dureeAns>0?fmtPct(perfSimple,2):'\u2014']
+  ];
+  var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
+  document.getElementById('synthTbl').innerHTML=h;
+}
+
+function renderAlloc(){
+  var total=0,sriSum=0,sriW=0,poidsFondsE=0,poidsUC=0;
+  STATE.allocation.forEach(function(a){total+=a.valTot||0;});
+  if(total<=0)total=num('vVal');
+
+  var h='<thead><tr><th>Support</th><th>ISIN</th><th class="c">SRI</th><th class="r">Poids</th><th class="r">PMA</th><th class="r">+/- value</th><th class="r">Perf.</th></tr></thead><tbody>';
+  STATE.allocation.forEach(function(a){
+    var pctPerf=a.perf||0;
+    var plusVal=a.plusVal||0;
+    var perfCls=pctPerf>=0?'pos':'neg';
+    h+='<tr>';
+    h+='<td class="lbl">'+esc(a.label)+'</td>';
+    h+='<td class="mut" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px">'+esc(a.isin)+'</td>';
+    h+='<td class="c">'+esc(a.sri)+'</td>';
+    h+='<td class="r">'+fmtPct(a.poids,2)+'</td>';
+    h+='<td class="r">'+fmtE(a.pma)+'</td>';
+    h+='<td class="r '+(plusVal>=0?'pos':'neg')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</td>';
+    h+='<td class="r '+perfCls+'">'+(pctPerf>=0?'+':'')+fmtPct(pctPerf,2)+'</td>';
+    h+='</tr>';
+
+    // Agr\u00e9gations
+    var s=parseInt(a.sri)||0;var w=a.poids||0;
+    if(s>0){sriSum+=s*w;sriW+=w;}
+    // Fonds \u20ac = SRI 1 g\u00e9n\u00e9ralement, ou libell\u00e9 contenant "euro" / "tresorerie"
+    if(s===1||/euro|tresorerie|tr\u00e9sorerie|actif g[eé]n[eé]ral/i.test(a.label))poidsFondsE+=w;
+    else poidsUC+=w;
+  });
+  if(STATE.allocation.length===0){h+='<tr><td colspan="7" class="mut" style="text-align:center;padding:14px">\u2014</td></tr>';}
+  h+='</tbody>';
+  h+='<tfoot><tr><td colspan="3">TOTAL</td><td class="r">'+fmtPct(poidsFondsE+poidsUC,2)+'</td><td colspan="3" class="r">'+fmtE(total)+'</td></tr></tfoot>';
+  document.getElementById('allocTbl').innerHTML=h;
+
+  var sriMoy=sriW>0?(sriSum/sriW):0;
+  var nbSupports=STATE.allocation.length;
+  var analysis='<strong>R\u00e9partition :</strong> Fonds \u20ac '+fmtPct(poidsFondsE,1)+' / UC '+fmtPct(poidsUC,1)+' \u00b7 ';
+  analysis+='<strong>SRI moyen pond\u00e9r\u00e9 :</strong> '+fmt(sriMoy,1)+' / 7 \u00b7 ';
+  analysis+='<strong>Diversification :</strong> '+nbSupports+' support'+(nbSupports>1?'s':'');
+  // Top concentration
+  if(STATE.allocation.length>0){
+    var top=STATE.allocation.slice().sort(function(a,b){return (b.poids||0)-(a.poids||0);}).slice(0,3);
+    var topPct=top.reduce(function(s,x){return s+(x.poids||0);},0);
+    analysis+=' \u2014 Top 3 supports : '+fmtPct(topPct,1)+' du portefeuille.';
+  }
+  document.getElementById('allocAnalysis').innerHTML=analysis;
+}
+
+function renderMouv(){
+  var h='<thead><tr><th>Date</th><th>Type</th><th class="r">Montant</th><th style="width:35%">Commentaire</th></tr></thead><tbody>';
+  var filtered=STATE.movements.filter(function(m){
+    if(m.amount<1000)return false;
+    // Volontaires uniquement : arbitrages volontaires + VLC + souscription
+    return /^Arbitrage\s+volontaire/i.test(m.type)||/^Versement\s+Libre/i.test(m.type)||/^Souscription|^Adh|^Ouverture/i.test(m.type);
+  });
+  filtered.forEach(function(m,i){
+    h+='<tr>';
+    h+='<td style="white-space:nowrap">'+esc(m.dateFr)+'</td>';
+    h+='<td class="lbl">'+esc(m.type)+'</td>';
+    h+='<td class="r">'+fmtE(m.amount)+'</td>';
+    h+='<td><div class="comm" contenteditable="true" id="mc_'+i+'" data-placeholder="Commentaire..." oninput="saveLocal()" style="padding:4px 8px;min-height:24px;font-size:11px">'+esc(STATE.mouvComms&&STATE.mouvComms[m.dateFr+'_'+m.amount]||'')+'</div></td>';
+    h+='</tr>';
+  });
+  if(filtered.length===0){h+='<tr><td colspan="4" class="mut" style="text-align:center;padding:14px">Aucun mouvement volontaire \u2265 1 000 \u20ac</td></tr>';}
+  h+='</tbody>';
+  document.getElementById('movTbl').innerHTML=h;
+}
+
+function renderTriEq(){
+  var tri=STATE.tri;
+  var note=document.getElementById('triFlowsNote');
+  var eq=document.getElementById('triEq');
+  if(!tri||!tri.flows||tri.flows.length<2){
+    note.textContent='\u2014';eq.innerHTML='\u2014';return;
+  }
+  var nIn=tri.flows.filter(function(f){return f.amount<0;}).length;
+  var nOut=tri.flows.filter(function(f){return f.amount>0;}).length;
+  note.textContent=nIn+' versement(s) client (sortie de tr\u00e9sorerie), '+nOut+' entr\u00e9e(s) dont la valorisation finale. '+tri.flows.length+' flux au total.';
+
+  // \u00e9quation : on montre 3-4 flux + la r\u00e9solution
+  var sample=[];
+  if(tri.flows.length>5){
+    sample.push(tri.flows[0]);
+    sample.push(tri.flows[1]);
+    sample.push({ellipsis:true});
+    sample.push(tri.flows[tri.flows.length-2]);
+    sample.push(tri.flows[tri.flows.length-1]);
+  }else sample=tri.flows.slice();
+
+  var lines=[];
+  sample.forEach(function(f){
+    if(f.ellipsis){lines.push('   &hellip;');return;}
+    var sign=f.amount>=0?'+':'\u2212';
+    var abs=Math.abs(f.amount);
+    var d=dateFmt(f.date);
+    lines.push('   '+sign+' '+fmt(abs,2)+' \u20ac   (<span style="color:var(--gris)">'+d+'</span>)');
+  });
+  var rPct=(tri.rate!==null&&!isNaN(tri.rate))?fmtPct(tri.rate*100,4):'non r\u00e9solu';
+  var html='&Sigma; F<sub>i</sub> / (1 + r)^((d<sub>i</sub> \u2212 d<sub>0</sub>)/365) = 0<br><br>';
+  html+=lines.join('<br>')+'<br><br>';
+  html+='<strong>\u21d2 r = '+rPct+'</strong>';
+  eq.innerHTML=html;
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+
+// ══════════════════════════════════════════════════════════════
+// PERSIST
+// ══════════════════════════════════════════════════════════════
+function collectState(){
+  var mouvComms={};
+  document.querySelectorAll('[id^="mc_"]').forEach(function(el,i){
+    var m=STATE.movements.filter(function(x){return x.amount>=1000&&(/^Arbitrage\s+volontaire/i.test(x.type)||/^Versement\s+Libre/i.test(x.type)||/^Souscription|^Adh|^Ouverture/i.test(x.type));})[i];
+    if(m)mouvComms[m.dateFr+'_'+m.amount]=el.innerHTML;
+  });
+  return {
+    client:{nom:V('cNom'),age:V('cAge'),tel:V('cTel'),email:V('cEmail')},
+    contrat:{compagnie:V('kCompagnie'),prestation:V('kPrestation'),num:V('kNum'),sri:V('kSri'),open:V('kOpen'),arret:V('kArret'),cat:V('kCat')},
+    valo:{valo:V('vVal'),versNets:V('vVersNets'),rachats:V('vRachats')},
+    alloc:STATE.allocation,
+    movs:STATE.movements.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr};}),
+    comms:{perf:document.getElementById('cPerf').innerHTML,alloc:document.getElementById('cAlloc').innerHTML,warn:document.getElementById('cWarn').innerHTML,optim:document.getElementById('cOptim').innerHTML},
+    mouvComms:mouvComms,
+    raw:V('rawExport')
+  };
+}
+
+function applyState(s){
+  if(!s)return;
+  if(s.client){setV('cNom',s.client.nom);setV('cAge',s.client.age);setV('cTel',s.client.tel);setV('cEmail',s.client.email);}
+  if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);setV('kCat',s.contrat.cat);}
+  if(s.valo){setV('vVal',s.valo.valo);setV('vVersNets',s.valo.versNets);setV('vRachats',s.valo.rachats);}
+  if(s.alloc)STATE.allocation=s.alloc;
+  if(s.movs)STATE.movements=s.movs.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr,dateObj:parseDateFr(m.dateFr)};});
+  STATE.mouvComms=s.mouvComms||{};
+  if(s.raw)setV('rawExport',s.raw);
+  if(s.comms){
+    document.getElementById('cPerf').innerHTML=s.comms.perf||'';
+    document.getElementById('cAlloc').innerHTML=s.comms.alloc||'';
+    document.getElementById('cWarn').innerHTML=s.comms.warn||'';
+    document.getElementById('cOptim').innerHTML=s.comms.optim||'';
+  }
+}
+
+function saveLocal(){try{localStorage.setItem(STORE_KEY,JSON.stringify(collectState()));}catch(e){}}
+function loadLocal(){try{var raw=localStorage.getItem(STORE_KEY);if(raw)applyState(JSON.parse(raw));}catch(e){}}
+function saveAll(){
+  var s=collectState();
+  var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  var u=URL.createObjectURL(blob);var a=document.createElement('a');
+  a.href=u;a.download='suivi-contrat-'+(V('kNum')||'contrat')+'.json';a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);},1000);
+}
+function loadAll(file){
+  if(!file)return;var r=new FileReader();
+  r.onload=function(e){try{applyState(JSON.parse(e.target.result));renderAll();setStatus('ok','Fichier charg\u00e9.');}catch(err){setStatus('err','Fichier invalide.');}};
+  r.readAsText(file);
+}
+function resetAll(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  localStorage.removeItem(STORE_KEY);location.reload();
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+loadLocal();
+renderAll();
+if(typeof CGP!=='undefined'&&CGP.footer)CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+</body>
+</html>
