@@ -139,6 +139,9 @@ details[open] summary span.arr{transform:rotate(90deg)}
 .prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
 .prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
 .prog-count.full strong{color:var(--green)}
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
 </style>
 </head>
@@ -293,10 +296,15 @@ details[open] summary span.arr{transform:rotate(90deg)}
 
   <button class="sim-btn" onclick="runSim()">Lancer la projection &#8594;</button>
   <div class="prog-count" id="progCount"><strong>0</strong> / 4 &#233;tapes valid&#233;es</div>
-  <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-  <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-  <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;border-radius:0" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-  <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center;border-radius:0">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+
+  <div style="flex:1;min-height:16px"></div>
+  <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+  <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+  <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+  <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+    <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+  </label>
+  <button class="btn-secondary" onclick="resetScpi()" style="color:#EF4444">&#9100; R&eacute;initialiser</button>
 </div>
 
 <div class="cs-main">
@@ -361,6 +369,11 @@ function updateProgress(){
 document.addEventListener('input',function(e){
   if(e.target&&(e.target.id==='fClient1'||e.target.id==='fRev'||e.target.closest&&e.target.closest('#scpiList'))){updateProgress()}
 });
+function resetScpi(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  try{localStorage.removeItem('cgpskool_state_scpi-financement');}catch(e){}
+  location.reload();
+}
 document.addEventListener('change',function(e){
   if(e.target&&e.target.closest&&e.target.closest('#scpiList'))updateProgress();
 });
