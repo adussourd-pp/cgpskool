@@ -154,6 +154,9 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
           <div class="fg"><label>Valorisation</label><div class="fi-row"><input type="number" step="0.01" id="vVal" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
           <div class="fg"><label>Versements nets</label><div class="fi-row"><input type="number" step="0.01" id="vVersNets" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
           <div class="fg"><label>Rachats bruts</label><div class="fi-row"><input type="number" step="0.01" id="vRachats" value="0" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
+
+          <div class="id-group">Allocation</div>
+          <div id="sbAllocList" style="font-size:11px;color:var(--gris-f)"></div>
         </div>
       </div>
     </div>
@@ -495,9 +498,23 @@ function renderAll(){
   computeTri();
   renderSynth();
   renderAlloc();
+  renderSbAlloc();
   renderMouv();
   toggleCtxInclude();
   saveLocal();
+}
+
+function renderSbAlloc(){
+  var el=document.getElementById('sbAllocList');if(!el)return;
+  if(!STATE.allocation.length){el.textContent='\u2014';return;}
+  var h='';
+  STATE.allocation.forEach(function(a){
+    h+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bord);gap:8px">';
+    h+='<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="'+esc(a.label)+'">'+esc(a.label)+'</span>';
+    h+='<span style="white-space:nowrap;font-weight:600;color:var(--noir)">'+fmtPct(a.poids,1)+'</span>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
 }
 
 function renderHeader(){
