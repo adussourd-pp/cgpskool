@@ -437,7 +437,7 @@ Avant commit d'un nouveau module ou refonte :
 | immo-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | productivite | ? | ? | ? | — | ? | ? |
 | bp-simulator | ? | ? | ? | — | ? | ? |
-| interets-composes | ? | ? | ? | — | ? | ? |
+| interets-composes | — | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | simulateur-avance-av | ? | ? | ? | — | ? | ? |
 | comparatif-cgp | ? | ? | ? | — | ? | ? |
 | equipe-builder | ? | ? | ? | — | ? | ? |

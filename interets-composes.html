@@ -81,18 +81,18 @@
 .frais-body { display: none; padding-top: 6px; }
 .frais-body.open { display: block; }
 
-/* Bouton calcul */
-.btn-calc {
-  width: 100%;
-  padding: 10px;
-  background: var(--orange); color: #fff;
-  font-family: var(--sans); font-size: 13px; font-weight: 500;
-  letter-spacing: 0.04em;
-  border: none; cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 8px;
-}
-.btn-calc:hover { background: var(--orange-hover); }
+/* Bouton action + compteur etapes (SIDEBAR_STANDARD) */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
+.sim-btn:hover{background:var(--orange-hover)}
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:#2D7A5B}
+
+/* Boutons bas standard */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
 /* ── Zone résultats ── */
 
@@ -248,14 +248,17 @@
   <!-- ── PANNEAU GAUCHE ── -->
   <div class="cs-sidebar">
 
-    <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
-      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    <!-- Client toggle (ouvert par defaut) -->
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
+      <div class="fg"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+        <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
+      </div>
     </div>
-    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
     <!-- Capital & versements -->
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Capital & versements</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="capital" onclick="openStep('capital',this)"><span class="acc">&#9654;</span>Capital &amp; versements</div>
+    <div class="sb-body" id="body_capital">
       <div class="fg"><label>Capital initial</label>
         <div class="fi-row"><input type="number" id="capital" value="10000" min="0" step="1000" oninput="recalc()"><span class="fi-unit">€</span></div>
       </div>
@@ -275,8 +278,8 @@
     </div>
 
     <!-- Rendement -->
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Rendement</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="rendement" onclick="openStep('rendement',this)"><span class="acc">&#9654;</span>Rendement</div>
+    <div class="sb-body" id="body_rendement">
       <div class="fg"><label>Taux annuel brut</label>
         <div class="fi-row"><input type="number" id="taux" value="5" min="0" max="20" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
@@ -290,8 +293,8 @@
     </div>
 
     <!-- Frais -->
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Frais</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="frais" onclick="openStep('frais',this)"><span class="acc">&#9654;</span>Frais</div>
+    <div class="sb-body" id="body_frais">
       <div class="fg">
         <div class="frais-toggle open" id="fraisToggle" onclick="toggleFrais()">
           <span>Taux de revalorisation nets de frais</span>
@@ -325,8 +328,8 @@
     </div>
 
     <!-- Fiscalité -->
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Fiscalite a la sortie</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="fisc" onclick="openStep('fisc',this)"><span class="acc">&#9654;</span>Fiscalite a la sortie</div>
+    <div class="sb-body" id="body_fisc">
       <div class="fg"><label>Mode d'imposition</label>
         <div class="toggle-row" id="fiscRow">
           <button class="toggle-opt active" onclick="setFisc('pfu',this)">Flat tax</button>
@@ -366,11 +369,19 @@
       </div>
     </div>
 
-    <button class="btn-calc" onclick="recalc()">Calculer &#8594;</button>
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <!-- Bouton d'action + compteur etapes -->
+    <button class="sim-btn" onclick="recalc()">Calculer &#8594;</button>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
+
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
   </div>
 
   <!-- ── PANNEAU DROIT ── -->
@@ -447,6 +458,46 @@
 
 <script>
 var toggleAcc=CGP.toggleAcc;
+
+/* ---- Progression (accordeon strict + compteur) ---- */
+var _stepOpened={client:true, capital:false, rendement:false, frais:false, fisc:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=document.getElementById('clientNom');return !!(v&&v.value.trim())}
+  if(id==='capital'){var c=document.getElementById('capital');return !!(c&&Number(c.value)>0)}
+  if(id==='rendement'){var t=document.getElementById('taux');return !!(t&&Number(t.value)>0)}
+  if(id==='frais')return true;
+  if(id==='fisc')return true;
+  return false;
+}
+function updateProgress(){
+  var steps=['client','capital','rendement','frais','fisc'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===5);}
+}
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  try{localStorage.removeItem('cgpskool_state_interets-composes');}catch(e){}
+  location.reload();
+}
+
 // ── État ──
 var freq = 'mensuel';       // mensuel | trimestriel | annuel
 var capit = 'annuelle';     // annuelle | mensuelle
@@ -741,6 +792,7 @@ function recalc() {
      fiscMode === 'pfu' ? `Fiscalité : flat tax 30% (IR 12,8% + PS ${fmtPct(ps*100)}) sur les plus-values.` :
      `Fiscalité : barème IR ${fmtPct(tmiBareme*100)} + PS ${fmtPct(ps*100)} sur les plus-values.`);
   CGP.project.autoSave('interets-composes');
+  updateProgress();
 }
 
 // Init auto
@@ -749,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fraisToggle').classList.add('open');
   document.getElementById('fraisBody').classList.add('open');
   recalc();
+  updateProgress();
   CGP.footer.render(document.getElementById('conseillerFooter'));
 });
 
