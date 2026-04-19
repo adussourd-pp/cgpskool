@@ -506,12 +506,15 @@ function renderAll(){
 
 function renderSbAlloc(){
   var el=document.getElementById('sbAllocList');if(!el)return;
-  if(!STATE.allocation.length){el.textContent='\u2014';return;}
+  if(!STATE.allocation.length){el.innerHTML='<span style="color:var(--gris)">\u2014</span>';return;}
   var h='';
-  STATE.allocation.forEach(function(a){
-    h+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bord);gap:8px">';
-    h+='<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="'+esc(a.label)+'">'+esc(a.label)+'</span>';
-    h+='<span style="white-space:nowrap;font-weight:600;color:var(--noir)">'+fmtPct(a.poids,1)+'</span>';
+  STATE.allocation.forEach(function(a,i){
+    h+='<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">';
+    h+='<input type="text" value="'+esc(a.label)+'" title="'+esc(a.label)+'" onchange="STATE.allocation['+i+'].label=this.value;renderAlloc();saveLocal()" style="flex:1;min-width:0;padding:3px 6px;border:1px solid var(--bord);border-radius:4px;font-size:11px;font-family:var(--sans);color:var(--noir);background:#fff;outline:none">';
+    h+='<div style="display:flex;align-items:center;border:1px solid var(--bord);border-radius:4px;background:#fff;flex-shrink:0">';
+    h+='<input type="number" value="'+(a.poids||0)+'" step="0.1" onchange="STATE.allocation['+i+'].poids=parseFloat(this.value)||0;renderAlloc();saveLocal()" style="width:38px;padding:3px 4px;border:none;font-size:11px;text-align:right;font-family:var(--sans);outline:none">';
+    h+='<span style="font-size:10px;color:var(--gris);padding-right:5px">%</span>';
+    h+='</div>';
     h+='</div>';
   });
   el.innerHTML=h;
@@ -644,10 +647,10 @@ function renderAlloc(){
     h+='<td class="lbl">'+esc(a.label)+'</td>';
     h+='<td class="mut" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px">'+esc(a.isin)+'</td>';
     h+='<td class="c">'+esc(a.sri)+'</td>';
-    h+='<td class="r">'+fmtPct(a.poids,2)+'</td>';
+    h+='<td class="r">'+fmtPct(a.poids,0)+'</td>';
     h+='<td class="r">'+fmtE(a.pma)+'</td>';
     h+='<td class="r '+(plusVal>=0?'pos':'neg')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</td>';
-    h+='<td class="r '+perfCls+'">'+(pctPerf>=0?'+':'')+fmtPct(pctPerf,2)+'</td>';
+    h+='<td class="r '+perfCls+'">'+(pctPerf>=0?'+':'')+fmtPct(pctPerf,0)+'</td>';
     h+='</tr>';
     if(showCmt){
       var saved=(STATE.allocComms||{})[a.isin||a.label]||'';
@@ -662,7 +665,7 @@ function renderAlloc(){
   });
   if(STATE.allocation.length===0){h+='<tr><td colspan="7" class="mut" style="text-align:center;padding:14px">\u2014</td></tr>';}
   h+='</tbody>';
-  h+='<tfoot><tr><td colspan="3">TOTAL</td><td class="r">'+fmtPct(poidsFondsE+poidsUC,2)+'</td><td colspan="3" class="r">'+fmtE(total)+'</td></tr></tfoot>';
+  h+='<tfoot><tr><td colspan="3">TOTAL</td><td class="r">'+fmtPct(poidsFondsE+poidsUC,0)+'</td><td colspan="3" class="r">'+fmtE(total)+'</td></tr></tfoot>';
   document.getElementById('allocTbl').innerHTML=h;
 
   var sriMoy=sriW>0?(sriSum/sriW):0;
@@ -684,14 +687,14 @@ function renderAlloc(){
     ASSET_CLASSES.forEach(function(c){
       var w=byClass[c.id];
       if(w>0.01){
-        html+='<div class="gauge-seg" style="flex:'+w+';background:'+c.color+'" title="'+esc(c.label)+' : '+fmtPct(w,1)+'"></div>';
+        html+='<div class="gauge-seg" style="flex:'+w+';background:'+c.color+'" title="'+esc(c.label)+' : '+fmtPct(w,0)+'"></div>';
       }
     });
     html+='</div><div class="gauge-legend">';
     ASSET_CLASSES.forEach(function(c){
       var w=byClass[c.id];
       if(w>0.01){
-        html+='<div class="gauge-item"><span class="gauge-dot" style="background:'+c.color+'"></span>'+esc(c.label)+' <b>'+fmtPct(w,1)+'</b></div>';
+        html+='<div class="gauge-item"><span class="gauge-dot" style="background:'+c.color+'"></span>'+esc(c.label)+' <b>'+fmtPct(w,0)+'</b></div>';
       }
     });
     html+='</div></div>';
@@ -703,7 +706,7 @@ function renderAlloc(){
   if(STATE.allocation.length>0){
     var top=STATE.allocation.slice().sort(function(a,b){return (b.poids||0)-(a.poids||0);}).slice(0,3);
     var topPct=top.reduce(function(s,x){return s+(x.poids||0);},0);
-    html+=' \u2014 Top 3 supports : '+fmtPct(topPct,1);
+    html+=' \u2014 Top 3 supports : '+fmtPct(topPct,0);
   }
   html+='</div>';
   document.getElementById('allocAnalysis').innerHTML=html;
