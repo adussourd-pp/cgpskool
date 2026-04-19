@@ -262,6 +262,51 @@ p.hero-desc {
   </div>
 </div>
 
+<!-- BANDEAU PRODUCTIVITE DU JOUR -->
+<a href="productivite.html" class="daily-strip" id="dailyStrip">
+  <div class="daily-inner">
+    <div class="daily-left">
+      <div class="daily-tag">&#9889; Ma journee</div>
+      <div class="daily-title" id="dailyDate">Aujourd'hui</div>
+      <div class="daily-sub" id="dailySub">Suivez votre productivite quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
+    </div>
+    <div class="daily-mid">
+      <div class="daily-score-wrap">
+        <div class="daily-score" id="dailyScore">0</div>
+        <div class="daily-score-lbl">/ 100</div>
+      </div>
+      <div class="daily-streak" id="dailyStreak"></div>
+    </div>
+    <div class="daily-cta">
+      <span class="daily-cta-txt">Completer ma journee</span>
+      <span class="daily-cta-arrow">&rarr;</span>
+    </div>
+  </div>
+</a>
+<style>
+.daily-strip{display:block;background:linear-gradient(135deg,#181614 0%,#221d18 100%);padding:24px 52px;border-top:1px solid rgba(212,98,42,0.25);border-bottom:1px solid rgba(212,98,42,0.12);text-decoration:none;color:inherit;transition:background 0.25s}
+.daily-strip:hover{background:linear-gradient(135deg,#1e1a16 0%,#2a231c 100%)}
+.daily-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.daily-left{flex:1;min-width:240px}
+.daily-tag{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.daily-title{font-family:var(--serif);font-size:20px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:4px}
+.daily-sub{font-size:12px;color:rgba(255,255,255,0.5);font-weight:300;max-width:420px;line-height:1.5}
+.daily-mid{display:flex;align-items:center;gap:18px}
+.daily-score-wrap{display:flex;align-items:baseline;gap:4px}
+.daily-score{font-family:var(--sans);font-size:42px;font-weight:800;color:#fff;line-height:1}
+.daily-score.low{color:#EF4444}
+.daily-score.med{color:#F59E0B}
+.daily-score.good{color:#F0A738}
+.daily-score.great{color:#10B981}
+.daily-score-lbl{font-size:13px;color:rgba(255,255,255,0.4);font-weight:400}
+.daily-streak{font-size:12px;color:var(--orange);font-weight:600;white-space:nowrap}
+.daily-cta{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--orange);color:#fff;font-size:13px;font-weight:600;border-radius:6px;transition:background 0.15s}
+.daily-strip:hover .daily-cta{background:var(--orange-hover)}
+.daily-cta-arrow{font-size:16px;transition:transform 0.2s}
+.daily-strip:hover .daily-cta-arrow{transform:translateX(3px)}
+@media (max-width:720px){.daily-strip{padding:20px 24px}.daily-inner{gap:16px}.daily-score{font-size:34px}.daily-cta{width:100%;justify-content:center}}
+</style>
+
 <div class="tools-section">
   <div class="tools-inner">
     <div class="tools-label">Analyse &amp; Solutions</div>
@@ -645,6 +690,80 @@ function openProfil(){document.getElementById('modalProfil').classList.add('open
 function closeProfil(){document.getElementById('modalProfil').classList.remove('open');}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeProfil();});
 document.addEventListener('DOMContentLoaded',function(){loadProfil();if(new URLSearchParams(window.location.search).get('openProfil'))openProfil();});
+
+// ── Bandeau productivite du jour ────────────────────────────
+(function(){
+  var PROD_KEY='cgpskool_productivite_v1';
+  var ACTIONS_PTS={conv:5,r1:15,inv:15,rel:5,sign:20,insc:25,pro:7,lead:8};
+  var DAY_FULL=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  var MONTH_NAMES=['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+
+  function dateKey(d){var mm=String(d.getMonth()+1).padStart(2,'0');var dd=String(d.getDate()).padStart(2,'0');return d.getFullYear()+'-'+mm+'-'+dd;}
+
+  function getDayScore(state,dayKey){
+    var total=0;var found=false;
+    Object.keys(state.history||{}).forEach(function(wk){
+      var week=state.history[wk];
+      if(week[dayKey]){
+        found=true;
+        Object.keys(ACTIONS_PTS).forEach(function(id){
+          var w=(state.weights&&state.weights[id]!==undefined)?state.weights[id]:ACTIONS_PTS[id];
+          total+=(week[dayKey][id]||0)*w;
+        });
+      }
+    });
+    return Math.min(total,100);
+  }
+
+  function computeStreak(state){
+    var streak=0;var d=new Date();
+    for(var i=0;i<60;i++){
+      var key=dateKey(d);
+      var s=getDayScore(state,key);
+      if(i===0&&s===0){d.setDate(d.getDate()-1);continue;}
+      if(s>=30)streak++;else break;
+      d.setDate(d.getDate()-1);
+    }
+    return streak;
+  }
+
+  function scoreClass(s){if(s===0)return '';if(s<30)return 'low';if(s<55)return 'med';if(s<75)return 'good';return 'great';}
+
+  function refresh(){
+    var state={history:{},weights:{}};
+    try{var raw=localStorage.getItem(PROD_KEY);if(raw)state=JSON.parse(raw);}catch(e){}
+
+    var now=new Date();
+    var today=dateKey(now);
+    var score=getDayScore(state,today);
+    var streak=computeStreak(state);
+
+    var dateEl=document.getElementById('dailyDate');
+    if(dateEl)dateEl.textContent=DAY_FULL[now.getDay()]+' '+now.getDate()+' '+MONTH_NAMES[now.getMonth()];
+
+    var scoreEl=document.getElementById('dailyScore');
+    if(scoreEl){scoreEl.textContent=score;scoreEl.className='daily-score '+scoreClass(score);}
+
+    var subEl=document.getElementById('dailySub');
+    if(subEl){
+      if(score===0)subEl.textContent='Pas encore d\u2019actions aujourd\u2019hui. Notez vos conversations, R1, invitations\u2026';
+      else if(score<30)subEl.textContent='Bon depart ! Continuez pour atteindre le seuil de la journee productive (30 pts).';
+      else if(score<55)subEl.textContent='Journee en cours. Une prise de R1 ou une invitation peut tout changer.';
+      else if(score<75)subEl.textContent='Tres bonne journee en cours ! Encore un effort pour viser l\u2019excellence.';
+      else subEl.textContent='Excellente journee ! Vous tenez le rythme d\u2019un top performer.';
+    }
+
+    var streakEl=document.getElementById('dailyStreak');
+    if(streakEl){
+      if(streak>=3)streakEl.innerHTML='\uD83D\uDD25 '+streak+' jours consecutifs';
+      else if(streak>=1)streakEl.innerHTML='\uD83C\uDF31 '+streak+' jour'+(streak>1?'s':'');
+      else streakEl.innerHTML='';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',refresh);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
+})();
 </script>
 </body>
 </html>
