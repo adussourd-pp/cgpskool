@@ -604,8 +604,9 @@ function renderSynth(){
     ['Versements nets (affect\u00e9s au contrat)',fmtE(vNets)],
     ['Rachats bruts',fmtE(rach)],
     ['Valorisation actuelle','<strong>'+fmtE(valo)+'</strong>'],
-    ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+(triPct!==null?' \u00b7 TRI '+(triPct>=0?'+':'')+fmtPct(triPct,2):'')+')'],
-    ['Dur\u00e9e de d\u00e9tention',dureeTxt]
+    ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
+    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
+    ['TRI annualis\u00e9'+(dureeAns>0?' (sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')+')':''),'<strong>'+(triPct!==null?(triPct>=0?'+':'')+fmtPct(triPct,2):'\u2014')+'</strong>']
   ]);
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
   document.getElementById('synthTbl').innerHTML=h;
