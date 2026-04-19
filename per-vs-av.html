@@ -192,6 +192,11 @@
 /* Boutons bas (SIDEBAR_STANDARD section 7) */
 .sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:14px;flex-shrink:0}
 .sim-btn:hover{background:var(--orange-hover)}
+
+/* Compteur etapes */
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:#2D7A5B}
 .btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
 .btn-pdf:hover{opacity:0.9}
 .btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
@@ -217,13 +222,17 @@
   <!-- ── SIDEBAR ── -->
   <div class="cs-sidebar">
 
-    <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
-      <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
+    <!-- Client toggle (ouvert par defaut) -->
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
+      <div class="sb-field">
+        <label class="sb-label">Nom du client</label>
+        <input class="sb-input" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader();updateProgress()">
+      </div>
     </div>
-    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypotheses</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="hyp" onclick="openStep('hyp',this)"><span class="acc">&#9654;</span>Hypotheses</div>
+    <div class="sb-body" id="body_hyp">
       <div class="sb-field">
         <label class="sb-label">Montant disponible avant IR</label>
         <input type="number" class="sb-input" id="montantBrut" value="10000" min="1000" step="1000" oninput="recalc()">
@@ -235,8 +244,8 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Assurance Vie — sortie</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="av" onclick="openStep('av',this)"><span class="acc">&#9654;</span>Assurance Vie &#8212; sortie</div>
+    <div class="sb-body" id="body_av">
       <div class="sb-row2">
         <div class="sb-field">
           <label class="sb-label">IR sur PV (%)</label>
@@ -252,8 +261,8 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>PER — sortie</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="per" onclick="openStep('per',this)"><span class="acc">&#9654;</span>PER &#8212; sortie</div>
+    <div class="sb-body" id="body_per">
       <div class="sb-row2">
         <div class="sb-field">
           <label class="sb-label">IR sur PV (%)</label>
@@ -269,8 +278,8 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Horizon</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="horizon" onclick="openStep('horizon',this)"><span class="acc">&#9654;</span>Horizon</div>
+    <div class="sb-body" id="body_horizon">
       <div class="dur-tabs" style="margin-bottom:0">
         <button class="dur-tab active" onclick="setDuree(10, this)">10 ans</button>
         <button class="dur-tab" onclick="setDuree(20, this)">20 ans</button>
@@ -278,8 +287,9 @@
       </div>
     </div>
 
-    <!-- Bouton d'action principal -->
+    <!-- Bouton d'action principal + compteur etapes -->
     <button class="sim-btn" onclick="recalc()">Lancer la projection &#8594;</button>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
 
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
@@ -473,6 +483,41 @@
 
 <script>
 var toggleAcc=CGP.toggleAcc;
+
+/* ---- Progression (accordeon strict + compteur) ---- */
+var _stepOpened={client:true, hyp:false, av:false, per:false, horizon:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='client'){var v=document.getElementById('clientNom');return !!(v&&v.value.trim())}
+  if(id==='hyp'){var m=document.getElementById('montantBrut');return !!(m&&Number(m.value)>0)}
+  if(id==='av')return true;
+  if(id==='per')return true;
+  if(id==='horizon')return true;
+  return false;
+}
+function updateProgress(){
+  var steps=['client','hyp','av','per','horizon'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===5);}
+}
+
 // ── État ──
 var duree = 10;
 var tmiEntree = 0.41;
@@ -564,6 +609,7 @@ function recalc() {
   renderDetail(p);
   renderEvolutionChart(p);
   CGP.project.autoSave('per-vs-av');
+  updateProgress();
 }
 
 // ── Matrice ──
