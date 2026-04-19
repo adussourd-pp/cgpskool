@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>CGP Skool &#8212; Comparaison de contrats</title>
+<title>CGP Skool &#8212; Transfert PER/AV</title>
 <link rel="stylesheet" href="cgp-skool-theme.css">
 <link rel="stylesheet" href="cgp-skool-layout.css">
 <script src="cgp-skool-core.js"></script>
@@ -12,25 +12,39 @@
 <script src="cgp-skool-feedback.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* accordion styles via cgp-skool-layout.css */
-.sf{padding:0 8px;margin-bottom:8px}
-.sf-range{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:8px}
+/* Sidebar standard (cf. SIDEBAR_STANDARD.md) */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi{width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;box-sizing:border-box;min-width:0}
+.fi:focus{border-color:var(--orange)}
+select.fi{cursor:pointer}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--orange)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* Sliders */
+.sf-range{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .sf-range input[type="range"]{flex:1;accent-color:var(--orange);height:4px;-webkit-appearance:none;background:rgba(0,0,0,0.08);border-radius:2px}
 .sf-range input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--orange);cursor:pointer}
 .sf-range-val{font-size:12px;font-weight:700;color:var(--orange);min-width:42px;text-align:right}
-.alloc-grid{display:grid;grid-template-columns:1fr 50px 50px;gap:4px;align-items:center;font-size:10px;padding:0 8px 0 8px;margin-bottom:4px}
-.alloc-grid-simple{display:grid;grid-template-columns:1fr 64px;gap:6px;align-items:center;font-size:10px;padding:0 8px;margin-bottom:4px}
+
+/* Allocations (supports + %) */
+.alloc-grid-simple{display:grid;grid-template-columns:1fr 64px;gap:6px;align-items:center;font-size:10px;margin-bottom:4px}
 .alloc-grid-simple input[type="text"],.alloc-grid-simple input[type="number"]{
   width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;
   font-family:var(--sans);font-size:11px;color:var(--noir);background:#fff;outline:none
 }
 .alloc-grid-simple input:focus{border-color:var(--orange)}
-.alloc-grid .hdr{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600}
-.alloc-grid input{border:1.5px solid var(--bord);border-radius:5px;padding:5px 6px;font-size:10px;font-family:var(--sans);color:var(--noir);background:#fff}
-.alloc-grid input:focus{border-color:var(--orange)}
-.alloc-alert{font-size:9px;color:#dc2626;padding:0 8px;min-height:14px}
-.sidebar-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:auto;transition:opacity 0.2s}
-.sidebar-btn:hover{opacity:0.85}
+.alloc-grid-simple .hdr{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600}
+.alloc-alert{font-size:9px;color:#dc2626;min-height:14px;margin-bottom:6px}
+
+/* Bottom buttons standard */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
 /* Main A4 content */
 /* cs-main override */
@@ -104,21 +118,24 @@
 <div class="cs-app">
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
-    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Client</div>
-    <div class="sb-body open">
-      <div class="sf"><label>Nom du client</label><input type="text" id="pClient" placeholder="Nom Pr&#233;nom" oninput="update()"></div>
+    <!-- 1. Bloc client (sans toggle) -->
+    <div class="fg" style="margin-bottom:14px">
+      <label>Nom du client</label>
+      <input class="fi" type="text" id="pClient" placeholder="Pr&#233;nom Nom" oninput="update()">
     </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
+    <!-- 2. Toggles m&#233;tier -->
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Contrat actuel</div>
     <div class="sb-body open">
-      <div class="sf"><label>Famille</label>
-        <select id="pFamille" onchange="onFamilleChange()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
+      <div class="fg"><label>Famille</label>
+        <select class="fi" id="pFamille" onchange="onFamilleChange()">
           <option value="per">Plan &#201;pargne Retraite</option>
           <option value="av">Assurance Vie</option>
         </select>
       </div>
-      <div id="perTypeRow" class="sf"><label>Type de contrat</label>
-        <select id="pTypePER" onchange="onTypeChange();update()" style="width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);background:#fff;outline:none">
+      <div id="perTypeRow" class="fg"><label>Type de contrat</label>
+        <select class="fi" id="pTypePER" onchange="onTypeChange();update()">
           <option value="per">PER</option>
           <option value="perp">PERP</option>
           <option value="madelin">Loi Madelin</option>
@@ -128,16 +145,14 @@
           <option value="prefon">PREFON / COREM</option>
         </select>
       </div>
-      <div id="typeEncart" style="margin:6px 8px 10px;padding:10px 12px;background:#fff;border:1.5px solid var(--bord);border-radius:7px;font-size:10px;line-height:1.6;color:var(--gris)">
+      <div id="typeEncart" style="margin-bottom:10px;padding:10px 12px;background:#fff;border:1.5px solid var(--bord);border-radius:7px;font-size:10px;line-height:1.6;color:var(--gris)">
         <div style="font-weight:700;color:var(--noir);margin-bottom:4px" id="teTitle">PER</div>
         <div id="teCanDo" style="color:#2da064"></div>
         <div id="teCantDo" style="color:#dc2626;margin-top:2px"></div>
         <div id="teFrais" style="color:var(--orange);margin-top:2px"></div>
       </div>
-      <div style="padding:0 8px;margin-bottom:8px">
-        <button onclick="openRecap()" style="width:100%;padding:7px;background:transparent;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:10px;color:var(--gris);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)';this.style.color='var(--gris)'">&#128203; Tableau synth&#232;se des transferts</button>
-      </div>
-      <div class="sf"><label>Nom du contrat</label><input type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
+      <button onclick="openRecap()" style="width:100%;padding:7px;background:transparent;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:10px;color:var(--gris);cursor:pointer;transition:all 0.15s;margin-bottom:10px" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)';this.style.color='var(--gris)'">&#128203; Tableau synth&#232;se des transferts</button>
+      <div class="fg"><label>Nom du contrat</label><input class="fi" type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
       <div class="alloc-grid-simple">
         <span class="hdr">Support</span><span class="hdr">%</span>
         <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
@@ -146,23 +161,31 @@
         <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
       </div>
       <div class="alloc-alert" id="alertAllocA"></div>
-      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
-      <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
-      <div class="sf"><label>Capital actuel (&#8364;)</label><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"></div>
-      <div class="sf"><label>Anciennet&#233; du contrat (ann&#233;es)</label><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"></div>
-      <div id="ancienneteInfo" style="padding:0 8px;font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
+      <div class="fg"><label>Rendement estim&#233;</label>
+        <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Capital actuel</label>
+          <div class="fi-row"><input type="number" id="pCapital" value="50000" min="0" step="1000" oninput="update()"><span class="fi-unit">&#8364;</span></div>
+        </div>
+        <div class="fg"><label>Anciennet&#233;</label>
+          <div class="fi-row"><input type="number" id="pAnciennete" value="3" min="0" max="50" step="1" oninput="update()"><span class="fi-unit">ans</span></div>
+        </div>
+      </div>
+      <div id="ancienneteInfo" style="font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
     <div class="sb-body open">
-      <div class="sf"><label>Contrat recommand&#233;</label><input type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-      <div id="fraisTransfertRow" style="padding:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer" onclick="toggleFraisTransfert()">
-        <span style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em">Frais de transfert (1 %)</span>
+      <div class="fg"><label>Contrat recommand&#233;</label><input class="fi" type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
+      <div id="fraisTransfertRow" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px" onclick="toggleFraisTransfert()">
+        <span style="font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Frais de transfert (1 %)</span>
         <button type="button" id="ftSwitch" class="ft-switch on" aria-label="Activer/d&#233;sactiver les frais de transfert"></button>
         <input type="hidden" id="pFraisTransfert" value="1">
       </div>
-      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Frais d'entr&#233;e</label></div>
-      <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
+      <div class="fg"><label>Frais d'entr&#233;e</label>
+        <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
+      </div>
       <div class="alloc-grid-simple">
         <span class="hdr">Support</span><span class="hdr">%</span>
         <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
@@ -175,16 +198,23 @@
         <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
       </div>
       <div class="alloc-alert" id="alertAllocB"></div>
-      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Rendement estim&#233;</label></div>
-      <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
-      <div style="padding:0 8px"><label style="font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;display:block">Horizon</label></div>
-      <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+      <div class="fg"><label>Rendement estim&#233;</label>
+        <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
+      </div>
+      <div class="fg"><label>Horizon</label>
+        <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+      </div>
     </div>
 
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetTransfert()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
   </div><!-- /cs-sidebar -->
 
   <!-- MAIN -->
@@ -402,7 +432,7 @@ function onTypeChange(){
 }
 
 function renderHeader(){
-  try{CGP.header.render('pageHeader',{tag:'ETUDE DE TRANSFERT PER',solutions:['PER'],clientId:'pClient',savedKey:'etude-transfert-per'});}catch(e){}
+  try{CGP.header.render('pageHeader',{tag:'TRANSFERT PER/AV',solutions:['PER','AV'],clientId:'pClient',savedKey:'etude-transfert-per'});}catch(e){}
 }
 function update(){
   renderHeader();
@@ -585,6 +615,12 @@ function renderCharts(capA,capB,yA,yB,horizon,nomA,nomB){
 // Export PDF — utilise CGP.pdf.print() (canvas→PNG automatique via core.js)
 function exportPDF(){
   CGP.pdf.print();
+}
+
+function resetTransfert(){
+  if(!confirm('R\u00e9initialiser tous les champs ?')) return;
+  try{localStorage.removeItem('cgpskool_state_etude-transfert-per');}catch(e){}
+  location.reload();
 }
 
 CGP.project.registerModule('etude-transfert-per', {

@@ -339,7 +339,7 @@ Avant commit d'un nouveau module ou refonte :
 | immo-simulator | ? | ? | — | ? | ? |
 | interets-composes | ? | ? | — | ? | ? |
 | simulateur-avance-av | ? | ? | — | ? | ? |
-| etude-transfert-per | ? | ? | — | ? | ? |
+| etude-transfert-per | ✓ | ✓ | — (live) | ✓ 4 boutons | ✓ |
 | comparatif-cgp | ? | ? | — | ? | ? |
 | equipe-builder | ? | ? | — | ? | ? |
 | etude-dossier | ✗ (structure différente) | — | ✓ sections | — | — |

@@ -21,7 +21,7 @@
     'per-vs-av':            'PER vs Assurance Vie',
     'interets-composes':    'Interets composes',
     'simulateur-avance-av': 'Avance sur Assurance Vie',
-    'etude-transfert-per':  'Transfert PER',
+    'etude-transfert-per':  'Transfert PER/AV',
     'allocation-cible':     'Allocation Cible',
     'bp-simulator':         'Business Plan',
     'equipe-builder':       'Equipe',
