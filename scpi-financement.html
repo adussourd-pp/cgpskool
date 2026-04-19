@@ -45,13 +45,23 @@ select.fi{cursor:pointer}
 .scpi-add:hover{background:var(--ambre-l);border-color:var(--ambre)}
 .sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:12px;flex-shrink:0}
 .sim-btn:hover{background:var(--orange-hover)}
-.barem-btn{font-size:11px;color:var(--ambre-d);background:transparent;border:none;font-family:var(--sans);cursor:pointer;text-decoration:underline;padding:0}
-.barem-panel{background:var(--gris-l);border-radius:8px;padding:10px;margin-top:6px;display:none}
+.barem-btn{width:100%;padding:8px 10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris-f);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:all 0.15s;margin-bottom:6px}
+.barem-btn:hover{border-color:var(--orange);color:var(--orange)}
+.barem-btn .arr{font-size:9px;transition:transform 0.2s}
+.barem-btn.open .arr{transform:rotate(180deg)}
+.barem-panel{display:none;background:var(--gris-l);border:1px solid var(--bord);border-radius:7px;padding:12px 14px;margin-top:6px;font-family:var(--sans)}
 .barem-panel.open{display:block}
-.bt{width:100%;font-size:11px;border-collapse:collapse}
-.bt th{font-size:9px;font-weight:700;color:var(--gris);padding:3px 5px;border-bottom:1px solid var(--bord);text-align:left}
-.bt td{padding:3px 5px;border-bottom:1px solid rgba(0,0,0,0.04)}
-.bt input{width:52px;border:1px solid var(--bord);border-radius:4px;padding:2px 4px;font-size:10px;font-family:var(--sans)}
+.barem-panel .sec-title{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:6px;margin-top:10px}
+.barem-panel .sec-title:first-child{margin-top:0}
+.barem-panel .bank-name{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.barem-panel .brow{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:11px;border-bottom:1px solid rgba(0,0,0,0.05)}
+.barem-panel .brow:last-child{border-bottom:none}
+.barem-panel .brow .bl{color:var(--gris-f)}
+.barem-panel .brow .bv{font-weight:700;color:var(--orange);white-space:nowrap}
+.barem-panel .brow .bv-multi{display:flex;gap:10px}
+.barem-panel .brow .bv-multi span{font-weight:700;color:var(--orange);font-variant-numeric:tabular-nums}
+.barem-panel .brow .bv-multi small{color:var(--gris);font-weight:500;font-size:9px;margin-left:2px}
+.barem-note{font-size:10px;color:var(--gris);font-style:italic;line-height:1.55;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.05)}
 .endett-live{background:var(--gris-l);border-radius:8px;padding:10px;margin-bottom:8px}
 .prog-track{height:8px;background:var(--bord);border-radius:4px;margin:4px 0 2px;overflow:hidden}
 .prog-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
@@ -268,7 +278,7 @@ details[open] summary span.arr{transform:rotate(90deg)}
   <div class="fg"><label>Revalorisation des parts /an (%)</label>
     <div class="fi-row"><input type="number" id="fReval" value="0" min="-5" max="10" step="0.5"><span class="fi-unit">%</span></div>
   </div>
-  <button class="barem-btn" onclick="toggleBarem()">&#9881;&#65039; Conditions banque</button>
+  <button class="barem-btn" id="baremBtn" onclick="toggleBarem()"><span>&#128203; Conditions banque</span><span class="arr">&#9660;</span></button>
   <div class="barem-panel" id="baremPanel"></div>
   </div>
 
@@ -609,25 +619,27 @@ function buildTab(cap,tx,dur,dif,typD,div0,rev){
   return rows;
 }
 
-function toggleBarem(){document.getElementById('baremPanel').classList.toggle('open');}
+function toggleBarem(){
+  document.getElementById('baremPanel').classList.toggle('open');
+  document.getElementById('baremBtn').classList.toggle('open');
+}
 function renderBarem(){
   const b=BANKS[bank];
   const fe=Object.values(b.taux)[0];
-  const cols=fe.t!==undefined?['Taux']:fe.ai!==undefined?['<20% apport','≥20% apport']:['Proprio','Locataire'];
-  let h=`<div style="font-size:10px;font-weight:700;color:${b.color};margin-bottom:5px;text-transform:uppercase">${b.name}</div>`;
-  h+=`<div style="font-size:9px;font-weight:600;color:var(--gris);margin:4px 0">TAUX NOMINAUX</div>`;
-  h+=`<table class="bt"><thead><tr><th>Dur.</th>${cols.map(c=>'<th>'+c+'</th>').join('')}</tr></thead><tbody>`;
+  let h=`<div class="bank-name" style="color:${b.color}">${b.name}</div>`;
+  h+=`<div class="sec-title">Taux nominaux</div>`;
   Object.entries(b.taux).forEach(([dur,e])=>{
-    h+=`<tr><td>${dur}m</td>`;
-    if(e.t!==undefined)h+=`<td><input value="${(e.t*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].t=this.value/100;setTauxAuto()"> %</td>`;
-    else if(e.ai!==undefined){h+=`<td><input value="${(e.ai*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].ai=this.value/100;setTauxAuto()"> %</td><td><input value="${(e.as*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].as=this.value/100;setTauxAuto()"> %</td>`;}
-    else{h+=`<td><input value="${(e.p*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].p=this.value/100;setTauxAuto()"> %</td><td><input value="${(e.l*100).toFixed(2)}" onchange="BANKS['${bank}'].taux[${dur}].l=this.value/100;setTauxAuto()"> %</td>`;}
-    h+=`</tr>`;
+    let val;
+    if(e.t!==undefined){val=`<span class="bv">${(e.t*100).toFixed(2)}&nbsp;%</span>`;}
+    else if(e.ai!==undefined){val=`<div class="bv-multi"><span>${(e.ai*100).toFixed(2)}&nbsp;%<small>&lt;20% apport</small></span><span>${(e.as*100).toFixed(2)}&nbsp;%<small>&ge;20%</small></span></div>`;}
+    else{val=`<div class="bv-multi"><span>${(e.p*100).toFixed(2)}&nbsp;%<small>proprio</small></span><span>${(e.l*100).toFixed(2)}&nbsp;%<small>locataire</small></span></div>`;}
+    h+=`<div class="brow"><span class="bl">${dur}&nbsp;mois</span>${val}</div>`;
   });
-  h+=`</tbody></table><div style="font-size:9px;font-weight:600;color:var(--gris);margin:6px 0 3px">ADI — ${b.assureur}</div>`;
-  h+=`<table class="bt"><thead><tr><th>Âge</th><th>Taux/an</th></tr></thead><tbody>`;
-  b.adi.forEach((r,i)=>{h+=`<tr><td>${r.l}</td><td><input value="${(r.t*100).toFixed(3)}" onchange="BANKS['${bank}'].adi[${i}].t=this.value/100;autoADI()"> %</td></tr>`;});
-  h+=`</tbody></table><div style="font-size:10px;color:var(--gris-f);margin-top:7px;line-height:1.6">${b.note}</div>`;
+  h+=`<div class="sec-title">ADI &mdash; ${b.assureur}</div>`;
+  b.adi.forEach(r=>{
+    h+=`<div class="brow"><span class="bl">${r.l}&nbsp;ans</span><span class="bv">${(r.t*100).toFixed(3)}&nbsp;%/an</span></div>`;
+  });
+  h+=`<div class="barem-note">${b.note}</div>`;
   document.getElementById('baremPanel').innerHTML=h;
 }
 
