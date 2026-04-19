@@ -394,7 +394,13 @@ const SCPI=CGP.SCPI_DATA.map(function(s){return{id:s.id,n:s.name,r:+(s.yieldGros
 
 let bank='sofiap', sc=0, cBar=null, cPie=null, invMode='solo';
 
-window.onload=()=>{addSCPI();setBank('sofiap');calcEndett();autoADI();renderBarem();onProfil();try{updateHeader();}catch(e){}updateProgress();};
+window.onload=()=>{addSCPI();setBank('sofiap');calcEndett();autoADI();renderBarem();onProfil();try{updateHeader();}catch(e){}
+  var firstRow=document.querySelector('#scpiList .scpi-row');
+  if(firstRow){var sel=firstRow.querySelector('.scpi-sel'),parts=firstRow.querySelector('.sp');
+    if(sel){sel.value='comete';}
+    if(parts){parts.value=400;}
+    if(sel)updateScpiMontant(firstRow.id);}
+  updateProgress();};
 
 function setInvMode(mode){
   invMode=mode;
