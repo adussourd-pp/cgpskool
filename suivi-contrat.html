@@ -175,10 +175,6 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
           <div class="ph-title" id="hTitle">Contrat n&deg; &mdash;</div>
           <div class="ph-sub" id="hSub">&mdash;</div>
         </div>
-        <div class="hdr-r">
-          <div id="hDate">&mdash;</div>
-          <div style="margin-top:3px" id="hAuthor">&mdash;</div>
-        </div>
       </div>
 
       <!-- 1. EN-T&Ecirc;TE -->
@@ -500,22 +496,11 @@ function renderHeader(){
   document.getElementById('hTag').textContent=cat.toUpperCase();
   document.getElementById('hTitle').textContent='Contrat n\u00b0 '+(V('kNum')||'\u2014')+' \u2014 '+(V('kPrestation')||'\u2014');
   document.getElementById('hSub').textContent=(V('kCompagnie')||'\u2014');
-
-  var arret=V('kArret');
-  document.getElementById('hDate').textContent=arret?('Arr\u00eat\u00e9 au '+arret):'\u2014';
-
-  // Profil conseiller
-  try{
-    var p=CGP.profil.load();
-    var nom=(p.prenom||'')+' '+(p.nom||'');
-    document.getElementById('hAuthor').textContent=nom.trim()?('R\u00e9dig\u00e9 par '+nom.trim()):'\u2014';
-  }catch(e){}
 }
 
 function renderHeadTbl(){
   var rows=[
     ['Client',V('cNom')+(V('cAge')?' \u2014 '+V('cAge')+' ans':'')],
-    ['Contact',[V('cTel'),V('cEmail')].filter(Boolean).join(' \u00b7 ')],
     ['Compagnie / Prestation',V('kCompagnie')+' \u2014 '+V('kPrestation')],
     ['N\u00b0 contrat',V('kNum')],
     ['Date d\'ouverture',V('kOpen')],
