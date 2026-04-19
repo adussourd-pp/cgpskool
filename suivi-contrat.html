@@ -199,30 +199,24 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div id="allocAnalysis" style="font-size:12px;color:var(--gris-f);line-height:1.7"></div>
       </div>
 
-      <!-- 4. CONTEXTE MACRO / G&Eacute;OPOLITIQUE -->
-      <div class="card">
-        <div class="card-title"><span class="n">4</span>&#127758; Contexte macro / g&eacute;opolitique</div>
-        <table class="tbl ctx-tbl">
-          <thead><tr>
-            <th style="width:16%">Dimension</th>
-            <th style="width:40%">Faits marquants</th>
-            <th>&#128172; Impact contrat</th>
-          </tr></thead>
-          <tbody id="ctxBody"></tbody>
-        </table>
-        <div class="card-sub">Lecture conseiller du contexte</div>
-        <div class="comm" contenteditable="true" id="cCtx" data-placeholder="Synth&egrave;se de la p&eacute;riode et lien avec les d&eacute;cisions d'arbitrage prises..." oninput="saveLocal()"></div>
+      <!-- 4. CONTEXTE MACRO / G&Eacute;OPOLITIQUE (optionnel) -->
+      <div class="card ctx-card" id="ctxCard">
+        <div class="card-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px"><span class="n">4</span>&#127758; Contexte macro / g&eacute;opolitique</div>
+          <label class="no-print" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--gris);text-transform:none;letter-spacing:0;cursor:pointer">
+            <input type="checkbox" id="ctxInclude" checked onchange="toggleCtxInclude();saveLocal()">
+            Inclure dans le PDF
+          </label>
+        </div>
+        <div id="ctxContent">
+          <div class="card-sub">Lecture conseiller du contexte</div>
+          <div class="comm" contenteditable="true" id="cCtx" data-placeholder="Synth&egrave;se de la p&eacute;riode macro / g&eacute;opolitique et impact sur le contrat..." style="min-height:70px" oninput="saveLocal()"></div>
+        </div>
       </div>
 
-      <!-- 5. MOUVEMENTS SIGNIFICATIFS -->
+      <!-- 5. COMMENTAIRE -->
       <div class="card">
-        <div class="card-title"><span class="n">5</span>Mouvements significatifs (&ge; 1 000 &euro;)</div>
-        <table class="tbl" id="movTbl"></table>
-      </div>
-
-      <!-- 6. COMMENTAIRE -->
-      <div class="card">
-        <div class="card-title"><span class="n">6</span>Commentaire du conseiller</div>
+        <div class="card-title"><span class="n">5</span>Commentaire du conseiller</div>
         <div class="card-sub">Performance vs objectif / march&eacute;</div>
         <div class="comm" contenteditable="true" id="cPerf" data-placeholder="Analyse de la performance..." oninput="saveLocal()"></div>
         <div class="card-sub">Coh&eacute;rence de l'allocation avec le profil</div>
@@ -233,9 +227,9 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div class="comm" contenteditable="true" id="cOptim" data-placeholder="Arbitrages, versements compl&eacute;mentaires, diversification..." oninput="saveLocal()"></div>
       </div>
 
-      <!-- 7. NOTE GLOBALE -->
+      <!-- 6. NOTE GLOBALE -->
       <div class="card">
-        <div class="card-title"><span class="n">7</span>&#128203; Note globale &mdash; Synth&egrave;se du point annuel</div>
+        <div class="card-title"><span class="n">6</span>&#128203; Note globale &mdash; Synth&egrave;se du point annuel</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div class="fg" style="margin-bottom:0"><label>R&eacute;dig&eacute;e le</label><input class="fi" type="text" id="ngDate" placeholder="JJ/MM/AAAA" oninput="saveLocal()"></div>
           <div class="fg" style="margin-bottom:0"><label>Par</label><input class="fi" type="text" id="ngAuthor" placeholder="Nom conseiller" oninput="saveLocal()"></div>
@@ -244,17 +238,12 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div class="comm" contenteditable="true" id="ngText" data-placeholder="Conclusion du rendez-vous annuel, d&eacute;cisions prises, prochaines &eacute;tapes..." style="min-height:90px" oninput="saveLocal()"></div>
       </div>
 
-      <!-- 8. M&Eacute;THODE TRI -->
-      <div class="card">
-        <div class="card-title"><span class="n">8</span>M&eacute;thode de calcul du TRI (XIRR)</div>
-        <div style="font-size:12px;color:var(--gris-f);line-height:1.7;margin-bottom:8px">
-          R&eacute;solution de <strong>&Sigma; F<sub>i</sub> / (1 + r)<sup>(d<sub>i</sub> &minus; d<sub>0</sub>)/365</sup> = 0</strong> par Newton-Raphson.
-        </div>
-        <div class="card-sub">Flux retenus (externes uniquement)</div>
-        <div style="font-size:11px;color:var(--gris-f);line-height:1.6" id="triFlowsNote">&mdash;</div>
-        <div class="card-sub">Flux exclus</div>
-        <div style="font-size:11px;color:var(--gris);line-height:1.6">OST sans impact fiscal, arbitrages automatiques et volontaires, versements d'int&eacute;r&ecirc;ts (mouvements internes au contrat).</div>
-        <div class="eq" id="triEq">&mdash;</div>
+      <!-- ANNEXE - Historique des mouvements -->
+      <div style="margin:32px 0 14px;padding-top:18px;border-top:2px dashed var(--bord)"></div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gris);margin-bottom:14px">Annexe</div>
+      <div class="card" style="border-style:dashed;background:#fafafa">
+        <div class="card-title"><span class="n" style="background:var(--gris)">A</span>Historique complet des mouvements</div>
+        <table class="tbl" id="movTbl"></table>
       </div>
 
       <div id="conseillerFooter"></div>
@@ -296,9 +285,16 @@ function parseAll(){
   if(!raw||raw.length<100){setStatus('err','Collez d\'abord l\'export complet du contrat.');return;}
 
   try{
-    // --- Client ---
-    var mNom=raw.match(/(M\.|Mme|Mlle)\s+([A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F\-]+)+)/);
-    if(mNom)setV('cNom',mNom[0]);
+    // --- Client (nom complet : titre + prenom + NOM) ---
+    // Pattern 1 : "M./Mme/Mlle Prenom NOM" ou "M./Mme/Mlle Jean-Louis LE NOM"
+    var mNom=raw.match(/(M\.|Mme\.?|Mlle\.?)\s+([A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][A-Za-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+)*)/);
+    if(mNom){
+      setV('cNom',(mNom[1]+' '+mNom[2]+' '+mNom[3]).trim());
+    } else {
+      // Pattern 2 fallback : ligne "Prenom NOM" seule (apres "Souscripteur" ou "Client" ou en debut)
+      var mNom2=raw.match(/(?:Souscripteur|Client)\s*:?\s*\n?\s*([A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+(?:[\-\s]+[A-Z\u00C0-\u017F][a-z\u00C0-\u017F\-]+)*)\s+([A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+(?:\s+[A-Z\u00C0-\u017F][A-Z\u00C0-\u017F\-]+)*)/);
+      if(mNom2) setV('cNom',(mNom2[1]+' '+mNom2[2]).trim());
+    }
     var mAge=raw.match(/(\d{1,3})\s*ans?\b/);if(mAge)setV('cAge',mAge[1]);
     var mTel=raw.match(/(?:phone|T[eé]l[\.\s:]*)[\s+]*((?:\+?33|0)[\s\.\-]?[1-9](?:[\s\.\-]?\d{2}){4})/i);
     if(mTel)setV('cTel',mTel[1].replace(/[\s\.\-]/g,' ').trim());
@@ -313,9 +309,10 @@ function parseAll(){
       else if(/PEA/i.test(cat))setV('kCat','PEA');
       else if(/compte/i.test(cat))setV('kCat','Compte-titres');
     }
-    var mPresta=raw.match(/Prestation\s*:\s*([^\n\r]+?)(?=Compagnie|Num[eé]ro|$)/i);
+    // Prestation : ancre en debut de ligne pour eviter le match sur "Categorie de la prestation"
+    var mPresta=raw.match(/(?:^|\n)\s*Prestation\s*:\s*([^\n\r]+)/i);
     if(mPresta)setV('kPrestation',mPresta[1].trim());
-    var mCompa=raw.match(/Compagnie\s*:\s*([^\n\r]+?)(?=Num[eé]ro|Date|$)/i);
+    var mCompa=raw.match(/(?:^|\n)\s*Compagnie\s*:\s*([^\n\r]+)/i);
     if(mCompa)setV('kCompagnie',mCompa[1].trim());
     var mNum=raw.match(/Num[eé]ro\s+de\s+contrat\s*:\s*(\S+)/i);
     if(mNum)setV('kNum',mNum[1].trim());
@@ -495,7 +492,7 @@ function renderAll(){
   renderSynth();
   renderAlloc();
   renderMouv();
-  renderTriEq();
+  toggleCtxInclude();
   saveLocal();
 }
 
@@ -530,10 +527,26 @@ function renderHeadTbl(){
   document.getElementById('headTbl').innerHTML=h;
 }
 
+function sumVersBruts(){
+  // Somme des versements client (flux externes sortants) depuis les mouvements
+  var total=0;
+  STATE.movements.forEach(function(m){
+    if(isExternalFlow(m.type)==='in') total+=(m.amount||0);
+  });
+  return total;
+}
+
 function renderSynth(){
   var valo=num('vVal'),vNets=num('vVersNets'),rach=num('vRachats');
-  var plusVal=valo-vNets;
-  var plusValPct=vNets>0?(plusVal/vNets)*100:0;
+  var vBruts=sumVersBruts();
+  // Fallback si pas de mouvements parses : on considere bruts = nets + rachats
+  if(vBruts<=0) vBruts=vNets+rach;
+  var fraisEntree=Math.max(0,vBruts-vNets-rach);
+
+  // Montant investi net = ce qui a ete affecte au contrat (base Apicil apres frais)
+  var invNet=vNets;
+  var plusVal=valo-invNet+rach;
+  var plusValPct=invNet>0?(plusVal/invNet)*100:0;
 
   var dOpen=parseDateFr(V('kOpen'));
   var dArret=parseDateFr(V('kArret'));
@@ -545,29 +558,33 @@ function renderSynth(){
     var mois=Math.round((dureeAns-ans)*12);
     dureeTxt=ans+' an'+(ans>1?'s':'')+' '+mois+' mois';
   }
-  var perfSimple=dureeAns>0?((Math.pow(valo/vNets,1/dureeAns)-1)*100):0;
+  var perfSimple=dureeAns>0&&invNet>0?((Math.pow((valo+rach)/invNet,1/dureeAns)-1)*100):0;
   var triPct=(STATE.tri&&STATE.tri.rate!==null&&STATE.tri.rate!==undefined&&!isNaN(STATE.tri.rate))?(STATE.tri.rate*100):null;
 
-  STATE.syntheseCalc={dureeAns:dureeAns,dureeTxt:dureeTxt,perfSimple:perfSimple,plusVal:plusVal,plusValPct:plusValPct,triPct:triPct};
+  STATE.syntheseCalc={dureeAns:dureeAns,dureeTxt:dureeTxt,perfSimple:perfSimple,plusVal:plusVal,plusValPct:plusValPct,triPct:triPct,vBruts:vBruts,fraisEntree:fraisEntree};
 
   // KPI cards
   var kpi='';
   kpi+='<div class="kpi"><div class="kpi-l">Valorisation</div><div class="kpi-v orange">'+fmtE(valo)+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div><div class="kpi-s">'+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
-  kpi+='<div class="kpi"><div class="kpi-l">TRI annualis\u00e9</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div><div class="kpi-s">XIRR / money-weighted</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">TRI annualis\u00e9</div><div class="kpi-v orange">'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</div><div class="kpi-s">sur vers. bruts investis</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">Dur\u00e9e de d\u00e9tention</div><div class="kpi-v">'+dureeTxt+'</div></div>';
   document.getElementById('kpiGrid').innerHTML=kpi;
 
-  // Table synth\u00e8se
+  // Table synthese
   var rows=[
-    ['Valorisation actuelle',fmtE(valo)],
-    ['Versements nets (vers. \u2013 rachats)',fmtE(vNets)],
-    ['Rachats bruts',fmtE(rach)],
-    ['+/- value latente',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
-    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
-    ['<strong>TRI annualis\u00e9 (XIRR)</strong>','<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>'],
-    ['Performance annualis\u00e9e simple',dureeAns>0?fmtPct(perfSimple,2):'\u2014']
+    ['Versements bruts (investis par le client)',fmtE(vBruts)]
   ];
+  if(fraisEntree>0.5) rows.push(['Frais d\'entr\u00e9e pr\u00e9lev\u00e9s','-'+fmtE(fraisEntree)]);
+  rows=rows.concat([
+    ['Versements nets (affect\u00e9s au contrat)',fmtE(vNets)],
+    ['Rachats bruts',fmtE(rach)],
+    ['Valorisation actuelle','<strong>'+fmtE(valo)+'</strong>'],
+    ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
+    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
+    ['<strong>TRI annualis\u00e9 (XIRR sur vers. bruts)</strong>','<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>'],
+    ['Performance annualis\u00e9e simple',dureeAns>0?fmtPct(perfSimple,2):'\u2014']
+  ]);
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
   document.getElementById('synthTbl').innerHTML=h;
 }
@@ -619,59 +636,29 @@ function renderAlloc(){
 }
 
 function renderMouv(){
-  var h='<thead><tr><th>Date</th><th>Type</th><th class="r">Montant</th><th style="width:35%">Commentaire</th></tr></thead><tbody>';
-  var filtered=STATE.movements.filter(function(m){
-    if(m.amount<1000)return false;
-    // Volontaires uniquement : arbitrages volontaires + VLC + souscription
-    return /^Arbitrage\s+volontaire/i.test(m.type)||/^Versement\s+Libre/i.test(m.type)||/^Souscription|^Adh|^Ouverture/i.test(m.type);
-  });
-  filtered.forEach(function(m,i){
+  var el=document.getElementById('movTbl');if(!el)return;
+  var h='<thead><tr><th>Date</th><th>Type</th><th class="r">Montant</th></tr></thead><tbody>';
+  // Tri chronologique descendant (plus recent en haut)
+  var sorted=STATE.movements.slice().sort(function(a,b){return (b.dateObj||0)-(a.dateObj||0);});
+  sorted.forEach(function(m){
+    var cls=isExternalFlow(m.type)==='in'?'neg':(isExternalFlow(m.type)==='out'?'pos':'mut');
     h+='<tr>';
-    h+='<td style="white-space:nowrap">'+esc(m.dateFr)+'</td>';
-    h+='<td class="lbl">'+esc(m.type)+'</td>';
-    h+='<td class="r">'+fmtE(m.amount)+'</td>';
-    h+='<td><div class="comm" contenteditable="true" id="mc_'+i+'" data-placeholder="Commentaire..." oninput="saveLocal()" style="padding:4px 8px;min-height:24px;font-size:11px">'+esc(STATE.mouvComms&&STATE.mouvComms[m.dateFr+'_'+m.amount]||'')+'</div></td>';
+    h+='<td style="white-space:nowrap;font-size:11px">'+esc(m.dateFr)+'</td>';
+    h+='<td class="lbl" style="font-size:11px">'+esc(m.type)+'</td>';
+    h+='<td class="r '+cls+'" style="font-size:11px">'+fmtE(m.amount)+'</td>';
     h+='</tr>';
   });
-  if(filtered.length===0){h+='<tr><td colspan="4" class="mut" style="text-align:center;padding:14px">Aucun mouvement volontaire \u2265 1 000 \u20ac</td></tr>';}
+  if(sorted.length===0){h+='<tr><td colspan="3" class="mut" style="text-align:center;padding:14px">Aucun mouvement \u2014 importez un contrat.</td></tr>';}
   h+='</tbody>';
-  document.getElementById('movTbl').innerHTML=h;
+  el.innerHTML=h;
 }
 
-function renderTriEq(){
-  var tri=STATE.tri;
-  var note=document.getElementById('triFlowsNote');
-  var eq=document.getElementById('triEq');
-  if(!tri||!tri.flows||tri.flows.length<2){
-    note.textContent='\u2014';eq.innerHTML='\u2014';return;
-  }
-  var nIn=tri.flows.filter(function(f){return f.amount<0;}).length;
-  var nOut=tri.flows.filter(function(f){return f.amount>0;}).length;
-  note.textContent=nIn+' versement(s) client (sortie de tr\u00e9sorerie), '+nOut+' entr\u00e9e(s) dont la valorisation finale. '+tri.flows.length+' flux au total.';
-
-  // \u00e9quation : on montre 3-4 flux + la r\u00e9solution
-  var sample=[];
-  if(tri.flows.length>5){
-    sample.push(tri.flows[0]);
-    sample.push(tri.flows[1]);
-    sample.push({ellipsis:true});
-    sample.push(tri.flows[tri.flows.length-2]);
-    sample.push(tri.flows[tri.flows.length-1]);
-  }else sample=tri.flows.slice();
-
-  var lines=[];
-  sample.forEach(function(f){
-    if(f.ellipsis){lines.push('   &hellip;');return;}
-    var sign=f.amount>=0?'+':'\u2212';
-    var abs=Math.abs(f.amount);
-    var d=dateFmt(f.date);
-    lines.push('   '+sign+' '+fmt(abs,2)+' \u20ac   (<span style="color:var(--gris)">'+d+'</span>)');
-  });
-  var rPct=(tri.rate!==null&&!isNaN(tri.rate))?fmtPct(tri.rate*100,4):'non r\u00e9solu';
-  var html='&Sigma; F<sub>i</sub> / (1 + r)^((d<sub>i</sub> \u2212 d<sub>0</sub>)/365) = 0<br><br>';
-  html+=lines.join('<br>')+'<br><br>';
-  html+='<strong>\u21d2 r = '+rPct+'</strong>';
-  eq.innerHTML=html;
+function toggleCtxInclude(){
+  var cb=document.getElementById('ctxInclude');
+  var card=document.getElementById('ctxCard');
+  if(!cb||!card)return;
+  card.classList.toggle('skip-print',!cb.checked);
+  card.style.opacity=cb.checked?'1':'0.5';
 }
 
 function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
