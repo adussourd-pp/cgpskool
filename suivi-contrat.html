@@ -199,15 +199,30 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div id="allocAnalysis" style="font-size:12px;color:var(--gris-f);line-height:1.7"></div>
       </div>
 
-      <!-- 4. MOUVEMENTS SIGNIFICATIFS -->
+      <!-- 4. CONTEXTE MACRO / G&Eacute;OPOLITIQUE -->
       <div class="card">
-        <div class="card-title"><span class="n">4</span>Mouvements significatifs (&ge; 1 000 &euro;)</div>
+        <div class="card-title"><span class="n">4</span>&#127758; Contexte macro / g&eacute;opolitique</div>
+        <table class="tbl ctx-tbl">
+          <thead><tr>
+            <th style="width:16%">Dimension</th>
+            <th style="width:40%">Faits marquants</th>
+            <th>&#128172; Impact contrat</th>
+          </tr></thead>
+          <tbody id="ctxBody"></tbody>
+        </table>
+        <div class="card-sub">Lecture conseiller du contexte</div>
+        <div class="comm" contenteditable="true" id="cCtx" data-placeholder="Synth&egrave;se de la p&eacute;riode et lien avec les d&eacute;cisions d'arbitrage prises..." oninput="saveLocal()"></div>
+      </div>
+
+      <!-- 5. MOUVEMENTS SIGNIFICATIFS -->
+      <div class="card">
+        <div class="card-title"><span class="n">5</span>Mouvements significatifs (&ge; 1 000 &euro;)</div>
         <table class="tbl" id="movTbl"></table>
       </div>
 
-      <!-- 5. COMMENTAIRE -->
+      <!-- 6. COMMENTAIRE -->
       <div class="card">
-        <div class="card-title"><span class="n">5</span>Commentaire du conseiller</div>
+        <div class="card-title"><span class="n">6</span>Commentaire du conseiller</div>
         <div class="card-sub">Performance vs objectif / march&eacute;</div>
         <div class="comm" contenteditable="true" id="cPerf" data-placeholder="Analyse de la performance..." oninput="saveLocal()"></div>
         <div class="card-sub">Coh&eacute;rence de l'allocation avec le profil</div>
@@ -218,9 +233,20 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div class="comm" contenteditable="true" id="cOptim" data-placeholder="Arbitrages, versements compl&eacute;mentaires, diversification..." oninput="saveLocal()"></div>
       </div>
 
-      <!-- 6. M&Eacute;THODE TRI -->
+      <!-- 7. NOTE GLOBALE -->
       <div class="card">
-        <div class="card-title"><span class="n">6</span>M&eacute;thode de calcul du TRI (XIRR)</div>
+        <div class="card-title"><span class="n">7</span>&#128203; Note globale &mdash; Synth&egrave;se du point annuel</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="fg" style="margin-bottom:0"><label>R&eacute;dig&eacute;e le</label><input class="fi" type="text" id="ngDate" placeholder="JJ/MM/AAAA" oninput="saveLocal()"></div>
+          <div class="fg" style="margin-bottom:0"><label>Par</label><input class="fi" type="text" id="ngAuthor" placeholder="Nom conseiller" oninput="saveLocal()"></div>
+          <div class="fg" style="margin-bottom:0"><label>Prochain point</label><input class="fi" type="text" id="ngNext" placeholder="JJ/MM/AAAA" oninput="saveLocal()"></div>
+        </div>
+        <div class="comm" contenteditable="true" id="ngText" data-placeholder="Conclusion du rendez-vous annuel, d&eacute;cisions prises, prochaines &eacute;tapes..." style="min-height:90px" oninput="saveLocal()"></div>
+      </div>
+
+      <!-- 8. M&Eacute;THODE TRI -->
+      <div class="card">
+        <div class="card-title"><span class="n">8</span>M&eacute;thode de calcul du TRI (XIRR)</div>
         <div style="font-size:12px;color:var(--gris-f);line-height:1.7;margin-bottom:8px">
           R&eacute;solution de <strong>&Sigma; F<sub>i</sub> / (1 + r)<sup>(d<sub>i</sub> &minus; d<sub>0</sub>)/365</sup> = 0</strong> par Newton-Raphson.
         </div>
@@ -665,7 +691,9 @@ function collectState(){
     valo:{valo:V('vVal'),versNets:V('vVersNets'),rachats:V('vRachats')},
     alloc:STATE.allocation,
     movs:STATE.movements.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr};}),
-    comms:{perf:document.getElementById('cPerf').innerHTML,alloc:document.getElementById('cAlloc').innerHTML,warn:document.getElementById('cWarn').innerHTML,optim:document.getElementById('cOptim').innerHTML},
+    comms:{perf:document.getElementById('cPerf').innerHTML,alloc:document.getElementById('cAlloc').innerHTML,warn:document.getElementById('cWarn').innerHTML,optim:document.getElementById('cOptim').innerHTML,ctx:(document.getElementById('cCtx')||{}).innerHTML||''},
+    ctxImp:(function(){var o={};for(var i=0;i<DEFAULT_CTX.length;i++){var el=document.getElementById('ctxImp_'+i);if(el)o[i]=el.innerHTML;}return o;})(),
+    noteGlobale:{date:V('ngDate'),author:V('ngAuthor'),next:V('ngNext'),text:(document.getElementById('ngText')||{}).innerHTML||''},
     mouvComms:mouvComms,
     raw:V('rawExport')
   };
@@ -685,6 +713,14 @@ function applyState(s){
     document.getElementById('cAlloc').innerHTML=s.comms.alloc||'';
     document.getElementById('cWarn').innerHTML=s.comms.warn||'';
     document.getElementById('cOptim').innerHTML=s.comms.optim||'';
+    var ctxEl=document.getElementById('cCtx');if(ctxEl)ctxEl.innerHTML=s.comms.ctx||'';
+  }
+  if(s.ctxImp){
+    Object.keys(s.ctxImp).forEach(function(k){var el=document.getElementById('ctxImp_'+k);if(el)el.innerHTML=s.ctxImp[k]||'';});
+  }
+  if(s.noteGlobale){
+    setV('ngDate',s.noteGlobale.date);setV('ngAuthor',s.noteGlobale.author);setV('ngNext',s.noteGlobale.next);
+    var ngT=document.getElementById('ngText');if(ngT)ngT.innerHTML=s.noteGlobale.text||'';
   }
 }
 
@@ -708,8 +744,33 @@ function resetAll(){
 }
 
 // ══════════════════════════════════════════════════════════════
+// CONTEXTE MACRO / GEOPOLITIQUE
+// ══════════════════════════════════════════════════════════════
+var DEFAULT_CTX=[
+  {dim:'Taux & inflation',      faits:'Hausse BCE 2022-23 (+450 pb), pic inflation zone euro 10,6 % (oct. 2022), desinflation 2024, baisses BCE amorcees mi-2024'},
+  {dim:'Marches actions',       faits:'Rebond 2023-24 porte par l\'IA (Nasdaq +40 % en 2023), correction tech debut 2025, rotation value'},
+  {dim:'Marches taux / credit', faits:'Courbe inversee 2023, repentification 2024-25, spreads IG stables, conditions favorables aux produits structures'},
+  {dim:'Geopolitique',          faits:'Guerre Ukraine (fev. 2022+), Israel-Gaza (oct. 2023+), tensions Taiwan, election US 2024, vague tarifaire 2025'},
+  {dim:'France / Europe',       faits:'Degradation note France, instabilite budgetaire, reforme retraites, spreads OAT/Bund elargis'},
+  {dim:'Risques contrat',       faits:'(a completer selon supports detenus)'}
+];
+function renderCtx(){
+  var tb=document.getElementById('ctxBody');if(!tb)return;
+  var h='';
+  DEFAULT_CTX.forEach(function(r,i){
+    h+='<tr>';
+    h+='<td class="lbl" style="vertical-align:top">'+esc(r.dim)+'</td>';
+    h+='<td style="vertical-align:top;font-size:11px;color:var(--gris-f);line-height:1.6">'+esc(r.faits)+'</td>';
+    h+='<td style="vertical-align:top"><div class="comm" contenteditable="true" id="ctxImp_'+i+'" data-placeholder="..." oninput="saveLocal()" style="min-height:32px;font-size:11px"></div></td>';
+    h+='</tr>';
+  });
+  tb.innerHTML=h;
+}
+
+// ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
+renderCtx();
 loadLocal();
 renderAll();
 if(typeof CGP!=='undefined'&&CGP.footer)CGP.footer.render(document.getElementById('conseillerFooter'));
