@@ -25,9 +25,18 @@ body { background: var(--paper); color: var(--noir); font-family: var(--sans); }
 .fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
 .fi:focus{border-color:var(--orange)}
 
-/* Bouton calculer (CTA orange) */
-.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:14px}
+/* Bouton action + compteur etapes (SIDEBAR_STANDARD) */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:12px;flex-shrink:0}
 .sim-btn:hover{background:var(--orange-hover)}
+.prog-count{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center;margin-top:8px}
+.prog-count strong{color:var(--orange);font-weight:700;font-size:11px}
+.prog-count.full strong{color:#2D7A5B}
+
+/* Boutons bas standard */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
 /* Note Prodémial */
 .pmr-note{background:rgba(212,98,42,0.06);border-left:3px solid var(--orange);padding:11px 14px;margin-bottom:16px;font-size:11px;line-height:1.65;color:var(--gris-f);border-radius:0 7px 7px 0}
@@ -132,8 +141,8 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
 
     <!-- ── AN 0 : SITUATION ACTUELLE ── -->
     <div class="an0-box">
-      <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)" style="color:var(--orange)"><span class="acc">&#9654;</span>Situation actuelle &mdash; An 0</div>
-      <div class="sb-body open">
+      <div class="cs-sidebar-lbl open" data-step="an0" onclick="openStep('an0',this)" style="color:var(--orange)"><span class="acc">&#9654;</span>Situation actuelle &mdash; An 0</div>
+      <div class="sb-body open" id="body_an0">
       <div style="font-size:10px;color:var(--gris);margin-bottom:10px;line-height:1.55">Renseignez vos chiffres r&#233;els si vous avez d&#233;j&#224; une activit&#233;. Laissez &#224; 0 si vous d&#233;marrez.</div>
       <div class="fg"><label>VA personnelle actuelle <small>(An 0)</small></label>
         <div class="fi-row"><input type="number" id="va0actuel" value="0" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
@@ -160,8 +169,8 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Projection &mdash; Activit&#233; personnelle</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="perso" onclick="openStep('perso',this)"><span class="acc">&#9654;</span>Projection &mdash; Activit&#233; personnelle</div>
+    <div class="sb-body" id="body_perso">
       <div class="fg"><label>VA cible An 1 <small>(base de croissance)</small></label>
         <div class="fi-row"><input type="number" id="va0" value="500000" step="50000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
       <div class="fg"><label>Croissance VA perso / an</label>
@@ -170,8 +179,8 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
         <div class="fi-row"><input type="number" id="pvPerso" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveau 1</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="niv1" onclick="openStep('niv1',this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveau 1</div>
+    <div class="sb-body" id="body_niv1">
       <div class="fg"><label>Consultants inscrits/an <small>(moyenne)</small></label>
         <div class="fi-row"><input type="number" id="inscNiv1" value="3" step="1" oninput="recalc()"><span class="fi-unit">/ an</span></div></div>
       <div class="fg"><label>Taux de parrainage <small>(top : 1 &#224; 2)</small></label>
@@ -184,16 +193,16 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
         <div class="fi-row"><input type="number" id="pvNiv1" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveaux 2+</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="niv2" onclick="openStep('niv2',this)"><span class="acc">&#9654;</span>Organisation &mdash; Niveaux 2+</div>
+    <div class="sb-body" id="body_niv2">
       <div class="fg"><label>VA moyenne / actif niv.2+</label>
         <div class="fi-row"><input type="number" id="vaNiv2" value="100000" step="25000" oninput="recalc()"><span class="fi-unit">&euro;</span></div></div>
       <div class="fg"><label>PV moyen &#233;quipe niv.2+</label>
         <div class="fi-row"><input type="number" id="pvNiv2" value="0.4" step="0.05" oninput="recalc()"><span class="fi-unit">coeff.</span></div></div>
     </div>
 
-    <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Hypoth&#232;ses PMR</div>
-    <div class="sb-body open">
+    <div class="cs-sidebar-lbl" data-step="pmr" onclick="openStep('pmr',this)"><span class="acc">&#9654;</span>Hypoth&#232;ses PMR</div>
+    <div class="sb-body" id="body_pmr">
       <div class="fg"><label>Dur&#233;e du business plan</label>
         <div class="fi-row"><input type="number" id="duréePlan" value="7" min="3" max="10" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
       <div class="fg"><label>VA Manager (seuil branche active)</label>
@@ -227,11 +236,19 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
       </div>
     </div>
 
+    <!-- Bouton action + compteur etapes -->
     <button class="sim-btn" onclick="recalc()">Calculer mon business plan &#8594;</button>
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
+
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
   </div>
 
   <!-- Résultats -->
@@ -310,6 +327,45 @@ table.bp-tbl tr.total td.o{color:var(--orange)}
 
 <script>
 var toggleAcc=CGP.toggleAcc;
+
+/* ---- Progression (accordeon strict + compteur) ---- */
+var _stepOpened={an0:true, perso:false, niv1:false, niv2:false, pmr:false};
+function openStep(id, el){
+  if(id)_stepOpened[id]=true;
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){
+      var open=l.classList.toggle('open');
+      body.classList.toggle('open', open);
+    } else {
+      l.classList.remove('open');
+      body.classList.remove('open');
+    }
+  });
+  updateProgress();
+}
+function isStepComplete(id){
+  if(!_stepOpened[id])return false;
+  if(id==='an0')return true;
+  if(id==='perso'){var v=document.getElementById('va0');return !!(v&&Number(v.value)>0)}
+  if(id==='niv1'){var v=document.getElementById('vaNiv1');return !!(v&&Number(v.value)>0)}
+  if(id==='niv2'){var v=document.getElementById('vaNiv2');return !!(v&&Number(v.value)>0)}
+  if(id==='pmr'){var v=document.getElementById('vaManagerActif');return !!(v&&Number(v.value)>0)}
+  return false;
+}
+function updateProgress(){
+  var steps=['an0','perso','niv1','niv2','pmr'], done=0;
+  steps.forEach(function(id){if(isStepComplete(id))done++});
+  var c=document.getElementById('progCount');
+  if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
+    c.classList.toggle('full', done===5);}
+}
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  try{localStorage.removeItem('cgpskool_state_bp-simulator');}catch(e){}
+  location.reload();
+}
 var caChartInst = null, encChartInst = null;
 
 function gv(id,def) { var el=document.getElementById(id); return el?(parseFloat(el.value)||0):(def||0); }
@@ -667,6 +723,7 @@ function recalc() {
   var last = rows[rows.length-1];
   setHTML('simNote', 'Projection indicative — hypothèses PMR Prodémial. TPC : 5% → 8% selon qualification. La qualification et les titres sont des conséquences du volume réalisé. Commission démarrage : 2% sur VA équipe niv.1. Commission expansion : 1% sur VA équipe managers niv.1. Commission développement : 0,5% sur VA niv.2+. Manager à partir de 50k€ VAVC perso (~18-20 mois en moyenne selon les mails experts). VA Manager actif moyen : '+fmtE(gv('vaManagerActif',700000))+' (source : équipe Payraudeau S12/2026). Taux parrainage 1,5/actif/an = top performers réseau Forman (Darmaillacq 8, Van Ledeghem 7, Geraud 7 filleuls sur l\'exercice). Taux moyen réseau : ~0,5/actif/an. Taux d\'actifs 62% validé (équipe Payraudeau : 658/1010 = 65%). CA total an '+dureePlan+' projeté : '+fmtE(last.caTotal)+'. Projections non contractuelles.');
   CGP.project.autoSave('bp-simulator');
+  updateProgress();
 }
 
 CGP.project.registerModule('bp-simulator', {
@@ -723,6 +780,7 @@ CGP.project.registerModule('bp-simulator', {
 
 document.addEventListener('DOMContentLoaded', function() {
   recalc();
+  updateProgress();
   CGP.footer.render(document.getElementById('conseillerFooter'));
 });
 </script>

@@ -436,7 +436,7 @@ Avant commit d'un nouveau module ou refonte :
 | per-vs-av | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 4/4 | ✓ 4 boutons | ✓ |
 | immo-simulator | ✓ `.mode-tabs` (3) | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | productivite | ? | ? | ? | — | ? | ? |
-| bp-simulator | ? | ? | ? | — | ? | ? |
+| bp-simulator | — | ✗ (module generique) | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | interets-composes | — | ✓ toggle | ✓ | ✓ compteur 5/5 | ✓ 4 boutons | ✓ |
 | simulateur-avance-av | ? | ? | ? | — | ? | ? |
 | comparatif-cgp | ? | ? | ? | — | ? | ? |
