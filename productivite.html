@@ -23,6 +23,25 @@
 .week-nav button:hover{border-color:var(--orange);color:var(--orange)}
 .week-label{font-size:11px;font-weight:700;color:var(--noir);text-align:center;flex:1;line-height:1.3}
 
+/* ── Dots sidebar (7 jours) ── */
+.sb-days{display:flex;gap:4px;margin-bottom:10px}
+.sb-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.sb-day-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--bord);background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(0,0,0,0.25);transition:all 0.15s}
+.sb-day.partial .sb-day-dot{background:rgba(212,98,42,0.12);border-color:rgba(212,98,42,0.35);color:var(--orange)}
+.sb-day.has .sb-day-dot{background:var(--orange);border-color:var(--orange);color:#fff}
+.sb-day.full .sb-day-dot{background:#10B981;border-color:#10B981;color:#fff}
+.sb-day.today .sb-day-dot{box-shadow:0 0 0 2px rgba(212,98,42,0.35)}
+.sb-day.today{color:var(--orange)}
+.sb-day.future .sb-day-dot{border-style:dashed;background:transparent;color:var(--ink-30)}
+
+/* ── Score semaine sidebar ── */
+.sb-week-stat{margin-bottom:14px}
+.sb-week-line{font-size:13px;font-weight:700;color:var(--noir);margin-bottom:6px}
+.sb-week-line .pct{color:var(--orange)}
+.sb-week-line .sep{color:var(--ink-30);margin:0 2px}
+.sb-week-bar{height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden}
+.sb-week-bar > span{display:block;height:100%;background:var(--orange);transition:width 0.4s}
+
 /* ── Objectif ── */
 .goal-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .goal-val{font-size:12px;font-weight:700;color:var(--orange);min-width:32px;text-align:right}
@@ -68,7 +87,7 @@
 .score-great{background:#10B981}
 
 /* KPI cards */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .kpi-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:14px 16px;text-align:center}
 .kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
 .kpi-val{font-size:22px;font-weight:800;color:var(--noir);line-height:1;font-family:var(--sans)}
@@ -97,7 +116,17 @@
 /* Today column highlight */
 .tracker-grid .today-col{background:rgba(212,98,42,0.04)}
 
-/* Streak */
+/* Notes semaine */
+.notes-wrap{background:#FFFBF5;border:1px dashed #E6CFA8;border-radius:10px;padding:14px 16px;margin-bottom:20px}
+.notes-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
+.notes-area{width:100%;min-height:60px;border:none;background:transparent;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;outline:none;resize:vertical}
+.notes-area::placeholder{color:var(--ink-30);font-style:italic}
+
+/* Export all weeks (hidden pour print multi-semaines) */
+.multi-week-page{display:none}
+.multi-week-page.printing{display:block}
+
+/* Streak (indicateur sidebar) */
 .streak-fire{font-size:20px;line-height:1}
 
 /* Evolution chart (multi-semaines) */
@@ -142,6 +171,16 @@
       <button onclick="changeWeek(1)" title="Semaine suivante">&#8250;</button>
     </div>
 
+    <!-- 7 dots resume de la semaine -->
+    <div class="sb-days" id="sbDays"></div>
+
+    <!-- Score semaine + objectif -->
+    <div class="sb-week-stat">
+      <div class="sb-week-line"><span id="sbWeekTotal">0</span> / <span id="sbWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="sbWeekPct">0&nbsp;%</span></div>
+      <div class="sb-week-bar"><span id="sbWeekBar" style="width:0%"></span></div>
+    </div>
+
+    <!-- Slider objectif -->
     <div class="goal-row">
       <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);flex:1">Objectif semaine</span>
       <span class="goal-val" id="goalDisplay">250</span>
@@ -149,10 +188,9 @@
     <input type="range" id="weeklyGoal" min="50" max="700" step="25" value="250"
       style="width:100%;accent-color:var(--orange);margin-bottom:4px"
       oninput="onGoalChange()">
-    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink-30);margin-bottom:6px">
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink-30);margin-bottom:14px">
       <span>50</span><span>700</span>
     </div>
-    <div class="goal-bar-wrap"><div class="goal-bar" id="goalBar" style="width:0%"></div></div>
 
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
@@ -162,8 +200,10 @@
     </div>
 
     <div style="flex:1"></div>
-    <div style="height:1px;background:var(--bord);margin-bottom:12px"></div>
-    <button onclick="resetWeek()" style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px" title="Remettre a zero la semaine courante">&#9100; Effacer semaine</button>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button onclick="exportCurrentWeek()" style="width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px">&#11015; Exporter PDF &mdash; semaine</button>
+    <button onclick="exportAllWeeks()" style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:10px" title="PDF de toutes les semaines avec donnees">&#128220; Exporter toutes les semaines</button>
+    <button onclick="resetWeek()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(239,68,68,0.2);color:#EF4444;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px" title="Remettre a zero la semaine courante">&#9100; Effacer cette semaine</button>
 
   </div>
 
@@ -179,7 +219,6 @@
         </div>
         <div style="text-align:right">
           <div class="ph-date" id="pageDate"></div>
-          <div id="streakDisplay" style="margin-top:4px"></div>
         </div>
       </div>
 
@@ -188,7 +227,6 @@
         <div class="kpi-card"><div class="kpi-label">Score semaine</div><div class="kpi-val orange" id="kpiWeek">0</div><div class="kpi-sub" id="kpiWeekSub">/ 250 pts</div></div>
         <div class="kpi-card"><div class="kpi-label">Moy. / jour</div><div class="kpi-val" id="kpiAvg">0</div><div class="kpi-sub">pts / jour actif</div></div>
         <div class="kpi-card"><div class="kpi-label">Meilleur jour</div><div class="kpi-val green" id="kpiBest">0</div><div class="kpi-sub" id="kpiBestDay">--</div></div>
-        <div class="kpi-card"><div class="kpi-label">Streak</div><div class="kpi-val" id="kpiStreak">0</div><div class="kpi-sub">jours consecutifs</div></div>
       </div>
 
       <!-- Mini chart -->
@@ -217,6 +255,13 @@
       </div>
 
       <div class="divider"></div>
+
+      <!-- Notes de la semaine -->
+      <div class="notes-wrap">
+        <div class="notes-lbl">Notes &amp; rappels de la semaine</div>
+        <textarea class="notes-area" id="weekNotes" placeholder="Pour se rappeler : contacts relances, rendez-vous cles, freins, insights..."
+          oninput="onNotesChange()"></textarea>
+      </div>
 
       <!-- Tracker grid -->
       <div class="sec-lbl">Detail des actions</div>
@@ -257,7 +302,8 @@ var state = {
   weekOffset: 0,   // 0 = current week
   goal: 250,       // 5 jours ouvres x 50 pts/jour
   weights: {},     // id -> pts override
-  history: {}      // 'YYYY-Www' -> { 'YYYY-MM-DD': { conv:0, r1:0, ... } }
+  history: {},     // 'YYYY-Www' -> { 'YYYY-MM-DD': { conv:0, r1:0, ... } }
+  notes: {}        // 'YYYY-Www' -> string (notes de la semaine)
 };
 
 var STORE_KEY = 'cgpskool_productivite_v1';
@@ -270,6 +316,7 @@ function loadState() {
       if (saved.goal !== undefined) state.goal = saved.goal;
       if (saved.weights) state.weights = saved.weights;
       if (saved.history) state.history = saved.history;
+      if (saved.notes) state.notes = saved.notes;
     }
   } catch(e) {}
 }
@@ -279,7 +326,8 @@ function saveState() {
     localStorage.setItem(STORE_KEY, JSON.stringify({
       goal: state.goal,
       weights: state.weights,
-      history: state.history
+      history: state.history,
+      notes: state.notes
     }));
   } catch(e) {}
 }
@@ -589,7 +637,6 @@ function renderKPIs() {
   var avg = activeDays.length > 0 ? Math.round(weekTotal / activeDays.length) : 0;
   var best = Math.max.apply(null, scores);
   var bestIdx = scores.indexOf(best);
-  var streak = computeStreak();
   var goal = state.goal;
 
   document.getElementById('kpiWeek').textContent = weekTotal;
@@ -597,21 +644,10 @@ function renderKPIs() {
   document.getElementById('kpiAvg').textContent = avg;
   document.getElementById('kpiBest').textContent = best;
   document.getElementById('kpiBestDay').textContent = best > 0 ? DAY_FULL[days[bestIdx].getDay()] : '--';
-  document.getElementById('kpiStreak').textContent = streak;
-  document.getElementById('kpiStreak').className = 'kpi-val' + (streak >= 5 ? ' green' : streak >= 3 ? ' orange' : '');
-
-  // Streak fire display
-  var streakEl = document.getElementById('streakDisplay');
-  if (streak >= 3) {
-    streakEl.innerHTML = '<span style="font-size:13px;color:var(--orange);font-weight:600">' + streak + ' jours</span> &#128293;';
-  } else {
-    streakEl.innerHTML = '';
-  }
 
   // Goal bar
   var pct = Math.min((weekTotal / goal) * 100, 100);
-  document.getElementById('goalBar').style.width = pct + '%';
-  document.getElementById('goalBar').style.background = pct >= 100 ? 'var(--green)' : 'var(--orange)';
+  // goalBar supprime : la barre de progression est maintenant dans .sb-week-bar
   document.getElementById('goalDisplay').textContent = goal;
 }
 
@@ -630,10 +666,63 @@ function renderHeader() {
 // ── FULL RENDER ───────────────────────────────────────────────
 function render() {
   renderHeader();
+  renderSidebarDays();
   renderGrid();
   renderChart();
   renderEvolution();
   renderKPIs();
+  renderNotes();
+}
+
+function renderSidebarDays() {
+  var days = getWeekDays();
+  var DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  var now = new Date();
+  var todayK = dateStr(now);
+  var html = '';
+  days.forEach(function(d, i) {
+    var k = dateStr(d);
+    var sc = getDayScore(k);
+    var cls = 'sb-day';
+    var isFuture = d > now && k !== todayK;
+    if (isFuture) cls += ' future';
+    else if (sc >= 75) cls += ' full';
+    else if (sc >= 30) cls += ' has';
+    else if (sc > 0) cls += ' partial';
+    if (k === todayK) cls += ' today';
+    var content = sc > 0 ? sc : (isFuture ? '' : '·');
+    html += '<div class="' + cls + '"><div class="sb-day-dot">' + content + '</div>' + DAY_LETTERS[i] + '</div>';
+  });
+  document.getElementById('sbDays').innerHTML = html;
+
+  // Mini stats semaine sidebar
+  var scores = days.map(function(d) { return getDayScore(dateStr(d)); });
+  var weekTotal = scores.reduce(function(s, x) { return s + x; }, 0);
+  var goal = state.goal;
+  var pct = goal > 0 ? Math.round((weekTotal / goal) * 100) : 0;
+  var barPct = Math.min(pct, 100);
+  document.getElementById('sbWeekTotal').textContent = weekTotal;
+  document.getElementById('sbWeekGoal').textContent = goal;
+  document.getElementById('sbWeekPct').textContent = pct + '\u00a0%';
+  var sbBar = document.getElementById('sbWeekBar');
+  if (sbBar) {
+    sbBar.style.width = barPct + '%';
+    sbBar.style.background = pct >= 100 ? '#10B981' : 'var(--orange)';
+  }
+}
+
+function renderNotes() {
+  var wk = weekKey(getCurrentMonday());
+  var textarea = document.getElementById('weekNotes');
+  if (textarea) textarea.value = state.notes[wk] || '';
+}
+
+function onNotesChange() {
+  var wk = weekKey(getCurrentMonday());
+  var val = document.getElementById('weekNotes').value;
+  if (val.trim() === '') delete state.notes[wk];
+  else state.notes[wk] = val;
+  saveState();
 }
 
 // ── INTERACTIONS ──────────────────────────────────────────────
@@ -689,8 +778,105 @@ function resetWeek() {
   if (!confirm('Effacer toutes les donnees de cette semaine ?')) return;
   var wk = weekKey(getCurrentMonday());
   delete state.history[wk];
+  delete state.notes[wk];
   saveState();
   render();
+}
+
+// ── EXPORT PDF ───────────────────────────────────────────────
+function exportCurrentWeek() {
+  if (typeof CGP !== 'undefined' && CGP.pdf && CGP.pdf.print) CGP.pdf.print();
+  else window.print();
+}
+
+function exportAllWeeks() {
+  // Liste les semaines ayant au moins 1 score > 0
+  var weeksWithData = [];
+  Object.keys(state.history).forEach(function(wk) {
+    var hasData = false;
+    var week = state.history[wk];
+    Object.keys(week).forEach(function(dayKey) {
+      var tot = 0;
+      ACTIONS.forEach(function(a) { tot += (week[dayKey][a.id] || 0); });
+      if (tot > 0) hasData = true;
+    });
+    if (hasData) weeksWithData.push(wk);
+  });
+
+  if (weeksWithData.length === 0) {
+    alert('Aucune semaine avec des donnees a exporter.');
+    return;
+  }
+  if (!confirm('Exporter ' + weeksWithData.length + ' semaine(s) en un PDF unique ?')) return;
+
+  // Calcule l'offset pour chaque semaine (par rapport a la semaine courante)
+  var currentMonday = getMonday(new Date());
+  var offsets = weeksWithData.map(function(wk) {
+    // trouve le lundi de cette semaine
+    var parts = wk.split('-W');
+    var year = parseInt(parts[0]);
+    var weekNum = parseInt(parts[1]);
+    // lundi de la semaine wk : approximation simple
+    var jan1 = new Date(year, 0, 1);
+    var dayOfWeek = jan1.getDay() || 7;
+    var firstMonday = new Date(year, 0, 1 + (8 - dayOfWeek) % 7);
+    var mon = new Date(firstMonday);
+    mon.setDate(firstMonday.getDate() + (weekNum - 1) * 7);
+    return Math.round((mon - currentMonday) / (7 * 86400000));
+  });
+  offsets.sort(function(a, b) { return a - b; });
+
+  // Injecte une page par semaine dans un conteneur cache, visible au print uniquement
+  var originalOffset = state.weekOffset;
+  var originalPage = document.querySelector('.cs-page');
+  var originalParent = originalPage.parentNode;
+  var container = document.createElement('div');
+  container.id = 'multi-export-container';
+
+  offsets.forEach(function(off, idx) {
+    state.weekOffset = off;
+    // render sur la page originale pour cloner son contenu
+    render();
+    var clone = originalPage.cloneNode(true);
+    clone.style.pageBreakAfter = (idx < offsets.length - 1) ? 'always' : 'auto';
+    clone.style.marginBottom = '40px';
+    // remplir la zone notes dans le clone car textarea.value ne se clone pas
+    var notesClone = clone.querySelector('#weekNotes');
+    if (notesClone) {
+      var currentWk = weekKey(getCurrentMonday());
+      var notesTxt = state.notes[currentWk] || '';
+      notesClone.value = notesTxt;
+      notesClone.textContent = notesTxt;
+    }
+    container.appendChild(clone);
+  });
+
+  // Restaure l'offset d'origine + re-render
+  state.weekOffset = originalOffset;
+  render();
+
+  // Injecte le conteneur a la place pour l'impression
+  var mainWrap = document.querySelector('.cs-main');
+  mainWrap.style.display = 'none';
+  document.body.appendChild(container);
+
+  // Style temporaire : pleine largeur, chaque page A4
+  container.style.cssText = 'padding:20px;background:#ECEAE6;min-height:100vh';
+  var style = document.createElement('style');
+  style.id = 'multi-export-style';
+  style.textContent = '#multi-export-container .cs-page{background:#fff;border:1px solid var(--rule-l);padding:40px;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}@media print{#multi-export-container{padding:0}#multi-export-container .cs-page{box-shadow:none;margin:0;border:none;page-break-after:always}#multi-export-container .cs-page:last-child{page-break-after:auto}}';
+  document.head.appendChild(style);
+
+  setTimeout(function() {
+    if (typeof CGP !== 'undefined' && CGP.pdf && CGP.pdf.print) CGP.pdf.print();
+    else window.print();
+    setTimeout(function() {
+      // Cleanup
+      document.body.removeChild(container);
+      document.head.removeChild(style);
+      mainWrap.style.display = '';
+    }, 500);
+  }, 250);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
