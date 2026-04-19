@@ -310,16 +310,32 @@ Specs bouton : `width:100%; padding:10px; font-size:13px; font-weight:500; font-
 
 ### Print CSS — Règles critiques
 
-**R23 — JAMAIS `* { print-color-adjust: exact }` sur le sélecteur universel.**
-Ça rend le texte flou sur Chrome/Edge (désactive l'anti-aliasing).
-Appliquer `print-color-adjust: exact` UNIQUEMENT sur les éléments avec des fonds colorés :
-```css
-/* BON — ciblé */
-.badge,.kpi,.card,[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+**R23 — TOUJOURS préserver les couleurs au PDF (et JAMAIS `*`)**
 
-/* MAUVAIS — rend le texte flou */
-*{-webkit-print-color-adjust:exact!important}
+Par défaut, Chrome/Edge strip les fonds/couleurs à l'impression pour économiser l'encre. Sans la règle, les KPI orange/verts, badges, headers de tableau, card backgrounds, etc. apparaissent en gris/blanc dans le PDF exporté.
+
+**Tout nouveau module avec des fonds colorés, bordures colorées, ou textes en couleur DOIT inclure une règle `print-color-adjust: exact` ciblée** (pas sur `*` — ça rend le texte flou) :
+
+```css
+/* ✅ BON — ciblé : élargir la liste selon les classes du module */
+.card,.kpi,.badge,.tool-card,.card-title .n,.tbl th,.tbl tfoot td,
+.ph-tag,.pos,.neg,.gold,.green,.red,.sri-chip,
+[style*="background"]{
+  -webkit-print-color-adjust:exact !important;
+  print-color-adjust:exact !important;
+}
+
+/* ❌ MAUVAIS — rend le texte flou (désactive l'anti-aliasing) */
+*{-webkit-print-color-adjust:exact !important}
 ```
+
+**Checklist avant commit d'un nouveau module** :
+1. Lister tes classes avec fond/bordure/couleur non-défaut
+2. Les ajouter au sélecteur ciblé ci-dessus
+3. Ctrl+P (ou `CGP.pdf.print()`) pour prévisualiser le rendu PDF
+4. Si un fond/couleur est absent → sélecteur manquant à ajouter
+
+**Reconnaître le bug** : symptôme = "les couleurs disparaissent au PDF" / "le PDF sort tout gris" → oubli de R23.
 
 **R24 — Les graphiques Chart.js (canvas) ne s'impriment PAS.**
 Les `<canvas>` apparaissent vides/blancs en impression. Solution :
