@@ -589,9 +589,9 @@ function renderSynth(){
   // KPI cards
   var kpi='';
   kpi+='<div class="kpi"><div class="kpi-l">Valorisation</div><div class="kpi-v orange">'+fmtE(valo)+'</div></div>';
-  kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div><div class="kpi-s">'+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">+/- value latente</div><div class="kpi-v '+(plusVal>=0?'green':'')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</div></div>';
   var triSubLbl=dureeAns>0&&triPct!==null?('TRI annualis\u00e9 : '+(triPct>=0?'+':'')+fmtPct(triPct,2)):'';
-  kpi+='<div class="kpi"><div class="kpi-l">Perf. totale</div><div class="kpi-v orange">'+(plusValPct>=0?'+':'')+fmtPct(plusValPct,2)+'</div><div class="kpi-s">'+triSubLbl+'</div></div>';
+  kpi+='<div class="kpi"><div class="kpi-l">Perf. totale</div><div class="kpi-v orange">'+(plusValPct>=0?'+':'')+fmtPct(plusValPct,2)+'</div></div>';
   kpi+='<div class="kpi"><div class="kpi-l">Dur\u00e9e de d\u00e9tention</div><div class="kpi-v">'+dureeTxt+'</div></div>';
   document.getElementById('kpiGrid').innerHTML=kpi;
 
@@ -604,9 +604,8 @@ function renderSynth(){
     ['Versements nets (affect\u00e9s au contrat)',fmtE(vNets)],
     ['Rachats bruts',fmtE(rach)],
     ['Valorisation actuelle','<strong>'+fmtE(valo)+'</strong>'],
-    ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
-    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
-    ['<strong>Rendement annuel</strong>'+(triSubLbl?'<br><span style="font-size:10px;color:var(--gris);font-weight:400">'+triSubLbl+'</span>':''),'<strong>'+(triPct!==null?fmtPct(triPct,2):'\u2014')+'</strong>']
+    ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+(triPct!==null?' \u00b7 TRI '+(triPct>=0?'+':'')+fmtPct(triPct,2):'')+')'],
+    ['Dur\u00e9e de d\u00e9tention',dureeTxt]
   ]);
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
   document.getElementById('synthTbl').innerHTML=h;
