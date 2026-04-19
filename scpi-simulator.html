@@ -42,15 +42,19 @@
 .stag.ok{background:var(--green-l);color:var(--green);border-color:rgba(45,122,91,0.15)}
 .stag.blue{background:var(--blue-l);color:var(--blue);border-color:rgba(43,94,167,0.15)}
 
-/* INPUTS */
-.input-group{margin-bottom:16px}
-/* .input-label: see cgp-skool-layout.css (.cs-label) */
-.input-row{display:flex;align-items:center;background:var(--blanc);border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
-.input-row:focus-within{border-color:var(--ambre)}
-.input-row input{flex:1;background:transparent;border:none;outline:none;padding:10px 13px;color:var(--noir);font-family:var(--sans);font-size:15px;font-weight:500}
-.input-unit{padding:10px 13px;font-size:12px;color:var(--gris);border-left:1px solid var(--bord);font-weight:500}
+/* INPUTS (standard SIDEBAR_STANDARD.md : fg / fi / fi-row / fi-unit / grid2) */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+.fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
+.fi-row:focus-within{border-color:var(--ambre)}
+.fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-size:13px;color:var(--noir);min-width:0}
+.fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
 /* range slider: see cgp-skool-layout.css */
-.slider-val{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:4px}
+.slider-val{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:4px}
 .slider-labs{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-30);margin-top:2px}
 /* Boutons TMI */
 .tmi-pill{flex:1;padding:8px 4px;font-family:var(--sans);font-size:12px;font-weight:600;
@@ -59,12 +63,15 @@
 .tmi-pill:hover{border-color:var(--orange);color:var(--orange)}
 .tmi-pill.active{background:var(--ambre-l);color:var(--ambre-d);border-color:var(--ambre-m)}
 
-/* CTA */
-.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;margin-top:8px}
+/* CTA (bouton action principal orange) */
+.sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
 .sim-btn:hover{background:var(--orange-hover)}
-.sim-btn-export{width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;margin-top:6px}
-.sim-btn-export:hover{opacity:0.85}
-.divider{height:1px;background:var(--bord);margin:20px 0}
+
+/* Boutons bas (SIDEBAR_STANDARD.md section 7) */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.85}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
 
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70vh;text-align:center;gap:12px}
 .empty-icon{font-size:48px;opacity:0.18}
@@ -209,7 +216,7 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 
 /* CUSTOM RATE PANEL */
 .custom-rate-panel{background:var(--ambre-l);border:1.5px solid var(--ambre-m);border-radius:10px;padding:16px;margin-bottom:0}
-.custom-rate-panel .input-label{color:var(--ambre-d);font-weight:600}
+.custom-rate-panel .fg label{color:var(--ambre-d);font-weight:600}
 .custom-rate-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .custom-rate-hint{font-size:11px;color:var(--gris);margin-top:8px;line-height:1.5;font-style:italic}
 .custom-badge{display:inline-flex;align-items:center;gap:5px;background:var(--ambre-l);color:var(--ambre-d);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:8px}
@@ -245,87 +252,86 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 <!-- SIDEBAR -->
 <div class="cs-sidebar">
 
-  <div class="fg" style="margin-bottom:14px"><label style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Nom du client</label>
+  <div class="fg" style="margin-bottom:14px">
+    <label>Nom du client</label>
     <input class="fi" type="text" id="clientNom" placeholder="Pr&#233;nom Nom" oninput="renderHeader()">
   </div>
   <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
   <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Type de projection</div>
-    <div class="sb-body open">
+  <div class="sb-body open">
     <div class="mode-tabs">
       <div class="mode-tab active" onclick="setMode('retraite',this)"><span class="mode-icon">&#128200;</span>Plan Retraite SCPI</div>
       <div class="mode-tab" onclick="setMode('np',this)"><span class="mode-icon">&#128256;</span>Nue-propri&#233;t&#233;</div>
       <div class="mode-tab" onclick="setMode('entreprise',this)"><span class="mode-icon">&#127970;</span>Montage Entreprise</div>
     </div>
-    </div>
+  </div>
 
   <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>SCPI</div>
-    <div class="sb-body open">
+  <div class="sb-body open">
     <div class="source-toggle">
-      <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">📋 Gamme SCPI</button>
-      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">✏️ Taux personnalisé</button>
+      <button class="src-btn active" id="srcBtnSCPI" onclick="setSource('scpi')">&#128203; Gamme SCPI</button>
+      <button class="src-btn" id="srcBtnCustom" onclick="setSource('custom')">&#9997;&#65039; Taux personnalis&#233;</button>
     </div>
     <div id="scpiPickerPanel">
-      <input class="scpi-search" type="text" placeholder="Rechercher par nom, société…" oninput="filterSCPI(this.value)">
+      <input class="scpi-search" type="text" placeholder="Rechercher par nom, soci&#233;t&#233;&hellip;" oninput="filterSCPI(this.value)">
       <div class="scpi-list" id="scpiList"></div>
     </div>
     <div id="customRatePanel" style="display:none">
       <div class="custom-rate-panel">
-        <div class="custom-badge">✏️ Taux personnalisé</div>
-        <div class="input-group" style="margin-bottom:8px">
-          <span class="input-label">Taux de distribution</span>
-          <div class="input-row">
+        <div class="custom-badge">&#9997;&#65039; Taux personnalis&#233;</div>
+        <div class="fg" style="margin-bottom:8px">
+          <label>Taux de distribution</label>
+          <div class="fi-row">
             <input type="number" id="custom-gross" value="6.00" min="0.1" max="20" step="0.1">
-            <span class="input-unit">%</span>
+            <span class="fi-unit">%</span>
           </div>
         </div>
-        <div class="input-group" style="margin-bottom:0">
-          <span class="input-label">Libellé (optionnel)</span>
-          <div class="input-row">
-            <input type="text" id="custom-name" placeholder="Ex : SCPI hypothétique" style="font-size:13px;font-family:var(--sans)">
-          </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Libell&#233; (optionnel)</label>
+          <input class="fi" type="text" id="custom-name" placeholder="Ex : SCPI hypoth&#233;tique">
         </div>
       </div>
     </div>
-    </div>
+  </div>
 
   <div class="cs-sidebar-lbl open" onclick="toggleAcc(this)"><span class="acc">&#9654;</span>Plan d'investissement</div>
-    <div class="sb-body open">
+  <div class="sb-body open">
 
     <!-- RETRAITE -->
     <div id="inputs-retraite">
-      <div class="input-group">
-        <span class="input-label">Investissement initial</span>
-        <div class="input-row"><input type="number" id="ret-init" value="10000" min="0" step="1000"><span class="input-unit">€</span></div>
+      <div class="fg">
+        <label>Investissement initial</label>
+        <div class="fi-row"><input type="number" id="ret-init" value="10000" min="0" step="1000"><span class="fi-unit">&euro;</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Versement mensuel</span>
-        <div class="input-row"><input type="number" id="ret-monthly" value="200" min="0" step="50"><span class="input-unit">€ / mois</span></div>
+      <div class="fg">
+        <label>Versement mensuel</label>
+        <div class="fi-row"><input type="number" id="ret-monthly" value="200" min="0" step="50"><span class="fi-unit">&euro; / mois</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">% Dividendes réinvestis</span>
+      <div class="fg">
+        <label>% Dividendes r&eacute;investis</label>
         <div class="slider-val" id="ret-reinvest-val">0 %</div>
         <input type="range" id="ret-reinvest" min="0" max="100" value="0" step="5" oninput="document.getElementById('ret-reinvest-val').textContent=this.value+' %'">
         <div class="slider-labs"><span>0 %</span><span>50 %</span><span>100 %</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Horizon de temps</span>
+      <div class="fg">
+        <label>Horizon de temps</label>
         <div class="slider-val" id="ret-horizon-val">20 ans</div>
         <input type="range" id="ret-horizon" min="3" max="40" value="20" step="1" oninput="document.getElementById('ret-horizon-val').textContent=this.value+' ans'">
         <div class="slider-labs"><span>3 ans</span><span>20 ans</span><span>40 ans</span></div>
       </div>
-      <!-- TMI masqué — rente nette non affichée (fiscalité SCPI étrangères non fiable) -->
+      <!-- TMI masque - rente nette non affichee (fiscalite SCPI etrangeres non fiable) -->
       <input type="hidden" id="ret-tmi" value="30">
     </div>
 
     <!-- NP -->
     <div id="inputs-np" style="display:none">
-      <div class="input-group">
-        <span class="input-label">Montant investi (en NP)</span>
-        <div class="input-row"><input type="number" id="np-init" value="20000" min="0" step="1000"><span class="input-unit">€</span></div>
+      <div class="fg">
+        <label>Montant investi (en NP)</label>
+        <div class="fi-row"><input type="number" id="np-init" value="20000" min="0" step="1000"><span class="fi-unit">&euro;</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Durée du démembrement</span>
+      <div class="fg">
+        <label>Dur&eacute;e du d&eacute;membrement</label>
         <div class="slider-val" id="np-dur-val">7 ans</div>
         <input type="range" id="np-duration" min="3" max="20" value="7" step="1" oninput="document.getElementById('np-dur-val').textContent=this.value+' ans'">
         <div class="slider-labs"><span>3 ans</span><span>10 ans</span><span>20 ans</span></div>
@@ -334,33 +340,38 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
 
     <!-- ENTREPRISE -->
     <div id="inputs-entreprise" style="display:none">
-      <div class="input-group">
-        <span class="input-label">Cash société → Usufruit</span>
-        <div class="input-row"><input type="number" id="ent-invest" value="100000" min="0" step="5000"><span class="input-unit">€</span></div>
+      <div class="fg">
+        <label>Cash soci&eacute;t&eacute; &rarr; Usufruit</label>
+        <div class="fi-row"><input type="number" id="ent-invest" value="100000" min="0" step="5000"><span class="fi-unit">&euro;</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Cash perso → Nue-propriété (optionnel)</span>
-        <div class="input-row"><input type="number" id="ent-invest-np" value="0" min="0" step="5000"><span class="input-unit">€</span></div>
+      <div class="fg">
+        <label>Cash perso &rarr; Nue-propri&eacute;t&eacute; (optionnel)</label>
+        <div class="fi-row"><input type="number" id="ent-invest-np" value="0" min="0" step="5000"><span class="fi-unit">&euro;</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Durée de l'usufruit</span>
+      <div class="fg">
+        <label>Dur&eacute;e de l'usufruit</label>
         <div class="slider-val" id="ent-dur-val">5 ans</div>
         <input type="range" id="ent-duration" min="3" max="20" value="5" step="1" oninput="updateEntDur(this.value)">
         <div class="slider-labs"><span>3 ans</span><span>10 ans</span><span>20 ans</span></div>
       </div>
-      <div class="input-group">
-        <span class="input-label">Taux d'IS de la société</span>
-        <div class="input-row"><input type="number" id="ent-is" value="25" min="15" max="33" step="1"><span class="input-unit">%</span></div>
+      <div class="fg">
+        <label>Taux d'IS de la soci&eacute;t&eacute;</label>
+        <div class="fi-row"><input type="number" id="ent-is" value="25" min="15" max="33" step="1"><span class="fi-unit">%</span></div>
       </div>
     </div>
 
-    </div>
+  </div>
 
-  <button class="sim-btn" onclick="runSimulation()">Lancer la projection &#8594;</button>
-  <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-  <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-  <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;border-radius:0" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-  <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center;border-radius:0">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+  <button class="sim-btn" onclick="runSimulation()">Lancer la projection &rarr;</button>
+
+  <div style="flex:1;min-height:16px"></div>
+  <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+  <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+  <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+  <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+    <input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''">
+  </label>
+  <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9100; R&eacute;initialiser</button>
 </div>
 <div class="cs-main" id="mainContent">
 <div class="cs-page">
@@ -864,6 +875,13 @@ function setScpiTMI(val, btn) {
 
 // Footer conseiller (gere par CGP.profil.load() dans core.js)
 CGP.footer.render(document.getElementById('conseillerFooter'));
+
+// ── Reset module (SIDEBAR_STANDARD.md section 7) ──
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  try{localStorage.removeItem('cgpskool_state_scpi-simulator');}catch(e){}
+  location.reload();
+}
 
 // ── Project save/restore ──
 CGP.project.registerModule('scpi-simulator', {
