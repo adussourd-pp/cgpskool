@@ -21,9 +21,12 @@
 .stat-pill b{color:var(--ink);font-weight:700}
 .stat-pill.orange b{color:var(--orange)}
 
-/* Tree container : permet le defilement horizontal quand l'arbre est large */
-.tree-wrap{display:block;overflow-x:auto;overflow-y:visible;padding:20px 0;margin:0 -20px}
-.tree-inner{display:flex;flex-direction:column;align-items:center;gap:0;min-width:max-content;padding:0 20px}
+/* Tree container : vue infinie pannable (drag pour naviguer) */
+.tree-wrap{position:relative;overflow:hidden;width:100%;height:calc(100vh - 260px);min-height:480px;margin:0 -20px;padding:0;background:var(--paper);border-radius:12px;border:1.5px solid var(--rule-l);cursor:grab;touch-action:none;user-select:none}
+.tree-wrap.grabbing{cursor:grabbing}
+.tree-pan{position:absolute;top:50%;left:50%;will-change:transform;transition:none}
+.tree-inner{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px}
+.tree-hint{position:absolute;bottom:10px;right:14px;font-size:10px;color:var(--ink-30);pointer-events:none;background:rgba(255,255,255,0.7);padding:4px 10px;border-radius:12px;letter-spacing:0.04em}
 
 /* Node */
 .node-group{display:flex;flex-direction:column;align-items:center}
@@ -114,7 +117,7 @@
     <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
   </div>
   <div class="cs-main">
-    <div class="cs-page" style="max-width:900px">
+    <div class="cs-page" style="max-width:1200px">
 
       <div class="team-header">
         <h1>Construire son &#233;quipe</h1>
@@ -412,6 +415,61 @@ function getInitials(node){
 
 var esc=CGP.esc;
 
+/* Pan (drag) sur la vue infinie de l'arborescence */
+var _panX=0,_panY=0,_panStartX=0,_panStartY=0,_panDragging=false,_panWrapEl=null;
+
+function applyPan(){
+  if(!_panWrapEl)return;
+  var pane=_panWrapEl.querySelector('.tree-pan');
+  if(!pane)return;
+  pane.style.transform='translate(calc(-50% + '+_panX+'px), calc(-50% + '+_panY+'px))';
+}
+
+function centerOnRoot(){
+  // Au premier rendu : on centre sur le noeud racine (moi)
+  _panX=0;_panY=0;
+  // Decaler vers le haut pour laisser de la place aux enfants en-dessous
+  if(_panWrapEl){
+    var h=_panWrapEl.clientHeight||480;
+    _panY=-h/2+120; // racine a ~120px du haut
+  }
+  applyPan();
+}
+
+function setupPan(wrap){
+  _panWrapEl=wrap;
+  centerOnRoot();
+
+  // Evite de re-attacher les listeners a chaque render
+  if(wrap._panBound)return;
+  wrap._panBound=true;
+
+  wrap.addEventListener('pointerdown',function(e){
+    // Ne pas lancer le pan si on clique sur un bouton / action
+    if(e.target.closest('.node-act,.add-child-btn,button,input'))return;
+    _panDragging=true;
+    _panStartX=e.clientX-_panX;
+    _panStartY=e.clientY-_panY;
+    wrap.classList.add('grabbing');
+    wrap.setPointerCapture&&wrap.setPointerCapture(e.pointerId);
+  });
+  wrap.addEventListener('pointermove',function(e){
+    if(!_panDragging)return;
+    _panX=e.clientX-_panStartX;
+    _panY=e.clientY-_panStartY;
+    applyPan();
+  });
+  function endPan(e){
+    if(!_panDragging)return;
+    _panDragging=false;
+    wrap.classList.remove('grabbing');
+    try{wrap.releasePointerCapture&&wrap.releasePointerCapture(e.pointerId);}catch(_){}
+  }
+  wrap.addEventListener('pointerup',endPan);
+  wrap.addEventListener('pointercancel',endPan);
+  wrap.addEventListener('pointerleave',endPan);
+}
+
 function renderNode(node,path,depth){
   var q=getQualif(node);
   var qColor=QUALIF_COLORS[q.code]||'var(--ink-60)';
@@ -500,9 +558,9 @@ function render(){
   V('statBranches').textContent=branchesActives;
   V('statQualif').textContent=rootQ.label;
 
-  // Tree (enveloppe dans .tree-inner pour permettre le scroll horizontal
-  // quand l'arborescence est plus large que la page)
-  wrap.innerHTML='<div class="tree-inner">'+renderNode(tree,[],0)+'</div>';
+  // Tree : rendu dans .tree-pan (pannable) -> .tree-inner
+  wrap.innerHTML='<div class="tree-pan"><div class="tree-inner">'+renderNode(tree,[],0)+'</div></div><div class="tree-hint">Glissez pour naviguer</div>';
+  setupPan(wrap);
 
   CGP.project.autoSave('equipe-builder');
 }
