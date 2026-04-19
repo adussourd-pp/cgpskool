@@ -172,11 +172,10 @@
   text-decoration: none;
   letter-spacing: 0.04em;
   padding: 4px 6px;
-  border-bottom: 1px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
-.top-menu-item:hover { color: #fff; }
-.top-menu-item.active { color: var(--orange); border-bottom-color: var(--orange); }
+.top-menu-item:hover,
+.top-menu-item.active { color: #fff; }
 .top-menu-sep { color: rgba(255,255,255,0.15); font-size: 10px; user-select: none; }
 @media (max-width: 900px) {
   .top-menu { display: none; }
@@ -262,15 +261,15 @@
       <span class="cs-logo-name">CGP Skool</span>
     </a>
     <nav class="top-menu" id="topMenu">
-      <a href="#formation" class="top-menu-item" data-target="formation">Formation</a>
-      <span class="top-menu-sep">&middot;</span>
-      <a href="#mon-activite" class="top-menu-item" data-target="mon-activite">Mon activit&eacute;</a>
-      <span class="top-menu-sep">&middot;</span>
-      <a href="#simulateurs" class="top-menu-item" data-target="simulateurs">Simulateurs</a>
+      <a href="#analyse" class="top-menu-item" data-target="analyse">Analyse</a>
       <span class="top-menu-sep">&middot;</span>
       <a href="#suivi" class="top-menu-item" data-target="suivi">Suivi</a>
       <span class="top-menu-sep">&middot;</span>
-      <a href="#analyse" class="top-menu-item" data-target="analyse">Analyse</a>
+      <a href="#simulateurs" class="top-menu-item" data-target="simulateurs">Simulateurs</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#formation" class="top-menu-item" data-target="formation">Formation</a>
+      <span class="top-menu-sep">&middot;</span>
+      <a href="#mon-activite" class="top-menu-item" data-target="mon-activite">Mon activit&eacute;</a>
     </nav>
     <div style="flex:1"></div>
     <div class="cs-nav-actions">
@@ -565,15 +564,16 @@
     var items = document.querySelectorAll('.top-menu-item');
     if(!items.length) return;
     var scrollY = window.scrollY + 120; // offset pour la nav fixe
-    var activeId = null;
+    var bestId = null, bestTop = -1;
     items.forEach(function(it){
       var target = document.getElementById(it.dataset.target);
       if(!target) return;
       var top = target.offsetTop;
-      if(top <= scrollY) activeId = it.dataset.target;
+      // On prend la section dont le offsetTop est le plus proche du scroll mais <= scroll
+      if(top <= scrollY && top > bestTop){ bestTop = top; bestId = it.dataset.target; }
     });
     items.forEach(function(it){
-      it.classList.toggle('active', it.dataset.target === activeId);
+      it.classList.toggle('active', it.dataset.target === bestId);
     });
   }
   window.addEventListener('scroll', scrollSpy, {passive:true});
