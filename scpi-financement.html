@@ -279,13 +279,16 @@ details[open] summary span.arr{transform:rotate(90deg)}
   </div>
   </div>
 
-  <div class="cs-sidebar-lbl" onclick="openStep(null,this)"><span class="acc">&#9654;</span>Hypoth&#232;ses</div>
+  <div class="cs-sidebar-lbl" onclick="openStep(null,this)"><span class="acc">&#9654;</span>Revalorisation des parts</div>
   <div class="sb-body" id="body_hyp">
   <div class="fg"><label>Revalorisation des parts /an (%)</label>
     <div class="fi-row"><input type="number" id="fReval" value="0" min="-5" max="10" step="0.5"><span class="fi-unit">%</span></div>
   </div>
-  <button class="barem-btn" id="baremBtn" onclick="toggleBarem()"><span>&#128203; Conditions banque</span><span class="arr">&#9660;</span></button>
-  <div class="barem-panel" id="baremPanel"></div>
+  </div>
+
+  <div style="margin-top:6px">
+    <button class="barem-btn" id="baremBtn" onclick="toggleBarem()"><span>&#128203; Conditions banque</span><span class="arr">&#9660;</span></button>
+    <div class="barem-panel" id="baremPanel"></div>
   </div>
 
   <button class="sim-btn" onclick="runSim()">Lancer la projection &#8594;</button>
@@ -367,7 +370,7 @@ const BANKS={
     garantie:'Caution Crédit Logement (~1.73%)',assureur:'SURAVENIR',ageFin:75,
     fraisDoss:{type:'pct',val:0.01,max:1200},fraisNant:0,endMax:35,
     profiles:['salarie','liberal','fonctionnaire','expatrie'],
-    taux:{120:{ai:0.0395,as:0.0390},180:{ai:0.0400,as:0.0395},240:{ai:0.0410,as:0.0400}},
+    taux:{72:{ai:0.042,as:0.0415},120:{ai:0.042,as:0.0415},144:{ai:0.0425,as:0.042},180:{ai:0.0425,as:0.042},240:{ai:0.0435,as:0.0425}},
     adi:[{l:'< 30',max:29,t:0.0012},{l:'31–35',max:35,t:0.0013},{l:'36–40',max:40,t:0.0015},{l:'41–45',max:45,t:0.0021},{l:'> 45',max:99,t:0.0031}],
     coefScpi:1,coefScpiMax:0.04,
     note:'Patrimoine net immo ≥ montant financé. Pas de max lignes. SCPI éligibles : EP, EPE, TE, Activimmo, Comète…'},
@@ -375,15 +378,15 @@ const BANKS={
     garantie:'Nantissement (135,84 €/SCPI)',assureur:'SURAVENIR',ageFin:85,
     fraisDoss:{type:'pct',val:0.01,max:null},fraisNant:135.84,endMax:40,maxLignes:6,minLigne:10000,
     profiles:['salarie','liberal','retraite'],
-    taux:{120:{p:0.0463,l:0.0515},180:{p:0.0489,l:0.0515},240:{p:0.0499,l:0.0535},300:{p:0.0515,l:0.0535}},
+    taux:{120:{np:0.0525,p:0.0473,sci:0.0480},144:{np:0.0525,p:0.0473},180:{np:0.0525,p:0.0499,sci:0.0505},240:{np:0.0545,p:0.0509,sci:0.0525},276:{np:0.0545,p:0.0509},300:{np:0.0545,p:0.0525,sci:0.0534}},
     adi:[{l:'< 30',max:29,t:0.002},{l:'30–50',max:50,t:0.003},{l:'> 50',max:99,t:0.004}],
     coefScpi:0,
     note:'6 lignes max, min 10 000 € par ligne. SCPI fiscales : 15 ans min.'},
-  cacf:{name:'CACF – Crédit Agricole',color:'#7B1FA2',min:10000,minD:144,maxD:240,difMax:6,difTypes:['partiel','total'],
+  cacf:{name:'CACF – Crédit Agricole',color:'#7B1FA2',min:10000,minD:120,maxD:240,difMax:6,difTypes:['partiel','total'],
     garantie:'Nantissement (gratuit)',assureur:'CACI',ageFin:81,
     fraisDoss:{type:'fixed',val:0},fraisNant:0,endMax:45,
     profiles:['salarie','liberal','retraite','dirigeant','fonctionnaire','expatrie'],
-    taux:{144:{t:0.051},180:{t:0.051},240:{t:0.051}},
+    taux:{120:{t:0.054},144:{t:0.054},180:{t:0.054},240:{t:0.054}},
     adi:[{l:'< 30',max:29,t:0.002},{l:'30–50',max:50,t:0.003},{l:'> 50',max:99,t:0.004}],
     coefScpi:0,
     note:'Financement 90% (apport 10% + honoraires). Montant max = 30× revenus. Pas de prise en compte des revenus SCPI.'}
@@ -469,6 +472,7 @@ function setTauxAuto(){
   if(e.t!==undefined){t=e.t;h=`Barème ${b.name} ${d}m : ${(t*100).toFixed(2)}%`;}
   else if(e.ai!==undefined){t=e.ai;h=`SOFIAP ${d}m (apport <20%) : ${(t*100).toFixed(2)}%`;}
   else{t=e.p;h=`CFCAL ${d}m propriétaire : ${(t*100).toFixed(2)}%`;}
+  // NB: pour CFCAL, e peut contenir np/p/sci — on prend p par défaut (propriétaire)
   document.getElementById('fTaux').value=(t*100).toFixed(2);
   document.getElementById('tauxHint').textContent='✓ '+h;
 }
@@ -691,18 +695,24 @@ function renderBarem(){
   const fe=Object.values(b.taux)[0];
   let h=`<div class="bank-name" style="color:${b.color}">${b.name}</div>`;
   h+=`<div class="sec-title">Taux nominaux</div>`;
+  if(bank==='cfcal'){h+=`<div style="font-size:9px;color:var(--gris);margin-bottom:6px;line-height:1.5">NP&nbsp;=&nbsp;non-propri&eacute;taire &middot; P&nbsp;=&nbsp;propri&eacute;taire &middot; SCI&nbsp;=&nbsp;offre SCI</div>`;}
   Object.entries(b.taux).forEach(([dur,e])=>{
     let val;
+    const yrs=Math.round(dur/12);
     if(e.t!==undefined){val=`<span class="bv">${(e.t*100).toFixed(2)}&nbsp;%</span>`;}
     else if(e.ai!==undefined){val=`<div class="bv-multi"><span>${(e.ai*100).toFixed(2)}&nbsp;%<small>&lt;20% apport</small></span><span>${(e.as*100).toFixed(2)}&nbsp;%<small>&ge;20%</small></span></div>`;}
+    else if(e.np!==undefined){
+      const sci=e.sci!==undefined?`<span>${(e.sci*100).toFixed(2)}&nbsp;%<small>SCI</small></span>`:`<span style="color:var(--gris);font-weight:500">&mdash;<small>SCI</small></span>`;
+      val=`<div class="bv-multi"><span>${(e.np*100).toFixed(2)}&nbsp;%<small>NP</small></span><span>${(e.p*100).toFixed(2)}&nbsp;%<small>P</small></span>${sci}</div>`;
+    }
     else{val=`<div class="bv-multi"><span>${(e.p*100).toFixed(2)}&nbsp;%<small>proprio</small></span><span>${(e.l*100).toFixed(2)}&nbsp;%<small>locataire</small></span></div>`;}
-    h+=`<div class="brow"><span class="bl">${dur}&nbsp;mois</span>${val}</div>`;
+    h+=`<div class="brow"><span class="bl">${yrs}&nbsp;ans</span>${val}</div>`;
   });
   h+=`<div class="sec-title">ADI &mdash; ${b.assureur}</div>`;
   b.adi.forEach(r=>{
     h+=`<div class="brow"><span class="bl">${r.l}&nbsp;ans</span><span class="bv">${(r.t*100).toFixed(3)}&nbsp;%/an</span></div>`;
   });
-  h+=`<div class="barem-note">${b.note}</div>`;
+  h+=`<div class="barem-note">${b.note}<br><span style="color:var(--ink-30);font-style:normal">Derni&egrave;re mise &agrave; jour : 13/04/2026</span></div>`;
   document.getElementById('baremPanel').innerHTML=h;
 }
 
@@ -764,7 +774,7 @@ function runSim(){
     if(bk.minLigne){const minL=scpis.find(s=>s.montant<bk.minLigne);if(minL)iss.push('Min/ligne: '+fmt(bk.minLigne)+' €');}
     const ke=Object.keys(bk.taux).map(Number).sort((a,c)=>a-c);
     const kk=ke.reduce((p,c)=>Math.abs(c-dur)<Math.abs(p-dur)?c:p);
-    const ee=bk.taux[kk]; const txBk=ee.t||ee.ai||ee.p||tx;
+    const ee=bk.taux[kk]; const txBk=ee.t||ee.ai||ee.p||ee.np||tx;
     const mBk=mensAmort(emp,txBk,dur-dif)+emp*adiM;
     const eBk=revC>0?(charges+mBk)/revC*100:0;
     if(eBk>bk.endMax)iss.push(`Endettement: ${eBk.toFixed(0)}% > ${bk.endMax}%`);
