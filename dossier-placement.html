@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>CGP Skool &mdash; Dossier Solution Placement</title>
+<link rel="stylesheet" href="cgp-skool-theme.css">
+<link rel="stylesheet" href="cgp-skool-layout.css">
+<script src="cgp-skool-core.js"></script>
+<script src="cgp-skool-nav.js" defer></script>
+<script src="cgp-skool-feedback.js" defer></script>
+<style>
+/* Sidebar standard */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+.cb-row{display:flex;align-items:center;gap:8px;padding:4px 8px;font-size:12px;color:var(--noir);cursor:pointer}
+.cb-row input{accent-color:var(--orange)}
+
+/* Mode tabs choix initial */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.mode-tab{padding:10px 4px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:10px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
+.mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
+.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
+.mode-icon{font-size:16px;display:block;margin-bottom:4px}
+
+/* Boutons bas standard */
+.btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
+.btn-pdf:hover{opacity:0.9}
+.btn-secondary{width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;margin-bottom:4px;display:block;text-align:center;box-sizing:border-box}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+
+/* A4 blocs editables */
+.bloc{margin-bottom:24px;position:relative}
+.bloc-tag{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:8px}
+.bloc-title{font-family:var(--serif);font-size:20px;color:var(--noir);margin-bottom:10px}
+.bloc-body{font-size:13px;line-height:1.8;color:var(--gris-f,#3a3733);outline:none;min-height:40px;padding:8px 12px;border:1.5px solid transparent;border-radius:7px;transition:border-color 0.2s}
+.bloc-body:hover{border-color:var(--bord)}
+.bloc-body:focus{border-color:var(--orange);background:rgba(212,98,42,0.02)}
+.bloc-body b,.bloc-body strong{color:var(--noir);font-weight:600}
+
+/* Page de garde */
+.garde{text-align:center;padding:60px 40px;margin-bottom:24px}
+.garde-type{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:12px}
+.garde-title{font-family:var(--serif);font-size:32px;color:var(--noir);margin-bottom:8px}
+.garde-client{font-size:18px;font-weight:300;color:var(--gris);margin-bottom:6px}
+.garde-date{font-size:13px;color:var(--gris)}
+.garde-rule{width:40px;height:2px;background:var(--orange);margin:20px auto 0}
+
+/* Frais table */
+.frais-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.frais-tbl th{text-align:left;padding:8px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);background:var(--paper);border-bottom:1px solid var(--bord)}
+.frais-tbl td{padding:8px 10px;border-bottom:1px solid var(--bord);color:var(--noir)}
+.frais-tbl td[contenteditable]{outline:none}
+.frais-tbl td[contenteditable]:focus{background:rgba(212,98,42,0.04)}
+.frais-tbl .frais-montant{font-weight:700;color:var(--orange)}
+
+/* Pyramide retraite (PER) */
+.pyramide{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
+.pyr-level{text-align:center;padding:10px 0;color:#fff;font-size:11px;font-weight:600;position:relative}
+.pyr-level:nth-child(1){width:40%;background:#7B4FA6;border-radius:6px 6px 0 0}
+.pyr-level:nth-child(2){width:55%;background:#9B6FC6}
+.pyr-level:nth-child(3){width:70%;background:#B490D6;border-radius:0 0 6px 6px}
+.pyr-labels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px}
+.pyr-box{padding:14px 16px;border-radius:8px;font-size:11px;line-height:1.6;color:var(--noir)}
+.pyr-box.orange{background:rgba(212,98,42,0.06);border:1px solid rgba(212,98,42,0.15)}
+.pyr-box.purple{background:rgba(123,79,166,0.06);border:1px solid rgba(123,79,166,0.15)}
+.pyr-box.red{background:rgba(220,80,60,0.06);border:1px solid rgba(220,80,60,0.15)}
+.pyr-box-title{font-size:12px;font-weight:700;margin-bottom:6px}
+.pyr-box.orange .pyr-box-title{color:var(--orange)}
+.pyr-box.purple .pyr-box-title{color:#7B4FA6}
+.pyr-box.red .pyr-box-title{color:#dc3c28}
+
+/* Schema SCPI */
+.scpi-schema{display:flex;align-items:center;justify-content:center;gap:14px;margin:20px 0;flex-wrap:wrap}
+.scpi-box{border:1.5px solid var(--bord);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px}
+.scpi-box-title{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:4px}
+.scpi-box-sub{font-size:9px;color:var(--gris)}
+.scpi-box.main{border-color:#8B2020;background:rgba(139,32,32,0.03)}
+.scpi-box.main .scpi-box-title{color:#8B2020}
+.scpi-arrow{font-size:18px;color:var(--orange);flex-shrink:0}
+.scpi-icons{display:flex;gap:6px;justify-content:center;margin:6px 0;font-size:18px}
+
+/* Schema AV/Immo simple */
+.av-steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:18px 0}
+.av-step{border:1.5px solid var(--bord);border-radius:10px;padding:14px;text-align:center;background:#fff}
+.av-step-icon{font-size:22px;margin-bottom:6px}
+.av-step-title{font-size:12px;font-weight:700;color:var(--noir);margin-bottom:4px}
+.av-step-sub{font-size:10px;color:var(--gris);line-height:1.5}
+
+/* Workflow */
+.wf-steps{display:flex;gap:0;margin:20px 0 4px;overflow-x:auto}
+.wf-step{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;padding:0 4px}
+.wf-num{width:32px;height:32px;border-radius:50%;border:2px solid #2D7A5B;color:#2D7A5B;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:#fff}
+.wf-pill{background:#2D7A5B;color:#fff;font-size:11px;font-weight:600;padding:6px 12px;border-radius:5px;text-align:center;white-space:nowrap;margin-bottom:8px}
+.wf-detail{font-size:10px;color:var(--gris);line-height:1.5;text-align:center;padding:0 2px}
+.wf-detail b{color:var(--noir);display:block;margin-bottom:2px;font-size:10px}
+
+/* Annexes projection cards */
+.annexe-card{background:var(--paper);border:1.5px solid var(--bord);border-radius:7px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.annexe-card-title{font-size:12px;font-weight:600;color:var(--noir)}
+.annexe-card-sub{font-size:10px;color:var(--gris);margin-top:2px}
+.annexe-link{font-size:10px;color:var(--orange);text-decoration:none;font-weight:600;white-space:nowrap}
+.annexe-link:hover{text-decoration:underline}
+
+/* R23 : preserve couleurs au PDF */
+.bloc-tag,.garde-type,.pyr-level,.pyr-box,.scpi-box.main,.wf-pill,.wf-num,.frais-tbl th,.frais-tbl .frais-montant,.av-step,[style*="background"]{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+@media print{
+  .bloc-body{border:none!important;padding:0!important;background:none!important}
+  .bloc-body:hover,.bloc-body:focus{border:none!important;background:none!important}
+}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <!-- Type de solution (choix initial, sans toggle) -->
+    <div class="fg" style="margin-bottom:14px">
+      <label>Type de solution</label>
+      <div class="mode-tabs">
+        <div class="mode-tab active" id="typTabAv"   onclick="setType('av')"><span class="mode-icon">&#128737;</span>AV</div>
+        <div class="mode-tab"        id="typTabPer"  onclick="setType('per')"><span class="mode-icon">&#128200;</span>PER</div>
+        <div class="mode-tab"        id="typTabScpi" onclick="setType('scpi')"><span class="mode-icon">&#127970;</span>SCPI</div>
+        <div class="mode-tab"        id="typTabImmo" onclick="setType('immo')"><span class="mode-icon">&#127968;</span>LMNP</div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
+
+    <!-- Client -->
+    <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
+    <div class="sb-body open" id="body_client">
+      <div class="fg"><label>Nom du client</label>
+        <input class="fi" type="text" id="pClient" placeholder="Pr&#233;nom Nom" oninput="updateGarde()">
+      </div>
+      <div class="fg"><label>Date du dossier</label>
+        <input class="fi" type="text" id="pDate" placeholder="JJ/MM/AAAA" oninput="updateGarde()">
+      </div>
+    </div>
+
+    <!-- Blocs a afficher -->
+    <div class="cs-sidebar-lbl" data-step="blocs" onclick="openStep('blocs',this)"><span class="acc">&#9654;</span>Blocs &agrave; afficher</div>
+    <div class="sb-body" id="body_blocs">
+      <label class="cb-row"><input type="checkbox" id="cbGarde"          checked onchange="toggleBloc()"> Page de garde</label>
+      <label class="cb-row"><input type="checkbox" id="cbAccompagnement" checked onchange="toggleBloc()"> Accompagnement</label>
+      <label class="cb-row"><input type="checkbox" id="cbContrat"        checked onchange="toggleBloc()"> Le contrat</label>
+      <label class="cb-row"><input type="checkbox" id="cbGestion"        checked onchange="toggleBloc()"> Mode de gestion</label>
+      <label class="cb-row"><input type="checkbox" id="cbFrais"          checked onchange="toggleBloc()"> Frais</label>
+      <label class="cb-row"><input type="checkbox" id="cbSchema"         checked onchange="toggleBloc()"> Sch&#233;ma p&#233;dagogique</label>
+      <label class="cb-row"><input type="checkbox" id="cbWorkflow"       checked onchange="toggleBloc()"> Workflow souscription</label>
+      <label class="cb-row"><input type="checkbox" id="cbAnnexes"        checked onchange="toggleBloc()"> Annexes projections</label>
+    </div>
+
+    <!-- Annexes disponibles -->
+    <div class="cs-sidebar-lbl" data-step="annexes" onclick="openStep('annexes',this)"><span class="acc">&#9654;</span>Annexes disponibles</div>
+    <div class="sb-body" id="annexesList">
+      <div style="font-size:11px;color:var(--gris);padding:4px 8px">Chargement...</div>
+    </div>
+
+    <!-- Spacer + boutons bas -->
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="btn-secondary" onclick="saveDossier()">&#128190; Sauvegarder</button>
+    <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
+      <input type="file" accept=".json" style="display:none" onchange="loadDossier(this.files[0]);this.value=''">
+    </label>
+    <button class="btn-secondary" onclick="resetModule()" style="color:#EF4444">&#9096; R&#233;initialiser</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page" id="pageContent">
+
+      <!-- PAGE DE GARDE -->
+      <div class="bloc" id="blocGarde">
+        <div class="garde">
+          <div class="garde-type" id="gardeType">ASSURANCE VIE</div>
+          <div class="garde-title">Notre accompagnement &amp; proposition</div>
+          <div class="garde-client" id="gardeClient">Client</div>
+          <div class="garde-date" id="gardeDate"></div>
+          <div class="garde-rule"></div>
+          <div style="margin-top:28px;font-size:12px;color:var(--gris);line-height:1.7">
+            <div style="font-weight:600;color:var(--noir)" id="gardeConseiller"></div>
+            <div id="gardeCabinet"></div>
+            <div id="gardeOrias" style="font-size:11px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOMPAGNEMENT -->
+      <div class="bloc" id="blocAccompagnement">
+        <div class="bloc-tag">Accompagnement</div>
+        <div class="bloc-title">Une premi&egrave;re &eacute;tape structurante</div>
+        <div class="bloc-body" contenteditable="true" id="bodyAccompagnement"></div>
+      </div>
+
+      <!-- CONTRAT -->
+      <div class="bloc" id="blocContrat">
+        <div class="bloc-tag">Le contrat</div>
+        <div class="bloc-title">Un cadre d'investissement solide</div>
+        <div class="bloc-body" contenteditable="true" id="bodyContrat"></div>
+      </div>
+
+      <!-- GESTION -->
+      <div class="bloc" id="blocGestion">
+        <div class="bloc-tag">Gestion</div>
+        <div class="bloc-title">Un mode de gestion clair et progressif</div>
+        <div class="bloc-body" contenteditable="true" id="bodyGestion"></div>
+      </div>
+
+      <!-- FRAIS -->
+      <div class="bloc" id="blocFrais">
+        <div class="bloc-tag">Frais</div>
+        <div class="bloc-title">Les frais expliqu&eacute;s simplement</div>
+        <table class="frais-tbl" id="fraisTable">
+          <thead><tr><th>Type de frais</th><th>Montant</th><th>D&eacute;tail</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div style="font-size:11px;color:var(--gris);margin-top:8px;font-style:italic" id="fraisNote"></div>
+      </div>
+
+      <!-- SCHEMA PEDAGOGIQUE -->
+      <div class="bloc" id="blocSchema">
+        <div class="bloc-tag">Compr&eacute;hension</div>
+        <div class="bloc-title" id="schemaTitle">Comprendre le m&eacute;canisme</div>
+        <div id="schemaContent"></div>
+      </div>
+
+      <!-- WORKFLOW -->
+      <div class="bloc" id="blocWorkflow">
+        <div class="bloc-tag">Processus</div>
+        <div class="bloc-title">Prochaines &eacute;tapes</div>
+        <div class="wf-steps" id="wfSteps"></div>
+      </div>
+
+      <!-- ANNEXES -->
+      <div class="bloc" id="blocAnnexes">
+        <div class="bloc-tag">Annexes</div>
+        <div class="bloc-title">Projections financi&egrave;res</div>
+        <div id="annexesContent">
+          <div style="font-size:12px;color:var(--gris);font-style:italic">Coche les projections &agrave; inclure dans la sidebar &laquo;&nbsp;Annexes disponibles&nbsp;&raquo;.</div>
+        </div>
+      </div>
+
+      <!-- Pied conseiller -->
+      <div id="conseillerFooter"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var TEMPLATES={
+  av:{
+    type:'ASSURANCE VIE',
+    accompagnement:'L\'assurance vie reste le placement pr\u00e9f\u00e9r\u00e9 des Fran\u00e7ais \u2014 et pour cause. Bien utilis\u00e9e, elle est bien plus qu\'un compte \u00e9pargne : c\'est le socle de toute strat\u00e9gie patrimoniale solide.<br><br>Mon r\u00f4le n\'est pas de vous vendre un contrat. C\'est de comprendre votre situation, vos objectifs et vos contraintes pour construire avec vous une solution coh\u00e9rente, \u00e9volutive et durable.<br><br>Ce que vous gagnez en travaillant avec moi :<br>\u2713 <b>Une strat\u00e9gie sur-mesure</b>, align\u00e9e avec votre profil et vos projets de vie<br>\u2713 <b>Un suivi actif dans la dur\u00e9e</b> \u2014 pas un contrat ouvert et oubli\u00e9<br>\u2713 <b>La transparence totale</b> sur les frais, les rendements et les arbitrages<br>\u2713 <b>Un interlocuteur humain</b>, joignable directement',
+    contrat:'Le contrat retenu est <b>Vie Plus</b>, propos\u00e9 par <b>Suravenir</b> (filiale du Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e) \u2014 l\'un des assureurs les plus solides du march\u00e9 ind\u00e9pendant.<br><br>\u2713 <b>Architecture ouverte</b> \u2014 300+ supports financiers et immobiliers<br>\u2713 <b>+60 soci\u00e9t\u00e9s de gestion</b> partenaires ind\u00e9pendantes<br>\u2713 <b>Fonds en euros garanti</b> avec capital prot\u00e9g\u00e9<br>\u2713 <b>Offre immobili\u00e8re compl\u00e8te</b> : SCPI, SCI, OPCI<br>\u2713 <b>Capital-investissement</b> : private equity accessible d\u00e8s 25 \u20ac<br>\u2713 <b>Produits structur\u00e9s et obligations dat\u00e9es</b> exclusifs<br><br>En clair : un contrat haut de gamme, normalement r\u00e9serv\u00e9 aux grandes banques priv\u00e9es, accessible sans condition de fortune.',
+    gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et coh\u00e9rence dans le temps</b><br><br><b>Versement initial (VI)</b> \u2014 Poser une base solide d\u00e8s l\'ouverture.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e et profiter de la m\u00e9thode DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer la position selon les opportunit\u00e9s de march\u00e9.<br><br>\u2192 <b>Horizon conseill\u00e9 : 5 ans minimum</b><br>\u2192 <b>Ambition de rendement : 3 \u00e0 5 % nets</b> de frais de gestion<br><br><i>Objectif indicatif, non garanti.</i>',
+    frais:[['Frais sur versement','4,8 %','R\u00e9mun\u00e9ration du conseil, de l\'analyse et de l\'accompagnement'],['Frais de gestion','1 %/an','Pr\u00e9lev\u00e9s par l\'assureur sur l\'encours'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre entre supports'],['Frais de sortie','0 %','Capital disponible \u00e0 tout moment'],['Frais de gestion pilot\u00e9e','0 %','Gestion libre et ind\u00e9pendante']],
+    fraisNote:'Co\u00fbt moyen sur 10 ans : \u2248 1,48 %/an tous frais confondus',
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Ouverture','Confirmation sous 5-10 jours ouvr\u00e9s'],['Bilan \u00e0 4 mois','Point performance, ajustement'],['Suivi annuel','Revue compl\u00e8te du contrat']]
+  },
+  per:{
+    type:'PLAN \u00c9PARGNE RETRAITE',
+    accompagnement:'Le Plan \u00c9pargne Retraite, c\'est l\'outil le plus puissant dont vous disposez aujourd\'hui pour agir sur <b>deux leviers simultan\u00e9ment</b> : r\u00e9duire votre imposition d\u00e8s cette ann\u00e9e, et construire un revenu compl\u00e9mentaire pour la retraite.<br><br>Avec un taux de remplacement qui baisse d\'ann\u00e9e en ann\u00e9e, les r\u00e9gimes obligatoires ne maintiendront plus votre niveau de vie. Le PER vous permet de reprendre la main sur cet \u00e9cart.<br><br>\u2713 Chaque euro vers\u00e9 est <b>d\u00e9ductible de votre revenu imposable</b><br>\u2713 L\'\u00e9conomie d\'imp\u00f4t est imm\u00e9diate<br>\u2713 Le capital fructifie sur le long terme<br>\u2713 \u00c0 la retraite : capital ou rente selon votre choix<br><br>Mon ambition : <b>3 \u00e0 5 % nets</b> de tous frais sur la dur\u00e9e. <i>Objectif indicatif, non garanti.</i>',
+    contrat:'Le contrat retenu est <b>Vie Plus</b>, propos\u00e9 par <b>Suravenir</b> (filiale du Cr\u00e9dit Mutuel Ark\u00e9a Banque Priv\u00e9e).<br><br>\u2713 <b>Architecture ouverte</b> \u2014 300+ supports financiers et immobiliers<br>\u2713 <b>+60 soci\u00e9t\u00e9s de gestion</b> partenaires ind\u00e9pendantes<br>\u2713 <b>Fonds en euros garanti</b> pour la partie s\u00e9curis\u00e9e<br>\u2713 <b>Offre immobili\u00e8re compl\u00e8te</b> : SCPI, SCI, OPCI<br>\u2713 <b>Capital-investissement</b> : FCPR accessibles d\u00e8s 25 \u20ac<br>\u2713 <b>Produits structur\u00e9s exclusifs</b>',
+    gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et optimisation fiscale</b><br><br><b>Versement initial (VI)</b> \u2014 Amorcer le contrat avec une base solide.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e via DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer en fin d\'ann\u00e9e pour maximiser la d\u00e9duction fiscale.<br><br>\u2192 <b>Horizon : jusqu\'\u00e0 la retraite</b> (minimum 5 ans)<br>\u2192 <b>D\u00e9duction fiscale : jusqu\'\u00e0 10 % des revenus</b> nets',
+    frais:[['Frais sur versement','4,5 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 %/an','Li\u00e9s \u00e0 l\'assureur (norme du march\u00e9)'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre sans surco\u00fbt'],['Frais de sortie','0 %','Capital libre, sans p\u00e9nalit\u00e9'],['Frais pilot\u00e9s','0 %','Gestion libre et ind\u00e9pendante']],
+    fraisNote:'\u2192 Moyenne globale sur 30 ans : \u2248 1,15 %/an tous frais confondus',
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Confirmation','Ouverture confirm\u00e9e par l\'assureur'],['Suivi \u00e0 3 mois','Bilan performance, ajustement'],['Suivi annuel','D\u00e9claration avril, correction sept, bilan oct-nov']]
+  },
+  scpi:{
+    type:'SCPI DE RENDEMENT',
+    accompagnement:'La SCPI vous permet d\'investir dans l\'immobilier professionnel \u2014 bureaux, commerces, logistique, sant\u00e9, h\u00f4tellerie \u2014 <b>sans aucune contrainte de gestion</b>. Pas de locataire \u00e0 g\u00e9rer, pas de travaux, pas d\'impay\u00e9.<br><br>Vous d\u00e9l\u00e9guez tout \u00e0 des gestionnaires professionnels agr\u00e9\u00e9s par l\'AMF, et vous percevez des <b>dividendes trimestriels</b> r\u00e9guliers.<br><br>\u2713 <b>Diversification</b> sur plusieurs types d\'actifs et zones g\u00e9ographiques<br>\u2713 <b>Revenu compl\u00e9mentaire</b> vers\u00e9 chaque trimestre<br>\u2713 <b>Gestion 100 % d\u00e9l\u00e9gu\u00e9e</b> \u2014 encadr\u00e9e, transparente, audit\u00e9e<br>\u2713 <b>Flexibilit\u00e9 d\'acquisition</b> : comptant, \u00e0 cr\u00e9dit ou en d\u00e9membrement<br><br>Notre ambition : un <b>rendement de 5 \u00e0 6 % brut</b>, net de frais de gestion. <i>Objectif indicatif, non garanti.</i>',
+    contrat:'<b>Pourquoi nous privil\u00e9gions les SCPI europ\u00e9ennes</b><br><br>Les SCPI que nous s\u00e9lectionnons investissent majoritairement <b>hors de France</b>. Avantage fiscal concret : les revenus ne sont <b>pas soumis aux pr\u00e9l\u00e8vements sociaux fran\u00e7ais (17,2 %)</b>.<br><br><b>Aide \u00e0 la d\u00e9claration d\'imp\u00f4ts incluse</b><br>\u2713 <b>R\u00e9capitulatif fiscal clair</b> avant chaque d\u00e9claration<br>\u2713 <b>Identification des cases</b> \u00e0 remplir selon votre situation<br>\u2713 <b>Analyse de l\'impact fiscal</b> selon votre TMI<br>\u2713 <b>V\u00e9rification crois\u00e9e</b> IFU / montants',
+    gestion:'<b>Objectif : revenu r\u00e9gulier, constitution de patrimoine et s\u00e9r\u00e9nit\u00e9</b><br><br><b>Acquisition au comptant</b> \u2014 G\u00e9n\u00e9rer un revenu compl\u00e9mentaire imm\u00e9diat.<br><br><b>Acquisition \u00e0 cr\u00e9dit</b> \u2014 Utiliser l\'effet de levier bancaire.<br><br><b>D\u00e9membrement</b> \u2014 Acheter l\'usufruit (revenus temporaires) ou la nue-propri\u00e9t\u00e9 (valorisation long terme).<br><br>\u2192 <b>Horizon recommand\u00e9 : 8 \u00e0 10 ans minimum</b><br>\u2192 <b>D\u00e9lai de jouissance : 3 \u00e0 6 mois</b>',
+    frais:[['Frais de gestion','\u2248 10 %/an des loyers bruts','Pr\u00e9lev\u00e9s avant versement des dividendes. Le rendement de 6 % est d\u00e9j\u00e0 net de ces frais.'],['Frais de souscription','8 % \u00e0 12 %','Int\u00e9gr\u00e9s dans le prix de la part. N\'impactent qu\'en cas de revente.']],
+    fraisNote:'Dans une optique de d\u00e9tention long terme ou de transmission, les frais de souscription ne vous impactent pas.',
+    etapes:[['S\u00e9lection','Choix des SCPI adapt\u00e9es \u00e0 votre profil'],['Documents','Pi\u00e8ce d\'identit\u00e9, RIB, justificatif'],['Signature','Bulletin de souscription par e-mail'],['Jouissance','3 \u00e0 6 mois (premier dividende)'],['Suivi annuel','Bilan + aide d\u00e9claration fiscale']]
+  },
+  immo:{
+    type:'IMMOBILIER LMNP',
+    accompagnement:'L\'investissement immobilier locatif en <b>LMNP (Loueur Meubl\u00e9 Non Professionnel)</b> est l\'un des rares dispositifs qui combine \u00e0 la fois <b>revenus r\u00e9guliers, avantage fiscal significatif et constitution de patrimoine tangible</b>.<br><br>Le principe : vous achetez un bien meubl\u00e9, vous le louez, et l\'amortissement comptable du bien vous permet de percevoir des loyers <b>quasiment d\u00e9fiscalis\u00e9s pendant 10 \u00e0 20 ans</b>.<br><br>\u2713 <b>Revenus locatifs nets d\'imp\u00f4t</b> gr\u00e2ce au r\u00e9gime r\u00e9el simplifi\u00e9<br>\u2713 <b>Amortissement du bien</b> : la charge comptable efface fiscalement les loyers<br>\u2713 <b>Patrimoine immobilier tangible</b>, transmissible<br>\u2713 <b>Gestion simplifi\u00e9e</b> selon le format choisi',
+    contrat:'<b>Trois formats d\'investissement selon votre profil</b><br><br><b>LMNP sans exploitant</b> \u2014 Vous g\u00e9rez la location directement. Plus de libert\u00e9, meilleure rentabilit\u00e9 brute.<br><br><b>LMNP en colocation meubl\u00e9e</b> \u2014 Plusieurs locataires. Rentabilit\u00e9 maximis\u00e9e, vacance r\u00e9duite.<br><br><b>LMNP en r\u00e9sidence de services</b> \u2014 Bail commercial avec exploitant. Loyers garantis, gestion 100 % d\u00e9l\u00e9gu\u00e9e.<br><br>\u2713 R\u00e9gime fiscal : <b>BIC r\u00e9el simplifi\u00e9</b><br>\u2713 R\u00e9cup\u00e9ration de TVA possible en neuf<br>\u2713 Financement \u00e0 cr\u00e9dit pour maximiser l\'effet de levier',
+    gestion:'<b>Objectif : revenus nets d\'imp\u00f4t et valorisation \u00e0 long terme</b><br><br><b>Financement</b> \u2014 Apport ou cr\u00e9dit immobilier. Le cr\u00e9dit maximise l\'effet de levier.<br><br><b>Structure de d\u00e9tention</b> \u2014 En direct, en SCI \u00e0 l\'IS ou SCI transparente.<br><br><b>Strat\u00e9gie de sortie</b> \u2014 Revente, transmission ou basculement en nue-propri\u00e9t\u00e9.<br><br>\u2192 <b>Horizon conseill\u00e9 : 10 ans minimum</b><br>\u2192 <b>Rentabilit\u00e9 brute cible : 5 \u00e0 8 %</b>',
+    frais:[['Frais de notaire','7 \u00e0 8 % (ancien) / 2 \u00e0 3 % (neuf)','Frais d\'acquisition standards'],['Frais d\'agence','3 \u00e0 5 %','Int\u00e9gr\u00e9s dans le prix FAI'],['Honoraires comptable','300 \u00e0 800 \u20ac/an','Obligatoire au r\u00e9gime r\u00e9el'],['Gestion locative','6 \u00e0 10 % des loyers','Si d\u00e9l\u00e9gation \u00e0 une agence'],['CFE','Variable','Cotisation Fonci\u00e8re des Entreprises']],
+    fraisNote:'La rentabilit\u00e9 nette tient compte de l\'ensemble de ces frais dans la projection.',
+    etapes:[['S\u00e9lection du bien','Analyse projet, capacit\u00e9, objectifs'],['Montage financier','Cr\u00e9dit, structure, projection 10-20 ans'],['Acquisition','Compromis, acte authentique chez notaire'],['Mise en location','D\u00e9claration greffe, BIC r\u00e9el, comptable'],['Suivi annuel','Bilan locatif, d\u00e9claration BIC']]
+  }
+};
+
+var ANNEXE_MODULES=[
+  {id:'scpi-simulator',label:'Projection SCPI Cash',icon:'\ud83d\udcc8'},
+  {id:'scpi-financement',label:'Projection SCPI Cr\u00e9dit',icon:'\ud83c\udfe6'},
+  {id:'immo-simulator',label:'Projection Immobilier LMNP',icon:'\ud83c\udfe0'},
+  {id:'etude-transfert-per',label:'Comparaison PER / AV',icon:'\ud83d\udd04'},
+  {id:'simulateur-avance-av',label:'Avance sur Assurance Vie',icon:'\ud83d\udcb6'},
+  {id:'interets-composes',label:'Capitalisation',icon:'\ud83e\uddee'},
+  {id:'per-vs-av',label:'Matrice PER vs AV',icon:'\u2696\ufe0f'}
+];
+
+var currentType='av';
+function V(id){return document.getElementById(id);}
+
+function openStep(id, el){
+  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+    var body=l.nextElementSibling;
+    if(!body||!body.classList.contains('sb-body'))return;
+    if(l===el){var open=l.classList.toggle('open');body.classList.toggle('open',open);}
+    else{l.classList.remove('open');body.classList.remove('open');}
+  });
+}
+
+function updateGarde(){
+  var t=TEMPLATES[currentType]||TEMPLATES.av;
+  V('gardeType').textContent=t.type;
+  V('gardeClient').textContent=V('pClient').value||'Client';
+  V('gardeDate').textContent=V('pDate').value||'';
+  try{
+    var p=CGP.profil.load();
+    var nom=((p.prenom||'')+(p.nom?' '+p.nom:'')).trim();
+    V('gardeConseiller').textContent=nom||'';
+    V('gardeCabinet').textContent=p.cabinet||'';
+    V('gardeOrias').textContent=p.orias?'ORIAS n\u00b0 '+p.orias:'';
+  }catch(e){}
+}
+
+function buildSchema(type){
+  var el=V('schemaContent');
+  if(!el)return;
+  if(type==='per'){
+    V('schemaTitle').textContent='Comprendre le m\u00e9canisme retraite';
+    el.innerHTML='<div class="pyramide">'
+      +'<div class="pyr-level">R\u00e9gime de base (obligatoire)</div>'
+      +'<div class="pyr-level">R\u00e9gimes compl\u00e9mentaires</div>'
+      +'<div class="pyr-level">\u00c9pargne retraite individuelle (PER)</div>'
+      +'</div>'
+      +'<div class="pyr-labels">'
+      +'<div class="pyr-box orange"><div class="pyr-box-title">Aujourd\'hui</div>Revenus d\'activit\u00e9 impos\u00e9s \u00e0 votre TMI. Chaque euro sur le PER est d\u00e9ductible.</div>'
+      +'<div class="pyr-box purple"><div class="pyr-box-title">Pendant la phase</div>Capital investi et valoris\u00e9 sur supports diversifi\u00e9s (UC + fonds euros).</div>'
+      +'<div class="pyr-box red"><div class="pyr-box-title">\u00c0 la retraite</div>Sortie en capital (fractionn\u00e9) ou en rente \u2014 selon votre choix.</div>'
+      +'</div>';
+  }else if(type==='scpi'){
+    V('schemaTitle').textContent='Comprendre la SCPI';
+    el.innerHTML='<div class="scpi-schema">'
+      +'<div class="scpi-box"><div class="scpi-box-title">Vous</div><div class="scpi-icons">\ud83d\udc64</div><div class="scpi-box-sub">Investisseur</div></div>'
+      +'<div class="scpi-arrow">\u2192</div>'
+      +'<div class="scpi-box main"><div class="scpi-box-title">SCPI</div><div class="scpi-icons">\ud83c\udfe2 \ud83c\udfe5 \ud83c\udfec</div><div class="scpi-box-sub">Parc immobilier g\u00e9r\u00e9</div></div>'
+      +'<div class="scpi-arrow">\u2192</div>'
+      +'<div class="scpi-box"><div class="scpi-box-title">Loyers</div><div class="scpi-icons">\ud83d\udcb0</div><div class="scpi-box-sub">Dividendes trim.</div></div>'
+      +'</div>';
+  }else if(type==='immo'){
+    V('schemaTitle').textContent='Les 3 formats LMNP';
+    el.innerHTML='<div class="av-steps">'
+      +'<div class="av-step"><div class="av-step-icon">\ud83d\udd11</div><div class="av-step-title">Sans exploitant</div><div class="av-step-sub">Gestion directe, rentabilit\u00e9 brute max</div></div>'
+      +'<div class="av-step"><div class="av-step-icon">\ud83d\udc65</div><div class="av-step-title">Colocation</div><div class="av-step-sub">Plusieurs loc., vacance r\u00e9duite</div></div>'
+      +'<div class="av-step"><div class="av-step-icon">\ud83c\udfe8</div><div class="av-step-title">R\u00e9sidence services</div><div class="av-step-sub">Bail commercial, loyers garantis</div></div>'
+      +'</div>';
+  }else{
+    V('schemaTitle').textContent='Les 3 leviers d\'investissement';
+    el.innerHTML='<div class="av-steps">'
+      +'<div class="av-step"><div class="av-step-icon">\ud83c\udfaf</div><div class="av-step-title">Versement initial</div><div class="av-step-sub">Base solide d\u00e8s l\'ouverture</div></div>'
+      +'<div class="av-step"><div class="av-step-icon">\ud83d\udd01</div><div class="av-step-title">Versements programm\u00e9s</div><div class="av-step-sub">R\u00e9guliers, m\u00e9thode DCA</div></div>'
+      +'<div class="av-step"><div class="av-step-icon">\u2795</div><div class="av-step-title">Versements compl.</div><div class="av-step-sub">Opportunit\u00e9s de march\u00e9</div></div>'
+      +'</div>';
+  }
+}
+
+function setType(t){
+  currentType=t;
+  ['av','per','scpi','immo'].forEach(function(k){
+    var tab=V('typTab'+k.charAt(0).toUpperCase()+k.slice(1));
+    if(tab)tab.classList.toggle('active',k===t);
+  });
+  var tpl=TEMPLATES[t]||TEMPLATES.av;
+  V('bodyAccompagnement').innerHTML=tpl.accompagnement||'';
+  V('bodyContrat').innerHTML=tpl.contrat||'';
+  V('bodyGestion').innerHTML=tpl.gestion||'';
+  var fraisHtml='';
+  (tpl.frais||[]).forEach(function(r){
+    fraisHtml+='<tr><td>'+r[0]+'</td><td class="frais-montant" contenteditable="true">'+r[1]+'</td><td contenteditable="true">'+r[2]+'</td></tr>';
+  });
+  V('fraisTable').querySelector('tbody').innerHTML=fraisHtml;
+  V('fraisNote').textContent=tpl.fraisNote||'';
+  var wfHtml='';
+  (tpl.etapes||[]).forEach(function(e,i){
+    wfHtml+='<div class="wf-step"><div class="wf-num">'+(i+1)+'</div><div class="wf-pill">'+e[0]+'</div><div class="wf-detail">'+e[1]+'</div></div>';
+  });
+  V('wfSteps').innerHTML=wfHtml;
+  buildSchema(t);
+  updateGarde();
+}
+
+function toggleBloc(){
+  var map={cbGarde:'blocGarde',cbAccompagnement:'blocAccompagnement',cbContrat:'blocContrat',cbGestion:'blocGestion',cbFrais:'blocFrais',cbSchema:'blocSchema',cbWorkflow:'blocWorkflow',cbAnnexes:'blocAnnexes'};
+  Object.keys(map).forEach(function(cbId){
+    var el=V(map[cbId]);
+    var cb=V(cbId);
+    if(el&&cb)el.style.display=cb.checked?'':'none';
+  });
+}
+
+function loadAnnexes(){
+  var html='';
+  var found=false;
+  ANNEXE_MODULES.forEach(function(m){
+    var key='cgpskool_state_'+m.id;
+    var data=null;
+    try{var raw=localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
+    if(data){
+      found=true;
+      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
+    }
+  });
+  if(!found){
+    html='<div style="font-size:11px;color:var(--gris);padding:4px 8px;font-style:italic">Aucune projection sauvegard\u00e9e. Lance une simulation depuis un module et reviens ici.</div>';
+  }
+  V('annexesList').innerHTML=html;
+  renderAnnexesContent();
+}
+
+function renderAnnexesContent(){
+  var checked=Array.from(V('annexesList').querySelectorAll('input[data-annexe]:checked')).map(function(i){return i.dataset.annexe;});
+  if(checked.length===0){
+    V('annexesContent').innerHTML='<div style="font-size:12px;color:var(--gris);font-style:italic">Coche les projections \u00e0 inclure dans la sidebar &laquo;&nbsp;Annexes disponibles&nbsp;&raquo;.</div>';
+    return;
+  }
+  var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  checked.forEach(function(id){
+    var m=ANNEXE_MODULES.find(function(x){return x.id===id;});
+    if(!m)return;
+    html+='<div class="annexe-card">'
+      +'<div><div class="annexe-card-title">'+m.icon+' '+m.label+'</div>'
+      +'<div class="annexe-card-sub">Projection sauvegard\u00e9e</div></div>'
+      +'<a class="annexe-link" href="'+m.id+'.html" target="_blank">Voir \u2192</a>'
+      +'</div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--gris);font-style:italic;margin-top:10px">'+checked.length+' projection'+(checked.length>1?'s':'')+' jointe'+(checked.length>1?'s':'')+' au dossier.</div>';
+  V('annexesContent').innerHTML=html;
+}
+
+function saveDossier(){
+  var state={
+    type:currentType,
+    client:V('pClient').value,
+    date:V('pDate').value,
+    blocs:{
+      accompagnement:V('bodyAccompagnement').innerHTML,
+      contrat:V('bodyContrat').innerHTML,
+      gestion:V('bodyGestion').innerHTML
+    },
+    frais:Array.from(V('fraisTable').querySelectorAll('tbody tr')).map(function(tr){
+      var tds=tr.querySelectorAll('td');
+      return [tds[0].textContent,tds[1].textContent,tds[2].textContent];
+    }),
+    checkboxes:{}
+  };
+  ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
+    state.checkboxes[id]=V(id).checked;
+  });
+  try{localStorage.setItem('cgpskool_state_dossier-placement',JSON.stringify(state));}catch(e){}
+  var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='dossier-placement-'+(V('pClient').value||'client').replace(/\s+/g,'-')+'.json';
+  a.click();
+}
+
+function loadDossier(file){
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var s=JSON.parse(e.target.result);
+      if(s.type){setType(s.type);}
+      if(s.client)V('pClient').value=s.client;
+      if(s.date)V('pDate').value=s.date;
+      if(s.blocs){
+        if(s.blocs.accompagnement)V('bodyAccompagnement').innerHTML=s.blocs.accompagnement;
+        if(s.blocs.contrat)V('bodyContrat').innerHTML=s.blocs.contrat;
+        if(s.blocs.gestion)V('bodyGestion').innerHTML=s.blocs.gestion;
+      }
+      if(s.frais){
+        var html='';
+        s.frais.forEach(function(r){html+='<tr><td>'+r[0]+'</td><td class="frais-montant" contenteditable="true">'+r[1]+'</td><td contenteditable="true">'+r[2]+'</td></tr>';});
+        V('fraisTable').querySelector('tbody').innerHTML=html;
+      }
+      if(s.checkboxes){
+        Object.keys(s.checkboxes).forEach(function(id){var el=V(id);if(el)el.checked=s.checkboxes[id];});
+        toggleBloc();
+      }
+      updateGarde();
+    }catch(err){alert('Fichier invalide');}
+  };
+  reader.readAsText(file);
+}
+
+function resetModule(){
+  if(!confirm('R\u00e9initialiser tous les champs ?'))return;
+  try{localStorage.removeItem('cgpskool_state_dossier-placement');}catch(e){}
+  location.reload();
+}
+
+// Init
+(function(){
+  var today=new Date();
+  V('pDate').value=today.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  setType('av');
+  loadAnnexes();
+  try{CGP.footer.render(V('conseillerFooter'));}catch(e){}
+})();
+</script>
+</body>
+</html>
