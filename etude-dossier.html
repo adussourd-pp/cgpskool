@@ -1782,17 +1782,19 @@ function getActifConfig(label) {
   var l = label.trim();
   if (ACTIFS_CONFIG[l]) return ACTIFS_CONFIG[l];
   var low = l.toLowerCase().replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ç]/g,'c');
+  // Patterns prioritaires AVANT fuzzy (évite faux positifs type 'cat' dans 'locatif')
+  if (/locatif|r[eé]sidence|\bimmo\b|immobilier|\bsci\b|terrain|\blmnp\b|\blmp\b|pinel|malraux|monument hist|denormandie|duflot|robien|scellier|borloo|jeanbrun/i.test(l)) return {h:'LT', immo:true};
+  if (/\blivret\b|\blep\b|\bldds?\b|\bcel\b|compte courant|\bcc\b/i.test(l)) return {h:'CT', immo:false};
+  if (/assurance.?vie|capitalisation/i.test(l)) return {h:'MT', immo:false};
+  if (/\bpea\b|\bcto\b|\bpee\b|compte.titre/i.test(l)) return {h:'MT', immo:false};
+  if (/\bper\b|\bperp\b|\bperco\b|\bpero\b|madelin|article\s*8[23]/i.test(l)) return {h:'LT', immo:false};
+  if (/\bpel\b|\bcat\b|compte.?a.?terme/i.test(l)) return {h:'MT', immo:false};
+  // Fuzzy fallback (ordre ACTIFS_CONFIG)
   var keys = Object.keys(ACTIFS_CONFIG);
   for (var i=0; i<keys.length; i++) {
     var klow = keys[i].toLowerCase().replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ç]/g,'c');
     if (low.indexOf(klow)>=0 || klow.indexOf(low)>=0) return ACTIFS_CONFIG[keys[i]];
   }
-  if (/livret|livrets/i.test(l))              return {h:'CT', immo:false};
-  if (/compte courant|\bcc\b/i.test(l))       return {h:'CT', immo:false};
-  if (/assurance.?vie/i.test(l))              return {h:'MT', immo:false};
-  if (/\bper\b|\bperp\b|\bperco\b/i.test(l)) return {h:'LT', immo:false};
-  if (/r[eé]sidence|immo|sci\b|terrain|lmnp|pinel/i.test(l)) return {h:'LT', immo:true};
-  if (/\bpea\b|\bcto\b|\bpee\b/i.test(l))    return {h:'MT', immo:false};
   return {h:'LT', immo:false};
 }
 
@@ -4048,14 +4050,19 @@ function rPatrimoine(){
   const aSum=ED.actifs.reduce((s,a)=>s+(a.montant||0),0);
   const pSum=ED.passifs.reduce((s,p)=>s+(p.crd||0),0);
   const patNet=aSum-pSum;
-  const lt=sum('lt'),mt=sum('mt'),ct=sum('ct'),patFin=lt+mt+ct;
+  const lt=sum('lt'),mt=sum('mt'),ct=sum('ct');
+  // Patrimoine financier = actifs hors immobilier (RP, locatif, SCPI, LMNP, etc.)
+  const patFin=ED.actifs.reduce(function(s,a){
+    var cfg=getActifConfig(a.label||a.nom||'');
+    return cfg.immo?s:s+(a.montant||0);
+  },0);
   set('kPat1',fmt(aSum)+' €');set('kPat2',fmt(pSum)+' €');
   const kpn=document.getElementById('kPat3');kpn.textContent=fmt(patNet)+' €';kpn.style.color=patNet<0?'var(--red)':'inherit';
   set('kPat4',fmt(patFin)+' €');
 
   const pct=(v,t)=>t>0?(v/t*100).toFixed(0)+'%':'0%';
-  var ltNet=lt-pSum; // LT net = actifs LT - capital restant dû des passifs
-  set('pyrLT',fmt(ltNet)+' €');set('pyrLTp',pct(ltNet,aSum));
+  // Répartition par horizon : brut (cohérent avec les sous-totaux du tableau actifs)
+  set('pyrLT',fmt(lt)+' €');set('pyrLTp',pct(lt,aSum));
   set('pyrMT',fmt(mt)+' €');set('pyrMTp',pct(mt,aSum));
   set('pyrCT',fmt(ct)+' €');set('pyrCTp',pct(ct,aSum));
   // Épargne de précaution cible = 3 mois de revenus nets (ou valeur saisie si renseignée)
@@ -4270,9 +4277,11 @@ function rFiscal(){
 function rFinancement(){
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-  var rav=revM-chrCredit;
-  var endett=revM>0?chrCredit/revM*100:0;
-  var capa=Math.max(0,revM*0.35-chrCredit);
+  var autresCharges=Math.round(ED.charges||0);
+  var chargesTotales=chrCredit+autresCharges;
+  var rav=revM-chargesTotales;
+  var endett=revM>0?chargesTotales/revM*100:0;
+  var capa=Math.max(0,revM*0.35-chargesTotales);
   var col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
   var isCoupleFin=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
 
@@ -4303,8 +4312,8 @@ function rFinancement(){
     h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
     if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Charges cr\u00e9dit /mois</span><span class="fr-v">'+fmt(chrCredit)+' \u20ac/mois</span></div>';
-    if(ED.charges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois</span><span class="fr-v">'+fmt(Math.round(ED.charges))+' \u20ac/mois</span></div>';
-    h+='<div class="fiscal-row"><span class="fr-l">Reste \u00e0 vivre</span><span class="fr-v">'+fmt(revM-chrCredit-Math.round(ED.charges||0))+' \u20ac/mois</span></div>';
+    if(autresCharges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois (loyers, etc.)</span><span class="fr-v">'+fmt(autresCharges)+' \u20ac/mois</span></div>';
+    h+='<div class="fiscal-row"><span class="fr-l">Reste \u00e0 vivre</span><span class="fr-v">'+fmt(revM-chargesTotales)+' \u20ac/mois</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Taux d\'endettement</span><span class="fr-v" style="color:'+col+';font-weight:700">'+endett.toFixed(1)+' %</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" style="color:'+(capa>0?'var(--green)':'var(--red)')+'">'+fmt(capa)+' €/mois</span></div>';
     h+='</div>';
@@ -4527,19 +4536,20 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
     var impColor=impactFoyer>0?'var(--red)':'var(--green)';
     ifEl.innerHTML='<div class="card" style="margin-bottom:0"><div class="fiscal-row" style="border:none"><span class="fr-l" style="font-weight:700;font-size:13px">Impact retraite total du foyer</span><span class="fr-v" style="color:'+impColor+';font-weight:700;font-size:16px">'+(impactFoyer>0?'-'+fmt(impactFoyer):'+'+fmt(Math.abs(impactFoyer)))+' \u20ac</span></div></div>';
   }
-  var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(5,Math.min(40,(c1cl.retAge||64)-age0));var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);var cap=gap0*12/0.04;
-  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--noir)'},{label:'Fonds euro (2,5 %)',rate:0.025,color:'var(--noir)'}];
-  var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon</th><th>Effort mensuel</th></tr></thead><tbody>';
-  effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(effort)+' €/mois</td></tr>';});
+  var c1cl=clients[0];var age0=ageFrom(c1cl.c.dob)||40;var h=Math.max(1,(c1cl.retAge||64)-age0);var ageI0=AGES.reduce(function(bi,a,i){return a>=age0?i:bi;},0);var tx0=(TAUX[c1cl.csp]||TAUX['Sal. cadre'])[ageI0];var pensM0=Math.floor(c1cl.rev/12*tx0/100);var gap0=Math.max(0,c1cl.pension-pensM0);
+  // Capital cible = impact retraite total du foyer ; horizon = âge départ - âge actuel (activité restante)
+  var cap=Math.max(0,impactFoyer);
+  var effortRows=[{label:'Livret / épargne réglementée (1,5 %)',rate:0.015,color:'var(--noir)'}];
+  var tblHtml='<thead><tr><th>Placement</th><th>Capital cible</th><th>Horizon activité</th><th>Effort mensuel</th></tr></thead><tbody>';
+  effortRows.forEach(function(r){var effort=cap>0&&h>0?cap/((Math.pow(1+r.rate,h)-1)/r.rate)/12:0;tblHtml+='<tr><td>'+r.label+'</td><td class="right">'+fmt(cap)+' €</td><td class="right">'+h+' ans</td><td class="right" style="color:'+r.color+';font-weight:700">'+fmt(Math.round(effort))+' €/mois</td></tr>';});
   tblHtml+='</tbody></table>';
   var rst=document.getElementById('retSimuTbl');if(rst)rst.innerHTML=tblHtml;
   var leg=document.getElementById('retSimuLegend');
   var msg=document.getElementById('retSimuMsg');
-  if(gap0===0){
+  if(cap<=0){
     if(leg)leg.style.display='none';
     if(msg){msg.style.display='block';
-      var surplus=pensM0-c1cl.pension;
-      msg.textContent='Bonne nouvelle ! Votre pension estimee ('+fmt(pensM0)+' EUR/mois) couvre votre objectif ('+fmt(c1cl.pension)+' EUR/mois). Surplus : +'+fmt(surplus)+' EUR/mois.';}
+      msg.textContent='Bonne nouvelle ! Les pensions estimees couvrent les objectifs de retraite du foyer.';}
     if(rst)rst.style.display='none';
   } else {
     if(leg)leg.style.display='';
@@ -4876,11 +4886,12 @@ function rPreconisations(){
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+  var chargesTotales=chrCredit+Math.round(ED.charges||0);
   var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
-  var capa=revM>0?Math.max(0,revM*0.35-chrCredit):0;
-  var endett=revM>0?(chrCredit/revM*100).toFixed(1):'0';
+  var capa=revM>0?Math.max(0,revM*0.35-chargesTotales):0;
+  var endett=revM>0?(chargesTotales/revM*100).toFixed(1):'0';
 
   // ── Leviers disponibles (tick vert / rond rouge grise) ──
   var levEl=document.getElementById('precoLeviers');
@@ -4965,7 +4976,7 @@ function rPreconisations(){
         h+='<td style="padding:5px 8px;color:var(--gris-f)">'+a.nom+'</td>';
         h+='<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--noir);white-space:nowrap">'+fmt(a.montant)+' \u20ac</td>';
         h+='<td style="padding:5px 8px;text-align:center"><label style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer"><input type="checkbox" '+(isKept?'checked':'')+' onchange="togglePrecoSwitch(\''+uid+'\','+a.montant+',this.checked)" style="opacity:0;width:0;height:0"><span style="position:absolute;inset:0;border-radius:9px;background:'+(isKept?'#2D7A5B':'#ccc')+';transition:0.2s"></span><span style="position:absolute;top:2px;left:'+(isKept?'18':'2')+'px;width:14px;height:14px;border-radius:50%;background:#fff;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span></label></td>';
-        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:80px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals()"> \u20ac</td>';
+        h+='<td style="padding:5px 8px;text-align:right"><input type="number" value="'+conseille+'" min="0" step="100" style="width:80px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-family:var(--sans);font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none" onchange="window._precoConseille[\''+uid+'\']=+this.value;updatePrecoTotals();refreshPrecoStats()"> \u20ac</td>';
         h+='</tr>';
       });
     });
@@ -4984,30 +4995,20 @@ function updatePrecoTotals(){
   (ED.actifs||[]).forEach(function(a){
     var cfg=getActifConfig(a.label||a.nom||'');
     if(cfg.immo)return;
-    var h=a.horizon||cfg.h||'CT';
-    var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
-    finActifs.push({montant:a.montant||0,horizon:hKey});
+    finActifs.push({montant:a.montant||0});
   });
-  var totalActuel=0,totalConseille=0;
-  finActifs.forEach(function(a,i){
-    var hzKeys=['lt','mt','ct'];
-    // Reconstruct uid
-    var counts={lt:0,mt:0,ct:0};
-    var uid='';
-    (ED.actifs||[]).forEach(function(act){
-      var cfg=getActifConfig(act.label||act.nom||'');
-      if(cfg.immo)return;
-      var hh=act.horizon||cfg.h||'CT';
-      var hk=hh==='ct'||hh==='CT'?'ct':hh==='mt'||hh==='MT'?'mt':'lt';
-      if(act===arguments)return; // skip
-    });
-  });
-  // Simpler approach: iterate all inputs
   var inputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
   var consTot=0;
   inputs.forEach(function(inp){consTot+=+(inp.value||0);});
   var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
-  var reorienter=finTotal-consTot;
+  // Montant alloué via les solutions sélectionnées (versements initiaux)
+  var viAffecte=(typeof solsSelectionnees!=='undefined'?solsSelectionnees:[]).reduce(function(s,sol){return s+(+sol.vi||0);},0);
+  // Projets court terme (horizon < 3 ans) à provisionner
+  var projetsCT=(ED.projets||[]).filter(function(p){
+    var hz=(p.horizon||'').toLowerCase();
+    return /6 mois|< 1 an|2 ans|3 ans/.test(hz);
+  }).reduce(function(s,p){return s+(+p.montant||0);},0);
+  var reorienter=finTotal-consTot-viAffecte-projetsCT;
 
   var cEl=document.getElementById('precoConserver');
   var rEl=document.getElementById('precoReorienter');
@@ -5071,13 +5072,15 @@ function buildMatriceObjSol(impot,capa,aSum){
   var hasPlacement=ED.epMens>0||aSum>5000;
   var hasFiscal=impot>=2000;
   var hasFinancement=capa>200;
-  // Epargne a reorienter
+  // Epargne a reorienter = financier total - à conserver - VI déjà affectés aux solutions - projets CT
   var reorInputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
   var reorConsTot=0;reorInputs.forEach(function(inp){reorConsTot+=+(inp.value||0);});
   var finActifsTotal=(ED.actifs||[]).reduce(function(s,a){var cfg=getActifConfig(a.label||a.nom||'');return cfg.immo?s:s+(a.montant||0);},0);
-  var reorMontant=Math.max(0,finActifsTotal-reorConsTot);
+  var viAffecte=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vi||0);},0);
+  var projetsCT=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|2 ans|3 ans/.test(hz);}).reduce(function(s,p){return s+(+p.montant||0);},0);
+  var reorMontant=Math.max(0,finActifsTotal-reorConsTot-viAffecte-projetsCT);
   // VP dispo = epargne mensuelle - somme des VP deja affectees
-  var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(sol.vp||0);},0);
+  var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vp||0);},0);
   var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
 
   var entActive=isEntrepriseActive();
@@ -5099,11 +5102,23 @@ function buildMatriceObjSol(impot,capa,aSum){
     html+='</div>';
   });
   html+='</div>';
-  // VP disponible
-  html+='<div style="display:flex;gap:16px;margin-bottom:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px">';
+  // VP disponible + projets CT
+  html+='<div style="display:flex;gap:16px;margin-bottom:8px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px;flex-wrap:wrap">';
   html+='<div><span style="color:var(--gris)">VP disponible (mensuelle) :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
+  html+='<div><span style="color:var(--gris)">VI d\u00e9j\u00e0 affect\u00e9 :</span> <strong style="color:var(--noir)">'+fmt(viAffecte)+' \u20ac</strong></div>';
+  if(projetsCT>0)html+='<div><span style="color:var(--gris)">Projets CT :</span> <strong style="color:var(--noir)">-'+fmt(projetsCT)+' \u20ac</strong></div>';
   html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:var(--orange)">'+fmt(reorMontant)+' \u20ac</strong></div>';
   html+='</div>';
+  // Liste des projets CT (issus de Situation & Objectifs)
+  var projetsCTList=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|2 ans|3 ans/.test(hz)&&(+p.montant||0)>0;});
+  if(projetsCTList.length){
+    html+='<div style="margin-bottom:14px;padding:10px 14px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.15);border-radius:8px;font-size:12px">';
+    html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:6px">Projets court terme \u00e0 provisionner</div>';
+    projetsCTList.forEach(function(p){
+      html+='<div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--gris-f)"><span>'+(p.titre||'Projet')+' <span style="color:var(--gris);font-size:11px">('+(p.horizon||'')+')</span></span><strong style="color:var(--noir)">'+fmt(p.montant)+' \u20ac</strong></div>';
+    });
+    html+='</div>';
+  }
 
   // Group ALL COPERNIC solutions by levier category
   var groups={placement:[],fiscal:[],financement:[],entreprise:[]};
@@ -5294,6 +5309,25 @@ function renderSolsRetenues(){
         html+='</div>';
       }
     }catch(e){console.warn('Recos error:',e);}
+
+    // Rendement éditable + toggle capital investi (tous produits sauf ceux avec calculateur dédié)
+    var cpCat=(cp.cat||'').toLowerCase();
+    var prodLow=(grp.produit||'').toLowerCase();
+    var hasDedicatedCalc=/donation|fip|jeanbrun|denormandie|girardin|\blli\b/i.test(grp.produit||'');
+    var isImmoCat=cpCat==='immobilier'||cp.levier==='financement';
+    if(!hasDedicatedCalc&&!isImmoCat){
+      var defRate=(cp.rendement||0.025);
+      if(/scpi/i.test(prodLow))defRate=0.05;
+      else if(/\bper\b|assurance.?vie|capitalisation/i.test(prodLow))defRate=0.03;
+      var curRate=firstSol._rate!==undefined?firstSol._rate:defRate;
+      var capOnly=firstSol._capitalOnly||false;
+      html+='<div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:var(--gris-l);border-radius:8px">';
+      html+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris)">Rendement</span>';
+      html+='<input type="number" min="0" max="20" step="0.1" value="'+(curRate*100).toFixed(1)+'" onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_rate\',+this.value/100)" style="width:60px;padding:4px 6px;border:1.5px solid var(--bord);border-radius:5px;font-size:12px;font-weight:700;text-align:right;color:var(--orange);outline:none">';
+      html+='<span style="font-size:11px;color:var(--gris)">%</span></div>';
+      html+='<label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--gris-f);cursor:pointer"><input type="checkbox" '+(capOnly?'checked':'')+' onchange="updateSolGroup(\''+grp.produit.replace(/'/g,"\\'")+'\',\'_capitalOnly\',this.checked)" style="accent-color:var(--orange)">Afficher uniquement le capital investi</label>';
+      html+='</div>';
+    }
 
     // SCPI reinvest toggle (shown once per group)
     var isSCPIRendement=grp.produit==='SCPI de rendement';
@@ -5725,10 +5759,24 @@ function updateSolGroup(produit,field,val){
   solsSelectionnees.forEach(function(sol){
     if(sol.produit===produit)sol[field]=val;
   });
-  renderSolsRetenues();renderFichesClient();
+  renderSolsRetenues();renderFichesClient();refreshPrecoStats();
 }
 
-function updateSol(idx,field,val){if(solsSelectionnees[idx])solsSelectionnees[idx][field]=val;renderFichesClient();}
+// Rafraîchit les totaux et la matrice (réorienter diminue quand VI/VP ajoutés)
+function refreshPrecoStats(){
+  try{
+    updatePrecoTotals();
+    var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
+    var revM=revMens();
+    var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
+    var chargesTotales=chrCredit+Math.round(ED.charges||0);
+    var capa=revM>0?Math.max(0,revM*0.35-chargesTotales):0;
+    var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
+    if(typeof buildMatriceObjSol==='function')buildMatriceObjSol(impot,capa,aSum);
+  }catch(e){console.warn('refreshPrecoStats:',e);}
+}
+
+function updateSol(idx,field,val){if(solsSelectionnees[idx])solsSelectionnees[idx][field]=val;renderFichesClient();refreshPrecoStats();}
 function toggleObjValide(idx,obj,checked){
   if(!solsSelectionnees[idx])return;
   if(!solsSelectionnees[idx].objectifsValides)solsSelectionnees[idx].objectifsValides=[];
@@ -5858,8 +5906,12 @@ function renderFichesClient(){
       html+='</div>';
 
       // Ligne par contrat/titulaire
+      // Rendement et toggle capital investi (partagés par groupe produit)
+      var grpRate=firstSol._rate;
+      var grpCapOnly=firstSol._capitalOnly||false;
       pg.sols.forEach(function(sol){
-        var r2=(cfg&&cfg.rendement)||cp.rendement||meta.rate||0.025;
+        var defR=(cfg&&cfg.rendement)||cp.rendement||meta.rate||0.025;
+        var r2=grpRate!==undefined?grpRate:defR;
         var h2=parseInt(sol.horizon)||10;
         var isSCPI2=(sol.produit==='SCPI de rendement');
         var isGirardin=/girardin/i.test(sol.produit||'');
@@ -5918,12 +5970,22 @@ function renderFichesClient(){
           html+='</div>';
           if(sol.vi>0||sol.vp>0){
             var totalVerse2=Math.round((sol.vi||0)+(sol.vp||0)*12*h2);
-            var capBas=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
-            var capHaut=Math.round((sol.vi||0)*Math.pow(1.05,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.05,h2)-1)/0.05):0));
-            var renteBas=Math.round(capBas*0.04/12);
-            var renteHaut=Math.round(capHaut*0.04/12);
+            // Rendement actif (éditable par conseiller). Défaut selon produit.
+            var defRateSol=0.03;
+            if(/scpi/i.test(sol.produit||''))defRateSol=0.05;
+            var rateSol=grpRate!==undefined?grpRate:defRateSol;
+            var pctLbl=(rateSol*100).toFixed(1).replace(/\.0$/,'')+'\u00a0%';
             html+='<div style="padding:4px 14px 10px;font-size:12px;color:var(--gris-f);line-height:1.6">';
-            if(isGirardin){
+            if(grpCapOnly){
+              // Afficher uniquement le capital investi (total versé)
+              html+='Investissement total sur <strong>'+h2+' ans</strong> : <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong> de capital investi.';
+              if(isGirardin){
+                var ecoGirCo=Math.round((sol.vi||0)*1.10);
+                html+=' \u00c9conomie d\'imp\u00f4t : <strong>'+fmt(ecoGirCo)+'\u00a0\u20ac</strong> (110\u00a0%).';
+              } else if(economieFisc2>0){
+                html+='<br>\u00c9conomie fiscale : <strong>'+fmt(economieFisc2)+'\u00a0\u20ac/an</strong>.';
+              }
+            } else if(isGirardin){
               // Girardin : one-shot, économie impôt = 110% du VI
               var ecoGir=Math.round((sol.vi||0)*1.10);
               html+='Investissement one-shot de <strong>'+fmt(sol.vi||0)+'\u00a0\u20ac</strong>.';
@@ -5932,19 +5994,17 @@ function renderFichesClient(){
               var scpiMode3=sol._scpiMode||'pp';
               var US_PCT_TBL={3:0.15,4:0.18,5:0.24,6:0.27,7:0.29,8:0.32,9:0.34,10:0.37,11:0.39,12:0.42,13:0.44,14:0.47,15:0.50,16:0.52,17:0.54,18:0.56,19:0.58,20:0.60};
               if(scpiMode3==='np'){
-                // Nue-propriété (identique scpi-simulator calcNP)
                 var usPctNP=US_PCT_TBL[Math.min(h2,20)]||0.37;
                 var npPctNP=1-usPctNP;
                 var valPP=Math.round((sol.vi||0)/npPctNP);
                 var gainNP=valPP-(sol.vi||0);
-                var renteGrossNP=Math.round(valPP*0.05/12);
+                var renteGrossNP=Math.round(valPP*rateSol/12);
                 html+='Acquisition en nue-propri\u00e9t\u00e9 sur <strong>'+h2+' ans</strong> : d\u00e9cote <strong>'+Math.round(usPctNP*100)+'\u00a0%</strong>.';
                 html+='<br>Investissement : <strong>'+fmt(sol.vi||0)+'\u00a0\u20ac</strong> \u2192 Valeur pleine propri\u00e9t\u00e9 reconstitu\u00e9e : <strong>'+fmt(valPP)+'\u00a0\u20ac</strong> (+'+fmt(gainNP)+'\u00a0\u20ac).';
-                html+='<br>Revenus potentiels au terme : <strong>~'+fmt(renteGrossNP)+'\u00a0\u20ac/mois</strong> bruts.';
+                html+='<br>Revenus potentiels au terme : <strong>~'+fmt(renteGrossNP)+'\u00a0\u20ac/mois</strong> bruts (distribution '+pctLbl+').';
                 html+='<br><span style="font-size:11px;color:var(--gris)">Aucun revenu ni IFI pendant le d\u00e9membrement.</span>';
               } else {
-                // Pleine propriété (identique scpi-simulator calcRetraite)
-                var yieldSCPI=0.05;
+                var yieldSCPI=rateSol;
                 var reinvPctSol=sol._reinvestPct!==undefined?sol._reinvestPct:(sol.reinvest?100:0);
                 var patSCPI=(sol.vi||0);
                 var totalDiv=0,totalReinv=0;
@@ -5965,33 +6025,31 @@ function renderFichesClient(){
                 if(reinvPctSol>=100)html+=' (dividendes 100\u00a0% r\u00e9investis).';
                 else if(reinvPctSol>0)html+=' ('+reinvPctSol+'\u00a0% r\u00e9investis, '+fmt(totalDiv)+'\u00a0\u20ac per\u00e7us).';
                 else html+=totalDiv>0?'. Dividendes per\u00e7us sur la p\u00e9riode : <strong>'+fmt(totalDiv)+'\u00a0\u20ac</strong>.':'.';
-                html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution 5\u00a0%).';
+                html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution '+pctLbl+').';
               }
             } else if(/per\b/i.test(sol.produit||'')){
-              // PER : rendement 3% fixe + économie fiscale
               var tmiPer=ED.fiscal.tmi||0;
               var ecoAn1=Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmiPer/100);
               var ecoSuiv=sol.vp>0?Math.round(sol.vp*12*tmiPer/100):0;
-              var capPer3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+              var capPer3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
               html+='Ann\u00e9e 1 : \u00e9conomie fiscale de <strong>'+fmt(ecoAn1)+'\u00a0\u20ac</strong>';
               html+=' (versement initial'+(sol.vp>0?' + mensualit\u00e9s':'')+' \u00d7 TMI '+tmiPer+'\u00a0%).';
               if(ecoSuiv>0&&h2>1)html+='<br>Ann\u00e9es suivantes : <strong>'+fmt(ecoSuiv)+'\u00a0\u20ac/an</strong> d\'\u00e9conomie d\'imp\u00f4t.';
-              html+='<br>Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(capPer3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%).';
+              html+='<br>Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(capPer3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else if(/assurance.vie|contrat de capitalisation/i.test(sol.produit||'')){
-              // AV / Capi : rendement 3% fixe
-              var capAV3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+              var capAV3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
               var renteAV3=Math.round(capAV3*0.04/12);
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%), ';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+'), ';
               html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteAV3)+'\u00a0\u20ac/mois</strong>.';
             } else if(economieFisc2>0){
               html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
-              html+='Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0)))+'\u00a0\u20ac</strong> (rendement 3\u00a0%).';
+              html+='Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0)))+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else {
-              var capDef3=Math.round((sol.vi||0)*Math.pow(1.03,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1.03,h2)-1)/0.03):0));
+              var capDef3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
               var renteDef3=Math.round(capDef3*0.04/12);
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capDef3)+'\u00a0\u20ac</strong> (rendement 3\u00a0%), ';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capDef3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+'), ';
               html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteDef3)+'\u00a0\u20ac/mois</strong>.';
             }
             html+='</div>';
