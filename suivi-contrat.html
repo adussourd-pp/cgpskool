@@ -281,9 +281,9 @@ function setCategorie(v){
   if(typeof renderAll==='function') renderAll();
 }
 
-/* ---- Accordeon strict entre les 2 toggles ---- */
+/* ---- Accordeon strict entre toggles frères uniquement ---- */
 function openStep(id, el){
-  document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
+  el.parentElement.querySelectorAll(':scope > .cs-sidebar-lbl').forEach(function(l){
     var body=l.nextElementSibling;
     if(!body||!body.classList.contains('sb-body'))return;
     if(l===el){
