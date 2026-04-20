@@ -162,21 +162,22 @@
 .top-menu {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   margin-left: 28px;
 }
 .top-menu-item {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.82);
   text-decoration: none;
-  letter-spacing: 0.04em;
-  padding: 4px 6px;
-  transition: color 0.15s;
+  letter-spacing: 0.03em;
+  padding: 5px 12px;
+  border-radius: 5px;
+  transition: color 0.15s, background 0.15s;
 }
-.top-menu-item:hover,
-.top-menu-item.active { color: #fff; }
-.top-menu-sep { color: rgba(255,255,255,0.15); font-size: 10px; user-select: none; }
+.top-menu-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.top-menu-item.active { color: #fff; background: rgba(212,98,42,0.28); }
+.top-menu-sep { display: none; }
 .top-menu-ext { margin-left: 0; gap: 6px; }
 .top-menu-ext .top-menu-item.ext {
   display: inline-flex; align-items: center; gap: 5px;
@@ -470,22 +471,22 @@
   };
 
   // Aperçu des events cochés (mini-chips dans le header plié)
+  function shortTitle(t){
+    if(/Universit/i.test(t)) return 'UDP';
+    if(/Forum/i.test(t)) return 'Forum';
+    if(/Convention/i.test(t)) return 'Convention';
+    return t;
+  }
   function updateAgendaPreview(){
     var el = document.getElementById('agendaPreview');
     if(!el) return;
     var state = load();
     var checked = EVENTS.filter(function(ev){return !!state[ev.id];});
     if(checked.length === 0){ el.innerHTML = ''; return; }
-    var MAX = 3;
-    var shown = checked.slice(0, MAX);
-    var html = shown.map(function(ev){
+    var html = checked.map(function(ev){
       var cls = ev.host === 'Forman' ? 'forman' : 'prodemial';
-      var short = ev.month.replace('Début ','').replace('Fin ','').replace('début ','').replace('fin ','');
-      return '<span class="mini-event-chip '+cls+'">'+short+' &middot; '+ev.host+'</span>';
+      return '<span class="mini-event-chip '+cls+'">'+shortTitle(ev.title)+'</span>';
     }).join('');
-    if(checked.length > MAX){
-      html += '<span class="mini-event-more">+'+(checked.length - MAX)+'</span>';
-    }
     el.innerHTML = html;
   }
   window.__updateAgendaPreview = updateAgendaPreview;
