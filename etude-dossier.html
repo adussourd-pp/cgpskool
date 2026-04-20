@@ -1296,14 +1296,16 @@ select.span2{grid-column:span 2}
     </div>
   </div>
 
-  <!-- ── Note de synthèse ── -->
-  <div class="card">
-    <div class="card-title"><span class="dot"></span>Note de synthèse globale</div>
-    <div class="ed-block" id="noteSynthese" contenteditable="true" data-placeholder="Résumé de l'étude, logique de la stratégie préconisée, points clés pour le client…"></div>
-  </div>
+  <!-- Note de synthèse — rendu PDF, contrôlé par le switch dans le panneau conseiller -->
+  <div class="note-print" id="notePrint-synthese" style="display:none"></div>
 
   <div class="page-number"></div>
 </div><!-- /sec-synthese -->
+<div class="comment-zone comment-off panneau-interne" data-sec="synthese" style="display:none">
+  <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">⚠️ Non imprimé — visible conseiller uniquement</div>
+  <div class="comment-zone-label"><span>Note de synthèse globale</span><label class="cz-switch"><input type="checkbox" onchange="toggleComment(this)"><span class="cz-slider"></span></label></div>
+  <textarea id="noteSynthese" placeholder="Résumé de l'étude, logique de la stratégie préconisée, points clés pour le client…" rows="4" oninput="autoEnableComment(this)"></textarea>
+</div>
 
 
 <!-- ── ZONE SAISIE MENTIONS (hors section-page) ── -->
@@ -8222,6 +8224,7 @@ function chargerEtude(input){
             if(zone){
               var sw=zone.querySelector('.cz-switch input');
               if(sw){sw.checked=data.commentSwitches[sec];zone.classList.toggle('comment-off',!sw.checked);}
+              try{syncNotePrint(zone);}catch(e){}
             }
           });
         }
