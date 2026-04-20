@@ -344,6 +344,24 @@ Les `<canvas>` apparaissent vides/blancs en impression. Solution :
 - Pour les modules avec leur propre logique d'export (ex: `etude-dossier.html`) : déclarer `CGP.pdf.customHandler = true` pour empêcher le double traitement
 - Ne JAMAIS appeler `window.print()` directement dans un module avec des graphiques
 
+**R25 — Le footer conseiller (`#conseillerFooter`) DOIT rester le dernier bloc et NE PAS être enveloppé.**
+
+`CGP.footer.render` génère `<div style="background:#F2F1EE;margin:28px -40px -40px -40px;...">` — les `-40px` débordent les 40px de padding de `.cs-page` en écran. En print le padding tombe à 20px et le `-40px` bas ferait déborder le fond beige sur la page suivante (symptôme = "barre grise sous le footer") + le bloc peut se couper en deux (symptôme = "footer coupé").
+
+La correction globale est dans `cgp-skool-layout.css` (`@media print` → section 9b) :
+```css
+#conseillerFooter,#conseillerFooter>div{
+  break-inside:avoid!important;page-break-inside:avoid!important
+}
+#conseillerFooter>div{margin:16px -20px 0 -20px!important}
+```
+
+**À respecter dans les nouveaux modules** :
+- L'élément d'ancrage DOIT avoir `id="conseillerFooter"` (pas de wrapper intermédiaire)
+- Le footer doit être le **dernier** enfant de `.cs-page`, sans bloc après
+- Ne **pas** dupliquer le CSS footer dans le module (déjà géré globalement)
+- Si tu changes le nom de l'ID ou la structure, mets à jour R25 + `cgp-skool-layout.css`
+
 **Print CSS partagé** : géré dans `cgp-skool-layout.css` (ne pas dupliquer dans les modules).
 
 ### Processus de modification UI
