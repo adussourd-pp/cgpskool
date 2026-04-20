@@ -208,6 +208,17 @@ body{font-family:var(--sans);color:var(--ink);background:#ECEAE6;-webkit-font-sm
   /* ── 9. FOOTER CONSEILLER : visible en print ── */
   .cgp-footer-conseiller{display:block!important}
 
+  /* ── 9b. FOOTER CONSEILLER (#conseillerFooter) : anti-split + anti-bleed sur page suivante ──
+     Le footer rendu par CGP.footer.render utilise margin:28px -40px -40px -40px pour déborder
+     les 40px de padding de .cs-page en screen. En print .cs-page a padding:20px : le -40px en bas
+     fait déborder le fond beige sur la page suivante (barre grise), le -40px latéral dépasse aussi.
+     On neutralise le débordement bas, on aligne les marges latérales sur le padding print (20px),
+     et on force le bloc à ne pas se couper entre pages. */
+  #conseillerFooter,#conseillerFooter>div{
+    break-inside:avoid!important;page-break-inside:avoid!important
+  }
+  #conseillerFooter>div{margin:16px -20px 0 -20px!important}
+
   /* ── 10. HAUTEURS VIEWPORT : neutraliser ── */
   [style*="min-height:calc(100vh"],[style*="height:calc(100vh"]{
     min-height:auto!important;height:auto!important
