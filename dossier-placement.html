@@ -137,7 +137,7 @@
         <div class="mode-tab active" id="typTabAv"   onclick="setType('av')"><span class="mode-icon">&#128737;</span>AV</div>
         <div class="mode-tab"        id="typTabPer"  onclick="setType('per')"><span class="mode-icon">&#128200;</span>PER</div>
         <div class="mode-tab"        id="typTabScpi" onclick="setType('scpi')"><span class="mode-icon">&#127970;</span>SCPI</div>
-        <div class="mode-tab"        id="typTabImmo" onclick="setType('immo')"><span class="mode-icon">&#127968;</span>LMNP</div>
+        <div class="mode-tab"        id="typTabImmo" onclick="goToImmo()"><span class="mode-icon">&#127968;</span>Immo</div>
       </div>
     </div>
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
@@ -274,7 +274,7 @@ var TEMPLATES={
     gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et coh\u00e9rence dans le temps</b><br><br><b>Versement initial (VI)</b> \u2014 Poser une base solide d\u00e8s l\'ouverture.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e et profiter de la m\u00e9thode DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer la position selon les opportunit\u00e9s de march\u00e9.<br><br>\u2192 <b>Horizon conseill\u00e9 : 5 ans minimum</b><br>\u2192 <b>Ambition de rendement : 3 \u00e0 5 % nets</b> de frais de gestion<br><br><i>Objectif indicatif, non garanti.</i>',
     frais:[['Frais sur versement','4,8 %','R\u00e9mun\u00e9ration du conseil, de l\'analyse et de l\'accompagnement'],['Frais de gestion','1 %/an','Pr\u00e9lev\u00e9s par l\'assureur sur l\'encours'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre entre supports'],['Frais de sortie','0 %','Capital disponible \u00e0 tout moment'],['Frais de gestion pilot\u00e9e','0 %','Gestion libre et ind\u00e9pendante']],
     fraisNote:'Co\u00fbt moyen sur 10 ans : \u2248 1,48 %/an tous frais confondus',
-    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Ouverture','Confirmation sous 5-10 jours ouvr\u00e9s'],['Bilan \u00e0 4 mois','Point performance, ajustement'],['Suivi annuel','Revue compl\u00e8te du contrat']]
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Confirmation d\'ouverture','Sous 5-10 jours ouvr\u00e9s'],['Premier bilan \u00e0 4 mois','Point performance, ajustement'],['Suivi annuel','Revue compl\u00e8te du contrat']]
   },
   per:{
     type:'PLAN \u00c9PARGNE RETRAITE',
@@ -283,7 +283,7 @@ var TEMPLATES={
     gestion:'<b>Objectif : performance, s\u00e9r\u00e9nit\u00e9 et optimisation fiscale</b><br><br><b>Versement initial (VI)</b> \u2014 Amorcer le contrat avec une base solide.<br><br><b>Versements programm\u00e9s (VP)</b> \u2014 Investir r\u00e9guli\u00e8rement pour lisser les points d\'entr\u00e9e via DCA.<br><br><b>Versements compl\u00e9mentaires (VC)</b> \u2014 Renforcer en fin d\'ann\u00e9e pour maximiser la d\u00e9duction fiscale.<br><br>\u2192 <b>Horizon : jusqu\'\u00e0 la retraite</b> (minimum 5 ans)<br>\u2192 <b>D\u00e9duction fiscale : jusqu\'\u00e0 10 % des revenus</b> nets',
     frais:[['Frais sur versement','4,5 %','R\u00e9mun\u00e9ration conseil et accompagnement'],['Frais de gestion','1 %/an','Li\u00e9s \u00e0 l\'assureur (norme du march\u00e9)'],['Frais d\'arbitrage','0 %','R\u00e9allocation libre sans surco\u00fbt'],['Frais de sortie','0 %','Capital libre, sans p\u00e9nalit\u00e9'],['Frais pilot\u00e9s','0 %','Gestion libre et ind\u00e9pendante']],
     fraisNote:'\u2192 Moyenne globale sur 30 ans : \u2248 1,15 %/an tous frais confondus',
-    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Confirmation','Ouverture confirm\u00e9e par l\'assureur'],['Suivi \u00e0 3 mois','Bilan performance, ajustement'],['Suivi annuel','D\u00e9claration avril, correction sept, bilan oct-nov']]
+    etapes:[['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Fiche Conseil + proposition par e-mail'],['Confirmation d\'ouverture','Confirmation par l\'assureur'],['Premier bilan \u00e0 3 mois','Bilan performance, ajustement'],['Suivi annuel','D\u00e9claration avril, correction sept, bilan oct-nov']]
   },
   scpi:{
     type:'SCPI DE RENDEMENT',
@@ -292,7 +292,7 @@ var TEMPLATES={
     gestion:'<b>Objectif : revenu r\u00e9gulier, constitution de patrimoine et s\u00e9r\u00e9nit\u00e9</b><br><br><b>Acquisition au comptant</b> \u2014 G\u00e9n\u00e9rer un revenu compl\u00e9mentaire imm\u00e9diat.<br><br><b>Acquisition \u00e0 cr\u00e9dit</b> \u2014 Utiliser l\'effet de levier bancaire.<br><br><b>D\u00e9membrement</b> \u2014 Acheter l\'usufruit (revenus temporaires) ou la nue-propri\u00e9t\u00e9 (valorisation long terme).<br><br>\u2192 <b>Horizon recommand\u00e9 : 8 \u00e0 10 ans minimum</b><br>\u2192 <b>D\u00e9lai de jouissance : 3 \u00e0 6 mois</b>',
     frais:[['Frais de gestion','\u2248 10 %/an des loyers bruts','Pr\u00e9lev\u00e9s avant versement des dividendes. Le rendement de 6 % est d\u00e9j\u00e0 net de ces frais.'],['Frais de souscription','8 % \u00e0 12 %','Int\u00e9gr\u00e9s dans le prix de la part. N\'impactent qu\'en cas de revente.']],
     fraisNote:'Dans une optique de d\u00e9tention long terme ou de transmission, les frais de souscription ne vous impactent pas.',
-    etapes:[['S\u00e9lection','Choix des SCPI adapt\u00e9es \u00e0 votre profil'],['Documents','Pi\u00e8ce d\'identit\u00e9, RIB, justificatif'],['Signature','Bulletin de souscription par e-mail'],['Jouissance','3 \u00e0 6 mois (premier dividende)'],['Suivi annuel','Bilan + aide d\u00e9claration fiscale']]
+    etapes:[['S\u00e9lection','Choix des SCPI adapt\u00e9es \u00e0 votre profil'],['Envoi des documents','Pi\u00e8ce d\'identit\u00e9, RIB PDF, justificatif < 3 mois'],['Signature \u00e9lectronique','Bulletin de souscription par e-mail'],['D\u00e9lai de jouissance','3 \u00e0 6 mois (premier dividende)'],['Suivi annuel','Bilan + aide d\u00e9claration fiscale']]
   },
   immo:{
     type:'IMMOBILIER LMNP',
@@ -317,6 +317,12 @@ var ANNEXE_MODULES=[
 
 var currentType='av';
 function V(id){return document.getElementById(id);}
+
+function goToImmo(){
+  if(confirm('Le dossier Immobilier (LMNP / D\u00e9normandie / D\u00e9ficit foncier) dispose de son propre module d\u00e9di\u00e9. Y acc\u00e9der ?')){
+    location.href='dossier-solution.html';
+  }
+}
 
 function openStep(id, el){
   document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
@@ -425,7 +431,7 @@ function loadAnnexes(){
     try{var raw=localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
     if(data){
       found=true;
-      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
+      html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
     }
   });
   if(!found){
