@@ -696,7 +696,7 @@ function renderAlloc(){
   if(total<=0)total=num('vVal');
 
   var showCmt=(document.getElementById('allocComments')||{}).checked;
-  var h='<thead><tr><th>Support</th><th>ISIN</th><th class="c">SRI</th><th class="r">Poids</th><th class="r">PMA</th><th class="r">+/- value</th><th class="r">Perf.</th></tr></thead><tbody>';
+  var h='<thead><tr><th>Support</th><th>ISIN</th><th class="c">SRI</th><th class="r">Poids</th><th class="r">Valeur totale</th><th class="r">+/- value</th><th class="r">Perf.</th></tr></thead><tbody>';
   STATE.allocation.forEach(function(a,i){
     var pctPerf=a.perf||0;
     var plusVal=a.plusVal||0;
@@ -706,7 +706,7 @@ function renderAlloc(){
     h+='<td class="mut" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px">'+esc(a.isin)+'</td>';
     h+='<td class="c">'+esc(a.sri)+'</td>';
     h+='<td class="r">'+fmtPct(a.poids,0)+'</td>';
-    h+='<td class="r">'+fmtE(a.pma)+'</td>';
+    h+='<td class="r">'+fmtE(a.valTot)+'</td>';
     h+='<td class="r '+(plusVal>=0?'pos':'neg')+'">'+(plusVal>=0?'+':'')+fmtE(plusVal)+'</td>';
     h+='<td class="r '+perfCls+'">'+(pctPerf>=0?'+':'')+fmtPct(pctPerf,0)+'</td>';
     h+='</tr>';
