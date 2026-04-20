@@ -158,6 +158,9 @@
 .btn-ghost-ink { display: inline-flex; align-items: center; padding: 10px 18px; border: 1px solid var(--rule-l); background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-60); cursor: pointer; transition: all 0.2s; }
 .btn-ghost-ink:hover { border-color: var(--orange); color: var(--orange); }
 
+/* ── Nav pleine largeur sur index (pas de max-width comme le footer) ── */
+.cs-nav-inner { max-width: none; padding: 0 36px; }
+
 /* ── Menu dans la top-nav ── */
 .top-menu {
   display: flex;
@@ -176,14 +179,16 @@
 .top-menu-item:hover { color: rgba(255,255,255,0.9); }
 .top-menu-item.active { color: var(--orange); font-weight: 500; }
 .top-menu-sep { display: none; }
-.top-menu-ext { margin-left: 0; gap: 6px; }
+.top-menu-ext { margin-left: 0; gap: 4px; flex-shrink: 0; }
 .top-menu-ext .top-menu-item.ext {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 10px;
+  display: inline-flex; align-items: center;
+  padding: 4px 9px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 6px;
-  color: rgba(255,255,255,0.7);
+  border-radius: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  white-space: nowrap;
 }
 .top-menu-ext .top-menu-item.ext:hover {
   border-color: rgba(212,98,42,0.45);
@@ -547,15 +552,14 @@
 /* ── Scroll-spy sur le top-menu ── */
 (function(){
   function scrollSpy(){
-    var items = document.querySelectorAll('.top-menu-item');
+    var items = document.querySelectorAll('.top-menu-item[data-target]');
     if(!items.length) return;
-    var scrollY = window.scrollY + 120; // offset pour la nav fixe
+    var scrollY = window.scrollY + 120;
     var bestId = null, bestTop = -1;
     items.forEach(function(it){
       var target = document.getElementById(it.dataset.target);
       if(!target) return;
-      var top = target.offsetTop;
-      // On prend la section dont le offsetTop est le plus proche du scroll mais <= scroll
+      var top = target.getBoundingClientRect().top + window.scrollY;
       if(top <= scrollY && top > bestTop){ bestTop = top; bestId = it.dataset.target; }
     });
     items.forEach(function(it){
