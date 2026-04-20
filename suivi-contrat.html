@@ -208,7 +208,13 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
 
       <!-- 2. SYNTH&Egrave;SE -->
       <div class="card">
-        <div class="card-title"><span class="n">2</span>Synth&egrave;se financi&egrave;re</div>
+        <div class="card-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px"><span class="n">2</span>Synth&egrave;se financi&egrave;re</div>
+          <label class="no-print" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--gris);text-transform:none;letter-spacing:0;cursor:pointer">
+            <input type="checkbox" id="hideTri" onchange="renderSynth();saveLocal()">
+            Masquer le TRI
+          </label>
+        </div>
         <div class="kpi-grid" id="kpiGrid"></div>
         <table class="tbl" id="synthTbl"></table>
       </div>
@@ -674,9 +680,12 @@ function renderSynth(){
     ['Rachats bruts',fmtE(rach)],
     ['Valorisation actuelle','<strong>'+fmtE(valo)+'</strong>'],
     ['+/- value latente (vs nets)',(plusVal>=0?'+':'')+fmtE(plusVal)+' ('+(plusVal>=0?'+':'')+fmtPct(plusValPct,2)+')'],
-    ['Dur\u00e9e de d\u00e9tention',dureeTxt],
-    ['TRI annualis\u00e9'+(dureeAns>0?' (sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')+')':''),'<strong>'+(triPct!==null?(triPct>=0?'+':'')+fmtPct(triPct,2):'\u2014')+'</strong>']
+    ['Dur\u00e9e de d\u00e9tention',dureeTxt]
   ]);
+  var hideTri=(document.getElementById('hideTri')||{}).checked;
+  if(!hideTri){
+    rows.push(['TRI annualis\u00e9'+(dureeAns>0?' (sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')+')':''),'<strong>'+(triPct!==null?(triPct>=0?'+':'')+fmtPct(triPct,2):'\u2014')+'</strong>']);
+  }
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
   document.getElementById('synthTbl').innerHTML=h;
 }
@@ -802,6 +811,7 @@ function esc(s){var d=document.createElement('div');d.textContent=s==null?'':Str
 function collectState(){
   var cb=document.getElementById('ctxInclude');
   var cbAlloc=document.getElementById('allocComments');
+  var cbTri=document.getElementById('hideTri');
   return {
     client:{nom:V('cNom'),age:V('cAge'),tel:V('cTel'),email:V('cEmail')},
     contrat:{compagnie:V('kCompagnie'),prestation:V('kPrestation'),num:V('kNum'),sri:V('kSri'),open:V('kOpen'),arret:V('kArret'),cat:V('kCat')},
@@ -809,6 +819,7 @@ function collectState(){
     alloc:STATE.allocation,
     allocComms:STATE.allocComms||{},
     allocCommentsOn:!!(cbAlloc&&cbAlloc.checked),
+    hideTri:!!(cbTri&&cbTri.checked),
     movs:STATE.movements.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr};}),
     cNote:(document.getElementById('cNote')||{}).innerHTML||'',
     cCtx:(document.getElementById('cCtx')||{}).innerHTML||'',
@@ -845,6 +856,8 @@ function applyState(s){
   if(cbCtx&&s.ctxInclude===false)cbCtx.checked=false;
   var cbAC=document.getElementById('allocComments');
   if(cbAC&&s.allocCommentsOn)cbAC.checked=true;
+  var cbTri=document.getElementById('hideTri');
+  if(cbTri)cbTri.checked=!!s.hideTri;
 }
 
 function saveLocal(){try{localStorage.setItem(STORE_KEY,JSON.stringify(collectState()));}catch(e){}}
