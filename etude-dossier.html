@@ -1061,7 +1061,7 @@ select.span2{grid-column:span 2}
   <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
   <div class="card" style="margin-bottom:18px">
     <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:12px" id="retSimuLegend">Indicatif. Capital cible = manque mensuel x 12 / 4%.</p>
+    <p id="retSimuLegend" style="display:none"></p>
     <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
     <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
   </div>
@@ -4552,7 +4552,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
       msg.textContent='Bonne nouvelle ! Les pensions estimees couvrent les objectifs de retraite du foyer.';}
     if(rst)rst.style.display='none';
   } else {
-    if(leg)leg.style.display='';
+    if(leg)leg.style.display='none';
     if(msg)msg.style.display='none';
     if(rst)rst.style.display='';
   }
@@ -4941,6 +4941,18 @@ function rPreconisations(){
     var hKey=h==='ct'||h==='CT'?'ct':h==='mt'||h==='MT'?'mt':'lt';
     finActifs.push({nom:a.label||a.nom||'Actif',montant:a.montant||0,horizon:hKey,horizonLabel:hLabel,titulaire:a.titulaire||'C1'});
   });
+  // Purge les uids orphelins (actifs supprimés, changement schéma de nommage) pour éviter les valeurs "conseillées" qui restent collées
+  (function(){
+    var countsByH={lt:0,mt:0,ct:0};
+    var validUids={};
+    finActifs.forEach(function(a){
+      var idx=countsByH[a.horizon]++;
+      validUids[a.horizon+'_'+(a.nom||'').replace(/[^a-zA-Z0-9]/g,'_').substring(0,60)+'_'+idx]=true;
+    });
+    Object.keys(window._precoConseille).forEach(function(k){
+      if(!validUids[k])delete window._precoConseille[k];
+    });
+  })();
 
   var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
   var ftEl=document.getElementById('precoFinTotal');
@@ -4969,7 +4981,8 @@ function rPreconisations(){
       var subTotal=items.reduce(function(s,a){return s+a.montant;},0);
       h+='<tr style="background:'+hz.bg+'"><td colspan="4" style="padding:6px 8px;font-weight:700;color:'+hz.color+';font-size:11px;text-transform:uppercase;letter-spacing:0.06em">'+hz.label+' : '+fmt(subTotal)+' \u20ac</td></tr>';
       items.forEach(function(a,i){
-        var uid=hz.key+'_'+i;
+        // UID stable basé sur le nom (évite que les valeurs conseillées stockées ne soient appliquées à la mauvaise ligne si la liste change)
+        var uid=hz.key+'_'+(a.nom||'').replace(/[^a-zA-Z0-9]/g,'_').substring(0,60)+'_'+i;
         var conseille=window._precoConseille[uid]!==undefined?window._precoConseille[uid]:a.montant;
         var isKept=conseille>0;
         h+='<tr style="border-bottom:1px solid var(--bord);opacity:'+(isKept?'1':'0.5')+'" id="row_'+uid+'">';
@@ -4981,6 +4994,19 @@ function rPreconisations(){
       });
     });
     h+='</tbody></table>';
+    // Projets court terme (issus de Situation & Objectifs) — à provisionner sur l'épargne réorientable
+    var projetsCTList=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|1 an|2 ans|3 ans/.test(hz);});
+    if(projetsCTList.length){
+      h+='<div style="margin-top:14px;padding:10px 14px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.2);border-radius:8px">';
+      h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:6px">Projets court terme \u00e0 provisionner</div>';
+      var totProj=0;
+      projetsCTList.forEach(function(p){
+        totProj+=(+p.montant||0);
+        h+='<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:var(--gris-f)"><span>'+(p.titre||'Projet')+' <span style="color:var(--gris);font-size:11px">('+(p.horizon||'')+')</span></span><strong style="color:var(--noir)">'+fmt(p.montant||0)+' \u20ac</strong></div>';
+      });
+      h+='<div style="display:flex;justify-content:space-between;padding:6px 0 0;margin-top:4px;border-top:1px solid rgba(212,98,42,0.2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--orange)"><span>Total \u00e0 provisionner</span><span>'+fmt(totProj)+' \u20ac</span></div>';
+      h+='</div>';
+    }
     tEl.innerHTML=h;
   }
 
@@ -5001,14 +5027,13 @@ function updatePrecoTotals(){
   var consTot=0;
   inputs.forEach(function(inp){consTot+=+(inp.value||0);});
   var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
-  // Montant alloué via les solutions sélectionnées (versements initiaux)
-  var viAffecte=(typeof solsSelectionnees!=='undefined'?solsSelectionnees:[]).reduce(function(s,sol){return s+(+sol.vi||0);},0);
   // Projets court terme (horizon < 3 ans) à provisionner
   var projetsCT=(ED.projets||[]).filter(function(p){
     var hz=(p.horizon||'').toLowerCase();
-    return /6 mois|< 1 an|2 ans|3 ans/.test(hz);
+    return /6 mois|< 1 an|1 an|2 ans|3 ans/.test(hz);
   }).reduce(function(s,p){return s+(+p.montant||0);},0);
-  var reorienter=finTotal-consTot-viAffecte-projetsCT;
+  // Épargne à réorienter = épargne financière totale - projets court terme - à conserver
+  var reorienter=finTotal-projetsCT-consTot;
 
   var cEl=document.getElementById('precoConserver');
   var rEl=document.getElementById('precoReorienter');
@@ -5072,13 +5097,15 @@ function buildMatriceObjSol(impot,capa,aSum){
   var hasPlacement=ED.epMens>0||aSum>5000;
   var hasFiscal=impot>=2000;
   var hasFinancement=capa>200;
-  // Epargne a reorienter = financier total - à conserver - VI déjà affectés aux solutions - projets CT
+  // Épargne à réorienter = financier total - projets CT - à conserver
   var reorInputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
   var reorConsTot=0;reorInputs.forEach(function(inp){reorConsTot+=+(inp.value||0);});
   var finActifsTotal=(ED.actifs||[]).reduce(function(s,a){var cfg=getActifConfig(a.label||a.nom||'');return cfg.immo?s:s+(a.montant||0);},0);
+  var projetsCT=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|1 an|2 ans|3 ans/.test(hz);}).reduce(function(s,p){return s+(+p.montant||0);},0);
+  var reorMontant=Math.max(0,finActifsTotal-projetsCT-reorConsTot);
+  // VI déjà affectés aux solutions sélectionnées → reste à allouer
   var viAffecte=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vi||0);},0);
-  var projetsCT=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|2 ans|3 ans/.test(hz);}).reduce(function(s,p){return s+(+p.montant||0);},0);
-  var reorMontant=Math.max(0,finActifsTotal-reorConsTot-viAffecte-projetsCT);
+  var resteAllouer=Math.max(0,reorMontant-viAffecte);
   // VP dispo = epargne mensuelle - somme des VP deja affectees
   var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vp||0);},0);
   var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
@@ -5102,23 +5129,13 @@ function buildMatriceObjSol(impot,capa,aSum){
     html+='</div>';
   });
   html+='</div>';
-  // VP disponible + projets CT
-  html+='<div style="display:flex;gap:16px;margin-bottom:8px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px;flex-wrap:wrap">';
-  html+='<div><span style="color:var(--gris)">VP disponible (mensuelle) :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
-  html+='<div><span style="color:var(--gris)">VI d\u00e9j\u00e0 affect\u00e9 :</span> <strong style="color:var(--noir)">'+fmt(viAffecte)+' \u20ac</strong></div>';
-  if(projetsCT>0)html+='<div><span style="color:var(--gris)">Projets CT :</span> <strong style="color:var(--noir)">-'+fmt(projetsCT)+' \u20ac</strong></div>';
+  // Allocation solutions
+  html+='<div style="display:flex;gap:16px;margin-bottom:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px;flex-wrap:wrap">';
   html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:var(--orange)">'+fmt(reorMontant)+' \u20ac</strong></div>';
+  html+='<div><span style="color:var(--gris)">VI affect\u00e9 aux solutions :</span> <strong style="color:var(--noir)">'+fmt(viAffecte)+' \u20ac</strong></div>';
+  html+='<div><span style="color:var(--gris)">Reste \u00e0 allouer :</span> <strong style="color:'+(resteAllouer>0?'var(--green)':'var(--gris-f)')+'">'+fmt(resteAllouer)+' \u20ac</strong></div>';
+  html+='<div style="border-left:1px solid var(--bord);padding-left:16px"><span style="color:var(--gris)">VP disponible :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
   html+='</div>';
-  // Liste des projets CT (issus de Situation & Objectifs)
-  var projetsCTList=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|2 ans|3 ans/.test(hz)&&(+p.montant||0)>0;});
-  if(projetsCTList.length){
-    html+='<div style="margin-bottom:14px;padding:10px 14px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.15);border-radius:8px;font-size:12px">';
-    html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:6px">Projets court terme \u00e0 provisionner</div>';
-    projetsCTList.forEach(function(p){
-      html+='<div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--gris-f)"><span>'+(p.titre||'Projet')+' <span style="color:var(--gris);font-size:11px">('+(p.horizon||'')+')</span></span><strong style="color:var(--noir)">'+fmt(p.montant)+' \u20ac</strong></div>';
-    });
-    html+='</div>';
-  }
 
   // Group ALL COPERNIC solutions by levier category
   var groups={placement:[],fiscal:[],financement:[],entreprise:[]};
