@@ -5029,7 +5029,7 @@ function updatePrecoTotals(){
   var consTot=0;
   inputs.forEach(function(inp){consTot+=+(inp.value||0);});
   var finTotal=finActifs.reduce(function(s,a){return s+a.montant;},0);
-  // Projets court terme (horizon < 3 ans) à provisionner
+  // Projets court terme à provisionner
   var projetsCT=(ED.projets||[]).filter(function(p){
     var hz=(p.horizon||'').toLowerCase();
     return /6 mois|< 1 an|1 an|2 ans|3 ans/.test(hz);
@@ -5040,7 +5040,17 @@ function updatePrecoTotals(){
   var cEl=document.getElementById('precoConserver');
   var rEl=document.getElementById('precoReorienter');
   if(cEl)cEl.textContent=fmt(consTot)+' \u20ac';
-  if(rEl)rEl.textContent=fmt(Math.max(0,reorienter))+' \u20ac';
+  if(rEl){
+    if(reorienter<0){
+      rEl.textContent=fmt(reorienter)+' \u20ac \u26a0\ufe0f';
+      rEl.style.color='var(--red)';
+      rEl.title='Conserver + Projets CT ('+fmt(consTot+projetsCT)+' \u20ac) > Patrimoine financier ('+fmt(finTotal)+' \u20ac). Reduisez l\'epargne conservee ou les projets.';
+    } else {
+      rEl.textContent=fmt(reorienter)+' \u20ac';
+      rEl.style.color='var(--orange)';
+      rEl.title='';
+    }
+  }
 }
 
 function togglePrecoSwitch(uid,montantActuel,checked){
@@ -5099,15 +5109,15 @@ function buildMatriceObjSol(impot,capa,aSum){
   var hasPlacement=ED.epMens>0||aSum>5000;
   var hasFiscal=impot>=2000;
   var hasFinancement=capa>200;
-  // Épargne à réorienter = financier total - projets CT - à conserver
+  // Épargne à réorienter = financier total - projets CT - à conserver (peut être négative)
   var reorInputs=document.querySelectorAll('#precoEpargneTable input[type="number"]');
   var reorConsTot=0;reorInputs.forEach(function(inp){reorConsTot+=+(inp.value||0);});
   var finActifsTotal=(ED.actifs||[]).reduce(function(s,a){var cfg=getActifConfig(a.label||a.nom||'');return cfg.immo?s:s+(a.montant||0);},0);
   var projetsCT=(ED.projets||[]).filter(function(p){var hz=(p.horizon||'').toLowerCase();return /6 mois|< 1 an|1 an|2 ans|3 ans/.test(hz);}).reduce(function(s,p){return s+(+p.montant||0);},0);
-  var reorMontant=Math.max(0,finActifsTotal-projetsCT-reorConsTot);
+  var reorMontant=finActifsTotal-projetsCT-reorConsTot;
   // VI déjà affectés aux solutions sélectionnées → reste à allouer
   var viAffecte=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vi||0);},0);
-  var resteAllouer=Math.max(0,reorMontant-viAffecte);
+  var resteAllouer=reorMontant-viAffecte;
   // VP dispo = epargne mensuelle - somme des VP deja affectees
   var vpAffectee=solsSelectionnees.reduce(function(s,sol){return s+(+sol.vp||0);},0);
   var vpDispo=Math.max(0,(ED.epMens||0)-vpAffectee);
@@ -5132,10 +5142,12 @@ function buildMatriceObjSol(impot,capa,aSum){
   });
   html+='</div>';
   // Allocation solutions
+  var reorColor=reorMontant<0?'var(--red)':'var(--orange)';
+  var resteColor=resteAllouer<0?'var(--red)':(resteAllouer>0?'var(--green)':'var(--gris-f)');
   html+='<div style="display:flex;gap:16px;margin-bottom:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:12px;flex-wrap:wrap">';
-  html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:var(--orange)">'+fmt(reorMontant)+' \u20ac</strong></div>';
+  html+='<div><span style="color:var(--gris)">\u00c9pargne \u00e0 r\u00e9orienter :</span> <strong style="color:'+reorColor+'">'+fmt(reorMontant)+' \u20ac</strong></div>';
   html+='<div><span style="color:var(--gris)">VI affect\u00e9 aux solutions :</span> <strong style="color:var(--noir)">'+fmt(viAffecte)+' \u20ac</strong></div>';
-  html+='<div><span style="color:var(--gris)">Reste \u00e0 allouer :</span> <strong style="color:'+(resteAllouer>0?'var(--green)':'var(--gris-f)')+'">'+fmt(resteAllouer)+' \u20ac</strong></div>';
+  html+='<div><span style="color:var(--gris)">Reste \u00e0 allouer :</span> <strong style="color:'+resteColor+'">'+fmt(resteAllouer)+' \u20ac</strong></div>';
   html+='<div style="border-left:1px solid var(--bord);padding-left:16px"><span style="color:var(--gris)">VP disponible :</span> <strong style="color:var(--noir)">'+fmt(vpDispo)+' \u20ac/mois</strong></div>';
   html+='</div>';
 
