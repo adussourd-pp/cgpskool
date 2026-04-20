@@ -5794,6 +5794,12 @@ function refreshPrecoStats(){
 }
 
 function updateSol(idx,field,val){if(solsSelectionnees[idx])solsSelectionnees[idx][field]=val;renderFichesClient();refreshPrecoStats();}
+
+function updateLevierComment(lev,val){
+  if(!ED.commentsLevier)ED.commentsLevier={};
+  ED.commentsLevier[lev]=val;
+  // Pas de re-render complet pour éviter la perte de focus
+}
 function toggleObjValide(idx,obj,checked){
   if(!solsSelectionnees[idx])return;
   if(!solsSelectionnees[idx].objectifsValides)solsSelectionnees[idx].objectifsValides=[];
@@ -5840,13 +5846,10 @@ function renderFichesClient(){
       });
     });
   }
-  if(!solsSelectionnees.length){
-    el.innerHTML='<div style="text-align:center;padding:32px;color:var(--gris);font-size:13px;border:1.5px dashed var(--bord);border-radius:12px">Selectionnez des solutions dans le panneau conseiller pour générer les fiches</div>';
-    return;
-  }
-
-  // Regrouper par levier
+  // Regrouper par levier (et toujours afficher les 3 leviers principaux : placement, fiscal, financement)
   var levierMap={};
+  var FORCED_LEVIERS=['epargne','fiscal','financement'];
+  FORCED_LEVIERS.forEach(function(lev){levierMap[lev]=[];});
   solsSelectionnees.forEach(function(s){
     var cp=COPERNIC[s.produit]||{};
     var lev=cp.levier||s.levier||'epargne';
@@ -5870,15 +5873,21 @@ function renderFichesClient(){
   var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?(ED.c2.prenom||'')+(ED.c2.nom?' '+ED.c2.nom[0]+'.':''):'';
   var html='';
 
-  // Ordonner les leviers dans l'ordre des étapes
+  // Ordre des leviers : les 3 leviers forcés en premier (placement, fiscal, financement), puis les autres par étape min
   var leviersOrdonnes = Object.keys(levierMap).sort(function(a,b){
-    var minA = Math.min.apply(null, levierMap[a].map(function(s){return s.etape||99;}));
-    var minB = Math.min.apply(null, levierMap[b].map(function(s){return s.etape||99;}));
-    return minA-minB;
+    var fA=FORCED_LEVIERS.indexOf(a),fB=FORCED_LEVIERS.indexOf(b);
+    if(fA>=0&&fB>=0)return fA-fB;
+    if(fA>=0)return -1;
+    if(fB>=0)return 1;
+    var etA=(levierMap[a]||[]).map(function(s){return s.etape||99;}).concat([99]);
+    var etB=(levierMap[b]||[]).map(function(s){return s.etape||99;}).concat([99]);
+    return Math.min.apply(null,etA)-Math.min.apply(null,etB);
   });
 
   leviersOrdonnes.forEach(function(lev){
-    var sols=levierMap[lev]; if(!sols.length)return;
+    var sols=levierMap[lev];
+    // Skip les leviers non-forcés sans solution
+    if(!sols.length&&FORCED_LEVIERS.indexOf(lev)<0)return;
     var meta=LEVIER_META[lev]||LEVIER_META['epargne'];
 
     // ── En-tête levier ──
@@ -5888,11 +5897,26 @@ function renderFichesClient(){
     html+='</div>';
     html+='<div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">';
 
-    // Grouper par produit au sein du levier
+    // Cas levier vide : textarea éditable pour commentaire conseiller
+    if(!sols.length){
+      if(!ED.commentsLevier)ED.commentsLevier={};
+      var txtLev=ED.commentsLevier[lev]||'';
+      html+='<textarea rows="3" oninput="updateLevierComment(\''+lev+'\',this.value)" placeholder="Commentaire conseiller (visible sur le PDF) \u2014 ex: pas d\'opportunit\u00e9 fiscale pertinente \u00e0 date, \u00e0 r\u00e9\u00e9valuer \u00e0 la prochaine revue" style="width:100%;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;resize:vertical">'+txtLev.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</textarea>';
+      html+='</div></div>';
+      return;
+    }
+
+    // Grouper par produit au sein du levier (ordonné par étape min)
     var prodGroups=[];var prodMap={};
     sols.forEach(function(sol){
       if(!prodMap[sol.produit]){prodMap[sol.produit]={produit:sol.produit,sols:[]};prodGroups.push(prodMap[sol.produit]);}
       prodMap[sol.produit].sols.push(sol);
+    });
+    // Tri par étape minimale du groupe (ordre de numérotation des solutions)
+    prodGroups.sort(function(a,b){
+      var minA=Math.min.apply(null,a.sols.map(function(s){return s.etape||99;}));
+      var minB=Math.min.apply(null,b.sols.map(function(s){return s.etape||99;}));
+      return minA-minB;
     });
 
     prodGroups.forEach(function(pg){
