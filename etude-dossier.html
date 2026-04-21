@@ -2955,9 +2955,15 @@ function parseTextRI(txt){
     function dedupTel(t){
       if(!t)return '';
       t=t.trim();
-      // Cas '+33 X ... +33 X ...' : si 2 patterns phone identiques
-      var m=t.match(/^(\+?\d[\d\s.-]*\d)\s+(\+?\d[\d\s.-]*\d)$/);
-      if(m&&m[1].replace(/\s/g,'')===m[2].replace(/\s/g,''))return m[1];
+      // Cas '+33 X ... +33 X ...' : s'il y a 2 '+', garder ce qui precede le 2e (robuste aux typos)
+      var idx1=t.indexOf('+');
+      if(idx1>=0){
+        var idx2=t.indexOf('+',idx1+1);
+        if(idx2>0)return t.substring(0,idx2).trim();
+      }
+      // Fallback : dedupe par comparaison de digits (sans '+')
+      var m=t.match(/^([\d\s.-]+?)\s+([\d\s.-]+)$/);
+      if(m&&m[1].replace(/\D/g,'')===m[2].replace(/\D/g,'')&&m[1].replace(/\D/g,'').length>=8)return m[1].trim();
       return t;
     }
     if(tel.v1)ED.c1.tel=dedupTel(tel.v1);
