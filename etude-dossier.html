@@ -3909,8 +3909,15 @@ function rSituation(){
 
 
 
+  const priObjSit=ED.objectifsPriority||{};
   const objH=ED.objectifs.length
-    ? ED.objectifs.map((o,i)=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span></div>`).join('')
+    ? ED.objectifs.map((o,i)=>{
+        const p=priObjSit[o]||{};
+        let badges='';
+        if(p.i1)badges+=`<span style="font-size:9px;font-weight:700;color:#fff;background:var(--orange);padding:1px 5px;border-radius:8px;margin-left:6px">I1 n°${p.i1}</span>`;
+        if(p.i2)badges+=`<span style="font-size:9px;font-weight:700;color:#fff;background:#2B5EA7;padding:1px 5px;border-radius:8px;margin-left:3px">I2 n°${p.i2}</span>`;
+        return `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span>${badges}</div>`;
+      }).join('')
     : '<em style="color:var(--gris)">Aucun objectif renseigné</em>';
   var od=document.getElementById('objDisplay');if(od)od.innerHTML=objH;
 
