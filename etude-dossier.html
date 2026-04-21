@@ -4865,8 +4865,13 @@ function rPreconisations(){
   var objEl=document.getElementById('precoObjectifs');
   if(objEl){
     if(ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!=='Objectifs \u00e0 compl\u00e9ter'){
+      var priObj=ED.objectifsPriority||{};
       objEl.innerHTML=ED.objectifs.map(function(o,i){
-        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord)"><span style="color:var(--orange);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
+        var p=priObj[o]||{};
+        var badges='';
+        if(p.i1)badges+='<span style="font-size:10px;font-weight:700;color:#fff;background:var(--orange);padding:1px 6px;border-radius:10px;margin-left:6px">I1 n\u00b0'+p.i1+'</span>';
+        if(p.i2)badges+='<span style="font-size:10px;font-weight:700;color:#fff;background:#2B5EA7;padding:1px 6px;border-radius:10px;margin-left:4px">I2 n\u00b0'+p.i2+'</span>';
+        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--orange);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+badges+'</span></div>';
       }).join('');
     } else {
       objEl.innerHTML='<em style="color:var(--gris)">Aucun objectif identifi\u00e9</em>';
@@ -5024,13 +5029,19 @@ function getLevierCategory(levier){
 
 function buildMatriceObjSol(impot,capa,aSum){
   var activeObjs=[];
+  // Auto-detection basée sur les indicateurs financiers
   if(ED.epMens>100||aSum>5000)activeObjs.push('Épargne / capitalisation');
   if(impot>=2000)activeObjs.push('Optimiser son IR');
   if(ED.fiscal.rbg>1300000)activeObjs.push('Optimiser son IFI');
   if(capa>200)activeObjs.push('Se créer un complément de revenus');
   if(capa>300)activeObjs.push('Investir via le financement');
   if(aSum>300000)activeObjs.push('Optimiser la transmission');
-  if(ED.objectifs&&ED.objectifs.length){ED.objectifs.forEach(function(o){var ol=o.toLowerCase();if(ol.includes('retraite'))activeObjs.push('Préparer sa retraite');if(ol.includes('transm'))activeObjs.push('Optimiser la transmission');if(ol.includes('revenu'))activeObjs.push('Se créer un complément de revenus');if(ol.includes('capital')||ol.includes('epargne')||ol.includes('fructif'))activeObjs.push('Faire fructifier un capital');if(ol.includes('reorgan'))activeObjs.push('Réorganiser son patrimoine');if(ol.includes('conjoint')||ol.includes('protect'))activeObjs.push('Protéger son conjoint');if(ol.includes('fisc')||ol.includes('impot'))activeObjs.push('Optimiser son IR');});}
+  // Objectifs du RI (mappés via OBJ_TO_COPERNIC)
+  if(ED.objectifs&&ED.objectifs.length){
+    (typeof getCopernicObjs==='function'?getCopernicObjs():[]).forEach(function(co){
+      if(activeObjs.indexOf(co)<0)activeObjs.push(co);
+    });
+  }
   activeObjs=activeObjs.filter(function(v,i,a){return a.indexOf(v)===i;});
   if(!activeObjs.length)activeObjs=['Épargne / capitalisation'];
 
@@ -7992,23 +8003,133 @@ function addVerifCharge(){
   ED.chargesDetail.push({nom:'',montant:0,titulaire:'C1'});
   renderVerifCharges();
 }
+// Liste officielle des objectifs (issue du doc ID Besoins, groupee par famille)
+var OBJ_LIST_RI=[
+  {cat:'PATRIMOINE',objs:[
+    'Se constituer une \u00e9pargne financi\u00e8re',
+    'R\u00e9organiser votre patrimoine',
+    'Optimiser la rentabilit\u00e9 de vos placements financiers',
+    'Se constituer un patrimoine immobilier',
+    'Diversifier votre patrimoine',
+    'Optimiser la rentabilit\u00e9 de votre patrimoine',
+    'Optimiser la rentabilit\u00e9 de votre patrimoine immobilier locatif'
+  ]},
+  {cat:'REVENUS',objs:[
+    'Disposer de revenus ponctuellement',
+    'Compl\u00e9ter vos revenus r\u00e9guli\u00e8rement'
+  ]},
+  {cat:'FISCALIT\u00c9',objs:[
+    'Optimiser la fiscalit\u00e9 de vos revenus',
+    'Optimiser la fiscalit\u00e9 de votre patrimoine (IFI)',
+    'Pr\u00e9parer la transmission de votre entreprise',
+    'Optimiser la fiscalit\u00e9 de la transmission'
+  ]},
+  {cat:'AVENIR',objs:[
+    'Prot\u00e9ger vos proches (pr\u00e9voyances, ...)',
+    'Prot\u00e9ger votre conjoint survivant',
+    'Prot\u00e9ger vos enfants',
+    'Prot\u00e9ger vos proches',
+    'Transmettre votre patrimoine',
+    'Pr\u00e9parer votre retraite',
+    'Accompagner vos enfants',
+    'Se pr\u00e9munir contre les accidents de la vie'
+  ]}
+];
+
+// Mapping label RI officiel -> cle interne Copernic (utilisee par OBJ_SOLUTIONS)
+var OBJ_TO_COPERNIC={
+  'Se constituer une \u00e9pargne financi\u00e8re':'\u00c9pargne / capitalisation',
+  'R\u00e9organiser votre patrimoine':'R\u00e9organiser son patrimoine',
+  'Optimiser la rentabilit\u00e9 de vos placements financiers':'Faire fructifier un capital',
+  'Se constituer un patrimoine immobilier':'Cr\u00e9er un patrimoine immobilier',
+  'Diversifier votre patrimoine':'R\u00e9organiser son patrimoine',
+  'Optimiser la rentabilit\u00e9 de votre patrimoine':'R\u00e9organiser son patrimoine',
+  'Optimiser la rentabilit\u00e9 de votre patrimoine immobilier locatif':'R\u00e9organiser son patrimoine',
+  'Disposer de revenus ponctuellement':'Se cr\u00e9er un compl\u00e9ment de revenus',
+  'Compl\u00e9ter vos revenus r\u00e9guli\u00e8rement':'Se cr\u00e9er un compl\u00e9ment de revenus',
+  'Optimiser la fiscalit\u00e9 de vos revenus':'Optimiser son IR',
+  'Optimiser la fiscalit\u00e9 de votre patrimoine (IFI)':'Optimiser son IR',
+  'Pr\u00e9parer la transmission de votre entreprise':'Optimiser la transmission',
+  'Optimiser la fiscalit\u00e9 de la transmission':'Optimiser la transmission',
+  'Prot\u00e9ger vos proches (pr\u00e9voyances, ...)':'Prot\u00e9ger son conjoint',
+  'Prot\u00e9ger votre conjoint survivant':'Prot\u00e9ger son conjoint',
+  'Prot\u00e9ger vos enfants':'Prot\u00e9ger son conjoint',
+  'Prot\u00e9ger vos proches':'Prot\u00e9ger son conjoint',
+  'Transmettre votre patrimoine':'Optimiser la transmission',
+  'Pr\u00e9parer votre retraite':'Pr\u00e9parer sa retraite',
+  'Accompagner vos enfants':'Prot\u00e9ger son conjoint',
+  'Se pr\u00e9munir contre les accidents de la vie':'Prot\u00e9ger son conjoint'
+};
+
+// Migration : anciens labels (Copernic) -> nouveaux labels RI
+var OLD_TO_RI={
+  'Pr\u00e9parer sa retraite':'Pr\u00e9parer votre retraite',
+  'Optimiser son IR':'Optimiser la fiscalit\u00e9 de vos revenus',
+  'Optimiser son IFI':'Optimiser la fiscalit\u00e9 de votre patrimoine (IFI)',
+  'Faire fructifier un capital':'Optimiser la rentabilit\u00e9 de vos placements financiers',
+  'Se cr\u00e9er un compl\u00e9ment de revenus':'Compl\u00e9ter vos revenus r\u00e9guli\u00e8rement',
+  'Prot\u00e9ger son conjoint':'Prot\u00e9ger votre conjoint survivant',
+  'R\u00e9organiser son patrimoine':'R\u00e9organiser votre patrimoine',
+  'Cr\u00e9er un patrimoine immobilier':'Se constituer un patrimoine immobilier',
+  'Optimiser la transmission':'Transmettre votre patrimoine',
+  '\u00c9pargne / capitalisation':'Se constituer une \u00e9pargne financi\u00e8re'
+};
+
+// Map objectifs RI -> liste Copernic (utilise pour la matrice)
+function getCopernicObjs(){
+  var list=[];
+  (ED.objectifs||[]).forEach(function(o){
+    var mapped=OBJ_TO_COPERNIC[o]||o; // retour identique si deja cle Copernic
+    if(list.indexOf(mapped)<0)list.push(mapped);
+  });
+  return list;
+}
+
 function renderVerifObjectifs(){
   var el=document.getElementById('vObjectifsBlock');if(!el)return;
-  var allObjs=['Faire fructifier un capital','Pr\u00e9parer sa retraite','Optimiser son IR','Se cr\u00e9er un compl\u00e9ment de revenus','Prot\u00e9ger son conjoint','R\u00e9organiser son patrimoine','Cr\u00e9er un patrimoine immobilier','Optimiser la transmission','Investir via le financement','\u00c9pargne / capitalisation'];
-  // Mapper les objectifs du RI vers les objectifs Copernic
-  var objMap={'se constituer un patrimoine immobilier':'Cr\u00e9er un patrimoine immobilier','pr\u00e9parer votre retraite':'Pr\u00e9parer sa retraite','optimiser la fiscalit\u00e9 de vos revenus':'Optimiser son IR','optimiser la rentabilit\u00e9 de vos placements financiers':'Faire fructifier un capital','optimiser la rentabilit\u00e9 de votre patrimoine':'R\u00e9organiser son patrimoine','optimiser la rentabilit\u00e9 de votre patrimoine immobilier locatif':'R\u00e9organiser son patrimoine','compl\u00e9ter vos revenus r\u00e9guli\u00e8rement':'Se cr\u00e9er un compl\u00e9ment de revenus','disposer de revenus ponctuellement':'Se cr\u00e9er un compl\u00e9ment de revenus','transmettre votre patrimoine':'Optimiser la transmission','optimiser la fiscalit\u00e9 de la transmission':'Optimiser la transmission','prot\u00e9ger votre conjoint survivant':'Prot\u00e9ger son conjoint','prot\u00e9ger vos proches':'Prot\u00e9ger son conjoint','se constituer une \u00e9pargne financi\u00e8re':'\u00c9pargne / capitalisation','diversifier votre patrimoine':'R\u00e9organiser son patrimoine','accompagner vos enfants':'Prot\u00e9ger son conjoint','se pr\u00e9munir contre les accidents de la vie':'Prot\u00e9ger son conjoint','r\u00e9organiser votre patrimoine':'R\u00e9organiser son patrimoine'};
-  // Mapper ED.objectifs en conservant l'ordre d'import
-  var mapped=[];
-  (ED.objectifs||[]).forEach(function(o){var m=objMap[o.toLowerCase()]||o;if(mapped.indexOf(m)<0)mapped.push(m);});
-  // Trier : d'abord les objectifs importes (dans leur ordre), puis le reste
-  var sorted=mapped.slice();
-  allObjs.forEach(function(o){if(sorted.indexOf(o)<0)sorted.push(o);});
-  var h='';
-  sorted.forEach(function(o){
-    var ck=mapped.indexOf(o)>=0;
-    h+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="vObjCheck" value="'+o+'" '+(ck?'checked':'')+' style="accent-color:var(--orange)">'+o+'</label>';
+  // Migrer anciens labels vers nouveaux labels RI
+  ED.objectifs=(ED.objectifs||[]).map(function(o){return OLD_TO_RI[o]||o;});
+  if(!ED.objectifsPriority)ED.objectifsPriority={};
+  // Migrer cles priorite anciennes -> nouvelles
+  var newPri={};
+  Object.keys(ED.objectifsPriority).forEach(function(k){
+    var nk=OLD_TO_RI[k]||k;
+    newPri[nk]=ED.objectifsPriority[k];
   });
+  ED.objectifsPriority=newPri;
+  var checkedSet={};
+  (ED.objectifs||[]).forEach(function(o){checkedSet[o]=true;});
+
+  var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  h+='<thead><tr style="background:var(--gris-l);color:var(--gris);font-size:10px;text-transform:uppercase;letter-spacing:0.08em">';
+  h+='<th style="text-align:left;padding:6px 10px;font-weight:700">Objectif</th>';
+  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 I1</th>';
+  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 I2</th>';
+  h+='</tr></thead><tbody>';
+  OBJ_LIST_RI.forEach(function(grp){
+    h+='<tr><td colspan="3" style="padding:8px 10px;background:rgba(212,98,42,0.08);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange)">'+grp.cat+'</td></tr>';
+    grp.objs.forEach(function(obj){
+      var ck=!!checkedSet[obj];
+      var pri=ED.objectifsPriority[obj]||{};
+      var safeId=obj.replace(/[^a-zA-Z0-9]/g,'_').substring(0,50);
+      var objEsc=obj.replace(/"/g,'&quot;').replace(/'/g,"\\'");
+      h+='<tr style="border-bottom:1px solid var(--bord)">';
+      h+='<td style="padding:6px 10px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px"><input type="checkbox" class="vObjCheck" data-obj="'+obj.replace(/"/g,'&quot;')+'" value="'+obj.replace(/"/g,'&quot;')+'" '+(ck?'checked':'')+' style="accent-color:var(--orange)">'+obj+'</label></td>';
+      h+='<td style="text-align:center;padding:6px"><input type="number" min="1" max="3" id="vObjPri1_'+safeId+'" value="'+(pri.i1||'')+'" placeholder="-" onchange="autoCheckObjPri(this,\''+objEsc+'\')" style="width:50px;padding:3px;border:1.5px solid var(--bord);border-radius:5px;text-align:center;font-size:12px;font-family:var(--sans)"></td>';
+      h+='<td style="text-align:center;padding:6px"><input type="number" min="1" max="3" id="vObjPri2_'+safeId+'" value="'+(pri.i2||'')+'" placeholder="-" onchange="autoCheckObjPri(this,\''+objEsc+'\')" style="width:50px;padding:3px;border:1.5px solid var(--bord);border-radius:5px;text-align:center;font-size:12px;font-family:var(--sans)"></td>';
+      h+='</tr>';
+    });
+  });
+  h+='</tbody></table>';
   el.innerHTML=h;
+}
+
+// Auto-coche l'objectif si une priorite est saisie
+function autoCheckObjPri(input,obj){
+  if(input.value){
+    var cb=document.querySelector('.vObjCheck[data-obj="'+obj.replace(/"/g,'&quot;')+'"]');
+    if(cb&&!cb.checked)cb.checked=true;
+  }
 }
 function appliquerVerification(){
   try{
@@ -8116,9 +8237,27 @@ function appliquerVerification(){
     // Épargne
     ED.epMens=n('vEpMens1');ED.epMens2=n('vEpMens2');
     ED.epPrec=n('vEpPrec1')+(n('vEpPrec2')||0);
-    // Objectifs
+    // Objectifs + priorités I1/I2 par objectif
     ED.objectifs=[];
-    document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){ED.objectifs.push(cb.value);});
+    ED.objectifsPriority={};
+    document.querySelectorAll('.vObjCheck:checked').forEach(function(cb){
+      var obj=cb.value;
+      ED.objectifs.push(obj);
+      var safeId=obj.replace(/[^a-zA-Z0-9]/g,'_').substring(0,50);
+      var p1El=document.getElementById('vObjPri1_'+safeId);
+      var p2El=document.getElementById('vObjPri2_'+safeId);
+      var pri={};
+      if(p1El&&p1El.value){var v1=parseInt(p1El.value);if(v1>=1&&v1<=3)pri.i1=v1;}
+      if(p2El&&p2El.value){var v2=parseInt(p2El.value);if(v2>=1&&v2<=3)pri.i2=v2;}
+      if(Object.keys(pri).length)ED.objectifsPriority[obj]=pri;
+    });
+    // Tri par priorité min (plus petit = plus prioritaire, puis non-prioritaires)
+    ED.objectifs.sort(function(a,b){
+      var pa=ED.objectifsPriority[a]||{},pb=ED.objectifsPriority[b]||{};
+      var minA=Math.min(pa.i1||99,pa.i2||99);
+      var minB=Math.min(pb.i1||99,pb.i2||99);
+      return minA-minB;
+    });
     // Épargne
     var revM=revMens();
     if(!ED.epMens)ED.epMens=Math.max(0,Math.round((ED.revenus.sal1||ED.revenus.c1||0)/12*0.20));
