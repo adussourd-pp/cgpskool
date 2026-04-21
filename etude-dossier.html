@@ -647,12 +647,23 @@ select.span2{grid-column:span 2}
 
         <!-- Déclarant 1 -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">D&#233;clarant 1</div>
-        <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1.4fr;gap:8px;margin-bottom:8px">
           <div><label style="font-size:10px;color:var(--gris)">Civ.</label><select class="fi" id="vC1Civ"><option>M.</option><option>Mme</option></select></div>
           <div><label style="font-size:10px;color:var(--gris)">Pr&#233;nom</label><input class="fi" id="vC1Prenom"></div>
           <div><label style="font-size:10px;color:var(--gris)">Nom</label><input class="fi" id="vC1Nom"></div>
           <div><label style="font-size:10px;color:var(--gris)">Date naissance</label><input class="fi" id="vC1Dob" placeholder="JJ/MM/AAAA"></div>
-          <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC1CSP"><option>Sal. cadre</option><option>Sal. cadre sup.</option><option>Sal. non cadre</option><option>Fonctionnaire</option><option>TNS lib.</option><option>TNS comer.</option></select></div>
+          <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC1CSP" onchange="toggleAncienneCSP(1)"><option>Cadre ou profession intellectuelle sup&#233;rieure</option><option>Cadre dirigeant / cadre sup&#233;rieur</option><option>Profession interm&#233;diaire</option><option>Employ&#233;</option><option>Ouvrier</option><option>Fonctionnaire (titulaire ou contractuel)</option><option>Profession lib&#233;rale (TNS)</option><option>Artisan, commer&#231;ant, chef d'entreprise</option><option>Agriculteur exploitant</option><option>Retrait&#233;</option><option>Sans activit&#233; professionnelle</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">Nom de naissance</label><input class="fi" id="vC1NomNaiss"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Lieu de naissance</label><input class="fi" id="vC1LieuNaiss"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Nationalit&#233;</label><input class="fi" id="vC1Nationalite" placeholder="fran&#231;aise"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Pays de r&#233;sidence</label><input class="fi" id="vC1PaysResidence" placeholder="France"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">T&#233;l&#233;phone</label><input class="fi" id="vC1Tel"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Email</label><input class="fi" type="email" id="vC1Email"></div>
+          <div id="vC1CspAncienneWrap" style="display:none"><label style="font-size:10px;color:var(--gris)">Ancienne cat&#233;gorie (si retrait&#233;/sans activit&#233;)</label><select class="fi" id="vC1CspAncienne"><option value="">&#8212;</option><option>Cadre ou profession intellectuelle sup&#233;rieure</option><option>Cadre dirigeant / cadre sup&#233;rieur</option><option>Profession interm&#233;diaire</option><option>Employ&#233;</option><option>Ouvrier</option><option>Fonctionnaire (titulaire ou contractuel)</option><option>Profession lib&#233;rale (TNS)</option><option>Artisan, commer&#231;ant, chef d'entreprise</option><option>Agriculteur exploitant</option><option>Retrait&#233;</option><option>Sans activit&#233; professionnelle</option></select></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">Profession</label><input class="fi" id="vC1Prof"></div>
@@ -664,12 +675,23 @@ select.span2{grid-column:span 2}
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--noir);margin-bottom:10px;cursor:pointer"><input type="checkbox" id="vCouple" onchange="document.getElementById('vC2Block').style.display=this.checked?'':'none'" style="accent-color:var(--orange)">Couple (D&#233;clarant 2)</label>
         <div id="vC2Block" style="display:none">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">D&#233;clarant 2</div>
-          <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div style="display:grid;grid-template-columns:0.5fr 1fr 1fr 1fr 1.4fr;gap:8px;margin-bottom:8px">
             <div><label style="font-size:10px;color:var(--gris)">Civ.</label><select class="fi" id="vC2Civ"><option>Mme</option><option>M.</option></select></div>
             <div><label style="font-size:10px;color:var(--gris)">Pr&#233;nom</label><input class="fi" id="vC2Prenom"></div>
             <div><label style="font-size:10px;color:var(--gris)">Nom</label><input class="fi" id="vC2Nom"></div>
             <div><label style="font-size:10px;color:var(--gris)">Date naissance</label><input class="fi" id="vC2Dob" placeholder="JJ/MM/AAAA"></div>
-            <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC2CSP"><option>Sal. cadre</option><option>Sal. cadre sup.</option><option>Sal. non cadre</option><option>Fonctionnaire</option><option>TNS lib.</option><option>TNS comer.</option></select></div>
+            <div><label style="font-size:10px;color:var(--gris)">CSP</label><select class="fi" id="vC2CSP" onchange="toggleAncienneCSP(2)"><option>Cadre ou profession intellectuelle sup&#233;rieure</option><option>Cadre dirigeant / cadre sup&#233;rieur</option><option>Profession interm&#233;diaire</option><option>Employ&#233;</option><option>Ouvrier</option><option>Fonctionnaire (titulaire ou contractuel)</option><option>Profession lib&#233;rale (TNS)</option><option>Artisan, commer&#231;ant, chef d'entreprise</option><option>Agriculteur exploitant</option><option>Retrait&#233;</option><option>Sans activit&#233; professionnelle</option></select></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><label style="font-size:10px;color:var(--gris)">Nom de naissance</label><input class="fi" id="vC2NomNaiss"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Lieu de naissance</label><input class="fi" id="vC2LieuNaiss"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Nationalit&#233;</label><input class="fi" id="vC2Nationalite" placeholder="fran&#231;aise"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Pays de r&#233;sidence</label><input class="fi" id="vC2PaysResidence" placeholder="France"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><label style="font-size:10px;color:var(--gris)">T&#233;l&#233;phone</label><input class="fi" id="vC2Tel"></div>
+            <div><label style="font-size:10px;color:var(--gris)">Email</label><input class="fi" type="email" id="vC2Email"></div>
+            <div id="vC2CspAncienneWrap" style="display:none"><label style="font-size:10px;color:var(--gris)">Ancienne cat&#233;gorie (si retrait&#233;/sans activit&#233;)</label><select class="fi" id="vC2CspAncienne"><option value="">&#8212;</option><option>Cadre ou profession intellectuelle sup&#233;rieure</option><option>Cadre dirigeant / cadre sup&#233;rieur</option><option>Profession interm&#233;diaire</option><option>Employ&#233;</option><option>Ouvrier</option><option>Fonctionnaire (titulaire ou contractuel)</option><option>Profession lib&#233;rale (TNS)</option><option>Artisan, commer&#231;ant, chef d'entreprise</option><option>Agriculteur exploitant</option><option>Retrait&#233;</option><option>Sans activit&#233; professionnelle</option></select></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
             <div><label style="font-size:10px;color:var(--gris)">Profession</label><input class="fi" id="vC2Prof"></div>
@@ -680,11 +702,14 @@ select.span2{grid-column:span 2}
 
         <!-- Situation -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">Situation</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 0.5fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 0.5fr;gap:8px;margin-bottom:8px">
           <div id="vRegimeWrap"><label style="font-size:10px;color:var(--gris)">R&#233;gime</label><select class="fi" id="vRegime"><option value="">&#8212;</option><option>Communaut&#233; r&#233;duite aux acqu&#234;ts</option><option>S&#233;paration de biens</option><option>Communaut&#233; universelle</option><option>Participation aux acqu&#234;ts</option></select></div>
           <div><label style="font-size:10px;color:var(--gris)">Sit. matrimoniale</label><select class="fi" id="vSitmat" onchange="toggleRegimeField()"><option>Mari&#233;(e)</option><option>Pacs&#233;(e)</option><option>C&#233;libataire</option><option>Divorc&#233;(e)</option><option>Veuf(ve)</option><option>Concubinage</option></select></div>
+          <div id="vDateMariageWrap"><label style="font-size:10px;color:var(--gris)">Date mariage / PACS</label><input class="fi" id="vDateMariage" placeholder="JJ/MM/AAAA"></div>
           <div><label style="font-size:10px;color:var(--gris)">Logement</label><select class="fi" id="vLogement"><option>Propri&#233;taire</option><option>Locataire</option><option>H&#233;berg&#233;</option></select></div>
           <div><label style="font-size:10px;color:var(--gris)">Enfants</label><input class="fi" type="number" id="vNbEnfants" min="0" value="0" oninput="renderVerifEnfants()"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">Adresse</label><input class="fi" id="vAdresse"></div>
         </div>
 
@@ -739,7 +764,11 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">TMI (%)</label><input class="fi" type="number" id="vFiscTMI"></div>
           <div><label style="font-size:10px;color:var(--gris)">IR net</label><input class="fi" type="number" id="vFiscIRNet"></div>
           <div><label style="font-size:10px;color:var(--gris)">Pr&#233;l&#232;vements sociaux</label><input class="fi" type="number" id="vFiscPS"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo</label><input class="fi" type="number" id="vFiscPER"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (D1)</label><input class="fi" type="number" id="vFiscPER"></div>
+        </div>
+        <div id="vFiscPER2Wrap" style="display:none;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (D2)</label><input class="fi" type="number" id="vFiscPER2"></div>
+          <div></div><div></div><div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">IR soumis au bar&#232;me</label><input class="fi" type="number" id="vFiscIRBareme"></div>
@@ -1651,20 +1680,20 @@ var ESP_VIE = {
 
 // Mapping labels RI -> cles RET_TAUX
 var CSP_MAP = {
+  // Cles directes (valeurs internes RET_TAUX)
   'Sal. cadre':                'Sal. cadre',
   'Sal. cadre sup.':           'Sal. cadre sup.',
   'Sal. non cadre':            'Sal. non cadre',
   'Fonctionnaire':             'Fonctionnaire',
   'TNS lib.':                  'TNS lib.',
   'TNS comer.':                'TNS comer.',
+  // Synonymes historiques
   'Salarie cadre':             'Sal. cadre',
   'Salarie non-cadre':         'Sal. non cadre',
-  'Salarie cadre':             'Sal. cadre',
   "Chef d'entreprise":         'TNS comer.',
   'Independant / TNS':         'TNS lib.',
   'TNS Prof. liberale':        'TNS lib.',
   'TNS Commercant':            'TNS comer.',
-  'Retraite':                  'Sal. non cadre',
   'Autres independants':       'TNS comer.',
   'Autres ind\u00e9pendants':  'TNS comer.',
   'Salari\u00e9 cadre':        'Sal. cadre',
@@ -1672,6 +1701,33 @@ var CSP_MAP = {
   'Salari\u00e9 cadre sup.':   'Sal. cadre sup.',
   'TNS Prof. lib\u00e9rale':   'TNS lib.',
   'TNS Commer\u00e7ant':       'TNS comer.',
+  // Nouveau RI 2026 - dropdown Word aligne INSEE PCS + Fonctionnaire
+  'Cadre ou profession intellectuelle sup\u00e9rieure': 'Sal. cadre',
+  'Cadre dirigeant / cadre sup\u00e9rieur':             'Sal. cadre sup.',
+  'Cadre dirigeant':                                    'Sal. cadre sup.',
+  'Cadre sup\u00e9rieur':                               'Sal. cadre sup.',
+  'Profession interm\u00e9diaire':                      'Sal. non cadre',
+  'Professions interm\u00e9diaires':                    'Sal. non cadre',
+  'Employ\u00e9':                                       'Sal. non cadre',
+  'Employ\u00e9s':                                      'Sal. non cadre',
+  'Ouvrier':                                            'Sal. non cadre',
+  'Ouvriers':                                           'Sal. non cadre',
+  'Fonctionnaire (titulaire ou contractuel)':           'Fonctionnaire',
+  'Fonctionnaires':                                     'Fonctionnaire',
+  'Profession lib\u00e9rale (TNS)':                     'TNS lib.',
+  'Professions lib\u00e9rales':                         'TNS lib.',
+  'Artisan, commer\u00e7ant, chef d\'entreprise':       'TNS comer.',
+  'Artisans, commer\u00e7ants':                         'TNS comer.',
+  'Agriculteur exploitant':                             'TNS lib.',
+  'Agriculteurs exploitants':                           'TNS lib.',
+  // Retraite / Sans activite - tag conserve dans ED.sitpro, fallback graphe via cles Retraite/Sans activite ci-dessous
+  'Retrait\u00e9':                                      'Retraite',
+  'Retrait\u00e9s':                                     'Retraite',
+  'Sans activit\u00e9 professionnelle':                 'Sans activite',
+  'Sans activit\u00e9':                                 'Sans activite',
+  // Fallback pour graphe quand sitpro = Retraite/Sans activite et pas d'ancienne categorie saisie
+  'Retraite':                                           'Sal. non cadre',
+  'Sans activite':                                      'Sal. non cadre',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2755,6 +2811,8 @@ function parseTextRI(txt){
   var hasTabs  = txt.indexOf('\t') >= 0;
   var hasPipes = /^\s*\|/m.test(txt);
   var isMammoth = !hasTabs && hasPipes;
+  // Format C : nouveau RI 2026 (cases ☒/☐ + Investisseur 1/2)
+  var isFormatC = /[☒☐]/.test(txt) && /Investisseur\s+[12]/i.test(txt);
 
   // ── Helpers communs ─────────────────────────────────────────────
   function pEur(s){
@@ -2792,7 +2850,8 @@ function parseTextRI(txt){
   // ── Découper en sections 01→05 ─────────────────────────────────
   var full = txt;
   function getSection(n){
-    var re = new RegExp('(?:^|\\n)0'+n+'\\s*\\n([\\s\\S]*?)(?=\\n0'+(n+1)+'\\s*\\n|$)');
+    // Match "0N\n" (ancien format) OU "0N Titre quelconque\n" (nouveau RI 2026)
+    var re = new RegExp('(?:^|\\n)0'+n+'(?:\\s+[^\\n]*)?\\n([\\s\\S]*?)(?=\\n0'+(n+1)+'(?:\\s+[^\\n]*)?\\n|$)');
     var m  = full.match(re);
     return m ? m[1] : '';
   }
@@ -2800,408 +2859,289 @@ function parseTextRI(txt){
       s04=getSection(4), s05=getSection(5);
 
   // ══════════════════════════════════════════════════════════════════
-  // FORMAT B — MAMMOTH (pipes)
+  // FORMAT C — NOUVEAU RI 2026 (cases ☒/☐ + Investisseur 1/2)
   // ══════════════════════════════════════════════════════════════════
-  if(isMammoth){
+  if(isFormatC){
 
-    // ── Helper : parser une ligne pipe → tableau de cellules ──────
-    function pipeRow(line){
-      if(line.trim().charAt(0)!=='|') return null;
-      return line.split('|').map(function(c){return c.trim();}).filter(function(c,i,a){
-        return i>0 && i<a.length-1; // supprimer les cellules vides de début/fin
-      });
+    // Mapping titulaire texte -> code interne
+    function mapTit(s){
+      s=(s||'').toLowerCase().trim();
+      if(/investisseur\s*1|d[eé]clarant\s*1|\bc1\b/.test(s))return 'C1';
+      if(/investisseur\s*2|d[eé]clarant\s*2|\bc2\b/.test(s))return 'C2';
+      if(/commun|couple|les\s*deux/.test(s))return 'Commun';
+      return '';
     }
 
-    // ── Helper : lire les tableaux pipe d'une section ─────────────
-    function parsePipeTable(section){
-      var rows = [];
-      var lines = section.split('\n');
+    // Getter champ 2 colonnes avec debordement dropdown sur ligne suivante
+    // Placeholders a neutraliser (apparaissent si dropdown/champ non rempli)
+    var PLACEHOLDERS=['Choisissez un élément.','JJ/MM/AAAA','MM/AAAA','Oui/Non','Prénom, Nom','_______________'];
+    function isPlaceholder(s){return PLACEHOLDERS.indexOf(s)>=0;}
+    // Sections et sous-titres connus — a ne pas prendre pour une valeur de dropdown
+    var SECTION_HEADERS=/^(Situation\s+(personnelle|familiale|professionnelle|de\s+famille)|Identit[ée]|Actifs|Passifs|Immobilier(\s+&\s+Foncier)?|Placements(\s+\(moyen\s+terme\))?|Liquidit[ée]s?(\s+&\s+livrets)?(\s+\(court\s+terme\))?|Retraite(\s+et\s+)?|Revenus(\s+net.*)?|Charges(\s+annuelles)?|Coordonn[ée]es|Profession\s+actuelle|Autre\s*:.*)$/i;
+    function getField(section,label){
+      var lines=section.split('\n');
+      // Require tab (or end of line) after label — not just whitespace — to avoid matching "Profession actuelle" when looking for "Profession"
+      var labelRe=new RegExp('^'+label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\t|$)','i');
       for(var i=0;i<lines.length;i++){
-        var r = pipeRow(lines[i]);
-        if(r && r.length >= 2) rows.push(r);
-      }
-      return rows;
-    }
-
-    // ── Helper : champs clé/valeur (label sur une ligne, valeur sur la suivante) ──
-    function kvMap(section){
-      var map = {};
-      var lines = section.split('\n').map(function(l){return l.trim();});
-      for(var i=0;i<lines.length-1;i++){
-        var label = lines[i].replace(/\s*:\s*\*?\s*$/,'').replace(/^\|/,'').trim().toLowerCase();
-        var val   = lines[i+1].trim();
-        // La valeur ne doit pas ressembler à un label (pas de ":" ni de "*")
-        if(label.length>2 && label.length<80 && val.length>0 && val.length<120
-           && !val.includes(':') && !val.startsWith('|')){
-          map[label] = val;
-          i++; // skip la valeur
+        var line=lines[i];
+        if(!labelRe.test(line))continue;
+        var parts=line.split('\t').map(function(x){return x.trim();});
+        parts.shift(); // label
+        var v1=parts.shift()||'';
+        var v2=parts.shift()||'';
+        // Si v2 vide : regarder la ligne suivante (dropdown déborde)
+        if(!v2&&i+1<lines.length){
+          var nxt=lines[i+1].trim();
+          if(nxt&&!isPlaceholder(nxt)&&nxt.indexOf('\t')<0&&!SECTION_HEADERS.test(nxt)){
+            v2=nxt;
+          }
         }
+        if(isPlaceholder(v1))v1='';
+        if(isPlaceholder(v2))v2='';
+        return {v1:v1,v2:v2};
       }
-      return map;
+      return {v1:'',v2:''};
     }
 
-    // ══ SECTION 01 ══
-    var kv01 = kvMap(s01);
-    // Also try pipe-table parsing for tabular identity data (couples have 2+ columns)
-    var tbl01 = parsePipeTable(s01);
-    var pt01 = {};
-    tbl01.forEach(function(cols){
-      var key = cols[0].replace(/[\s\*:]+$/,'').toLowerCase().trim();
-      if(key) pt01[key] = {v1: cols[1]||'', v2: cols[2]||''};
+    // Detection couple : presence de donnees dans colonne Investisseur 2
+    var isCoupleC=false;
+    s01.split('\n').forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var p=line.split('\t').map(function(x){return x.trim();});
+      if(p.length>=3&&p[2]&&p[2]!==''&&p[2]!=='Choisissez un élément.'&&p[2]!==p[1])isCoupleC=true;
     });
+    // Fallback : recherche champ Prénom, Nom pour confirmer
+    var pnCheck=getField(s01,'Prénom, Nom');
+    if(pnCheck.v2&&pnCheck.v2.length>2)isCoupleC=true;
+    ED.type=isCoupleC?'couple':'seul';
 
-    // Couple detection
-    var isCouple = /c2\.|madame.*monsieur|monsieur.*madame/i.test(s01);
-    if(!isCouple && s01.indexOf('Déclarant 2')>=0) isCouple = true;
-    if(!isCouple){
-      tbl01.forEach(function(cols){
-        if(cols.length>=3 && cols[1] && cols[1].trim() && cols[2] && cols[2].trim()
-           && cols[2].trim()!==cols[1].trim()) isCouple=true;
-      });
+    // Identite
+    var civ=getField(s01,'Civilité');
+    if(civ.v1)ED.c1.civ=/madame|mme/i.test(civ.v1)?'Mme':'M.';
+    if(isCoupleC&&civ.v2)ED.c2.civ=/madame|mme/i.test(civ.v2)?'Mme':'M.';
+
+    var pn=getField(s01,'Prénom, Nom');
+    if(pn.v1){var n1=parseNom(pn.v1);ED.c1.prenom=n1.prenom;ED.c1.nom=n1.nom;}
+    if(isCoupleC&&pn.v2){var n2=parseNom(pn.v2);ED.c2.prenom=n2.prenom;ED.c2.nom=n2.nom;}
+
+    var nn=getField(s01,'Nom de naissance');
+    if(nn.v1)ED.c1.nomNaissance=nn.v1;
+    if(isCoupleC&&nn.v2)ED.c2.nomNaissance=nn.v2;
+
+    var dln=getField(s01,'Date et lieu de naissance');
+    function parseDobLieu(s){
+      var m=s.match(/(\d{1,2}\/\d{1,2}\/\d{4})\s*,?\s*(.*)$/);
+      if(m)return {dob:m[1],lieu:(m[2]||'').trim()};
+      return {dob:parseDob(s)||'',lieu:''};
     }
-    ED.type = isCouple ? 'sep' : 'seul';
+    if(dln.v1){var dl1=parseDobLieu(dln.v1);ED.c1.dob=dl1.dob;if(dl1.lieu)ED.c1.lieuNaissance=dl1.lieu;}
+    if(isCoupleC&&dln.v2){var dl2=parseDobLieu(dln.v2);ED.c2.dob=dl2.dob;if(dl2.lieu)ED.c2.lieuNaissance=dl2.lieu;}
 
-    // Nom/prénom — pipe-table first, kvMap fallback
-    var nomPt = pt01['nom / prénom'] || pt01['nom / prenom'] || pt01['nom/prénom'];
-    if(nomPt && nomPt.v1){
-      var n1 = parseNom(nomPt.v1); ED.c1.prenom = n1.prenom; ED.c1.nom = n1.nom;
-      if(isCouple && nomPt.v2){ var n2 = parseNom(nomPt.v2); ED.c2.prenom = n2.prenom; ED.c2.nom = n2.nom; }
-    } else {
-      var nomVal = kv01['nom / prénom'] || kv01['nom / prenom'] || kv01['nom/prénom'] || '';
-      if(!nomVal){
-        var nmMatch = s01.match(/nom \/ pr[eé]nom\s*[:\*\s]+\n([^\n]+)/i);
-        if(nmMatch) nomVal = nmMatch[1].trim();
-      }
-      if(nomVal){ var n1b = parseNom(nomVal); ED.c1.prenom = n1b.prenom; ED.c1.nom = n1b.nom; }
+    var nat=getField(s01,'Nationalité');
+    if(nat.v1)ED.c1.nationalite=nat.v1.toLowerCase();
+    if(isCoupleC&&nat.v2)ED.c2.nationalite=nat.v2.toLowerCase();
+
+    var adr=getField(s01,'Adresse postale');
+    if(adr.v1)ED.adresse=adr.v1;
+
+    var pays=getField(s01,'Pays de résidence');
+    if(pays.v1)ED.c1.paysResidence=pays.v1;
+    if(isCoupleC&&pays.v2)ED.c2.paysResidence=pays.v2;
+
+    var log=getField(s01,'Logement');
+    if(log.v1)ED.logement=log.v1;
+
+    var tel=getField(s01,'Téléphone');
+    function dedupTel(t){
+      if(!t)return '';
+      t=t.trim();
+      // Cas '+33 X ... +33 X ...' : si 2 patterns phone identiques
+      var m=t.match(/^(\+?\d[\d\s.-]*\d)\s+(\+?\d[\d\s.-]*\d)$/);
+      if(m&&m[1].replace(/\s/g,'')===m[2].replace(/\s/g,''))return m[1];
+      return t;
     }
+    if(tel.v1)ED.c1.tel=dedupTel(tel.v1);
+    if(isCoupleC&&tel.v2)ED.c2.tel=dedupTel(tel.v2);
 
-    // Civilité
-    var civPt = pt01['civilité'] || pt01['civilite'];
-    if(civPt && civPt.v1){
-      ED.c1.civ = /madame|mme/i.test(civPt.v1) ? 'Mme' : 'M.';
-      if(isCouple && civPt.v2) ED.c2.civ = /madame|mme/i.test(civPt.v2) ? 'Mme' : 'M.';
-    } else {
-      var civVal = kv01['civilité'] || kv01['civilite'] || '';
-      if(civVal) ED.c1.civ = /madame|mme/i.test(civVal) ? 'Mme' : 'M.';
-    }
+    var em=getField(s01,'Email');
+    if(em.v1)ED.c1.email=em.v1;
+    if(isCoupleC&&em.v2)ED.c2.email=em.v2;
 
-    // Date de naissance
-    var dobPt = pt01['né(e) le'] || pt01['ne(e) le'] || pt01['né le'];
-    if(dobPt && dobPt.v1){
-      ED.c1.dob = parseDob(dobPt.v1);
-      if(isCouple && dobPt.v2) ED.c2.dob = parseDob(dobPt.v2);
-    } else {
-      var dobVal = kv01['né(e) le'] || kv01['ne(e) le'] || kv01['né le'] || '';
-      if(dobVal) ED.c1.dob = parseDob(dobVal);
-    }
+    var sit=getField(s01,'Situation');
+    if(sit.v1)ED.sitmat=sit.v1;
 
-    // Situation matrimoniale
-    var sitPt = pt01['situation'];
-    var sitVal = (sitPt ? sitPt.v1 : '') || kv01['situation'] || '';
-    if(sitVal) ED.sitmat = sitVal;
+    var dmar=getField(s01,'Date (mariage, PACS, divorce)');
+    if(dmar.v1&&dmar.v1!=='JJ/MM/AAAA')ED.dateMariage=parseDob(dmar.v1)||dmar.v1;
 
-    // Regime matrimonial / Convention
-    var convPt = pt01['regime/ convention'] || pt01['regime / convention'] || pt01['regime'] || pt01['convention'];
-    var convVal = (convPt ? convPt.v1 : '') || kv01['regime/ convention'] || kv01['regime'] || '';
-    if(convVal){
-      convVal = convVal.replace(/R.gime matrimonial\s*:\s*/i,'').replace(/R.gime\s*:\s*/i,'').trim();
-      if(convVal) ED.convention = convVal;
-    }
+    var reg=getField(s01,'Régime / Convention');
+    if(reg.v1)ED.convention=reg.v1;
 
-    // Logement
-    var logPt = pt01['logement'];
-    var logVal = (logPt ? logPt.v1 : '') || kv01['logement'] || '';
-    if(logVal) ED.logement = logVal;
+    // Situation pro
+    var csp=getField(s01,'Catégorie socio-professionnelle');
+    if(csp.v1)ED.c1.sitpro=CSP_MAP[csp.v1]?csp.v1:mapCSP(csp.v1);
+    if(isCoupleC&&csp.v2)ED.c2.sitpro=CSP_MAP[csp.v2]?csp.v2:mapCSP(csp.v2);
 
-    // Adresse
-    var adrPt = pt01['adresse'] || pt01['adresse de résidence'] || pt01['adresse residence'];
-    var adrVal = (adrPt ? adrPt.v1 : '') || kv01['adresse'] || kv01['adresse de résidence'] || '';
-    if(adrVal) ED.adresse = adrVal;
+    var prof=getField(s01,'Profession');
+    if(prof.v1)ED.c1.profession=prof.v1;
+    if(isCoupleC&&prof.v2)ED.c2.profession=prof.v2;
 
-    // CSP
-    var cspPt = pt01['catégorie socio-professionnelle'] || pt01['categorie socio-professionnelle'] || pt01['catégorie socio'];
-    if(cspPt && cspPt.v1){
-      ED.c1.sitpro = mapCSP(cspPt.v1);
-      if(isCouple && cspPt.v2) ED.c2.sitpro = mapCSP(cspPt.v2);
-    } else {
-      var cspVal = kv01['catégorie socio-professionnelle'] || kv01['categorie socio-professionnelle']
-                 || kv01['catégorie socio'] || '';
-      if(cspVal){ ED.c1.sitpro = mapCSP(cspVal); }
-    }
+    var soc=getField(s01,'Nom de la société');
+    if(soc.v1)ED.c1.societe=soc.v1;
+    if(isCoupleC&&soc.v2)ED.c2.societe=soc.v2;
 
-    // Profession
-    var profPt=pt01['profession']||pt01['activit\u00e9 professionnelle']||pt01['activite professionnelle'];
-    if(profPt&&profPt.v1){ED.c1.profession=profPt.v1;if(isCouple&&profPt.v2)ED.c2.profession=profPt.v2;}
-    else{var profVal=kv01['profession']||kv01['activit\u00e9 professionnelle']||'';if(profVal)ED.c1.profession=profVal;}
-    // Soci\u00e9t\u00e9 / Employeur — variantes \u00e9largies
-    var socKeys=['soci\u00e9t\u00e9','societe','employeur','entreprise','raison sociale','nom de l\'entreprise','nom de l\'employeur','nom soci\u00e9t\u00e9','nom societe','nom de la soci\u00e9t\u00e9','nom de la societe'];
-    var socPt=null;
-    for(var _i=0;_i<socKeys.length;_i++){if(pt01[socKeys[_i]]){socPt=pt01[socKeys[_i]];break;}}
-    if(socPt&&socPt.v1){ED.c1.societe=socPt.v1;if(isCouple&&socPt.v2)ED.c2.societe=socPt.v2;}
-    else{
-      var socVal='';
-      for(var _j=0;_j<socKeys.length;_j++){if(kv01[socKeys[_j]]){socVal=kv01[socKeys[_j]];break;}}
-      if(socVal)ED.c1.societe=socVal;
-    }
-
-    // Enfants
-    ED.nbEnfants = 0; ED.enfants=[];
-    var enfMatch = s01.match(/(?:Enfants?)\s*\n([^\n]+)/i);
-    if(enfMatch){
-      var enfLine = enfMatch[1].trim();
-      var enfParts2=enfLine.split(',');
-      var enfSeenB={};
-      enfParts2.forEach(function(part){
-        var clean=part.trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();
-        var m=clean.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m){var nn=m[1].trim();if(!enfSeenB[nn]){enfSeenB[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
-        else if(clean.length>2){if(!enfSeenB[clean]){enfSeenB[clean]=true;ED.enfants.push({nom:clean,dob:''});}}
+    // Enfants (bloc 'Situation familiale')
+    ED.enfants=[];ED.nbEnfants=0;
+    var famM=s01.match(/Situation familiale[\s\S]*?\n([\s\S]*?)(?=\n(?:Situation professionnelle|Note))/i);
+    if(famM){
+      famM[1].split('\n').forEach(function(line){
+        if(line.indexOf('\t')<0)return;
+        var p=line.split('\t').map(function(x){return x.trim();});
+        var nm=p[0];
+        if(!nm||nm==='Prénom, Nom'||nm==='Identité'||nm.length<2)return;
+        var dob=p[1]||'';
+        if(dob==='JJ/MM/AAAA'||!dob)dob='';
+        var charge=p[2]||'';
+        if(charge==='Oui/Non')charge='';
+        var ratt=p[3]||'';
+        if(ratt==='Choisissez un élément.')ratt='';
+        ED.enfants.push({nom:nm,prenom:nm,dob:dob,aCharge:charge,rattache:mapTit(ratt)||'Commun'});
       });
       ED.nbEnfants=ED.enfants.length;
     }
 
-    // ══ SECTION 02 — OBJECTIFS ══
-    ED.objectifs = [];
-    var objSeen = {};
-    // Try pipe-table extraction first (R14: objective is in column 1, not column 0)
-    var objRows02 = parsePipeTable(s02);
-    var SKIP_OBJ_HDR = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation|\d+$)/i;
-    var SKIP_OBJ_VAL = /^(personnes?|objectifs?|horizon|moyen|épargne|epargne|désignation|designation)$/i;
-    objRows02.forEach(function(cols){
-      if(SKIP_OBJ_HDR.test((cols[0]||'').trim())) return;
-      var obj = (cols[1] || '').trim();
-      if(obj.length < 5 || obj.length > 200) return;
-      if(SKIP_OBJ_VAL.test(obj)) return;
-      if(!objSeen[obj]){ objSeen[obj] = true; ED.objectifs.push(obj); }
-    });
-    // Fallback: line-by-line heuristic for non-pipe mammoth text
-    if(!ED.objectifs.length){
-      var objLines = s02.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-      var isName = false;
-      for(var oi=0;oi<objLines.length;oi++){
-        var ol = objLines[oi];
-        if(SKIP_OBJ_HDR.test(ol) || /^\|/.test(ol)) continue;
-        if(/^[A-ZÉÈÊ][a-zéèêàùûî]+\s+[A-ZÉÈÊ]+/.test(ol)){
-          isName = true; continue;
-        }
-        if(isName && ol.length>5 && ol.length<200 && !objSeen[ol]){
-          ED.objectifs.push(ol); objSeen[ol]=true;
-        }
-        isName = false;
+    // --- Section 02 : Actifs + Passifs ---
+    ED.actifs=[];ED.passifs=[];
+    var s02Parts=s02.split(/\nPassifs\s*\n/i);
+    var s02Actifs=(s02Parts[0]||'').replace(/^[\s\S]*?Actifs\s*\n/i,'');
+    var s02Passifs=s02Parts[1]||'';
+    var s02Lines=s02Actifs.split('\n');
+    var skipNext=-1;
+    for(var iA=0;iA<s02Lines.length;iA++){
+      if(iA===skipNext)continue;
+      var lA=s02Lines[iA].trim();
+      if(lA.charAt(0)!=='☒')continue;
+      var nomA=lA.replace(/^☒\s*/,'').trim();
+      var nxtA=(s02Lines[iA+1]||'').trim();
+      var pA=nxtA.split('\t').map(function(x){return x.trim();});
+      var mtA=pEur(pA[0]||'');
+      var titA=pA[1]||'';
+      if(mtA<=0||!titA||titA==='Choisissez un élément.')continue;
+      var titATag=mapTit(titA)||'C1';
+      // Observation : ligne suivante, si pas un autre checkbox ni entete bloc
+      var obsL=(s02Lines[iA+2]||'').trim();
+      var obs='';
+      if(obsL&&obsL.charAt(0)!=='☒'&&obsL.charAt(0)!=='☐'&&obsL.indexOf('\t')<0&&obsL!=='Choisissez un élément.'&&!/^(Placements|Retraite|Liquidit|Immobilier|Passifs)/i.test(obsL)){
+        obs=obsL;
+        skipNext=iA+2;
       }
+      var nl=nomA.toLowerCase();
+      var horizonA='lt';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b/.test(nl))horizonA='ct';
+      else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizonA='ct';
+      else if(/\bpel\b|\bcat\b|assurance.vie|capitalisation|\bpea\b|\bpee\b|compte titre|\bcto\b/.test(nl))horizonA='mt';
+      var finalNomA=obs?(nomA+' — '+obs):nomA;
+      ED.actifs.push({nom:finalNomA,label:finalNomA,montant:mtA,titulaire:titATag,horizon:horizonA});
     }
-    if(!ED.objectifs.length) ED.objectifs = ['Objectifs à compléter'];
 
-    // Épargne de précaution souhaitée (C1 + C2)
-    var kv02 = kvMap(s02);
-    var epPrecVal = kv02['\u00e9pargne de pr\u00e9caution souhait\u00e9e'] || kv02['epargne de precaution souhaitee'] || '';
-    if(epPrecVal){var epNums=epPrecVal.match(/[\d\s]+/g);if(epNums&&epNums.length>=2){ED.epPrec=pEur(epNums[0]);ED.epPrec2=pEur(epNums[1]);}else{ED.epPrec=pEur(epPrecVal);}}
-    if(!ED.epPrec){
-      objRows02.forEach(function(cols){
-        if(/\u00e9pargne de pr\u00e9caution|epargne de precaution/i.test(cols[0])){
-          ED.epPrec = pEur(cols[1]) || 0;
-          if(cols[2])ED.epPrec2 = pEur(cols[2]) || 0;
-        }
+    var linesP=s02Passifs.split('\n');
+    for(var iP=0;iP<linesP.length;iP++){
+      var lP=linesP[iP].trim();
+      if(lP.charAt(0)!=='☒')continue;
+      var typeP=lP.replace(/^☒\s*/,'').trim();
+      var titL=(linesP[iP+1]||'').trim();
+      if(titL==='Choisissez un élément.'||!titL)continue;
+      var titP=mapTit(titL)||'Commun';
+      var dataL=(linesP[iP+2]||'').trim();
+      var dP=dataL.split('\t').map(function(x){return x.trim();});
+      var montantEmprunte=pEur(dP[0]||'');
+      var ech=pEur(dP[1]||'');
+      var crd=pEur(dP[2]||'');
+      var tauxS=(dP[3]||'').replace(/[^\d,.]/g,'').replace(',','.');
+      var dureeS=(dP[4]||'').replace(/[^\d]/g,'');
+      var dateM=(dP[5]||'').match(/\d{1,2}\/\d{1,2}\/\d{2,4}/);
+      if(crd<=0&&ech<=0)continue;
+      ED.passifs.push({
+        nom:typeP,titulaire:titP,echeance:ech,crd:crd,
+        montantEmprunte:montantEmprunte,
+        taux:parseFloat(tauxS)||0,
+        duree:parseInt(dureeS)||0,
+        dateEmprunt:dateM?dateM[0]:''
       });
     }
+    ED.chargesCredit=Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
 
-    // ══ SECTION 03 — PATRIMOINE ══
-    var SKIP_A = /^(désignation|designation|total|immobilier & foncier|immobilier de jouissance|immobilier locatif|épargne|epargne|court terme|moyen terme|long terme|retraite et salariale|biens professionnels|foncier)$/i;
-
-    ED.actifs = [];
-    var actifRows = parsePipeTable(s03.split(/PASSIFS/i)[0]);
-    actifRows.forEach(function(cols){
-      var nom = cols[0];
-      if(!nom || nom.length<2 || SKIP_A.test(nom) || /^désignation|designation/i.test(nom)) return;
-      var montant = 0;
-      for(var i=cols.length-1;i>=1;i--){
-        var v = pEur(cols[i]);
-        if(v>0){montant=v;break;}
-      }
-      if(montant<=0) return;
-      var nl = nom.toLowerCase();
-      var horizon = 'lt';
-      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b/.test(nl)) horizon='ct';
-      else if(/\blivret\b/.test(nl) && !/pel/.test(nl)) horizon='ct';
-      else if(/\bpel\b|\bcat\b|assurance.vie|capitalisation|\bpea\b|\bpee\b/.test(nl)) horizon='mt';
-      // Titulaire
-      var tit = isCouple ? 'Commun' : 'C1';
-      if(isCouple){
-        var v1=pEur(cols[1]||''), v2=pEur(cols[2]||'');
-        if(v1>0&&v2===0) tit='C1';
-        else if(v2>0&&v1===0) tit='C2';
-        else tit='Commun';
-      }
-      ED.actifs.push({nom:nom, horizon:horizon, titulaire:tit, montant:montant});
-    });
-
-    // PASSIFS — tableau pipe dans la partie Passifs de s03
-    ED.passifs = [];
-    var passifSection = (s03.match(/PASSIFS([\s\S]*?)(?:TOTAL DES ACTIFS|TOTAL DES PASSIFS|$)/i)||['',''])[1];
-    var passifRows = parsePipeTable(passifSection);
-    var SKIP_P = /^(désignation|designation|total|crédit immobilier|credit immobilier|crédit personnel|credit personnel|crédit|credit|prêt|pret)$/i;
-    passifRows.forEach(function(cols){
-      var nom = cols[0];
-      if(!nom||nom.length<2||SKIP_P.test(nom.trim())) return;
-      // Format : [Nom, Titulaire, Echéance/an, CRD, Date]
-      var ech=0, crd=0;
-      var nums=[];
-      for(var i=1;i<cols.length;i++){var v=pEur(cols[i]);if(v>0)nums.push(v);}
-      if(nums.length>=2){ech=nums[0];crd=nums[1];}
-      else if(nums.length===1){crd=nums[0];}
-      if(ech<=0&&crd<=0) return;
-      ED.passifs.push({nom:nom, titulaire:'Commun', echeance:ech, crd:crd});
-    });
-
-    // ══ SECTION 04 — REVENUS & CHARGES ══
-    ED.revenus = {c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0};
-
-    var revSection  = (s04.match(/(?:^|\n)REVENUS\s*\n([\s\S]*?)(?=\nCHARGES\s*\n|TOTAL DES REVENUS|$)/i)||['',''])[1];
-    var revRows = parsePipeTable(revSection);
-    var _sal1=0, _sal2=0, _fonc=0;
-    var vals; // helper for max(vals)
-    function max(arr){return Math.max.apply(null,arr.length?arr:[0]);}
-    revRows.forEach(function(cols){
-      var label = cols[0].toLowerCase();
-      if(/désignation|designation/i.test(label)) return;
-      var v1=pEur(cols[1]||''), v2=isCouple?pEur(cols[2]||''):0;
-      var total=pEur(cols[cols.length-1]||'')||v1;
-      vals=cols.slice(1).map(pEur).filter(function(v){return v>0;});
-      // R16 : distinction specific vs category pour salaires
-      if(/salaire|salaires|\bba\b|\bbic\b|\bbnc\b|auto.entrepreneur/i.test(label)){
-        ED.revenus._salSpecific = (ED.revenus._salSpecific||0) + v1;
-        _sal1+=v1; if(isCouple)_sal2+=v2;
-      } else if(/revenus d.activit/i.test(label)){
-        ED.revenus._salCategory = (ED.revenus._salCategory||0) + v1;
-        if(!_sal1){_sal1+=v1; if(isCouple)_sal2+=v2;}
-      }
-      // R10/R13 : distinction specific vs category pour fonciers
-      if(/revenus fonciers|location.meuble/i.test(label) && !/immobilier.*foncier|foncier.*immobilier/i.test(label)){
-        ED.revenus._foncSpecific = (ED.revenus._foncSpecific||0) + max(vals);
-        _fonc+=total;
-      } else if(/revenus immobiliers/i.test(label) && !/immobilier.*foncier/i.test(label)){
-        ED.revenus._foncCategory = (ED.revenus._foncCategory||0) + max(vals);
-        if(!_fonc) _fonc+=total;
-      }
-      if(/^total$/i.test(label) && !_sal1){
-        _sal1=v1; if(isCouple)_sal2=v2;
+    // --- Section 03 : Revenus + Charges ---
+    ED.revenus={c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,bic:0};
+    ED.charges=0;ED.chargesDetail=[];
+    var s03Parts=s03.split(/\nCharges annuelles\s*\n/i);
+    var s03Rev=(s03Parts[0]||'').replace(/^[\s\S]*?Revenus[\s\S]*?\n/i,'');
+    var s03Chr=s03Parts[1]||'';
+    s03Rev.split('\n').forEach(function(line,idx,arr){
+      var lR=line.trim();
+      if(lR.charAt(0)!=='☒')return;
+      var typeR=lR.replace(/^☒\s*/,'').trim();
+      var nextR=(arr[idx+1]||'').trim();
+      var pR=nextR.split('\t').map(function(x){return x.trim();});
+      var mtR=pEur(pR[0]||'');
+      var titR=pR[1]||'';
+      if(mtR<=0||!titR||titR==='Choisissez un élément.')return;
+      var titTag=mapTit(titR)||'C1';
+      if(/salaire|prime/i.test(typeR)){
+        if(titTag==='C1'){ED.revenus.sal1+=mtR;ED.revenus.c1+=mtR;}
+        else if(titTag==='C2'){ED.revenus.sal2+=mtR;ED.revenus.c2+=mtR;}
+        else {ED.revenus.sal1+=Math.round(mtR/2);ED.revenus.sal2+=Math.round(mtR/2);ED.revenus.c1=ED.revenus.sal1;ED.revenus.c2=ED.revenus.sal2;}
+      } else if(/foncier|immobilier/i.test(typeR)){
+        ED.revenus.fonc+=mtR;
+      } else {
+        ED.revenus.compl+=mtR;
       }
     });
-
-    // Finalize R16 : prefer specific over category for salaries
-    ED.revenus.sal1 = ED.revenus._salSpecific || ED.revenus._salCategory || _sal1 || 0;
-    // Finalize R10/R13 : prefer specific over category for fonciers
-    ED.revenus.fonc = ED.revenus._foncSpecific || ED.revenus._foncCategory || _fonc || 0;
-
-    // Fallback : TOTAL DES REVENUS
-    var totalRevMatch = full.match(/TOTAL DES REVENUS\s*[:\s]*([0-9\s,\.]+)\s*[€$]/i);
-    if(!ED.revenus.sal1 && totalRevMatch) {
-      var totalRev = pEur(totalRevMatch[1]);
-      _sal1 = isCouple ? totalRev/2 : totalRev;
-      if(isCouple) _sal2 = totalRev/2;
-      ED.revenus.sal1=_sal1;
-    }
-    if(!ED.revenus.sal1) ED.revenus.sal1=_sal1;
-    ED.revenus.sal2=_sal2;
-    ED.revenus.c1=ED.revenus.sal1;   ED.revenus.c2=_sal2;
-    ED.revenus.compl=ED.revenus.fonc;
-
-    // Charges crédit (sum des échéances passifs)
-    var totalEch = ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0);
-    // Fallback : TOTAL ligne du tableau passifs
-    passifRows.forEach(function(cols){
-      if(/^total$/i.test((cols[0]||'').trim())){
-        var t=pEur(cols[1]||'')||pEur(cols[2]||'');
-        if(t>totalEch) totalEch=t;
-      }
+    s03Chr.split('\n').forEach(function(line,idx,arr){
+      var lC=line.trim();
+      if(lC.charAt(0)!=='☒')return;
+      var typeC=lC.replace(/^☒\s*/,'').trim();
+      var nextC=(arr[idx+1]||'').trim();
+      var pC=nextC.split('\t').map(function(x){return x.trim();});
+      var mtC=pEur(pC[0]||'');
+      var titC=pC[1]||'';
+      if(mtC<=0||!titC||titC==='Choisissez un élément.')return;
+      ED.chargesDetail.push({nom:typeC,montant:mtC,titulaire:mapTit(titC)||'Commun'});
     });
-    ED.chargesCredit = Math.round(totalEch/12);
+    ED.charges=Math.round(ED.chargesDetail.reduce(function(s,c){return s+(c.montant||0);},0)/12);
 
-    // ══ SECTION 05 — FISCALITÉ ══
-    ED.fiscal = {annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,
-                 salBruts:0,revImposable:0,irBareme:0};
-
-    function fiscNum(pattern){
-      var m = s05.match(new RegExp(pattern+'[\\s:*€$]*([0-9][0-9\\s]*)[\\s€$]*','i'));
-      return m ? pEur(m[1]) : 0;
-    }
-    function fiscPct(pattern){
-      var m = s05.match(new RegExp(pattern+'[\\s:*]*([0-9,\\.]+)\\s*%','i'));
-      return m ? parseFloat((m[1]||'').replace(',','.')) : 0;
-    }
-
-    var irAn = s05.match(/IR acquitt[eé] en\s*[:\*]+\s*(\d{4})/i);
-    if(irAn) ED.fiscal.annee = irAn[1];
-
-    ED.fiscal.annee      = '';
-    var irAnM = s05.match(/IR acquitt[eé] en\s*[:\*]+\s*(\d{4})/i);
-    if(irAnM) ED.fiscal.annee = irAnM[1];
-    ED.fiscal.rbg        = fiscNum('Revenu brut global');
-    ED.fiscal.irnet      = fiscNum('Total de l.imp.t sur le revenu net');
-    ED.fiscal.irBareme   = fiscNum('Imp.t sur le revenu soumis au bar.me');
-    ED.fiscal.salBruts   = fiscNum('Total des salaires et assimil.s');
-    ED.fiscal.revImposable = fiscNum('Revenu imposable');
-    ED.fiscal.tmi        = Math.round(fiscPct('TMI IR'));
-    ED.fiscal.txMoyen    = fiscPct('Taux d.imposition');
-    ED.fiscal.rfr        = fiscNum('Revenu fiscal de r.f.rence');
-    ED.fiscal.credits    = fiscNum('Total des cr.dits d.imp.t');
-    ED.fiscal.reductions = fiscNum('Total des r.ductions d.imp.t');
-    // Plafond PER : sommer les 2 déclarants
-    var perMatches=[];var perRe=/Plafond[^:]*retraite[^:]*:\s*([\d\s]+)/gi;var perM;
-    while((perM=perRe.exec(s05))!==null){var pv=parseInt((perM[1]||'').replace(/\s/g,''));if(pv>0)perMatches.push(pv);}
-    ED.fiscal.plafondPER=perMatches.length?perMatches.reduce(function(a,b){return a+b;},0):fiscNum('Plafond .pargne retraite non utilis');
-    ED.fiscal.csgDed     = fiscNum('CSG d.ductible');
-    ED.fiscal.deductions = fiscNum('Charges d.ductibles du revenu global');
-    var partsM = s05.match(/Nombre de parts fiscales\s*[:\*\s]+([0-9,\.]+)/i);
-    if(partsM) ED.fiscal.parts = parseFloat(partsM[1].replace(',','.'))||1;
-    ED.fiscal.ps = fiscNum('pr.l.vements sociaux nets');
-    if(!ED.fiscal.rfr && ED.fiscal.rbg) ED.fiscal.rfr = ED.fiscal.rbg;
-
-    if(!ED.fiscal.tmi && ED.fiscal.rbg) ED.fiscal.tmi = tmiFromRBG(ED.fiscal.rbg, ED.fiscal.parts);
-    if(!ED.fiscal.irnet && ED.fiscal.rbg){
-      var c = calcIR(ED.fiscal.rbg, ED.fiscal.parts);
-      ED.fiscal.irnet = c.ir; if(!ED.fiscal.tmi) ED.fiscal.tmi = c.tmi;
-    }
-
-    // Épargne mensuelle estimée
-    var revM = revMens();
-    // Charges (non-credit) from CHARGES sub-section
-    ED.charges = 0;
-    ED.chargesDetail = [];
-    var chSection = (s04.match(/(?:^|\n)CHARGES\s*\n([\s\S]*?)(?=TOTAL DES REVENUS|TOTAL DES CHARGES|$)/i)||['',''])[1];
-    var chRows = parsePipeTable(chSection);
-    var SKIP_CH = /^(designation|d\u00e9signation|total|d\u00e9penses courantes|depenses courantes|d\u00e9penses ouvrant|depenses ouvrant|charges)$/i;
-    chRows.forEach(function(cols){
-      var nom = (cols[0]||'').trim();
-      if(!nom || nom.length<2 || SKIP_CH.test(nom)) return;
-      if(/^total$/i.test(nom)) return;
-      var nums = cols.slice(1).map(pEur).filter(function(v){return v>0;});
-      if(nums.length){
-        var montant = Math.max.apply(null, nums);
-        ED.chargesDetail.push({nom:nom, montant:montant, titulaire:'C1'});
-      }
+    // --- Section 04 : Fiscalité (format cle/valeur) ---
+    ED.fiscal={annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,salBruts:0,revImposable:0,irBareme:0};
+    s04.split('\n').forEach(function(line){
+      if(line.indexOf('\t')<0)return;
+      var p=line.split('\t').map(function(x){return x.trim();});
+      var key=p[0].toLowerCase();
+      var val=p[1]||'';
+      if(/^ann[eé]e/i.test(key))ED.fiscal.annee=(val.match(/\d{4}/)||[''])[0];
+      else if(/revenu brut global/i.test(key))ED.fiscal.rbg=pEur(val);
+      else if(/revenu imposable/i.test(key))ED.fiscal.revImposable=pEur(val);
+      else if(/nbr parts|nombre de parts/i.test(key))ED.fiscal.parts=parseFloat(val.replace(',','.'))||1;
+      else if(/^tmi/i.test(key))ED.fiscal.tmi=parseFloat((val||'').replace(/[^\d.,]/g,'').replace(',','.'))||0;
+      else if(/soumis au bar[eè]me/i.test(key))ED.fiscal.irBareme=pEur(val);
+      else if(/imp[oô]t net/i.test(key))ED.fiscal.irnet=pEur(val);
     });
-    if(ED.chargesDetail.length){
-      ED.charges = Math.round(ED.chargesDetail.reduce(function(s,c){return s+(c.montant||0);},0) / 12);
-    } else {
-      // Fallback : lire le total si pas de lignes individuelles
-      chRows.forEach(function(cols){
-        if(/^total$/i.test((cols[0]||'').trim())){
-          var chVals = cols.slice(1).map(pEur).filter(function(v){return v>0;});
-          if(chVals.length) ED.charges = Math.round(Math.max.apply(null, chVals) / 12);
-        }
-      });
-    }
+    // Auto-calcul si manquant
+    if(!ED.fiscal.tmi&&ED.fiscal.rbg){try{ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);}catch(e){}}
+    if(!ED.fiscal.irnet&&ED.fiscal.rbg){try{var cc=calcIR(ED.fiscal.rbg,ED.fiscal.parts);ED.fiscal.irnet=cc.ir;if(!ED.fiscal.tmi)ED.fiscal.tmi=cc.tmi;}catch(e){}}
 
-    ED.epMens = Math.max(0, Math.round(revM * 0.20));
+    // Objectifs : non parsés (remplis manuellement dans Vérifier & compléter)
+    if(!ED.objectifs||!ED.objectifs.length)ED.objectifs=['Objectifs à compléter'];
+
+    // Epargne mensuelle initiale (20% du salaire net/mois)
+    ED.epMens=Math.max(0,Math.round((ED.revenus.sal1||0)/12*0.20));
+    ED.epMens2=Math.max(0,Math.round((ED.revenus.sal2||0)/12*0.20));
 
     launch();
-    return; // ← fin format mammoth
+    return; // ← fin format C
   }
 
   // ══════════════════════════════════════════════════════════════════
   // FORMAT A — COPIER-COLLER WORD (tabulations \t)
-  // ══════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
   var lines = txt.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
   var full2 = lines.join('\n');
@@ -7916,22 +7856,47 @@ function remplirVerification(){
     s('vC1Civ',ED.c1.civ);s('vC1Prenom',ED.c1.prenom);s('vC1Nom',ED.c1.nom);s('vC1Dob',ED.c1.dob);
     s('vC1CSP',ED.c1.sitpro);s('vC1Prof',ED.c1.profession);s('vC1Societe',ED.c1.societe);
     s('vC1Sal',ED.revenus.sal1||ED.revenus.c1||'');
+    // Nouveaux champs RI 2026 C1
+    s('vC1NomNaiss',ED.c1.nomNaissance||'');s('vC1LieuNaiss',ED.c1.lieuNaissance||'');
+    s('vC1Nationalite',ED.c1.nationalite||'');s('vC1PaysResidence',ED.c1.paysResidence||'');
+    s('vC1Tel',ED.c1.tel||'');s('vC1Email',ED.c1.email||'');s('vC1CspAncienne',ED.c1.cspAncienne||'');
+    toggleAncienneCSP(1);
     var isC=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
     var cb=document.getElementById('vCouple');if(cb){cb.checked=isC;document.getElementById('vC2Block').style.display=isC?'':'none';}
-    if(isC){s('vC2Civ',ED.c2.civ);s('vC2Prenom',ED.c2.prenom);s('vC2Nom',ED.c2.nom);s('vC2Dob',ED.c2.dob);s('vC2CSP',ED.c2.sitpro);s('vC2Prof',ED.c2.profession);s('vC2Societe',ED.c2.societe);s('vC2Sal',ED.revenus.sal2||ED.revenus.c2||'');}
+    if(isC){
+      s('vC2Civ',ED.c2.civ);s('vC2Prenom',ED.c2.prenom);s('vC2Nom',ED.c2.nom);s('vC2Dob',ED.c2.dob);s('vC2CSP',ED.c2.sitpro);s('vC2Prof',ED.c2.profession);s('vC2Societe',ED.c2.societe);s('vC2Sal',ED.revenus.sal2||ED.revenus.c2||'');
+      s('vC2NomNaiss',ED.c2.nomNaissance||'');s('vC2LieuNaiss',ED.c2.lieuNaissance||'');
+      s('vC2Nationalite',ED.c2.nationalite||'');s('vC2PaysResidence',ED.c2.paysResidence||'');
+      s('vC2Tel',ED.c2.tel||'');s('vC2Email',ED.c2.email||'');s('vC2CspAncienne',ED.c2.cspAncienne||'');
+      toggleAncienneCSP(2);
+      var per2Wrap=document.getElementById('vFiscPER2Wrap');if(per2Wrap)per2Wrap.style.display='grid';
+    } else {
+      var per2WrapH=document.getElementById('vFiscPER2Wrap');if(per2WrapH)per2WrapH.style.display='none';
+    }
     s('vSitmat',ED.sitmat);s('vRegime',ED.convention);toggleRegimeField();s('vLogement',ED.logement);s('vAdresse',ED.adresse);s('vNbEnfants',ED.nbEnfants||0);
+    s('vDateMariage',ED.dateMariage||'');
     s('vFonc',ED.revenus.fonc||'');s('vBIC',ED.revenus.bic||'');s('vAutres',ED.revenus.compl||'');
     renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifCharges();renderVerifObjectifs();
     // Impôts
     s('vFiscAnnee',ED.fiscal.annee);s('vFiscRBG',ED.fiscal.rbg||'');s('vFiscRevImp',ED.fiscal.revImposable||'');
     s('vFiscParts',ED.fiscal.parts||'');s('vFiscTMI',ED.fiscal.tmi||'');s('vFiscIRNet',ED.fiscal.irnet||'');
-    s('vFiscPS',ED.fiscal.ps||'');s('vFiscPER',ED.fiscal.plafondPER||'');s('vFiscIRBareme',ED.fiscal.irBareme||'');
+    s('vFiscPS',ED.fiscal.ps||'');s('vFiscPER',ED.fiscal.plafondPER||'');s('vFiscPER2',ED.fiscal.plafondPER2||'');s('vFiscIRBareme',ED.fiscal.irBareme||'');
     s('vFiscReduc',ED.fiscal.reductions||'');s('vFiscCredits',ED.fiscal.credits||'');
     s('vEpMens1',ED.epMens||'');s('vEpMens2',ED.epMens2||'');
     s('vEpPrec1',ED.epPrec||'');s('vEpPrec2',ED.epPrec2||'');
     document.getElementById('verifierBody').style.display='';
     highlightEmptyFields('verifierBody');
   }catch(e){console.warn('remplirVerification:',e);}
+}
+
+// Affiche le champ 'Ancienne catégorie' si CSP = Retraité ou Sans activité professionnelle
+function toggleAncienneCSP(num){
+  var cspEl=document.getElementById('vC'+num+'CSP');
+  var wrap=document.getElementById('vC'+num+'CspAncienneWrap');
+  if(!cspEl||!wrap)return;
+  var v=(cspEl.value||'').toLowerCase();
+  var need=/retrait|sans activit/i.test(v);
+  wrap.style.display=need?'':'none';
 }
 function highlightEmptyFields(containerId){
   try{
@@ -8054,6 +8019,14 @@ function appliquerVerification(){
     var csp1=v('vC1CSP');ED.c1.sitpro=csp1;
     ED.c1.profession=v('vC1Prof').trim();ED.c1.societe=v('vC1Societe').trim();
     var sal1=n('vC1Sal');ED.revenus.sal1=sal1;ED.revenus.c1=sal1;
+    // Nouveaux champs RI 2026 C1
+    ED.c1.nomNaissance=v('vC1NomNaiss').trim();
+    ED.c1.lieuNaissance=v('vC1LieuNaiss').trim();
+    ED.c1.nationalite=v('vC1Nationalite').trim().toLowerCase();
+    ED.c1.paysResidence=v('vC1PaysResidence').trim();
+    ED.c1.tel=v('vC1Tel').trim();
+    ED.c1.email=v('vC1Email').trim();
+    ED.c1.cspAncienne=v('vC1CspAncienne').trim();
     // Couple
     var isC2=document.getElementById('vCouple')&&document.getElementById('vCouple').checked;
     ED.type=isC2?'couple':'seul';
@@ -8061,6 +8034,13 @@ function appliquerVerification(){
       ED.c2.civ=v('vC2Civ');ED.c2.prenom=v('vC2Prenom').trim();ED.c2.nom=v('vC2Nom').trim();ED.c2.dob=v('vC2Dob').trim();
       ED.c2.sitpro=v('vC2CSP');ED.c2.profession=v('vC2Prof').trim();ED.c2.societe=v('vC2Societe').trim();
       var sal2=n('vC2Sal');ED.revenus.sal2=sal2;ED.revenus.c2=sal2;
+      ED.c2.nomNaissance=v('vC2NomNaiss').trim();
+      ED.c2.lieuNaissance=v('vC2LieuNaiss').trim();
+      ED.c2.nationalite=v('vC2Nationalite').trim().toLowerCase();
+      ED.c2.paysResidence=v('vC2PaysResidence').trim();
+      ED.c2.tel=v('vC2Tel').trim();
+      ED.c2.email=v('vC2Email').trim();
+      ED.c2.cspAncienne=v('vC2CspAncienne').trim();
     } else {
       ED.c2={civ:'Mme',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''};
       ED.revenus.sal2=0;ED.revenus.c2=0;
@@ -8069,6 +8049,7 @@ function appliquerVerification(){
     ED.sitmat=v('vSitmat');
     ED.convention=/mari|pacs/i.test(ED.sitmat)?v('vRegime'):'';
     ED.logement=v('vLogement');ED.adresse=v('vAdresse').trim();
+    ED.dateMariage=v('vDateMariage').trim();
     ED.nbEnfants=n('vNbEnfants');
     // Enfants
     ED.enfants=[];
@@ -8130,7 +8111,7 @@ function appliquerVerification(){
     ED.fiscal.annee=v('vFiscAnnee');ED.fiscal.rbg=n('vFiscRBG');ED.fiscal.revImposable=n('vFiscRevImp');
     ED.fiscal.parts=+(document.getElementById('vFiscParts')?document.getElementById('vFiscParts').value:1)||1;
     ED.fiscal.tmi=n('vFiscTMI');ED.fiscal.irnet=n('vFiscIRNet');ED.fiscal.ps=n('vFiscPS');
-    ED.fiscal.plafondPER=n('vFiscPER');ED.fiscal.irBareme=n('vFiscIRBareme');
+    ED.fiscal.plafondPER=n('vFiscPER');ED.fiscal.plafondPER2=n('vFiscPER2');ED.fiscal.irBareme=n('vFiscIRBareme');
     ED.fiscal.reductions=n('vFiscReduc');ED.fiscal.credits=n('vFiscCredits');
     // Épargne
     ED.epMens=n('vEpMens1');ED.epMens2=n('vEpMens2');
