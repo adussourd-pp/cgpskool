@@ -103,13 +103,13 @@
 
 | Cas | Indicateur | Résultat |
 |---|---|---|
-| Alexia LAFOSSE | revMens() | 4 326 € ✅ |
-| Alexia LAFOSSE | Pension 30 ans, cadre (48%) | 576 €/mois ✅ |
-| Alexia LAFOSSE | Taux endettement | 84,5 % ✅ |
-| Mathieu THOMAS | Taux endettement | 33,0 % ✅ |
-| Mathieu THOMAS | Pension 47 ans, cadre (interpolé 54%) | 4 704 €/mois ✅ |
-| Eric KEMPF | Pension 50 ans, cadre (55%) | 4 931 €/mois ✅ |
-| Marie Aude KEMPF | Pension 48 ans, non cadre (interpolé 62%) | 465 €/mois ✅ |
+| Cas n°1 — Couple | revMens() | 4 326 € ✅ |
+| Cas n°1 — Couple | Pension 30 ans, cadre (48%) | 576 €/mois ✅ |
+| Cas n°1 — Couple | Taux endettement | 84,5 % ✅ |
+| Cas n°2 — Célibataire | Taux endettement | 33,0 % ✅ |
+| Cas n°2 — Célibataire | Pension 47 ans, cadre (interpolé 54%) | 4 704 €/mois ✅ |
+| Cas n°3 — Couple | Pension 50 ans, cadre (55%) | 4 931 €/mois ✅ |
+| Cas n°4 — Couple | Pension 48 ans, non cadre (interpolé 62%) | 465 €/mois ✅ |
 
 ---
 
