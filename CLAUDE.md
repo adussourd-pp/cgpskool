@@ -17,7 +17,7 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 | `docs/REGLES_PROJET.md` | Règles de code (R1-R22) + tests de non-régression | Critique |
 
 ### Outils secondaires (pages séparées)
-`bp-simulator.html`, `comparatif-cgp.html`, `scpi-simulator.html`, `per-vs-av.html`, `immo-simulator.html`, `interets-composes.html`
+`modules/bp-simulator.html`, `modules/scpi-simulator.html`, `modules/per-vs-av.html`, `modules/immo-simulator.html`, `modules/interets-composes.html` (tous dans `modules/`)
 
 ---
 

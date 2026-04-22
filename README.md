@@ -13,19 +13,18 @@
 
 | Outil | Fichier | État |
 |---|---|---|
-| **Étude de Dossier** | `etude-dossier.html` | ✅ v2.0 |
-| PER vs Assurance Vie | `per-vs-av.html` | ✅ Opérationnel |
-| SCPI Cash | `scpi-simulator.html` | ✅ Bêta |
-| SCPI Financement | `scpi-financement.html` | ✅ Bêta |
-| Immobilier locatif (LMNP) | `immo-simulator.html` | ✅ Opérationnel |
-| Intérêts composés | `interets-composes.html` | ✅ Opérationnel |
+| **Étude de Dossier** | `modules/etude-dossier.html` | ✅ v2.0 |
+| PER vs Assurance Vie | `modules/per-vs-av.html` | ✅ Opérationnel |
+| SCPI Cash | `modules/scpi-simulator.html` | ✅ Bêta |
+| SCPI Financement | `modules/scpi-financement.html` | ✅ Bêta |
+| Immobilier locatif (LMNP) | `modules/immo-simulator.html` | ✅ Opérationnel |
+| Intérêts composés | `modules/interets-composes.html` | ✅ Opérationnel |
 
 ### Outils développement réseau (conseiller)
 
 | Outil | Fichier | État |
 |---|---|---|
-| Business Plan | `bp-simulator.html` | ✅ Opérationnel |
-| Comparatif CGP (positionnement) | `comparatif-cgp.html` | ✅ Opérationnel |
+| Business Plan | `modules/bp-simulator.html` | ✅ Opérationnel |
 
 ## ✨ Étude de Dossier v2 — fonctionnalités
 
@@ -44,14 +43,17 @@
 ```
 /
 ├── index.html              ← Hub d'accueil (2 sections : outils client + réseau)
-├── etude-dossier.html      ← Outil principal (standalone, data.js + calculs.js inline)
-├── per-vs-av.html          ← Comparateur PER vs AV (matrice TMI)
-├── scpi-simulator.html     ← SCPI Cash (rendement, capital, fiscalité)
-├── scpi-financement.html   ← SCPI à crédit (levier, amortissement, IFI)
-├── immo-simulator.html     ← Immobilier locatif LMNP (cashflow, amortissement)
-├── interets-composes.html  ← Capitalisation (frais, versements, fiscalité)
-├── bp-simulator.html       ← Business Plan réseau (PMR, qualifications, CA)
-├── comparatif-cgp.html     ← Comparatif 3 modèles CGP (frais, simulateur coût)
+├── articles.html           ← Bibliothèque d'articles (manifest dynamique)
+├── favicon.svg
+├── modules/                ← 16 outils HTML (etude-dossier, simulateurs, etc.)
+│   ├── etude-dossier.html  ← Outil principal (standalone, data.js + calculs.js inline)
+│   ├── per-vs-av.html
+│   ├── scpi-simulator.html
+│   ├── scpi-financement.html
+│   ├── immo-simulator.html
+│   ├── interets-composes.html
+│   ├── bp-simulator.html   ← Business Plan réseau (PMR, qualifications, CA)
+│   └── ...
 ├── assets/                 ← Design system & scripts partagés
 │   ├── cgp-skool-theme.css     ← Tokens design (Inter + Playfair Display)
 │   ├── cgp-skool-layout.css    ← Layout, sidebar, print CSS

@@ -25,7 +25,6 @@
     'allocation-cible':     'Allocation Cible',
     'bp-simulator':         'Business Plan',
     'equipe-builder':       'Equipe',
-    'comparatif-cgp':       'Notre positionnement',
     'dossier-solution':     'Dossier Solution'
   };
 
