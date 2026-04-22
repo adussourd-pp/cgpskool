@@ -12,9 +12,9 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 | `etude-dossier.html` | App principale (~5000+ lignes JS inline) | ~350 Ko |
 | `data.js` | Tables de référence (barème IR, taux retraite, COPERNIC) | ~450 lignes |
 | `calculs.js` | Fonctions de calcul (fiscal, retraite, patrimoine) | ~500 lignes |
-| `cgp-skool-theme.css` | Variables CSS, thème global | |
-| `cgp-skool.css` | Styles spécifiques composants | |
-| `REGLES_PROJET.md` | Règles de code (R1-R22) + tests de non-régression | Critique |
+| `assets/cgp-skool-theme.css` | Variables CSS, thème global | |
+| `assets/cgp-skool-layout.css` | Layout, sidebar, print CSS | |
+| `docs/REGLES_PROJET.md` | Règles de code (R1-R22) + tests de non-régression | Critique |
 
 ### Outils secondaires (pages séparées)
 `bp-simulator.html`, `comparatif-cgp.html`, `scpi-simulator.html`, `per-vs-av.html`, `immo-simulator.html`, `interets-composes.html`
@@ -162,10 +162,10 @@ Chaque module outil (simulateur, étude) doit suivre ce format.
 ### Imports requis (dans cet ordre)
 
 ```html
-<link rel="stylesheet" href="cgp-skool-theme.css">
-<link rel="stylesheet" href="cgp-skool-layout.css">
-<script src="cgp-skool-core.js"></script>
-<script src="cgp-skool-nav.js" defer></script>
+<link rel="stylesheet" href="assets/cgp-skool-theme.css">
+<link rel="stylesheet" href="assets/cgp-skool-layout.css">
+<script src="assets/cgp-skool-core.js"></script>
+<script src="assets/cgp-skool-nav.js" defer></script>
 ```
 
 ### Sidebar — Standard
@@ -390,10 +390,10 @@ La correction globale est dans `cgp-skool-layout.css` (`@media print` → sectio
 
 Chaque nouveau module doit inclure :
 ```html
-<link rel="stylesheet" href="cgp-skool-theme.css">
-<link rel="stylesheet" href="cgp-skool-layout.css">
-<script src="cgp-skool-core.js"></script>
-<script src="cgp-skool-nav.js" defer></script>
+<link rel="stylesheet" href="assets/cgp-skool-theme.css">
+<link rel="stylesheet" href="assets/cgp-skool-layout.css">
+<script src="assets/cgp-skool-core.js"></script>
+<script src="assets/cgp-skool-nav.js" defer></script>
 ```
 
 Structure HTML :
@@ -464,7 +464,7 @@ Ajouter une entrée dans le tableau `MODULES` de `cgp-skool-nav.js` :
 - **Commits atomiques** : une feature = un commit. Tester R2b + R2c avant chaque commit.
 - **Si ça casse** : `git checkout <dernier-bon-commit> -- etude-dossier.html` pour revenir en arrière.
 
-## Règles de code critiques (résumé de REGLES_PROJET.md)
+## Règles de code critiques (résumé de docs/REGLES_PROJET.md)
 
 - **R1** : Pas de quotes autour de font-family dans les strings JS
 - **R2** : Pas de `\xa0` (espace insécable) dans le code
@@ -478,7 +478,7 @@ Ajouter une entrée dans le tableau `MODULES` de `cgp-skool-nav.js` :
 
 ### Tests de non-régression (4 cas canoniques)
 
-Voir `REGLES_PROJET.md` pour les valeurs attendues :
+Voir `docs/REGLES_PROJET.md` pour les valeurs attendues :
 - Alexia LAFOSSE & François LIÈVRE (couple)
 - Mathieu THOMAS (célibataire)
 - Éric KEMPF (couple)

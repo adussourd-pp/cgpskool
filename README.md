@@ -52,12 +52,18 @@
 ├── interets-composes.html  ← Capitalisation (frais, versements, fiscalité)
 ├── bp-simulator.html       ← Business Plan réseau (PMR, qualifications, CA)
 ├── comparatif-cgp.html     ← Comparatif 3 modèles CGP (frais, simulateur coût)
-├── cgp-skool-theme.css     ← Design system (cs- prefix, Inter + Playfair Display)
-├── cgp-skool.css           ← CSS composants communs (nav, tables, badges)
+├── assets/                 ← Design system & scripts partagés
+│   ├── cgp-skool-theme.css     ← Tokens design (Inter + Playfair Display)
+│   ├── cgp-skool-layout.css    ← Layout, sidebar, print CSS
+│   ├── cgp-skool-core.js       ← CGP.profil, CGP.fmt, CGP.footer, CGP.pdf
+│   ├── cgp-skool-nav.js        ← Nav universelle, guide, boutons sidebar
+│   ├── cgp-skool-feedback.js   ← Widget feedback Tally
+│   └── cgp-skool-scpi-data.js  ← Données SCPI partagées
+├── docs/
+│   ├── REGLES_PROJET.md    ← Règles de code R1-R22 + cas de non-régression
+│   └── SIDEBAR_STANDARD.md ← Standard sidebar des modules
 ├── data.js                 ← Tables de référence (source: Excel ED_RI_62)
 ├── calculs.js              ← Fonctions de calcul patrimonial (testées)
-├── scpi-data.js            ← Données SCPI (barèmes démembrement, panorama 2025)
-├── REGLES_PROJET.md        ← Règles de code R1-R22 + cas de non-régression
 └── README.md
 ```
 
@@ -71,7 +77,7 @@
 3. `Settings` → `Pages` → Source : `main` / `/ (root)`
 4. L'URL sera : `https://[username].github.io/cgpskool/`
 
-## 🔑 Règles de code (REGLES_PROJET.md)
+## 🔑 Règles de code (docs/REGLES_PROJET.md)
 
 ### Calculs patrimoniaux
 - **R4** — Revenus stockés en ANNUEL, `revMens()` divise par 12
