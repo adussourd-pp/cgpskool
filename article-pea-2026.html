@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEA - Ce que votre conseiller ne vous a pas dit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --bg2: #ffffff;
+    --bg3: #f0ede8;
+    --orange: #C85520;
+    --orange-light: #C8552012;
+    --orange-bright: #D4622A;
+    --text: #1a1815;
+    --text-muted: #4a4845;
+    --text-dim: #9a9690;
+    --border: #e2ddd8;
+    --border-accent: #ccc8c2;
+    --red: #b83225;
+    --red-light: #b8322510;
+    --amber: #b87c1a;
+    --amber-light: #b87c1a12;
+    --green: #1e8a4a;
+    --green-light: #1e8a4a12;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 40%, #C855200d 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 6vw, 78px);
+    line-height: 1.08;
+    font-weight: 700;
+    max-width: 780px;
+    margin-bottom: 28px;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--orange); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 540px;
+    font-weight: 300;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.6s;
+  }
+
+  .hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 1s;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 44px;
+    background: linear-gradient(to bottom, var(--orange), transparent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 96px 32px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+
+  .section h2 em { font-style: italic; color: var(--orange); }
+
+  .lead {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    line-height: 1.8;
+  }
+
+  p { color: var(--text-muted); margin-bottom: 18px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* PEA GRID */
+  .pea-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 36px 0;
+  }
+
+  .pea-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .pea-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  }
+
+  .pea-card-icon { font-size: 26px; margin-bottom: 12px; }
+
+  .pea-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .pea-card p { font-size: 14px; line-height: 1.65; color: var(--text-muted); margin: 0; }
+
+  /* STAT BANNER */
+  .stat-banner {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--orange);
+    border-radius: 0 0 10px 10px;
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--orange-bright);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 300; line-height: 1.5; }
+
+  /* TIMELINE */
+  .timeline { position: relative; margin: 40px 0; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 8px; bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 28px;
+    padding-bottom: 36px;
+    position: relative;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-dot {
+    width: 49px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  .timeline-dot-inner {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--orange);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--orange);
+    flex-shrink: 0;
+  }
+
+  .timeline-dot-inner.amber { background: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+  .timeline-dot-inner.red { background: var(--red); box-shadow: 0 0 0 1px var(--red); }
+
+  .timeline-content h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--text);
+  }
+
+  .tag {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+
+  .tag-orange { background: #C855201a; color: var(--orange); border: 1px solid #C8552040; }
+  .tag-amber  { background: var(--amber-light); color: var(--amber); border: 1px solid #b87c1a40; }
+  .tag-red    { background: var(--red-light); color: var(--red); border: 1px solid #b8322540; }
+
+  .timeline-content p { font-size: 14px; line-height: 1.65; margin: 0; }
+
+  /* FISCAL TABLE */
+  .fiscal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .fiscal-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .fiscal-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .fiscal-table tr:last-child td { border-bottom: none; }
+  .fiscal-table td:first-child { font-weight: 500; color: var(--text); }
+  .fiscal-table .highlight td { background: #C855200a; }
+  .fiscal-table .highlight td:first-child { color: var(--orange); }
+  .fiscal-table .highlight td strong { color: var(--orange); }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--bg2);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin: 28px 0;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange);
+  }
+
+  .callout p { font-size: 15px; font-style: italic; color: var(--text); margin: 0; line-height: 1.7; }
+  .callout-red { border-left-color: var(--red); }
+  .callout-amber { border-left-color: var(--amber); }
+
+  /* RISK CARDS */
+  .risk-stack { display: flex; flex-direction: column; gap: 14px; margin: 36px 0; }
+
+  .risk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 20px;
+    align-items: start;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .risk-card:hover {
+    border-color: #b8322540;
+    box-shadow: 0 2px 16px rgba(184,50,37,0.06);
+  }
+
+  .risk-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--border-accent);
+    line-height: 1;
+    margin-top: 2px;
+    transition: color 0.25s;
+  }
+
+  .risk-card:hover .risk-number { color: var(--red); }
+
+  .risk-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .risk-card p { font-size: 14px; line-height: 1.65; color: var(--text-muted); margin: 0; }
+
+  /* BEHAVIOR GRID */
+  .behavior-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 36px 0;
+  }
+
+  .behavior-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .behavior-card.good { border-top: 2px solid var(--green); }
+  .behavior-card.bad  { border-top: 2px solid var(--red); }
+
+  .behavior-card h4 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .behavior-card.good h4 { color: var(--green); }
+  .behavior-card.bad  h4 { color: var(--red); }
+
+  .behavior-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .behavior-item .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  .behavior-card.good .dot { background: var(--green); }
+  .behavior-card.bad  .dot { background: var(--red); }
+
+  /* DATA BOX */
+  .data-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin: 28px 0;
+  }
+
+  .data-box-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .data-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .data-row-label { color: var(--text-muted); }
+  .data-row-value { font-weight: 600; color: var(--text); font-family: 'Playfair Display', serif; font-size: 16px; }
+  .data-row-value.orange { color: var(--orange); }
+  .data-row-value.red    { color: var(--red); }
+
+  /* BIG QUOTE */
+  .big-quote {
+    text-align: center;
+    padding: 72px 40px;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .big-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 34px);
+    font-style: italic;
+    line-height: 1.45;
+    max-width: 680px;
+    margin: 0 auto 18px;
+    color: var(--text);
+  }
+
+  .big-quote cite { font-size: 12px; color: var(--text-dim); letter-spacing: 0.1em; }
+
+  /* SOURCES */
+  .sources-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 60px 32px;
+  }
+
+  .sources-inner { max-width: 860px; margin: 0 auto; }
+
+  .sources-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .source-list { list-style: none; }
+
+  .source-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .source-item:last-child { border-bottom: none; }
+
+  .source-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--text-dim);
+    min-width: 24px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .source-title { font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .source-detail { color: var(--text-dim); }
+  .source-url { color: var(--orange); word-break: break-all; }
+
+  sup {
+    font-size: 10px;
+    color: var(--orange);
+    font-weight: 600;
+    vertical-align: super;
+    cursor: default;
+  }
+
+  .footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .pea-grid, .behavior-grid { grid-template-columns: 1fr; }
+    .stat-banner { grid-template-columns: 1fr; gap: 20px; padding: 24px; }
+    .stat-number { font-size: 36px; }
+    .risk-card { grid-template-columns: 1fr; }
+    .risk-number { display: none; }
+    .section { padding: 56px 20px; }
+    .hero h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <p class="hero-label">Note d'analyse &middot; Peak Patrimoine &middot; Avril 2026</p>
+  <h1>Le PEA en 2026 :<br><em>les règles ont changé.</em></h1>
+  <p class="hero-sub">Ce que tout épargnant en ETF doit savoir avant de continuer à investir dans cette enveloppe.</p>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Lire l'analyse</span>
+  </div>
+</header>
+
+<!-- SECTION 1 : QU'EST-CE QUE LE PEA -->
+<section class="section reveal">
+  <div class="section-label">01 &mdash; Comprendre l'enveloppe</div>
+  <h2>Le PEA, c'est <em>quoi exactement</em> ?</h2>
+  <p class="lead">Créé en 1992, le Plan d'Épargne en Actions est une enveloppe fiscale française conçue pour encourager l'investissement en bourse &mdash; avec une promesse simple : une exonération d'impôt sur le revenu sur vos gains après 5 ans de détention.</p>
+  <p>C'est l'enveloppe que tous les médias et créateurs de contenu financier recommandent : "ouvrir un PEA, mettre un ETF monde, attendre." Simple, accessible, fiscalement avantageux. Dans les années 90, c'était révolutionnaire. En 2026, le tableau est plus nuancé.</p>
+
+  <div class="pea-grid">
+    <div class="pea-card">
+      <div class="pea-card-icon">&#127963;&#65039;</div>
+      <h3>Le principe</h3>
+      <p>Vous investissez jusqu'à 150 000 &euro; dans des actions ou fonds éligibles. Après 5 ans, vos plus-values ne sont soumises qu'aux prélèvements sociaux &mdash; pas à l'impôt sur le revenu. Les dividendes et gains capitalisent en franchise d'impôt tant qu'ils restent dans l'enveloppe.<sup>1</sup></p>
+    </div>
+    <div class="pea-card">
+      <div class="pea-card-icon">&#128202;</div>
+      <h3>L'avantage affiché</h3>
+      <p>En comparaison avec un compte-titres ordinaire (CTO), le PEA exonère d'IR. En 2026 : 18,6% de prélèvements sociaux sur vos plus-values vs 31,4% de flat tax en CTO &mdash; soit 12,8 points d'écart.</p>
+    </div>
+    <div class="pea-card">
+      <div class="pea-card-icon">&#128274;</div>
+      <h3>Les contraintes</h3>
+      <p>Plafond de versement à 150 000 &euro;. Retrait avant 5 ans = clôture du plan + flat tax de 31,4%. Même un retrait partiel de 500 &euro; avant 5 ans entraîne la clôture totale.<sup>1</sup> Transfert entre courtiers : plusieurs mois de délai.</p>
+    </div>
+    <div class="pea-card">
+      <div class="pea-card-icon">&#127758;</div>
+      <h3>L'univers d'investissement</h3>
+      <p>Limité aux entreprises de l'Espace Économique Européen. Pour accéder aux marchés mondiaux (S&amp;P 500, MSCI World), les courtiers utilisent des ETF dits "synthétiques" : au moins 75% d'actifs européens.<sup>2</sup> On y revient en section 3.</p>
+    </div>
+  </div>
+
+  <div class="stat-banner">
+    <div>
+      <div class="stat-number">6,8M</div>
+      <div class="stat-label">PEA ouverts en France</div>
+    </div>
+    <div>
+      <div class="stat-number">150k&euro;</div>
+      <div class="stat-label">Plafond de versement</div>
+    </div>
+    <div>
+      <div class="stat-number">5 ans</div>
+      <div class="stat-label">Pour l'exonération d'IR</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 2 : MODIFICATIONS FISCALES -->
+<section class="section reveal">
+  <div class="section-label">02 &mdash; Ce qui a changé</div>
+  <h2>Une fiscalité qui <em>évolue sans vous prévenir</em></h2>
+  <p class="lead">L'État a modifié le taux de prélèvements sociaux applicable au PEA à trois reprises en 8 ans &mdash; et le taux retenu est toujours celui en vigueur au moment du retrait, pas celui de l'année où le gain a été constitué.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content">
+        <h4>2018 &mdash; Point de départ <span class="tag tag-orange">Référence</span></h4>
+        <p>Les prélèvements sociaux sur les gains PEA s'élèvent à <strong>15,5%</strong>. C'est le taux de référence que la plupart des épargnants avaient en tête en ouvrant leur plan. La Flat tax (PFU) est fixée à 30% pour les CTO.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"><div class="timeline-dot-inner amber"></div></div>
+      <div class="timeline-content">
+        <h4>2019 &mdash; Première hausse <span class="tag tag-amber">+1,7 pt</span></h4>
+        <p>Le taux passe à <strong>17,2%</strong>, stable jusqu'en 2025. Cette hausse s'applique au taux en vigueur lors du retrait &mdash; y compris sur des gains accumulés avant 2019.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"><div class="timeline-dot-inner red"></div></div>
+      <div class="timeline-content">
+        <h4>1er janvier 2026 &mdash; Deuxième hausse <span class="tag tag-red">+1,4 pt</span></h4>
+        <p>La LFSS 2026 (loi n&deg;2025-1403 du 30 décembre 2025, art. 12) relève la CSG de 9,2% à 10,6% sur les revenus du capital. Les prélèvements sociaux sur le PEA passent à <strong>18,6%</strong>. La flat tax CTO monte à 31,4%. Point de vigilance : des plus-values générées en 2021 ou 2023 seront taxées à 18,6% si le retrait intervient en 2026 ou après.<sup>2,3</sup></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <p>À noter : l'assurance-vie est exclue de cette hausse. Ses prélèvements sociaux restent à 17,2%, créant un écart de 1,4 point avec le PEA. Cette divergence est une nouveauté 2026 qui modifie les comparatifs patrimoniaux.<sup>3</sup></p>
+  </div>
+
+  <table class="fiscal-table">
+    <thead>
+      <tr>
+        <th>Période</th>
+        <th>PS sur gains PEA (après 5 ans)</th>
+        <th>Flat tax CTO totale</th>
+        <th>Écart PEA/CTO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2018</td>
+        <td>15,5%</td>
+        <td>30%</td>
+        <td>14,5 pts</td>
+      </tr>
+      <tr>
+        <td>2019&ndash;2025</td>
+        <td>17,2%</td>
+        <td>30%</td>
+        <td>12,8 pts</td>
+      </tr>
+      <tr class="highlight">
+        <td>2026</td>
+        <td><strong>18,6%</strong></td>
+        <td><strong>31,4%</strong></td>
+        <td><strong>12,8 pts</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="data-box">
+    <div class="data-box-label">Impact concret &mdash; surcoût de la hausse 2026</div>
+    <div class="data-row">
+      <span class="data-row-label">Sur 50 000 &euro; de plus-values</span>
+      <span class="data-row-value orange">+700 &euro;</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Sur 150 000 &euro; de plus-values</span>
+      <span class="data-row-value orange">+2 100 &euro;</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Sur 180 000 &euro; de plus-values</span>
+      <span class="data-row-value red">+2 520 &euro;</span>
+    </div>
+  </div>
+  <p style="font-size:12px; color:var(--text-dim); margin-top:-16px;">Source : calculs Auguste Patrimoine d'après LFSS 2026, art. 12.<sup>2</sup></p>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 3 : ETF SYNTHÉTIQUES -->
+<section class="section reveal">
+  <div class="section-label">03 &mdash; Le risque réglementaire</div>
+  <h2>Votre "ETF monde" dans le PEA :<br><em>pas tout à fait ce que vous croyez</em></h2>
+  <p class="lead">Quand vous achetez un ETF S&amp;P 500 dans votre PEA, vous croyez détenir du Apple, du Nvidia, du Amazon. En réalité, la mécanique est plus complexe.</p>
+  <p>Pour être éligible au PEA, un fonds doit détenir au moins 75% de titres de l'Espace Économique Européen. Les ETF qui répliquent des indices américains ou mondiaux contournent cette contrainte via un <strong>swap de performance</strong> : le fonds détient des actions européennes, mais échange contractuellement leur performance contre celle du S&amp;P 500 avec une banque contrepartie. Ce mécanisme est légal et encadré &mdash; mais il comporte des risques spécifiques.<sup>2</sup></p>
+
+  <div class="callout callout-amber">
+    <p>En février 2026, le ministère des Finances a officiellement déclaré que ces ETF synthétiques constituent "un sujet bien identifié qui fait l'objet d'analyse." Cette formulation est la même que celle utilisée en 2011, avant l'exclusion des foncières cotées du PEA.</p>
+  </div>
+
+  <div class="risk-stack">
+    <div class="risk-card">
+      <div class="risk-number">01</div>
+      <div>
+        <h3>Risque de contrepartie bancaire</h3>
+        <p>Votre exposition aux marchés mondiaux dépend d'un contrat swap avec une banque contrepartie que vous n'avez pas choisie. Votre PEA détient juridiquement des actions européennes &mdash; pas des actions américaines. En cas de défaillance de cette contrepartie, votre exposition internationale peut être impactée.</p>
+      </div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-number">02</div>
+      <div>
+        <h3>Risque de fermeture réglementaire</h3>
+        <p>Si Bercy décide d'exclure les ETF synthétiques du PEA &mdash; comme il a exclu les foncières cotées en 2011 avec la même formulation préalable &mdash; votre PEA devient purement européen. L'Europe représente environ 15% de la capitalisation boursière mondiale, contre 65% pour les États-Unis dans un MSCI World. Votre allocation serait transformée sans que vous ayez agi.</p>
+      </div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-number">03</div>
+      <div>
+        <h3>Risque de mobilité et de liquidité</h3>
+        <p>Déménagement à l'étranger, besoin de liquidités, changement de situation familiale : le PEA vous contraint. Tout retrait avant 5 ans entraîne la clôture du plan. Après 5 ans, les retraits partiels sont possibles, mais ferment le plan à de nouveaux versements.<sup>1</sup> Le PEA est pensé pour des épargnants sédentaires avec un horizon très long.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="big-quote reveal">
+  <blockquote>"Le PEA est une enveloppe conçue dans les années 90 pour encourager les Français à acheter des actions françaises. Nous sommes en 2026. Le monde a changé &mdash; l'enveloppe, elle, n'a pas bougé d'un millimètre."</blockquote>
+  <cite>&mdash; Analyse Peak Patrimoine, Avril 2026</cite>
+</div>
+
+<!-- SECTION 4 : ETF LONG TERME -->
+<section class="section reveal">
+  <div class="section-label">04 &mdash; La réalité comportementale</div>
+  <h2>La stratégie ETF long terme :<br><em>plus difficile qu'il n'y paraît</em></h2>
+  <p class="lead">La stratégie ETF "buy and hold" est mathématiquement solide. Historiquement, le S&amp;P 500 a délivré environ 10% annualisé brut sur 30 ans. Mais cette performance n'est accessible qu'à une seule condition : ne jamais vendre au mauvais moment.</p>
+  <p>Et c'est là que la réalité diverge. Tenir une stratégie ETF sur 15, 20 ou 30 ans suppose de traverser plusieurs krachs &mdash; et de ne pas agir. En 2008, le S&amp;P 500 a perdu 57%. En mars 2020, -34% en 23 jours. En 2022, -25% sur l'année. À chaque fois, la tentation de "couper les pertes" est réelle, humaine, et souvent fatale pour le rendement final.</p>
+
+  <div class="data-box">
+    <div class="data-box-label">L'écart comportemental &mdash; données DALBAR &amp; Morningstar 2025</div>
+    <div class="data-row">
+      <span class="data-row-label">Rendement S&amp;P 500 en 2024</span>
+      <span class="data-row-value">+25,02%</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Rendement réel de l'investisseur moyen en 2024 (DALBAR)</span>
+      <span class="data-row-value orange">+16,54%</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Écart comportemental en 2024 &mdash; 2e plus grand de la décennie</span>
+      <span class="data-row-value red">-8,48 pts</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Écart annuel moyen sur 10 ans (fonds &amp; ETF, Morningstar 2025)</span>
+      <span class="data-row-value red">-1,2 pt/an</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Rendement manqué sur 10 ans &mdash; équivalent à</span>
+      <span class="data-row-value red">~15% du total</span>
+    </div>
+    <div class="data-row">
+      <span class="data-row-label">Durée de détention moyenne d'un ETF actions en 2024</span>
+      <span class="data-row-value orange">4,79 ans</span>
+    </div>
+  </div>
+  <p style="font-size:12px; color:var(--text-dim); margin-top:-12px;">Sources : DALBAR QAIB 2025 (données 2024)<sup>4</sup> &middot; Morningstar Mind the Gap 2025 (décennie 2015&ndash;2024)<sup>5</sup></p>
+
+  <div class="callout">
+    <p>Sur 100 000 &euro; investis en 2004 : le portefeuille buy-and-hold parfait atteint 717 503 $ en 2024. Le portefeuille de l'investisseur moyen &mdash; avec ses allers-retours au mauvais moment &mdash; atteint 345 614 $. Plus de la moitié de la performance détruite par le comportement, pas par le marché.<sup>4</sup></p>
+  </div>
+
+  <div class="behavior-grid">
+    <div class="behavior-card good">
+      <h4>&#10003; Ce que la stratégie exige</h4>
+      <div class="behavior-item"><div class="dot"></div><span>Investir régulièrement, même quand les marchés baissent de -30%</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Ne pas regarder son portefeuille pendant les crises</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Résister à l'information financière quotidienne</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Maintenir la même allocation sur 20+ ans</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Accepter des années entières en négatif</span></div>
+    </div>
+    <div class="behavior-card bad">
+      <h4>&#10007; Ce que font la plupart des gens</h4>
+      <div class="behavior-item"><div class="dot"></div><span>Vendre à -25% pour "limiter les pertes"</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Racheter après la remontée, manquant les meilleures journées</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Modifier leur allocation à chaque actualité géopolitique</span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Durée de détention moyenne : 4,79 ans seulement<sup>4</sup></span></div>
+      <div class="behavior-item"><div class="dot"></div><span>Sortir du PEA avant 5 ans pour un projet imprévu</span></div>
+    </div>
+  </div>
+
+  <p>Morningstar souligne que les fonds les moins volatils présentent les écarts comportementaux les plus faibles &mdash; ce qui plaide pour des stratégies larges et diversifiées (MSCI World, S&amp;P 500) plutôt que des fonds sectoriels ou thématiques, dont l'écart moyen dépasse 2,6 points par an.<sup>5</sup></p>
+
+  <div class="stat-banner">
+    <div>
+      <div class="stat-number">15 ans</div>
+      <div class="stat-label">Consécutifs de sous-performance des investisseurs vs S&amp;P 500 (DALBAR, 2024)<sup>4</sup></div>
+    </div>
+    <div>
+      <div class="stat-number">25%</div>
+      <div class="stat-label">Seulement des investisseurs ont correctement anticipé le sens du marché en 2024 (DALBAR)<sup>4</sup></div>
+    </div>
+    <div>
+      <div class="stat-number">20 ans</div>
+      <div class="stat-label">Horizon minimum recommandé pour traverser plusieurs cycles complets</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 5 : QUESTIONS -->
+<section class="section reveal">
+  <div class="section-label">05 &mdash; Les bonnes questions</div>
+  <h2>Ce qu'il faut <em>évaluer ensemble</em></h2>
+  <p class="lead">Le PEA reste une enveloppe pertinente pour certains profils, dans certaines situations. Ce n'est pas une question de mode &mdash; c'est une question d'adéquation à votre situation spécifique.</p>
+
+  <div class="risk-stack">
+    <div class="risk-card">
+      <div class="risk-number">?</div>
+      <div>
+        <h3>Quel est votre horizon réel ?</h3>
+        <p>Pas votre horizon théorique &mdash; votre horizon réel, compte tenu de vos projets de vie : achat immobilier, transmission, mobilité professionnelle, départ à l'étranger. Le PEA est structurellement peu flexible face à ces évolutions. La durée de détention moyenne d'un ETF actions est de 4,79 ans &mdash; soit moins que le seuil des 5 ans requis pour l'avantage fiscal.<sup>4</sup></p>
+      </div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-number">?</div>
+      <div>
+        <h3>Quelle est votre tolérance réelle à la volatilité ?</h3>
+        <p>Pas votre tolérance déclarée &mdash; votre réaction probable face à -30% sur votre portefeuille. Les données Morningstar montrent que plus un fonds est volatile, plus l'écart entre la performance du fonds et celle de l'investisseur se creuse. Une stratégie ETF non accompagnée peut amplifier les erreurs comportementales.<sup>5</sup></p>
+      </div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-number">?</div>
+      <div>
+        <h3>Votre allocation est-elle cohérente dans son ensemble ?</h3>
+        <p>Le PEA ne doit pas exister en isolation. Assurance-vie (dont les PS restent à 17,2% en 2026), PER, compte-titres, SCPI : chaque enveloppe a un rôle. La question n'est pas "PEA ou pas PEA" mais "comment structurer l'ensemble de façon cohérente" selon votre TMI, votre horizon et votre situation patrimoniale.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section class="sources-section reveal">
+  <div class="sources-inner">
+    <h3>Sources &amp; références</h3>
+    <ul class="source-list">
+      <li class="source-item">
+        <div class="source-num">1</div>
+        <div class="source-content">
+          <div class="source-title">PEA.fr &mdash; Fiscalité du PEA : imposition, retraits et prélèvements [Guide 2026]</div>
+          <div class="source-detail">Règles de fonctionnement, clôture avant 5 ans, retraits partiels, capitalisation en franchise d'impôt.</div>
+          <div class="source-url">pea.fr/guides/fiscalite-pea-2/ &middot; pea.fr/fiscalite/fiscalite-pea/</div>
+        </div>
+      </li>
+      <li class="source-item">
+        <div class="source-num">2</div>
+        <div class="source-content">
+          <div class="source-title">Auguste Patrimoine &mdash; PEA et hausse de la CSG en 2026 : impact, calcul et stratégies de retrait</div>
+          <div class="source-detail">Analyse détaillée LFSS 2026 art. 12, calculs de surcoût, effet rétroactif sur les PEA ouverts depuis 2018, ETF synthétiques (75% EEE).</div>
+          <div class="source-url">www.auguste-patrimoine.fr/blog/pea-et-hausse-de-la-csg-en-2026-impact-calcul-et-strategies-de-retrait</div>
+        </div>
+      </li>
+      <li class="source-item">
+        <div class="source-num">3</div>
+        <div class="source-content">
+          <div class="source-title">Banque Transatlantique / Banque Populaire &mdash; LFSS 2026 : loi n&deg;2025-1403 du 30 décembre 2025</div>
+          <div class="source-detail">Texte législatif de référence. Hausse CSG de 9,2% à 10,6%, PS total à 18,6%, exclusion de l'AV, impact PEA et CTO. Taux de 17,2% maintenu pour AV, revenus fonciers, plus-values immobilières.</div>
+          <div class="source-url">www.banquetransatlantique.com &middot; www.banquepopulaire.fr/conseils/mesures-fiscales-sociales-2026/</div>
+        </div>
+      </li>
+      <li class="source-item">
+        <div class="source-num">4</div>
+        <div class="source-content">
+          <div class="source-title">DALBAR &mdash; Quantitative Analysis of Investor Behavior (QAIB) 2025, données 2024</div>
+          <div class="source-detail">L'investisseur actions moyen a réalisé +16,54% en 2024 vs +25,02% pour le S&amp;P 500 (écart de 848 bps, 2e plus grand de la décennie). 15 années consécutives de sous-performance. Taux de bonne anticipation du marché en 2024 : 25%. Durée de détention moyenne ETF actions 2024 : 4,79 ans. Simulation sur 20 ans : $100k &rarr; $717k (buy-and-hold) vs $345k (comportement moyen).</div>
+          <div class="source-url">www.dalbar.com/qaib/ &middot; Relayé par PLANADVISER (avril 2025) et Kirr Marbach (oct. 2025)</div>
+        </div>
+      </li>
+      <li class="source-item">
+        <div class="source-num">5</div>
+        <div class="source-content">
+          <div class="source-title">Morningstar &mdash; Mind the Gap 2025 (décennie 2015&ndash;2024, publié août 2025)</div>
+          <div class="source-detail">Le rendement réel des investisseurs en fonds et ETF US est de 7,0%/an sur 10 ans vs 8,2%/an pour les fonds eux-mêmes &mdash; écart de 1,2 pt/an, équivalent à ~15% du rendement total. Gap persistent sur 5 périodes glissantes consécutives. Gap plus large pour les ETF (-1,7 pt) que les fonds ouverts (-1,2 pt). Fonds sectoriels : gap moyen de 2,6 pts/an. Fonds allocation (set-and-forget) : gap le plus faible (-0,4 pt).</div>
+          <div class="source-url">www.morningstar.com/financial-advisors/volatility-bedevils-fund-investors &middot; PDF complet : US_Mind_the_Gap_2025.pdf</div>
+        </div>
+      </li>
+      <li class="source-item">
+        <div class="source-num">6</div>
+        <div class="source-content">
+          <div class="source-title">Meilleurtaux Placement &mdash; PEA : les cotisations sociales passent à 18,6% en 2026</div>
+          <div class="source-detail">Calculs détaillés d'exemples chiffrés. Historique des taux : 15,5% (2018) &rarr; 17,2% (2019) &rarr; 18,6% (2026). Suppression des taux historiques pour les PEA ouverts à partir de 2018.</div>
+          <div class="source-url">placement.meilleurtaux.com/bourse/actualites/2026-fevrier/pea-les-cotisations-sociales-passent-a-18-6-en-2026.html</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Document informatif &mdash; Peak Patrimoine &middot; Alexandre Dussourd, CGP &middot; avril 2026<br>
+  Ce document ne constitue pas un conseil en investissement. Toute décision patrimoniale doit faire l'objet d'une analyse individuelle. Les performances passées ne préjugent pas des performances futures.</p>
+</footer>
+
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
