@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finzzle Groupe — Positionnement marché</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --bg2: #ffffff;
+    --bg3: #f0ede8;
+    --orange: #C85520;
+    --orange-light: #C8552012;
+    --orange-mid: #C8552025;
+    --orange-bright: #D4622A;
+    --text: #1a1815;
+    --text-muted: #4a4845;
+    --text-dim: #9a9690;
+    --border: #e2ddd8;
+    --border-accent: #ccc8c2;
+    --red: #b83225;
+    --red-light: #b8322510;
+    --amber: #b87c1a;
+    --amber-light: #b87c1a12;
+    --green: #1e8a4a;
+    --green-light: #1e8a4a15;
+    --blue: #1a5fa8;
+    --blue-light: #1a5fa810;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 32px 64px;
+    text-align: center;
+  }
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange-mid);
+    border: 1px solid var(--orange);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5.5vw, 68px);
+    line-height: 1.08;
+    font-weight: 700;
+    max-width: 820px;
+    margin: 0 auto 20px;
+  }
+  .hero h1 em { font-style: italic; color: var(--orange); }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 580px;
+    margin: 0 auto 48px;
+    font-weight: 300;
+    line-height: 1.75;
+  }
+  .hero-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hkpi {
+    background: var(--bg2);
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .hkpi-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--orange-bright);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .hkpi-label { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .hkpi-src { font-size: 10px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+
+  /* ── LAYOUT ── */
+  .section { max-width: 900px; margin: 0 auto; padding: 80px 32px; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 28px;
+  }
+  .section h2 em { font-style: italic; color: var(--orange); }
+  .lead {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    line-height: 1.8;
+  }
+  p { color: var(--text-muted); margin-bottom: 16px; }
+  .divider { width: 100%; height: 1px; background: var(--border); }
+  sup { font-size: 10px; color: var(--orange); font-weight: 600; vertical-align: super; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-green  { background: var(--green-light); color: var(--green); border: 1px solid var(--green); }
+  .badge-orange { background: var(--orange-mid); color: var(--orange); border: 1px solid var(--orange); }
+  .badge-red    { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
+  .badge-amber  { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber); }
+  .badge-dim    { background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin: 28px 0;
+  }
+  .callout p { font-size: 15px; color: var(--text); margin: 0; line-height: 1.7; }
+  .callout-green { border-left-color: var(--green); }
+  .callout-red   { border-left-color: var(--red); }
+  .callout-amber { border-left-color: var(--amber); }
+  .callout-blue  { border-left-color: var(--blue); }
+
+  /* ── STAT CARDS 3-COL ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 20px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border-accent); box-shadow: 0 2px 14px rgba(0,0,0,0.04); }
+  .stat-card.accent { border-top: 2px solid var(--orange); }
+  .stat-card.accent-green { border-top: 2px solid var(--green); }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--orange-bright);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-num.green { color: var(--green); }
+  .stat-t { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .stat-d { font-size: 12px; color: var(--text-muted); line-height: 1.65; }
+  .stat-src { font-size: 10px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+
+  /* ── PYRAMIDE ── */
+  .pyra-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin: 32px 0;
+  }
+  .pyra { display: flex; flex-direction: column; gap: 3px; align-items: center; }
+  .py-tier { display: flex; justify-content: center; width: 100%; }
+  .py-bar {
+    display: flex; align-items: center; justify-content: center;
+    height: 48px; color: white; font-weight: 600; font-size: 13px;
+  }
+  .py-lbl {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 14px;
+  }
+  .py-legs { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+  .py-leg {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+  }
+  .py-leg:last-child { border-bottom: none; }
+  .py-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; margin-top: 4px; }
+  .py-lt { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .py-ls { font-size: 12px; color: var(--text-muted); }
+  .py-note { font-size: 10px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+
+  /* ── VIABILITÉ TABLE ── */
+  .viab-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .viab-table th {
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    text-align: center;
+  }
+  .viab-table th:first-child { text-align: left; }
+  .viab-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+  .viab-table tr:last-child td { border-bottom: none; }
+  .viab-table td:first-child { font-weight: 600; color: var(--text); text-align: left; font-size: 13px; }
+  .viab-table tr.us td { background: var(--orange-light); }
+  .viab-table tr.us td:first-child { color: var(--orange); }
+  .viab-note { font-size: 10px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+
+  /* ── BAR CHART ENCOURS ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; margin: 28px 0; }
+  .bc-row { display: grid; grid-template-columns: 180px 1fr 100px; gap: 14px; align-items: center; }
+  .bc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .bc-name.us { color: var(--orange); }
+  .bc-wrap { height: 24px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+  .bc-bar {
+    height: 100%; border-radius: 4px;
+    display: flex; align-items: center; padding-left: 8px;
+    font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap;
+  }
+  .bc-val { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; color: var(--text); text-align: right; }
+  .bc-val.orange { color: var(--orange); }
+
+  /* ── TENDANCES ── */
+  .tend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 32px 0;
+  }
+  .tend-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    transition: border-color 0.2s;
+  }
+  .tend-card:hover { border-color: var(--border-accent); }
+  .tend-icon { font-size: 22px; margin-bottom: 10px; }
+  .tend-t { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .tend-d { font-size: 12px; color: var(--text-muted); line-height: 1.65; }
+  .tend-stat {
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--orange); margin-top: 8px;
+    padding: 2px 8px; background: var(--orange-light);
+    border-radius: 4px;
+  }
+
+  /* ── TRAJECTOIRE ── */
+  .traj-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+  .traj-item { background: var(--bg2); padding: 18px 16px; }
+  .traj-item.highlight { background: var(--orange-light); }
+  .traj-year { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+  .traj-val { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 3px; }
+  .traj-val.orange { color: var(--orange); }
+  .traj-label { font-size: 11px; color: var(--text-muted); }
+  .traj-delta { font-size: 10px; font-weight: 700; color: var(--green); margin-top: 4px; }
+
+  /* ── PARTENARIATS ── */
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 28px 0;
+  }
+  .partner-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 18px;
+  }
+  .partner-icon { font-size: 22px; margin-bottom: 10px; }
+  .partner-t { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .partner-d { font-size: 12px; color: var(--text-muted); line-height: 1.65; }
+
+  /* ── COMP TABLE ACTEURS ── */
+  .actors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .actors-table th {
+    padding: 10px 12px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .actors-table th.us { background: var(--orange-light); color: var(--orange); }
+  .actors-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  .actors-table tr:last-child td { border-bottom: none; }
+  .actors-table td:first-child { font-weight: 600; color: var(--text); }
+  .actors-table tr.us-row td { background: var(--orange-light); }
+  .actors-table tr.us-row td:first-child { color: var(--orange); }
+  .val-o { font-family:'Courier New',monospace; font-weight:700; color: var(--orange); }
+  .val-g { font-family:'Courier New',monospace; font-weight:700; color: var(--green); }
+
+  /* ── BIG QUOTE ── */
+  .big-quote {
+    text-align: center;
+    padding: 64px 40px;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .big-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 2.8vw, 30px);
+    font-style: italic;
+    line-height: 1.45;
+    max-width: 660px;
+    margin: 0 auto 16px;
+    color: var(--text);
+  }
+  .big-quote cite { font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; }
+
+  /* ── SOURCES ── */
+  .sources-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px;
+  }
+  .sources-inner { max-width: 900px; margin: 0 auto; }
+  .sources-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .source-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .source-item:last-child { border-bottom: none; }
+  .source-num { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text-dim); min-width: 20px; flex-shrink: 0; }
+  .source-title { font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .source-detail { color: var(--text-dim); font-size: 12px; }
+
+  .footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* ── ANIM ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 680px) {
+    .stat-grid, .tend-grid, .partner-grid { grid-template-columns: 1fr; }
+    .pyra-section { grid-template-columns: 1fr; }
+    .traj-grid { grid-template-columns: 1fr 1fr; }
+    .hero-kpis { grid-template-columns: 1fr 1fr; }
+    .bc-row { grid-template-columns: 130px 1fr 80px; }
+    .section { padding: 56px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-pill">Usage interne · CGP Skool · Peak Patrimoine · Avril 2026</div>
+  <h1>Finzzle Groupe :<br><em>où on se situe</em> vraiment.</h1>
+  <p class="hero-sub">Le marché de la gestion de patrimoine en France est massif et en consolidation accélérée. Données réelles, sources citées — pour comprendre notre positionnement par rapport aux autres acteurs CGP.</p>
+
+  <div class="hero-kpis">
+    <div class="hkpi">
+      <div class="hkpi-num">3,4 Mds€</div>
+      <div class="hkpi-label">Encours conseillés 2025 · +29% en 1 an</div>
+      <div class="hkpi-src">Communiqué Finzzle, fév. 2026</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-num">1er</div>
+      <div class="hkpi-label">Collecteur & financeur SCPI France · +38%</div>
+      <div class="hkpi-src">Finzzle / ASPIM-IEIF 2025</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-num">4 100+</div>
+      <div class="hkpi-label">Consultants habilités · dont 850 CIF (+25%)</div>
+      <div class="hkpi-src">Finzzle Groupe, fév. 2026</div>
+    </div>
+    <div class="hkpi">
+      <div class="hkpi-num">97%</div>
+      <div class="hkpi-label">Satisfaction clients (54 000 enquêtes OpinionWay)</div>
+      <div class="hkpi-src">OpinionWay 2024–2025</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── SECTION 1 : TAILLE DU MARCHÉ ── -->
+<section class="section reveal">
+  <div class="section-label">01 — Le marché</div>
+  <h2>Un potentiel <em>massif, structurellement sous-conseillé.</em></h2>
+  <p class="lead">15 000 milliards d'euros de patrimoine des Français. Un taux d'épargne à son plus haut historique. Et une grande partie de ce capital soit dormant, soit mal placé dans des fonds bancaires à 2–3%/an.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <div class="stat-num">15 000</div>
+      <div class="stat-t">Milliards € de patrimoine total des ménages</div>
+      <div class="stat-d">41% d'actifs financiers · 59% immobilier. En croissance structurelle de +3,6%/an sur les 5 dernières années.<sup>1</sup></div>
+      <div class="stat-src">Banque de France, 2023</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2 108</div>
+      <div class="stat-t">Milliards € d'actifs liquides dormants</div>
+      <div class="stat-d">Comptes courants + livrets — dont Livret A à 1,7% depuis fév. 2025 (encours : 444 Mds€). Capital sous-rémunéré captif des banques de réseau.<sup>1,5</sup></div>
+      <div class="stat-src">Banque de France, 2023 / 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">19–20%</div>
+      <div class="stat-t">Taux d'épargne des ménages</div>
+      <div class="stat-d">Record depuis 1980 hors COVID (moy. historique : 16%). Les Français épargnent — mais sans conseil patrimonial adapté pour 7,2M de foyers.<sup>1</sup></div>
+      <div class="stat-src">Banque de France / INSEE, 2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">~10%</div>
+      <div class="stat-t">Part de marché des CGP (encours)</div>
+      <div class="stat-d">Pour la première fois, les CGP franchissent la barre des 10% de part de marché, après une longue stagnation à 7–8%. La profession gagne du terrain sur les banques.<sup>2</sup></div>
+      <div class="stat-src">H24 Finance, données marché 2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">68%</div>
+      <div class="stat-t">Considèrent le conseil patrimonial essentiel</div>
+      <div class="stat-d">68% sur l'épargne · 75% estiment payer trop d'impôts. La demande de conseil est structurelle — l'offre accessible à tous les profils ne l'est pas.<sup>1</sup></div>
+      <div class="stat-src">AT Kearney, due diligence Finzzle, 2025</div>
+    </div>
+    <div class="stat-card accent-green">
+      <div class="stat-num green">5 985</div>
+      <div class="stat-t">CGP recensés en France (AMF 2025)</div>
+      <div class="stat-d">81% fonctionnent par rétrocommissions · 12% en mode hybride · 7% en honoraires purs MIF2. Notre modèle représente la grande majorité du marché.<sup>6</sup></div>
+      <div class="stat-src">AMF, rapport chiffres-clés CIF, décembre 2025</div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>La réalité du marché :</strong> une grande majorité du patrimoine français reste mal conseillée ou non conseillée. Les banques de réseau ferment des agences. Les CGP indépendants sont économiquement non viables sous 100–300k€. C'est le vide que nous occupons — et personne d'autre ne peut le faire à notre échelle.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── SECTION 2 : SEGMENTATION & VIABILITÉ ── -->
+<section class="section reveal">
+  <div class="section-label">02 — Qui peut servir qui</div>
+  <h2>18 millions de ménages — <em>une seule adresse viable sur le grand public.</em></h2>
+  <p class="lead">La segmentation patrimoniale détermine quels modèles sont économiquement viables pour chaque profil. C'est la clé de compréhension de notre position concurrentielle.</p>
+
+  <div class="pyra-section">
+    <div>
+      <div class="py-lbl">Segmentation — 18M ménages · Banque de France 2023<sup>1</sup></div>
+      <div class="pyra">
+        <div class="py-tier"><div class="py-bar" style="width:110px;background:#b83028;border-radius:4px 4px 0 0">10%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:188px;background:#d4622a">10%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:268px;background:#e89030">40%</div></div>
+        <div class="py-tier"><div class="py-bar" style="width:340px;background:#9a7040;border-radius:0 0 4px 4px">40%</div></div>
+      </div>
+      <div class="py-legs">
+        <div class="py-leg">
+          <div class="py-dot" style="background:#b83028"></div>
+          <div>
+            <div class="py-lt">Très hauts patrimoines — &gt; 992k€</div>
+            <div class="py-ls">Banques privées · wealth management · Crystal (&gt;22Mds€) · Cyrus-Herez (17Mds€)</div>
+          </div>
+        </div>
+        <div class="py-leg">
+          <div class="py-dot" style="background:#d4622a"></div>
+          <div>
+            <div class="py-lt">Hauts patrimoines — 586k€ à 992k€</div>
+            <div class="py-ls">CGPI MIF2 · hybride SilmaTec · banques privées · <strong>Finzzle</strong></div>
+          </div>
+        </div>
+        <div class="py-leg">
+          <div class="py-dot" style="background:#e89030"></div>
+          <div>
+            <div class="py-lt">Patrimoines moyens — 185k€ à 586k€</div>
+            <div class="py-ls"><strong>Finzzle</strong> · banques · assureurs · hybride (≥100k€)</div>
+          </div>
+        </div>
+        <div class="py-leg">
+          <div class="py-dot" style="background:#9a7040"></div>
+          <div>
+            <div class="py-lt" style="font-weight:700">Grand public — &lt; 185k€ · 7,2M foyers</div>
+            <div class="py-ls" style="color:var(--orange);font-weight:600">Finzzle + banques uniquement. Aucun autre modèle CGP n'est viable ici.</div>
+          </div>
+        </div>
+      </div>
+      <div class="py-note">Source : Banque de France, 2023</div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;">Viabilité économique par segment</div>
+      <table class="viab-table">
+        <thead>
+          <tr>
+            <th>Acteur</th>
+            <th>&lt;185k€</th>
+            <th>185–586k€</th>
+            <th>586–992k€</th>
+            <th>&gt;992k€</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="us">
+            <td>Finzzle Groupe ★</td>
+            <td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+          </tr>
+          <tr>
+            <td>Hybride (SilmaTec type)</td>
+            <td>🚫</td><td>⚠️</td><td>✅</td><td>✅</td>
+          </tr>
+          <tr>
+            <td>Honoraires purs MIF2</td>
+            <td>🚫</td><td>🚫</td><td>✅</td><td>✅</td>
+          </tr>
+          <tr>
+            <td>Banques de réseau</td>
+            <td>✅</td><td>✅</td><td>⚠️</td><td>🚫</td>
+          </tr>
+          <tr>
+            <td>Banques privées</td>
+            <td>🚫</td><td>🚫</td><td>⚠️</td><td>✅</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="viab-note">✅ Accessible · ⚠️ Viable avec réserves · 🚫 Non viable économiquement<br>Sources : AMF déc. 2025 · Webinaire CGPulse 30/01/2026 · prosper-conseil.fr<sup>3,6</sup></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── SECTION 3 : GRANDS ACTEURS DU MARCHÉ ── -->
+<section class="section reveal">
+  <div class="section-label">03 — Les acteurs leaders</div>
+  <h2>Où se situe Finzzle <em>parmi les grands acteurs CGP</em> ?</h2>
+  <p class="lead">Le marché des grands acteurs CGP est dominé par des groupes avec des encours de 10 à 22 milliards d'euros. Finzzle Groupe, avec 3,4 Mds€ en croissance de +29%, entre dans la cour des acteurs nationaux — avec un positionnement radicalement différent.</p>
+
+  <!-- BAR CHART ENCOURS -->
+  <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;">Encours sous gestion/conseil — grands acteurs CGP France (données publiques 2024–2025)</div>
+  <div class="bar-chart">
+    <div class="bc-row">
+      <div class="bc-name">Crystal Groupe</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:100%;background:#b83028;">Leader marché</div></div>
+      <div class="bc-val">&gt;22 Mds€</div>
+    </div>
+    <div class="bc-row">
+      <div class="bc-name">Cyrus-Herez</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:77%;background:#c04820;"> </div></div>
+      <div class="bc-val">17 Mds€</div>
+    </div>
+    <div class="bc-row">
+      <div class="bc-name">Astoria Finance</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:45%;background:#c85020;"> </div></div>
+      <div class="bc-val">10 Mds€</div>
+    </div>
+    <div class="bc-row">
+      <div class="bc-name">Groupe Premium</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:45%;background:#c85020;"> </div></div>
+      <div class="bc-val">10 Mds€</div>
+    </div>
+    <div class="bc-row">
+      <div class="bc-name us">Finzzle Groupe ★</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:15%;background:var(--orange);">+29%/an</div></div>
+      <div class="bc-val orange">3,4 Mds€</div>
+    </div>
+    <div class="bc-row">
+      <div class="bc-name" style="color:var(--text-dim)">Banques de réseau</div>
+      <div class="bc-wrap"><div class="bc-bar" style="width:100%;background:#ccc8c2;color:var(--text-dim);">Fonds captifs · pas de conseil patrimonial</div></div>
+      <div class="bc-val" style="color:var(--text-dim)">~</div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--text-dim);margin-top:-16px;font-style:italic;">Sources : Périclès Group oct. 2024 · Anaxago oct. 2024 · Communiqué Finzzle fév. 2026<sup>4,7</sup></p>
+
+  <!-- TABLEAU ACTEURS -->
+  <div style="overflow-x:auto;margin-top:32px;">
+    <table class="actors-table">
+      <thead>
+        <tr>
+          <th>Acteur</th>
+          <th>Modèle</th>
+          <th>Encours</th>
+          <th>Conseillers</th>
+          <th>Seuil accès</th>
+          <th>Actionnaires</th>
+          <th>Angle mort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Crystal Groupe</td>
+          <td>Consolidateur / hybride</td>
+          <td class="val-o">&gt;22 Mds€</td>
+          <td>600+</td>
+          <td>&gt;500k€</td>
+          <td>Indépendant</td>
+          <td>Grand public non adressé</td>
+        </tr>
+        <tr>
+          <td>Cyrus-Herez</td>
+          <td>Haut patrimoine · gestion privée</td>
+          <td class="val-o">17 Mds€</td>
+          <td>~300</td>
+          <td>&gt;500k€</td>
+          <td>Bridgepoint (fusion 2024)</td>
+          <td>Grand public non adressé</td>
+        </tr>
+        <tr>
+          <td>Astoria Finance</td>
+          <td>Consolidateur CGP</td>
+          <td class="val-o">10 Mds€</td>
+          <td>—</td>
+          <td>&gt;200k€</td>
+          <td>Naxicap Partners</td>
+          <td>Grand public non adressé</td>
+        </tr>
+        <tr>
+          <td>Groupe Premium</td>
+          <td>CGP haut de gamme</td>
+          <td class="val-o">10 Mds€</td>
+          <td>—</td>
+          <td>&gt;300k€</td>
+          <td>Blackstone · Eurazeo</td>
+          <td>Grand public non adressé</td>
+        </tr>
+        <tr class="us-row">
+          <td>Finzzle Groupe ★</td>
+          <td>Réseau marketing relationnel · rétrocommissions</td>
+          <td class="val-g">3,4 Mds€ (+29%)</td>
+          <td class="val-g">4 100+</td>
+          <td class="val-g">50 €/mois</td>
+          <td>Bridgepoint Dev. Capital · Xavier Chausson</td>
+          <td>Seul à couvrir <strong>tous les segments</strong></td>
+        </tr>
+        <tr>
+          <td>Banques de réseau</td>
+          <td>Distribution captive · fonds maison</td>
+          <td>—</td>
+          <td>—</td>
+          <td>50€/mois</td>
+          <td>Institutionnel</td>
+          <td>Conseil biaisé · produits captifs</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:11px;color:var(--text-dim);margin-top:-16px;font-style:italic;">Sources : Périclès Group oct. 2024 · Anaxago oct. 2024 · Communiqué Finzzle · Bridgepoint mai 2025<sup>4,7,8</sup></p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;">
+    <div class="callout">
+      <p><strong>L'angle mort des leaders :</strong> Crystal, Cyrus-Herez, Astoria, Premium ciblent tous des patrimoines supérieurs à 200–500k€. Le segment grand public (7,2M de foyers sous 185k€) n'est servi par aucun d'eux. C'est notre terrain exclusif — et structurellement inaccessible à leurs modèles économiques.</p>
+    </div>
+    <div class="callout callout-green">
+      <p><strong>Signal Bridgepoint :</strong> Bridgepoint investit dans Cyrus-Herez, Primonial ET Finzzle Groupe. Cet investisseur qui connaît le secteur de l'intérieur a validé nos avantages compétitifs via une due diligence AT Kearney — c'est la validation externe la plus crédible possible.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── SECTION 4 : TENDANCES DE MARCHÉ ── -->
+<section class="section reveal">
+  <div class="section-label">04 — Tendances structurelles</div>
+  <h2>Pourquoi le marché <em>joue en notre faveur.</em></h2>
+  <p class="lead">Le marché des CGP français est en transformation profonde. Six tendances lourdes documentées favorisent directement le modèle Finzzle Groupe.</p>
+
+  <div class="tend-grid">
+    <div class="tend-card">
+      <div class="tend-icon">📈</div>
+      <div class="tend-t">Croissance continue de la clientèle CGP</div>
+      <div class="tend-d">67% des CGP constatent une hausse de leur clientèle sur 12 mois. 83% estiment avoir de fortes perspectives à 5 ans. 94% considèrent que la profession se porte bien.<sup>3</sup></div>
+      <div class="tend-stat">+5,3% de cabinets en 1 an · 2 439 cabinets en 2024</div>
+    </div>
+    <div class="tend-card">
+      <div class="tend-icon">🔄</div>
+      <div class="tend-t">Consolidation PE-backed accélérée</div>
+      <div class="tend-d">41% des CGP envisagent des acquisitions, 46% des cessions. Les grands groupes (Crystal, Cyrus-Herez, Astoria, Premium) dominent. La lourdeur réglementaire MIF2/DDA rend l'indépendance totale de plus en plus coûteuse.<sup>4</sup></div>
+      <div class="tend-stat">Part de marché CGP : 7–8% → ~10% aujourd'hui</div>
+    </div>
+    <div class="tend-card">
+      <div class="tend-icon">👤</div>
+      <div class="tend-t">Rajeunissement et élargissement de la clientèle</div>
+      <div class="tend-d">47% des CGP constatent un rajeunissement de leur clientèle. 34% s'ouvrent à des profils plus modestes — notre terrain historique. Les banques ferment des agences et excluent les petits patrimoines.<sup>3</sup></div>
+      <div class="tend-stat">121 clients en moyenne / cabinet CNCGP 2024</div>
+    </div>
+    <div class="tend-card">
+      <div class="tend-icon">⚖️</div>
+      <div class="tend-t">Réglementation : avantage aux réseaux structurés</div>
+      <div class="tend-d">70% des CGP citent l'adaptation réglementaire (MIF2, DDA, ORIAS, documentation) comme leur premier défi. Finzzle mutualise ce coût fixe sur 4 100 consultants — un cabinet solo de 4–5 personnes ne peut pas en faire autant.<sup>3</sup></div>
+      <div class="tend-stat">Veille juridique centralisée · support conformité groupe</div>
+    </div>
+    <div class="tend-card">
+      <div class="tend-icon">💼</div>
+      <div class="tend-t">CA moyen des CGP en forte hausse</div>
+      <div class="tend-d">Le CA moyen par adhérent CNCGP atteint 650 000 €, en hausse de 9% sur 1 an. La collecte des CGP dépasse 13,6 milliards d'euros en 2024. L'assurance représente 67% du CA — notre cœur de métier.<sup>5</sup></div>
+      <div class="tend-stat">CA moyen CGP : 650k€ · +9% sur 1 an</div>
+    </div>
+    <div class="tend-card">
+      <div class="tend-icon">🤖</div>
+      <div class="tend-t">IA et digitalisation : investissements mutualisables</div>
+      <div class="tend-d">82% des CGP considèrent l'IA incontournable. 24% l'utilisent déjà. Ces investissements (budget IT SilmaTec : 40k€/an pour 4–5 personnes) sont mutualisables à l'échelle d'un réseau de 4 100 consultants.<sup>3</sup></div>
+      <div class="tend-stat">Finzzle Digital — filiale dédiée à la transformation numérique</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── SECTION 5 : TRAJECTOIRE FINZZLE ── -->
+<section class="section reveal">
+  <div class="section-label">05 — Notre trajectoire</div>
+  <h2>Une croissance <em>documentée et continue depuis 2019.</em></h2>
+  <p class="lead">Les chiffres 2025 publiés officiellement — communiqué de presse Galivel & Associés, 11 février 2026 — montrent une accélération sur tous les indicateurs. Ce ne sont pas des projections : ce sont des résultats audités.</p>
+
+  <div class="traj-grid">
+    <div class="traj-item">
+      <div class="traj-year">Collecte AV 2023</div>
+      <div class="traj-val">380 M€</div>
+      <div class="traj-label">Assurance-vie</div>
+    </div>
+    <div class="traj-item">
+      <div class="traj-year">Collecte AV 2024</div>
+      <div class="traj-val">450 M€</div>
+      <div class="traj-label">Assurance-vie</div>
+      <div class="traj-delta">+18%</div>
+    </div>
+    <div class="traj-item">
+      <div class="traj-year">Collecte AV 2025</div>
+      <div class="traj-val">650 M€</div>
+      <div class="traj-label">Assurance-vie</div>
+      <div class="traj-delta">+44%</div>
+    </div>
+    <div class="traj-item highlight">
+      <div class="traj-year">Encours total 2025</div>
+      <div class="traj-val orange">3,4 Mds€</div>
+      <div class="traj-label">Total conseillé</div>
+      <div class="traj-delta" style="color:var(--orange);">+29% vs 2024</div>
+    </div>
+  </div>
+
+  <div class="stat-grid" style="margin-top:0;">
+    <div class="stat-card accent">
+      <div class="stat-num">1,814 Md€</div>
+      <div class="stat-t">Collecte globale 2025</div>
+      <div class="stat-d">AV + PER : <strong>+36%</strong> · SCPI : <strong>+38%</strong><br>Leader national collecte et financement SCPI</div>
+      <div class="stat-src">Communiqué Finzzle, fév. 2026<sup>7</sup></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">36 000</div>
+      <div class="stat-t">Nouveaux clients accompagnés en 2025</div>
+      <div class="stat-d">Soit environ 100 nouveaux clients par jour — preuve d'un modèle de distribution opérationnel et scalable.</div>
+      <div class="stat-src">Communiqué Finzzle, fév. 2026<sup>7</sup></div>
+    </div>
+    <div class="stat-card accent-green">
+      <div class="stat-num green">9,8/10</div>
+      <div class="stat-t">Note de recommandation client</div>
+      <div class="stat-d">97% de satisfaction · enquête OpinionWay sur <strong>54 000 clients</strong> — pas un sondage interne, une mesure indépendante.</div>
+      <div class="stat-src">OpinionWay, 2024–2025<sup>7</sup></div>
+    </div>
+  </div>
+
+  <!-- PARTENARIATS 2025 -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin:40px 0 16px;color:var(--text);">Partenariats structurants conclus en 2025</h3>
+  <div class="partner-grid">
+    <div class="partner-card">
+      <div class="partner-icon">🏢</div>
+      <div class="partner-t">CORUM — SCPI</div>
+      <div class="partner-d">Alliance avec CORUM, l'un des leaders historiques de la pierre-papier. Renforce notre offre SCPI avec des véhicules de référence (Corum Origin, etc.).</div>
+    </div>
+    <div class="partner-card">
+      <div class="partner-icon">🛡️</div>
+      <div class="partner-t">APRIL — Assurance emprunteur</div>
+      <div class="partner-d">Partenariat pour l'assurance emprunteur — élément clé dans la sécurisation des projets immobiliers de nos clients. Renforce notre offre financement.</div>
+    </div>
+    <div class="partner-card">
+      <div class="partner-icon">🏘️</div>
+      <div class="partner-t">Coloc Sélection — Fonds colocation</div>
+      <div class="partner-d">Fonds inédit colocation avec Urban Premium et Colosséum Invest. Accessible via AV et PER, référencé APICIL et Vie Plus. Innovation de gamme.</div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--text-dim);font-style:italic;">Source : Communiqué Finzzle Groupe, Galivel & Associés, 11 février 2026<sup>7</sup></p>
+</section>
+
+<div class="big-quote reveal">
+  <blockquote>"Crystal, Cyrus-Herez, Astoria et Premium ont des encours de 10 à 22 milliards — et aucun ne peut servir un salarié qui épargne 200€/mois. C'est notre terrain exclusif. Et personne n'a les process pour nous y concurrencer."</blockquote>
+  <cite>— Analyse Peak Patrimoine · Données Banque de France & Finzzle Groupe, 2025</cite>
+</div>
+
+<!-- ── SOURCES ── -->
+<section class="sources-section reveal">
+  <div class="sources-inner">
+    <h3>Sources & références</h3>
+    <div class="source-item">
+      <div class="source-num">1</div>
+      <div>
+        <div class="source-title">Banque de France 2023 · INSEE 2024 · AT Kearney due diligence Finzzle 2025</div>
+        <div class="source-detail">Patrimoine total ménages : 15 000 Mds€ (41% financier / 59% immo) · Actifs liquides : 2 108 Mds€ · 18M ménages segmentés (40% &lt;185k€ = 7,2M foyers) · Taux épargne 19–20% · +3,6%/an actifs financiers sur 5 ans · 68% considèrent le conseil essentiel · 75% estiment payer trop d'impôts.</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">2</div>
+      <div>
+        <div class="source-title">H24 Finance — Part de marché CGP France (2024)</div>
+        <div class="source-detail">Part de marché des CGP (encours) : de 7–8% stable pendant des années à ~10% en 2024, première fois franchie. Plus d'une quinzaine de CGP avec encours &gt;100M€. Quelques acteurs proches de 10 Mds€, rivalisant avec banques privées. Contexte : les banques de réseau excluent les patrimoines jugés insuffisants.</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">3</div>
+      <div>
+        <div class="source-title">BNP Paribas Cardif / Kantar — 18e Baromètre marché CGP (2024, 1 995 CGP interrogés)</div>
+        <div class="source-detail">67% hausse clientèle · 47% rajeunissement · 34% ouverture profils modestes · 94% profession se porte bien · 91% confiants · 83% perspectives développement · 82% IA incontournable · 70% adaptation réglementaire premier défi · 41% envisagent acquisitions · 46% cessions. CA moyen 650k€ (+9% / an) · 121 clients par cabinet · Assurance : 67% du CA. Source : bnpparibascardif.com/barometre-du-marche-des-conseillers-en-gestion-de-patrimoine-cgp/</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">4</div>
+      <div>
+        <div class="source-title">Périclès Group / Anaxago — Concentration marché CGP 2024</div>
+        <div class="source-detail">Crystal &gt;22 Mds€ (leader) · Cyrus-Herez 17 Mds€ (fusion avr. 2024) · Astoria Finance 10 Mds€ (6 acquisitions, Naxicap) · Groupe Premium 10 Mds€ (Blackstone + Eurazeo). Facteurs : lourdeur réglementaire MIF2/DDA, investissements digitaux coûteux, consolidation PE-backed. Sources : pericles-group.com, anaxago.com/blog/investisseur/concentration-marche-CGP-2024</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">5</div>
+      <div>
+        <div class="source-title">CNCGP — Baromètre annuel 2025 (données 2024, publié mai 2025)</div>
+        <div class="source-detail">4 500 adhérents · 2 439 cabinets (+5,3%) · CA moyen 650k€ (+9%) · Collecte 13,6 Mds€ 2024 · Assurance 67% du CA · 121 clients/cabinet · 11% certifiés finance durable · Géographie : IDF 29,7%, ARA 14,6%, PACA 6,7%. Source : cncgp.fr / haussmann-fusac.fr/ressources/barometre-cncgp-2025</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">6</div>
+      <div>
+        <div class="source-title">AMF — Rapport chiffres-clés CIF, décembre 2025</div>
+        <div class="source-detail">5 985 CIF-CGP recensés en France · 81% non-indépendants (rétrocommissions) = notre modèle · 12% mixtes (honoraires + rétros) · 7% honoraires purs MIF2.</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">7</div>
+      <div>
+        <div class="source-title">Finzzle Groupe — Communiqué résultats 2025 (Galivel & Associés / Profession CGP / Boursorama AOF, 11 fév. 2026)</div>
+        <div class="source-detail">3,4 Mds€ encours (+29%) · Collecte 1,814 Md€ · AV+PER +36% · SCPI +38% · 1er collecteur France · 4 100+ consultants dont 850 CIF (+25%) · 36 000 nouveaux clients · Satisfaction 97% · Note 9,8/10 (OpinionWay, 54 000 enquêtes) · Partenariats : CORUM, APRIL, Coloc Sélection. Source : galivel.com/fr/1-0-6824/communiques-de-presse/en-2025-avec-3-4-mds-dencours-finzzle-groupe-confirme-sa-place</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">8</div>
+      <div>
+        <div class="source-title">Bridgepoint — Communiqué négociation exclusive avec Finzzle Groupe (Galivel & Associés, 23 mai 2025)</div>
+        <div class="source-detail">Bridgepoint Development Capital V · AUM ~75 Mds$ · investisseur dans Primonial, Cyrus-Herez, Kereis. Finzzle au moment de l'annonce : 2,8 Mds€ encours · 3 300+ consultants dont 750 CIF. Due diligence AT Kearney réalisée. Finalisation automne 2025. Xavier Chausson et management restent actionnaires de référence. Source : galivel.com/fr/1-0-6427/communiques-de-presse/finzzle-groupe-entre-en-negociation-exclusive-avec-bridgepoint</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">9</div>
+      <div>
+        <div class="source-title">Webinaire CGPulse 30/01/2026 — Stéphane Veaux, SilmaTec Finance (données modèle hybride)</div>
+        <div class="source-detail">Budget IT cabinet 4-5 personnes : 40k€/an · Mix 40/50% honoraires / 50/60% rétros · Objectif 150k€ HT d'honoraires 2026. Données utilisées pour illustrer la non-viabilité économique du modèle hybride sous 100k€.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Document de formation interne — Usage équipe MED · Peak Patrimoine · Alexandre Dussourd · Avril 2026<br>
+  Les données de marché sont issues de sources publiques citées. Les données Finzzle Groupe sont issues de communiqués officiels. Ce document ne constitue pas une présentation commerciale.</p>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

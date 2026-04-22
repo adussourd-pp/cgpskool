@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Répondre aux attaques — Guide Finzzle Groupe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --bg2: #ffffff;
+    --bg3: #f0ede8;
+    --orange: #C85520;
+    --orange-light: #C8552012;
+    --orange-mid: #C8552025;
+    --orange-bright: #D4622A;
+    --text: #1a1815;
+    --text-muted: #4a4845;
+    --text-dim: #9a9690;
+    --border: #e2ddd8;
+    --border-accent: #ccc8c2;
+    --red: #b83225;
+    --red-light: #b8322510;
+    --amber: #b87c1a;
+    --amber-light: #b87c1a12;
+    --green: #1e8a4a;
+    --green-light: #1e8a4a12;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--text);
+    border-bottom: 1px solid #333;
+    padding: 72px 32px 64px;
+    text-align: center;
+  }
+
+  .hero-pill {
+    display: inline-flex;
+    background: rgba(200,85,32,0.2);
+    border: 1px solid var(--orange);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--orange-bright);
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(34px, 5vw, 62px);
+    line-height: 1.08;
+    font-weight: 700;
+    max-width: 760px;
+    margin: 0 auto 20px;
+    color: #f0ede8;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--orange-bright); }
+
+  .hero-sub {
+    font-size: 17px;
+    color: #9a9690;
+    max-width: 560px;
+    margin: 0 auto;
+    font-weight: 300;
+    line-height: 1.75;
+  }
+
+  /* ── NAV ── */
+  .toc {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+  }
+
+  .toc-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .toc-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-right: 8px;
+  }
+
+  .toc a {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--bg);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .toc a:hover { background: var(--orange-mid); color: var(--orange); border-color: var(--orange); }
+
+  /* ── LAYOUT ── */
+  .section { max-width: 900px; margin: 0 auto; padding: 80px 32px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 28px;
+  }
+
+  .section h2 em { font-style: italic; color: var(--orange); }
+  p { color: var(--text-muted); margin-bottom: 16px; }
+  .divider { width: 100%; height: 1px; background: var(--border); }
+  sup { font-size: 10px; color: var(--orange); font-weight: 600; vertical-align: super; }
+
+  /* ── ATTAQUE CARD ── */
+  .attaque-stack { display: flex; flex-direction: column; gap: 28px; margin: 36px 0; }
+
+  .attaque-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    scroll-margin-top: 80px;
+  }
+
+  .attaque-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 28px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .attaque-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--border-accent);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 36px;
+  }
+
+  .attaque-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .attaque-objection {
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-dim);
+    background: var(--red-light);
+    border: 1px solid #b8322530;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-top: 8px;
+  }
+
+  .attaque-objection::before {
+    content: '❝ ';
+    color: var(--red);
+    font-style: normal;
+  }
+
+  .attaque-body { padding: 24px 28px; }
+
+  .step {
+    margin-bottom: 20px;
+  }
+
+  .step-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .step-label.reformulation { color: var(--amber); }
+  .step-label.reponse { color: var(--green); }
+  .step-label.resume { color: var(--orange); }
+
+  .step-content {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .step-content.key {
+    font-size: 15px;
+    color: var(--text);
+    background: var(--green-light);
+    border-left: 3px solid var(--green);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 8px;
+  }
+
+  .step-bullets {
+    list-style: none;
+    margin-top: 8px;
+  }
+
+  .step-bullets li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    align-items: flex-start;
+    line-height: 1.55;
+  }
+
+  .step-bullets li::before {
+    content: '→';
+    color: var(--orange);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0px;
+  }
+
+  /* ── TIMELINE HISTORIQUE ── */
+  .timeline { position: relative; margin: 36px 0; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 24px; top: 8px; bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    display: flex;
+    gap: 24px;
+    padding-bottom: 28px;
+    position: relative;
+  }
+
+  .tl-item:last-child { padding-bottom: 0; }
+
+  .tl-dot {
+    width: 49px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  .tl-dot-inner {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--orange);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--orange);
+    flex-shrink: 0;
+  }
+
+  .tl-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .tl-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── DATA BOX ── */
+  .data-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--orange);
+    border-radius: 0 0 10px 10px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .data-row:last-child { border-bottom: none; }
+  .data-row-label { color: var(--text-muted); }
+  .data-row-value { font-weight: 600; color: var(--text); }
+  .data-row-value.green { color: var(--green); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px;
+    margin: 20px 0;
+  }
+
+  .callout p { font-size: 14px; color: var(--text); margin: 0; line-height: 1.65; }
+  .callout-green { border-left-color: var(--green); }
+  .callout-red { border-left-color: var(--red); }
+
+  /* ── SOURCES ── */
+  .sources-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 48px 32px;
+  }
+
+  .sources-inner { max-width: 900px; margin: 0 auto; }
+
+  .sources-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .source-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .source-item:last-child { border-bottom: none; }
+  .source-num { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text-dim); min-width: 20px; flex-shrink: 0; }
+  .source-title { font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .source-detail { color: var(--text-dim); font-size: 12px; }
+
+  .footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 640px) {
+    .section { padding: 56px 20px; }
+    .attaque-header { flex-direction: column; }
+    .attaque-num { font-size: 24px; }
+    .toc-inner { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-pill">Usage interne · Équipe MED · Peak Patrimoine</div>
+  <h1>Répondre aux <em>objections</em> sur le Groupe.</h1>
+  <p class="hero-sub">Guide de formation interne — les vraies questions, les vraies réponses, les vraies données. Basé sur le Mémorandum officiel Omnium Finance et des sources documentées.</p>
+</header>
+
+<!-- ── TOC ── -->
+<nav class="toc">
+  <div class="toc-inner">
+    <span class="toc-label">Aller à :</span>
+    <a href="#mlm">MLM / Pyramide</a>
+    <a href="#formation">Formation</a>
+    <a href="#prospection">Prospection</a>
+    <a href="#conseil">Qualité du conseil</a>
+    <a href="#frais">Frais trop chers</a>
+    <a href="#defiscalisation">Défiscalisation</a>
+    <a href="#immobilier">Risques immo</a>
+    <a href="#historique">Historique Groupe</a>
+    <a href="#noms">Noms / marques</a>
+  </div>
+</nav>
+
+<!-- ── SECTION INTRO ── -->
+<section class="section reveal">
+  <div class="section-label">Contexte</div>
+  <h2>Le Groupe en <em>chiffres réels</em> — 2025</h2>
+  <p>Finzzle Groupe (anciennement Omnium Finance / Groupe GOF) est fondé en 1992 à Toulouse par Xavier Chausson. En 33 ans d'existence, il a accompagné plus de 85 000 investisseurs particuliers. En mai 2025, le groupe a fait l'objet d'une due diligence par AT Kearney et un rapprochement avec Bridgepoint, fonds de PE gérant ~75 Mds$ d'actifs.</p>
+
+  <div class="data-box">
+    <div class="data-row"><span class="data-row-label">Fondation</span><span class="data-row-value">1992 · Toulouse · Xavier Chausson</span></div>
+    <div class="data-row"><span class="data-row-label">Consultants habilités</span><span class="data-row-value">4 100+</span></div>
+    <div class="data-row"><span class="data-row-label">Encours Stellium</span><span class="data-row-value">3,4 Mds€</span></div>
+    <div class="data-row"><span class="data-row-label">Collecte AV 2025</span><span class="data-row-value green">650M€ (+44% vs 2024)</span></div>
+    <div class="data-row"><span class="data-row-label">Collecte SCPI 2025</span><span class="data-row-value green">570M€ · 12% marché national · 1er collecteur France</span></div>
+    <div class="data-row"><span class="data-row-label">Collecte PER 2025</span><span class="data-row-value green">200M€ (+71% vs 2023)</span></div>
+    <div class="data-row"><span class="data-row-label">Filiales actives</span><span class="data-row-value">Stellium Immobilier · Stellium Courtage · Stellium Invest · Stellium Financement · Prodémial · Prodémial Business School · Imodeus · Finzzle Digital</span></div>
+    <div class="data-row"><span class="data-row-label">Validation externe 2025</span><span class="data-row-value">Due diligence AT Kearney · Rapprochement Bridgepoint</span></div>
+  </div>
+  <p style="font-size:12px; color:var(--text-dim);">Sources : Finzzle Groupe données internes 2025 · Mémorandum Omnium Finance (mars 2018) · Pappers.fr · Accord social Finzzle Groupe, janvier 2025.<sup>1,2</sup></p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── ATTAQUES ── -->
+<section class="section">
+  <div class="section-label">Les objections les plus fréquentes</div>
+  <h2>9 questions difficiles, <em>9 réponses documentées.</em></h2>
+
+  <div class="attaque-stack">
+
+    <!-- 1 MLM -->
+    <div class="attaque-card reveal" id="mlm">
+      <div class="attaque-header">
+        <div class="attaque-num">01</div>
+        <div>
+          <div class="attaque-title">Marketing de réseau — "C'est du MLM, c'est une pyramide"</div>
+          <div class="attaque-objection">C'est la même chose que la vente à la boule de neige. C'est une arnaque pour les investisseurs et un système d'exploitation pour les conseillers.</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reformulation">↳ Reformuler d'abord</div>
+          <div class="step-content">"Si je comprends bien, vous souhaitez avoir de l'information sur notre modèle en marketing relationnel ?"</div>
+        </div>
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Le marketing de réseau (MLM) est un modèle légal de distribution directe pratiqué depuis des décennies par des entreprises mondiales (Amway, Avon, Tupperware…). En 2015, le MLM pesait 184 milliards de dollars dans le monde. La différence fondamentale avec un système pyramidal est claire : le pyramidal ne vit pas de la vente de produits mais du recrutement payant de nouveaux membres. Dans notre modèle, <strong>aucun consultant ne paie pour rejoindre le réseau</strong>, et la rémunération est entièrement basée sur la vente de solutions patrimoniales réelles.<sup>2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>Système pyramidal = recrutement payant + pas de produit réel → frauduleux, réprimé par le Code de la consommation</li>
+            <li>Notre modèle = vente de solutions patrimoniales réglementées (immobilier, AV, placements financiers) + réseau structuré habilité</li>
+            <li>Accès au réseau 100% gratuit · Rémunération basée sur les ventes uniquement</li>
+            <li>Cadre réglementaire strict : CCI, ORIAS, AMF, ACPR · RCP obligatoire</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 FORMATION -->
+    <div class="attaque-card reveal" id="formation">
+      <div class="attaque-header">
+        <div class="attaque-num">02</div>
+        <div>
+          <div class="attaque-title">Formation — "N'importe qui peut devenir consultant"</div>
+          <div class="attaque-objection">Ce ne sont pas des professionnels de l'investissement. Qu'est-ce qui garantit leur sérieux ? Peut-on vraiment leur faire confiance ?</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Nos consultants exercent dans un secteur parmi les plus réglementés de France. Pour exercer, ils doivent obtenir et maintenir des habilitations strictement contrôlées par des organismes officiels (CCI, ORIAS, AMF, ACPR) avec conditions d'honorabilité et souscription annuelle d'une RCP. Prodémial Business School (certification ISO 9001 depuis 2017) dispense l'ensemble des formations habilitantes et plus de 2 000 formations par an avec 600 heures de e-learning disponibles.<sup>2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>Habilitations métier contrôlées par CCI · ORIAS · AMF · ACPR</li>
+            <li>Prodémial Business School — centre de formation ISO 9001 depuis 2017</li>
+            <li>2 000+ formations dispensées/an · 600h e-learning disponibles</li>
+            <li>Accompagnement terrain par les consultants expérimentés (votre lignée)</li>
+            <li>RCP obligatoire — responsabilité professionnelle assurée</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 PROSPECTION -->
+    <div class="attaque-card reveal" id="prospection">
+      <div class="attaque-header">
+        <div class="attaque-num">03</div>
+        <div>
+          <div class="attaque-title">Prospection — "Vous exploitez votre réseau familial"</div>
+          <div class="attaque-objection">Votre système est fondé sur l'exploitation du réseau familial et amical de vos consultants. Ce n'est pas professionnel.</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Notre clientèle est composée de particuliers que les établissements bancaires ne servent pas correctement et qui n'ont pas accès aux structures de gestion de fortune. La seule façon de les atteindre, c'est par une démarche relationnelle. La prospection initiale dans son cercle est naturelle et transitoire — les consultants évoluent ensuite vers les recommandations de leurs premiers clients satisfaits. <strong>La satisfaction client est la seule condition de développement durable de l'activité.</strong><sup>2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>7,2M de foyers français sans conseiller patrimonial viable — c'est notre marché naturel</li>
+            <li>Prospection initiale = cercle proche, puis élargissement par recommandation</li>
+            <li>Un client insatisfait = fin du développement par recommandation → la qualité du conseil est une nécessité structurelle</li>
+            <li>Nos outils de découverte et de conformité encadrent chaque relation dès le R0</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 CONSEIL -->
+    <div class="attaque-card reveal" id="conseil">
+      <div class="attaque-header">
+        <div class="attaque-num">04</div>
+        <div>
+          <div class="attaque-title">Qualité du conseil — "Vous êtes mandataire, pas indépendant"</div>
+          <div class="attaque-objection">Comment peut-on se prétendre indépendant en étant mandataire ? Comment être sûr que vous ne cherchez pas à vendre n'importe quoi ?</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Nos consultants sont des entrepreneurs indépendants — pas des salariés. Toute relation client commence par une analyse en profondeur de la situation professionnelle, financière, fiscale et patrimoniale, puis par l'identification des objectifs et de l'aversion au risque. La gamme Stellium est construite en architecture ouverte avec ~300 partenaires — promoteurs, assureurs, sociétés de gestion — sélectionnés en totale indépendance. L'AMF classe notre modèle comme "conseil non-indépendant au sens MIF2" — ce qui est la réalité légale de 81% du marché. Ce n'est pas une faiblesse, c'est une transparence réglementaire.<sup>1,2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>"Conseil non-indépendant MIF2" = 81% du marché, y compris les banques — c'est le cadre légal, pas une fraude</li>
+            <li>Analyse patrimoniale complète obligatoire avant toute préconisation</li>
+            <li>Architecture ouverte : ~300 partenaires · liberté de choix réelle dans la gamme</li>
+            <li>7 familles de solutions = capacité de recommander ce qui est juste pour chaque situation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 FRAIS -->
+    <div class="attaque-card reveal" id="frais">
+      <div class="attaque-header">
+        <div class="attaque-num">05</div>
+        <div>
+          <div class="attaque-title">Frais — "Vos 4,8% sont trop chers"</div>
+          <div class="attaque-objection">J'ai vu des conseillers sans frais d'entrée. Pourquoi vos 4,8% alors qu'on peut faire la même chose sans rien payer ?</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reformulation">↳ Reformuler d'abord</div>
+          <div class="step-content">"La vraie question n'est pas le taux d'entrée — c'est le coût total du conseil sur 10 ans, et ce que vous obtenez en échange."</div>
+        </div>
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Les modèles "sans frais d'entrée" ne sont pas gratuits — ils sont soit inaccessibles sous 100 000 € (hybride : 1 500 à 6 000 € de bilan initial), soit inaccessibles sous 300 000 € (honoraires purs MIF2 : 3 600 à 8 000 € an 1). Nos 4,8% sont dégressifs automatiquement (3,6% dès 50k€ · 2,4% dès 200k€) et comprennent l'intégralité du conseil, du suivi, de l'aide à la déclaration et des arbitrages — sans facture supplémentaire. Le coût moyen lissé sur 10 ans est ≈ 1,48%/an.<sup>1,3</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>4,8% une seule fois → 1,48%/an sur 10 ans · moins cher que les banques (≈2%+/an)</li>
+            <li>Hybride SilmaTec : bilan 1 500–3 000 € + CSP 650–1 200 €/an + TVA 20% irécupérable + rétros maintenues en parallèle → double rémunération</li>
+            <li>Honoraires purs MIF2 : forfait an 1 jusqu'à 8 000 € TTC · seuil 300k€ recommandé</li>
+            <li>Sans nous, ces profils restent à la banque avec des fonds maison à 2–3%/an · et sans suivi patrimonial</li>
+            <li>Aide à la déclaration fiscale incluse chez nous → facturée 200–360 €/h chez SilmaTec</li>
+          </ul>
+        </div>
+        <div class="callout callout-green">
+          <p><strong>Argument clé :</strong> "Si vous étiez chez SilmaTec Finance, votre bilan initial coûterait 1 500 € à 3 000 € TTC avant même de parler de placement — soit jusqu'à 5,5% de votre capital à 55 000 €. Chez nous, vous payez 4,8% une seule fois et vous avez tout inclus, depuis le premier rendez-vous."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 DÉFISCALISATION -->
+    <div class="attaque-card reveal" id="defiscalisation">
+      <div class="attaque-header">
+        <div class="attaque-num">06</div>
+        <div>
+          <div class="attaque-title">Défiscalisation — "C'est une arnaque, vous appâtez avec la fiscalité"</div>
+          <div class="attaque-objection">La défiscalisation est un mauvais produit. Vous gonflez les prix et vous passez sous silence les risques locatifs. Au final, c'est jamais une bonne affaire.</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Un dispositif fiscal est avant tout un investissement immobilier. La réduction d'impôt ne doit pas être le but — elle contribue à l'équilibre général de l'opération. Stellium Immobilier valide chaque opération sur la base de critères objectifs (INSEE, demande locative, prix de marché, concurrence). L'investisseur reçoit une information complète sur les risques avant signature, et signe une attestation d'avoir pris connaissance des contraintes (loyer plafonné, engagement de location, zonage).<sup>2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>La défiscalisation = investir une partie de ses impôts dans un actif réel</li>
+            <li>Règle d'or : l'emplacement doit avoir une demande locative réelle · le loyer doit correspondre au marché</li>
+            <li>Stellium valide chaque projet sur critères objectifs (INSEE, concurrence, loyer de marché)</li>
+            <li>Notice explicative + attestation de risque signée par l'investisseur — information exhaustive obligatoire</li>
+            <li>Même sans plus-value à la revente, l'opération peut être positive : loyers + avantage fiscal = constitution de patrimoine sans apport</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 RISQUES IMMO -->
+    <div class="attaque-card reveal" id="immobilier">
+      <div class="attaque-header">
+        <div class="attaque-num">07</div>
+        <div>
+          <div class="attaque-title">Risques immobiliers — "Des gens ont tout perdu"</div>
+          <div class="attaque-objection">On a vu des reportages avec des particuliers qui ont tout perdu en vous faisant confiance. Vous avez fait passer des produits risqués pour sûrs.</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ La réponse documentée</div>
+          <div class="step-content">Comme tout investissement, l'immobilier est risqué — nous ne l'avons jamais minimisé. Pour contextualiser les litiges : en 26 ans, sur 85 000 investisseurs et 38 000 logements vendus, le groupe a été condamné définitivement 17 fois comme commercialisateur et 4 fois comme promoteur. Les difficultés des années 2000 sont liées à un zonage législatif (loi Robien) qui permettait d'investir dans des zones en sur-offre locative — un problème qui a touché l'ensemble du secteur, pas seulement notre réseau.<sup>2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label resume">En résumé</div>
+          <ul class="step-bullets">
+            <li>17 condamnations définitives sur 38 000 logements vendus = 0,045% de taux de litiges condamnés</li>
+            <li>Les problèmes des années 2000 touchaient l'ensemble du secteur (zonage Robien non maîtrisé)</li>
+            <li>Depuis : critères de sélection renforcés, validation systématique par Stellium, notice de risque obligatoire</li>
+            <li>Garanties disponibles : assurance carence locative, garantie moins-value à la revente (depuis 2018)</li>
+            <li>Aucun investisseur informé ne peut affirmer de bonne foi ne pas avoir été prévenu des risques</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 HISTORIQUE -->
+    <div class="attaque-card reveal" id="historique">
+      <div class="attaque-header">
+        <div class="attaque-num">08</div>
+        <div>
+          <div class="attaque-title">Historique — "J'ai lu des choses négatives sur vous en ligne"</div>
+          <div class="attaque-objection">Les condamnations, les gardes à vue, les forums… Ce n'est pas rassurant. Y a-t-il encore des contentieux ?</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ Le contexte réel</div>
+          <div class="step-content">Le groupe existe depuis 1992. En 33 ans, l'essentiel du bruit médiatique date des années 2008–2012, lié à des investissements de 2004–2005 dans le contexte du zonage Robien. Depuis, le groupe s'est structuré, a créé ses filiales Stellium (2010), Prodémial Business School (2012, certification ISO 9001 en 2017), et a renforcé ses processus de validation des projets. En 2025, Bridgepoint et AT Kearney ont réalisé une due diligence approfondie et validé le positionnement stratégique du groupe.<sup>1,2</sup></div>
+        </div>
+        <div class="step">
+          <div class="step-label">Chronologie clé</div>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">1992</div><div class="tl-desc">Fondation par Xavier Chausson à Toulouse. Distribution d'immobilier locatif via réseau de mandataires.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">1999</div><div class="tl-desc">Ajout de l'assurance-vie avec Stellium Courtage. Élargissement de la gamme patrimoniale.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2004–2008</div><div class="tl-desc">Période de croissance forte. Investissements en loi Robien dans certaines zones en sur-offre locative — problème structurel du marché, pas spécifique au Groupe.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2010</div><div class="tl-desc">Création des 3 sociétés Stellium : Immobilier, Courtage, Invest. Structuration de la diversification produit.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2012</div><div class="tl-desc">Création du centre de formation interne "Le Parvis" + Stellium Invest (statut PSI contrôlé AMF/ACPR).</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2015</div><div class="tl-desc">Création de Prodémial — entité dédiée à la formation, animation et accompagnement du réseau.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2017</div><div class="tl-desc">Centre de formation certifié ISO 9001. Devient Prodémial Business School en 2018.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+            <div><div class="tl-year">2025 (mai)</div><div class="tl-desc">Due diligence AT Kearney + rapprochement Bridgepoint (~75 Mds$ AUM). Validation stratégique externe du modèle. Groupe rebaptisé Finzzle Groupe. Collecte AV 2025 : 650M€ (+44%).</div></div>
+          </div>
+        </div>
+
+        <div class="callout callout-green">
+          <p><strong>Argument de fond :</strong> "Si le modèle était problématique, Bridgepoint — qui gère 75 milliards d'euros et investit aussi dans Primonial et Cyrus-Herez — n'aurait pas passé des mois à faire une due diligence avant de s'associer. Ce rapprochement est la validation externe la plus sérieuse possible."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 NOMS -->
+    <div class="attaque-card reveal" id="noms">
+      <div class="attaque-header">
+        <div class="attaque-num">09</div>
+        <div>
+          <div class="attaque-title">Noms / marques — "Qui est qui ? Omnium, Stellium, Finzzle…"</div>
+          <div class="attaque-objection">C'est quoi tous ces noms ? Omnium Finance, Finzzle Groupe, Stellium, Prodémial, Imodeus… Je n'y comprends rien.</div>
+        </div>
+      </div>
+      <div class="attaque-body">
+        <div class="step">
+          <div class="step-label reponse">✓ L'organigramme simple</div>
+          <div class="step-content">Chaque entité correspond à une activité distincte — ce n'est pas un écran de complexité, c'est une organisation professionnelle.</div>
+        </div>
+        <div class="data-box">
+          <div class="data-row"><span class="data-row-label">Finzzle Groupe (ex-Omnium Finance)</span><span class="data-row-value">Holding · Groupe mère · Toulouse depuis 1992</span></div>
+          <div class="data-row"><span class="data-row-label">Stellium Immobilier</span><span class="data-row-value">Plateforme solutions investissement locatif</span></div>
+          <div class="data-row"><span class="data-row-label">Stellium Courtage</span><span class="data-row-value">Distribution assurance-vie (multi-assureurs)</span></div>
+          <div class="data-row"><span class="data-row-label">Stellium Invest</span><span class="data-row-value">PSI contrôlé AMF/ACPR · SCPI · Capital-investissement</span></div>
+          <div class="data-row"><span class="data-row-label">Stellium Financement</span><span class="data-row-value">Crédit immobilier</span></div>
+          <div class="data-row"><span class="data-row-label">Prodémial</span><span class="data-row-value">Animation · accompagnement · réseau de consultants</span></div>
+          <div class="data-row"><span class="data-row-label">Prodémial Business School</span><span class="data-row-value">Centre de formation ISO 9001 · habilitations</span></div>
+          <div class="data-row"><span class="data-row-label">Imodeus</span><span class="data-row-value">Promoteur immobilier interne (11 000+ logements construits)</span></div>
+        </div>
+        <p style="font-size:13px; color:var(--text-muted);">Le groupe n'a pas changé de nom pour "cacher" son passé — il a créé des entités spécialisées au fur et à mesure du développement des activités. Finzzle Groupe est la nouvelle marque holding depuis 2024.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section class="sources-section reveal">
+  <div class="sources-inner">
+    <h3>Sources & références</h3>
+    <div class="source-item">
+      <div class="source-num">1</div>
+      <div>
+        <div class="source-title">Finzzle Groupe / Omnium Finance — données internes 2025 · Accord social janvier 2025 · Pappers.fr</div>
+        <div class="source-detail">Collecte 2025 : 650M€ AV (+44%) · 570M€ SCPI (12% marché, 1er national) · 200M€ PER · 3,4Mds€ encours Stellium · 4 100+ consultants. Bridgepoint AUM ~75Mds$. Entités Finzzle Groupe : Stellium Immobilier, Stellium Courtage, Stellium Invest, Stellium Financement, Prodémial, Prodémial Business School, Imodeus, Finzzle Digital (accord UES janv. 2025).</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">2</div>
+      <div>
+        <div class="source-title">Mémorandum Groupe Omnium Finance — Éléments de langage (mars 2018, confidentiel management)</div>
+        <div class="source-detail">Document officiel Prodemial rédigé pour le management (managers Galaxie). Traite 9 objections types en 3 niveaux : reformulation / argumentation / résumé. Utilisé comme base de travail en ESP et ateliers d'objections. Données historiques : 85 000 investisseurs · 38 000 logements · 17 condamnations comme commercialisateur · 4 comme promoteur · 1 en AV.</div>
+      </div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">3</div>
+      <div>
+        <div class="source-title">Webinaire CGPulse du 30/01/2026 — Stéphane Veaux, SilmaTec Finance · AMF déc. 2025 · prosper-conseil.fr</div>
+        <div class="source-detail">Données concurrentielles : hybride honoraires + rétros · grille tarifaire réelle SilmaTec. AMF : 5 985 CIF · 81% rétros · 12% hybrides · 7% honoraires purs. Prosper Conseil (2022) : 150€ 1er RDV · 3 600–8 000€ an 1 · seuil 300k€.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Document de formation interne — Usage réservé équipe MED · Peak Patrimoine · Alexandre Dussourd · Avril 2026<br>
+  Ce document est destiné à la formation des filleuls et à la préparation aux objections. Il ne doit pas être transmis tel quel à un prospect. Utiliser les éléments de réponse dans votre propre formulation.</p>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
