@@ -5,348 +5,403 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <title>Biblioth&egrave;que d'articles &mdash; CGP Skool</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cgp-skool-theme.css">
 <style>
-  :root {
-    --bg: #f7f5f2;
-    --bg2: #ffffff;
-    --bg3: #f0ede8;
-    --orange: #C85520;
-    --orange-bright: #D4622A;
-    --text: #1a1815;
-    --text-muted: #4a4845;
-    --text-dim: #9a9690;
-    --border: #e2ddd8;
-    --border-accent: #ccc8c2;
-  }
+  /* ── Sp&eacute;cifique articles ── */
+  .cs-nav-inner { max-width: none; padding: 0 36px; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* TOP BAR */
-  .topbar {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .topbar-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    text-decoration: none;
-    letter-spacing: 0.02em;
-  }
-
-  .topbar-back {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 7px 14px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: border-color 0.2s, color 0.2s;
-  }
-
-  .topbar-back:hover { border-color: var(--orange); color: var(--orange); }
-
-  /* HERO */
   .hero {
-    text-align: center;
-    padding: 100px 32px 72px;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
+    background: #1D1A16;
+    padding: 64px 52px 56px;
     position: relative;
     overflow: hidden;
+    border-bottom: 1px solid var(--rule-d);
   }
-
   .hero::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 60% 50% at 50% 40%, #C855200d 0%, transparent 70%);
+    background: radial-gradient(ellipse 55% 60% at 50% 0%, rgba(212,98,42,0.12) 0%, transparent 70%);
     pointer-events: none;
   }
-
-  .hero-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-kicker {
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--orange);
-    margin-bottom: 24px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-
+  .hero-kicker::before {
+    content: '';
+    width: 28px; height: 1px;
+    background: var(--orange);
+  }
   .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 5vw, 60px);
-    line-height: 1.1;
-    font-weight: 700;
-    max-width: 720px;
-    margin: 0 auto 20px;
-    color: var(--text);
+    font-family: var(--serif);
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 16px;
+    max-width: 760px;
   }
-
-  .hero h1 em { font-style: italic; color: var(--orange); }
-
+  .hero h1 em {
+    font-style: italic;
+    color: var(--orange);
+  }
   .hero-sub {
-    font-size: 17px;
-    color: var(--text-muted);
-    max-width: 560px;
+    font-size: 15px;
     font-weight: 300;
-    margin: 0 auto;
+    line-height: 1.75;
+    color: var(--fog);
+    max-width: 620px;
   }
 
-  /* LIBRARY */
-  .library {
-    max-width: 1080px;
+  /* ── Section articles ── */
+  .articles-section {
+    background: var(--paper);
+    padding: 56px 52px 72px;
+  }
+  .articles-inner {
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 72px 32px;
+  }
+  .articles-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-30);
+    margin-bottom: 20px;
   }
 
+  /* Filtres */
   .filter-bar {
     display: flex;
-    gap: 10px;
-    margin-bottom: 36px;
-    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--rule-l);
+    overflow-x: auto;
   }
-
   .filter-chip {
+    font-family: var(--sans);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 7px 14px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text-muted);
+    padding: 12px 18px;
+    border: none;
+    background: transparent;
+    color: var(--ink-60);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: color 0.18s;
+    position: relative;
+    white-space: nowrap;
   }
+  .filter-chip::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 1px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .filter-chip:hover { color: var(--ink); }
+  .filter-chip.active {
+    color: var(--orange);
+    font-weight: 600;
+  }
+  .filter-chip.active::after { background: var(--orange); }
 
-  .filter-chip:hover { border-color: var(--orange); color: var(--orange); }
-  .filter-chip.active { background: var(--orange); color: #fff; border-color: var(--orange); }
-
+  /* Grille articles */
   .articles-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
+    gap: 3px;
   }
-
   .article-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px 28px 24px;
+    border: 1px solid var(--rule-l);
+    padding: 28px 26px;
+    background: #fff;
     text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
-    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     position: relative;
-    overflow: hidden;
   }
-
-  .article-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--orange);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-
   .article-card:hover {
-    border-color: var(--border-accent);
-    box-shadow: 0 6px 28px rgba(0,0,0,0.06);
-    transform: translateY(-2px);
+    border-color: rgba(212,98,42,0.28);
+    box-shadow: 0 4px 24px rgba(212,98,42,0.05);
   }
-
-  .article-card:hover::before { transform: scaleX(1); }
-
+  .article-bar {
+    width: 24px;
+    height: 2px;
+    background: var(--orange);
+    margin-bottom: 20px;
+  }
+  .article-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    background: var(--o-dim);
+    color: var(--orange);
+  }
   .article-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 14px;
     font-size: 10px;
-    letter-spacing: 0.15em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--ink-30);
+    flex-wrap: wrap;
   }
-
-  .article-tag {
-    background: #C855201a;
+  .article-meta-sep {
+    color: var(--ink-30);
+    opacity: 0.5;
+  }
+  .article-lock {
     color: var(--orange);
-    padding: 3px 9px;
-    border-radius: 100px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    border: 1px solid #C8552040;
   }
-
   .article-card h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.25;
-    margin-bottom: 12px;
-    color: var(--text);
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 10px;
   }
-
-  .article-card h2 em { font-style: italic; color: var(--orange); }
-
+  .article-card h2 em {
+    font-style: italic;
+    color: var(--orange);
+  }
   .article-excerpt {
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 300;
     line-height: 1.7;
-    color: var(--text-muted);
-    margin-bottom: 20px;
+    color: var(--ink-60);
+    margin-bottom: 18px;
     flex: 1;
   }
-
-  .article-footer {
+  .article-footer-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     padding-top: 16px;
-    border-top: 1px solid var(--border);
-    font-size: 12px;
-    color: var(--text-dim);
+    border-top: 1px solid var(--rule-l);
   }
-
-  .article-read {
-    color: var(--orange);
-    font-weight: 600;
-    letter-spacing: 0.05em;
+  .article-features {
     display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .article-feature {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 2px 9px;
+    background: rgba(24,22,20,0.05);
+    color: var(--ink-60);
+  }
+  .article-read {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    white-space: nowrap;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
   }
-
   .article-read::after {
     content: '\2192';
+    font-size: 13px;
     transition: transform 0.2s;
   }
+  .article-card:hover .article-read::after { transform: translateX(4px); }
 
-  .article-card:hover .article-read::after { transform: translateX(3px); }
-
-  /* EMPTY STATE / COMING SOON */
+  /* Empty state */
   .coming-soon {
     grid-column: 1/-1;
     text-align: center;
-    padding: 60px 32px;
-    background: var(--bg2);
-    border: 1px dashed var(--border-accent);
-    border-radius: 12px;
-    color: var(--text-dim);
-    font-size: 14px;
-    font-style: italic;
+    padding: 48px 32px;
+    background: #fff;
+    border: 1px dashed rgba(24,22,20,0.15);
+    color: var(--ink-30);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .footer {
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 28px 32px;
-    text-align: center;
+  /* Footer (reprend site-footer de index) */
+  .site-footer {
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 36px 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .footer-mark {
+    width: 26px; height: 26px;
+    border: 1px solid rgba(212,98,42,0.38);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .footer-mark span {
+    font-family: var(--serif); font-size: 12px;
+    color: var(--orange); line-height: 1;
+  }
+  .footer-name {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .footer-copy {
     font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.8;
+    color: rgba(255,255,255,0.16);
   }
 
-  @media (max-width: 640px) {
-    .library { padding: 48px 20px; }
+  /* Top menu (m&ecirc;me que index) */
+  .top-menu { display: flex; align-items: center; gap: 2px; }
+  .top-menu-item {
+    font-size: 13px; font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    padding: 7px 16px;
+    transition: color 0.15s;
+  }
+  .top-menu-item:hover { color: rgba(255,255,255,0.9); }
+  .top-menu-item.active { color: var(--orange); font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .top-menu { display: none; }
+    .hero { padding: 44px 24px 40px; }
+    .articles-section { padding: 40px 24px 56px; }
+    .site-footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
     .articles-grid { grid-template-columns: 1fr; }
-    .hero { padding: 64px 20px 48px; }
   }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a href="index.html" class="topbar-logo">CGP Skool</a>
-  <a href="index.html" class="topbar-back">&larr; Accueil</a>
-</div>
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <nav class="top-menu">
+      <a href="index.html" class="top-menu-item">&larr; Accueil</a>
+      <a href="articles.html" class="top-menu-item active">Biblioth&egrave;que</a>
+    </nav>
+  </div>
+</nav>
 
 <header class="hero">
-  <p class="hero-label">Biblioth&egrave;que &middot; Peak Patrimoine</p>
-  <h1>Articles &amp; <em>analyses</em></h1>
-  <p class="hero-sub">Notes d'analyse long-format sur les enveloppes fiscales, les marches et la strategie patrimoniale &mdash; a partager avec vos clients.</p>
+  <div class="hero-inner">
+    <div class="hero-kicker">Biblioth&egrave;que &middot; Peak Patrimoine</div>
+    <h1>Articles &amp; <em>analyses</em></h1>
+    <p class="hero-sub">Notes d'analyse long-format sur les enveloppes fiscales, les march&eacute;s et la strat&eacute;gie patrimoniale &mdash; &agrave; partager avec vos clients ou pour approfondir vos connaissances.</p>
+  </div>
 </header>
 
-<section class="library">
+<section class="articles-section">
+  <div class="articles-inner">
 
-  <div class="filter-bar">
-    <button class="filter-chip active" data-filter="all">Tous</button>
-    <button class="filter-chip" data-filter="fiscalite">Fiscalit&eacute;</button>
-    <button class="filter-chip" data-filter="enveloppes">Enveloppes</button>
-    <button class="filter-chip" data-filter="marches">March&eacute;s</button>
-    <button class="filter-chip" data-filter="strategie">Strat&eacute;gie</button>
-  </div>
+    <div class="articles-label">Publications r&eacute;centes</div>
 
-  <div class="articles-grid" id="articlesGrid">
+    <div class="filter-bar">
+      <button class="filter-chip active" data-filter="all">Tous</button>
+      <button class="filter-chip" data-filter="fiscalite">Fiscalit&eacute;</button>
+      <button class="filter-chip" data-filter="enveloppes">Enveloppes</button>
+      <button class="filter-chip" data-filter="marches">March&eacute;s</button>
+      <button class="filter-chip" data-filter="strategie">Strat&eacute;gie</button>
+    </div>
 
-    <a href="article-pea-2026.html" class="article-card" data-cat="enveloppes fiscalite">
-      <div class="article-meta">
-        <span class="article-tag">Analyse</span>
-        <span>Avril 2026</span>
-        <span>&middot;</span>
-        <span>12 min</span>
+    <div class="articles-grid" id="articlesGrid">
+
+      <a href="article-pea-2026.html" class="article-card" data-cat="enveloppes fiscalite">
+        <span class="article-badge">Analyse</span>
+        <div class="article-bar"></div>
+        <div class="article-meta">
+          <span>Avril 2026</span>
+          <span class="article-meta-sep">&middot;</span>
+          <span>12 min de lecture</span>
+        </div>
+        <h2>Le PEA en 2026 : <em>les r&egrave;gles ont chang&eacute;</em></h2>
+        <p class="article-excerpt">Hausse de la CSG &agrave; 10,6%, ETF synth&eacute;tiques dans le viseur de Bercy, &eacute;cart comportemental DALBAR/Morningstar : ce que tout &eacute;pargnant en ETF doit savoir avant de continuer &agrave; investir dans cette enveloppe.</p>
+        <div class="article-footer-row">
+          <div class="article-features">
+            <span class="article-feature">PEA</span>
+            <span class="article-feature">LFSS 2026</span>
+            <span class="article-feature">ETF</span>
+          </div>
+          <span class="article-read">Lire</span>
+        </div>
+      </a>
+
+      <a href="comparatif-cgp.html" class="article-card" data-cat="strategie">
+        <span class="article-badge">Strat&eacute;gie</span>
+        <div class="article-bar"></div>
+        <div class="article-meta">
+          <span>2026</span>
+          <span class="article-meta-sep">&middot;</span>
+          <span>Comparatif</span>
+          <span class="article-meta-sep">&middot;</span>
+          <span class="article-lock">&#128274; Code requis</span>
+        </div>
+        <h2>Comparatif des <em>mod&egrave;les CGP</em></h2>
+        <p class="article-excerpt">Panorama des trois grands mod&egrave;les de conseil en gestion de patrimoine : march&eacute;, gamme produits, niveau de frais et impact long terme pour le client. Avec simulateur de co&ucirc;t client int&eacute;gr&eacute;.</p>
+        <div class="article-footer-row">
+          <div class="article-features">
+            <span class="article-feature">Mod&egrave;les</span>
+            <span class="article-feature">Frais</span>
+            <span class="article-feature">Positionnement</span>
+          </div>
+          <span class="article-read">Lire</span>
+        </div>
+      </a>
+
+      <div class="coming-soon">
+        D'autres articles arrivent prochainement &mdash; assurance-vie, PER, SCPI, transmission
       </div>
-      <h2>Le PEA en 2026 : <em>les r&egrave;gles ont chang&eacute;</em></h2>
-      <p class="article-excerpt">Hausse de la CSG &agrave; 10,6%, ETF synth&eacute;tiques dans le viseur de Bercy, &eacute;cart comportemental DALBAR/Morningstar : ce que tout &eacute;pargnant en ETF doit savoir avant de continuer &agrave; investir dans cette enveloppe.</p>
-      <div class="article-footer">
-        <span>PEA &middot; LFSS 2026 &middot; ETF</span>
-        <span class="article-read">Lire</span>
-      </div>
-    </a>
 
-    <a href="comparatif-cgp.html" class="article-card" data-cat="strategie">
-      <div class="article-meta">
-        <span class="article-tag">Strat&eacute;gie</span>
-        <span>2026</span>
-        <span>&middot;</span>
-        <span>Comparatif</span>
-        <span>&middot;</span>
-        <span>&#128274; Code requis</span>
-      </div>
-      <h2>Comparatif des <em>mod&egrave;les CGP</em></h2>
-      <p class="article-excerpt">Panorama des trois grands mod&egrave;les de conseil en gestion de patrimoine : march&eacute;, gamme produits, niveau de frais et impact long terme pour le client. Avec simulateur de co&ucirc;t client int&eacute;gr&eacute;.</p>
-      <div class="article-footer">
-        <span>Mod&egrave;les &middot; Frais &middot; Positionnement</span>
-        <span class="article-read">Lire</span>
-      </div>
-    </a>
-
-    <div class="coming-soon">
-      D'autres articles arrivent prochainement &mdash; assurance-vie, PER, SCPI, transmission...
     </div>
 
   </div>
-
 </section>
 
-<footer class="footer">
-  <p>Biblioth&egrave;que d'articles &mdash; CGP Skool &middot; Peak Patrimoine<br>
-  Ces contenus sont informatifs et ne constituent pas un conseil en investissement.</p>
+<footer class="site-footer">
+  <a href="index.html" class="footer-logo">
+    <div class="footer-mark"><span>C</span></div>
+    <span class="footer-name">CGP Skool</span>
+  </a>
+  <span class="footer-copy">Biblioth&egrave;que d'articles &middot; Peak Patrimoine &nbsp;&middot;&nbsp; <span style="color:var(--ink-30)">Contenus informatifs, non constitutifs d'un conseil en investissement</span></span>
 </footer>
 
 <script>
