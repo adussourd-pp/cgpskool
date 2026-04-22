@@ -344,53 +344,7 @@
     </div>
 
     <div class="articles-grid" id="articlesGrid">
-
-      <a href="article-pea-2026.html" class="article-card" data-cat="enveloppes fiscalite">
-        <span class="article-badge">Analyse</span>
-        <div class="article-bar"></div>
-        <div class="article-meta">
-          <span>Avril 2026</span>
-          <span class="article-meta-sep">&middot;</span>
-          <span>12 min de lecture</span>
-        </div>
-        <h2>Le PEA en 2026 : <em>les r&egrave;gles ont chang&eacute;</em></h2>
-        <p class="article-excerpt">Hausse de la CSG &agrave; 10,6%, ETF synth&eacute;tiques dans le viseur de Bercy, &eacute;cart comportemental DALBAR/Morningstar : ce que tout &eacute;pargnant en ETF doit savoir avant de continuer &agrave; investir dans cette enveloppe.</p>
-        <div class="article-footer-row">
-          <div class="article-features">
-            <span class="article-feature">PEA</span>
-            <span class="article-feature">LFSS 2026</span>
-            <span class="article-feature">ETF</span>
-          </div>
-          <span class="article-read">Lire</span>
-        </div>
-      </a>
-
-      <a href="comparatif-cgp.html" class="article-card" data-cat="strategie">
-        <span class="article-badge">Strat&eacute;gie</span>
-        <div class="article-bar"></div>
-        <div class="article-meta">
-          <span>2026</span>
-          <span class="article-meta-sep">&middot;</span>
-          <span>Comparatif</span>
-          <span class="article-meta-sep">&middot;</span>
-          <span class="article-lock">&#128274; Code requis</span>
-        </div>
-        <h2>Comparatif des <em>mod&egrave;les CGP</em></h2>
-        <p class="article-excerpt">Panorama des trois grands mod&egrave;les de conseil en gestion de patrimoine : march&eacute;, gamme produits, niveau de frais et impact long terme pour le client. Avec simulateur de co&ucirc;t client int&eacute;gr&eacute;.</p>
-        <div class="article-footer-row">
-          <div class="article-features">
-            <span class="article-feature">Mod&egrave;les</span>
-            <span class="article-feature">Frais</span>
-            <span class="article-feature">Positionnement</span>
-          </div>
-          <span class="article-read">Lire</span>
-        </div>
-      </a>
-
-      <div class="coming-soon">
-        D'autres articles arrivent prochainement &mdash; assurance-vie, PER, SCPI, transmission
-      </div>
-
+      <div class="coming-soon" id="articlesLoader">Chargement des articles...</div>
     </div>
 
   </div>
@@ -404,20 +358,105 @@
   <span class="footer-copy">Biblioth&egrave;que d'articles &middot; Peak Patrimoine &nbsp;&middot;&nbsp; <span style="color:var(--ink-30)">Contenus informatifs, non constitutifs d'un conseil en investissement</span></span>
 </footer>
 
+<template id="articleCardTpl">
+  <a class="article-card">
+    <span class="article-badge"></span>
+    <div class="article-bar"></div>
+    <div class="article-meta">
+      <span class="am-date"></span>
+      <span class="article-meta-sep am-sep1">&middot;</span>
+      <span class="am-reading"></span>
+      <span class="article-meta-sep am-sep2" hidden>&middot;</span>
+      <span class="am-lock article-lock" hidden>&#128274; Code requis</span>
+    </div>
+    <h2 class="am-title"></h2>
+    <p class="article-excerpt am-excerpt"></p>
+    <div class="article-footer-row">
+      <div class="article-features"></div>
+      <span class="article-read">Lire</span>
+    </div>
+  </a>
+</template>
+
 <script>
+  const grid = document.getElementById('articlesGrid');
+  const tpl  = document.getElementById('articleCardTpl');
   const chips = document.querySelectorAll('.filter-chip');
-  const cards = document.querySelectorAll('.article-card');
+
+  function renderArticles(list) {
+    grid.innerHTML = '';
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.className = 'coming-soon';
+      empty.textContent = 'Aucun article dans cette catégorie';
+      grid.appendChild(empty);
+      return;
+    }
+    list.forEach(a => {
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      node.href = a.href;
+      node.dataset.cat = (a.categories || []).join(' ');
+      node.querySelector('.article-badge').innerHTML = a.badge || 'Article';
+      node.querySelector('.am-date').textContent = a.date_label || '';
+      node.querySelector('.am-reading').textContent = a.reading_time || '';
+      node.querySelector('.am-title').innerHTML = a.title || '';
+      node.querySelector('.am-excerpt').innerHTML = a.excerpt || '';
+      if (a.locked) {
+        node.querySelector('.am-sep2').hidden = false;
+        node.querySelector('.am-lock').hidden = false;
+      }
+      const feats = node.querySelector('.article-features');
+      (a.features || []).forEach(f => {
+        const s = document.createElement('span');
+        s.className = 'article-feature';
+        s.innerHTML = f;
+        feats.appendChild(s);
+      });
+      grid.appendChild(node);
+    });
+
+    // Empty state footer
+    const soon = document.createElement('div');
+    soon.className = 'coming-soon';
+    soon.innerHTML = 'D\'autres articles arrivent prochainement &mdash; assurance-vie, PER, SCPI, transmission';
+    grid.appendChild(soon);
+  }
+
+  let allArticles = [];
+  let currentFilter = 'all';
+
+  function applyFilter() {
+    const list = currentFilter === 'all'
+      ? allArticles
+      : allArticles.filter(a => (a.categories || []).includes(currentFilter));
+    renderArticles(list);
+  }
+
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
       chips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      const f = chip.dataset.filter;
-      cards.forEach(card => {
-        const cats = (card.dataset.cat || '').split(' ');
-        card.style.display = (f === 'all' || cats.includes(f)) ? '' : 'none';
-      });
+      currentFilter = chip.dataset.filter;
+      applyFilter();
     });
   });
+
+  fetch('articles/manifest.json', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => {
+      allArticles = (data.articles || []).slice().sort((a, b) => {
+        return (b.date || '').localeCompare(a.date || '');
+      });
+      applyFilter();
+    })
+    .catch(err => {
+      grid.innerHTML = '';
+      const e = document.createElement('div');
+      e.className = 'coming-soon';
+      e.textContent = 'Impossible de charger le manifeste des articles.';
+      grid.appendChild(e);
+      console.error('manifest load failed:', err);
+    });
 </script>
 
 </body>
