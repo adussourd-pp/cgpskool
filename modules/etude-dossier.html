@@ -725,7 +725,7 @@ select.span2{grid-column:span 2}
         </div>
 
         <!-- Épargne -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">&#201;pargne</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">&#201;pargne souhait&#233;e</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C1</label><input class="fi" type="number" id="vEpMens1"></div>
           <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C2</label><input class="fi" type="number" id="vEpMens2"></div>
@@ -764,10 +764,10 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">TMI (%)</label><input class="fi" type="number" id="vFiscTMI"></div>
           <div><label style="font-size:10px;color:var(--gris)">IR net</label><input class="fi" type="number" id="vFiscIRNet"></div>
           <div><label style="font-size:10px;color:var(--gris)">Pr&#233;l&#232;vements sociaux</label><input class="fi" type="number" id="vFiscPS"></div>
-          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (I1)</label><input class="fi" type="number" id="vFiscPER"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (C1)</label><input class="fi" type="number" id="vFiscPER"></div>
         </div>
         <div id="vFiscPER2Wrap" style="display:none;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (I2)</label><input class="fi" type="number" id="vFiscPER2"></div>
+          <div><label style="font-size:10px;color:var(--gris)">Plafond PER dispo (C2)</label><input class="fi" type="number" id="vFiscPER2"></div>
           <div></div><div></div><div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
@@ -3909,14 +3909,9 @@ function rSituation(){
 
 
 
-  const priObjSit=ED.objectifsPriority||{};
   const objH=ED.objectifs.length
     ? ED.objectifs.map((o,i)=>{
-        const p=priObjSit[o]||{};
-        let badges='';
-        if(p.i1)badges+=`<span style="font-size:9px;font-weight:700;color:#fff;background:var(--orange);padding:1px 5px;border-radius:8px;margin-left:6px">I1 n°${p.i1}</span>`;
-        if(p.i2)badges+=`<span style="font-size:9px;font-weight:700;color:#fff;background:#2B5EA7;padding:1px 5px;border-radius:8px;margin-left:3px">I2 n°${p.i2}</span>`;
-        return `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span>${badges}</div>`;
+        return `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--ambre);font-weight:700;flex-shrink:0">${i+1}.</span><span class="ed" contenteditable="true">${o}</span></div>`;
       }).join('')
     : '<em style="color:var(--gris)">Aucun objectif renseigné</em>';
   var od=document.getElementById('objDisplay');if(od)od.innerHTML=objH;
@@ -4878,13 +4873,8 @@ function rPreconisations(){
   var objEl=document.getElementById('precoObjectifs');
   if(objEl){
     if(ED.objectifs&&ED.objectifs.length&&ED.objectifs[0]!=='Objectifs \u00e0 compl\u00e9ter'){
-      var priObj=ED.objectifsPriority||{};
       objEl.innerHTML=ED.objectifs.map(function(o,i){
-        var p=priObj[o]||{};
-        var badges='';
-        if(p.i1)badges+='<span style="font-size:10px;font-weight:700;color:#fff;background:var(--orange);padding:1px 6px;border-radius:10px;margin-left:6px">I1 n\u00b0'+p.i1+'</span>';
-        if(p.i2)badges+='<span style="font-size:10px;font-weight:700;color:#fff;background:#2B5EA7;padding:1px 6px;border-radius:10px;margin-left:4px">I2 n\u00b0'+p.i2+'</span>';
-        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--orange);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+badges+'</span></div>';
+        return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bord);align-items:center"><span style="color:var(--orange);font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span>'+o+'</span></div>';
       }).join('');
     } else {
       objEl.innerHTML='<em style="color:var(--gris)">Aucun objectif identifi\u00e9</em>';
@@ -6607,7 +6597,7 @@ function addSol(type){
     <div class="sol-grid">
       <div class="fg"><label>Produit / Nom</label><input class="fi" placeholder="Ex: SCPI Transitions Europe" style="font-size:13px"></div>
       <div class="fg"><label>Pour qui</label>
-        <select class="fi" style="font-size:13px"><option value="C1">I1</option>${ED.type!=='seul'?'<option value="C2">I2</option><option>Commun</option>':''}</select>
+        <select class="fi" style="font-size:13px"><option value="C1">C1</option>${ED.type!=='seul'?'<option value="C2">C2</option><option>Commun</option>':''}</select>
       </div>
       <div class="fg"><label>Horizon</label>
         <select class="fi" style="font-size:13px"><option>Long terme (+10 ans)</option><option>Moyen terme (3-10 ans)</option><option>Court terme (-3 ans)</option></select>
@@ -7112,7 +7102,7 @@ function addActif(){
   const tb=document.getElementById('actifsTbody');const tr=document.createElement('tr');
   tr.innerHTML=`<td><input class="fi" style="border:none;padding:4px;font-size:13px" placeholder="Désignation"></td>
     <td><select class="fi" style="border:none;padding:4px;font-size:12px"><option value="ct">Court terme</option><option value="mt">Moyen terme</option><option value="lt" selected>Long terme</option></select></td>
-    <td><select class="fi" style="border:none;padding:4px;font-size:12px"><option value="C1">I1</option><option value="C2">I2</option><option>Commun</option></select></td>
+    <td><select class="fi" style="border:none;padding:4px;font-size:12px"><option value="C1">C1</option><option value="C2">C2</option><option>Commun</option></select></td>
     <td><input class="fi" type="number" style="border:none;padding:4px;text-align:right;font-size:13px" placeholder="0"></td>
     <td><button onclick="this.closest('tr').remove()" style="border:none;background:transparent;color:var(--gris);cursor:pointer;font-size:16px">×</button></td>`;
   tb.appendChild(tr);
@@ -7120,7 +7110,7 @@ function addActif(){
 function addPassif(){
   const tb=document.getElementById('passifsTbody');const tr=document.createElement('tr');
   tr.innerHTML=`<td><input class="fi" style="border:none;padding:4px;font-size:13px" placeholder="Désignation"></td>
-    <td><select class="fi" style="border:none;padding:4px;font-size:12px"><option value="C1">I1</option><option value="C2">I2</option><option>Commun</option></select></td>
+    <td><select class="fi" style="border:none;padding:4px;font-size:12px"><option value="C1">C1</option><option value="C2">C2</option><option>Commun</option></select></td>
     <td><input class="fi" type="number" style="border:none;padding:4px;text-align:right;font-size:13px" placeholder="0"></td>
     <td><input class="fi" type="number" style="border:none;padding:4px;text-align:right;font-size:13px" placeholder="0"></td>
     <td><button onclick="this.closest('tr').remove()" style="border:none;background:transparent;color:var(--gris);cursor:pointer;font-size:16px">×</button></td>`;
@@ -7969,7 +7959,7 @@ function renderVerifActifs(){
   (ED.actifs||[]).forEach(function(a,i){
     h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
     h+='<input class="fi" id="vAct'+i+'Nom" value="'+((a.nom||a.label||'').replace(/"/g,'&quot;'))+'">';
-    h+='<select class="fi" id="vAct'+i+'Tit"><option value="C1"'+(a.titulaire==='C1'?' selected':'')+'>I1</option><option value="C2"'+(a.titulaire==='C2'?' selected':'')+'>I2</option><option value="Commun"'+(a.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<select class="fi" id="vAct'+i+'Tit"><option value="C1"'+(a.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(a.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(a.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vAct'+i+'Mt" value="'+(a.montant||0)+'">';
     h+='<button onclick="ED.actifs.splice('+i+',1);renderVerifActifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
     h+='</div>';
@@ -7986,7 +7976,7 @@ function renderVerifPassifs(){
   (ED.passifs||[]).forEach(function(p,i){
     h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
     h+='<input class="fi" id="vPas'+i+'Nom" value="'+((p.nom||'').replace(/"/g,'&quot;'))+'">';
-    h+='<select class="fi" id="vPas'+i+'Tit"><option value="C1"'+(p.titulaire==='C1'?' selected':'')+'>I1</option><option value="C2"'+(p.titulaire==='C2'?' selected':'')+'>I2</option><option value="Commun"'+(p.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<select class="fi" id="vPas'+i+'Tit"><option value="C1"'+(p.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(p.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(p.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vPas'+i+'Ech" value="'+(p.echeance||0)+'" placeholder="\u00c9ch/an">';
     h+='<input class="fi" type="number" id="vPas'+i+'Crd" value="'+(p.crd||0)+'" placeholder="CRD">';
     h+='<button onclick="ED.passifs.splice('+i+',1);renderVerifPassifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
@@ -8004,7 +7994,7 @@ function renderVerifCharges(){
   (ED.chargesDetail||[]).forEach(function(c,i){
     h+='<div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 28px;gap:6px;margin-bottom:4px;align-items:center">';
     h+='<input class="fi" id="vChr'+i+'Nom" value="'+((c.nom||'').replace(/"/g,'&quot;'))+'" placeholder="Libell\u00e9">';
-    h+='<select class="fi" id="vChr'+i+'Tit"><option value="C1"'+(c.titulaire==='C1'?' selected':'')+'>I1</option><option value="C2"'+(c.titulaire==='C2'?' selected':'')+'>I2</option><option value="Commun"'+(c.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
+    h+='<select class="fi" id="vChr'+i+'Tit"><option value="C1"'+(c.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(c.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(c.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vChr'+i+'Mt" value="'+(c.montant||0)+'" placeholder="Montant/an">';
     h+='<button onclick="ED.chargesDetail.splice('+i+',1);renderVerifCharges()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
     h+='</div>';
@@ -8116,8 +8106,8 @@ function renderVerifObjectifs(){
   var h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
   h+='<thead><tr style="background:var(--gris-l);color:var(--gris);font-size:10px;text-transform:uppercase;letter-spacing:0.08em">';
   h+='<th style="text-align:left;padding:6px 10px;font-weight:700">Objectif</th>';
-  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 I1</th>';
-  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 I2</th>';
+  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 C1</th>';
+  h+='<th style="width:80px;text-align:center;padding:6px;font-weight:700">Priorit\u00e9 C2</th>';
   h+='</tr></thead><tbody>';
   OBJ_LIST_RI.forEach(function(grp){
     h+='<tr><td colspan="3" style="padding:8px 10px;background:rgba(212,98,42,0.08);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange)">'+grp.cat+'</td></tr>';
