@@ -35,6 +35,15 @@
 /* Node */
 .node-group{display:flex;flex-direction:column;align-items:center}
 .node-bubble{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:10px;padding:10px 16px;cursor:default;transition:all 0.2s;min-width:160px}
+.node-bubble.statut-en-cours{opacity:0.6;border-style:dashed!important}
+.node-bubble.statut-en-cours .node-avatar{filter:grayscale(0.4)}
+.node-statut-pill{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle;line-height:1.4}
+.node-statut-pill.inscrit{background:#e5e7eb;color:#374151}
+.node-statut-pill.en-cours{background:rgba(212,98,42,0.18);color:var(--orange)}
+.statut-toggle{display:flex;gap:4px;margin-bottom:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:8px;padding:3px}
+.statut-toggle button{flex:1;padding:7px 8px;font-family:var(--sans);font-size:11px;font-weight:600;border:none;background:transparent;color:var(--ink-60);border-radius:5px;cursor:pointer;transition:all 0.15s}
+.statut-toggle button:hover{color:var(--ink)}
+.statut-toggle button.on{background:var(--orange);color:#fff}
 .node-bubble[draggable=true]{cursor:grab}
 .node-bubble[draggable=true]:active{cursor:grabbing}
 .node-bubble:hover{border-color:rgba(212,98,42,0.35)}
@@ -135,6 +144,9 @@
       <!-- Stats -->
       <div class="stats-bar" id="statsBar" style="display:none">
         <div class="stat-pill orange">Membres : <b id="statTotal">0</b></div>
+        <div class="stat-pill">Actifs : <b id="statActifs">0</b></div>
+        <div class="stat-pill" id="statInscritsPill" style="display:none">Inscrits : <b id="statInscrits">0</b></div>
+        <div class="stat-pill" id="statEnCoursPill" style="display:none;color:var(--orange)">En cours : <b id="statEnCours">0</b></div>
         <div class="stat-pill">Profondeur : <b id="statDepth">0</b> niveaux</div>
         <div class="stat-pill">Directs : <b id="statDirects">0</b></div>
         <div class="stat-pill">Branches actives : <b id="statBranches">0</b></div>
@@ -184,6 +196,11 @@
     <div class="add-sub" id="modalSub">sous Alexandre DUSSOURD</div>
     <input type="text" id="modalPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('modalNom').focus()">
     <input type="text" id="modalNom" placeholder="Nom" onkeydown="if(event.key==='Enter')confirmAdd()">
+    <div class="statut-toggle" id="modalStatut" data-value="actif">
+      <button type="button" data-statut="actif" class="on" onclick="setStatut('actif')">Actif</button>
+      <button type="button" data-statut="inscrit" onclick="setStatut('inscrit')">Inscrit</button>
+      <button type="button" data-statut="en-cours" onclick="setStatut('en-cours')">En cours</button>
+    </div>
     <select id="modalQualif" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
       <option value="">Qualification auto (selon &#233;quipe)</option>
       <option value="junior">Consultant Junior</option>
@@ -253,9 +270,12 @@ function getQualif(node){
   }
 
   // Compter les enfants directs qui sont managers, et ceux qui sont galaxie+
+  // Seuls les enfants ACTIFS comptent pour la qualif (Inscrits/En cours ignores)
   var directManagers = 0;
   var directGalaxies = 0;
   node.children.forEach(function(ch){
+    var chSt = ch.statut || 'actif';
+    if(chSt !== 'actif') return;
     var chQ = getQualif(ch);
     if(isManagerQualif(chQ.code)){
       directManagers++;
@@ -330,6 +350,21 @@ function getNode(path){
   return node;
 }
 
+function setStatut(v){
+  var box=V('modalStatut');
+  if(!box)return;
+  box.setAttribute('data-value',v);
+  var btns=box.querySelectorAll('button');
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.toggle('on',btns[i].getAttribute('data-statut')===v);
+  }
+}
+
+function getModalStatut(){
+  var box=V('modalStatut');
+  return (box&&box.getAttribute('data-value'))||'actif';
+}
+
 function openAdd(path){
   var parent=getNode(path);
   if(!parent)return;
@@ -340,6 +375,7 @@ function openAdd(path){
   V('modalPrenom').value='';
   V('modalNom').value='';
   V('modalQualif').value='';
+  setStatut('actif');
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -354,6 +390,7 @@ function openEdit(path){
   V('modalPrenom').value=node.prenom;
   V('modalNom').value=node.nom;
   V('modalQualif').value=node.qualif||'';
+  setStatut(node.statut||'actif');
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -369,15 +406,21 @@ function confirmAdd(){
   if(!p&&!n){V('modalPrenom').focus();return}
 
   var qualif=V('modalQualif').value||'';
+  var statut=getModalStatut();
   if(editTarget!==null){
     var node=getNode(editTarget);
-    if(node){node.prenom=p;node.nom=n;node.qualif=qualif||undefined;}
+    if(node){
+      node.prenom=p;node.nom=n;
+      node.qualif=qualif||undefined;
+      node.statut=(statut&&statut!=='actif')?statut:undefined;
+    }
   } else if(addTarget!==null){
     var parent=getNode(addTarget);
     if(parent){
       if(!parent.children)parent.children=[];
       var newNode={prenom:p,nom:n,children:[]};
       if(qualif)newNode.qualif=qualif;
+      if(statut&&statut!=='actif')newNode.statut=statut;
       parent.children.push(newNode);
     }
   }
@@ -407,6 +450,14 @@ function countNodes(node){
   var c=1;
   if(node.children)node.children.forEach(function(ch){c+=countNodes(ch)});
   return c;
+}
+
+function countByStatut(node,acc){
+  acc=acc||{actif:0,inscrit:0,'en-cours':0};
+  var st=node.statut||'actif';
+  if(acc[st]!==undefined)acc[st]++;
+  if(node.children)node.children.forEach(function(ch){countByStatut(ch,acc)});
+  return acc;
 }
 
 function maxDepth(node,d){
@@ -564,6 +615,12 @@ function renderNode(node,path,depth){
   var pathStr=JSON.stringify(path);
   var isRoot=path.length===0;
 
+  var statut=node.statut||'actif';
+  var statutClass=statut!=='actif'?' statut-'+statut:'';
+  var statutPill='';
+  if(statut==='inscrit')statutPill=' <span class="node-statut-pill inscrit">Inscrit</span>';
+  else if(statut==='en-cours')statutPill=' <span class="node-statut-pill en-cours">En cours</span>';
+
   var html='<div class="node-group">';
   var dragAttrs=isRoot?'':' draggable="true"'
     +' ondragstart="onDragStart(event,'+pathStr+')"'
@@ -571,10 +628,10 @@ function renderNode(node,path,depth){
     +' ondragover="onDragOver(event,'+pathStr+')"'
     +' ondragleave="onDragLeave(event)"'
     +' ondrop="onDrop(event,'+pathStr+')"';
-  html+='<div class="node-bubble"'+dragAttrs+' data-path="'+pathStr.replace(/"/g,'&quot;')+'" style="border-color:'+qColor+';'+(isRoot?'border-width:2px':'border-width:1.5px')+'">';
+  html+='<div class="node-bubble'+statutClass+'"'+dragAttrs+' data-path="'+pathStr.replace(/"/g,'&quot;')+'" style="border-color:'+qColor+';'+(isRoot?'border-width:2px':'border-width:1.5px')+'">';
   html+='<div class="node-avatar" style="background:'+qColor+'">'+getInitials(node)+'</div>';
   html+='<div class="node-info">';
-  html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+'</div>';
+  html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+statutPill+'</div>';
   html+='<div class="node-level" style="color:'+qColor+'">'+q.label+'</div>';
   var meta=[];
   if(directs>0)meta.push(directs+' direct'+(directs>1?'s':''));
@@ -642,7 +699,13 @@ function render(){
   var branchesActives=0;
   if(tree.children)tree.children.forEach(function(ch){if(ch.children&&ch.children.length>0)branchesActives++});
   var rootQ=getQualif(tree);
+  var st=countByStatut(tree);
   V('statTotal').textContent=total;
+  V('statActifs').textContent=st.actif;
+  V('statInscrits').textContent=st.inscrit;
+  V('statEnCours').textContent=st['en-cours'];
+  V('statInscritsPill').style.display=st.inscrit>0?'':'none';
+  V('statEnCoursPill').style.display=st['en-cours']>0?'':'none';
   V('statDepth').textContent=depth;
   V('statDirects').textContent=directs;
   V('statBranches').textContent=branchesActives;
