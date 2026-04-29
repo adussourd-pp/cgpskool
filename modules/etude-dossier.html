@@ -1067,33 +1067,52 @@ select.span2{grid-column:span 2}
   <div class="sec-header">
     <div><div class="sec-tag">Section 05</div><div class="sec-h1">Retraite</div><div class="sec-sub">Taux de remplacement &amp; effort d'épargne</div></div>
   </div>
-  <!-- Paramètres manuels retraite -->
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Paramètres retraite</div>
-    <div id="retParams" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+
+  <!-- Switch : désactiver les calculs (ex: personne déjà retraitée) -->
+  <div class="card no-print-when-disabled" id="retraiteToggleCard" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">Calculs retraite</div>
+      <div style="font-size:11px;color:var(--gris)">Désactiver si la personne est déjà à la retraite — seule la note conseiller sera affichée.</div>
+    </div>
+    <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retraiteDisableSwitch" onchange="toggleRetraiteCalcs(this)"><span class="cz-slider"></span></label>
   </div>
 
-  <div id="retKpis" style="display:none"></div>
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
-      <span id="retClientTags" style="margin-left:8px"></span>
+  <!-- Bloc calculs (masqué quand le switch est ON) -->
+  <div id="retraiteCalcsWrap">
+    <!-- Paramètres manuels retraite -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Paramètres retraite</div>
+      <div id="retParams" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
     </div>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
-    <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
-    <img id="retChartPrint" style="display:none;width:100%;height:auto" src="" alt="">
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
-    <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
-      <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
+
+    <div id="retKpis" style="display:none"></div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
+        <span id="retClientTags" style="margin-left:8px"></span>
+      </div>
+      <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
+      <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
+      <img id="retChartPrint" style="display:none;width:100%;height:auto" src="" alt="">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
+      <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
+        <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
+      </div>
+    </div>
+    <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
+    <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
+      <p id="retSimuLegend" style="display:none"></p>
+      <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
+      <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
     </div>
   </div>
-  <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
-  <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
-    <p id="retSimuLegend" style="display:none"></p>
-    <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
-    <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
+
+  <!-- Message visible uniquement quand les calculs sont désactivés -->
+  <div id="retraiteDisabledMsg" style="display:none;padding:14px 18px;border-radius:10px;background:var(--gris-l);font-size:12px;color:var(--gris-f);margin-bottom:14px">
+    Les calculs retraite sont désactivés pour ce dossier. Seule la note conseiller ci-dessous sera reprise dans le PDF.
   </div>
+
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
   <div class="page-number"></div>
@@ -4337,10 +4356,33 @@ function updateRetraiteCalc(){
   rRetraite(); // pour l'instant appel complet — optimiser si besoin
 }
 
+// Switch ON/OFF des calculs retraite (cas: personne déjà retraitée)
+function toggleRetraiteCalcs(cb){
+  var on=!!(cb&&cb.checked);
+  if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
+  ED.retraite.disabled=on;
+  var wrap=document.getElementById('retraiteCalcsWrap');
+  var msg=document.getElementById('retraiteDisabledMsg');
+  if(wrap)wrap.style.display=on?'none':'';
+  if(msg)msg.style.display=on?'':'none';
+}
+function applyRetraiteDisabledState(){
+  var sw=document.getElementById('retraiteDisableSwitch');
+  var on=!!(ED.retraite&&ED.retraite.disabled);
+  if(sw)sw.checked=on;
+  var wrap=document.getElementById('retraiteCalcsWrap');
+  var msg=document.getElementById('retraiteDisabledMsg');
+  if(wrap)wrap.style.display=on?'none':'';
+  if(msg)msg.style.display=on?'':'none';
+}
+
 function rRetraite(){
   // Nettoyer les images de print residuelles
   try{CGP.pdf._restoreCanvases();}catch(e){}
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
+  // Si les calculs retraite sont désactivés : juste afficher le message + note conseiller
+  applyRetraiteDisabledState();
+  if(ED.retraite.disabled)return;
 
   // ── Panneau paramètres manuels ──────────────────────────────
   var retParamsEl=document.getElementById('retParams');
@@ -6081,10 +6123,8 @@ function renderFichesClient(){
               html+='<br>Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(capPer3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else if(/assurance.vie|contrat de capitalisation/i.test(sol.produit||'')){
               var capAV3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
-              var renteAV3=Math.round(capAV3*0.04/12);
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+'), ';
-              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteAV3)+'\u00a0\u20ac/mois</strong>.';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else if(economieFisc2>0){
               html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
               html+='Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0)))+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
