@@ -1067,33 +1067,52 @@ select.span2{grid-column:span 2}
   <div class="sec-header">
     <div><div class="sec-tag">Section 05</div><div class="sec-h1">Retraite</div><div class="sec-sub">Taux de remplacement &amp; effort d'épargne</div></div>
   </div>
-  <!-- Paramètres manuels retraite -->
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Paramètres retraite</div>
-    <div id="retParams" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+
+  <!-- Switch : désactiver les calculs (ex: personne déjà retraitée) -->
+  <div class="card no-print-when-disabled" id="retraiteToggleCard" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">Calculs retraite</div>
+      <div style="font-size:11px;color:var(--gris)">Désactiver si la personne est déjà à la retraite — seule la note conseiller sera affichée.</div>
+    </div>
+    <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retraiteDisableSwitch" onchange="toggleRetraiteCalcs(this)"><span class="cz-slider"></span></label>
   </div>
 
-  <div id="retKpis" style="display:none"></div>
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
-      <span id="retClientTags" style="margin-left:8px"></span>
+  <!-- Bloc calculs (masqué quand le switch est ON) -->
+  <div id="retraiteCalcsWrap">
+    <!-- Paramètres manuels retraite -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Paramètres retraite</div>
+      <div id="retParams" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
     </div>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
-    <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
-    <img id="retChartPrint" style="display:none;width:100%;height:auto" src="" alt="">
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
-    <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
-      <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
+
+    <div id="retKpis" style="display:none"></div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Taux de remplacement par profil &amp; âge
+        <span id="retClientTags" style="margin-left:8px"></span>
+      </div>
+      <p style="font-size:11px;color:var(--gris);margin-bottom:14px">Source : études actuarielles. La pension estimée représente un pourcentage du dernier salaire net selon la catégorie et l'âge de départ.</p>
+      <div style="position:relative;height:320px"><canvas id="retChart"></canvas></div>
+      <img id="retChartPrint" style="display:none;width:100%;height:auto" src="" alt="">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px" id="retLegend"></div>
+      <div style="margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-size:11px;line-height:1.6;color:var(--gris-f)">
+        <strong>Hypothèse :</strong> les taux de remplacement supposent que tous les trimestres requis sont validés (carrière complète). Si le nombre de trimestres cotisés est inférieur au nombre requis, un coefficient minorateur s'applique : pension = pension estimée × (trimestres cotisés / trimestres requis).
+      </div>
+    </div>
+    <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
+    <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
+      <p id="retSimuLegend" style="display:none"></p>
+      <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
+      <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
     </div>
   </div>
-  <div id="retraiteCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px"></div>
-  <div id="retraiteImpactFoyer" style="margin-bottom:18px"></div>
-  <div class="card" style="margin-bottom:18px">
-    <div class="card-title"><span class="dot"></span>Simulation effort d'épargne necessaire</div>
-    <p id="retSimuLegend" style="display:none"></p>
-    <div id="retSimuMsg" style="display:none;padding:10px 14px;border-radius:8px;background:var(--green-l);color:var(--green);font-size:13px;font-weight:600;margin-bottom:8px"></div>
-    <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
+
+  <!-- Message visible uniquement quand les calculs sont désactivés -->
+  <div id="retraiteDisabledMsg" style="display:none;padding:14px 18px;border-radius:10px;background:var(--gris-l);font-size:12px;color:var(--gris-f);margin-bottom:14px">
+    Les calculs retraite sont désactivés pour ce dossier. Seule la note conseiller ci-dessous sera reprise dans le PDF.
   </div>
+
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
   <div class="page-number"></div>
@@ -3194,19 +3213,53 @@ function parseTextRI(txt){
   // Civilité
   var civRow=t01['civilit\u00e9']||t01['civilite'];
   if(civRow){ED.c1.civ=/madame|mme/i.test(civRow.v1)?'Mme':'M.';if(isCouple2)ED.c2.civ=/madame|mme/i.test(civRow.v2)?'Mme':'M.';}
-  // DOB
-  var dobRow=t01['n\u00e9(e) le']||t01['ne(e) le'];
-  if(dobRow){ED.c1.dob=parseDob(dobRow.v1);if(isCouple2)ED.c2.dob=parseDob(dobRow.v2);}
+  // DOB + Lieu de naissance (extraits depuis "N\u00e9(e) le : * 01/07/1965 \u00e0 Pornichet (44) France")
+  function parseDobLieu2(s){
+    if(!s)return {dob:'',lieu:''};
+    var m=s.match(/(\d{1,2}\/\d{1,2}\/\d{4})\s*[,\u00e0]?\s*(.*)$/);
+    if(m){
+      var lieu=(m[2]||'').trim().replace(/^[\u00e0a]\s+/i,'').trim();
+      return {dob:m[1],lieu:lieu};
+    }
+    return {dob:parseDob(s)||'',lieu:''};
+  }
+  var dobRow=t01['n\u00e9(e) le']||t01['ne(e) le']||t01['date et lieu de naissance']||t01['date de naissance'];
+  if(dobRow){
+    var dl1=parseDobLieu2(dobRow.v1);ED.c1.dob=dl1.dob;if(dl1.lieu)ED.c1.lieuNaissance=dl1.lieu;
+    if(isCouple2){var dl2=parseDobLieu2(dobRow.v2);ED.c2.dob=dl2.dob;if(dl2.lieu)ED.c2.lieuNaissance=dl2.lieu;}
+  }
+  // Nationalit\u00e9
+  var natRow=t01['nationalit\u00e9']||t01['nationalite'];
+  if(natRow){if(natRow.v1)ED.c1.nationalite=natRow.v1.toLowerCase();if(isCouple2&&natRow.v2)ED.c2.nationalite=natRow.v2.toLowerCase();}
   // Sit mat
   var sitRow=t01['situation']||t01['situation\u00a0'];if(sitRow)ED.sitmat=sitRow.v1;
+  // Date mariage / PACS / divorce \u2014 peut \u00eatre "Date de divorce : 01/01/2020" ou juste "01/01/2020"
+  var dmarRow=t01['le (mariage/pacs/divorce)']||t01['le (mariage, pacs, divorce)']||t01['date (mariage, pacs, divorce)']||t01['date de mariage']||t01['date de pacs']||t01['date de divorce'];
+  if(dmarRow&&dmarRow.v1&&dmarRow.v1!=='JJ/MM/AAAA'){
+    var dmd=parseDob(dmarRow.v1);
+    if(dmd)ED.dateMariage=dmd;
+  }
   // Regime / Convention
   var convRow=t01['r\u00e9gime/ convention']||t01['regime/ convention']||t01['r\u00e9gime']||t01['regime'];
   if(convRow){var cv=(convRow.v1||'').replace(/R.gime matrimonial\s*:\s*/i,'').replace(/R.gime\s*:\s*/i,'').trim();if(cv)ED.convention=cv;}
   // Logement
   var logRow=t01['logement'];if(logRow)ED.logement=logRow.v1;
   // Adresse
-  var adrRow=t01['adresse']||t01['adresse de r\u00e9sidence']||t01['adresse residence'];
+  var adrRow=t01['adresse']||t01['adresse de r\u00e9sidence']||t01['adresse residence']||t01['adresse postale'];
   if(adrRow)ED.adresse=adrRow.v1;
+  // Pays de r\u00e9sidence (fiscale)
+  var paysRow=t01['pays de r\u00e9sidence fiscale']||t01['pays de residence fiscale']||t01['pays de r\u00e9sidence']||t01['pays de residence']||t01['pays'];
+  if(paysRow){if(paysRow.v1)ED.c1.paysResidence=paysRow.v1;if(isCouple2&&paysRow.v2)ED.c2.paysResidence=paysRow.v2;}
+  // T\u00e9l\u00e9phone (Mobile / Domicile / Bureau / T\u00e9l\u00e9phone)
+  var telRow=t01['mobile']||t01['t\u00e9l\u00e9phone']||t01['telephone']||t01['t\u00e9l']||t01['tel']||t01['domicile']||t01['portable'];
+  if(telRow){if(telRow.v1)ED.c1.tel=telRow.v1;if(isCouple2&&telRow.v2)ED.c2.tel=telRow.v2;}
+  // Email
+  var emRow=t01['e-mail']||t01['email']||t01['mail']||t01['courriel']||t01['adresse e-mail']||t01['adresse email'];
+  if(emRow){
+    function cleanEmail(s){if(!s)return '';var mm=s.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);return mm?mm[0]:s.trim();}
+    if(emRow.v1)ED.c1.email=cleanEmail(emRow.v1);
+    if(isCouple2&&emRow.v2)ED.c2.email=cleanEmail(emRow.v2);
+  }
   // CSP
   var catRow=t01['cat\u00e9gorie socio-professionnelle']||t01['categorie socio-professionnelle']||t01['cat\u00e9gorie socio'];
   if(catRow){ED.c1.sitpro=mapCSP(catRow.v1);if(isCouple2)ED.c2.sitpro=mapCSP(catRow.v2);}
@@ -3230,7 +3283,7 @@ function parseTextRI(txt){
     if(enfDates){
       enfDates.forEach(function(part){
         var m=part.trim().match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)/);
-        if(m){var nn=m[1].trim().replace(/^(enfants?\s+communs?|investisseur|investisseuse)\s+/i,'').trim();if(!enfSeenA[nn]){enfSeenA[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
+        if(m){var nn=m[1].trim().replace(/^(enfants?(\s+communs?)?|personnes?\s+rattach[ée]es?|investisseur|investisseuse)\s+/i,'').trim();if(nn&&!enfSeenA[nn]){enfSeenA[nn]=true;ED.enfants.push({nom:nn,dob:m[2]});}}
       });
     }
   }
@@ -3238,7 +3291,7 @@ function parseTextRI(txt){
 
   // SECTION 02
   var t02=tabMap(ss02);
-  var epRow=t02['\u00e9pargne de pr\u00e9caution souhait\u00e9e']||t02['epargne de pr\u00e9caution souhaitee']||t02['epargne de precaution souhaitee'];
+  var epRow=t02['\u00e9pargne de pr\u00e9caution souhait\u00e9e']||t02['epargne de pr\u00e9caution souhait\u00e9e']||t02['\u00e9pargne de pr\u00e9caution souhaitee']||t02['epargne de pr\u00e9caution souhaitee']||t02['epargne de precaution souhaitee']||t02['\u00e9pargne de pr\u00e9caution']||t02['epargne de precaution']||t02['\u00e9pargne pr\u00e9caution']||t02['epargne precaution'];
   if(epRow)ED.epPrec=pEur2(epRow.v1)||pEur2(epRow.v2)||0;
   ED.objectifs=[];var objSeen2={};
   // Collecter les noms des clients pour les filtrer des objectifs
@@ -3370,7 +3423,7 @@ function parseTextRI(txt){
 
   // SECTION 05
   ED.fiscal={annee:'',rbg:0,parts:1,irnet:0,tmi:0,ps:0,salBruts:0,revImposable:0,irBareme:0};
-  var irAn2=ss05.match(/IR acquitt[e\u00e9] en\s*[:\*]+\s*(\d{4})/i);if(irAn2)ED.fiscal.annee=irAn2[1];
+  var irAn2=ss05.match(/IR acquitt[e\u00e9] en[\s:*]+(\d{4})/i);if(irAn2)ED.fiscal.annee=irAn2[1];
   function fiscNum2(pat){var m=ss05.match(new RegExp(pat+'[\\s:*\u20ac$]*([0-9][0-9\\s]*)[\\s\u20ac$]*','i'));return m?pEur2(m[1]):0;}
   function fiscPct2(pat){var m=ss05.match(new RegExp(pat+'[\\s:*]*([0-9,\\.]+)\\s*%','i'));return m?parseFloat((m[1]||'').replace(',','.')):0;}
   ED.fiscal.rbg=fiscNum2('Revenu brut global');
@@ -4303,10 +4356,33 @@ function updateRetraiteCalc(){
   rRetraite(); // pour l'instant appel complet — optimiser si besoin
 }
 
+// Switch ON/OFF des calculs retraite (cas: personne déjà retraitée)
+function toggleRetraiteCalcs(cb){
+  var on=!!(cb&&cb.checked);
+  if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
+  ED.retraite.disabled=on;
+  var wrap=document.getElementById('retraiteCalcsWrap');
+  var msg=document.getElementById('retraiteDisabledMsg');
+  if(wrap)wrap.style.display=on?'none':'';
+  if(msg)msg.style.display=on?'':'none';
+}
+function applyRetraiteDisabledState(){
+  var sw=document.getElementById('retraiteDisableSwitch');
+  var on=!!(ED.retraite&&ED.retraite.disabled);
+  if(sw)sw.checked=on;
+  var wrap=document.getElementById('retraiteCalcsWrap');
+  var msg=document.getElementById('retraiteDisabledMsg');
+  if(wrap)wrap.style.display=on?'none':'';
+  if(msg)msg.style.display=on?'':'none';
+}
+
 function rRetraite(){
   // Nettoyer les images de print residuelles
   try{CGP.pdf._restoreCanvases();}catch(e){}
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
+  // Si les calculs retraite sont désactivés : juste afficher le message + note conseiller
+  applyRetraiteDisabledState();
+  if(ED.retraite.disabled)return;
 
   // ── Panneau paramètres manuels ──────────────────────────────
   var retParamsEl=document.getElementById('retParams');
@@ -6047,10 +6123,8 @@ function renderFichesClient(){
               html+='<br>Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(capPer3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else if(/assurance.vie|contrat de capitalisation/i.test(sol.produit||'')){
               var capAV3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
-              var renteAV3=Math.round(capAV3*0.04/12);
               html+='Dans '+h2+' ans, pour un total vers\u00e9 de <strong>'+fmt(totalVerse2)+'\u00a0\u20ac</strong>, ';
-              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+'), ';
-              html+='g\u00e9n\u00e9rant un compl\u00e9ment de revenus potentiel de <strong>~'+fmt(renteAV3)+'\u00a0\u20ac/mois</strong>.';
+              html+='capital estim\u00e9 \u00e0 <strong>'+fmt(capAV3)+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
             } else if(economieFisc2>0){
               html+='D\u00e8s cette ann\u00e9e, \u00e9conomie fiscale de <strong>'+fmt(economieFisc2)+'\u00a0\u20ac</strong>. ';
               html+='Dans '+h2+' ans, capital estim\u00e9 \u00e0 <strong>'+fmt(Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0)))+'\u00a0\u20ac</strong> (rendement '+pctLbl+').';
