@@ -5956,13 +5956,7 @@ function renderFichesClient(){
     html+='<div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">';
 
     // Cas levier vide : textarea éditable pour commentaire conseiller
-    if(!sols.length){
-      if(!ED.commentsLevier)ED.commentsLevier={};
-      var txtLev=ED.commentsLevier[lev]||'';
-      html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-placeholder="Commentaire conseiller (visible sur le PDF) \u2014 ex: pas d\'opportunit\u00e9 fiscale pertinente \u00e0 date, \u00e0 r\u00e9\u00e9valuer \u00e0 la prochaine revue" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
-      html+='</div></div>';
-      return;
-    }
+    // Commentaire conseiller : rendu en bas du levier dans tous les cas (voir plus bas).
 
     // Grouper par produit au sein du levier (ordonné par étape min)
     var prodGroups=[];var prodMap={};
@@ -6299,6 +6293,17 @@ function renderFichesClient(){
 
       html+='</div>'; // close carte produit
     });
+
+    // ── Commentaire conseiller du levier (toujours rendu, vide ou avec solutions) ──
+    if(!ED.commentsLevier)ED.commentsLevier={};
+    var txtLev=ED.commentsLevier[lev]||'';
+    var phLev=sols.length
+      ? 'Note conseiller pour ce levier (visible sur le PDF) — optionnel'
+      : 'Commentaire conseiller (visible sur le PDF) — ex: pas d\'opportunité fiscale pertinente à date, à réévaluer à la prochaine revue';
+    if(sols.length){
+      html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:'+meta.titleBg+';margin-top:4px">Note conseiller</div>';
+    }
+    html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-placeholder="'+phLev.replace(/"/g,'&quot;')+'" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
 
     html+='</div></div>'; // close levier
   });
