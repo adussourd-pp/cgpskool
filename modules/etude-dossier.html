@@ -4283,10 +4283,18 @@ function rFiscal(){
 function rFinancement(){
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-  var autresCharges=Math.round(ED.charges||0);
+  // "Autres charges" : on exclut les lignes qui dupliquent le crédit ou qui sont
+  // en réalité des versements d'épargne (AV, PER, PEA…) — sinon doublon avec
+  // chargesCredit / patrimoine financier.
+  var EXCLUDE_RE=/(emprunt|cr[eé]dit|pr[eê]t|assurance.?vie|^av\b|\bper\b|\bpea\b|\bpee\b|capitalisation)/i;
+  var autresAn=(ED.chargesDetail||[]).reduce(function(s,c){
+    if(EXCLUDE_RE.test(c.nom||''))return s;
+    return s+(c.montant||0);
+  },0);
+  var autresCharges=Math.round(autresAn/12);
   var chargesTotales=chrCredit+autresCharges;
-  var rav=revM-chargesTotales;
-  var endett=revM>0?chargesTotales/revM*100:0;
+  // Taux d'endettement : standard bancaire = mensualités crédit / revenus nets
+  var endett=revM>0?chrCredit/revM*100:0;
   var capa=Math.max(0,revM*0.35-chargesTotales);
   var col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
   var isCoupleFin=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
@@ -6748,16 +6756,11 @@ function removeStep(i){
 // ║  HELPERS CALCUL                                                ║
 // ╚══════════════════════════════════════════════════════════════════╝
 function revMens(){
-  // Revenus annuels → mensuel net (pondération selon âge — config Excel)
-  // < 56 ans : salaires 100% | >= 57 ans : salaires 70%
-  // Fonciers et locations meublées : toujours 70%
-  var age1=ageFrom(ED.c1&&ED.c1.dob)||40;
-  var age2=ED.type!=='seul'?(ageFrom(ED.c2&&ED.c2.dob)||40):0;
-  var ageMoy=ED.type!=='seul'?Math.round((age1+age2)/2):age1;
-  var txSal=ageMoy>=57?0.70:1.00;
+  // Revenus annuels → mensuel net (revenus actuels du foyer, sans pondération âge)
+  // Fonciers : abattement 70 % (réalité bancaire — frais, vacance, fiscalité)
   var sal=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0);
   var fonc=ED.revenus.fonc||0;
-  return Math.round((sal*txSal + fonc*0.70)/12);
+  return Math.round((sal + fonc*0.70)/12);
 }
 function nomC(n){
   // Retourne le prenom+initiale NOM pour C1 ou C2
