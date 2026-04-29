@@ -5861,6 +5861,15 @@ function updateLevierComment(lev,val){
   ED.commentsLevier[lev]=val;
   // Pas de re-render complet pour éviter la perte de focus
 }
+function toggleLevierCommentSwitch(lev,on){
+  if(!ED.commentsLevierEnabled)ED.commentsLevierEnabled={};
+  ED.commentsLevierEnabled[lev]=!!on;
+  var box=document.querySelector('[data-lev-comment="'+lev+'"]');
+  if(box){
+    box.style.display=on?'block':'none';
+    if(on)setTimeout(function(){try{box.focus();}catch(e){}},10);
+  }
+}
 function autoGrowTextarea(el){
   if(!el)return;
   el.style.height='auto';
@@ -6302,16 +6311,21 @@ function renderFichesClient(){
       html+='</div>'; // close carte produit
     });
 
-    // ── Commentaire conseiller du levier (toujours rendu, vide ou avec solutions) ──
+    // ── Commentaire conseiller du levier (avec switch ON/OFF) ──
     if(!ED.commentsLevier)ED.commentsLevier={};
+    if(!ED.commentsLevierEnabled)ED.commentsLevierEnabled={};
     var txtLev=ED.commentsLevier[lev]||'';
+    // Default : ON si du texte est déjà saisi, sinon OFF
+    var commEnabled=ED.commentsLevierEnabled[lev];
+    if(commEnabled===undefined)commEnabled=!!txtLev.trim();
     var phLev=sols.length
       ? 'Note conseiller pour ce levier (visible sur le PDF) — optionnel'
       : 'Commentaire conseiller (visible sur le PDF) — ex: pas d\'opportunité fiscale pertinente à date, à réévaluer à la prochaine revue';
-    if(sols.length){
-      html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:'+meta.titleBg+';margin-top:4px">Note conseiller</div>';
-    }
-    html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-placeholder="'+phLev.replace(/"/g,'&quot;')+'" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px">';
+    html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:'+meta.titleBg+'">Note conseiller</div>';
+    html+='<label class="cz-switch" style="flex-shrink:0"><input type="checkbox" '+(commEnabled?'checked':'')+' onchange="toggleLevierCommentSwitch(\''+lev+'\',this.checked)"><span class="cz-slider"></span></label>';
+    html+='</div>';
+    html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-placeholder="'+phLev.replace(/"/g,'&quot;')+'" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word;display:'+(commEnabled?'block':'none')+'">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
 
     html+='</div></div>'; // close levier
   });
