@@ -5844,6 +5844,11 @@ function updateLevierComment(lev,val){
   ED.commentsLevier[lev]=val;
   // Pas de re-render complet pour éviter la perte de focus
 }
+function autoGrowTextarea(el){
+  if(!el)return;
+  el.style.height='auto';
+  el.style.height=Math.max(el.scrollHeight,60)+'px';
+}
 function toggleObjValide(idx,obj,checked){
   if(!solsSelectionnees[idx])return;
   if(!solsSelectionnees[idx].objectifsValides)solsSelectionnees[idx].objectifsValides=[];
@@ -5945,7 +5950,7 @@ function renderFichesClient(){
     if(!sols.length){
       if(!ED.commentsLevier)ED.commentsLevier={};
       var txtLev=ED.commentsLevier[lev]||'';
-      html+='<textarea rows="3" oninput="updateLevierComment(\''+lev+'\',this.value)" placeholder="Commentaire conseiller (visible sur le PDF) \u2014 ex: pas d\'opportunit\u00e9 fiscale pertinente \u00e0 date, \u00e0 r\u00e9\u00e9valuer \u00e0 la prochaine revue" style="width:100%;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;resize:vertical">'+txtLev.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</textarea>';
+      html+='<textarea data-lev-comment="'+lev+'" oninput="updateLevierComment(\''+lev+'\',this.value);autoGrowTextarea(this)" placeholder="Commentaire conseiller (visible sur le PDF) \u2014 ex: pas d\'opportunit\u00e9 fiscale pertinente \u00e0 date, \u00e0 r\u00e9\u00e9valuer \u00e0 la prochaine revue" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;resize:none;overflow:hidden">'+txtLev.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</textarea>';
       html+='</div></div>';
       return;
     }
@@ -6290,6 +6295,8 @@ function renderFichesClient(){
   });
 
   el.innerHTML=html;
+  // Auto-grow des textarea de commentaire conseiller (lever vide)
+  el.querySelectorAll('textarea[data-lev-comment]').forEach(autoGrowTextarea);
 }
 
 
