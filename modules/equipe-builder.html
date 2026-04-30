@@ -38,8 +38,10 @@
 .node-bubble.statut-en-cours{opacity:0.6;border-style:dashed!important}
 .node-bubble.statut-en-cours .node-avatar{filter:grayscale(0.4)}
 .node-statut-pill{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle;line-height:1.4}
+.node-statut-pill.actif{background:rgba(245,158,11,0.18);color:#B45309}
 .node-statut-pill.inscrit{background:#e5e7eb;color:#374151}
 .node-statut-pill.en-cours{background:rgba(212,98,42,0.18);color:var(--orange)}
+.node-bubble.statut-actif{background:rgba(245,158,11,0.05)}
 .statut-toggle{display:flex;gap:4px;margin-bottom:10px;background:#fff;border:1.5px solid var(--rule-l);border-radius:8px;padding:3px}
 .statut-toggle button{flex:1;padding:7px 8px;font-family:var(--sans);font-size:11px;font-weight:600;border:none;background:transparent;color:var(--ink-60);border-radius:5px;cursor:pointer;transition:all 0.15s}
 .statut-toggle button:hover{color:var(--ink)}
@@ -616,9 +618,10 @@ function renderNode(node,path,depth){
   var isRoot=path.length===0;
 
   var statut=node.statut||'actif';
-  var statutClass=statut!=='actif'?' statut-'+statut:'';
+  var statutClass=' statut-'+statut;
   var statutPill='';
-  if(statut==='inscrit')statutPill=' <span class="node-statut-pill inscrit">Inscrit</span>';
+  if(statut==='actif')statutPill=' <span class="node-statut-pill actif">Actif</span>';
+  else if(statut==='inscrit')statutPill=' <span class="node-statut-pill inscrit">Inscrit</span>';
   else if(statut==='en-cours')statutPill=' <span class="node-statut-pill en-cours">En cours</span>';
 
   var html='<div class="node-group">';
