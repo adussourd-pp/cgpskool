@@ -6183,7 +6183,9 @@ function renderFichesClient(){
                 html+='<br>Revenus potentiels \u00e0 terme : <strong>~'+fmt(loyerMens)+'\u00a0\u20ac/mois</strong> bruts (distribution '+pctLbl+').';
               }
             } else if(/per\b/i.test(sol.produit||'')){
-              var tmiPer=ED.fiscal.tmi||0;
+              // TMI : si la projection IR est activée (Fiscal → Projection), on prend
+              // la TMI projetée — sinon on retombe sur la TMI actuelle.
+              var tmiPer=(ED._projActive&&ED._projTMI>0)?ED._projTMI:(ED.fiscal.tmi||0);
               var ecoAn1=Math.round(((sol.vi||0)+(sol.vp||0)*12)*tmiPer/100);
               var ecoSuiv=sol.vp>0?Math.round(sol.vp*12*tmiPer/100):0;
               var capPer3=Math.round((sol.vi||0)*Math.pow(1+rateSol,h2)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+rateSol,h2)-1)/rateSol):0));
@@ -7735,6 +7737,9 @@ function calcProjectionIR(){
     // Calcul IR soumis au barème (avant réductions/crédits)
     var res=calcIR(rbg,parts);
     var irBareme=res.irBrut||res.ir||res.irNet||0;
+    // Mémoriser la TMI projetée pour les calculs aval (PER en préconisations notamment)
+    ED._projTMI=res.tmi||0;
+    ED._projActive=rbg>0;
     var el=document.getElementById('projFiscResultat');
     if(!el)return;
     var h='';
