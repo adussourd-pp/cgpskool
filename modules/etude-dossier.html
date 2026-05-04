@@ -1414,11 +1414,16 @@ select.span2{grid-column:span 2}
     <div><div class="sec-h1">Compte rendu</div></div>
   </div>
 
-  <!-- Date du RDV -->
-  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:14px">
+  <!-- Date du RDV + Forme (tu / vous) -->
+  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
     <label for="crDateRDV" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Date du RDV</label>
     <input type="date" id="crDateRDV" oninput="ED.dateRDV=this.value;refreshCRIfOpen()" style="border:1.5px solid var(--bord);border-radius:7px;padding:6px 10px;font-size:13px;font-family:var(--sans);outline:none">
-    <div style="font-size:11px;color:var(--gris);font-style:italic">Utilisée dans l'en-tête des comptes rendus</div>
+    <label for="crForme" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Forme</label>
+    <select id="crForme" onchange="ED.crTutoie=(this.value==='tu');refreshCRIfOpen()" style="border:1.5px solid var(--bord);border-radius:7px;padding:6px 10px;font-size:13px;font-family:var(--sans);outline:none;cursor:pointer">
+      <option value="vous">Vouvoiement</option>
+      <option value="tu">Tutoiement</option>
+    </select>
+    <div style="font-size:11px;color:var(--gris);font-style:italic;flex:1">Date et forme reprises dans les comptes rendus</div>
   </div>
 
   <!-- Tuiles -->
@@ -7793,6 +7798,9 @@ function rCompteRendu(){
     inp.value=iso;
     if(!ED.dateRDV)ED.dateRDV=iso;
   }
+  // Initialise le sélecteur de forme (default = vouvoiement)
+  var fSel=document.getElementById('crForme');
+  if(fSel)fSel.value=ED.crTutoie?'tu':'vous';
 }
 function refreshCRIfOpen(){
   // Si un CR est déjà affiché, le régénérer avec la nouvelle date
@@ -7843,6 +7851,9 @@ function genererCR(type){
       if(!isNaN(pd.getTime()))rdvDate=pd;
     }
     var dateJ=rdvDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+    // Forme : tutoiement ou vouvoiement (ED.crTutoie). tv() retourne la bonne version.
+    var TU=!!ED.crTutoie;
+    function tv(t,v){return TU?t:v;}
     var objs=(ED.objectifs||[]).filter(function(o){return o&&o!=='Objectifs \u00e0 compl\u00e9ter';});
     var epPrec=fmt((ED.epPrec||0)+(ED.epPrec2||0))+' \u20ac';
     var epMens=fmt((ED.epMens||0)+(ED.epMens2||0))+' \u20ac/mois';
@@ -7853,9 +7864,9 @@ function genererCR(type){
       subject='RDV patrimoine - Compte rendu R1 - '+noms;
       body='Bonjour'+(n2?' \u00e0 vous deux':' '+prenoms)+',\n\n';
       body+='Suite \u00e0 notre \u00e9change du '+dateJ+',\n\n';
-      body+='je vous joins les \u00e9l\u00e9ments relatifs \u00e0 votre situation actuelle, en tenant compte de vos souhaits et de vos projets :\n\n';
+      body+='je '+tv('te','vous')+' joins les \u00e9l\u00e9ments relatifs \u00e0 '+tv('ta','votre')+' situation actuelle, en tenant compte de '+tv('tes','vos')+' souhaits et de '+tv('tes','vos')+' projets :\n\n';
       body+='1/ Situation personnelle\n';
-      body+='Vous allez recevoir, en parall\u00e8le de ce mail, une demande de signature \u00e9lectronique via Signature Service (noreply@universign.eu), qui reprend tous les points dont nous avons parl\u00e9 lors de notre RDV. Merci de signer ces documents en amont afin que je puisse mener mon \u00e9tude patrimoniale.\n\n';
+      body+=tv('Tu vas','Vous allez')+' recevoir, en parall\u00e8le de ce mail, une demande de signature \u00e9lectronique via Signature Service (noreply@universign.eu), qui reprend tous les points dont nous avons parl\u00e9 lors de notre RDV. Merci de signer ces documents en amont afin que je puisse mener mon \u00e9tude patrimoniale.\n\n';
       body+='2/ Souhaits et projets\n';
       objs.forEach(function(o,i){body+=(i+1)+'. '+o+'\n';});
       body+='\nCeci tenant compte des \u00e9l\u00e9ments suivants :\n';
@@ -7867,7 +7878,7 @@ function genererCR(type){
       body+='- Moyen terme : \u00e0 d\u00e9finir\n';
       body+='- Long terme : \u00e0 d\u00e9finir\n\n';
       body+='3/ Informations compl\u00e9mentaires \u00e0 fournir\nsans objet\n\n';
-      body+='4/ Mise en relation\nComme vous le savez, je me d\u00e9veloppe exclusivement gr\u00e2ce \u00e0 la mise en relation.\nSi vous avez appr\u00e9ci\u00e9 ma d\u00e9marche et pour vous aider \u00e0 parler de moi \u00e0 votre entourage voici ce que vous pouvez leur envoyer :\n';
+      body+='4/ Mise en relation\nComme '+tv('tu le sais','vous le savez')+', je me d\u00e9veloppe exclusivement gr\u00e2ce \u00e0 la mise en relation.\nSi '+tv('tu as','vous avez')+' appr\u00e9ci\u00e9 ma d\u00e9marche et pour '+tv('t\'aider','vous aider')+' \u00e0 parler de moi \u00e0 '+tv('ton','votre')+' entourage voici ce que '+tv('tu peux','vous pouvez')+' leur envoyer :\n';
       body+='"J\'ai rencontr\u00e9 une personne qui m\'accompagne dans l\'organisation de mon \u00e9pargne, la pr\u00e9paration de ma retraite, la r\u00e9duction de mes imp\u00f4ts et la protection de ma famille. Si cela t\'int\u00e9resse, je lui communique tes coordonn\u00e9es. Elle t\'expliquera ce qu\'elle fait et tu verras si cela peut te correspondre\u2026 En plus, elle ne facture pas d\'honoraires !"\n\n';
       body+='Nous aurons l\'occasion d\'en reparler lors de notre prochain RDV.\n\n';
       body+='5/ Prochaine rencontre\nNotre prochaine rencontre est pr\u00e9vue le [DATE, HEURE] \u00e0/en [LIEU].\nIl faudra compter environ 1h30.\n\n';
@@ -7886,7 +7897,7 @@ function genererCR(type){
       subject='Pr\u00e9conisation '+(solNames.length?solNames.join(' + '):'\u00e0 compl\u00e9ter')+' \u2014 '+noms;
       body='Bonjour '+prenoms+',\n\n';
       body+='Je fais suite \u00e0 notre rendez-vous du '+dateJ+'.\n';
-      if(inclureEtude)body+='Tu trouveras en pi\u00e8ce jointe ton \u00e9tude patrimoniale.\n';
+      if(inclureEtude)body+=tv('Tu trouveras','Vous trouverez')+' en pi\u00e8ce jointe '+tv('ton','votre')+' \u00e9tude patrimoniale.\n';
       body+='\n1/ Bilan et pr\u00e9conisations\n\n';
       // Grouper par produit
       var r2Grps=[];var r2Map={};
@@ -7900,12 +7911,12 @@ function genererCR(type){
         var p=(grp.produit||'').toLowerCase();
         body+=label.toUpperCase()+'\n';
         // Pitch par type
-        if(p.indexOf('assurance vie')>=0)body+='Pour faire travailler ton \u00e9pargne sur le long terme, je te pr\u00e9conise l\'ouverture d\'une assurance vie. Fiscalit\u00e9 avantageuse apr\u00e8s 8 ans, disponibilit\u00e9 \u00e0 tout moment, transmission optimis\u00e9e.\n\n';
-        else if(p.indexOf('per')>=0&&p.indexOf('fcpr')<0&&p.indexOf('pereco')<0)body+='Pour r\u00e9duire tes imp\u00f4ts d\u00e8s cette ann\u00e9e tout en pr\u00e9parant ta retraite. Les versements sont d\u00e9ductibles de ton revenu imposable \u2014 \u00e0 ta TMI de '+(ED.fiscal.tmi||0)+'%, chaque euro vers\u00e9 g\u00e9n\u00e8re une \u00e9conomie d\'imp\u00f4t imm\u00e9diate.\n\n';
-        else if(p.indexOf('scpi')>=0&&p.indexOf('financ')>=0)body+='Avec ta capacit\u00e9 d\'endettement, tu peux emprunter pour acqu\u00e9rir des SCPI. Les loyers per\u00e7us remboursent une partie des mensualit\u00e9s \u2014 tu construis un patrimoine immobilier avec un effort r\u00e9duit.\n\n';
+        if(p.indexOf('assurance vie')>=0)body+='Pour faire travailler '+tv('ton','votre')+' \u00e9pargne sur le long terme, je '+tv('te','vous')+' pr\u00e9conise l\'ouverture d\'une assurance vie. Fiscalit\u00e9 avantageuse apr\u00e8s 8 ans, disponibilit\u00e9 \u00e0 tout moment, transmission optimis\u00e9e.\n\n';
+        else if(p.indexOf('per')>=0&&p.indexOf('fcpr')<0&&p.indexOf('pereco')<0)body+='Pour r\u00e9duire '+tv('tes','vos')+' imp\u00f4ts d\u00e8s cette ann\u00e9e tout en pr\u00e9parant '+tv('ta','votre')+' retraite. Les versements sont d\u00e9ductibles '+tv('de ton','de votre')+' revenu imposable \u2014 \u00e0 '+tv('ta','votre')+' TMI de '+(ED.fiscal.tmi||0)+'%, chaque euro vers\u00e9 g\u00e9n\u00e8re une \u00e9conomie d\'imp\u00f4t imm\u00e9diate.\n\n';
+        else if(p.indexOf('scpi')>=0&&p.indexOf('financ')>=0)body+='Avec '+tv('ta','votre')+' capacit\u00e9 d\'endettement, '+tv('tu peux','vous pouvez')+' emprunter pour acqu\u00e9rir des SCPI. Les loyers per\u00e7us remboursent une partie des mensualit\u00e9s \u2014 '+tv('tu construis','vous construisez')+' un patrimoine immobilier avec un effort r\u00e9duit.\n\n';
         else if(p.indexOf('scpi')>=0)body+='Pour g\u00e9n\u00e9rer des revenus compl\u00e9mentaires r\u00e9guliers sans contrainte de gestion. De l\'immobilier g\u00e9r\u00e9 par des professionnels : aucune gestion locative, mutualisation des risques.\n\n';
-        else if(p.indexOf('fip')>=0||p.indexOf('fcpi')>=0)body+='Pour r\u00e9duire tes imp\u00f4ts en finan\u00e7ant l\'\u00e9conomie r\u00e9elle fran\u00e7aise. Strat\u00e9gie de boucle : investir chaque ann\u00e9e pour diversifier les mill\u00e9simes.\n\n';
-        else if(p.indexOf('girardin')>=0)body+='Pour transformer ton imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine \u2014 r\u00e9duction sup\u00e9rieure \u00e0 la mise.\n\n';
+        else if(p.indexOf('fip')>=0||p.indexOf('fcpi')>=0)body+='Pour r\u00e9duire '+tv('tes','vos')+' imp\u00f4ts en finan\u00e7ant l\'\u00e9conomie r\u00e9elle fran\u00e7aise. Strat\u00e9gie de boucle : investir chaque ann\u00e9e pour diversifier les mill\u00e9simes.\n\n';
+        else if(p.indexOf('girardin')>=0)body+='Pour transformer '+tv('ton','votre')+' imp\u00f4t en soutien \u00e0 l\'\u00e9conomie ultramarine \u2014 r\u00e9duction sup\u00e9rieure \u00e0 la mise.\n\n';
         else if(cp.cat==='immobilier')body+='Pour construire un patrimoine immobilier tangible g\u00e9n\u00e9rateur de revenus compl\u00e9mentaires.\n\n';
         else body+=(cp.desc||'')+'\n\n';
         // Détail par contrat/titulaire
@@ -7950,21 +7961,21 @@ function genererCR(type){
       if(hasFinancement){body+='   - 2 derniers avis d\'imposition\n   - 3 derniers bulletins de salaire\n   - Relev\u00e9s de compte des 3 derniers mois\n';}
       body+='L\'ensemble du process se fait en signature \u00e9lectronique.\n\n';
       body+='3/ Mise en relation\n';
-      body+='Comme tu le sais, je d\u00e9veloppe mon activit\u00e9 exclusivement par la mise en relation. Si dans ton entourage des proches souhaitent mieux valoriser leur \u00e9pargne, obtenir des revenus compl\u00e9mentaires ou r\u00e9duire leurs imp\u00f4ts, je t\'invite \u00e0 me transmettre leurs coordonn\u00e9es.\n\n';
+      body+='Comme '+tv('tu le sais','vous le savez')+', je d\u00e9veloppe mon activit\u00e9 exclusivement par la mise en relation. Si dans '+tv('ton','votre')+' entourage des proches souhaitent mieux valoriser leur \u00e9pargne, obtenir des revenus compl\u00e9mentaires ou r\u00e9duire leurs imp\u00f4ts, je '+tv('t\'invite','vous invite')+' \u00e0 me transmettre leurs coordonn\u00e9es.\n\n';
       body+='4/ Prochaine rencontre\nNotre prochain rendez-vous est pr\u00e9vu le {{date R3}} en {{lieu}}.\nIl faudra compter environ 1h.\n\n';
-      body+='Reste \u00e0 ta disposition pour toute question.\n\u00c0 tr\u00e8s vite,';
+      body+='Reste \u00e0 '+tv('ta','votre')+' disposition pour toute question.\n\u00c0 tr\u00e8s vite,';
     } else if(type==='r3'){
       // Confirmation de souscription
       var solName=solsSelectionnees&&solsSelectionnees.length?solsSelectionnees[0].produit:'{{contrat}}';
       subject='\u2705 Confirmation \u2014 Souscription '+solName;
       body='Bonjour '+prenoms+',\n\n';
-      body+='Bonne nouvelle : ton dossier pour la souscription sur le contrat '+solName+' a \u00e9t\u00e9 valid\u00e9 par le back-office et transmis au partenaire.\n\n';
+      body+='Bonne nouvelle : '+tv('ton','votre')+' dossier pour la souscription sur le contrat '+solName+' a \u00e9t\u00e9 valid\u00e9 par le back-office et transmis au partenaire.\n\n';
       body+='Les fonds seront pr\u00e9lev\u00e9s sous 3 \u00e0 5 jours ouvr\u00e9s sur le compte renseign\u00e9. Merci de nous confirmer une fois le pr\u00e9l\u00e8vement effectu\u00e9.\n\n';
       body+='Enqu\u00eate de satisfaction\n';
-      body+='Dans les prochains jours, tu recevras une enqu\u00eate de satisfaction envoy\u00e9e par OpinionWay, partenaire externe ind\u00e9pendant. Elle ne prend que 2 minutes et permet d\'\u00e9valuer la qualit\u00e9 de notre accompagnement.\n\n';
+      body+=tv('Dans les prochains jours, tu recevras','Dans les prochains jours, vous recevrez')+' une enqu\u00eate de satisfaction envoy\u00e9e par OpinionWay, partenaire externe ind\u00e9pendant. Elle ne prend que 2 minutes et permet d\'\u00e9valuer la qualit\u00e9 de notre accompagnement.\n\n';
       body+='Mise en relation\n';
-      body+='Si autour de toi des proches s\'interrogent sur leur patrimoine ou recherchent un accompagnement de confiance, je suis bien s\u00fbr preneur d\'une mise en relation.\n\n';
-      body+='Reste \u00e0 ta disposition pour toute question.\nBien cordialement,';
+      body+='Si autour de '+tv('toi','vous')+' des proches s\'interrogent sur leur patrimoine ou recherchent un accompagnement de confiance, je suis bien s\u00fbr preneur d\'une mise en relation.\n\n';
+      body+='Reste \u00e0 '+tv('ta','votre')+' disposition pour toute question.\nBien cordialement,';
     }
     // Afficher dans la zone résultat de la page
     var zone=document.getElementById('crResultZone');
