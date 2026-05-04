@@ -1414,6 +1414,13 @@ select.span2{grid-column:span 2}
     <div><div class="sec-h1">Compte rendu</div></div>
   </div>
 
+  <!-- Date du RDV -->
+  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:14px">
+    <label for="crDateRDV" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris)">Date du RDV</label>
+    <input type="date" id="crDateRDV" oninput="ED.dateRDV=this.value;refreshCRIfOpen()" style="border:1.5px solid var(--bord);border-radius:7px;padding:6px 10px;font-size:13px;font-family:var(--sans);outline:none">
+    <div style="font-size:11px;color:var(--gris);font-style:italic">Utilisée dans l'en-tête des comptes rendus</div>
+  </div>
+
   <!-- Tuiles -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px" id="crTuiles">
     <div id="crTileR1" onclick="selectCRTile('r1');document.getElementById('crR2Config').style.display='none';genererCR('r1')" style="cursor:pointer;background:#fff;border:2px solid var(--bord);border-radius:14px;padding:20px;text-align:center;transition:all 0.15s">
@@ -3568,6 +3575,7 @@ function renderSection(sec){
   else if(sec==='pagegarde')rPageGarde();
   else if(sec==='sommaire')rPageGarde();
   else if(sec==='mentions')rMentions();
+  else if(sec==='compterendu')rCompteRendu();
   else if(sec==='avis')rAvis();
 }
 
@@ -7770,6 +7778,29 @@ function recalcProjTotal(){
 }
 function updateIRDiff(){recalcProjTotal();}
 // ── GÉNÉRATION COMPTE RENDU ──
+function rCompteRendu(){
+  // Initialise le champ "Date du RDV" (default = aujourd'hui ou ED.dateRDV s'il existe)
+  var inp=document.getElementById('crDateRDV');
+  if(inp){
+    var iso;
+    if(ED.dateRDV)iso=ED.dateRDV;
+    else{var d=new Date();iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+    inp.value=iso;
+    if(!ED.dateRDV)ED.dateRDV=iso;
+  }
+}
+function refreshCRIfOpen(){
+  // Si un CR est déjà affiché, le régénérer avec la nouvelle date
+  var rz=document.getElementById('crResultZone');
+  if(!rz||rz.style.display==='none')return;
+  // Détecter le type actif d'après la tuile en surbrillance
+  var t='r1';
+  ['R1','R2','R3'].forEach(function(suffix){
+    var el=document.getElementById('crTile'+suffix);
+    if(el&&el.style.borderColor&&el.style.borderColor.indexOf('212')>=0)t=suffix.toLowerCase();
+  });
+  try{genererCR(t);}catch(e){}
+}
 function selectCRTile(type){
   ['R1','R2','R3'].forEach(function(t){
     var el=document.getElementById('crTile'+t);
@@ -7800,7 +7831,13 @@ function genererCR(type){
     var n2=ED.type!=='seul'&&ED.c2&&ED.c2.prenom?((ED.c2.prenom||'')+' '+(ED.c2.nom||'')).trim():'';
     var noms=n1+(n2?' et '+n2:'');
     var prenoms=(ED.c1.prenom||'')+(n2?' et '+(ED.c2.prenom||''):'');
-    var dateJ=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+    // Date du RDV : champ utilisateur (ED.dateRDV au format ISO YYYY-MM-DD), sinon aujourd'hui
+    var rdvDate=new Date();
+    if(ED.dateRDV){
+      var pd=new Date(ED.dateRDV+'T00:00:00');
+      if(!isNaN(pd.getTime()))rdvDate=pd;
+    }
+    var dateJ=rdvDate.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     var objs=(ED.objectifs||[]).filter(function(o){return o&&o!=='Objectifs \u00e0 compl\u00e9ter';});
     var epPrec=fmt((ED.epPrec||0)+(ED.epPrec2||0))+' \u20ac';
     var epMens=fmt((ED.epMens||0)+(ED.epMens2||0))+' \u20ac/mois';
