@@ -3341,20 +3341,57 @@ function parseTextRI(txt){
       ED.actifs.push({nom:nom,horizon:horizon,titulaire:tit,montant:mont});
     });
   }
+  // PASSIFS \u2014 g\u00e8re le format simple (1 ligne par passif) ET le format Word
+  // multi-lignes pour les couples (titulaires sur 2 lignes, montants \u00e9clat\u00e9s).
+  // Strat\u00e9gie : d\u00e9tecter une ligne "nouveau passif" (nom contient un "-" ou
+  // "Emprunt" coupl\u00e9 \u00e0 "Cr\u00e9dit/Pr\u00eat"), puis collecter tous les nombres > 100
+  // des lignes de continuation jusqu'au prochain passif ou Total. On trie
+  // les nombres collect\u00e9s et on d\u00e9coupe en deux moiti\u00e9s : la plus petite
+  // = \u00e9ch\u00e9ances, la plus grande = CRD.
   ED.passifs=[];
   if(passifPart2){
-    passifPart2[1].split('\n').forEach(function(line){
-      if(line.indexOf('\t')<0)return;
-      var p=line.split('\t').map(function(x){return x.trim();});
-      var nom=p[0];if(!nom||nom.length<2)return;
-      if(/^(d\u00e9signation|designation|total|cr\u00e9dit immobilier|credit immobilier|cr\u00e9dit personnel|credit personnel|cr\u00e9dit|credit|pr\u00eat|pret)$/i.test(nom.trim()))return;
-      var ech=0,crd=0;
-      if(p.length>=4){var nums=p.slice(1).map(function(x,i){return{i:i+1,v:pEur2(x)};}).filter(function(x){return x.v>0;});
-        if(nums.length>=2){ech=nums[0].v;crd=nums[1].v;}else if(nums.length===1){crd=nums[0].v;}
+    var SKIP_PASSIF=/^(d\u00e9signation|designation|titulaire|.ch.ance|crd|date|cr\u00e9dit immobilier|credit immobilier|cr\u00e9dit personnel|credit personnel|cr\u00e9dit|credit|pr\u00eat|pret)\s*$/i;
+    var currentPassif=null;
+    var collected=[];
+    function flushPassif(){
+      if(currentPassif&&collected.length){
+        collected.sort(function(a,b){return a-b;});
+        var halfLen=Math.floor(collected.length/2);
+        if(halfLen===0){
+          currentPassif.crd=collected[0];
+        } else {
+          for(var i=0;i<halfLen;i++)currentPassif.echeance+=collected[i];
+          for(var j=halfLen;j<collected.length;j++)currentPassif.crd+=collected[j];
+        }
+        if(currentPassif.echeance>0||currentPassif.crd>0)ED.passifs.push(currentPassif);
       }
-      if(crd<=0&&ech<=0)return;
-      ED.passifs.push({nom:nom,titulaire:'Commun',echeance:ech,crd:crd});
+      currentPassif=null;
+      collected=[];
+    }
+    passifPart2[1].split('\n').forEach(function(line){
+      var raw=line;
+      var p=raw.split('\t').map(function(x){return x.trim();});
+      var nom=p[0]||'';
+      if(!nom&&p.length===1){return;}
+      // Sauts de ligne / lignes de synth\u00e8se / total \u2192 flush
+      if(SKIP_PASSIF.test(nom)){flushPassif();return;}
+      if(/^total\s*$/i.test(nom)){flushPassif();return;}
+      // Nouveau passif d\u00e9tect\u00e9 : nom assez long, avec "-" ou "Emprunt"
+      var isNewPassif=nom.length>5
+        && /(cr\u00e9dit|credit|pr\u00eat|pret|emprunt)/i.test(nom)
+        && (/-|emprunt/i.test(nom));
+      if(isNewPassif){
+        flushPassif();
+        currentPassif={nom:nom,titulaire:'Commun',echeance:0,crd:0};
+        // Collecter les nombres pr\u00e9sents sur la ligne du nom (cas une seule ligne)
+        p.slice(1).forEach(function(c){var v=pEur2(c);if(v>100)collected.push(v);});
+      } else if(currentPassif){
+        // Ligne de continuation : on ramasse tous les nombres > 100 (les dates
+        // donnent pEur2 \u2264 31, les montants en \u20ac sont >> 100).
+        p.forEach(function(c){var v=pEur2(c);if(v>100)collected.push(v);});
+      }
     });
+    flushPassif();
   }
 
   // SECTION 04
