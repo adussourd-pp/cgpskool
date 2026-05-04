@@ -3052,6 +3052,8 @@ function parseTextRI(txt){
     var s02Actifs=(s02Parts[0]||'').replace(/^[\s\S]*?Actifs\s*\n/i,'');
     var s02Passifs=s02Parts[1]||'';
     var s02Lines=s02Actifs.split('\n');
+    // Detection 3-colonnes (Investisseur 1 / Investisseur 2 / Commun) via header
+    var is3ColActifs=/Investisseur\s*1\s+Investisseur\s*2\s+Commun/i.test(s02Actifs);
     var skipNext=-1;
     for(var iA=0;iA<s02Lines.length;iA++){
       if(iA===skipNext)continue;
@@ -3060,24 +3062,50 @@ function parseTextRI(txt){
       var nomA=lA.replace(/^☒\s*/,'').trim();
       var nxtA=(s02Lines[iA+1]||'').trim();
       var pA=nxtA.split('\t').map(function(x){return x.trim();});
-      var mtA=pEur(pA[0]||'');
-      var titA=pA[1]||'';
-      if(mtA<=0||!titA||titA==='Choisissez un élément.')continue;
-      var titATag=mapTit(titA)||'C1';
-      // Observation : ligne suivante, si pas un autre checkbox ni entete bloc
-      var obsL=(s02Lines[iA+2]||'').trim();
-      var obs='';
-      if(obsL&&obsL.charAt(0)!=='☒'&&obsL.charAt(0)!=='☐'&&obsL.indexOf('\t')<0&&obsL!=='Choisissez un élément.'&&!/^(Placements|Retraite|Liquidit|Immobilier|Passifs)/i.test(obsL)){
-        obs=obsL;
-        skipNext=iA+2;
-      }
+      // Horizon (commun aux deux formats)
       var nl=nomA.toLowerCase();
       var horizonA='lt';
       if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b/.test(nl))horizonA='ct';
       else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizonA='ct';
       else if(/\bpel\b|\bcat\b|assurance.vie|capitalisation|\bpea\b|\bpee\b|compte titre|\bcto\b/.test(nl))horizonA='mt';
-      var finalNomA=obs?(nomA+' — '+obs):nomA;
-      ED.actifs.push({nom:finalNomA,label:finalNomA,montant:mtA,titulaire:titATag,horizon:horizonA});
+
+      if(is3ColActifs){
+        // Format 3 colonnes : inv1\tinv2\tcommun\t[obs]
+        var v1A=pEur(pA[0]||''),v2A=pEur(pA[1]||''),vCA=pEur(pA[2]||'');
+        if(v1A<=0&&v2A<=0&&vCA<=0)continue;
+        var obs3=(pA[3]||'').trim();
+        if(obs3==='Choisissez un élément.')obs3='';
+        // Si pas d'obs inline, la chercher sur la ligne suivante
+        if(!obs3){
+          var obsL3=(s02Lines[iA+2]||'').trim();
+          if(obsL3&&obsL3.charAt(0)!=='☒'&&obsL3.charAt(0)!=='☐'&&obsL3.indexOf('\t')<0&&obsL3!=='Choisissez un élément.'&&!/^(Placements|Retraite|Liquidit|Immobilier|Passifs)/i.test(obsL3)){
+            obs3=obsL3;
+            skipNext=iA+2;
+          }
+        }
+        var finalNomA3=obs3?(nomA+' — '+obs3):nomA;
+        // Eclater en jusqu'a 3 actifs (un par titulaire renseigne)
+        var triples=[['C1',v1A],['C2',v2A],['Commun',vCA]];
+        for(var tt=0;tt<triples.length;tt++){
+          if(triples[tt][1]<=0)continue;
+          ED.actifs.push({nom:finalNomA3,label:finalNomA3,montant:triples[tt][1],titulaire:triples[tt][0],horizon:horizonA});
+        }
+      } else {
+        // Format 2 colonnes (legacy) : montant\ttitulaire\t[obs]
+        var mtA=pEur(pA[0]||'');
+        var titA=pA[1]||'';
+        if(mtA<=0||!titA||titA==='Choisissez un élément.')continue;
+        var titATag=mapTit(titA)||'C1';
+        // Observation : ligne suivante, si pas un autre checkbox ni entete bloc
+        var obsL=(s02Lines[iA+2]||'').trim();
+        var obs='';
+        if(obsL&&obsL.charAt(0)!=='☒'&&obsL.charAt(0)!=='☐'&&obsL.indexOf('\t')<0&&obsL!=='Choisissez un élément.'&&!/^(Placements|Retraite|Liquidit|Immobilier|Passifs)/i.test(obsL)){
+          obs=obsL;
+          skipNext=iA+2;
+        }
+        var finalNomA=obs?(nomA+' — '+obs):nomA;
+        ED.actifs.push({nom:finalNomA,label:finalNomA,montant:mtA,titulaire:titATag,horizon:horizonA});
+      }
     }
 
     var linesP=s02Passifs.split('\n');
