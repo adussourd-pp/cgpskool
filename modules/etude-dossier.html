@@ -254,7 +254,7 @@ to{opacity:1;transform:translateY(0)}}
 .ed-block:hover{border-color:rgba(212,98,42,0.3);background:var(--o-dim)}
 .ed-block:focus{border-color:var(--orange);background:var(--o-dim)}
 .ed-hint{font-size:11px;color:rgba(212,98,42,0.5);font-style:italic;pointer-events:none}
-[data-lev-comment]:empty:before{content:attr(data-placeholder);color:rgba(0,0,0,0.3);font-style:italic;pointer-events:none}
+[data-lev-comment]:empty:before{content:attr(data-lev-placeholder);color:rgba(0,0,0,0.3);font-style:italic;pointer-events:none}
 
 /* ── CARDS ── */
 /* ── KPI ROW ── */
@@ -6362,7 +6362,7 @@ function renderFichesClient(){
     html+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:'+meta.titleBg+'">Note conseiller</div>';
     html+='<label class="cz-switch" style="flex-shrink:0"><input type="checkbox" '+(commEnabled?'checked':'')+' onchange="toggleLevierCommentSwitch(\''+lev+'\',this.checked)"><span class="cz-slider"></span></label>';
     html+='</div>';
-    html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-placeholder="'+phLev.replace(/"/g,'&quot;')+'" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word;display:'+(commEnabled?'block':'none')+'">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
+    html+='<div contenteditable="true" data-lev-comment="'+lev+'" data-lev-placeholder="'+phLev.replace(/"/g,'&quot;')+'" oninput="updateLevierComment(\''+lev+'\',this.innerText)" style="width:100%;min-height:60px;padding:10px 12px;border:1.5px solid '+meta.border+';border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;background:rgba(255,255,255,0.85);outline:none;white-space:pre-wrap;word-wrap:break-word;display:'+(commEnabled?'block':'none')+'">'+txtLev.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
 
     html+='</div></div>'; // close levier
   });
