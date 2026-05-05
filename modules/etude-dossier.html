@@ -8182,6 +8182,16 @@ function renderVerifEnfants(){
   }
   el.innerHTML=h;
 }
+function syncVerifActifsFromDOM(){
+  (ED.actifs||[]).forEach(function(a,i){
+    var nomEl=document.getElementById('vAct'+i+'Nom');
+    var titEl=document.getElementById('vAct'+i+'Tit');
+    var mtEl=document.getElementById('vAct'+i+'Mt');
+    if(nomEl){a.nom=nomEl.value;a.label=nomEl.value;}
+    if(titEl)a.titulaire=titEl.value;
+    if(mtEl)a.montant=+mtEl.value||0;
+  });
+}
 function renderVerifActifs(){
   var el=document.getElementById('vActifsBlock');if(!el)return;
   var h='';
@@ -8190,14 +8200,32 @@ function renderVerifActifs(){
     h+='<input class="fi" id="vAct'+i+'Nom" value="'+((a.nom||a.label||'').replace(/"/g,'&quot;'))+'">';
     h+='<select class="fi" id="vAct'+i+'Tit"><option value="C1"'+(a.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(a.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(a.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vAct'+i+'Mt" value="'+(a.montant||0)+'">';
-    h+='<button onclick="ED.actifs.splice('+i+',1);renderVerifActifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='<button onclick="removeVerifActif('+i+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
     h+='</div>';
   });
   el.innerHTML=h;
 }
 function addVerifActif(){
+  syncVerifActifsFromDOM();
   ED.actifs.push({nom:'',montant:0,titulaire:'C1',horizon:'ct'});
   renderVerifActifs();
+}
+function removeVerifActif(i){
+  syncVerifActifsFromDOM();
+  ED.actifs.splice(i,1);
+  renderVerifActifs();
+}
+function syncVerifPassifsFromDOM(){
+  (ED.passifs||[]).forEach(function(p,i){
+    var nomEl=document.getElementById('vPas'+i+'Nom');
+    var titEl=document.getElementById('vPas'+i+'Tit');
+    var echEl=document.getElementById('vPas'+i+'Ech');
+    var crdEl=document.getElementById('vPas'+i+'Crd');
+    if(nomEl)p.nom=nomEl.value;
+    if(titEl)p.titulaire=titEl.value;
+    if(echEl)p.echeance=+echEl.value||0;
+    if(crdEl)p.crd=+crdEl.value||0;
+  });
 }
 function renderVerifPassifs(){
   var el=document.getElementById('vPassifsBlock');if(!el)return;
@@ -8208,14 +8236,30 @@ function renderVerifPassifs(){
     h+='<select class="fi" id="vPas'+i+'Tit"><option value="C1"'+(p.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(p.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(p.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vPas'+i+'Ech" value="'+(p.echeance||0)+'" placeholder="\u00c9ch/an">';
     h+='<input class="fi" type="number" id="vPas'+i+'Crd" value="'+(p.crd||0)+'" placeholder="CRD">';
-    h+='<button onclick="ED.passifs.splice('+i+',1);renderVerifPassifs()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='<button onclick="removeVerifPassif('+i+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
     h+='</div>';
   });
   el.innerHTML=h;
 }
 function addVerifPassif(){
+  syncVerifPassifsFromDOM();
   ED.passifs.push({nom:'',crd:0,echeance:0,titulaire:'Commun'});
   renderVerifPassifs();
+}
+function removeVerifPassif(i){
+  syncVerifPassifsFromDOM();
+  ED.passifs.splice(i,1);
+  renderVerifPassifs();
+}
+function syncVerifChargesFromDOM(){
+  (ED.chargesDetail||[]).forEach(function(c,i){
+    var nomEl=document.getElementById('vChr'+i+'Nom');
+    var titEl=document.getElementById('vChr'+i+'Tit');
+    var mtEl=document.getElementById('vChr'+i+'Mt');
+    if(nomEl)c.nom=nomEl.value;
+    if(titEl)c.titulaire=titEl.value;
+    if(mtEl)c.montant=+mtEl.value||0;
+  });
 }
 function renderVerifCharges(){
   var el=document.getElementById('vChargesBlock');if(!el)return;
@@ -8225,14 +8269,20 @@ function renderVerifCharges(){
     h+='<input class="fi" id="vChr'+i+'Nom" value="'+((c.nom||'').replace(/"/g,'&quot;'))+'" placeholder="Libell\u00e9">';
     h+='<select class="fi" id="vChr'+i+'Tit"><option value="C1"'+(c.titulaire==='C1'?' selected':'')+'>C1</option><option value="C2"'+(c.titulaire==='C2'?' selected':'')+'>C2</option><option value="Commun"'+(c.titulaire==='Commun'?' selected':'')+'>Commun</option></select>';
     h+='<input class="fi" type="number" id="vChr'+i+'Mt" value="'+(c.montant||0)+'" placeholder="Montant/an">';
-    h+='<button onclick="ED.chargesDetail.splice('+i+',1);renderVerifCharges()" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
+    h+='<button onclick="removeVerifCharge('+i+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:16px">&times;</button>';
     h+='</div>';
   });
   el.innerHTML=h;
 }
 function addVerifCharge(){
   if(!ED.chargesDetail)ED.chargesDetail=[];
+  syncVerifChargesFromDOM();
   ED.chargesDetail.push({nom:'',montant:0,titulaire:'C1'});
+  renderVerifCharges();
+}
+function removeVerifCharge(i){
+  syncVerifChargesFromDOM();
+  ED.chargesDetail.splice(i,1);
   renderVerifCharges();
 }
 // Liste officielle des objectifs (issue du doc ID Besoins, groupee par famille)
