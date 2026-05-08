@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGP Skool Tracker — Suivi équipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CGP Skool Tracker — design system officiel CGP Skool
+     Tokens repris de cgp-skool-theme.css / cgp-skool-layout.css
+     (inline pour être déployable en standalone)
+     ============================================================ */
+  :root{
+    --bg:        #0f0e0d;
+    --paper:     #F6F3EE;
+    --paper-2:   #EDEAE3;
+    --beige-app: #ECEAE6;
+
+    --orange:      #D4622A;
+    --orange-hover:#b8501f;
+    --orange-lt:   #E8855A;
+    --o-dim:       rgba(212,98,42,0.13);
+
+    --ink:    #181614;
+    --ink-60: rgba(24,22,20,0.6);
+    --ink-30: rgba(24,22,20,0.3);
+
+    --rule-l: rgba(24,22,20,0.08);
+    --rule-d: rgba(255,255,255,0.07);
+
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans:  'Inter', system-ui, sans-serif;
+
+    --blue:   #2B5EA7; --blue-l:  #EDF2FB;
+    --green:  #2D7A5B; --green-l: #EAF5EF;
+    --violet: #6E4FA8; --violet-l:#F0EBF7;
+    --red:    #C0392B;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--beige-app);
+    line-height:1.5;
+    min-height:100vh;
+  }
+
+  /* ────── NAV (style CGP Skool, fond noir, logo orange) ────── */
+  .cs-nav{
+    position:sticky; top:0; z-index:200;
+    height:54px;
+    background:rgba(13,13,13,0.97);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--rule-d);
+    display:flex; align-items:center;
+  }
+  .cs-nav-inner{
+    width:100%; max-width:1200px; margin:0 auto;
+    padding:0 32px;
+    display:flex; align-items:center; gap:18px;
+  }
+  .cs-logo{
+    display:inline-flex; align-items:center; gap:10px;
+    text-decoration:none; flex-shrink:0;
+  }
+  .cs-logo-mark{
+    width:28px; height:28px;
+    border:1.5px solid var(--orange);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cs-logo-mark span{
+    font-family:var(--serif);
+    font-size:13px; font-weight:500;
+    color:var(--orange); line-height:1;
+  }
+  .cs-logo-name{
+    font-family:var(--sans);
+    font-size:11px; font-weight:500;
+    color:rgba(255,255,255,0.6);
+    letter-spacing:0.22em; text-transform:uppercase;
+  }
+  .cs-nav-spacer{flex:1}
+  .cs-nav-link{
+    font-size:12px; color:rgba(255,255,255,0.55);
+    text-decoration:none; padding:6px 12px;
+    transition:color .18s;
+  }
+  .cs-nav-link:hover{color:#fff}
+
+  /* Pill identité (nav) */
+  .user-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--sans);
+    font-size:11px; font-weight:500;
+    letter-spacing:0.04em;
+    padding:7px 14px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:transparent;
+    color:rgba(255,255,255,0.7);
+    cursor:pointer;
+    transition:all .18s;
+  }
+  .user-pill:hover{border-color:var(--orange); color:var(--orange)}
+  .user-pill.empty{
+    border-color:rgba(212,98,42,0.45);
+    color:var(--orange);
+  }
+  .user-pill .uname{color:#fff; font-weight:600}
+  .user-pill .pen{font-size:10px; opacity:.7}
+
+  /* Champ parrain "moi" */
+  .me-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; margin-bottom:5px;
+  }
+  .me-row label{margin-bottom:0}
+  .me-row .me-link{
+    background:none; border:none; cursor:pointer;
+    font-size:10px; color:var(--ink-30);
+    padding:0; font-family:var(--sans);
+    letter-spacing:0.04em;
+  }
+  .me-row .me-link:hover{color:var(--orange); text-decoration:underline}
+  input.is-me{background:var(--o-dim); border-color:rgba(212,98,42,0.35)}
+
+  /* ────── PAGE ────── */
+  .wrap{max-width:1200px; margin:0 auto; padding:36px 32px 80px}
+
+  .cs-kicker{display:flex; align-items:center; gap:12px; margin-bottom:14px}
+  .cs-kicker-line{width:28px; height:1px; background:var(--orange)}
+  .cs-kicker-text{
+    font-size:10.5px; font-weight:500;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color:var(--orange);
+  }
+  .cs-h1{
+    font-family:var(--serif);
+    font-size:clamp(28px,3.4vw,42px);
+    font-weight:400; line-height:1.1; letter-spacing:-0.02em;
+    color:var(--ink); margin-bottom:8px;
+  }
+  .cs-h1 em{font-style:italic; color:var(--orange)}
+  .cs-lead{
+    font-size:14px; color:var(--ink-60);
+    max-width:640px; margin-bottom:30px;
+  }
+
+  /* ────── BANDEAU STAT (deux KPI sobres) ────── */
+  .stat-banner{
+    background:#fff;
+    border:1.5px solid var(--rule-l);
+    border-radius:12px;
+    padding:18px 22px;
+    margin-bottom:22px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.04);
+  }
+  .stat-cell .lab{
+    font-size:9px; font-weight:600;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--ink-60); margin-bottom:6px;
+  }
+  .stat-cell .val{
+    font-family:var(--serif);
+    font-size:28px; font-weight:500;
+    color:var(--ink); line-height:1;
+  }
+  .stat-cell .val em{font-style:italic; color:var(--orange)}
+  .stat-cell.right{text-align:right; border-left:1px solid var(--rule-l); padding-left:24px}
+
+  /* ────── TUILES COMPTEURS ────── */
+  .tiles{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .tile{
+    background:#fff;
+    border:1.5px solid var(--rule-l);
+    border-radius:12px;
+    padding:18px 18px 16px;
+    cursor:pointer;
+    text-align:left;
+    position:relative;
+    overflow:hidden;
+    transition:border-color .18s, box-shadow .18s, transform .15s;
+    font-family:inherit; color:inherit;
+  }
+  .tile::before{
+    content:""; position:absolute; left:0; top:0; bottom:0;
+    width:3px; background:var(--col, var(--orange));
+  }
+  .tile:hover{
+    border-color:var(--col, var(--orange));
+    box-shadow:0 4px 18px rgba(0,0,0,0.06);
+    transform:translateY(-1px);
+  }
+  .tile.active{
+    border-color:var(--col);
+    box-shadow:0 0 0 1px var(--col), 0 4px 18px rgba(0,0,0,0.06);
+  }
+  .tile .lab{
+    font-size:9px; font-weight:700;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color:var(--col, var(--orange));
+    margin-bottom:8px;
+  }
+  .tile .num{
+    font-family:var(--serif);
+    font-size:36px; font-weight:500;
+    color:var(--ink); line-height:1;
+  }
+  .tile .sub{
+    font-size:11px; color:var(--ink-60);
+    margin-top:6px;
+  }
+  .tile.dm{--col:var(--blue)}
+  .tile.ad{--col:var(--orange)}
+  .tile.tj{--col:var(--violet)}
+  .tile.in{--col:var(--green)}
+
+  .clear-filter{
+    display:none;
+    background:#fff; border:1px solid var(--rule-l);
+    color:var(--ink-60);
+    padding:6px 12px; border-radius:999px;
+    font-size:11px; font-family:inherit; cursor:pointer;
+    margin-bottom:18px;
+    letter-spacing:0.04em;
+  }
+  .clear-filter:hover{border-color:var(--orange); color:var(--orange)}
+  .clear-filter.on{display:inline-flex; align-items:center; gap:6px}
+
+  /* ────── KANBAN ────── */
+  .kanban{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:30px;
+  }
+  .col{
+    background:var(--paper);
+    border:1px solid var(--rule-l);
+    border-radius:12px;
+    padding:12px;
+    min-height:240px;
+    display:flex; flex-direction:column;
+  }
+  .col h3{
+    margin:0 0 10px;
+    font-size:10px; font-weight:700;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color:var(--ink-60);
+    display:flex; align-items:center; gap:8px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--rule-l);
+  }
+  .col h3 .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--col); flex-shrink:0;
+  }
+  .col h3 .pill{
+    margin-left:auto;
+    font-size:10px; font-weight:600;
+    padding:1px 8px; border-radius:999px;
+    background:#fff; color:var(--ink);
+    border:1px solid var(--rule-l);
+    letter-spacing:0;
+  }
+  .col[data-etape="DM"]{--col:var(--blue)}
+  .col[data-etape="AD"]{--col:var(--orange)}
+  .col[data-etape="3J"]{--col:var(--violet)}
+  .col[data-etape="INSCRIT"]{--col:var(--green)}
+
+  .empty{
+    color:var(--ink-30); font-size:12px;
+    font-style:italic; padding:8px 4px;
+    font-family:var(--serif);
+  }
+
+  /* ────── CARTES INVITÉS ────── */
+  .card{
+    background:#fff;
+    border:1.5px solid var(--rule-l);
+    border-radius:10px;
+    padding:11px 12px;
+    margin-bottom:9px;
+    display:flex; flex-direction:column; gap:8px;
+    transition:transform .15s, opacity .2s, border-color .15s;
+    position:relative;
+  }
+  .card:hover{border-color:var(--col); transform:translateY(-1px)}
+  .card.dropped{
+    opacity:.55;
+    background:var(--paper-2);
+    border-style:dashed;
+  }
+  .card.dropped .name{text-decoration:line-through; color:var(--ink-30)}
+  .card .name{
+    font-size:14px; font-weight:600;
+    color:var(--ink);
+  }
+  .card .parrain{
+    font-size:11px; color:var(--ink-60);
+  }
+  .card .parrain em{font-style:italic; color:var(--ink)}
+  .card .actions{
+    display:flex; gap:5px; flex-wrap:wrap;
+    border-top:1px solid var(--rule-l);
+    padding-top:8px;
+  }
+  .card .actions button{
+    flex:1 1 auto; min-width:34px;
+    background:#fff;
+    border:1px solid var(--rule-l);
+    border-radius:7px;
+    padding:6px 0;
+    cursor:pointer;
+    font-size:14px;
+    font-family:inherit;
+    transition:background .15s, border-color .15s, transform .1s;
+  }
+  .card .actions button:hover{
+    background:var(--paper);
+    border-color:var(--orange);
+  }
+  .card .actions button:active{transform:scale(.94)}
+  .card .actions button:disabled{opacity:.3; cursor:not-allowed; background:#fff}
+  .card .actions button:disabled:hover{border-color:var(--rule-l)}
+  .card.flash-inscrit{animation:flash 1.4s ease-out}
+  @keyframes flash{
+    0%   {box-shadow:0 0 0 0 rgba(45,122,91,.55)}
+    60%  {box-shadow:0 0 0 14px rgba(45,122,91,0)}
+    100% {box-shadow:none}
+  }
+
+  /* ────── PANELS BAS (top parrains + ajout) ────── */
+  .grid-bottom{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:18px;
+    margin-bottom:24px;
+  }
+  .panel{
+    background:#fff;
+    border:1.5px solid var(--rule-l);
+    border-radius:12px;
+    padding:22px 24px;
+  }
+  .panel h2{
+    font-family:var(--serif);
+    font-size:20px; font-weight:500;
+    color:var(--ink); letter-spacing:-0.01em;
+    margin-bottom:6px;
+  }
+  .panel h2 em{font-style:italic; color:var(--orange)}
+  .panel .sub-h2{
+    font-size:12px; color:var(--ink-60);
+    margin-bottom:18px;
+  }
+
+  /* Formulaire */
+  .form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .form-row.full{grid-template-columns:1fr}
+  label{
+    font-size:9px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--ink-60);
+    display:block; margin-bottom:5px;
+  }
+  input[type=text], select{
+    width:100%;
+    padding:9px 11px;
+    border:1.5px solid var(--rule-l);
+    border-radius:7px;
+    font-size:13px;
+    font-family:var(--sans);
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+    transition:border-color .18s;
+  }
+  input[type=text]:focus, select:focus{border-color:var(--orange)}
+  .btn-add{
+    width:100%;
+    background:var(--orange);
+    color:#fff;
+    border:1.5px solid var(--orange);
+    padding:11px;
+    border-radius:7px;
+    font-weight:500;
+    font-size:13px;
+    font-family:var(--sans);
+    letter-spacing:0.04em;
+    cursor:pointer;
+    transition:background .18s;
+    margin-top:6px;
+    box-shadow:0 4px 14px rgba(212,98,42,0.22);
+  }
+  .btn-add:hover{background:var(--orange-hover); border-color:var(--orange-hover)}
+  .btn-add:disabled{opacity:.6; cursor:wait}
+
+  /* Top parrains */
+  .leaderboard{list-style:none}
+  .leaderboard li{
+    display:flex; align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--rule-l);
+    font-size:14px;
+  }
+  .leaderboard li:last-child{border-bottom:none}
+  .leaderboard .rk{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px;
+    border:1px solid var(--rule-l);
+    font-family:var(--serif);
+    font-weight:500; font-size:13px;
+    color:var(--ink-60);
+    margin-right:12px;
+  }
+  .leaderboard li:nth-child(1) .rk{background:var(--o-dim); border-color:var(--orange); color:var(--orange)}
+  .leaderboard li:nth-child(2) .rk{background:var(--paper); color:var(--ink)}
+  .leaderboard li:nth-child(3) .rk{background:var(--paper-2); color:var(--ink-60)}
+  .leaderboard .lname{flex:1; font-weight:500; color:var(--ink)}
+  .leaderboard .lcount{
+    font-size:11px;
+    color:var(--green);
+    font-weight:600;
+    background:var(--green-l);
+    padding:3px 10px; border-radius:999px;
+    letter-spacing:0.04em;
+  }
+  .empty-board{
+    color:var(--ink-30); font-size:13px;
+    font-style:italic; padding:6px 0;
+    font-family:var(--serif);
+  }
+
+  /* ────── TOAST ────── */
+  .toast{
+    position:fixed; left:50%; bottom:24px;
+    transform:translateX(-50%);
+    background:var(--ink); color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:12px; letter-spacing:0.02em;
+    box-shadow:0 8px 24px rgba(0,0,0,0.18);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    z-index:9999;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px)}
+  .toast.err{background:var(--red)}
+
+  /* ────── CONFETTI ────── */
+  .confetti-layer{
+    position:fixed; inset:0;
+    pointer-events:none; overflow:hidden;
+    z-index:9000;
+  }
+  .confetti{
+    position:absolute;
+    width:8px; height:14px;
+    top:-20px;
+    opacity:.85;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    0%   {transform:translateY(-20px) rotate(0deg)}
+    100% {transform:translateY(105vh) rotate(720deg)}
+  }
+
+  /* ────── LOADER ────── */
+  .loading{
+    text-align:center;
+    color:var(--ink-30);
+    font-size:12px;
+    padding:24px 0;
+  }
+  .dot{
+    display:inline-block;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--orange); margin:0 2px;
+    animation:bounce 1.2s infinite ease-in-out;
+  }
+  .dot:nth-child(2){animation-delay:.15s}
+  .dot:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{
+    0%,80%,100%{transform:scale(.6); opacity:.4}
+    40%        {transform:scale(1);  opacity:1}
+  }
+
+  footer.foot{
+    text-align:center;
+    color:var(--ink-30);
+    font-size:10px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-top:30px;
+  }
+
+  /* ────── RESPONSIVE ────── */
+  @media (max-width:920px){
+    .tiles{grid-template-columns:repeat(2,1fr)}
+    .kanban{grid-template-columns:1fr; gap:10px}
+    .col{min-height:auto}
+    .grid-bottom{grid-template-columns:1fr}
+    .form-row{grid-template-columns:1fr}
+    .stat-banner{grid-template-columns:1fr; gap:14px}
+    .stat-cell.right{
+      text-align:left; border-left:none;
+      border-top:1px solid var(--rule-l);
+      padding-left:0; padding-top:14px;
+    }
+  }
+  @media (max-width:520px){
+    .wrap{padding:24px 18px 60px}
+    .cs-nav-inner{padding:0 18px}
+    .panel{padding:18px}
+    .tile .num{font-size:30px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Barre de nav style CGP Skool -->
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="#">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool · Tracker</span>
+    </a>
+    <div class="cs-nav-spacer"></div>
+    <button id="userPill" class="user-pill empty" type="button" title="Cliquer pour s'identifier">
+      <span id="userPillText">Identifie-toi</span>
+      <span class="pen">✎</span>
+    </button>
+    <a class="cs-nav-link" href="https://cgpskool.com" target="_blank" rel="noopener">cgpskool.com →</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- En-tête -->
+  <div class="cs-kicker">
+    <span class="cs-kicker-line"></span>
+    <span class="cs-kicker-text">Suivi Équipe — Développement commercial</span>
+  </div>
+  <h1 class="cs-h1">Du <em>DM</em> au premier inscrit, ensemble.</h1>
+  <p class="cs-lead">
+    Un tableau commun pour suivre chaque invité, parrain par parrain, étape par étape.
+    Cliquez sur une tuile pour filtrer, et célébrez les inscriptions ensemble.
+  </p>
+
+  <!-- Bandeau stat -->
+  <div class="stat-banner">
+    <div class="stat-cell">
+      <div class="lab">Conversion DM → Inscrit</div>
+      <div class="val"><em id="convRate">— %</em></div>
+    </div>
+    <div class="stat-cell right">
+      <div class="lab">Invités actifs dans le pipe</div>
+      <div class="val" id="totalActifs">—</div>
+    </div>
+  </div>
+
+  <!-- Tuiles compteurs -->
+  <div class="tiles" id="tiles">
+    <button class="tile dm" data-etape="DM" type="button">
+      <div class="lab">DM</div>
+      <div class="num" data-count="DM">0</div>
+      <div class="sub">Message envoyé</div>
+    </button>
+    <button class="tile ad" data-etape="AD" type="button">
+      <div class="lab">AD</div>
+      <div class="num" data-count="AD">0</div>
+      <div class="sub">A demandé infos</div>
+    </button>
+    <button class="tile tj" data-etape="3J" type="button">
+      <div class="lab">3J</div>
+      <div class="num" data-count="3J">0</div>
+      <div class="sub">Période d'essai</div>
+    </button>
+    <button class="tile in" data-etape="INSCRIT" type="button">
+      <div class="lab">Inscrit</div>
+      <div class="num" data-count="INSCRIT">0</div>
+      <div class="sub">Bravo, c'est fait</div>
+    </button>
+  </div>
+
+  <button id="clearFilter" class="clear-filter" type="button">✕ Retirer le filtre</button>
+
+  <!-- Kanban -->
+  <div class="kanban" id="kanban">
+    <div class="col" data-etape="DM">
+      <h3><span class="dot"></span>DM<span class="pill" data-pill="DM">0</span></h3>
+      <div class="cards"></div>
+    </div>
+    <div class="col" data-etape="AD">
+      <h3><span class="dot"></span>AD<span class="pill" data-pill="AD">0</span></h3>
+      <div class="cards"></div>
+    </div>
+    <div class="col" data-etape="3J">
+      <h3><span class="dot"></span>3J<span class="pill" data-pill="3J">0</span></h3>
+      <div class="cards"></div>
+    </div>
+    <div class="col" data-etape="INSCRIT">
+      <h3><span class="dot"></span>Inscrit<span class="pill" data-pill="INSCRIT">0</span></h3>
+      <div class="cards"></div>
+    </div>
+  </div>
+
+  <div class="grid-bottom">
+    <!-- Top parrains -->
+    <section class="panel">
+      <h2>🏆 Top <em>parrains</em></h2>
+      <p class="sub-h2">Classement par nombre d'invités passés en INSCRIT.</p>
+      <ol class="leaderboard" id="leaderboard"></ol>
+    </section>
+
+    <!-- Formulaire d'ajout -->
+    <section class="panel">
+      <h2>Ajouter un <em>invité</em></h2>
+      <p class="sub-h2">Renseignez le prénom, le parrain ou la marraine, puis l'étape de départ.</p>
+      <form id="addForm" autocomplete="off">
+        <div class="form-row full">
+          <div>
+            <label for="prenom">Prénom de l'invité</label>
+            <input type="text" id="prenom" name="prenom" required maxlength="60" placeholder="ex : Camille">
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <div class="me-row">
+              <label for="parrain">Parrain / Marraine</label>
+              <button type="button" id="otherParrainBtn" class="me-link" hidden>parrainer pour quelqu'un d'autre ↩</button>
+            </div>
+            <input type="text" id="parrain" name="parrain" required maxlength="60" placeholder="ex : Alex" list="parrainsList">
+            <datalist id="parrainsList"></datalist>
+          </div>
+          <div>
+            <label for="etape">Étape de départ</label>
+            <select id="etape" name="etape">
+              <option value="DM" selected>DM</option>
+              <option value="AD">AD</option>
+              <option value="3J">3J</option>
+              <option value="INSCRIT">INSCRIT</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-add" id="btnAdd">+ Ajouter au tracker</button>
+      </form>
+    </section>
+  </div>
+
+  <footer class="foot">CGP Skool · Tracker · Données partagées via GitHub</footer>
+</div>
+
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   CGP Skool Tracker — logique front
+   ------------------------------------------------------------
+   Charge tracking.json depuis le Worker Cloudflare puis rend
+   tuiles, kanban, leaderboard, bandeau. Toutes les écritures
+   passent par /add /update /delete.
+   ============================================================ */
+
+// ⚠️ À adapter : URL du Worker Cloudflare déployé.
+// Ex : "https://cgp-skool-tracker.<ton-compte>.workers.dev"
+const WORKER_URL = "https://cgp-skool-tracker.example.workers.dev";
+
+const ETAPES = ["DM","AD","3J","INSCRIT"];
+const NEXT = { DM:"AD", AD:"3J", "3J":"INSCRIT", INSCRIT:null };
+const PREV = { INSCRIT:"3J", "3J":"AD", AD:"DM", DM:null };
+
+let DATA = [];          // état courant
+let FILTER = null;      // étape filtrée (null = aucune)
+let BUSY = false;       // verrou anti double-clic
+let ME = "";            // prénom de la personne connectée (parrain·e par défaut)
+
+// Clés localStorage
+const LS_PROFIL_CGP   = "cgpskool_profil_v1";   // profil officiel CGP Skool
+const LS_TRACKER_USER = "cgpskool_tracker_user"; // fallback local au tracker
+
+// --- Helpers -------------------------------------------------
+
+const $  = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+function escapeHTML(s){
+  return String(s||"").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function toast(msg, isErr=false){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.toggle("err", !!isErr);
+  t.classList.add("show");
+  clearTimeout(toast._tid);
+  toast._tid = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+async function api(path, body){
+  const opts = body ? {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(body),
+  } : { method:"GET" };
+  const res = await fetch(WORKER_URL + path, opts);
+  let json;
+  try { json = await res.json(); } catch(e){ json = { ok:false, error:"Réponse invalide" }; }
+  if (!res.ok || json.ok === false){
+    throw new Error(json.error || ("HTTP " + res.status));
+  }
+  return json;
+}
+
+// --- Rendu --------------------------------------------------
+
+function render(){
+  // 1) Compteurs (uniquement les invités qui "continuent")
+  const counts = { DM:0, AD:0, "3J":0, INSCRIT:0 };
+  DATA.forEach(x => { if (x.continue && counts[x.etape] !== undefined) counts[x.etape]++; });
+  ETAPES.forEach(et => {
+    $(`[data-count="${et}"]`).textContent = counts[et];
+    $(`[data-pill="${et}"]`).textContent  = counts[et];
+  });
+
+  // 2) Tuile active
+  $$(".tile").forEach(t => t.classList.toggle("active", t.dataset.etape === FILTER));
+  $("#clearFilter").classList.toggle("on", !!FILTER);
+
+  // 3) Kanban
+  ETAPES.forEach(et => {
+    const col = $(`.col[data-etape="${et}"] .cards`);
+    col.innerHTML = "";
+
+    let invites = DATA.filter(x => x.etape === et);
+    if (FILTER && FILTER !== et) invites = [];
+
+    if (!invites.length){
+      const e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = (FILTER && FILTER !== et) ? "(filtré)" : "Aucun invité";
+      col.appendChild(e);
+      return;
+    }
+
+    // Actifs d'abord, puis abandons, par date d'ajout décroissante
+    invites.sort((a,b) =>
+      (b.continue - a.continue) ||
+      (b.date_ajout||"").localeCompare(a.date_ajout||"")
+    );
+
+    invites.forEach(inv => col.appendChild(renderCard(inv)));
+  });
+
+  // 4) Bandeau stat
+  const inscrits  = DATA.filter(x => x.continue && x.etape === "INSCRIT").length;
+  const actifs    = DATA.filter(x => x.continue).length;
+  const total     = DATA.length;
+  $("#totalActifs").textContent = actifs;
+  const rate = total ? Math.round((inscrits / total) * 100) : 0;
+  $("#convRate").textContent = rate + " %";
+
+  // 5) Top parrains (par INSCRIT)
+  const board = {};
+  DATA.forEach(x => {
+    if (x.continue && x.etape === "INSCRIT"){
+      const k = x.parrain.trim();
+      if (!k) return;
+      board[k] = (board[k] || 0) + 1;
+    }
+  });
+  const sorted = Object.entries(board).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const ol = $("#leaderboard");
+  ol.innerHTML = "";
+  if (!sorted.length){
+    const li = document.createElement("li");
+    li.className = "empty-board";
+    li.textContent = "Pas encore d'inscrit·e — le premier arrive vite.";
+    ol.appendChild(li);
+  } else {
+    sorted.forEach(([nom, n], i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span class="rk">${i+1}</span>
+        <span class="lname">${escapeHTML(nom)}</span>
+        <span class="lcount">${n} inscrit${n>1?"s":""}</span>
+      `;
+      ol.appendChild(li);
+    });
+  }
+
+  // 6) Datalist parrains pour auto-suggestion
+  const dl = $("#parrainsList");
+  const setP = new Set(DATA.map(x => x.parrain).filter(Boolean));
+  dl.innerHTML = [...setP].sort((a,b)=>a.localeCompare(b))
+    .map(n => `<option value="${escapeHTML(n)}">`).join("");
+}
+
+function renderCard(inv){
+  const card = document.createElement("div");
+  card.className = "card" + (inv.continue ? "" : " dropped");
+  card.dataset.id = inv.id;
+
+  const canPrev = !!PREV[inv.etape];
+  const canNext = !!NEXT[inv.etape];
+
+  card.innerHTML = `
+    <div>
+      <div class="name">${escapeHTML(inv.prenom)}</div>
+      <div class="parrain">Parrain·e : <em>${escapeHTML(inv.parrain)}</em></div>
+    </div>
+    <div class="actions">
+      <button title="Reculer" data-act="prev" ${(!canPrev || !inv.continue) ? "disabled" : ""}>⬅️</button>
+      <button title="Avancer" data-act="next" ${(!canNext || !inv.continue) ? "disabled" : ""}>➡️</button>
+      ${inv.continue
+        ? `<button title="Ne continue pas" data-act="drop">❌</button>`
+        : `<button title="Réactiver"      data-act="reactivate">✅</button>`}
+      <button title="Supprimer" data-act="del">🗑️</button>
+    </div>
+  `;
+
+  card.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn) return;
+    if (BUSY) return;
+    const act = btn.dataset.act;
+
+    if (act === "del"){
+      if (!confirm(`Supprimer définitivement « ${inv.prenom} » ?`)) return;
+      await actDelete(inv.id);
+    } else if (act === "next" && NEXT[inv.etape]){
+      await actUpdate(inv.id, { etape: NEXT[inv.etape] }, { celebrate: NEXT[inv.etape] === "INSCRIT" });
+    } else if (act === "prev" && PREV[inv.etape]){
+      await actUpdate(inv.id, { etape: PREV[inv.etape] });
+    } else if (act === "drop"){
+      await actUpdate(inv.id, { continue: false });
+    } else if (act === "reactivate"){
+      await actUpdate(inv.id, { continue: true });
+    }
+  });
+
+  return card;
+}
+
+// --- Actions API -------------------------------------------
+
+async function actUpdate(id, patch, opts={}){
+  BUSY = true;
+  try {
+    const r = await api("/update", { id, actor: ME, ...patch });
+    DATA = r.data;
+    render();
+    if (opts.celebrate){
+      celebrate();
+      const newCard = document.querySelector(`.card[data-id="${id}"]`);
+      if (newCard) newCard.classList.add("flash-inscrit");
+      toast("Bienvenue à un nouvel inscrit ✦");
+    }
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+  }
+}
+
+async function actDelete(id){
+  BUSY = true;
+  try {
+    const r = await api("/delete", { id, actor: ME });
+    DATA = r.data;
+    render();
+    toast("Invité supprimé.");
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+  }
+}
+
+async function actAdd(payload){
+  BUSY = true;
+  $("#btnAdd").disabled = true;
+  try {
+    const r = await api("/add", { ...payload, actor: ME });
+    DATA = r.data;
+    render();
+    toast(`${payload.prenom} ajouté·e ✦`);
+    if (payload.etape === "INSCRIT") celebrate();
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+    $("#btnAdd").disabled = false;
+  }
+}
+
+// --- Confetti (palette CGP Skool) --------------------------
+
+function celebrate(){
+  const layer = $("#confettiLayer");
+  // On reste dans la palette : orange, vert, bleu, violet, ink
+  const colors = ["#D4622A","#2D7A5B","#2B5EA7","#6E4FA8","#181614","#E8855A"];
+  const n = 60;
+  for (let i=0; i<n; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100 + "%";
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2 + Math.random()*2) + "s";
+    c.style.animationDelay = (Math.random()*0.4) + "s";
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    layer.appendChild(c);
+    setTimeout(() => c.remove(), 4500);
+  }
+}
+
+// --- Profil conseiller (ME) --------------------------------
+// 1) On lit en priorité le profil CGP Skool standard (cgpskool_profil_v1)
+// 2) Sinon, fallback sur la clé locale du tracker
+// 3) En dernier ressort : prompt léger pour s'identifier
+
+function loadMe(){
+  // Profil officiel CGP Skool (rempli depuis index.html principal)
+  try {
+    const raw = localStorage.getItem(LS_PROFIL_CGP);
+    if (raw){
+      const p = JSON.parse(raw);
+      const prenom = (p && (p.pPrenom || p.prenom) || "").trim();
+      if (prenom) return prenom;
+    }
+  } catch(e){}
+  // Fallback tracker
+  try {
+    const raw = localStorage.getItem(LS_TRACKER_USER);
+    if (raw){
+      const p = JSON.parse(raw);
+      const prenom = (p && p.prenom || "").trim();
+      if (prenom) return prenom;
+    }
+  } catch(e){}
+  return "";
+}
+
+function saveMe(prenom){
+  try {
+    localStorage.setItem(LS_TRACKER_USER, JSON.stringify({ prenom }));
+  } catch(e){}
+}
+
+function clearMe(){
+  try { localStorage.removeItem(LS_TRACKER_USER); } catch(e){}
+}
+
+function applyMe(){
+  const pill     = $("#userPill");
+  const pillText = $("#userPillText");
+  const parrain  = $("#parrain");
+  const otherBtn = $("#otherParrainBtn");
+
+  if (ME){
+    pill.classList.remove("empty");
+    pillText.innerHTML = `Identifié·e : <span class="uname">${escapeHTML(ME)}</span>`;
+    pill.title = "Cliquer pour modifier";
+    // Pré-remplit le champ parrain avec ME (sauf si l'utilisateur a déjà tapé autre chose)
+    if (!parrain.value || parrain.dataset.autofilled === "1"){
+      parrain.value = ME;
+      parrain.classList.add("is-me");
+      parrain.dataset.autofilled = "1";
+      otherBtn.hidden = false;
+    }
+  } else {
+    pill.classList.add("empty");
+    pillText.textContent = "Identifie-toi";
+    pill.title = "Cliquer pour s'identifier";
+    parrain.classList.remove("is-me");
+    parrain.value = "";
+    parrain.dataset.autofilled = "";
+    otherBtn.hidden = true;
+  }
+}
+
+function promptIdentify(){
+  const current = ME || "";
+  const v = window.prompt(
+    "Quel est ton prénom ?\n(Sera stocké localement sur ce navigateur, sert à pré-remplir le champ « parrain·e ».)",
+    current
+  );
+  if (v === null) return;          // annulé
+  const prenom = v.trim().slice(0, 60);
+  if (!prenom){
+    clearMe();
+    ME = "";
+    applyMe();
+    toast("Identité effacée.");
+    return;
+  }
+  saveMe(prenom);
+  ME = prenom;
+  applyMe();
+  toast(`Bonjour ${prenom} ✦`);
+}
+
+// --- Init --------------------------------------------------
+
+function bindUI(){
+  $$(".tile").forEach(t => {
+    t.addEventListener("click", () => {
+      const et = t.dataset.etape;
+      FILTER = (FILTER === et) ? null : et;
+      render();
+    });
+  });
+  $("#clearFilter").addEventListener("click", () => { FILTER = null; render(); });
+
+  // Pill identité
+  $("#userPill").addEventListener("click", promptIdentify);
+
+  // Lien "parrainer pour quelqu'un d'autre" : libère le champ parrain
+  $("#otherParrainBtn").addEventListener("click", () => {
+    const p = $("#parrain");
+    p.value = "";
+    p.classList.remove("is-me");
+    p.dataset.autofilled = "";
+    p.focus();
+  });
+
+  // Si l'utilisateur tape manuellement dans le champ parrain, on retire le style "moi"
+  $("#parrain").addEventListener("input", () => {
+    const p = $("#parrain");
+    if (p.value !== ME){
+      p.classList.remove("is-me");
+      p.dataset.autofilled = "";
+    } else {
+      p.classList.add("is-me");
+      p.dataset.autofilled = "1";
+    }
+  });
+
+  $("#addForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const prenom  = $("#prenom").value.trim();
+    const parrain = $("#parrain").value.trim();
+    const etape   = $("#etape").value;
+    if (!prenom || !parrain){ toast("Prénom et parrain·e requis.", true); return; }
+
+    // Si pas encore identifié et qu'on saisit un parrain, proposer de mémoriser
+    if (!ME){
+      const ok = window.confirm(`Tu signes en tant que « ${parrain} ». Mémoriser ton prénom ?\n(Pratique pour les prochains ajouts — stocké uniquement sur ce navigateur.)`);
+      if (ok){
+        saveMe(parrain);
+        ME = parrain;
+        applyMe();
+      }
+    }
+
+    actAdd({ prenom, parrain, etape });
+    $("#prenom").value = "";
+    $("#etape").value = "DM";
+    // On garde le parrain en place : ME (ou la valeur saisie) reste pour la prochaine carte
+    if (ME){
+      $("#parrain").value = ME;
+      $("#parrain").classList.add("is-me");
+      $("#parrain").dataset.autofilled = "1";
+    }
+    $("#prenom").focus();
+  });
+}
+
+async function boot(){
+  ME = loadMe();
+  bindUI();
+  applyMe();
+  $$(".col .cards").forEach(c => {
+    c.innerHTML = `<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  });
+  try {
+    const r = await api("/");
+    DATA = Array.isArray(r.data) ? r.data : [];
+    render();
+  } catch (err){
+    toast("Impossible de charger les données : " + err.message, true);
+    DATA = [];
+    render();
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
