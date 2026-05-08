@@ -67,6 +67,11 @@ Copie le token, tu en auras besoin à l'étape suivante. **Ne le commite jamais.
 6. Note l'URL du Worker, du genre :
    `https://cgp-skool-tracker.<ton-compte>.workers.dev`
 
+> 💡 **Optionnel — notifications Slack**
+> Ajoute une variable de type **Secret** nommée `SLACK_WEBHOOK_URL`
+> contenant un *Incoming Webhook* (voir section dédiée plus bas).
+> Sans cette variable, la fonctionnalité est silencieusement désactivée.
+
 #### Option B — via wrangler (CLI)
 
 ```bash
@@ -115,14 +120,58 @@ Ton site sera accessible à :
 
 Toutes les routes renvoient le `tracking.json` à jour (`{ ok:true, data:[...] }`).
 
-| Méthode | Route     | Body JSON                                      | Effet                                       |
-|---------|-----------|------------------------------------------------|---------------------------------------------|
-| `GET`   | `/`       | —                                              | Healthcheck + lecture                       |
-| `POST`  | `/add`    | `{ prenom, parrain, etape }`                   | Ajoute un invité                            |
-| `POST`  | `/update` | `{ id, etape?, continue? }`                    | Met à jour étape et/ou statut "continue"    |
-| `POST`  | `/delete` | `{ id }`                                       | Supprime définitivement                     |
+| Méthode | Route     | Body JSON                                          | Effet                                       |
+|---------|-----------|----------------------------------------------------|---------------------------------------------|
+| `GET`   | `/`       | —                                                  | Healthcheck + lecture                       |
+| `POST`  | `/add`    | `{ prenom, parrain, etape, actor? }`               | Ajoute un invité                            |
+| `POST`  | `/update` | `{ id, etape?, continue?, actor? }`                | Met à jour étape et/ou statut "continue"    |
+| `POST`  | `/delete` | `{ id, actor? }`                                   | Supprime définitivement                     |
 
-CORS activé pour tous les domaines (GitHub Pages, dev local, etc.).
+`actor` = prénom de la personne qui fait l'action (utilisé pour signer la
+notification Slack). CORS activé pour tous les domaines.
+
+---
+
+## 💬 Notifications Slack (optionnel)
+
+Si `SLACK_WEBHOOK_URL` est configuré côté Worker, **chaque action déclenche
+un message dans le canal Slack associé**, signé par la personne qui l'a faite :
+
+| Action                    | Exemple de message Slack                                            |
+|---------------------------|---------------------------------------------------------------------|
+| Ajout                     | 👤 *Camille* a ajouté *Arnaud* au tracker en *DM*                   |
+| Avancement                | ▶️ *Arnaud* passe en *3J* _(AD → 3J)_ — acté par *Camille*          |
+| Recul                     | ◀️ *Arnaud* passe en *AD* _(3J → AD)_ — acté par *Camille*          |
+| Inscription 🎉            | 🎉 *Arnaud* est *INSCRIT·E* ! Bravo *Alex* (acté par *Camille*)     |
+| Abandon                   | ❌ *Arnaud* ne continue pas pour le moment — acté par *Camille*     |
+| Réactivation              | ✅ *Arnaud* reprend le parcours ! — réactivé·e par *Camille*        |
+| Suppression               | 🗑️ *Camille* a retiré *Arnaud* du tracker                           |
+
+### Créer le webhook Slack
+
+1. Va sur [api.slack.com/apps](https://api.slack.com/apps) → **Create New App**
+   → *From scratch* → choisis le workspace.
+2. Menu de gauche : **Incoming Webhooks** → active-le.
+3. **Add New Webhook to Workspace** → choisis le canal (par ex. `#tracker`)
+   → **Allow**.
+4. Copie l'URL générée (commence par `https://hooks.slack.com/services/…`).
+
+### Brancher au Worker
+
+```bash
+# avec wrangler
+wrangler secret put SLACK_WEBHOOK_URL
+
+# ou via le dashboard Cloudflare → Settings → Variables and Secrets :
+# Type "Secret", nom "SLACK_WEBHOOK_URL", valeur = l'URL du webhook
+```
+
+C'est tout : le Worker détecte automatiquement la variable et publie les
+messages. **Pas de redéploiement front nécessaire** — le webhook reste côté
+serveur, jamais exposé au navigateur.
+
+> Pour désactiver Slack : supprime la variable, le Worker reprend son
+> comportement silencieux.
 
 ---
 
@@ -159,6 +208,9 @@ CORS activé pour tous les domaines (GitHub Pages, dev local, etc.).
 - ✅ Classement 🏆 Top parrains
 - ✅ Taux de conversion DM → INSCRIT en direct
 - ✅ 🎉 Confetti aux couleurs CGP Skool quand un invité atteint INSCRIT
+- ✅ **Notifications Slack** (optionnel) : chaque ajout / changement d'étape /
+  inscription est posté dans un canal commun, signé par le prénom de la
+  personne qui a fait l'action — voir la section dédiée plus bas
 - ✅ 100% responsive mobile
 
 ### Comment marche l'identification ?
