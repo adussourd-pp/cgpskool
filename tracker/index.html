@@ -147,6 +147,100 @@
     color:var(--ink); margin-bottom:8px;
   }
   .cs-h1 em{font-style:italic; color:var(--orange)}
+  .title-row{display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:8px}
+  .title-row .cs-h1{margin-bottom:0}
+  .info-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 12px;
+    background:#fff;
+    border:1.5px solid var(--rule-l);
+    border-radius:999px;
+    font-family:var(--sans);
+    font-size:11px; font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--ink-60);
+    cursor:pointer;
+    transition:border-color .18s, color .18s, background .18s;
+  }
+  .info-btn:hover{border-color:var(--orange); color:var(--orange); background:var(--paper)}
+  .info-btn svg{flex-shrink:0}
+
+  /* Modale info */
+  .modal{
+    position:fixed; inset:0;
+    display:none; align-items:center; justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .modal[aria-hidden="false"]{display:flex}
+  .modal-backdrop{
+    position:absolute; inset:0;
+    background:rgba(24,22,20,0.55);
+    backdrop-filter:blur(2px);
+  }
+  .modal-content{
+    position:relative;
+    max-width:560px; width:100%;
+    max-height:85vh; overflow-y:auto;
+    background:#fff;
+    border-radius:14px;
+    padding:32px 32px 28px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.25);
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px;
+    width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:none;
+    border-radius:50%;
+    color:var(--ink-60);
+    cursor:pointer;
+    font-size:22px; line-height:1;
+    transition:background .15s, color .15s;
+  }
+  .modal-close:hover{background:var(--paper); color:var(--ink)}
+  .modal-content h2{
+    font-family:var(--serif);
+    font-size:24px; font-weight:500;
+    color:var(--ink);
+    margin-bottom:6px;
+    letter-spacing:-0.01em;
+  }
+  .modal-content h2 em{font-style:italic; color:var(--orange)}
+  .modal-content .modal-lead{
+    font-size:13px; color:var(--ink-60);
+    margin-bottom:18px;
+    line-height:1.5;
+  }
+  .modal-content .modal-lead strong{color:var(--ink); font-weight:600}
+  .dev-steps{
+    list-style:none;
+    display:flex; flex-direction:column; gap:10px;
+    margin-bottom:18px;
+  }
+  .dev-steps li{
+    display:flex; gap:12px; align-items:baseline;
+    padding:10px 12px;
+    background:var(--paper);
+    border-radius:8px;
+    font-size:13px;
+    color:var(--ink);
+    line-height:1.45;
+  }
+  .dev-steps li .day{
+    flex-shrink:0;
+    font-weight:700;
+    color:var(--orange);
+    font-size:12px;
+    letter-spacing:0.04em;
+    min-width:42px;
+  }
+  .modal-foot{
+    font-size:12px; color:var(--ink-60);
+    line-height:1.5;
+    padding-top:14px;
+    border-top:1px solid var(--rule-l);
+  }
   .cs-lead{
     font-size:14px; color:var(--ink-60);
     max-width:640px; margin-bottom:30px;
@@ -583,7 +677,13 @@
     <span class="cs-kicker-line"></span>
     <span class="cs-kicker-text">Développement d'équipe — Tracker</span>
   </div>
-  <h1 class="cs-h1"><em>Dev Action</em></h1>
+  <div class="title-row">
+    <h1 class="cs-h1"><em>Dev Action</em></h1>
+    <button id="infoBtn" class="info-btn" type="button" aria-haspopup="dialog" aria-controls="infoModal">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>C'est quoi une Dev Action&nbsp;?</span>
+    </button>
+  </div>
 
   <!-- Bandeau stat -->
   <div class="stat-banner">
@@ -689,6 +789,30 @@
 
 <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status"></div>
+
+<!-- Modale info Dev Action -->
+<div class="modal" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-content">
+    <button class="modal-close" type="button" data-close aria-label="Fermer">×</button>
+    <h2 id="infoModalTitle">C'est quoi une <em>Dev Action</em>&nbsp;?</h2>
+    <p class="modal-lead">
+      Une Dev Action, c'est une <strong>OCDP — Opération Coup De Poing</strong>.
+      Court, intense, ciblé : <strong>10 à 20 personnes max</strong> par session.
+      Pas de prospection diluée — c'est massif, calibré, reproductible chaque mois.
+    </p>
+    <ol class="dev-steps">
+      <li><span class="day">J-2</span><span>Tu fais ta liste — chaque personne a un « pourquoi ».</span></li>
+      <li><span class="day">J-1</span><span>Tu envoies tes SMS — objectif 3 à 5 confirmations.</span></li>
+      <li><span class="day">J</span><span>Bloc d'appels dédié — Script DEV + débrief à chaud calé.</span></li>
+      <li><span class="day">J+1</span><span>Tu rappelles les non-dispos et traites les recos.</span></li>
+      <li><span class="day">J+X</span><span>Suivi des inscriptions + débrief à chaud avant chaque DM.</span></li>
+    </ol>
+    <p class="modal-foot">
+      Ce tracker est un outil partagé : on voit où chacun·e en est, on s'entraide, on célèbre les inscriptions ensemble.
+    </p>
+  </div>
+</div>
 
 <script>
 /* ============================================================
@@ -1073,6 +1197,16 @@ function bindUI(){
 
   // Pill identité
   $("#userPill").addEventListener("click", promptIdentify);
+
+  // Modale info Dev Action
+  const infoModal = $("#infoModal");
+  const openInfo  = () => infoModal.setAttribute("aria-hidden","false");
+  const closeInfo = () => infoModal.setAttribute("aria-hidden","true");
+  $("#infoBtn").addEventListener("click", openInfo);
+  infoModal.querySelectorAll("[data-close]").forEach(el => el.addEventListener("click", closeInfo));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && infoModal.getAttribute("aria-hidden") === "false") closeInfo();
+  });
 
   // Lien "parrainer pour quelqu'un d'autre" : libère le champ parrain
   $("#otherParrainBtn").addEventListener("click", () => {
