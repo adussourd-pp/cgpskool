@@ -26,7 +26,7 @@
  */
 
 const FILE_PATH = 'tracker/tracking.json';
-const ETAPES = ['DM', 'AD', '3J', 'ESP', 'INSCRIT'];
+const ETAPES = ['DM', 'AD', '3J', 'INSCRIT'];
 
 // --- En-têtes CORS (autorisent l'appel depuis GitHub Pages, etc.) ---
 const corsHeaders = {

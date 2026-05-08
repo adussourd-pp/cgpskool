@@ -225,7 +225,6 @@
   .tile.dm{--col:var(--blue)}
   .tile.ad{--col:var(--orange)}
   .tile.tj{--col:var(--violet)}
-  .tile.esp{--col:#1E8A99}
   .tile.in{--col:var(--green)}
 
   .clear-filter{
@@ -279,7 +278,6 @@
   .col[data-etape="DM"]{--col:var(--blue)}
   .col[data-etape="AD"]{--col:var(--orange)}
   .col[data-etape="3J"]{--col:var(--violet)}
-  .col[data-etape="ESP"]{--col:#1E8A99}
   .col[data-etape="INSCRIT"]{--col:var(--green)}
 
   .empty{
@@ -606,11 +604,6 @@
       <div class="num" data-count="3J">0</div>
       <div class="sub">3 jours de la réussite</div>
     </button>
-    <button class="tile esp" data-etape="ESP" type="button">
-      <div class="lab">ESP</div>
-      <div class="num" data-count="ESP">0</div>
-      <div class="sub">Avec ton manager · 1h</div>
-    </button>
     <button class="tile in" data-etape="INSCRIT" type="button">
       <div class="lab">Inscrit</div>
       <div class="num" data-count="INSCRIT">0</div>
@@ -668,10 +661,6 @@
       <h3><span class="dot"></span>3J<span class="pill" data-pill="3J">0</span></h3>
       <div class="cards"></div>
     </div>
-    <div class="col" data-etape="ESP">
-      <h3><span class="dot"></span>ESP<span class="pill" data-pill="ESP">0</span></h3>
-      <div class="cards"></div>
-    </div>
     <div class="col" data-etape="INSCRIT">
       <h3><span class="dot"></span>Inscrit<span class="pill" data-pill="INSCRIT">0</span></h3>
       <div class="cards"></div>
@@ -703,7 +692,7 @@
 // URL du Worker Cloudflare déployé pour ce tracker.
 const WORKER_URL = "https://cgpskool-tracker.a-dussourd.workers.dev";
 
-const ETAPES = ["DM","AD","3J","ESP","INSCRIT"];
+const ETAPES = ["DM","AD","3J","INSCRIT"];
 const NEXT = { DM:"AD", AD:"3J", "3J":"INSCRIT", INSCRIT:null };
 const PREV = { INSCRIT:"3J", "3J":"AD", AD:"DM", DM:null };
 
