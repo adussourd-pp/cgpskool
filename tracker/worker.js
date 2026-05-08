@@ -25,7 +25,7 @@
  * Toutes les réponses renvoient le tracking.json à jour.
  */
 
-const FILE_PATH = 'tracking.json';
+const FILE_PATH = 'tracker/tracking.json';
 const ETAPES = ['DM', 'AD', '3J', 'INSCRIT'];
 
 // --- En-têtes CORS (autorisent l'appel depuis GitHub Pages, etc.) ---
