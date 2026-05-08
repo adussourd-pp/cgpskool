@@ -149,13 +149,29 @@ CORS activé pour tous les domaines (GitHub Pages, dev local, etc.).
 
 ## 🎨 Aperçu des fonctionnalités
 
+- ✅ Style officiel CGP Skool (Playfair / Inter, papier, orange #D4622A)
 - ✅ 4 tuiles compteurs cliquables (filtrent le Kanban)
 - ✅ Kanban à 4 colonnes avec actions ⬅️ ➡️ ❌ ✅ 🗑️
-- ✅ Formulaire d'ajout compact, avec auto-suggestion des parrains existants
+- ✅ Formulaire d'ajout compact, auto-suggestion des parrains existants
+- ✅ **Identification rapide** : pill « Identifié·e : <prénom> » dans la nav
+  → le champ « Parrain·e » est pré-rempli automatiquement, plus besoin de
+  retaper son prénom à chaque ajout
 - ✅ Classement 🏆 Top parrains
 - ✅ Taux de conversion DM → INSCRIT en direct
-- ✅ 🎉 Confetti CSS quand un invité atteint INSCRIT
+- ✅ 🎉 Confetti aux couleurs CGP Skool quand un invité atteint INSCRIT
 - ✅ 100% responsive mobile
+
+### Comment marche l'identification ?
+
+Au premier ajout, on te demande ton prénom (mémorisé en `localStorage` dans la
+clé `cgpskool_tracker_user`). Si l'app principale CGP Skool est ouverte sur le
+même navigateur/domaine, le tracker lit aussi automatiquement la clé
+`cgpskool_profil_v1` (champ `pPrenom`) — donc si tu as déjà rempli ton profil
+conseiller, il n'y a rien à faire, ton prénom est déjà connu.
+
+Tu peux changer ou effacer ton identité à tout moment en cliquant sur la pill
+en haut à droite. Si tu veux ponctuellement parrainer pour quelqu'un d'autre,
+clique sur « parrainer pour quelqu'un d'autre ↩ » sous le champ parrain.
 
 ---
 
