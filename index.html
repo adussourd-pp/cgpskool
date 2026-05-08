@@ -307,73 +307,103 @@
   </div>
 </nav>
 
-<!-- BANDEAU DEV ACTION (compteur live + CTA) -->
-<a href="tracker/index.html" class="devaction-strip" id="devactionStrip">
-  <div class="devaction-inner">
-    <div class="devaction-head">
-      <div class="devaction-tag">&#127919; Dev Action CGP Skool</div>
-      <div class="devaction-line">
-        <span class="devaction-num" id="devActionInscritsCount">&mdash;</span>
-        <span class="devaction-suf">inscrits gr&acirc;ce aux Dev Actions de l'&eacute;quipe</span>
-      </div>
+<!-- TOP STRIPS — 3 cellules : Évènements + Dev Action + Ma journée -->
+<div class="top-strips">
+  <!-- Cellule 1 : Évènements -->
+  <section class="ts-cell ts-fold" data-fold="agenda" id="agenda">
+    <button class="ts-head" onclick="toggleFold('agenda')" type="button">
+      <span class="ts-tag">&#128197; &Eacute;v&egrave;nements</span>
+      <span class="ts-preview" id="agendaPreview"></span>
+      <span class="ts-chev">&#9662;</span>
+    </button>
+  </section>
+
+  <!-- Cellule 2 : Dev Action CGP Skool -->
+  <a href="tracker/index.html" class="ts-cell ts-devaction" id="devactionStrip">
+    <span class="ts-tag">&#127919; Dev Action CGP Skool</span>
+    <div class="ts-line">
+      <span class="ts-num" id="devActionInscritsCount">&mdash;</span>
+      <span class="ts-suf">inscrits gr&acirc;ce aux Dev Actions</span>
     </div>
-    <span class="devaction-cta">
+    <span class="ts-cta">
       Participer au Dev Action
-      <span class="devaction-cta-arrow">&rarr;</span>
+      <span class="ts-cta-arrow">&rarr;</span>
     </span>
-  </div>
-</a>
+  </a>
 
-<!-- AGENDA Forman / Prodemial -->
-<section class="events-section" data-fold="agenda" id="agenda">
-  <div class="events-inner" style="flex-direction:column;align-items:stretch;gap:0">
-    <button class="fold-header" onclick="toggleFold('agenda')" type="button">
-      <div class="events-head" style="display:flex;align-items:baseline;gap:12px">
-        <div class="events-label">&#128197; &Eacute;v&egrave;nements</div>
+  <!-- Cellule 3 : Ma journée -->
+  <section class="ts-cell ts-fold" data-fold="journee" id="dailyStrip">
+    <button class="ts-head" onclick="toggleFold('journee')" type="button">
+      <span class="ts-tag">&#9889; Ma journ&eacute;e</span>
+      <span class="ts-preview" id="journeePreview"></span>
+      <span class="ts-chev">&#9662;</span>
+    </button>
+  </section>
+</div>
+
+<!-- Body dépliable Évènements -->
+<div class="ts-body-wrap" data-fold-body="agenda">
+  <div class="ts-body-inner">
+    <div class="events-grid" id="eventsGrid"></div>
+  </div>
+</div>
+
+<!-- Body dépliable Ma journée -->
+<div class="ts-body-wrap" data-fold-body="journee">
+  <div class="ts-body-inner">
+    <div class="daily-inner" style="margin:0">
+      <div class="daily-left">
+        <div class="daily-title" id="dailyDate">Aujourd'hui</div>
+        <div class="daily-sub" id="dailySub">Suivez votre productivit&eacute; quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
       </div>
-      <span class="fold-preview" id="agendaPreview"></span>
-      <span class="fold-chevron">&#9662;</span>
-    </button>
-    <div class="fold-body" style="margin-top:14px">
-      <div class="events-grid" id="eventsGrid"></div>
-    </div>
-  </div>
-</section>
-
-<!-- BANDEAU PRODUCTIVITE DU JOUR -->
-<section class="daily-strip" id="dailyStrip" data-fold="journee">
-  <div class="daily-inner" style="flex-direction:column;align-items:stretch;gap:0">
-    <button class="fold-header" onclick="toggleFold('journee')" type="button">
-      <span class="daily-tag" style="margin-bottom:0">&#9889; Ma journ&eacute;e</span>
-      <span class="fold-preview" id="journeePreview"></span>
-      <span class="fold-chevron">&#9662;</span>
-    </button>
-    <div class="fold-body" style="margin-top:12px">
-      <div class="daily-inner" style="margin:0">
-        <div class="daily-left">
-          <div class="daily-title" id="dailyDate">Aujourd'hui</div>
-          <div class="daily-sub" id="dailySub">Suivez votre productivit&eacute; quotidienne &mdash; score 0-100, streak, objectif hebdo.</div>
-        </div>
-        <div class="daily-mid">
-          <div class="daily-week-block">
-            <div class="daily-week-head">
-              <span class="daily-week-lbl">Semaine</span>
-              <span class="daily-streak" id="dailyStreak"></span>
-            </div>
-            <div class="daily-week-val"><span id="dailyWeekTotal">0</span> / <span id="dailyWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="dailyWeekPct">0&nbsp;%</span></div>
-            <div class="daily-week-bar"><span id="dailyWeekBar" style="width:0%"></span></div>
-            <div class="daily-days" id="dailyDays"></div>
+      <div class="daily-mid">
+        <div class="daily-week-block">
+          <div class="daily-week-head">
+            <span class="daily-week-lbl">Semaine</span>
+            <span class="daily-streak" id="dailyStreak"></span>
           </div>
+          <div class="daily-week-val"><span id="dailyWeekTotal">0</span> / <span id="dailyWeekGoal">250</span> pts <span class="sep">&middot;</span> <span class="pct" id="dailyWeekPct">0&nbsp;%</span></div>
+          <div class="daily-week-bar"><span id="dailyWeekBar" style="width:0%"></span></div>
+          <div class="daily-days" id="dailyDays"></div>
         </div>
-        <a href="modules/productivite.html" class="daily-cta">
-          <span class="daily-cta-txt">Compl&eacute;ter ma journ&eacute;e</span>
-          <span class="daily-cta-arrow">&rarr;</span>
-        </a>
       </div>
+      <a href="modules/productivite.html" class="daily-cta">
+        <span class="daily-cta-txt">Compl&eacute;ter ma journ&eacute;e</span>
+        <span class="daily-cta-arrow">&rarr;</span>
+      </a>
     </div>
   </div>
-</section>
+</div>
 <style>
+/* ── TOP STRIPS — 3 cellules horizontales (Évènements + Dev Action + Ma journée) ── */
+.top-strips{display:grid;grid-template-columns:1fr 1.4fr 1fr;background:#1D1A16;border-top:1px solid rgba(212,98,42,0.18)}
+.ts-cell{position:relative;padding:18px 22px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
+.ts-cell:last-child{border-right:none}
+.ts-cell.ts-fold:hover{background:rgba(255,255,255,0.02);cursor:pointer}
+.ts-head{background:none;border:none;padding:0;display:flex;flex-direction:column;gap:6px;align-items:flex-start;cursor:pointer;color:inherit;text-align:left;width:100%;font-family:inherit}
+.ts-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);line-height:1.2}
+.ts-preview{font-size:12px;color:var(--fog);line-height:1.45;display:block}
+.ts-chev{position:absolute;top:18px;right:18px;font-size:11px;color:var(--fog);transition:transform .18s}
+.ts-fold.closed .ts-chev{transform:rotate(-90deg)}
+
+/* Cellule Dev Action — accent orange */
+.ts-devaction{background:linear-gradient(135deg,#241f1a 0%,#332618 100%);border-right:1px solid rgba(212,98,42,0.18);border-left:1px solid rgba(212,98,42,0.18)}
+.ts-devaction:hover{background:linear-gradient(135deg,#2a241e 0%,#3d2c1c 100%)}
+.ts-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ts-num{font-size:30px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.ts-suf{font-size:12px;color:var(--fog)}
+.ts-cta{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 14px;background:var(--orange);color:#fff;border-radius:5px;font-size:12px;font-weight:600;transition:background .15s;white-space:nowrap}
+.ts-devaction:hover .ts-cta{background:var(--orange-hover)}
+.ts-cta-arrow{font-size:14px;transition:transform .15s}
+.ts-devaction:hover .ts-cta-arrow{transform:translateX(3px)}
+
+/* Bodies dépliables sous la barre */
+.ts-body-wrap{background:#1D1A16;overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid rgba(255,255,255,0.05)}
+.ts-body-wrap.closed{max-height:0;border-top-color:transparent}
+.ts-body-inner{max-width:1100px;margin:0 auto;padding:22px 52px}
+
+@media (max-width:900px){.top-strips{grid-template-columns:1fr}.ts-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,0.06)}.ts-cell:last-child{border-bottom:none}.ts-devaction{border-left:none;border-right:none}.ts-body-inner{padding:18px 24px}}
+
 .daily-strip{display:block;background:#1D1A16;padding:24px 52px;border-top:1px solid rgba(212,98,42,0.18);text-decoration:none;color:inherit}
 .daily-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
 .daily-left{flex:1;min-width:240px}
@@ -550,9 +580,13 @@
     try { localStorage.setItem(FOLD_KEY, JSON.stringify(s)); } catch(e){}
   }
   window.toggleFold = function(id){
-    var el = document.querySelector('[data-fold="'+id+'"]');
-    if(!el) return;
-    var closed = el.classList.toggle('closed');
+    var head = document.querySelector('[data-fold="'+id+'"]');
+    var body = document.querySelector('[data-fold-body="'+id+'"]');
+    if(!head && !body) return;
+    var closed = head ? head.classList.toggle('closed') : !body.classList.contains('closed');
+    if(body){
+      if(closed) body.classList.add('closed'); else body.classList.remove('closed');
+    }
     var state = load();
     state[id] = closed;
     save(state);
@@ -560,9 +594,12 @@
   function init(){
     var state = load();
     ['agenda','journee'].forEach(function(id){
-      var el = document.querySelector('[data-fold="'+id+'"]');
-      if(!el) return;
-      if(state[id]) el.classList.add('closed');
+      var head = document.querySelector('[data-fold="'+id+'"]');
+      var body = document.querySelector('[data-fold-body="'+id+'"]');
+      if(state[id]){
+        if(head) head.classList.add('closed');
+        if(body) body.classList.add('closed');
+      }
     });
     updateJourneePreview();
   }
