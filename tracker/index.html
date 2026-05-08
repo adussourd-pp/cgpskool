@@ -224,9 +224,9 @@
     font-size:11px; color:var(--ink-60);
     margin-top:6px;
   }
-  .tile.dm{--col:var(--violet)}
-  .tile.ad{--col:var(--indigo)}
-  .tile.tj{--col:var(--blue)}
+  .tile.dm{--col:var(--blue)}
+  .tile.ad{--col:var(--gold)}
+  .tile.tj{--col:var(--violet)}
   .tile.in{--col:var(--green)}
 
   .clear-filter{
@@ -277,9 +277,9 @@
     border:1px solid var(--rule-l);
     letter-spacing:0;
   }
-  .col[data-etape="DM"]{--col:var(--violet)}
-  .col[data-etape="AD"]{--col:var(--indigo)}
-  .col[data-etape="3J"]{--col:var(--blue)}
+  .col[data-etape="DM"]{--col:var(--blue)}
+  .col[data-etape="AD"]{--col:var(--gold)}
+  .col[data-etape="3J"]{--col:var(--violet)}
   .col[data-etape="INSCRIT"]{--col:var(--green)}
 
   .empty{
@@ -945,6 +945,16 @@ function celebrate(){
 // 2) Sinon, fallback sur la clé locale du tracker
 // 3) En dernier ressort : prompt léger pour s'identifier
 
+// Construit l'identifiant "Prénom N." (initiale du nom) pour éviter les doublons
+// quand plusieurs personnes ont le même prénom (ex: deux Alexandre).
+function buildIdentite(prenom, nom){
+  prenom = (prenom || "").trim();
+  nom = (nom || "").trim();
+  if (!prenom) return "";
+  if (!nom)    return prenom;
+  return `${prenom} ${nom.charAt(0).toUpperCase()}.`;
+}
+
 function loadMe(){
   // Profil officiel CGP Skool (rempli depuis index.html principal)
   try {
@@ -952,7 +962,9 @@ function loadMe(){
     if (raw){
       const p = JSON.parse(raw);
       const prenom = (p && (p.pPrenom || p.prenom) || "").trim();
-      if (prenom) return prenom;
+      const nom    = (p && (p.pNom    || p.nom)    || "").trim();
+      const id = buildIdentite(prenom, nom);
+      if (id) return id;
     }
   } catch(e){}
   // Fallback tracker
