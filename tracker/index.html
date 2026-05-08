@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGP Skool Tracker — Suivi équipe</title>
+<style>
+  /* ============================================================
+     CGP Skool Tracker — styles
+     Palette douce, dégradés, arrondis, ombres légères, mobile-first
+     ============================================================ */
+  :root{
+    --bg-1:#f5f3ff;
+    --bg-2:#ecfeff;
+    --ink:#1f2937;
+    --ink-soft:#475569;
+    --ink-light:#94a3b8;
+    --line:#e2e8f0;
+    --card:#ffffff;
+    --shadow:0 4px 14px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04);
+    --shadow-lg:0 10px 30px rgba(15,23,42,.10), 0 2px 8px rgba(15,23,42,.06);
+    --radius:14px;
+    --radius-sm:10px;
+
+    --dm-1:#3b82f6;     --dm-2:#1d4ed8;
+    --ad-1:#f59e0b;     --ad-2:#d97706;
+    --tj-1:#8b5cf6;     --tj-2:#6d28d9;
+    --in-1:#10b981;     --in-2:#059669;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,var(--bg-1) 0%,var(--bg-2) 100%);
+    min-height:100vh;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 18px 80px}
+
+  /* ----- En-tête ---------------------------------------------- */
+  header.hero{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header.hero h1{
+    font-size:clamp(24px,4vw,34px);
+    margin:0 0 6px;
+    letter-spacing:-.02em;
+    background:linear-gradient(135deg,#6d28d9,#0ea5e9);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header.hero p{margin:0;color:var(--ink-soft);font-size:14px}
+
+  /* ----- Bandeau stat ----------------------------------------- */
+  .stat-banner{
+    background:linear-gradient(135deg,#6d28d9,#0ea5e9);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:14px 18px;
+    margin:0 0 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    box-shadow:var(--shadow);
+  }
+  .stat-banner .lab{font-size:12px;opacity:.85;letter-spacing:.05em;text-transform:uppercase}
+  .stat-banner .val{font-size:22px;font-weight:700}
+
+  /* ----- Tuiles compteurs ------------------------------------- */
+  .tiles{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:24px;
+  }
+  .tile{
+    border:none;
+    border-radius:var(--radius);
+    padding:18px 16px;
+    color:#fff;
+    text-align:left;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .tile:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+  .tile.active{outline:3px solid rgba(255,255,255,.6); outline-offset:2px}
+  .tile .lab{font-size:11px;letter-spacing:.12em;font-weight:600;opacity:.92;text-transform:uppercase}
+  .tile .num{font-size:34px;font-weight:800;line-height:1;margin-top:6px}
+  .tile .sub{font-size:11px;opacity:.85;margin-top:4px}
+  .tile.dm{background:linear-gradient(135deg,var(--dm-1),var(--dm-2))}
+  .tile.ad{background:linear-gradient(135deg,var(--ad-1),var(--ad-2))}
+  .tile.tj{background:linear-gradient(135deg,var(--tj-1),var(--tj-2))}
+  .tile.in{background:linear-gradient(135deg,var(--in-1),var(--in-2))}
+
+  .clear-filter{
+    display:none;
+    margin:0 0 14px;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:7px 12px;
+    border-radius:999px;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .clear-filter.on{display:inline-flex;align-items:center;gap:6px}
+
+  /* ----- Kanban ----------------------------------------------- */
+  .kanban{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:30px;
+  }
+  .col{
+    background:rgba(255,255,255,.6);
+    backdrop-filter:blur(6px);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px;
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+  }
+  .col h3{
+    margin:0 0 12px;
+    font-size:12px;
+    letter-spacing:.12em;
+    font-weight:700;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .col h3 .pill{
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    font-weight:600;
+    letter-spacing:0;
+  }
+  .col[data-etape="DM"] h3{color:var(--dm-2)}
+  .col[data-etape="AD"] h3{color:var(--ad-2)}
+  .col[data-etape="3J"] h3{color:var(--tj-2)}
+  .col[data-etape="INSCRIT"] h3{color:var(--in-2)}
+
+  .empty{
+    color:var(--ink-light);
+    font-size:12px;
+    font-style:italic;
+    padding:8px 4px;
+  }
+
+  /* ----- Cartes ----------------------------------------------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:11px 12px;
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    transition:transform .15s ease, opacity .2s ease;
+    position:relative;
+  }
+  .card:hover{transform:translateY(-1px)}
+  .card.dropped{opacity:.55; background:#f8fafc}
+  .card.dropped .name{text-decoration:line-through; color:var(--ink-light)}
+  .card .name{font-size:14px;font-weight:700;color:var(--ink)}
+  .card .parrain{font-size:11px;color:var(--ink-soft)}
+  .card .actions{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+    border-top:1px dashed var(--line);
+    padding-top:8px;
+    margin-top:2px;
+  }
+  .card .actions button{
+    flex:1 1 auto;
+    min-width:34px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:6px 0;
+    cursor:pointer;
+    font-size:14px;
+    transition:background .15s, transform .1s;
+  }
+  .card .actions button:hover{background:#eef2f7}
+  .card .actions button:active{transform:scale(.94)}
+  .card .actions button:disabled{opacity:.35; cursor:not-allowed}
+  .card .actions .danger{background:#fef2f2;border-color:#fecaca}
+  .card .actions .danger:hover{background:#fee2e2}
+  .card .actions .ok{background:#ecfdf5;border-color:#a7f3d0}
+  .card .actions .ok:hover{background:#d1fae5}
+
+  .card.flash-inscrit{
+    animation:flash 1.2s ease-out;
+  }
+  @keyframes flash{
+    0%   { box-shadow:0 0 0 0 rgba(16,185,129,.55) }
+    60%  { box-shadow:0 0 0 14px rgba(16,185,129,0) }
+    100% { box-shadow:var(--shadow) }
+  }
+
+  /* ----- Top parrains + formulaire ---------------------------- */
+  .grid-bottom{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:18px;
+    margin-bottom:24px;
+  }
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--shadow);
+  }
+  .panel h2{
+    margin:0 0 14px;
+    font-size:15px;
+    letter-spacing:-.01em;
+  }
+  .panel h2 .ico{margin-right:6px}
+
+  .form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .form-row.full{grid-template-columns:1fr}
+  label{
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:5px;
+  }
+  input[type=text], select{
+    width:100%;
+    padding:9px 11px;
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus, select:focus{
+    border-color:#8b5cf6;
+    box-shadow:0 0 0 3px rgba(139,92,246,.15);
+  }
+  .btn-add{
+    width:100%;
+    background:linear-gradient(135deg,#6d28d9,#0ea5e9);
+    color:#fff;
+    border:none;
+    padding:11px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:filter .15s, transform .1s;
+    margin-top:6px;
+  }
+  .btn-add:hover{filter:brightness(1.05)}
+  .btn-add:active{transform:translateY(1px)}
+  .btn-add:disabled{opacity:.6; cursor:wait}
+
+  .leaderboard{list-style:none;padding:0;margin:0}
+  .leaderboard li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .leaderboard li:last-child{border-bottom:none}
+  .leaderboard .rk{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border-radius:8px;
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    font-weight:700;
+    font-size:12px;
+    margin-right:10px;
+    color:#92400e;
+  }
+  .leaderboard li:nth-child(1) .rk{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff}
+  .leaderboard li:nth-child(2) .rk{background:linear-gradient(135deg,#cbd5e1,#94a3b8);color:#fff}
+  .leaderboard li:nth-child(3) .rk{background:linear-gradient(135deg,#fdba74,#fb923c);color:#fff}
+  .leaderboard .lname{flex:1; font-weight:500}
+  .leaderboard .lcount{
+    font-weight:700;
+    color:var(--in-2);
+    font-size:13px;
+  }
+  .empty-board{color:var(--ink-light);font-size:13px;font-style:italic;padding:6px 0}
+
+  /* ----- Toast ------------------------------------------------ */
+  .toast{
+    position:fixed;
+    left:50%; transform:translateX(-50%);
+    bottom:24px;
+    background:#1f2937;
+    color:#fff;
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:13px;
+    box-shadow:var(--shadow-lg);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    z-index:9999;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px)}
+  .toast.err{background:#b91c1c}
+
+  /* ----- Confetti -------------------------------------------- */
+  .confetti-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:9000;
+  }
+  .confetti{
+    position:absolute;
+    width:8px; height:14px;
+    top:-20px;
+    border-radius:2px;
+    opacity:.9;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    0%   { transform:translateY(-20px) rotate(0deg) }
+    100% { transform:translateY(105vh) rotate(720deg) }
+  }
+
+  /* ----- Loader --------------------------------------------- */
+  .loading{
+    text-align:center;
+    color:var(--ink-light);
+    font-size:13px;
+    padding:30px 0;
+  }
+  .dot{
+    display:inline-block;
+    width:7px; height:7px;
+    border-radius:50%;
+    background:#8b5cf6;
+    margin:0 2px;
+    animation:bounce 1.2s infinite ease-in-out;
+  }
+  .dot:nth-child(2){animation-delay:.15s}
+  .dot:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{
+    0%,80%,100%{transform:scale(.6); opacity:.4}
+    40%        {transform:scale(1); opacity:1}
+  }
+
+  footer.foot{
+    text-align:center;
+    color:var(--ink-light);
+    font-size:11px;
+    margin-top:30px;
+  }
+
+  /* ----- Responsive mobile ----------------------------------- */
+  @media (max-width:780px){
+    .tiles{grid-template-columns:repeat(2,1fr)}
+    .kanban{grid-template-columns:1fr; gap:10px}
+    .col{min-height:auto}
+    .grid-bottom{grid-template-columns:1fr}
+    .form-row{grid-template-columns:1fr}
+    .stat-banner .val{font-size:18px}
+  }
+  @media (max-width:400px){
+    .tile .num{font-size:28px}
+    .card .actions button{font-size:13px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <h1>🎯 CGP Skool Tracker</h1>
+    <p>Suivi équipe — du DM au premier inscrit, ensemble.</p>
+  </header>
+
+  <!-- Bandeau de conversion -->
+  <div class="stat-banner">
+    <div>
+      <div class="lab">Taux de conversion DM → INSCRIT</div>
+      <div class="val" id="convRate">— %</div>
+    </div>
+    <div style="text-align:right">
+      <div class="lab">Total invités actifs</div>
+      <div class="val" id="totalActifs">—</div>
+    </div>
+  </div>
+
+  <!-- Tuiles compteurs -->
+  <div class="tiles" id="tiles">
+    <button class="tile dm" data-etape="DM" type="button">
+      <div class="lab">DM</div><div class="num" data-count="DM">0</div><div class="sub">Message envoyé</div>
+    </button>
+    <button class="tile ad" data-etape="AD" type="button">
+      <div class="lab">AD</div><div class="num" data-count="AD">0</div><div class="sub">A demandé</div>
+    </button>
+    <button class="tile tj" data-etape="3J" type="button">
+      <div class="lab">3J</div><div class="num" data-count="3J">0</div><div class="sub">3 jours d'essai</div>
+    </button>
+    <button class="tile in" data-etape="INSCRIT" type="button">
+      <div class="lab">Inscrit</div><div class="num" data-count="INSCRIT">0</div><div class="sub">🎉 Bravo !</div>
+    </button>
+  </div>
+
+  <button id="clearFilter" class="clear-filter" type="button">✖ Retirer le filtre</button>
+
+  <!-- Kanban -->
+  <div class="kanban" id="kanban">
+    <div class="col" data-etape="DM"><h3>DM <span class="pill" data-pill="DM">0</span></h3><div class="cards"></div></div>
+    <div class="col" data-etape="AD"><h3>AD <span class="pill" data-pill="AD">0</span></h3><div class="cards"></div></div>
+    <div class="col" data-etape="3J"><h3>3J <span class="pill" data-pill="3J">0</span></h3><div class="cards"></div></div>
+    <div class="col" data-etape="INSCRIT"><h3>Inscrit <span class="pill" data-pill="INSCRIT">0</span></h3><div class="cards"></div></div>
+  </div>
+
+  <div class="grid-bottom">
+    <!-- Top parrains -->
+    <section class="panel">
+      <h2><span class="ico">🏆</span>Top parrains</h2>
+      <p style="margin:-6px 0 12px;font-size:12px;color:var(--ink-light)">Classement par nombre d'invités passés en INSCRIT.</p>
+      <ol class="leaderboard" id="leaderboard"></ol>
+    </section>
+
+    <!-- Formulaire d'ajout -->
+    <section class="panel">
+      <h2><span class="ico">➕</span>Ajouter un invité</h2>
+      <form id="addForm" autocomplete="off">
+        <div class="form-row full">
+          <div>
+            <label for="prenom">Prénom de l'invité</label>
+            <input type="text" id="prenom" name="prenom" required maxlength="60" placeholder="ex : Camille">
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="parrain">Parrain / Marraine</label>
+            <input type="text" id="parrain" name="parrain" required maxlength="60" placeholder="ex : Alex" list="parrainsList">
+            <datalist id="parrainsList"></datalist>
+          </div>
+          <div>
+            <label for="etape">Étape de départ</label>
+            <select id="etape" name="etape">
+              <option value="DM" selected>DM</option>
+              <option value="AD">AD</option>
+              <option value="3J">3J</option>
+              <option value="INSCRIT">INSCRIT</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-add" id="btnAdd">+ Ajouter</button>
+      </form>
+    </section>
+  </div>
+
+  <footer class="foot">
+    Données stockées sur GitHub via Cloudflare Worker · CGP Skool Tracker
+  </footer>
+
+</div>
+
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   CGP Skool Tracker — logique front
+   ------------------------------------------------------------
+   - Charge tracking.json depuis le Worker
+   - Rend les tuiles, le kanban, le leaderboard, le bandeau
+   - Toutes les écritures passent par /add /update /delete
+   ============================================================ */
+
+// ⚠️ À adapter : URL du Worker Cloudflare déployé.
+// Exemple : "https://cgp-skool-tracker.<ton-compte>.workers.dev"
+const WORKER_URL = "https://cgp-skool-tracker.example.workers.dev";
+
+const ETAPES = ["DM","AD","3J","INSCRIT"];
+const NEXT = { DM:"AD", AD:"3J", "3J":"INSCRIT", INSCRIT:null };
+const PREV = { INSCRIT:"3J", "3J":"AD", AD:"DM", DM:null };
+
+let DATA = [];          // état courant côté client
+let FILTER = null;      // étape filtrée par tuile (null = aucune)
+let BUSY = false;       // verrou anti double-clic
+
+// --- Helpers -------------------------------------------------
+
+const $  = (sel,root=document)=>root.querySelector(sel);
+const $$ = (sel,root=document)=>[...root.querySelectorAll(sel)];
+
+function escapeHTML(s){
+  return String(s||"").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function toast(msg, isErr=false){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.toggle("err", !!isErr);
+  t.classList.add("show");
+  clearTimeout(toast._tid);
+  toast._tid = setTimeout(()=>t.classList.remove("show"), 2400);
+}
+
+async function api(path, body){
+  const opts = body ? {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body),
+  } : { method:"GET" };
+  const res = await fetch(WORKER_URL + path, opts);
+  let json;
+  try { json = await res.json(); } catch(e){ json = {ok:false, error:"Réponse invalide"} }
+  if (!res.ok || json.ok === false){
+    throw new Error(json.error || ("HTTP " + res.status));
+  }
+  return json;
+}
+
+// --- Rendu --------------------------------------------------
+
+function render(){
+  // 1) Compteurs (uniquement les invités qui "continuent")
+  const counts = { DM:0, AD:0, "3J":0, INSCRIT:0 };
+  DATA.forEach(x => { if (x.continue && counts[x.etape] !== undefined) counts[x.etape]++; });
+  ETAPES.forEach(et => {
+    $(`[data-count="${et}"]`).textContent = counts[et];
+    $(`[data-pill="${et}"]`).textContent  = counts[et];
+  });
+
+  // 2) Tuile active = filtre courant
+  $$(".tile").forEach(t => t.classList.toggle("active", t.dataset.etape === FILTER));
+  $("#clearFilter").classList.toggle("on", !!FILTER);
+
+  // 3) Kanban : on affiche tout, mais on grise les masquées (filtre)
+  ETAPES.forEach(et => {
+    const col = $(`.col[data-etape="${et}"] .cards`);
+    col.innerHTML = "";
+
+    let invites = DATA.filter(x => x.etape === et);
+    if (FILTER && FILTER !== et){
+      // Si un filtre est actif, on cache les autres colonnes en mettant le contenu vide
+      // (les colonnes restent visibles pour conserver la lecture du flux).
+      invites = [];
+    }
+
+    if (!invites.length){
+      const e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = (FILTER && FILTER !== et) ? "(filtré)" : "Aucun invité";
+      col.appendChild(e);
+      return;
+    }
+
+    // Tri : actifs d'abord, puis "ne continuent pas", par date d'ajout décroissante
+    invites.sort((a,b) => (b.continue - a.continue) || (b.date_ajout||"").localeCompare(a.date_ajout||""));
+
+    invites.forEach(inv => col.appendChild(renderCard(inv)));
+  });
+
+  // 4) Bandeau stat
+  const totalDM   = DATA.filter(x => x.continue).length; // total parcours en cours
+  const inscrits  = DATA.filter(x => x.continue && x.etape === "INSCRIT").length;
+  const totalParcours = DATA.length; // tous, y compris abandons
+  $("#totalActifs").textContent = totalDM;
+  const rate = totalParcours ? Math.round((inscrits / totalParcours) * 100) : 0;
+  $("#convRate").textContent = rate + " %";
+
+  // 5) Top parrains (classement par INSCRIT)
+  const board = {};
+  DATA.forEach(x => {
+    if (x.continue && x.etape === "INSCRIT"){
+      const k = x.parrain.trim();
+      if (!k) return;
+      board[k] = (board[k] || 0) + 1;
+    }
+  });
+  const sorted = Object.entries(board).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const ol = $("#leaderboard");
+  ol.innerHTML = "";
+  if (!sorted.length){
+    const li = document.createElement("li");
+    li.className = "empty-board";
+    li.textContent = "Pas encore d'inscrit·e — courage, le premier arrive vite ✨";
+    ol.appendChild(li);
+  } else {
+    sorted.forEach(([nom,n], i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span class="rk">${i+1}</span>
+        <span class="lname">${escapeHTML(nom)}</span>
+        <span class="lcount">${n} inscrit${n>1?"s":""}</span>
+      `;
+      ol.appendChild(li);
+    });
+  }
+
+  // 6) Datalist parrains pour auto-suggestion
+  const dl = $("#parrainsList");
+  const setP = new Set(DATA.map(x => x.parrain).filter(Boolean));
+  dl.innerHTML = [...setP].sort((a,b)=>a.localeCompare(b))
+    .map(n => `<option value="${escapeHTML(n)}">`).join("");
+}
+
+function renderCard(inv){
+  const card = document.createElement("div");
+  card.className = "card" + (inv.continue ? "" : " dropped");
+  card.dataset.id = inv.id;
+
+  const canPrev = !!PREV[inv.etape];
+  const canNext = !!NEXT[inv.etape];
+
+  card.innerHTML = `
+    <div>
+      <div class="name">${escapeHTML(inv.prenom)}</div>
+      <div class="parrain">Parrain·e : ${escapeHTML(inv.parrain)}</div>
+    </div>
+    <div class="actions">
+      <button title="Reculer" data-act="prev" ${(!canPrev||!inv.continue)?"disabled":""}>⬅️</button>
+      <button title="Avancer" data-act="next" ${(!canNext||!inv.continue)?"disabled":""}>➡️</button>
+      ${inv.continue
+        ? `<button class="danger" title="Ne continue pas" data-act="drop">❌</button>`
+        : `<button class="ok"     title="Réactiver"      data-act="reactivate">✅</button>`}
+      <button class="danger" title="Supprimer" data-act="del">🗑️</button>
+    </div>
+  `;
+
+  card.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn) return;
+    const act = btn.dataset.act;
+    if (BUSY) return;
+
+    if (act === "del"){
+      if (!confirm(`Supprimer définitivement « ${inv.prenom} » ?`)) return;
+      await actDelete(inv.id);
+    } else if (act === "next" && NEXT[inv.etape]){
+      await actUpdate(inv.id, { etape: NEXT[inv.etape] }, { celebrate: NEXT[inv.etape] === "INSCRIT", cardEl: card });
+    } else if (act === "prev" && PREV[inv.etape]){
+      await actUpdate(inv.id, { etape: PREV[inv.etape] });
+    } else if (act === "drop"){
+      await actUpdate(inv.id, { continue: false });
+    } else if (act === "reactivate"){
+      await actUpdate(inv.id, { continue: true });
+    }
+  });
+
+  return card;
+}
+
+// --- Actions API -------------------------------------------
+
+async function actUpdate(id, patch, opts={}){
+  BUSY = true;
+  try {
+    const r = await api("/update", { id, ...patch });
+    DATA = r.data;
+    render();
+    if (opts.celebrate){
+      celebrate();
+      // Re-cibler la nouvelle carte rendue
+      const newCard = document.querySelector(`.card[data-id="${id}"]`);
+      if (newCard) newCard.classList.add("flash-inscrit");
+      toast("🎉 Bienvenue à un nouvel inscrit !");
+    }
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+  }
+}
+
+async function actDelete(id){
+  BUSY = true;
+  try {
+    const r = await api("/delete", { id });
+    DATA = r.data;
+    render();
+    toast("Invité supprimé.");
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+  }
+}
+
+async function actAdd(payload){
+  BUSY = true;
+  $("#btnAdd").disabled = true;
+  try {
+    const r = await api("/add", payload);
+    DATA = r.data;
+    render();
+    toast(`✨ ${payload.prenom} ajouté·e !`);
+    if (payload.etape === "INSCRIT") celebrate();
+  } catch (err){
+    toast("Erreur : " + err.message, true);
+  } finally {
+    BUSY = false;
+    $("#btnAdd").disabled = false;
+  }
+}
+
+// --- Confetti ----------------------------------------------
+
+function celebrate(){
+  const layer = $("#confettiLayer");
+  const colors = ["#f59e0b","#10b981","#3b82f6","#8b5cf6","#ef4444","#ec4899","#14b8a6"];
+  const n = 60;
+  for (let i=0;i<n;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100 + "%";
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2 + Math.random()*2) + "s";
+    c.style.animationDelay = (Math.random()*0.4) + "s";
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    layer.appendChild(c);
+    setTimeout(()=>c.remove(), 4500);
+  }
+}
+
+// --- Init --------------------------------------------------
+
+function bindUI(){
+  // Tuiles : filtre toggle
+  $$(".tile").forEach(t => {
+    t.addEventListener("click", () => {
+      const et = t.dataset.etape;
+      FILTER = (FILTER === et) ? null : et;
+      render();
+    });
+  });
+  $("#clearFilter").addEventListener("click", () => { FILTER = null; render(); });
+
+  // Formulaire ajout
+  $("#addForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const prenom  = $("#prenom").value.trim();
+    const parrain = $("#parrain").value.trim();
+    const etape   = $("#etape").value;
+    if (!prenom || !parrain){ toast("Prénom et parrain·e requis.", true); return; }
+    actAdd({ prenom, parrain, etape });
+    $("#prenom").value = "";
+    // On garde le parrain en mémoire (pratique pour ajouter plusieurs invités à suivre)
+    $("#etape").value = "DM";
+    $("#prenom").focus();
+  });
+}
+
+async function boot(){
+  bindUI();
+  // Petit loader temporaire dans le kanban
+  $$(".col .cards").forEach(c => {
+    c.innerHTML = `<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  });
+  try {
+    const r = await api("/");
+    DATA = Array.isArray(r.data) ? r.data : [];
+    render();
+  } catch (err){
+    toast("Impossible de charger les données : " + err.message, true);
+    DATA = [];
+    render();
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
