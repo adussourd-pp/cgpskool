@@ -321,22 +321,34 @@
   }
   .card .actions button{
     flex:1 1 auto; min-width:34px;
+    height:30px;
+    display:inline-flex; align-items:center; justify-content:center;
     background:#fff;
     border:1px solid var(--rule-l);
     border-radius:7px;
-    padding:6px 0;
+    padding:0;
     cursor:pointer;
-    font-size:14px;
-    font-family:inherit;
-    transition:background .15s, border-color .15s, transform .1s;
+    color:var(--ink-60);
+    transition:background .15s, border-color .15s, color .15s, transform .1s;
   }
+  .card .actions button svg{display:block}
   .card .actions button:hover{
     background:var(--paper);
-    border-color:var(--orange);
+    border-color:var(--ink-60);
+    color:var(--ink);
+  }
+  .card .actions button.act-drop:hover{
+    border-color:#C0392B; color:#C0392B; background:#FCEEEC;
+  }
+  .card .actions button.act-reactivate:hover{
+    border-color:var(--green); color:var(--green); background:var(--green-l);
+  }
+  .card .actions button.act-del:hover{
+    border-color:#C0392B; color:#C0392B; background:#FCEEEC;
   }
   .card .actions button:active{transform:scale(.94)}
-  .card .actions button:disabled{opacity:.3; cursor:not-allowed; background:#fff}
-  .card .actions button:disabled:hover{border-color:var(--rule-l)}
+  .card .actions button:disabled{opacity:.35; cursor:not-allowed; background:#fff; color:var(--ink-30)}
+  .card .actions button:disabled:hover{border-color:var(--rule-l); background:#fff; color:var(--ink-30)}
   .card.flash-inscrit{animation:flash 1.4s ease-out}
   @keyframes flash{
     0%   {box-shadow:0 0 0 0 rgba(45,122,91,.55)}
@@ -822,6 +834,15 @@ function render(){
     .map(n => `<option value="${escapeHTML(n)}">`).join("");
 }
 
+// Icônes SVG (line, style Lucide). currentColor = la couleur définie par le CSS du bouton.
+const ICONS = {
+  prev:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  next:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  drop:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  reactivate: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  del:        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
+};
+
 function renderCard(inv){
   const card = document.createElement("div");
   card.className = "card" + (inv.continue ? "" : " dropped");
@@ -836,12 +857,12 @@ function renderCard(inv){
       <div class="parrain">Parrain·e : <em>${escapeHTML(inv.parrain)}</em></div>
     </div>
     <div class="actions">
-      <button title="Reculer" data-act="prev" ${(!canPrev || !inv.continue) ? "disabled" : ""}>⬅️</button>
-      <button title="Avancer" data-act="next" ${(!canNext || !inv.continue) ? "disabled" : ""}>➡️</button>
+      <button title="Reculer d'une étape" data-act="prev" ${(!canPrev || !inv.continue) ? "disabled" : ""}>${ICONS.prev}</button>
+      <button title="Avancer d'une étape" data-act="next" ${(!canNext || !inv.continue) ? "disabled" : ""}>${ICONS.next}</button>
       ${inv.continue
-        ? `<button title="Ne continue pas" data-act="drop">❌</button>`
-        : `<button title="Réactiver"      data-act="reactivate">✅</button>`}
-      <button title="Supprimer" data-act="del">🗑️</button>
+        ? `<button title="Ne continue pas (abandon)" data-act="drop" class="act-drop">${ICONS.drop}</button>`
+        : `<button title="Réactiver" data-act="reactivate" class="act-reactivate">${ICONS.reactivate}</button>`}
+      <button title="Supprimer" data-act="del" class="act-del">${ICONS.del}</button>
     </div>
   `;
 
