@@ -307,6 +307,24 @@
   </div>
 </nav>
 
+<!-- BANDEAU DEV ACTION (compteur live + CTA) -->
+<a href="tracker/index.html" class="devaction-strip" id="devactionStrip">
+  <div class="devaction-inner">
+    <div class="devaction-head">
+      <div class="devaction-tag">&#127919; Dev Action</div>
+      <div class="devaction-line">
+        <span class="devaction-num" id="devActionInscritsCount">&mdash;</span>
+        <span class="devaction-suf">inscrits gr&acirc;ce aux Dev Actions de l'&eacute;quipe</span>
+      </div>
+      <div class="devaction-sub">Op&eacute;ration Coup De Poing &mdash; 10 &agrave; 20 invit&eacute;s, 3 jours, 1 session d'appels.</div>
+    </div>
+    <span class="devaction-cta">
+      Ouvrir le tracker
+      <span class="devaction-cta-arrow">&rarr;</span>
+    </span>
+  </div>
+</a>
+
 <!-- AGENDA Forman / Prodemial -->
 <section class="events-section" data-fold="agenda" id="agenda">
   <div class="events-inner" style="flex-direction:column;align-items:stretch;gap:0">
@@ -391,6 +409,22 @@
 
 /* ── AGENDA — événements Forman / Prodémial ── */
 .events-section{background:#1D1A16;padding:22px 52px;border-top:1px solid rgba(212,98,42,0.18)}
+
+/* ── BANDEAU DEV ACTION (compteur + CTA) ── */
+.devaction-strip{display:block;background:linear-gradient(135deg,#1D1A16 0%,#2A2118 100%);padding:22px 52px;border-top:1px solid rgba(212,98,42,0.28);text-decoration:none;color:inherit;transition:background .25s}
+.devaction-strip:hover{background:linear-gradient(135deg,#241F1A 0%,#332618 100%)}
+.devaction-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.devaction-head{display:flex;flex-direction:column;gap:4px;min-width:0}
+.devaction-tag{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)}
+.devaction-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.devaction-num{font-size:38px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.devaction-suf{font-size:14px;font-weight:500;color:rgba(255,255,255,0.85)}
+.devaction-sub{font-size:12px;color:var(--fog);margin-top:2px}
+.devaction-cta{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;padding:11px 18px;border-radius:6px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;transition:background .18s}
+.devaction-strip:hover .devaction-cta{background:var(--orange-hover)}
+.devaction-cta-arrow{transition:transform .18s}
+.devaction-strip:hover .devaction-cta-arrow{transform:translateX(3px)}
+@media (max-width:720px){.devaction-strip{padding:18px 24px}.devaction-num{font-size:30px}.devaction-cta{width:100%;justify-content:center}}
 .events-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .events-head{flex-shrink:0}
 .events-label{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
@@ -838,13 +872,6 @@
         <span class="tool-icon">&#127919;</span>
         <div class="tool-name" style="color:var(--white)">Dev Action</div>
         <div class="tool-desc" style="color:var(--fog)">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
-        <div class="dev-action-pulse" style="margin-top:14px;padding:12px 14px;background:rgba(212,98,42,0.12);border:1px solid rgba(212,98,42,0.35);border-radius:8px;display:flex;align-items:center;gap:12px">
-          <div style="font-size:28px;font-weight:700;color:var(--orange);line-height:1" id="devActionInscritsCount">&mdash;</div>
-          <div style="display:flex;flex-direction:column;gap:2px">
-            <div style="font-size:11px;font-weight:600;color:var(--white);text-transform:uppercase;letter-spacing:0.06em">inscrits depuis le lancement</div>
-            <div style="font-size:11px;color:var(--fog)">&rarr; Lance ta prochaine Dev Action</div>
-          </div>
-        </div>
         <div class="tool-features">
           <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Kanban</span>
           <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Top parrains&#183;marraines</span>
