@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CGP Skool Tracker — Suivi équipe</title>
+<title>CGP Skool — Dev Action</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -225,6 +225,7 @@
   .tile.dm{--col:var(--blue)}
   .tile.ad{--col:var(--orange)}
   .tile.tj{--col:var(--violet)}
+  .tile.esp{--col:#1E8A99}
   .tile.in{--col:var(--green)}
 
   .clear-filter{
@@ -278,6 +279,7 @@
   .col[data-etape="DM"]{--col:var(--blue)}
   .col[data-etape="AD"]{--col:var(--orange)}
   .col[data-etape="3J"]{--col:var(--violet)}
+  .col[data-etape="ESP"]{--col:#1E8A99}
   .col[data-etape="INSCRIT"]{--col:var(--green)}
 
   .empty{
@@ -367,7 +369,17 @@
     margin-bottom:18px;
   }
 
-  /* Formulaire */
+  /* Formulaire d'ajout en haut (horizontal) */
+  .add-panel{margin-bottom:24px}
+  .add-grid{
+    display:grid;
+    grid-template-columns:1.4fr 1.4fr 1fr auto;
+    gap:12px;
+    align-items:end;
+  }
+  .add-submit{display:flex;align-items:end}
+  .add-submit .btn-add{margin-top:0;white-space:nowrap}
+  /* Anciennes classes (compat) */
   .form-row{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -557,11 +569,11 @@
   <!-- En-tête -->
   <div class="cs-kicker">
     <span class="cs-kicker-line"></span>
-    <span class="cs-kicker-text">Suivi Équipe — Développement commercial</span>
+    <span class="cs-kicker-text">Dev Action — Suivi équipe</span>
   </div>
-  <h1 class="cs-h1">Du <em>DM</em> au premier inscrit, ensemble.</h1>
+  <h1 class="cs-h1">De la <em>Découverte Métier</em> à l'Inscription Réseau.</h1>
   <p class="cs-lead">
-    Un tableau commun pour suivre chaque invité, parrain par parrain, étape par étape.
+    Un tableau commun pour suivre chaque invité, parrain·e par parrain·e, étape par étape.
     Cliquez sur une tuile pour filtrer, et célébrez les inscriptions ensemble.
   </p>
 
@@ -582,26 +594,65 @@
     <button class="tile dm" data-etape="DM" type="button">
       <div class="lab">DM</div>
       <div class="num" data-count="DM">0</div>
-      <div class="sub">Message envoyé</div>
+      <div class="sub">Découverte métier</div>
     </button>
     <button class="tile ad" data-etape="AD" type="button">
       <div class="lab">AD</div>
       <div class="num" data-count="AD">0</div>
-      <div class="sub">A demandé infos</div>
+      <div class="sub">Atelier démarrage</div>
     </button>
     <button class="tile tj" data-etape="3J" type="button">
       <div class="lab">3J</div>
       <div class="num" data-count="3J">0</div>
-      <div class="sub">Période d'essai</div>
+      <div class="sub">3 jours de la réussite</div>
+    </button>
+    <button class="tile esp" data-etape="ESP" type="button">
+      <div class="lab">ESP</div>
+      <div class="num" data-count="ESP">0</div>
+      <div class="sub">Avec ton manager · 1h</div>
     </button>
     <button class="tile in" data-etape="INSCRIT" type="button">
       <div class="lab">Inscrit</div>
       <div class="num" data-count="INSCRIT">0</div>
-      <div class="sub">Bravo, c'est fait</div>
+      <div class="sub">Inscription Réseau</div>
     </button>
   </div>
 
   <button id="clearFilter" class="clear-filter" type="button">✕ Retirer le filtre</button>
+
+  <!-- Formulaire d'ajout (placé en haut pour un accès rapide) -->
+  <section class="panel add-panel">
+    <h2>Ajouter un <em>invité</em></h2>
+    <p class="sub-h2">Renseignez le prénom, le parrain ou la marraine, puis l'étape de départ.</p>
+    <form id="addForm" autocomplete="off">
+      <div class="add-grid">
+        <div>
+          <label for="prenom">Prénom de l'invité</label>
+          <input type="text" id="prenom" name="prenom" required maxlength="60" placeholder="ex : Camille">
+        </div>
+        <div>
+          <div class="me-row">
+            <label for="parrain">Parrain / Marraine</label>
+            <button type="button" id="otherParrainBtn" class="me-link" hidden>parrainer pour quelqu'un d'autre ↩</button>
+          </div>
+          <input type="text" id="parrain" name="parrain" required maxlength="60" placeholder="ex : Alex" list="parrainsList">
+          <datalist id="parrainsList"></datalist>
+        </div>
+        <div>
+          <label for="etape">Étape de départ</label>
+          <select id="etape" name="etape">
+            <option value="DM" selected>DM</option>
+            <option value="AD">AD</option>
+            <option value="3J">3J</option>
+            <option value="INSCRIT">INSCRIT</option>
+          </select>
+        </div>
+        <div class="add-submit">
+          <button type="submit" class="btn-add" id="btnAdd">+ Ajouter</button>
+        </div>
+      </div>
+    </form>
+  </section>
 
   <!-- Kanban -->
   <div class="kanban" id="kanban">
@@ -617,54 +668,22 @@
       <h3><span class="dot"></span>3J<span class="pill" data-pill="3J">0</span></h3>
       <div class="cards"></div>
     </div>
+    <div class="col" data-etape="ESP">
+      <h3><span class="dot"></span>ESP<span class="pill" data-pill="ESP">0</span></h3>
+      <div class="cards"></div>
+    </div>
     <div class="col" data-etape="INSCRIT">
       <h3><span class="dot"></span>Inscrit<span class="pill" data-pill="INSCRIT">0</span></h3>
       <div class="cards"></div>
     </div>
   </div>
 
-  <div class="grid-bottom">
-    <!-- Top parrains -->
-    <section class="panel">
-      <h2>🏆 Top <em>parrains</em></h2>
-      <p class="sub-h2">Classement par nombre d'invités passés en INSCRIT.</p>
-      <ol class="leaderboard" id="leaderboard"></ol>
-    </section>
-
-    <!-- Formulaire d'ajout -->
-    <section class="panel">
-      <h2>Ajouter un <em>invité</em></h2>
-      <p class="sub-h2">Renseignez le prénom, le parrain ou la marraine, puis l'étape de départ.</p>
-      <form id="addForm" autocomplete="off">
-        <div class="form-row full">
-          <div>
-            <label for="prenom">Prénom de l'invité</label>
-            <input type="text" id="prenom" name="prenom" required maxlength="60" placeholder="ex : Camille">
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="me-row">
-              <label for="parrain">Parrain / Marraine</label>
-              <button type="button" id="otherParrainBtn" class="me-link" hidden>parrainer pour quelqu'un d'autre ↩</button>
-            </div>
-            <input type="text" id="parrain" name="parrain" required maxlength="60" placeholder="ex : Alex" list="parrainsList">
-            <datalist id="parrainsList"></datalist>
-          </div>
-          <div>
-            <label for="etape">Étape de départ</label>
-            <select id="etape" name="etape">
-              <option value="DM" selected>DM</option>
-              <option value="AD">AD</option>
-              <option value="3J">3J</option>
-              <option value="INSCRIT">INSCRIT</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="btn-add" id="btnAdd">+ Ajouter au tracker</button>
-      </form>
-    </section>
-  </div>
+  <!-- Top parrains·marraines -->
+  <section class="panel leaderboard-panel">
+    <h2>🏆 Top <em>parrains·marraines</em></h2>
+    <p class="sub-h2">Classement par nombre d'invités passés en INSCRIT.</p>
+    <ol class="leaderboard" id="leaderboard"></ol>
+  </section>
 
   <footer class="foot">CGP Skool · Tracker · Données partagées via GitHub</footer>
 </div>
@@ -684,7 +703,7 @@
 // URL du Worker Cloudflare déployé pour ce tracker.
 const WORKER_URL = "https://cgpskool-tracker.a-dussourd.workers.dev";
 
-const ETAPES = ["DM","AD","3J","INSCRIT"];
+const ETAPES = ["DM","AD","3J","ESP","INSCRIT"];
 const NEXT = { DM:"AD", AD:"3J", "3J":"INSCRIT", INSCRIT:null };
 const PREV = { INSCRIT:"3J", "3J":"AD", AD:"DM", DM:null };
 
