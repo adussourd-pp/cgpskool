@@ -566,7 +566,22 @@
   .leaderboard li:nth-child(1) .rk{background:var(--o-dim); border-color:var(--orange); color:var(--orange)}
   .leaderboard li:nth-child(2) .rk{background:var(--paper); color:var(--ink)}
   .leaderboard li:nth-child(3) .rk{background:var(--paper-2); color:var(--ink-60)}
-  .leaderboard .lname{flex:1; font-weight:500; color:var(--ink)}
+  .leaderboard .lname{flex:1; font-weight:500; color:var(--ink); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .leaderboard .lstats{display:inline-flex; gap:4px; margin:0 10px 0 6px}
+  .leaderboard .lst-pip{
+    font-size:10px; font-weight:500;
+    padding:2px 7px; border-radius:5px;
+    color:var(--ink-60); background:var(--paper);
+    letter-spacing:0.02em;
+    border:1px solid transparent;
+  }
+  .leaderboard .lst-pip em{font-style:normal; font-weight:700; color:var(--ink); margin-left:2px}
+  .leaderboard .lst-pip.lst-dm{background:var(--blue-l); color:var(--blue)}
+  .leaderboard .lst-pip.lst-dm em{color:var(--blue)}
+  .leaderboard .lst-pip.lst-ad{background:var(--gold-l); color:#8C5A1F}
+  .leaderboard .lst-pip.lst-ad em{color:#8C5A1F}
+  .leaderboard .lst-pip.lst-tj{background:var(--violet-l); color:var(--violet)}
+  .leaderboard .lst-pip.lst-tj em{color:var(--violet)}
   .leaderboard .lcount{
     font-size:11px;
     color:var(--green);
@@ -574,7 +589,12 @@
     background:var(--green-l);
     padding:3px 10px; border-radius:999px;
     letter-spacing:0.04em;
+    flex-shrink:0;
   }
+  .leaderboard .lb-row{cursor:pointer; transition:background .15s, padding .15s; padding:10px 8px; margin:0 -8px}
+  .leaderboard .lb-row:hover{background:var(--paper)}
+  .leaderboard .lb-row.active{background:var(--paper-2); border-radius:7px}
+  .leaderboard .lb-row.active .lname{color:var(--orange)}
   .empty-board{
     color:var(--ink-30); font-size:13px;
     font-style:italic; padding:6px 0;
@@ -695,7 +715,7 @@
     <h1 class="cs-h1"><em>Dev Action</em></h1>
     <button id="infoBtn" class="info-btn" type="button" aria-haspopup="dialog" aria-controls="infoModal">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>C'est quoi une Dev Action&nbsp;?</span>
+      <span>C'est quoi un Dev Action&nbsp;?</span>
     </button>
   </div>
 
@@ -774,7 +794,7 @@
   <!-- Top parrains·marraines (juste sous le formulaire) -->
   <section class="panel leaderboard-panel">
     <h2>🏆 Top <em>parrains·marraines</em></h2>
-    <p class="sub-h2">Classement par nombre d'invités passés en INSCRIT.</p>
+    <p class="sub-h2">Classement par inscrits — DM/AD/3J en cours indiqués. Clique sur une ligne pour filtrer le kanban.</p>
     <ol class="leaderboard" id="leaderboard"></ol>
   </section>
 
@@ -809,9 +829,9 @@
   <div class="modal-backdrop" data-close></div>
   <div class="modal-content">
     <button class="modal-close" type="button" data-close aria-label="Fermer">×</button>
-    <h2 id="infoModalTitle">C'est quoi une <em>Dev Action</em>&nbsp;?</h2>
+    <h2 id="infoModalTitle">C'est quoi un <em>Dev Action</em>&nbsp;?</h2>
     <p class="modal-lead">
-      Une Dev Action, c'est une <strong>OCDP — Opération Coup De Poing</strong>.
+      Un Dev Action, c'est une <strong>OCDP — Opération Coup De Poing</strong>.
       Court, intense, ciblé : <strong>10 à 20 personnes max</strong> par session.
       Pas de prospection diluée — c'est massif, calibré, reproductible chaque mois.
     </p>
@@ -845,9 +865,10 @@ const NEXT = { DM:"AD", AD:"3J", "3J":"INSCRIT", INSCRIT:null };
 const PREV = { INSCRIT:"3J", "3J":"AD", AD:"DM", DM:null };
 
 let DATA = [];          // état courant
-let FILTER = null;      // étape filtrée (null = aucune)
-let BUSY = false;       // verrou anti double-clic
-let ME = "";            // prénom de la personne connectée (parrain·e par défaut)
+let FILTER = null;          // étape filtrée (null = aucune)
+let PARRAIN_FILTER = null;  // parrain·e filtré·e (null = aucun)
+let BUSY = false;           // verrou anti double-clic
+let ME = "";                // prénom de la personne connectée (parrain·e par défaut)
 
 // Clés localStorage
 const LS_PROFIL_CGP   = "cgpskool_profil_v1";   // profil officiel CGP Skool
@@ -901,7 +922,15 @@ function render(){
 
   // 2) Tuile active
   $$(".tile").forEach(t => t.classList.toggle("active", t.dataset.etape === FILTER));
-  $("#clearFilter").classList.toggle("on", !!FILTER);
+  $("#clearFilter").classList.toggle("on", !!FILTER || !!PARRAIN_FILTER);
+  const cf = $("#clearFilter");
+  if (PARRAIN_FILTER && !FILTER){
+    cf.textContent = `✕ Filtre : ${PARRAIN_FILTER}`;
+  } else if (FILTER && PARRAIN_FILTER){
+    cf.textContent = `✕ Filtre : ${FILTER} · ${PARRAIN_FILTER}`;
+  } else {
+    cf.textContent = "✕ Retirer le filtre";
+  }
 
   // 3) Kanban
   ETAPES.forEach(et => {
@@ -910,11 +939,12 @@ function render(){
 
     let invites = DATA.filter(x => x.etape === et);
     if (FILTER && FILTER !== et) invites = [];
+    if (PARRAIN_FILTER) invites = invites.filter(x => (x.parrain||"").trim() === PARRAIN_FILTER);
 
     if (!invites.length){
       const e = document.createElement("div");
       e.className = "empty";
-      e.textContent = (FILTER && FILTER !== et) ? "(filtré)" : "Aucun invité";
+      e.textContent = ((FILTER && FILTER !== et) || PARRAIN_FILTER) ? "(filtré)" : "Aucun invité";
       col.appendChild(e);
       return;
     }
@@ -936,31 +966,47 @@ function render(){
   const rate = total ? Math.round((inscrits / total) * 100) : 0;
   $("#convRate").textContent = rate + " %";
 
-  // 5) Top parrains (par INSCRIT)
-  const board = {};
+  // 5) Top parrains·marraines (compteurs par étape, classé par INSCRIT puis total en cours)
+  const tally = {};
   DATA.forEach(x => {
-    if (x.continue && x.etape === "INSCRIT"){
-      const k = x.parrain.trim();
-      if (!k) return;
-      board[k] = (board[k] || 0) + 1;
-    }
+    if (!x.continue) return;
+    const k = (x.parrain||"").trim();
+    if (!k) return;
+    if (!tally[k]) tally[k] = { DM:0, AD:0, "3J":0, INSCRIT:0 };
+    if (tally[k][x.etape] !== undefined) tally[k][x.etape]++;
   });
-  const sorted = Object.entries(board).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const sorted = Object.entries(tally).sort((a,b) =>
+    (b[1].INSCRIT - a[1].INSCRIT) ||
+    ((b[1].DM + b[1].AD + b[1]["3J"]) - (a[1].DM + a[1].AD + a[1]["3J"]))
+  ).slice(0,8);
   const ol = $("#leaderboard");
   ol.innerHTML = "";
   if (!sorted.length){
     const li = document.createElement("li");
     li.className = "empty-board";
-    li.textContent = "Pas encore d'inscrit·e — le premier arrive vite.";
+    li.textContent = "Pas encore de parrain·e actif·ve — ajoutez votre premier invité.";
     ol.appendChild(li);
   } else {
-    sorted.forEach(([nom, n], i) => {
+    sorted.forEach(([nom, c], i) => {
       const li = document.createElement("li");
+      const isActive = PARRAIN_FILTER === nom;
+      li.className = "lb-row" + (isActive ? " active" : "");
+      li.dataset.parrain = nom;
+      li.title = `Cliquer pour ${isActive ? "retirer le filtre" : "filtrer le kanban sur " + nom}`;
       li.innerHTML = `
         <span class="rk">${i+1}</span>
         <span class="lname">${escapeHTML(nom)}</span>
-        <span class="lcount">${n} inscrit${n>1?"s":""}</span>
+        <span class="lstats">
+          <span class="lst-pip lst-dm" data-et="DM">DM <em>${c.DM}</em></span>
+          <span class="lst-pip lst-ad" data-et="AD">AD <em>${c.AD}</em></span>
+          <span class="lst-pip lst-tj" data-et="3J">3J <em>${c["3J"]}</em></span>
+        </span>
+        <span class="lcount">${c.INSCRIT} inscrit${c.INSCRIT>1?"s":""}</span>
       `;
+      li.addEventListener("click", () => {
+        PARRAIN_FILTER = (PARRAIN_FILTER === nom) ? null : nom;
+        render();
+      });
       ol.appendChild(li);
     });
   }
@@ -1207,7 +1253,7 @@ function bindUI(){
       render();
     });
   });
-  $("#clearFilter").addEventListener("click", () => { FILTER = null; render(); });
+  $("#clearFilter").addEventListener("click", () => { FILTER = null; PARRAIN_FILTER = null; render(); });
 
   // Pill identité
   $("#userPill").addEventListener("click", promptIdentify);
