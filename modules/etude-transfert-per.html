@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-<title>CGP Skool &#8212; Transfert PER/AV</title>
+<title>CGP Skool &#8212; Analyse contrat</title>
 <link rel="stylesheet" href="../assets/cgp-skool-theme.css">
 <link rel="stylesheet" href="../assets/cgp-skool-layout.css">
 <script src="../assets/cgp-skool-core.js"></script>
@@ -47,6 +47,27 @@ select.fi{cursor:pointer}
 .alloc-grid-simple .hdr{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600}
 .alloc-alert{font-size:9px;color:#dc2626;min-height:14px;margin-bottom:6px}
 
+/* Fonds dynamiques (rangees ajoutables/supprimables) */
+.alloc-hdr{display:grid;grid-template-columns:1fr 58px 22px;gap:6px;margin-bottom:4px}
+.alloc-hdr span{color:var(--gris);font-size:8px;text-transform:uppercase;font-weight:600;letter-spacing:0.06em}
+.alloc-row{display:grid;grid-template-columns:1fr 58px 22px;gap:6px;align-items:center;margin-bottom:4px}
+.alloc-row input[type="text"],.alloc-row input[type="number"]{
+  width:100%;padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;
+  font-family:var(--sans);font-size:11px;color:var(--noir);background:#fff;outline:none;box-sizing:border-box
+}
+.alloc-row input:focus{border-color:var(--orange)}
+.alloc-row .alloc-del{width:22px;height:22px;border:none;background:transparent;color:var(--gris);font-size:14px;line-height:1;cursor:pointer;border-radius:4px;padding:0}
+.alloc-row .alloc-del:hover{background:rgba(220,38,38,0.08);color:#dc2626}
+.alloc-add{width:100%;padding:7px;background:transparent;border:1.5px dashed var(--bord);border-radius:7px;font-family:var(--sans);font-size:11px;color:var(--gris);cursor:pointer;margin-bottom:6px;transition:all 0.15s}
+.alloc-add:hover{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.04)}
+
+/* Toggle comparatif (presenter une AV recommandee ?) */
+.compare-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin:6px 0 12px}
+.compare-toggle-row span{font-size:10px;font-weight:600;color:var(--noir);text-transform:uppercase;letter-spacing:0.06em;line-height:1.3}
+.cmp-off .new-contract-fields{display:none}
+.cmp-off #compareCardB,.cmp-off #kpiRow,.cmp-off #chartsRow,.cmp-off #breakevenBox,.cmp-off #ccProjAWrap{display:none}
+.cmp-off #compareGrid{grid-template-columns:1fr;max-width:520px;margin-left:auto;margin-right:auto}
+
 /* Bottom buttons standard */
 .btn-pdf{width:100%;padding:11px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:4px}
 .btn-pdf:hover{opacity:0.9}
@@ -72,11 +93,13 @@ select.fi{cursor:pointer}
 .cc-name{font-family:var(--serif);font-size:15px;margin-bottom:10px;color:var(--noir)}
 .cc-capital{font-size:22px;font-weight:700;color:var(--noir);margin-bottom:12px}
 .cc-capital small{font-size:12px;font-weight:400;color:var(--gris)}
-.alloc-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:6px}
-.alloc-bar span{display:block;height:100%}
-.alloc-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.alloc-legend span{font-size:10px;display:flex;align-items:center;gap:3px;color:var(--gris)}
-.alloc-legend span i{width:7px;height:7px;border-radius:2px;display:inline-block}
+.alloc-donut-wrap{display:flex;align-items:center;gap:14px;margin:8px 0 12px}
+.alloc-donut{width:100px;height:100px;flex-shrink:0;position:relative}
+.alloc-legend{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.alloc-legend span{font-size:10px;display:flex;align-items:center;gap:5px;color:var(--gris);min-width:0}
+.alloc-legend span i{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0}
+.alloc-legend span em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alloc-legend span b{font-weight:700;color:var(--noir);margin-left:auto;flex-shrink:0}
 .cc-yield{font-size:12px;color:var(--gris)}
 .cc-yield b{color:var(--noir);font-size:13px}
 .cc-proj{font-size:12px;color:var(--gris);margin-top:4px}
@@ -175,13 +198,9 @@ select.fi{cursor:pointer}
       </div>
       <button onclick="openRecap()" style="width:100%;padding:7px;background:transparent;border:1.5px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:10px;color:var(--gris);cursor:pointer;transition:all 0.15s;margin-bottom:10px" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--bord)';this.style.color='var(--gris)'">&#128203; Tableau synth&#232;se des transferts</button>
       <div class="fg"><label>Nom du contrat</label><input class="fi" type="text" id="pContratA" value="PER Ancien" oninput="update()"></div>
-      <div class="alloc-grid-simple">
-        <span class="hdr">Support</span><span class="hdr">%</span>
-        <input type="text" id="aA0n" value="Fonds euros" oninput="update()">
-        <input type="number" id="aA0p" value="70" min="0" max="100" oninput="update()">
-        <input type="text" id="aA1n" value="Actions CM" oninput="update()">
-        <input type="number" id="aA1p" value="30" min="0" max="100" oninput="update()">
-      </div>
+      <div class="alloc-hdr"><span>Fonds</span><span>%</span><span></span></div>
+      <div id="allocAList"></div>
+      <button type="button" class="alloc-add" onclick="addAllocRow('A')">+ Ajouter un fonds</button>
       <div class="alloc-alert" id="alertAllocA"></div>
       <div class="fg"><label>Rendement estim&#233;</label>
         <div class="sf-range"><input type="range" id="pRdtA" min="0" max="10" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vRdtA">2.0%</span></div>
@@ -197,34 +216,45 @@ select.fi{cursor:pointer}
       <div id="ancienneteInfo" style="font-size:9px;color:#2da064;margin-bottom:6px;display:none"></div>
     </div>
 
-    <div class="cs-sidebar-lbl" data-step="nouveau" onclick="openStep('nouveau', this)"><span class="acc">&#9654;</span>Nouveau contrat</div>
+    <div class="cs-sidebar-lbl" data-step="nouveau" onclick="openStep('nouveau', this)"><span class="acc">&#9654;</span>AV recommand&#233;e</div>
     <div class="sb-body" id="body_nouveau">
-      <div class="fg"><label>Contrat recommand&#233;</label><input class="fi" type="text" id="pContratB" value="PER Recommand&#233;" oninput="update()"></div>
-      <div id="fraisTransfertRow" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px" onclick="toggleFraisTransfert()">
-        <span style="font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Frais de transfert (1 %)</span>
-        <button type="button" id="ftSwitch" class="ft-switch on" aria-label="Activer/d&#233;sactiver les frais de transfert"></button>
-        <input type="hidden" id="pFraisTransfert" value="1">
+      <div class="compare-toggle-row" onclick="toggleCompare()">
+        <span>Pr&#233;senter une AV recommand&#233;e</span>
+        <button type="button" id="cmpSwitch" class="ft-switch on" aria-label="Activer/d&#233;sactiver la pr&#233;sentation de l'AV recommand&#233;e"></button>
+        <input type="hidden" id="pCompare" value="1">
       </div>
-      <div class="fg"><label>Frais d'entr&#233;e</label>
-        <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="4.5" oninput="update()"><span class="sf-range-val" id="vFraisEntree">4.5%</span></div>
-      </div>
-      <div class="alloc-grid-simple">
-        <span class="hdr">Support</span><span class="hdr">%</span>
-        <input type="text" id="aB0n" value="Produits structur&#233;s" oninput="update()">
-        <input type="number" id="aB0p" value="40" min="0" max="100" oninput="update()">
-        <input type="text" id="aB1n" value="Private equity" oninput="update()">
-        <input type="number" id="aB1p" value="30" min="0" max="100" oninput="update()">
-        <input type="text" id="aB2n" value="Fonds euros boost&#233;" oninput="update()">
-        <input type="number" id="aB2p" value="20" min="0" max="100" oninput="update()">
-        <input type="text" id="aB3n" value="Obligataire" oninput="update()">
-        <input type="number" id="aB3p" value="10" min="0" max="100" oninput="update()">
-      </div>
-      <div class="alloc-alert" id="alertAllocB"></div>
-      <div class="fg"><label>Rendement estim&#233;</label>
-        <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
-      </div>
-      <div class="fg"><label>Horizon</label>
-        <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+      <div class="new-contract-fields">
+        <div class="fg"><label>Nom du contrat recommand&#233;</label><input class="fi" type="text" id="pContratB" value="AV Recommand&#233;e" oninput="update()"></div>
+        <div class="fg"><label>Type de gestion</label>
+          <select class="fi" id="pGestion" onchange="update()">
+            <option value="Gestion libre">Gestion libre</option>
+            <option value="Gestion pilot&#233;e" selected>Gestion pilot&#233;e</option>
+            <option value="Gestion profil&#233;e">Gestion profil&#233;e</option>
+            <option value="Gestion sous mandat">Gestion sous mandat</option>
+            <option value="Gestion conseill&#233;e">Gestion conseill&#233;e</option>
+          </select>
+        </div>
+        <div id="fraisTransfertRow" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px" onclick="toggleFraisTransfert()">
+          <span style="font-size:9px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:0.06em">Frais de transfert (1 %)</span>
+          <button type="button" id="ftSwitch" class="ft-switch on" aria-label="Activer/d&#233;sactiver les frais de transfert"></button>
+          <input type="hidden" id="pFraisTransfert" value="1">
+        </div>
+        <div class="fg"><label>Frais d'entr&#233;e</label>
+          <div class="sf-range"><input type="range" id="pFraisEntree" min="0" max="4.5" step="0.1" value="2" oninput="update()"><span class="sf-range-val" id="vFraisEntree">2.0%</span></div>
+        </div>
+        <div class="fg"><label>Frais de gestion annuels</label>
+          <div class="sf-range"><input type="range" id="pFraisGestion" min="0" max="3" step="0.05" value="0.8" oninput="update()"><span class="sf-range-val" id="vFraisGestion">0.80%</span></div>
+        </div>
+        <div class="alloc-hdr"><span>Fonds</span><span>%</span><span></span></div>
+        <div id="allocBList"></div>
+        <button type="button" class="alloc-add" onclick="addAllocRow('B')">+ Ajouter un fonds</button>
+        <div class="alloc-alert" id="alertAllocB"></div>
+        <div class="fg"><label>Rendement estim&#233;</label>
+          <div class="sf-range"><input type="range" id="pRdtB" min="0" max="10" step="0.1" value="5" oninput="update()"><span class="sf-range-val" id="vRdtB">5.0%</span></div>
+        </div>
+        <div class="fg"><label>Horizon</label>
+          <div class="sf-range"><input type="range" id="pHorizon" min="1" max="40" step="1" value="10" oninput="update()"><span class="sf-range-val" id="vHorizon">10 ans</span></div>
+        </div>
       </div>
     </div>
 
@@ -251,28 +281,33 @@ select.fi{cursor:pointer}
       <div id="pageHeader"></div>
 
       <!-- Comparison -->
-      <div class="compare-grid">
+      <div class="compare-grid" id="compareGrid">
         <div class="compare-card current">
           <div class="cc-name" id="ccNameA">PER Ancien</div>
           <div class="cc-capital" id="ccCapA">50 000 &#8364;</div>
-          <div class="alloc-bar" id="allocBarA"></div>
-          <div class="alloc-legend" id="allocLegA"></div>
+          <div class="alloc-donut-wrap">
+            <div class="alloc-donut"><canvas id="donutAllocA"></canvas></div>
+            <div class="alloc-legend" id="allocLegA"></div>
+          </div>
           <div class="cc-yield">Rendement moyen pond&#233;r&#233; : <b id="ccYieldA">2.30%</b></div>
-          <div class="cc-proj">Projection &#224; <span class="horizon-span">10</span> ans : <b id="ccProjA">0 &#8364;</b></div>
+          <div class="cc-proj" id="ccProjAWrap">Projection &#224; <span class="horizon-span">10</span> ans : <b id="ccProjA">0 &#8364;</b></div>
         </div>
-        <div class="compare-card future">
+        <div class="compare-card future" id="compareCardB">
           <span class="badge-reco">Recommand&#233;</span>
-          <div class="cc-name" id="ccNameB">PER Recommand&#233;</div>
+          <div class="cc-name" id="ccNameB">AV Recommand&#233;e</div>
           <div class="cc-capital" id="ccCapB">49 500 &#8364; <small>net de frais</small></div>
-          <div class="alloc-bar" id="allocBarB"></div>
-          <div class="alloc-legend" id="allocLegB"></div>
-          <div class="cc-yield">Rendement moyen pond&#233;r&#233; : <b id="ccYieldB">6.85%</b></div>
+          <div class="alloc-donut-wrap">
+            <div class="alloc-donut"><canvas id="donutAllocB"></canvas></div>
+            <div class="alloc-legend" id="allocLegB"></div>
+          </div>
+          <div class="cc-yield" id="ccYieldBWrap">Rendement net moyen : <b id="ccYieldB">6.85%</b></div>
           <div class="cc-proj">Projection &#224; <span class="horizon-span">10</span> ans : <b id="ccProjB">0 &#8364;</b></div>
+          <div class="cc-yield" id="ccGestionWrap" style="margin-top:4px">Gestion : <b id="ccGestion">Gestion pilot&#233;e</b></div>
         </div>
       </div>
 
-      <!-- KPIs -->
-      <div class="kpi-row">
+      <!-- KPIs (uniquement en mode comparatif) -->
+      <div class="kpi-row" id="kpiRow">
         <div class="kpi-box red">
           <div class="kpi-label">Frais totaux</div>
           <div class="kpi-val" id="kpiFrais">500 &#8364;</div>
@@ -290,8 +325,8 @@ select.fi{cursor:pointer}
         </div>
       </div>
 
-      <!-- Charts -->
-      <div class="charts-row">
+      <!-- Charts (uniquement en mode comparatif) -->
+      <div class="charts-row" id="chartsRow">
         <div class="chart-box">
           <h3>R&#233;cup&#233;ration des frais</h3>
           <div class="chart-wrap"><canvas id="chartRecovery"></canvas></div>
@@ -302,8 +337,8 @@ select.fi{cursor:pointer}
         </div>
       </div>
 
-      <!-- Breakeven -->
-      <div class="breakeven">
+      <!-- Breakeven (uniquement en mode comparatif) -->
+      <div class="breakeven" id="breakevenBox">
         <div class="be-months" id="beMonths">6</div>
         <div class="be-label" id="beLabel">mois pour r&#233;cup&#233;rer les frais de transfert</div>
       </div>
@@ -340,9 +375,11 @@ select.fi{cursor:pointer}
 </div>
 
 <script>
-var chartRecovery=null, chartProjection=null;
-var COLORS_A=['#60a5fa','#93c5fd'];
-var COLORS_B=['#4ade80','#86efac','#bbf7d0','#d9f99d'];
+var chartRecovery=null, chartProjection=null, chartDonutA=null, chartDonutB=null;
+var COLORS_A=['#2563eb','#60a5fa','#93c5fd','#a5b4fc','#7dd3fc','#bae6fd','#0891b2','#0e7490','#1e40af','#312e81'];
+var COLORS_B=['#16a34a','#4ade80','#86efac','#bbf7d0','#d9f99d','#a3e635','#0d9488','#15803d','#84cc16','#65a30d'];
+var DEFAULTS_A=[{name:'Fonds euros',pct:70},{name:'Actions CM',pct:30}];
+var DEFAULTS_B=[{name:'Produits structurés',pct:40},{name:'Private equity',pct:30},{name:'Fonds euros boosté',pct:20},{name:'Obligataire',pct:10}];
 
 function openRecap(){
   var body=V('recapBody');
@@ -378,17 +415,57 @@ function txt(id){return V(id).value||''}
 var fmt=CGP.fmt;
 function fmtD(n,d){return n.toFixed(d)}
 
-function getAllocA(){
+function getAllocRows(side){
+  var rows=document.querySelectorAll('#alloc'+side+'List .alloc-row');
   var a=[];
-  for(var i=0;i<2;i++) a.push({name:txt('aA'+i+'n'),pct:num('aA'+i+'p')});
+  rows.forEach(function(r){
+    var n=r.querySelector('.alloc-name');
+    var p=r.querySelector('.alloc-pct');
+    if(!n||!p)return;
+    a.push({name:(n.value||'').trim(),pct:parseFloat(p.value)||0});
+  });
   return a;
 }
-function getAllocB(){
-  var a=[];
-  for(var i=0;i<4;i++) a.push({name:txt('aB'+i+'n'),pct:num('aB'+i+'p')});
-  return a;
-}
+function getAllocA(){return getAllocRows('A')}
+function getAllocB(){return getAllocRows('B')}
 function sumPct(arr){var s=0;arr.forEach(function(x){s+=x.pct});return s}
+
+function addAllocRow(side,name,pct){
+  var list=V('alloc'+side+'List');
+  if(!list)return;
+  var row=document.createElement('div');
+  row.className='alloc-row';
+  var n=document.createElement('input');
+  n.type='text';n.className='alloc-name';
+  n.value=(typeof name==='string')?name:'';
+  n.placeholder='Nom du fonds';
+  n.addEventListener('input',update);
+  var p=document.createElement('input');
+  p.type='number';p.className='alloc-pct';p.min='0';p.max='100';p.step='1';
+  p.value=(typeof pct==='number')?pct:0;
+  p.addEventListener('input',update);
+  var del=document.createElement('button');
+  del.type='button';del.className='alloc-del';del.title='Supprimer';
+  del.innerHTML='×';
+  del.addEventListener('click',function(){delAllocRow(del)});
+  row.appendChild(n);row.appendChild(p);row.appendChild(del);
+  list.appendChild(row);
+}
+function delAllocRow(btn){
+  var row=btn.closest('.alloc-row');if(!row)return;
+  var list=row.parentNode;
+  if(list&&list.querySelectorAll('.alloc-row').length<=1)return;
+  row.parentNode.removeChild(row);
+  update();
+}
+function clearAllocList(side){
+  var list=V('alloc'+side+'List');if(!list)return;
+  while(list.firstChild)list.removeChild(list.firstChild);
+}
+function initAllocList(side,defaults){
+  clearAllocList(side);
+  (defaults||[]).forEach(function(f){addAllocRow(side,f.name,f.pct)});
+}
 
 // Matrice des types de contrats
 var TYPE_RULES={
@@ -470,14 +547,17 @@ function onTypeChange(){
 }
 
 function renderHeader(){
-  try{CGP.header.render('pageHeader',{tag:'TRANSFERT PER/AV',solutions:['PER','AV'],clientId:'pClient',savedKey:'etude-transfert-per'});}catch(e){}
+  try{CGP.header.render('pageHeader',{tag:'ANALYSE CONTRAT',solutions:['PER','AV'],clientId:'pClient',savedKey:'etude-transfert-per'});}catch(e){}
 }
 function update(){
   renderHeader();
+  applyCompareState();
+  var compareOn=V('pCompare').value==='1';
   var capital=num('pCapital');
   var anciennete=num('pAnciennete');
   var fraisT=num('pFraisTransfert');
   var fraisE=num('pFraisEntree');
+  var fraisG=num('pFraisGestion');
   var type=V('pTypePER').value;
   var rule=TYPE_RULES[type]||TYPE_RULES.per;
 
@@ -498,13 +578,15 @@ function update(){
   var horizon=parseInt(V('pHorizon').value)||10;
   var nomA=txt('pContratA');
   var nomB=txt('pContratB');
-  var client=txt('pClient');
+  var gestion=txt('pGestion')||'Gestion pilotée';
 
   V('vFraisEntree').textContent=fmtD(fraisE,1)+'%';
+  var vfg=document.getElementById('vFraisGestion');if(vfg)vfg.textContent=fmtD(fraisG,2)+'%';
   V('vHorizon').textContent=horizon+' ans';
 
   var yieldA=num('pRdtA');
   var yieldB=num('pRdtB');
+  var yieldBNet=yieldB-fraisG;
   V('vRdtA').textContent=fmtD(yieldA,1)+'%';
   V('vRdtB').textContent=fmtD(yieldB,1)+'%';
 
@@ -523,25 +605,27 @@ function update(){
   var fraisTotal=montantTransfert+montantEntree;
 
   var projA=capital*Math.pow(1+yieldA/100,horizon);
-  var projB=capitalNet*Math.pow(1+yieldB/100,horizon);
+  var projB=capitalNet*Math.pow(1+yieldBNet/100,horizon);
   var gainTotal=projB-projA;
-
-  // hClient/hDate/hTitle/tbBadge/tbLabel : éléments supprimés (remplacés par pageHeader)
-  var fam=V('pFamille').value;
 
   V('ccNameA').textContent=nomA;
   V('ccNameB').textContent=nomB;
   V('ccCapA').textContent=fmt(capital)+' \u20ac';
   V('ccCapB').innerHTML=fmt(capitalNet)+' \u20ac <small>net de frais</small>';
   V('ccYieldA').textContent=fmtD(yieldA,2)+'%';
-  V('ccYieldB').textContent=fmtD(yieldB,2)+'%';
+  V('ccYieldB').innerHTML=fmtD(yieldBNet,2)+'% <span style="color:var(--gris);font-weight:400">('+fmtD(yieldB,2)+'% \u2212 '+fmtD(fraisG,2)+'% frais)</span>';
   V('ccProjA').textContent=fmt(projA)+' \u20ac';
   V('ccProjB').textContent=fmt(projB)+' \u20ac';
+  var ccg=document.getElementById('ccGestion');if(ccg)ccg.textContent=gestion;
 
   document.querySelectorAll('.horizon-span').forEach(function(el){el.textContent=horizon});
 
-  renderAllocBar('allocBarA','allocLegA',allocA,COLORS_A);
-  renderAllocBar('allocBarB','allocLegB',allocB,COLORS_B);
+  chartDonutA=renderAllocDonut('donutAllocA','allocLegA',allocA,COLORS_A,chartDonutA);
+  if(compareOn){
+    chartDonutB=renderAllocDonut('donutAllocB','allocLegB',allocB,COLORS_B,chartDonutB);
+  }else if(chartDonutB&&chartDonutB.destroy){
+    chartDonutB.destroy();chartDonutB=null;
+  }
 
   V('kpiFrais').textContent=fmt(fraisTotal)+' \u20ac';
   var pctFrais=fmtD(capital>0?fraisTotal/capital*100:0,1)+'% du capital';
@@ -553,28 +637,68 @@ function update(){
   V('kpiGainTotal').textContent=(gainTotal>=0?'+':'')+fmt(gainTotal)+' \u20ac';
   V('kpiGainSub').textContent='\u00e0 '+horizon+' ans vs actuel';
 
-  var beMonths=calcBreakeven(capital,capitalNet,yieldA,yieldB);
-  V('beMonths').textContent=beMonths===null?'N/A':beMonths;
-  V('beLabel').textContent=beMonths===null?'Le transfert ne se rentabilise pas sur l\'horizon choisi':'mois pour r\u00e9cup\u00e9rer les frais de transfert';
-
-  renderCharts(capital,capitalNet,yieldA,yieldB,horizon,nomA,nomB);
+  if(compareOn){
+    var beMonths=calcBreakeven(capital,capitalNet,yieldA,yieldBNet);
+    V('beMonths').textContent=beMonths===null?'N/A':beMonths;
+    V('beLabel').textContent=beMonths===null?'Le transfert ne se rentabilise pas sur l\'horizon choisi':'mois pour r\u00e9cup\u00e9rer les frais de transfert';
+    renderCharts(capital,capitalNet,yieldA,yieldBNet,horizon,nomA,nomB);
+  }else{
+    if(chartRecovery&&chartRecovery.destroy){chartRecovery.destroy();chartRecovery=null;}
+    if(chartProjection&&chartProjection.destroy){chartProjection.destroy();chartProjection=null;}
+  }
 
   V('footerNote').textContent='Projections indicatives. Les performances pass\u00e9es ne pr\u00e9jugent pas des performances futures.';
 
   CGP.project.autoSave('etude-transfert-per');
 }
 
-function renderAllocBar(barId,legId,alloc,colors){
-  var barEl=V(barId);var legEl=V(legId);
-  barEl.innerHTML='';legEl.innerHTML='';
-  alloc.forEach(function(x,i){
-    if(x.pct<=0)return;
-    var sp=document.createElement('span');
-    sp.style.width=x.pct+'%';
-    sp.style.background=colors[i%colors.length];
-    barEl.appendChild(sp);
-    legEl.innerHTML+='<span><i style="background:'+colors[i%colors.length]+'"></i>'+x.name+' ('+fmtD(x.pct,0)+'%)</span>';
+function renderAllocDonut(canvasId,legId,alloc,colors,chartRef){
+  var visible=alloc.filter(function(x){return x.pct>0});
+  var legEl=V(legId);
+  if(legEl){
+    legEl.innerHTML='';
+    visible.forEach(function(x,i){
+      var c=colors[i%colors.length];
+      var safe=(x.name||'(sans nom)').replace(/[<>&]/g,function(ch){return ({'<':'&lt;','>':'&gt;','&':'&amp;'})[ch]});
+      legEl.innerHTML+='<span><i style="background:'+c+'"></i><em>'+safe+'</em><b>'+fmtD(x.pct,0)+'%</b></span>';
+    });
+  }
+  var cv=V(canvasId);if(!cv)return null;
+  if(chartRef&&chartRef.destroy)chartRef.destroy();
+  if(!visible.length){
+    var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);return null;
+  }
+  return new Chart(cv,{
+    type:'doughnut',
+    data:{
+      labels:visible.map(function(x){return x.name||''}),
+      datasets:[{
+        data:visible.map(function(x){return x.pct}),
+        backgroundColor:visible.map(function(x,i){return colors[i%colors.length]}),
+        borderWidth:2,borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(ctx){return (ctx.label||'')+' : '+fmtD(ctx.parsed,0)+'%'}}}
+      }
+    }
   });
+}
+
+function toggleCompare(){
+  var sw=document.getElementById('cmpSwitch');if(!sw)return;
+  var on=!sw.classList.contains('on');
+  sw.classList.toggle('on',on);
+  V('pCompare').value=on?'1':'0';
+  applyCompareState();
+  update();
+}
+function applyCompareState(){
+  var on=V('pCompare').value==='1';
+  document.body.classList.toggle('cmp-off',!on);
 }
 
 function calcBreakeven(capA,capB,yA,yB){
@@ -686,6 +810,9 @@ function runTransfert(){update();updateProgress();}
 (function(){
   CGP.footer.render(document.getElementById('conseillerFooter'));
   updateTypeEncart();
+  initAllocList('A',DEFAULTS_A);
+  initAllocList('B',DEFAULTS_B);
+  applyCompareState();
   update();
   updateProgress();
 })();
@@ -705,55 +832,63 @@ CGP.project.registerModule('etude-transfert-per', {
   getState: function() {
     return {
       pClient: V('pClient').value,
+      pFamille: V('pFamille').value,
       pTypePER: V('pTypePER').value,
       pContratA: V('pContratA').value,
-      aA0n: V('aA0n').value,
-      aA0p: +V('aA0p').value,
-      aA1n: V('aA1n').value,
-      aA1p: +V('aA1p').value,
+      allocA: getAllocA(),
       pRdtA: +V('pRdtA').value,
       pCapital: +V('pCapital').value,
       pAnciennete: +V('pAnciennete').value,
+      pCompare: V('pCompare').value,
       pContratB: V('pContratB').value,
+      pGestion: V('pGestion').value,
       pFraisTransfert: +V('pFraisTransfert').value,
       pFraisEntree: +V('pFraisEntree').value,
-      aB0n: V('aB0n').value,
-      aB0p: +V('aB0p').value,
-      aB1n: V('aB1n').value,
-      aB1p: +V('aB1p').value,
-      aB2n: V('aB2n').value,
-      aB2p: +V('aB2p').value,
-      aB3n: V('aB3n').value,
-      aB3p: +V('aB3p').value,
+      pFraisGestion: +V('pFraisGestion').value,
+      allocB: getAllocB(),
       pRdtB: +V('pRdtB').value,
       pHorizon: +V('pHorizon').value
     };
   },
   setState: function(d) {
     if (d.pClient !== undefined) V('pClient').value = d.pClient;
+    if (d.pFamille !== undefined) { V('pFamille').value = d.pFamille; setFamille(d.pFamille); }
     if (d.pTypePER !== undefined) V('pTypePER').value = d.pTypePER;
     if (d.pContratA !== undefined) V('pContratA').value = d.pContratA;
-    if (d.aA0n !== undefined) V('aA0n').value = d.aA0n;
-    if (d.aA0p !== undefined) V('aA0p').value = d.aA0p;
-    if (d.aA1n !== undefined) V('aA1n').value = d.aA1n;
-    if (d.aA1p !== undefined) V('aA1p').value = d.aA1p;
+    if (Array.isArray(d.allocA)) initAllocList('A', d.allocA);
+    else {
+      // retro-compat ancien format aA0n/aA0p/aA1n/aA1p
+      var legacyA = [];
+      ['0','1','2','3','4','5','6','7','8','9'].forEach(function(i){
+        if (d['aA'+i+'n'] !== undefined) legacyA.push({name:d['aA'+i+'n'], pct:+d['aA'+i+'p']||0});
+      });
+      if (legacyA.length) initAllocList('A', legacyA);
+    }
     if (d.pRdtA !== undefined) V('pRdtA').value = d.pRdtA;
     if (d.pCapital !== undefined) V('pCapital').value = d.pCapital;
     if (d.pAnciennete !== undefined) V('pAnciennete').value = d.pAnciennete;
+    if (d.pCompare !== undefined) {
+      V('pCompare').value = d.pCompare;
+      var sw=document.getElementById('cmpSwitch');
+      if(sw)sw.classList.toggle('on', d.pCompare==='1');
+    }
     if (d.pContratB !== undefined) V('pContratB').value = d.pContratB;
+    if (d.pGestion !== undefined) V('pGestion').value = d.pGestion;
     if (d.pFraisTransfert !== undefined) V('pFraisTransfert').value = d.pFraisTransfert;
     if (d.pFraisEntree !== undefined) V('pFraisEntree').value = d.pFraisEntree;
-    if (d.aB0n !== undefined) V('aB0n').value = d.aB0n;
-    if (d.aB0p !== undefined) V('aB0p').value = d.aB0p;
-    if (d.aB1n !== undefined) V('aB1n').value = d.aB1n;
-    if (d.aB1p !== undefined) V('aB1p').value = d.aB1p;
-    if (d.aB2n !== undefined) V('aB2n').value = d.aB2n;
-    if (d.aB2p !== undefined) V('aB2p').value = d.aB2p;
-    if (d.aB3n !== undefined) V('aB3n').value = d.aB3n;
-    if (d.aB3p !== undefined) V('aB3p').value = d.aB3p;
+    if (d.pFraisGestion !== undefined) V('pFraisGestion').value = d.pFraisGestion;
+    if (Array.isArray(d.allocB)) initAllocList('B', d.allocB);
+    else {
+      var legacyB = [];
+      ['0','1','2','3','4','5','6','7','8','9'].forEach(function(i){
+        if (d['aB'+i+'n'] !== undefined) legacyB.push({name:d['aB'+i+'n'], pct:+d['aB'+i+'p']||0});
+      });
+      if (legacyB.length) initAllocList('B', legacyB);
+    }
     if (d.pRdtB !== undefined) V('pRdtB').value = d.pRdtB;
     if (d.pHorizon !== undefined) V('pHorizon').value = d.pHorizon;
     onTypeChange();
+    applyCompareState();
     update();
   }
 });
