@@ -23,7 +23,10 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 ### R4 -- Revenus ANNUELS dans le RI
 - `ED.revenus.c1` / `sal1` = salaires annuels
 - `ED.revenus.fonc` = fonciers annuels
-- `revMens()` = (sal + fonc×0.70) / 12
+- `ED.revenus.bic` = revenus BIC / LMNP locatif annuels
+- `revMens()` = (sal + (fonc + bic)×0.70) / 12
+
+Les revenus BIC issus du LMNP locatif sont pondérés à 70 % comme les fonciers (standard bancaire : frais, vacance, fiscalité).
 
 ### R5 -- Taux endettement = crédits + loyer habitation principale + pensions versées
 `chrCredit` = échéances passifs /mois.
@@ -112,8 +115,9 @@ Helper : `calcChrLoyer(ED.chargesDetail)` (défini dans `etude-dossier.html`).
 
 | Type | Endettement | Retraite |
 |---|---|---|
-| Salaires, BIC, BNC | 100% | 100% |
+| Salaires, BNC | 100% | 100% |
 | Revenus fonciers | 70% | Exclus |
+| Revenus BIC / LMNP locatif | 70% | Exclus |
 
 ---
 
