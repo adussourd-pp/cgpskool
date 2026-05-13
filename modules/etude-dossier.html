@@ -1001,9 +1001,10 @@ select.span2{grid-column:span 2}
         </div>
       </div>
       <div class="fiscal-row"><span class="fr-l">Ann&#233;e d'imposition</span><span class="fr-v"><input class="fi" type="number" id="projAnnee" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:100px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233;</option></select></span></div>
+      <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:140px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233; (T)</option><option value="parent_isole">A &#233;lev&#233; enfant seul (L)</option></select></span></div>
       <div class="fiscal-row"><span class="fr-l">Nb enfants</span><span class="fr-v"><input class="fi" type="number" id="projEnfants" min="0" value="0" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
-      <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange)"></span></div>
+      <div class="fiscal-row"><span class="fr-l" title="Demi-part suppl&#233;mentaire si enfant &#224; charge invalide">Invalidit&#233; enfant (W)</span><span class="fr-v"><label style="display:inline-flex;align-items:center;gap:6px;font-size:12px"><input type="checkbox" id="projCaseW" onchange="calcProjectionIR()" style="accent-color:var(--orange)"> +0,5 part</label></span></div>
+      <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange);background:#FAFAFA" title="Calcul&#233; automatiquement depuis Situation + Nb enfants + cases T/L/W"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="this._manualOverride=true;calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
@@ -7808,19 +7809,23 @@ function initProjectionIR(){
     var sm=document.getElementById('projSitmat');
     if(sm){
       var sit=(ED.sitmat||'').toLowerCase();
-      if(sit.indexOf('mari')>=0||sit.indexOf('pacs')>=0)sm.value='marie';
+      if(sit.indexOf('mari')>=0||sit.indexOf('pacs')>=0) sm.value='marie';
+      else if(ED.caseT) sm.value='celibataire_seul';
+      else if(ED.caseL) sm.value='parent_isole';
       else sm.value='celibataire';
     }
     var enf=document.getElementById('projEnfants');
     if(enf)enf.value=ED.nbEnfants||0;
-    var pp=document.getElementById('projParts');
-    if(pp)pp.value=ED.fiscal.parts||1;
+    var ckW=document.getElementById('projCaseW');
+    if(ckW)ckW.checked=!!ED.caseW;
     calcProjectionIR();
   }catch(e2){}
 }
 function calcProjectionIR(){
   try{
     var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+    var v=function(id){var el=document.getElementById(id);return el?el.value:'';};
+    var ck=function(id){var el=document.getElementById(id);return !!(el&&el.checked);};
     // Auto-calc RBG depuis salaires si salaires saisis
     var sal1=n('projSal1'),sal2=n('projSal2');
     if(sal1>0||sal2>0){
@@ -7830,9 +7835,21 @@ function calcProjectionIR(){
     }
     var rbg=n('projRBG');
     if(rbg<0)rbg=0;
-    var parts=n('projParts')||1;
-    // Calcul IR soumis au barème (avant réductions/crédits)
-    var res=calcIR(rbg,parts);
+    // Resoudre situation + cases T/L/W depuis projSitmat + checkbox W
+    var projSit=v('projSitmat')||'celibataire';
+    var caseT=false, caseL=false, caseW=ck('projCaseW');
+    var sitForCalc=projSit;
+    if(projSit==='celibataire_seul'){ caseT=true; sitForCalc='celibataire'; }
+    else if(projSit==='parent_isole'){ caseL=true; sitForCalc='celibataire'; }
+    var nbEnf=n('projEnfants')||0;
+    // Calcul IR via la nouvelle signature (cases T/L/W appliquees au bareme)
+    var res=calcIR(rbg, sitForCalc, nbEnf, caseT, 0, 0, caseL, caseW);
+    // Refleter le nb de parts effectif issu du bareme dans projParts (informational)
+    try{
+      var cfg=getBaremeIR(sitForCalc, nbEnf, caseT, caseL, caseW);
+      var pp=document.getElementById('projParts');
+      if(pp)pp.value=cfg.parts;
+    }catch(_e){}
     var irBareme=res.irBrut||res.ir||res.irNet||0;
     // Mémoriser la TMI projetée pour les calculs aval (PER en préconisations notamment)
     ED._projTMI=res.tmi||0;
