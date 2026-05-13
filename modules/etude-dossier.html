@@ -710,13 +710,7 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">Logement</label><select class="fi" id="vLogement"><option>Propri&#233;taire</option><option>Locataire</option><option>H&#233;berg&#233;</option></select></div>
           <div><label style="font-size:10px;color:var(--gris)">Enfants</label><input class="fi" type="number" id="vNbEnfants" min="0" value="0" oninput="renderVerifEnfants()"></div>
         </div>
-        <!-- Situations particulieres (cases fiscales T / L / W) -->
-        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;padding:8px 10px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);border-radius:7px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);width:100%;margin-bottom:2px">Situations particuli&#232;res (cases fiscales)</div>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) au 1er janvier ET a au moins un enfant a charge. Demi-part supplementaire (jusqu'a 2 455 EUR de gain max)."><input type="checkbox" id="vCaseT" onchange="ED.caseT=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case T</b> &mdash; parent isol&#233;</label>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) sans enfant a charge MAIS a eleve un enfant seul pendant >=5 ans. Demi-part supplementaire (jusqu'a 1 079 EUR de gain max)."><input type="checkbox" id="vCaseL" onchange="ED.caseL=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case L</b> &mdash; a &#233;lev&#233; un enfant seul &#8805;5 ans</label>
-          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Un enfant a charge est invalide (carte mobilite inclusion mention invalidite). Demi-part supplementaire."><input type="checkbox" id="vCaseW" onchange="ED.caseW=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case W</b> &mdash; invalidit&#233; enfant</label>
-        </div>
+        <!-- Situations particulieres (cases fiscales T / L / W) — sous Impots -->
 
         <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">Adresse</label><input class="fi" id="vAdresse"></div>
@@ -736,8 +730,8 @@ select.span2{grid-column:span 2}
         <!-- Épargne -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:8px">&#201;pargne souhait&#233;e</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C1</label><input class="fi" type="number" id="vEpMens1"></div>
-          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mens. C2</label><input class="fi" type="number" id="vEpMens2"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mensuelle C1</label><input class="fi" type="number" id="vEpMens1"></div>
+          <div><label style="font-size:10px;color:var(--gris)">&#201;pargne mensuelle C2</label><input class="fi" type="number" id="vEpMens2"></div>
           <div><label style="font-size:10px;color:var(--gris)">&#201;p. pr&#233;caution C1</label><input class="fi" type="number" id="vEpPrec1"></div>
           <div><label style="font-size:10px;color:var(--gris)">&#201;p. pr&#233;caution C2</label><input class="fi" type="number" id="vEpPrec2"></div>
         </div>
@@ -783,6 +777,14 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">IR soumis au bar&#232;me</label><input class="fi" type="number" id="vFiscIRBareme"></div>
           <div><label style="font-size:10px;color:var(--gris)">R&#233;ductions</label><input class="fi" type="number" id="vFiscReduc"></div>
           <div><label style="font-size:10px;color:var(--gris)">Cr&#233;dits d'imp&#244;t</label><input class="fi" type="number" id="vFiscCredits"></div>
+        </div>
+
+        <!-- Situations particulieres (cases fiscales T / L / W) -->
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;padding:8px 10px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);border-radius:7px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);width:100%;margin-bottom:2px">Situations particuli&#232;res (cases fiscales)</div>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) au 1er janvier ET a au moins un enfant a charge. Demi-part supplementaire (jusqu'a 2 455 EUR de gain max)."><input type="checkbox" id="vCaseT" onchange="ED.caseT=this.checked;autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case T</b> &mdash; parent isol&#233;</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) sans enfant a charge MAIS a eleve un enfant seul pendant >=5 ans. Demi-part supplementaire (jusqu'a 1 079 EUR de gain max)."><input type="checkbox" id="vCaseL" onchange="ED.caseL=this.checked;autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case L</b> &mdash; a &#233;lev&#233; un enfant seul &#8805;5 ans</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Un enfant a charge est invalide (carte mobilite inclusion mention invalidite). Demi-part supplementaire."><input type="checkbox" id="vCaseW" onchange="ED.caseW=this.checked;autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case W</b> &mdash; invalidit&#233; enfant</label>
         </div>
 
         <!-- Bouton appliquer -->
