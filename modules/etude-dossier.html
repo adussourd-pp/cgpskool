@@ -2091,7 +2091,10 @@ function fmt(n) {
  * Revenus mensuels nets du foyer
  * R4  : revenus annuels / 12
  * R18 : ponderation age — txSal = 0.70 si age moyen >= 57 ans
- * R9  : couple complet (sal1 + sal2 + fonciers×0.70)
+ * R9  : couple complet (sal1 + sal2 + (fonciers + bic) × 0.70)
+ *
+ * Les revenus LMNP / BIC locatifs sont pondérés à 70 % comme les fonciers
+ * (standard bancaire : frais, vacance, fiscalité).
  *
  * @param {number} sal1    salaires annuels C1
  * @param {number} sal2    salaires annuels C2 (0 si seul)
@@ -2099,13 +2102,14 @@ function fmt(n) {
  * @param {number} age1    age actuel C1 (pour ponderation)
  * @param {number} age2    age actuel C2 (0 si seul)
  * @param {boolean} isCouple
+ * @param {number} [bic]   revenus BIC (LMNP) annuels bruts (optionnel)
  * @returns {number} revenus mensuels nets arrondis
  */
-function calcRevMens(sal1, sal2, fonc, age1, age2, isCouple) {
+function calcRevMens(sal1, sal2, fonc, age1, age2, isCouple, bic) {
   var ageMoy = isCouple ? Math.round(((age1||40) + (age2||40)) / 2) : (age1||40);
   var txSal  = ageMoy >= 57 ? 0.70 : 1.00;
   var sal    = (sal1||0) + (sal2||0);
-  return Math.round((sal * txSal + (fonc||0) * 0.70) / 12);
+  return Math.round((sal * txSal + ((fonc||0) + (bic||0)) * 0.70) / 12);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2450,11 +2454,12 @@ function calcSynthese(ED, solsSelectionnees) {
   var sal1  = ED.revenus.sal1 || ED.revenus.c1 || 0;
   var sal2  = ED.revenus.sal2 || ED.revenus.c2 || 0;
   var fonc  = ED.revenus.fonc || 0;
+  var bic   = ED.revenus.bic  || 0;
   var isCouple = ED.type !== 'seul';
   var age1  = calcAge(ED.c1.dob) || 40;
   var age2  = isCouple ? (calcAge(ED.c2.dob)||40) : 0;
 
-  var revM      = calcRevMens(sal1, sal2, fonc, age1, age2, isCouple);
+  var revM      = calcRevMens(sal1, sal2, fonc, age1, age2, isCouple, bic);
   var chrCredit = calcChrCredit(ED.passifs||[]);
   var endett    = calcTauxEndettement(chrCredit, revM);
   var rav       = calcRAV(revM, chrCredit);
@@ -4401,6 +4406,7 @@ function rFinancement(){
     var sal1=ED.revenus.sal1||ED.revenus.c1||0;
     var sal2=ED.revenus.sal2||ED.revenus.c2||0;
     var fonc=ED.revenus.fonc||0;
+    var bic=ED.revenus.bic||0;
     var h='';
     if(isCoupleFin){
       var n1=((ED.c1.prenom||'')+(ED.c1.nom?' '+ED.c1.nom:'')).trim()||'C1';
@@ -4420,7 +4426,8 @@ function rFinancement(){
     }
     h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Analyse du foyer</div>';
     h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
-    if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
+    if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers (pondérés 70 %)</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
+    if(bic>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus BIC / LMNP (pondérés 70 %)</span><span class="fr-v">'+fmt(bic)+' €/an</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Charges cr\u00e9dit /mois</span><span class="fr-v">'+fmt(chrCredit)+' \u20ac/mois</span></div>';
     if(chrLoyer>0) h+='<div class="fiscal-row"><span class="fr-l">Loyer / pension vers\u00e9e /mois</span><span class="fr-v">'+fmt(chrLoyer)+' \u20ac/mois</span></div>';
     if(autresCharges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois</span><span class="fr-v">'+fmt(autresCharges)+' \u20ac/mois</span></div>';
@@ -6875,10 +6882,11 @@ function removeStep(i){
 // ╚══════════════════════════════════════════════════════════════════╝
 function revMens(){
   // Revenus annuels → mensuel net (revenus actuels du foyer, sans pondération âge)
-  // Fonciers : abattement 70 % (réalité bancaire — frais, vacance, fiscalité)
+  // Fonciers + BIC (LMNP) : abattement 70 % (réalité bancaire — frais, vacance, fiscalité)
   var sal=(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus.sal2||ED.revenus.c2||0);
   var fonc=ED.revenus.fonc||0;
-  return Math.round((sal + fonc*0.70)/12);
+  var bic=ED.revenus.bic||0;
+  return Math.round((sal + (fonc + bic)*0.70)/12);
 }
 function nomC(n){
   // Retourne le prenom+initiale NOM pour C1 ou C2
