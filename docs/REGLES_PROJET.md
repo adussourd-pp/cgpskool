@@ -25,8 +25,15 @@ Chercher si une variable existe déjà avant d'en déclarer une nouvelle (y comp
 - `ED.revenus.fonc` = fonciers annuels
 - `revMens()` = (sal + fonc×0.70) / 12
 
-### R5 -- Taux endettement = crédits SEULEMENT
-`chrCredit` = échéances passifs /mois. PAS les charges totales (PER, leasing, éducation exclus).
+### R5 -- Taux endettement = crédits + loyer habitation principale + pensions versées
+`chrCredit` = échéances passifs /mois.
+`chrLoyer` = lignes `chargesDetail` dont le libellé matche `/loyer|pension.?aliment|prestation.?compens/i`, divisées par 12.
+
+Standard bancaire : `endett = (chrCredit + chrLoyer) / revMens × 100`.
+
+PAS les charges courantes (alimentation, transport, énergie, école...) ni les versements d'épargne (AV, PER, PEA, PEE, capitalisation).
+
+Helper : `calcChrLoyer(ED.chargesDetail)` (défini dans `etude-dossier.html`).
 
 ### R6 -- Pension retraite = salaires SEULS
 `pensM = Math.floor(ED.revenus.c1 / 12 * taux / 100)`. Fonciers exclus.
