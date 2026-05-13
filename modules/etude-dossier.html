@@ -2124,6 +2124,17 @@ function calcChrCredit(passifs) {
   return Math.round(total / 12);
 }
 
+// Banking standard : un loyer habitation principale ou une pension alimentaire
+// versee compte dans le taux d'endettement, au meme titre qu'une mensualite
+// de credit. Detecte ces lignes dans chargesDetail.
+var ENDETT_LOYER_RE = /loyer|pension.?aliment|prestation.?compens/i;
+function calcChrLoyer(chargesDetail) {
+  var total = (chargesDetail||[]).reduce(function(s, c) {
+    return ENDETT_LOYER_RE.test(c.nom||'') ? s + (c.montant || 0) : s;
+  }, 0);
+  return Math.round(total / 12);
+}
+
 /**
  * Taux d'endettement
  * @param {number} chrCredit  charges credit /mois
@@ -4052,8 +4063,9 @@ function rSituation(){
 
   const revM=revMens();
   const chrCr=ED.chargesCredit||0;
-  const endett=chrCr>0&&revM>0?chrCr/revM*100:0;
-  const rav=revM-chrCr;
+  const chrLy=calcChrLoyer(ED.chargesDetail);
+  const endett=revM>0?((chrCr+chrLy)/revM*100):0;
+  const rav=revM-chrCr-chrLy;
   // Épargne mensuelle — saisie R1
   var epWrap=document.getElementById('kSit1Wrap');
   if(epWrap){
@@ -4361,19 +4373,25 @@ function rFiscal(){
 function rFinancement(){
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-  // "Autres charges" : on exclut les lignes qui dupliquent le crédit ou qui sont
-  // en réalité des versements d'épargne (AV, PER, PEA…) — sinon doublon avec
-  // chargesCredit / patrimoine financier.
+  // "Autres charges" : on exclut les lignes qui dupliquent le crédit (déjà dans
+  // chrCredit via passifs) ou qui sont des versements d'épargne (AV, PER, PEA…).
+  // Loyer habitation et pension versée sont isolés car ils comptent dans
+  // l'endettement bancaire (au même titre qu'un crédit).
   var EXCLUDE_RE=/(emprunt|cr[eé]dit|pr[eê]t|assurance.?vie|^av\b|\bper\b|\bpea\b|\bpee\b|capitalisation)/i;
-  var autresAn=(ED.chargesDetail||[]).reduce(function(s,c){
-    if(EXCLUDE_RE.test(c.nom||''))return s;
-    return s+(c.montant||0);
-  },0);
+  var loyerAn=0,autresAn=0;
+  (ED.chargesDetail||[]).forEach(function(c){
+    var nom=c.nom||'',m=c.montant||0;
+    if(EXCLUDE_RE.test(nom))return;
+    if(ENDETT_LOYER_RE.test(nom)){loyerAn+=m;return;}
+    autresAn+=m;
+  });
+  var chrLoyer=Math.round(loyerAn/12);
   var autresCharges=Math.round(autresAn/12);
-  var chargesTotales=chrCredit+autresCharges;
-  // Taux d'endettement : standard bancaire = mensualités crédit / revenus nets
-  var endett=revM>0?chrCredit/revM*100:0;
-  var capa=Math.max(0,revM*0.35-chargesTotales);
+  var endettCharges=chrCredit+chrLoyer;
+  var chargesTotales=endettCharges+autresCharges;
+  // Taux d'endettement : standard bancaire = (crédits + loyer/pension) / revenus nets
+  var endett=revM>0?endettCharges/revM*100:0;
+  var capa=Math.max(0,revM*0.35-endettCharges);
   var col=endett>35?'var(--red)':endett>28?'var(--ambre-d)':'var(--green)';
   var isCoupleFin=ED.type!=='seul'&&ED.c2&&ED.c2.prenom;
 
@@ -4404,7 +4422,8 @@ function rFinancement(){
     h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois (foyer)</span><span class="fr-v" style="font-weight:700">'+fmt(revM)+' €/mois</span></div>';
     if(fonc>0) h+='<div class="fiscal-row"><span class="fr-l">dont revenus fonciers</span><span class="fr-v">'+fmt(fonc)+' €/an</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Charges cr\u00e9dit /mois</span><span class="fr-v">'+fmt(chrCredit)+' \u20ac/mois</span></div>';
-    if(autresCharges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois (loyers, etc.)</span><span class="fr-v">'+fmt(autresCharges)+' \u20ac/mois</span></div>';
+    if(chrLoyer>0) h+='<div class="fiscal-row"><span class="fr-l">Loyer / pension vers\u00e9e /mois</span><span class="fr-v">'+fmt(chrLoyer)+' \u20ac/mois</span></div>';
+    if(autresCharges>0) h+='<div class="fiscal-row"><span class="fr-l">Autres charges /mois</span><span class="fr-v">'+fmt(autresCharges)+' \u20ac/mois</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Reste \u00e0 vivre</span><span class="fr-v">'+fmt(revM-chargesTotales)+' \u20ac/mois</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Taux d\'endettement</span><span class="fr-v" style="color:'+col+';font-weight:700">'+endett.toFixed(1)+' %</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Capacité emprunt additionnelle</span><span class="fr-v" style="color:'+(capa>0?'var(--green)':'var(--red)')+'">'+fmt(capa)+' €/mois</span></div>';
@@ -5008,12 +5027,13 @@ function rPreconisations(){
   var pSum=ED.passifs.reduce(function(s,p){return s+(p.crd||0);},0);
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-  var chargesTotales=chrCredit+Math.round(ED.charges||0);
+  var chrLoyer=calcChrLoyer(ED.chargesDetail);
+  var endettCharges=chrCredit+chrLoyer;
   var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
   var plafondPER=ED.fiscal.plafondPER||Math.min(35194,Math.round((ED.fiscal.rbg||0)*0.10));
   var economiePER=ED.fiscal.tmi>0?Math.round(plafondPER*(ED.fiscal.tmi/100)):0;
-  var capa=revM>0?Math.max(0,revM*0.35-chargesTotales):0;
-  var endett=revM>0?(chargesTotales/revM*100).toFixed(1):'0';
+  var capa=revM>0?Math.max(0,revM*0.35-endettCharges):0;
+  var endett=revM>0?(endettCharges/revM*100).toFixed(1):'0';
 
   // ── Leviers disponibles (tick vert / rond rouge grise) ──
   var levEl=document.getElementById('precoLeviers');
@@ -5926,8 +5946,9 @@ function refreshPrecoStats(){
     var impot=(ED.fiscal.irnet||0)+(ED.fiscal.ps||0);
     var revM=revMens();
     var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-    var chargesTotales=chrCredit+Math.round(ED.charges||0);
-    var capa=revM>0?Math.max(0,revM*0.35-chargesTotales):0;
+    var chrLoyer=calcChrLoyer(ED.chargesDetail);
+    var endettCharges=chrCredit+chrLoyer;
+    var capa=revM>0?Math.max(0,revM*0.35-endettCharges):0;
     var aSum=ED.actifs.reduce(function(s,a){return s+(a.montant||0);},0);
     if(typeof buildMatriceObjSol==='function')buildMatriceObjSol(impot,capa,aSum);
   }catch(e){console.warn('refreshPrecoStats:',e);}
@@ -6425,7 +6446,9 @@ function rSynthese(){
   var patNet=aSum-pSum;
   var revM=revMens();
   var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-  var endett=revM>0?(chrCredit/revM*100).toFixed(1):'—';
+  var chrLoyer=calcChrLoyer(ED.chargesDetail);
+  var endettCharges=chrCredit+chrLoyer;
+  var endett=revM>0?(endettCharges/revM*100).toFixed(1):'—';
   var irNet=(ED.fiscal.irnet||0);
   var ps=(ED.fiscal.ps||0);
   var impot=irNet+ps;
@@ -6528,7 +6551,7 @@ function rSynthese(){
       aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
       aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement \u2014 Avant</div>';
       aaH+=kpiRow('Taux endettement',endett+' %',{color:parseFloat(endett)>35?'var(--red)':'inherit'});
-      aaH+=kpiRow('Reste \u00e0 vivre',fmt(revM-chrCredit)+' \u20ac/mois');
+      aaH+=kpiRow('Reste \u00e0 vivre',fmt(revM-endettCharges)+' \u20ac/mois');
       aaH+='</div>';
       aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Financement \u2014 Apr\u00e8s</div>';
       aaH+=kpiRow('Patrimoine immo. constitu\u00e9',fmt(capFin)+' \u20ac',{bold:true,color:'var(--green)'});
@@ -8027,7 +8050,9 @@ function calcProjectionFin(){
     var tauxM=taux/12;
     var revM=revMens();
     var chrCredit=ED.chargesCredit||Math.round(ED.passifs.reduce(function(s,p){return s+(p.echeance||0);},0)/12);
-    var capaRestante=Math.max(0,Math.round(revM*0.35-chrCredit));
+    var chrLoyer=calcChrLoyer(ED.chargesDetail);
+    var endettCharges=chrCredit+chrLoyer;
+    var capaRestante=Math.max(0,Math.round(revM*0.35-endettCharges));
     // Montant max : mensTotale = capaRestante
     // mensTotale = mensCredit + mensAssur
     // mensCredit = montant × r / (1-(1+r)^-n)
@@ -8054,6 +8079,7 @@ function calcProjectionFin(){
     var h='';
     h+='<div class="fiscal-row"><span class="fr-l">Revenus nets /mois</span><span class="fr-v">'+fmt(revM)+' \u20ac</span></div>';
     h+='<div class="fiscal-row"><span class="fr-l">Charges cr\u00e9dit actuelles</span><span class="fr-v">'+fmt(chrCredit)+' \u20ac/mois</span></div>';
+    if(chrLoyer>0) h+='<div class="fiscal-row"><span class="fr-l">Loyer / pension vers\u00e9e</span><span class="fr-v">'+fmt(chrLoyer)+' \u20ac/mois</span></div>';
     h+='<div class="fiscal-row" style="padding:10px 0;background:rgba(45,122,91,0.05);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;color:var(--green)">Capacit\u00e9 restante (35%)</span><span class="fr-v" style="font-size:16px;font-weight:700;color:var(--green)">'+fmt(capaRestante)+' \u20ac/mois</span></div>';
     if(montantMax>0){
       h+='<div class="fiscal-row"><span class="fr-l">Montant empruntable</span><span class="fr-v" style="font-weight:700">'+fmt(montantMax)+' \u20ac</span></div>';
