@@ -710,6 +710,14 @@ select.span2{grid-column:span 2}
           <div><label style="font-size:10px;color:var(--gris)">Logement</label><select class="fi" id="vLogement"><option>Propri&#233;taire</option><option>Locataire</option><option>H&#233;berg&#233;</option></select></div>
           <div><label style="font-size:10px;color:var(--gris)">Enfants</label><input class="fi" type="number" id="vNbEnfants" min="0" value="0" oninput="renderVerifEnfants()"></div>
         </div>
+        <!-- Situations particulieres (cases fiscales T / L / W) -->
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;padding:8px 10px;background:rgba(212,98,42,0.05);border:1px solid rgba(212,98,42,0.18);border-radius:7px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);width:100%;margin-bottom:2px">Situations particuli&#232;res (cases fiscales)</div>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) au 1er janvier ET a au moins un enfant a charge. Demi-part supplementaire (jusqu'a 2 455 EUR de gain max)."><input type="checkbox" id="vCaseT" onchange="ED.caseT=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case T</b> &mdash; parent isol&#233;</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Vit seul(e) sans enfant a charge MAIS a eleve un enfant seul pendant >=5 ans. Demi-part supplementaire (jusqu'a 1 079 EUR de gain max)."><input type="checkbox" id="vCaseL" onchange="ED.caseL=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case L</b> &mdash; a &#233;lev&#233; un enfant seul &#8805;5 ans</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer" title="Un enfant a charge est invalide (carte mobilite inclusion mention invalidite). Demi-part supplementaire."><input type="checkbox" id="vCaseW" onchange="ED.caseW=this.checked;rSituation&&rSituation();autoTMI&&autoTMI()" style="accent-color:var(--orange)"> <b>Case W</b> &mdash; invalidit&#233; enfant</label>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px">
           <div><label style="font-size:10px;color:var(--gris)">Adresse</label><input class="fi" id="vAdresse"></div>
         </div>
@@ -1972,23 +1980,32 @@ var SOLUTIONS_CONFIG = {
  * Recuperer la config bareme IR
  * @param {string} sitmat  'marie'|'celibataire'|'veuf'|'divorce'|'pacs'
  * @param {number} nbEnfants  0, 0.5, 1, 1.5, 2 ...
- * @param {boolean} vivantSeul  case T (parent isole avec enfant present)
+ * @param {boolean} caseT  case T (parent isole avec enfant present, vit seul)
+ * @param {boolean} caseL  case L (vit seul, a eleve un enfant seul >=5 ans, plus d'enfant a charge)
+ * @param {boolean} caseW  case W (invalidite enfant) \u2014 ajoute 0.5 part
  */
-function getBaremeIR(sitmat, nbEnfants, vivantSeul) {
+function getBaremeIR(sitmat, nbEnfants, caseT, caseL, caseW) {
   var s = (sitmat||'').toLowerCase()
     .replace(/\u00e9|\u00e8|\u00ea/g,'e')
     .replace(/\u00e0|\u00e2/g,'a');
+  // Indexation table : nb enfants + 0.5 si case W (invalidite enfant)
+  var enf = (nbEnfants||0) + (caseW ? 0.5 : 0);
+  enf = Math.round(enf * 2) / 2;
   var table;
+  // Case L prioritaire si vit seul sans enfant a charge
+  if (caseL && (nbEnfants||0) === 0 && s.indexOf('mari')<0 && s.indexOf('pacs')<0) {
+    table = BAREME_IR.parent_isole;
+    return table[0] || BAREME_IR.celibataire[0];
+  }
   if (s.indexOf('mari')>=0 || s.indexOf('pacs')>=0) {
     table = BAREME_IR.marie;
   } else if (s.indexOf('veuf')>=0) {
     table = BAREME_IR.veuf;
-  } else if (vivantSeul && nbEnfants > 0) {
+  } else if (caseT && (nbEnfants||0) > 0) {
     table = BAREME_IR.celibataire_seul;
   } else {
     table = BAREME_IR.celibataire;
   }
-  var enf = Math.round((nbEnfants||0) * 2) / 2;
   return table[enf] || table[0] || BAREME_IR.celibataire[0];
 }
 
@@ -2184,7 +2201,7 @@ function calcRAV(revMens, chrCredit) {
  * @param {number} credits     total credits d'impot
  * @returns {{ irBrut, decote, irNet, tmi, tauxMoyen, nbParts }}
  */
-function _calcIR_impl(rbg, sitmat, nbEnfants, vivantSeul, reductions, credits) {
+function _calcIR_impl(rbg, sitmat, nbEnfants, caseT, reductions, credits, caseL, caseW) {
   rbg       = rbg || 0;
   reductions = reductions || 0;
   credits    = credits    || 0;
@@ -2192,7 +2209,7 @@ function _calcIR_impl(rbg, sitmat, nbEnfants, vivantSeul, reductions, credits) {
   if (rbg <= 0) return { irBrut:0, decote:0, irNet:0, tmi:0, tauxMoyen:0, nbParts:2 };
 
   // Recuperer la config bareme (data.js)
-  var cfg = getBaremeIR(sitmat, nbEnfants||0, vivantSeul||false);
+  var cfg = getBaremeIR(sitmat, nbEnfants||0, caseT||false, caseL||false, caseW||false);
   var nbParts = cfg.parts;
   var seuils  = cfg.seuils;  // [0, s11, s30, s41, s45]
   var taux    = [0, 0.11, 0.30, 0.41, 0.45];
@@ -2469,9 +2486,11 @@ function calcSynthese(ED, solsSelectionnees) {
     ED.fiscal.rbg || ED.fiscal.revBrutGlobal || 0,
     ED.sitmat || 'marie',
     ED.nbEnfants || 0,
-    false,
+    !!ED.caseT,
     ED.fiscal.reductions || 0,
-    ED.fiscal.credits || 0
+    ED.fiscal.credits || 0,
+    !!ED.caseL,
+    !!ED.caseW
   );
 
   // AVANT
@@ -2567,7 +2586,7 @@ let ED = {
   type:'seul', consultant:'',
   c1:{civ:'M.',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''},
   c2:{civ:'Mme',prenom:'',nom:'',dob:'',sitpro:'',profession:'',societe:''},
-  sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[],
+  sitmat:'Célibataire', convention:'', logement:'Propriétaire', adresse:'', nbEnfants:0, enfants:[], caseT:false, caseL:false, caseW:false,
   objectifs:[], epMens:0, epPrec:0,
   actifs:[], passifs:[],
   revenus:{c1:0,c2:0,sal1:0,sal2:0,fonc:0,compl:0,_salSpecific:0,_sal2Specific:0,_salCategory:0,_sal2Category:0,_foncSpecific:0,_foncCategory:0}, charges:0, chargesDetail:[], chargesCredit:0,
@@ -3750,17 +3769,28 @@ function parseAvisIR(){
   if (!mParts) mParts = t.match(/\bNOMBRE\s+DE\s+PARTS\b[^0-9]*(\d+[,.]\d+)/i);
   if (mParts) ED.fiscal.parts = parseFloat(mParts[1].replace(',','.'));
 
-  // ── 5. SITUATION FOYER (case O=marie, S/C=celib, T=isole, V=veuf) ──
-  var mCase = t.match(/situation du foyer[^\n]*\n\s*([A-Z])\s*\n/i);
-  if (!mCase) mCase = t.match(/^([OSTVCD])\s*$/m);
-  if (mCase) {
-    var cas = mCase[1].toUpperCase();
-    if (cas === 'O') ED.sitmat = 'Marie(e)s';
-    else if (cas === 'T') ED.sitmat = 'Celibataire_seul';
+  // ── 5. SITUATION DE FAMILLE (M/O=marie, D=divorce, C/S=celib, V=veuf) ──
+  //     + SITUATIONS PARTICULIERES (case T=parent isole, L=eleve enfant seul, W=invalidite)
+  var mSit = t.match(/situation\s+de\s+famille[^\n]*\n\s*([A-Z])\s*(?:\n|$)/i);
+  if (!mSit) mSit = t.match(/situation\s+du\s+foyer[^\n]*\n\s*([A-Z])\s*(?:\n|$)/i);
+  if (!mSit) mSit = t.match(/^([MODSVCT])\s*$/m);
+  if (mSit) {
+    var cas = mSit[1].toUpperCase();
+    if (cas === 'M' || cas === 'O') ED.sitmat = 'Marié(e)';
+    else if (cas === 'D') ED.sitmat = 'Divorcé(e)';
     else if (cas === 'V') ED.sitmat = 'Veuf(ve)';
-    else ED.sitmat = 'Celibataire';
+    else if (cas === 'C' || cas === 'S') ED.sitmat = 'Célibataire';
+    // 'T' n'est pas une situation de famille mais une situation particuliere — voir bloc ci-dessous
   } else if (isCouple) {
     ED.sitmat = 'Marie(e)s';
+  }
+  // Situations particulieres (cases fiscales)
+  var mPart = t.match(/situations?\s+particuli[eè]res[^\n]*\n\s*([A-Z][\sA-Z]*)/i);
+  if (mPart) {
+    var lettres = mPart[1].toUpperCase();
+    if (/\bT\b/.test(lettres)) ED.caseT = true;
+    if (/\bL\b/.test(lettres)) ED.caseL = true;
+    if (/\bW\b/.test(lettres)) ED.caseW = true;
   }
 
   // ── 6. SALAIRES D1 / D2 ───────────────────────────────────────
@@ -6928,7 +6958,7 @@ function ageFrom(dob){
 // calculs.js expose calcIR(rbg, sitmat, nbEnfants, vivantSeul, reductions, credits)
 // L'ancien code appellait calcIR(rbg, parts) → on détecte et on convertit
 // _calcIR_impl vient de calculs.js (renommé pour éviter conflit avec wrapper)
-function calcIR(rbg, sitmatOrParts, nbEnfants, vivantSeul, reductions, credits) {
+function calcIR(rbg, sitmatOrParts, nbEnfants, caseT, reductions, credits, caseL, caseW) {
   // Détection : si 2ème arg est un nombre → ancien format (parts)
   if (typeof sitmatOrParts === 'number') {
     // Ancien format : calcIR(rbg, parts) → retourne {ir, tmi}
@@ -6939,8 +6969,8 @@ function calcIR(rbg, sitmatOrParts, nbEnfants, vivantSeul, reductions, credits) 
     var res = _calcIR_impl(rbg, sitmat2, nbEnf2, false, 0, 0);
     return {ir: res.irNet, tmi: res.tmi, irNet: res.irNet, irBrut: res.irBrut, tauxMoyen: res.tauxMoyen};
   }
-  // Nouveau format : calcIR(rbg, sitmat, nbEnfants, ...)
-  return _calcIR_impl(rbg, sitmatOrParts||'celibataire', nbEnfants||0, vivantSeul||false, reductions||0, credits||0);
+  // Nouveau format : calcIR(rbg, sitmat, nbEnfants, caseT, reductions, credits, caseL, caseW)
+  return _calcIR_impl(rbg, sitmatOrParts||'celibataire', nbEnfants||0, caseT||false, reductions||0, credits||0, caseL||false, caseW||false);
 }
 function tmiFromRBG(rbg, parts) { return calcIR(rbg, parts||1).tmi; }
 
@@ -8151,6 +8181,8 @@ function remplirVerification(){
       var per2WrapH=document.getElementById('vFiscPER2Wrap');if(per2WrapH)per2WrapH.style.display='none';
     }
     s('vSitmat',ED.sitmat);s('vRegime',ED.convention);toggleRegimeField();s('vLogement',ED.logement);s('vAdresse',ED.adresse);s('vNbEnfants',ED.nbEnfants||0);
+    var setCk=function(id,b){var el=document.getElementById(id);if(el)el.checked=!!b;};
+    setCk('vCaseT',ED.caseT);setCk('vCaseL',ED.caseL);setCk('vCaseW',ED.caseW);
     s('vDateMariage',ED.dateMariage||'');
     s('vFonc',ED.revenus.fonc||'');s('vBIC',ED.revenus.bic||'');s('vAutres',ED.revenus.compl||'');
     renderVerifEnfants();renderVerifActifs();renderVerifPassifs();renderVerifCharges();renderVerifObjectifs();
@@ -8488,6 +8520,8 @@ function appliquerVerification(){
     ED.logement=v('vLogement');ED.adresse=v('vAdresse').trim();
     ED.dateMariage=v('vDateMariage').trim();
     ED.nbEnfants=n('vNbEnfants');
+    var gk=function(id){var el=document.getElementById(id);return !!(el&&el.checked);};
+    ED.caseT=gk('vCaseT');ED.caseL=gk('vCaseL');ED.caseW=gk('vCaseW');
     // Enfants
     ED.enfants=[];
     for(var i=0;i<ED.nbEnfants;i++){
