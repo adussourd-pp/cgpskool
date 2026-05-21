@@ -283,6 +283,14 @@ tbody td:first-child{text-align:left;color:var(--noir);font-weight:600}
     <div id="scpiPickerPanel">
       <input class="scpi-search" type="text" placeholder="Rechercher par nom, soci&#233;t&#233;&hellip;" oninput="filterSCPI(this.value)">
       <div class="scpi-list" id="scpiList"></div>
+      <div class="fg" style="margin-top:12px;margin-bottom:0">
+        <label>Taux de distribution personnalis&#233; <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gris)">(optionnel)</span></label>
+        <div class="fi-row">
+          <input type="number" id="scpi-override" placeholder="Taux par d&#233;faut" min="0" max="20" step="0.1" oninput="updateProgress()">
+          <span class="fi-unit">%</span>
+        </div>
+        <div style="font-size:10px;color:var(--gris);margin-top:4px;line-height:1.4;font-style:italic">Laisser vide pour utiliser le taux de la SCPI s&#233;lectionn&#233;e.</div>
+      </div>
     </div>
     <div id="customRatePanel" style="display:none">
       <div class="custom-rate-panel">
@@ -510,6 +518,16 @@ function getActiveScpi(){
       isCustom:true
     };
   }
+  if(!selectedSCPI) return null;
+  const ovEl=document.getElementById('scpi-override');
+  const ovRaw=ovEl?ovEl.value.trim():'';
+  if(ovRaw!==''){
+    const ov=+ovRaw/100;
+    if(ov>0){
+      const ratio=selectedSCPI.yieldGross>0?selectedSCPI.yieldNet/selectedSCPI.yieldGross:0.75;
+      return Object.assign({},selectedSCPI,{yieldGross:ov,yieldNet:ov*ratio,yieldOverride:true,yieldOriginal:selectedSCPI.yieldGross});
+    }
+  }
   return selectedSCPI;
 }
 
@@ -613,9 +631,10 @@ function renderSCPIHeader(){
         <div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir);line-height:1.2">${s.name} <span style="color:var(--gris);font-weight:400">— ${s.manager}</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">${tagsHtml}</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:2px">
+      <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:2px;align-items:flex-end">
         ${s.price?`<div style="font-family:var(--sans);font-size:14px;font-weight:700;color:var(--noir)">${s.price} &euro;</div>`:''}
-        <div style="font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ambre)">${(s.yieldGross*100).toFixed(2)}%</div>
+        <div style="font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ambre)">${(s.yieldGross*100).toFixed(2)}%${s.yieldOverride?` <span style="font-size:10px;font-weight:600;color:var(--gris);text-decoration:line-through;margin-left:4px">${(s.yieldOriginal*100).toFixed(2)}%</span>`:''}</div>
+        ${s.yieldOverride?'<div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ambre-d)">Taux personnalis&eacute;</div>':''}
       </div>
     </div>`;
 }
@@ -936,6 +955,7 @@ CGP.project.registerModule('scpi-simulator', {
       currentMode: currentMode,
       sourceMode: sourceMode,
       selectedSCPIid: selectedSCPI ? selectedSCPI.id : null,
+      scpiOverride: document.getElementById('scpi-override').value,
       customGross: +document.getElementById('custom-gross').value,
       customName: document.getElementById('custom-name').value,
       retInit: +document.getElementById('ret-init').value,
@@ -956,6 +976,7 @@ CGP.project.registerModule('scpi-simulator', {
     if (d.customGross !== undefined) document.getElementById('custom-gross').value = d.customGross;
     if (d.customName !== undefined) document.getElementById('custom-name').value = d.customName;
     if (d.selectedSCPIid !== undefined && d.selectedSCPIid !== null) selectSCPI(d.selectedSCPIid);
+    if (d.scpiOverride !== undefined) document.getElementById('scpi-override').value = d.scpiOverride;
     if (d.retInit !== undefined) document.getElementById('ret-init').value = d.retInit;
     if (d.retMonthly !== undefined) document.getElementById('ret-monthly').value = d.retMonthly;
     if (d.retReinvest !== undefined) {
