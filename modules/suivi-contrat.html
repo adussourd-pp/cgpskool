@@ -255,11 +255,19 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
       </div>
 
       <!-- ANNEXE - Historique des mouvements -->
-      <div style="margin:32px 0 14px;padding-top:18px;border-top:2px dashed var(--bord)"></div>
-      <div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gris);margin-bottom:14px">Annexe</div>
-      <div class="card" style="border-style:dashed;background:#fafafa">
-        <div class="card-title">Historique complet des mouvements</div>
-        <table class="tbl" id="movTbl"></table>
+      <div id="annexeBlock">
+        <div style="margin:32px 0 14px;padding-top:18px;border-top:2px dashed var(--bord)"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gris)">Annexe</div>
+          <label class="no-print" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--gris);text-transform:none;letter-spacing:0;cursor:pointer">
+            <input type="checkbox" id="annexeInclude" checked onchange="toggleAnnexeInclude();saveLocal()">
+            Inclure dans le PDF
+          </label>
+        </div>
+        <div class="card" style="border-style:dashed;background:#fafafa">
+          <div class="card-title">Historique complet des mouvements</div>
+          <table class="tbl" id="movTbl"></table>
+        </div>
       </div>
 
       <div id="conseillerFooter"></div>
@@ -552,6 +560,7 @@ function renderAll(){
   renderSbAlloc();
   renderMouv();
   toggleCtxInclude();
+  toggleAnnexeInclude();
   saveLocal();
 }
 
@@ -779,6 +788,14 @@ function toggleCtxInclude(){
   card.style.opacity=cb.checked?'1':'0.5';
 }
 
+function toggleAnnexeInclude(){
+  var cb=document.getElementById('annexeInclude');
+  var block=document.getElementById('annexeBlock');
+  if(!cb||!block)return;
+  block.classList.toggle('skip-print',!cb.checked);
+  block.style.opacity=cb.checked?'1':'0.5';
+}
+
 function saveAllocComm(i){
   var a=STATE.allocation[i];if(!a)return;
   var el=document.getElementById('ac_'+i);if(!el)return;
@@ -793,6 +810,7 @@ function esc(s){var d=document.createElement('div');d.textContent=s==null?'':Str
 // ══════════════════════════════════════════════════════════════
 function collectState(){
   var cb=document.getElementById('ctxInclude');
+  var cbAnnexe=document.getElementById('annexeInclude');
   var cbAlloc=document.getElementById('allocComments');
   var cbTri=document.getElementById('hideTri');
   return {
@@ -807,6 +825,7 @@ function collectState(){
     cNote:(document.getElementById('cNote')||{}).innerHTML||'',
     cCtx:(document.getElementById('cCtx')||{}).innerHTML||'',
     ctxInclude:!(cb&&!cb.checked),
+    annexeInclude:!(cbAnnexe&&!cbAnnexe.checked),
     raw:V('rawExport')
   };
 }
@@ -837,6 +856,8 @@ function applyState(s){
   if(ctxEl)ctxEl.innerHTML=s.cCtx||(s.comms&&s.comms.ctx)||'';
   var cbCtx=document.getElementById('ctxInclude');
   if(cbCtx&&s.ctxInclude===false)cbCtx.checked=false;
+  var cbAnnexe=document.getElementById('annexeInclude');
+  if(cbAnnexe&&s.annexeInclude===false)cbAnnexe.checked=false;
   var cbAC=document.getElementById('allocComments');
   if(cbAC&&s.allocCommentsOn)cbAC.checked=true;
   var cbTri=document.getElementById('hideTri');
