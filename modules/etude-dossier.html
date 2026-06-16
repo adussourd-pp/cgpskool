@@ -3291,10 +3291,13 @@ function parseTextRI(txt){
         parts.shift(); // label
         var v1=parts.shift()||'';
         var v2=parts.shift()||'';
-        // Si v2 vide : regarder la ligne suivante (dropdown déborde)
-        if(!v2&&i+1<lines.length){
+        // Si v2 vide : regarder la ligne suivante (dropdown déborde).
+        // Le vrai debordement d'un menu deroulant est une ligne SANS tabulation.
+        // Une ligne-libelle vide ('Nom de naissance\t\t') contient des tabs (meme
+        // si trim() les retire) : on teste donc la ligne BRUTE pour les exclure.
+        if(!v2&&i+1<lines.length&&lines[i+1].indexOf('\t')<0){
           var nxt=lines[i+1].trim();
-          if(nxt&&!isPlaceholder(nxt)&&nxt.indexOf('\t')<0&&!SECTION_HEADERS.test(nxt)){
+          if(nxt&&!isPlaceholder(nxt)&&!SECTION_HEADERS.test(nxt)){
             v2=nxt;
           }
         }
@@ -3305,16 +3308,20 @@ function parseTextRI(txt){
       return {v1:'',v2:''};
     }
 
-    // Detection couple : presence de donnees dans colonne Investisseur 2
+    // Detection couple : Investisseur 2 a-t-il une vraie identite ?
+    // (on ne se fie PAS aux lignes d'en-tete 'Investisseur 1 / Investisseur 2'
+    //  ni aux placeholders JJ/MM/AAAA, Oui/Non, Choisissez un élément...)
     var isCoupleC=false;
-    s01.split('\n').forEach(function(line){
-      if(line.indexOf('\t')<0)return;
-      var p=line.split('\t').map(function(x){return x.trim();});
-      if(p.length>=3&&p[2]&&p[2]!==''&&p[2]!=='Choisissez un élément.'&&p[2]!==p[1])isCoupleC=true;
-    });
-    // Fallback : recherche champ Prénom, Nom pour confirmer
+    function realV2C(v){
+      if(!v||v.length<2)return false;
+      if(v==='Choisissez un élément.')return false;
+      if(/^(JJ\/MM\/AAAA|MM\/AAAA|Oui\/Non|Investisseur\s*[12])$/i.test(v))return false;
+      return true;
+    }
     var pnCheck=getField(s01,'Prénom, Nom');
-    if(pnCheck.v2&&pnCheck.v2.length>2)isCoupleC=true;
+    var civCheck=getField(s01,'Civilité');
+    var dobCheck=getField(s01,'Date et lieu de naissance');
+    if(realV2C(pnCheck.v2)||realV2C(civCheck.v2)||realV2C(dobCheck.v2))isCoupleC=true;
     ED.type=isCoupleC?'couple':'seul';
 
     // Identite
@@ -3429,10 +3436,13 @@ function parseTextRI(txt){
     for(var iA=0;iA<s02Lines.length;iA++){
       if(iA===skipNext)continue;
       var lA=s02Lines[iA].trim();
-      if(lA.charAt(0)!=='☒')continue;
-      var nomA=lA.replace(/^☒\s*/,'').trim();
-      var nxtA=(s02Lines[iA+1]||'').trim();
-      var pA=nxtA.split('\t').map(function(x){return x.trim();});
+      var cbA=lA.charAt(0);
+      if(cbA!=='☒'&&cbA!=='☐')continue;
+      var nomA=lA.replace(/^[☒☐]\s*/,'').trim();
+      // NE PAS trim() la ligne avant split : les tabulations de tete = cellules
+      // vides (colonnes Investisseur 1/2 non remplies). Les retirer decalerait
+      // une valeur 'Commun' ou 'Investisseur 2' vers la colonne Investisseur 1.
+      var pA=(s02Lines[iA+1]||'').split('\t').map(function(x){return x.trim();});
       // Horizon (commun aux deux formats)
       var nl=nomA.toLowerCase();
       var horizonA='lt';
@@ -3482,8 +3492,9 @@ function parseTextRI(txt){
     var linesP=s02Passifs.split('\n');
     for(var iP=0;iP<linesP.length;iP++){
       var lP=linesP[iP].trim();
-      if(lP.charAt(0)!=='☒')continue;
-      var typeP=lP.replace(/^☒\s*/,'').trim();
+      var cbP=lP.charAt(0);
+      if(cbP!=='☒'&&cbP!=='☐')continue;
+      var typeP=lP.replace(/^[☒☐]\s*/,'').trim();
       var titL=(linesP[iP+1]||'').trim();
       if(titL==='Choisissez un élément.'||!titL)continue;
       var titP=mapTit(titL)||'Commun';
@@ -3514,8 +3525,9 @@ function parseTextRI(txt){
     var s03Chr=s03Parts[1]||'';
     s03Rev.split('\n').forEach(function(line,idx,arr){
       var lR=line.trim();
-      if(lR.charAt(0)!=='☒')return;
-      var typeR=lR.replace(/^☒\s*/,'').trim();
+      var cbR=lR.charAt(0);
+      if(cbR!=='☒'&&cbR!=='☐')return;
+      var typeR=lR.replace(/^[☒☐]\s*/,'').trim();
       var nextR=(arr[idx+1]||'').trim();
       var pR=nextR.split('\t').map(function(x){return x.trim();});
       var mtR=pEur(pR[0]||'');
@@ -3534,8 +3546,9 @@ function parseTextRI(txt){
     });
     s03Chr.split('\n').forEach(function(line,idx,arr){
       var lC=line.trim();
-      if(lC.charAt(0)!=='☒')return;
-      var typeC=lC.replace(/^☒\s*/,'').trim();
+      var cbC=lC.charAt(0);
+      if(cbC!=='☒'&&cbC!=='☐')return;
+      var typeC=lC.replace(/^[☒☐]\s*/,'').trim();
       var nextC=(arr[idx+1]||'').trim();
       var pC=nextC.split('\t').map(function(x){return x.trim();});
       var mtC=pEur(pC[0]||'');
@@ -3564,7 +3577,22 @@ function parseTextRI(txt){
     if(!ED.fiscal.tmi&&ED.fiscal.rbg){try{ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);}catch(e){}}
     if(!ED.fiscal.irnet&&ED.fiscal.rbg){try{var cc=calcIR(ED.fiscal.rbg,ED.fiscal.parts);ED.fiscal.irnet=cc.ir;if(!ED.fiscal.tmi)ED.fiscal.tmi=cc.tmi;}catch(e){}}
 
-    // Objectifs : non parsés (remplis manuellement dans Vérifier & compléter)
+    // Objectifs : section 05 — seuls les items coches (☒) sont retenus
+    // (sans colonne valeur, la case cochee est le seul signal de selection)
+    ED.objectifs=[];
+    var OBJ05=[['imp','Réduire mes impôts'],['épargne','Me constituer une épargne'],['epargne','Me constituer une épargne'],
+      ['immobilier','Investir dans l\'immobilier'],['retraite','Préparer ma retraite'],
+      ['transmission','Préparer ma transmission'],['succession','Préparer ma transmission']];
+    (s05||'').split('\n').forEach(function(line){
+      var lO=line.trim();
+      if(lO.charAt(0)!=='☒')return;
+      var obj=lO.replace(/^☒\s*/,'').trim();
+      if(!obj||/^Autre\s*:/i.test(obj)||obj.indexOf('___')>=0||obj==='Choisissez un élément.')return;
+      var keyO=obj.toLowerCase(),mappedO='';
+      for(var io=0;io<OBJ05.length;io++){if(!mappedO&&keyO.indexOf(OBJ05[io][0])>=0)mappedO=OBJ05[io][1];}
+      var valO=mappedO||obj;
+      if(ED.objectifs.indexOf(valO)<0)ED.objectifs.push(valO);
+    });
     if(!ED.objectifs||!ED.objectifs.length)ED.objectifs=['Objectifs à compléter'];
 
     // Epargne mensuelle initiale (20% du salaire net/mois)
