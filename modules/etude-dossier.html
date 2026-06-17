@@ -465,6 +465,11 @@ select.span2{grid-column:span 2}
 .ml-input{width:100%;padding:7px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:12px;color:var(--noir);outline:none}
 .ml-input:focus{border-color:var(--orange)}
 @media print{.comment-zone textarea{border:none;background:transparent;resize:none;padding:0;min-height:0}.comment-zone.comment-off{display:none!important}}
+/* En print : masquer TOUS les boutons switch conseiller (.cz-switch) — note
+   conseiller, retraite, visibilite PDF, notes solution/levier. Les toggles
+   "Conserver" de l'Epargne financiere preconisee sont des switches inline
+   (hors .cz-switch) et restent donc visibles au PDF. */
+@media print{.cz-switch{display:none!important}}
 
 /* ── NOTE PRINT (dans la page, visible quand switch ON) ── */
 .note-print{margin-top:14px;padding:10px 14px;background:var(--gris-l);border-radius:8px;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;white-space:pre-wrap}
