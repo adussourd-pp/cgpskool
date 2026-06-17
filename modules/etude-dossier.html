@@ -9064,6 +9064,7 @@ function sauvegarderEtude(){
       dateMAJ:dateStr,
       ED:JSON.parse(JSON.stringify(ED)),
       solsSelectionnees:JSON.parse(JSON.stringify(solsSelectionnees)),
+      steps:JSON.parse(JSON.stringify(typeof steps!=='undefined'&&steps?steps:[])),
       comments:comments,
       commentSwitches:commentSwitches,
       precoConseille:JSON.parse(JSON.stringify(window._precoConseille||{}))
@@ -9102,6 +9103,11 @@ function chargerEtude(input){
         if(data.solsSelectionnees){
           solsSelectionnees.length=0;
           data.solsSelectionnees.forEach(function(s){solsSelectionnees.push(s);});
+        }
+        // Restaurer la feuille de route (jalons, type de RDV et dates)
+        if(data.steps&&data.steps.length){
+          steps.length=0;
+          data.steps.forEach(function(s){steps.push(s);});
         }
         // Restaurer commentaires
         if(data.comments){
