@@ -2880,8 +2880,12 @@ function parseTextRI(txt){
   var hasTabs  = txt.indexOf('\t') >= 0;
   var hasPipes = /^\s*\|/m.test(txt);
   var isMammoth = !hasTabs && hasPipes;
-  // Format C : nouveau RI 2026 (cases ☒/☐ + Investisseur 1/2)
-  var isFormatC = /[☒☐]/.test(txt) && /Investisseur\s+[12]/i.test(txt);
+  // Format C : nouveau RI 2026 (modele Word a cases + Investisseur 1/2).
+  // Detection independante du glyphe exact de la case (☐ ☑ ☒ □ ⬜...) : on
+  // s'appuie sur l'en-tete 'Investisseur 1/2' ET (une case OU le placeholder
+  // de menu deroulant 'Choisissez un élément.' propre a ce modele).
+  var isFormatC = /Investisseur\s+[12]/i.test(txt)
+    && (/[☐☑☒■□⬛⬜❎❏❑❒]/.test(txt) || /Choisissez un .l.ment/i.test(txt));
   // Format D : Recueil Proxeema/Stellium (remplace Ariane) — libelle puis valeur(s) sur lignes successives
   var isFormatD = /Recueil d[\u2019']informations/i.test(txt)
     && /(?:^|\n)\s*Consultant\s*:/i.test(txt)
@@ -3265,6 +3269,33 @@ function parseTextRI(txt){
   // ══════════════════════════════════════════════════════════════════
   if(isFormatC){
 
+    // Detection des cases a cocher — glyphe variable selon l'export Word
+    // (☐ U+2610, ☑ U+2611, ☒ U+2612, □ U+25A1, ⬜ U+2B1C, ❏ U+274F, etc.)
+    var CBX='☐☑☒■□⬛⬜❎❏❑❒�';
+    var CBX_RE=new RegExp('^['+CBX+']');
+    var CBX_STRIP=new RegExp('^['+CBX+'\\s\\-\\u2022\\u00b7]+');
+    // Une ligne est un item si elle commence par une case OU si (sans tabulation,
+    // hors entete/categorie) la ligne suivante est une ligne de donnees chiffree.
+    function cbItemName(rawLine){
+      var t=(rawLine||'').trim();
+      if(!t)return null;
+      if(CBX_RE.test(t))return t.replace(CBX_STRIP,'').trim()||null;
+      return null;
+    }
+    // Variante avec repli structurel : si aucun glyphe n'est reconnu, la ligne
+    // est quand meme un item si (sans tab, hors entete) la ligne suivante est
+    // une ligne de donnees contenant au moins un montant > 0.
+    function cbOrStructItem(line,nextLine,skipRe){
+      var nm=cbItemName(line);
+      if(nm!==null)return nm;
+      if((line||'').indexOf('\t')>=0)return null;
+      var t=(line||'').trim();
+      if(!t||(skipRe&&skipRe.test(t)))return null;
+      if((nextLine||'').indexOf('\t')<0)return null;
+      if(!(nextLine||'').split('\t').some(function(x){return pEur(x)>0;}))return null;
+      return t.replace(CBX_STRIP,'').trim()||null;
+    }
+
     // Mapping titulaire texte -> code interne
     function mapTit(s){
       s=(s||'').toLowerCase().trim();
@@ -3291,10 +3322,13 @@ function parseTextRI(txt){
         parts.shift(); // label
         var v1=parts.shift()||'';
         var v2=parts.shift()||'';
-        // Si v2 vide : regarder la ligne suivante (dropdown déborde)
-        if(!v2&&i+1<lines.length){
+        // Si v2 vide : regarder la ligne suivante (dropdown déborde).
+        // Le vrai debordement d'un menu deroulant est une ligne SANS tabulation.
+        // Une ligne-libelle vide ('Nom de naissance\t\t') contient des tabs (meme
+        // si trim() les retire) : on teste donc la ligne BRUTE pour les exclure.
+        if(!v2&&i+1<lines.length&&lines[i+1].indexOf('\t')<0){
           var nxt=lines[i+1].trim();
-          if(nxt&&!isPlaceholder(nxt)&&nxt.indexOf('\t')<0&&!SECTION_HEADERS.test(nxt)){
+          if(nxt&&!isPlaceholder(nxt)&&!SECTION_HEADERS.test(nxt)){
             v2=nxt;
           }
         }
@@ -3305,16 +3339,20 @@ function parseTextRI(txt){
       return {v1:'',v2:''};
     }
 
-    // Detection couple : presence de donnees dans colonne Investisseur 2
+    // Detection couple : Investisseur 2 a-t-il une vraie identite ?
+    // (on ne se fie PAS aux lignes d'en-tete 'Investisseur 1 / Investisseur 2'
+    //  ni aux placeholders JJ/MM/AAAA, Oui/Non, Choisissez un élément...)
     var isCoupleC=false;
-    s01.split('\n').forEach(function(line){
-      if(line.indexOf('\t')<0)return;
-      var p=line.split('\t').map(function(x){return x.trim();});
-      if(p.length>=3&&p[2]&&p[2]!==''&&p[2]!=='Choisissez un élément.'&&p[2]!==p[1])isCoupleC=true;
-    });
-    // Fallback : recherche champ Prénom, Nom pour confirmer
+    function realV2C(v){
+      if(!v||v.length<2)return false;
+      if(v==='Choisissez un élément.')return false;
+      if(/^(JJ\/MM\/AAAA|MM\/AAAA|Oui\/Non|Investisseur\s*[12])$/i.test(v))return false;
+      return true;
+    }
     var pnCheck=getField(s01,'Prénom, Nom');
-    if(pnCheck.v2&&pnCheck.v2.length>2)isCoupleC=true;
+    var civCheck=getField(s01,'Civilité');
+    var dobCheck=getField(s01,'Date et lieu de naissance');
+    if(realV2C(pnCheck.v2)||realV2C(civCheck.v2)||realV2C(dobCheck.v2))isCoupleC=true;
     ED.type=isCoupleC?'couple':'seul';
 
     // Identite
@@ -3428,11 +3466,23 @@ function parseTextRI(txt){
     var skipNext=-1;
     for(var iA=0;iA<s02Lines.length;iA++){
       if(iA===skipNext)continue;
-      var lA=s02Lines[iA].trim();
-      if(lA.charAt(0)!=='☒')continue;
-      var nomA=lA.replace(/^☒\s*/,'').trim();
-      var nxtA=(s02Lines[iA+1]||'').trim();
-      var pA=nxtA.split('\t').map(function(x){return x.trim();});
+      var rawLA=s02Lines[iA]||'';
+      var nomA=cbItemName(rawLA);
+      if(nomA===null){
+        // Pas de glyphe case reconnu : un item est une ligne SANS tabulation
+        // (les entetes/categories en ont), suivie d'une ligne de donnees chiffree.
+        if(rawLA.indexOf('\t')>=0)continue;
+        var tA=rawLA.trim();
+        if(!tA||/^(Désignation|Immobilier|Liquidit|Placements|Retraite et|Biens|Autres? actifs|Actifs|Passifs)/i.test(tA))continue;
+        if((s02Lines[iA+1]||'').indexOf('\t')<0)continue;
+        if(!(s02Lines[iA+1]||'').split('\t').some(function(x){return pEur(x)>0;}))continue;
+        nomA=tA.replace(CBX_STRIP,'').trim();
+      }
+      if(!nomA)continue;
+      // NE PAS trim() la ligne avant split : les tabulations de tete = cellules
+      // vides (colonnes Investisseur 1/2 non remplies). Les retirer decalerait
+      // une valeur 'Commun' ou 'Investisseur 2' vers la colonne Investisseur 1.
+      var pA=(s02Lines[iA+1]||'').split('\t').map(function(x){return x.trim();});
       // Horizon (commun aux deux formats)
       var nl=nomA.toLowerCase();
       var horizonA='lt';
@@ -3481,9 +3531,8 @@ function parseTextRI(txt){
 
     var linesP=s02Passifs.split('\n');
     for(var iP=0;iP<linesP.length;iP++){
-      var lP=linesP[iP].trim();
-      if(lP.charAt(0)!=='☒')continue;
-      var typeP=lP.replace(/^☒\s*/,'').trim();
+      var typeP=cbItemName(linesP[iP]);
+      if(typeP===null)continue;
       var titL=(linesP[iP+1]||'').trim();
       if(titL==='Choisissez un élément.'||!titL)continue;
       var titP=mapTit(titL)||'Commun';
@@ -3513,9 +3562,8 @@ function parseTextRI(txt){
     var s03Rev=(s03Parts[0]||'').replace(/^[\s\S]*?Revenus[\s\S]*?\n/i,'');
     var s03Chr=s03Parts[1]||'';
     s03Rev.split('\n').forEach(function(line,idx,arr){
-      var lR=line.trim();
-      if(lR.charAt(0)!=='☒')return;
-      var typeR=lR.replace(/^☒\s*/,'').trim();
+      var typeR=cbOrStructItem(line,arr[idx+1],/^(Désignation|Revenus|Valorisation)/i);
+      if(typeR===null)return;
       var nextR=(arr[idx+1]||'').trim();
       var pR=nextR.split('\t').map(function(x){return x.trim();});
       var mtR=pEur(pR[0]||'');
@@ -3533,9 +3581,8 @@ function parseTextRI(txt){
       }
     });
     s03Chr.split('\n').forEach(function(line,idx,arr){
-      var lC=line.trim();
-      if(lC.charAt(0)!=='☒')return;
-      var typeC=lC.replace(/^☒\s*/,'').trim();
+      var typeC=cbOrStructItem(line,arr[idx+1],/^(Désignation|Charges|Valorisation)/i);
+      if(typeC===null)return;
       var nextC=(arr[idx+1]||'').trim();
       var pC=nextC.split('\t').map(function(x){return x.trim();});
       var mtC=pEur(pC[0]||'');
@@ -3564,7 +3611,22 @@ function parseTextRI(txt){
     if(!ED.fiscal.tmi&&ED.fiscal.rbg){try{ED.fiscal.tmi=tmiFromRBG(ED.fiscal.rbg,ED.fiscal.parts);}catch(e){}}
     if(!ED.fiscal.irnet&&ED.fiscal.rbg){try{var cc=calcIR(ED.fiscal.rbg,ED.fiscal.parts);ED.fiscal.irnet=cc.ir;if(!ED.fiscal.tmi)ED.fiscal.tmi=cc.tmi;}catch(e){}}
 
-    // Objectifs : non parsés (remplis manuellement dans Vérifier & compléter)
+    // Objectifs : section 05 — seuls les items coches (☒) sont retenus
+    // (sans colonne valeur, la case cochee est le seul signal de selection)
+    ED.objectifs=[];
+    var OBJ05=[['imp','Réduire mes impôts'],['épargne','Me constituer une épargne'],['epargne','Me constituer une épargne'],
+      ['immobilier','Investir dans l\'immobilier'],['retraite','Préparer ma retraite'],
+      ['transmission','Préparer ma transmission'],['succession','Préparer ma transmission']];
+    (s05||'').split('\n').forEach(function(line){
+      var lO=line.trim();
+      if(lO.charAt(0)!=='☒'&&lO.charAt(0)!=='☑')return;
+      var obj=lO.replace(/^[☒☑]\s*/,'').trim();
+      if(!obj||/^Autre\s*:/i.test(obj)||obj.indexOf('___')>=0||obj==='Choisissez un élément.')return;
+      var keyO=obj.toLowerCase(),mappedO='';
+      for(var io=0;io<OBJ05.length;io++){if(!mappedO&&keyO.indexOf(OBJ05[io][0])>=0)mappedO=OBJ05[io][1];}
+      var valO=mappedO||obj;
+      if(ED.objectifs.indexOf(valO)<0)ED.objectifs.push(valO);
+    });
     if(!ED.objectifs||!ED.objectifs.length)ED.objectifs=['Objectifs à compléter'];
 
     // Epargne mensuelle initiale (20% du salaire net/mois)
