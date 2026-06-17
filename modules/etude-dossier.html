@@ -2880,8 +2880,12 @@ function parseTextRI(txt){
   var hasTabs  = txt.indexOf('\t') >= 0;
   var hasPipes = /^\s*\|/m.test(txt);
   var isMammoth = !hasTabs && hasPipes;
-  // Format C : nouveau RI 2026 (cases ☒/☐ + Investisseur 1/2)
-  var isFormatC = /[☒☐]/.test(txt) && /Investisseur\s+[12]/i.test(txt);
+  // Format C : nouveau RI 2026 (modele Word a cases + Investisseur 1/2).
+  // Detection independante du glyphe exact de la case (☐ ☑ ☒ □ ⬜...) : on
+  // s'appuie sur l'en-tete 'Investisseur 1/2' ET (une case OU le placeholder
+  // de menu deroulant 'Choisissez un élément.' propre a ce modele).
+  var isFormatC = /Investisseur\s+[12]/i.test(txt)
+    && (/[☐☑☒■□⬛⬜❎❏❑❒]/.test(txt) || /Choisissez un .l.ment/i.test(txt));
   // Format D : Recueil Proxeema/Stellium (remplace Ariane) — libelle puis valeur(s) sur lignes successives
   var isFormatD = /Recueil d[\u2019']informations/i.test(txt)
     && /(?:^|\n)\s*Consultant\s*:/i.test(txt)
@@ -3265,6 +3269,33 @@ function parseTextRI(txt){
   // ══════════════════════════════════════════════════════════════════
   if(isFormatC){
 
+    // Detection des cases a cocher — glyphe variable selon l'export Word
+    // (☐ U+2610, ☑ U+2611, ☒ U+2612, □ U+25A1, ⬜ U+2B1C, ❏ U+274F, etc.)
+    var CBX='☐☑☒■□⬛⬜❎❏❑❒�';
+    var CBX_RE=new RegExp('^['+CBX+']');
+    var CBX_STRIP=new RegExp('^['+CBX+'\\s\\-\\u2022\\u00b7]+');
+    // Une ligne est un item si elle commence par une case OU si (sans tabulation,
+    // hors entete/categorie) la ligne suivante est une ligne de donnees chiffree.
+    function cbItemName(rawLine){
+      var t=(rawLine||'').trim();
+      if(!t)return null;
+      if(CBX_RE.test(t))return t.replace(CBX_STRIP,'').trim()||null;
+      return null;
+    }
+    // Variante avec repli structurel : si aucun glyphe n'est reconnu, la ligne
+    // est quand meme un item si (sans tab, hors entete) la ligne suivante est
+    // une ligne de donnees contenant au moins un montant > 0.
+    function cbOrStructItem(line,nextLine,skipRe){
+      var nm=cbItemName(line);
+      if(nm!==null)return nm;
+      if((line||'').indexOf('\t')>=0)return null;
+      var t=(line||'').trim();
+      if(!t||(skipRe&&skipRe.test(t)))return null;
+      if((nextLine||'').indexOf('\t')<0)return null;
+      if(!(nextLine||'').split('\t').some(function(x){return pEur(x)>0;}))return null;
+      return t.replace(CBX_STRIP,'').trim()||null;
+    }
+
     // Mapping titulaire texte -> code interne
     function mapTit(s){
       s=(s||'').toLowerCase().trim();
@@ -3435,10 +3466,19 @@ function parseTextRI(txt){
     var skipNext=-1;
     for(var iA=0;iA<s02Lines.length;iA++){
       if(iA===skipNext)continue;
-      var lA=s02Lines[iA].trim();
-      var cbA=lA.charAt(0);
-      if(cbA!=='☒'&&cbA!=='☐')continue;
-      var nomA=lA.replace(/^[☒☐]\s*/,'').trim();
+      var rawLA=s02Lines[iA]||'';
+      var nomA=cbItemName(rawLA);
+      if(nomA===null){
+        // Pas de glyphe case reconnu : un item est une ligne SANS tabulation
+        // (les entetes/categories en ont), suivie d'une ligne de donnees chiffree.
+        if(rawLA.indexOf('\t')>=0)continue;
+        var tA=rawLA.trim();
+        if(!tA||/^(Désignation|Immobilier|Liquidit|Placements|Retraite et|Biens|Autres? actifs|Actifs|Passifs)/i.test(tA))continue;
+        if((s02Lines[iA+1]||'').indexOf('\t')<0)continue;
+        if(!(s02Lines[iA+1]||'').split('\t').some(function(x){return pEur(x)>0;}))continue;
+        nomA=tA.replace(CBX_STRIP,'').trim();
+      }
+      if(!nomA)continue;
       // NE PAS trim() la ligne avant split : les tabulations de tete = cellules
       // vides (colonnes Investisseur 1/2 non remplies). Les retirer decalerait
       // une valeur 'Commun' ou 'Investisseur 2' vers la colonne Investisseur 1.
@@ -3491,10 +3531,8 @@ function parseTextRI(txt){
 
     var linesP=s02Passifs.split('\n');
     for(var iP=0;iP<linesP.length;iP++){
-      var lP=linesP[iP].trim();
-      var cbP=lP.charAt(0);
-      if(cbP!=='☒'&&cbP!=='☐')continue;
-      var typeP=lP.replace(/^[☒☐]\s*/,'').trim();
+      var typeP=cbItemName(linesP[iP]);
+      if(typeP===null)continue;
       var titL=(linesP[iP+1]||'').trim();
       if(titL==='Choisissez un élément.'||!titL)continue;
       var titP=mapTit(titL)||'Commun';
@@ -3524,10 +3562,8 @@ function parseTextRI(txt){
     var s03Rev=(s03Parts[0]||'').replace(/^[\s\S]*?Revenus[\s\S]*?\n/i,'');
     var s03Chr=s03Parts[1]||'';
     s03Rev.split('\n').forEach(function(line,idx,arr){
-      var lR=line.trim();
-      var cbR=lR.charAt(0);
-      if(cbR!=='☒'&&cbR!=='☐')return;
-      var typeR=lR.replace(/^[☒☐]\s*/,'').trim();
+      var typeR=cbOrStructItem(line,arr[idx+1],/^(Désignation|Revenus|Valorisation)/i);
+      if(typeR===null)return;
       var nextR=(arr[idx+1]||'').trim();
       var pR=nextR.split('\t').map(function(x){return x.trim();});
       var mtR=pEur(pR[0]||'');
@@ -3545,10 +3581,8 @@ function parseTextRI(txt){
       }
     });
     s03Chr.split('\n').forEach(function(line,idx,arr){
-      var lC=line.trim();
-      var cbC=lC.charAt(0);
-      if(cbC!=='☒'&&cbC!=='☐')return;
-      var typeC=lC.replace(/^[☒☐]\s*/,'').trim();
+      var typeC=cbOrStructItem(line,arr[idx+1],/^(Désignation|Charges|Valorisation)/i);
+      if(typeC===null)return;
       var nextC=(arr[idx+1]||'').trim();
       var pC=nextC.split('\t').map(function(x){return x.trim();});
       var mtC=pEur(pC[0]||'');
@@ -3585,8 +3619,8 @@ function parseTextRI(txt){
       ['transmission','Préparer ma transmission'],['succession','Préparer ma transmission']];
     (s05||'').split('\n').forEach(function(line){
       var lO=line.trim();
-      if(lO.charAt(0)!=='☒')return;
-      var obj=lO.replace(/^☒\s*/,'').trim();
+      if(lO.charAt(0)!=='☒'&&lO.charAt(0)!=='☑')return;
+      var obj=lO.replace(/^[☒☑]\s*/,'').trim();
       if(!obj||/^Autre\s*:/i.test(obj)||obj.indexOf('___')>=0||obj==='Choisissez un élément.')return;
       var keyO=obj.toLowerCase(),mappedO='';
       for(var io=0;io<OBJ05.length;io++){if(!mappedO&&keyO.indexOf(OBJ05[io][0])>=0)mappedO=OBJ05[io][1];}
