@@ -667,9 +667,11 @@ function renderRetraite(){
   ].map((k,i)=>`<div class="kpi-card ${k.cls} fade-in-${i+1}"><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   document.getElementById('chartTitle').textContent='Évolution du patrimoine sur '+horizon+' ans';
+  let cumulPercu=0;const cumulPercuData=res.rows.map(r=>{cumulPercu+=r.perceived;return Math.round(cumulPercu);});
   renderChart(res.rows.map(r=>'An '+r.year),[
     {label:'Patrimoine constitué',data:res.rows.map(r=>Math.round(r.after)),color:'#C8832A'},
-    {label:'Capital versé',data:res.rows.map((_,i)=>Math.round(init+monthly*12*(i+1))),color:'#2D7A5B'}
+    {label:'Capital versé',data:res.rows.map((_,i)=>Math.round(init+monthly*12*(i+1))),color:'#2D7A5B'},
+    {label:'Dividendes perçus cumulés',data:cumulPercuData,color:'#2B5EA7'}
   ]);
 
   renderHypothesesBox([
