@@ -1151,22 +1151,22 @@ select.span2{grid-column:span 2}
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Situation successorale</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Patrimoine net</label><input class="fi" type="number" id="trPatNet" oninput="calcTransmission()"></div>
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont AV hors succession</label><input class="fi" type="number" id="trAV" oninput="calcTransmission()"></div>
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont PER hors succession</label><input class="fi" type="number" id="trPER" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Patrimoine net</label><div class="fi-row"><input type="text" inputmode="numeric" id="trPatNet" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont AV hors succession</label><div class="fi-row"><input type="text" inputmode="numeric" id="trAV" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Dont PER hors succession</label><div class="fi-row"><input type="text" inputmode="numeric" id="trPER" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
       <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">R&#233;gime matrimonial</label><select class="fi" id="trRegime" onchange="calcTransmission()"><option>Communaut&#233; r&#233;duite aux acqu&#234;ts</option><option>S&#233;paration de biens</option><option>Communaut&#233; universelle</option><option>Participation aux acqu&#234;ts</option></select></div>
       <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Nb enfants</label><input class="fi" type="number" id="trEnfants" min="0" value="0" oninput="calcTransmission()"></div>
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Donations ant&#233;rieures</label><input class="fi" type="number" id="trDonAnt" oninput="calcTransmission()"><div style="font-size:9px;color:var(--gris);font-style:italic">Moins de 15 ans</div></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Donations ant&#233;rieures</label><div class="fi-row"><input type="text" inputmode="numeric" id="trDonAnt" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div><div style="font-size:9px;color:var(--gris);font-style:italic">Moins de 15 ans</div></div>
     </div>
     <div style="display:flex;gap:16px;margin-bottom:10px">
       <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trDDV" onchange="calcTransmission()" style="accent-color:var(--orange)">Donation au dernier vivant</label>
       <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trTestament" onchange="calcTransmission()" style="accent-color:var(--orange)">Testament</label>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C1</label><input class="fi" type="number" id="trPropC1" oninput="calcTransmission()"></div>
-      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C2</label><input class="fi" type="number" id="trPropC2" oninput="calcTransmission()"></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C1</label><div class="fi-row"><input type="text" inputmode="numeric" id="trPropC1" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      <div><label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);display:block;margin-bottom:3px">Biens propres C2</label><div class="fi-row"><input type="text" inputmode="numeric" id="trPropC2" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
     </div>
   </div>
 
@@ -1176,14 +1176,22 @@ select.span2{grid-column:span 2}
   <!-- Optimisations -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title"><span class="dot"></span>Optimisations</div>
-    <div id="transOptimisations" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDonation" onchange="calcTransmission()" style="accent-color:var(--green)">Donation aux enfants</label>
-      <div id="trOptDonMontantWrap" style="display:none"><input class="fi" type="number" id="trOptDonMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
-      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptAV" onchange="calcTransmission()" style="accent-color:var(--green)">Abondement AV hors succession</label>
-      <div id="trOptAVMontantWrap" style="display:none"><input class="fi" type="number" id="trOptAVMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
-      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDDV" onchange="calcTransmission()" style="accent-color:var(--green)">Donation au dernier vivant</label>
-      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDemembrement" onchange="calcTransmission()" style="accent-color:var(--green)">D&#233;membrement</label>
-      <div id="trOptDemMontantWrap" style="display:none"><input class="fi" type="number" id="trOptDemMontant" placeholder="Montant &#8364;" oninput="calcTransmission()"></div>
+    <div id="transOptimisations" style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDonation" onchange="calcTransmission()" style="accent-color:var(--green)">Donation aux enfants</label>
+        <div id="trOptDonMontantWrap" style="display:none;margin:6px 0 0 22px;max-width:240px"><div class="fi-row"><input type="text" inputmode="numeric" id="trOptDonMontant" placeholder="Montant" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+      <div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptAV" onchange="calcTransmission()" style="accent-color:var(--green)">Abondement AV hors succession</label>
+        <div id="trOptAVMontantWrap" style="display:none;margin:6px 0 0 22px;max-width:240px"><div class="fi-row"><input type="text" inputmode="numeric" id="trOptAVMontant" placeholder="Montant" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
+      <div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDDV" onchange="calcTransmission()" style="accent-color:var(--green)">Donation au dernier vivant</label>
+      </div>
+      <div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="trOptDemembrement" onchange="calcTransmission()" style="accent-color:var(--green)">D&#233;membrement</label>
+        <div id="trOptDemMontantWrap" style="display:none;margin:6px 0 0 22px;max-width:240px"><div class="fi-row"><input type="text" inputmode="numeric" id="trOptDemMontant" placeholder="Montant" oninput="trMoneyInput(this)"><span class="fi-unit">&#8364;</span></div></div>
+      </div>
     </div>
   </div>
 
@@ -5150,9 +5158,9 @@ function rTransmission(){
   var patNet=aSum-pSum;
   var avSum=ED.actifs.filter(function(a){return(a.nom||'').toLowerCase().indexOf('assurance')>=0||(a.nom||'').toLowerCase().indexOf(' av ')>=0;}).reduce(function(s,a){return s+(a.montant||0);},0);
   var perSum=ED.actifs.filter(function(a){return(a.nom||'').toLowerCase().indexOf('per')>=0;}).reduce(function(s,a){return s+(a.montant||0);},0);
-  var el1=document.getElementById('trPatNet');if(el1&&!el1.value)el1.value=patNet||'';
-  var el2=document.getElementById('trAV');if(el2&&!el2.value)el2.value=avSum||'';
-  var el3=document.getElementById('trPER');if(el3&&!el3.value)el3.value=perSum||'';
+  var el1=document.getElementById('trPatNet');if(el1&&!el1.value)el1.value=patNet>0?fmt(patNet):'';
+  var el2=document.getElementById('trAV');if(el2&&!el2.value)el2.value=avSum>0?fmt(avSum):'';
+  var el3=document.getElementById('trPER');if(el3&&!el3.value)el3.value=perSum>0?fmt(perSum):'';
   var el4=document.getElementById('trEnfants');if(el4&&!+el4.value)el4.value=ED.nbEnfants||0;
   calcTransmission();
 }
@@ -5177,9 +5185,21 @@ function calcDroitsSucc(baseTaxable){
   return{total:total,tranches:det};
 }
 
+// Formatage live des montants saisis : separateurs de milliers fr-FR + caret preserve
+function trMoneyInput(el){
+  var pos=el.selectionStart||0;
+  var nbDigitsAvant=el.value.slice(0,pos).replace(/\D/g,'').length;
+  var digits=el.value.replace(/\D/g,'').replace(/^0+(?=\d)/,'').slice(0,13);
+  el.value=digits?(+digits).toLocaleString('fr-FR'):'';
+  var np=0,cnt=0;
+  while(np<el.value.length&&cnt<nbDigitsAvant){if(/\d/.test(el.value.charAt(np)))cnt++;np++;}
+  try{el.setSelectionRange(np,np);}catch(e){}
+  calcTransmission();
+}
+
 function calcTransmission(){
   try{
-  var n=function(id){return +(document.getElementById(id)?document.getElementById(id).value:0)||0;};
+  var n=function(id){var e=document.getElementById(id);return e?(+String(e.value).replace(/\D/g,'')||0):0;};
   var cb=function(id){var e=document.getElementById(id);return e&&e.checked;};
   // Toggle montants optim
   var dw=document.getElementById('trOptDonMontantWrap');if(dw)dw.style.display=cb('trOptDonation')?'':'none';
