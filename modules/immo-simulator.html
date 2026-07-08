@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-<title>Simulateur Immobilier LMNP — CGP Skool</title>
+<title>Simulateur Immobilier LMNP &amp; Denormandie — CGP Skool</title>
 <link rel="stylesheet" href="../assets/cgp-skool-theme.css">
 <link rel="stylesheet" href="../assets/cgp-skool-layout.css">
 <script src="../assets/cgp-skool-core.js"></script>
@@ -31,7 +31,7 @@ body { background: #ECEAE6; }
 .fi-unit{padding:7px 9px;font-size:11px;color:var(--gris);border-left:1px solid var(--bord);white-space:nowrap;flex-shrink:0}
 
 /* Mode tabs (choix initial type investissement - cf. SIDEBAR_STANDARD) */
-.mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:11px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
 .mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
 .mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
@@ -147,6 +147,7 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="mode-tab active" onclick="setMode('mono',this)"><span class="mode-icon">&#127968;</span>Sans exploit.</div>
         <div class="mode-tab" onclick="setMode('coloc',this)"><span class="mode-icon">&#128101;</span>Colocation</div>
         <div class="mode-tab" onclick="setMode('resid',this)"><span class="mode-icon">&#127976;</span>Resid. Serv.</div>
+        <div class="mode-tab" onclick="setMode('denorm',this)"><span class="mode-icon">&#127963;</span>Denormandie</div>
       </div>
     </div>
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
@@ -205,6 +206,29 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fg"><label>Frais d'acte (notaire)</label>
           <div class="fi-row"><input type="number" id="fraisNotaireR" value="2760" step="100" oninput="recalc()"><span class="fi-unit">€</span></div></div>
       </div>
+
+      <div id="B-denorm" style="display:none">
+        <div class="fg"><label>Prix d'acquisition (logement ancien)</label>
+          <div class="fi-row"><input type="number" id="prixDenorm" value="150000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Travaux de r&#233;novation <small>(&#8805;25% du co&#251;t total)</small></label>
+          <div class="fi-row"><input type="number" id="travauxDenorm" value="60000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Frais de notaire</label>
+          <div class="fi-row"><input type="number" id="fraisNotaireD" value="12000" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Engagement de location</label>
+          <select class="fi" id="dEngagement" onchange="recalc()">
+            <option value="6">6 ans &#8212; r&#233;duction 12%</option>
+            <option value="9" selected>9 ans &#8212; r&#233;duction 18%</option>
+            <option value="12">12 ans &#8212; r&#233;duction 21%</option>
+          </select></div>
+        <div class="fg"><label>TMI du foyer fiscal</label>
+          <select class="fi" id="dTMI" onchange="recalc()">
+            <option value="0">0%</option>
+            <option value="11">11%</option>
+            <option value="30" selected>30%</option>
+            <option value="41">41%</option>
+            <option value="45">45%</option>
+          </select></div>
+      </div>
     </div>
 
     <div class="cs-sidebar-lbl" data-step="revenus" onclick="openStep('revenus',this)"><span class="acc">&#9654;</span>Revenus locatifs</div>
@@ -227,6 +251,12 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fg"><label>Taux de remplissage</label>
           <div class="fi-row"><input type="number" id="tauxRpl" value="95" step="1" min="50" max="100" oninput="recalc()"><span class="fi-unit">%</span></div></div>
       </div>
+      <div id="R-denorm" style="display:none">
+        <div class="fg"><label>Loyer mensuel (hors charges)</label>
+          <div class="fi-row"><input type="number" id="loyerMD" value="650" step="25" oninput="recalc()"><span class="fi-unit">€/mois</span></div></div>
+        <div class="fg"><label>Charges non r&#233;cup&#233;rables <small>(% loyer)</small></label>
+          <div class="fi-row"><input type="number" id="tauxCNRD" value="30" step="1" oninput="recalc()"><span class="fi-unit">%</span></div></div>
+      </div>
       <div class="fg"><label>Revalorisation annuelle des loyers</label>
         <div class="fi-row"><input type="number" id="revaloL" value="0" step="0.5" oninput="recalc()"><span class="fi-unit">%/an</span></div></div>
       <div class="fg"><label>Revalorisation annuelle de la valeur immo</label>
@@ -235,6 +265,12 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
 
     <div class="cs-sidebar-lbl" data-step="charges" onclick="openStep('charges',this)"><span class="acc">&#9654;</span>Charges annuelles</div>
     <div class="sb-body" id="body_charges">
+      <div id="chargesNote" style="font-size:10.5px;color:var(--gris);line-height:1.6;padding:2px 0 10px">
+        Dans ce mode, les charges sont couvertes par le <strong>taux de charges non r&#233;cup&#233;rables</strong>
+        (bloc Revenus locatifs) : copropri&#233;t&#233;, taxe fonci&#232;re, gestion, PNO, comptabilit&#233;...
+        Elles ne sont pas d&#233;duites une seconde fois.
+      </div>
+      <div id="chargesDetail" style="display:none">
       <div class="fg"><label>Charges de copropriété (propriétaire)</label>
         <div class="fi-row"><input type="number" id="cCopro" value="180" step="50" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
       <div class="fg"><label>Taxe foncière</label>
@@ -251,6 +287,7 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <div class="fi-row"><input type="number" id="cCompta" value="140" step="10" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
       <div class="fg" id="pr-cfe" style="display:none"><label>CFE (Cotisation Foncière)</label>
         <div class="fi-row"><input type="number" id="cCFE" value="335" step="10" oninput="recalc()"><span class="fi-unit">€/an</span></div></div>
+      </div>
     </div>
 
     <div class="cs-sidebar-lbl" data-step="fin" onclick="openStep('fin',this)"><span class="acc">&#9654;</span>Financement</div>
@@ -279,8 +316,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl" onclick="openStep(null,this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
-    <div class="sb-body">
+    <div class="cs-sidebar-lbl" id="lblAmort" onclick="openStep(null,this)"><span class="acc">&#9654;</span>Amortissement LMNP</div>
+    <div class="sb-body" id="bodyAmort">
       <div class="fg"><label>Dur&#233;e amortissement immobilier</label>
         <div class="fi-row"><input type="number" id="durAmI" value="30" min="10" max="50" step="1" oninput="recalc()"><span class="fi-unit">ans</span></div></div>
       <div class="fg"><label>Dur&#233;e amortissement mobilier</label>
@@ -316,7 +353,7 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
         <rect x="44" y="14" width="8" height="38" fill="#181614" opacity="0.5"/>
         <line x1="0" y1="52" x2="54" y2="52" stroke="#181614" stroke-width="1.5"/>
       </svg>
-      <div class="empty-title">Projection LMNP</div>
+      <div class="empty-title">Projection immobili&#232;re</div>
       <div class="empty-sub">Renseignez les paramètres et lancez la simulation.</div>
     </div>
 
@@ -355,11 +392,11 @@ function isStepComplete(id){
   if(!_stepOpened[id])return false;
   if(id==='client'){var v=document.getElementById('immoClient');return !!(v&&v.value.trim())}
   if(id==='bien'){
-    var fieldId = mode==='coloc'?'prixFAI' : (mode==='resid'?'prixTotalR':'prixTotal');
+    var fieldId = mode==='coloc'?'prixFAI' : (mode==='resid'?'prixTotalR':(mode==='denorm'?'prixDenorm':'prixTotal'));
     var v=document.getElementById(fieldId); return !!(v&&Number(v.value)>0);
   }
   if(id==='revenus'){
-    var fieldId = mode==='coloc'?'loyerCh' : (mode==='resid'?'loyerAHT':'loyerM');
+    var fieldId = mode==='coloc'?'loyerCh' : (mode==='resid'?'loyerAHT':(mode==='denorm'?'loyerMD':'loyerM'));
     var v=document.getElementById(fieldId); return !!(v&&Number(v.value)>0);
   }
   if(id==='charges')return true;
@@ -393,13 +430,22 @@ function setMode(m, btn) {
   document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   // Affichage blocs
-  ['mono','coloc','resid'].forEach(k => {
+  ['mono','coloc','resid','denorm'].forEach(k => {
     var s = (k===m)?'':'none';
     ['B-','R-'].forEach(p => { var el=document.getElementById(p+k); if(el) el.style.display=s; });
   });
   // CFE coloc uniquement
   var cfe = document.getElementById('pr-cfe');
   if(cfe) cfe.style.display = m==='coloc' ? '' : 'none';
+  // Charges détaillées : uniquement en coloc (sinon taux CNR seul, cf. simulateurs Excel)
+  var cdet = document.getElementById('chargesDetail');
+  if(cdet) cdet.style.display = m==='coloc' ? '' : 'none';
+  var cnote = document.getElementById('chargesNote');
+  if(cnote) cnote.style.display = m==='coloc' ? 'none' : '';
+  // Amortissement LMNP : sans objet en Denormandie (location nue)
+  var la = document.getElementById('lblAmort'), ba = document.getElementById('bodyAmort');
+  if(la) la.style.display = m==='denorm' ? 'none' : '';
+  if(ba) ba.style.display = m==='denorm' ? 'none' : '';
 
   // Valeurs par défaut selon mode
   if(m==='mono') {
@@ -414,6 +460,11 @@ function setMode(m, btn) {
     setV('apport',20000); setV('tauxN',4.5); setV('dureePret',25); setV('differe',6);
     setV('adi1',0.2); setV('adi2',0.2); setV('q1',50); setV('q2',50);
     setV('cGest',10); setV('cMEL',5);
+  } else if(m==='denorm') {
+    setV('prixDenorm',150000); setV('travauxDenorm',60000); setV('fraisNotaireD',12000);
+    setV('loyerMD',650); setV('tauxCNRD',30);
+    setV('apport',10000); setV('tauxN',3.5); setV('dureePret',20); setV('differe',0);
+    setV('adi1',0.15); setV('adi2',0.15); setV('q1',50); setV('q2',50);
   } else {
     setV('prixTotalR',120000); setV('prixFoncierR',15000); setV('prixImmoHT',85000);
     setV('prixMobilierR',5400); setV('tvaRec',20900); setV('fraisNotaireR',2760);
@@ -439,7 +490,7 @@ function colorClass(c) {
 }
 
 function renderHeader(){
-  try{CGP.header.render('pageHeader',{tag:'PROJECTION IMMOBILIERE',solutions:['LMNP','PINEL'],clientId:'immoClient',savedKey:'immo-simulator'});}catch(e){}
+  try{CGP.header.render('pageHeader',{tag:'PROJECTION IMMOBILIERE',solutions:(mode==='denorm'?['DENORMANDIE']:['LMNP']),clientId:'immoClient',savedKey:'immo-simulator'});}catch(e){}
 }
 function recalc() {
   renderHeader();
@@ -474,12 +525,12 @@ function recalc() {
     p.loyerBrut    = gv('loyerM',700) * 12;
     p.tauxCNR      = gv('tauxCNR',35) / 100;
     p.prixImmo     = p.prixTotal;
-    p.budgetTotal  = p.prixTotal + p.fraisNotaire;
+    // Budget = prix + mobilier + notaire (réf. Excel V1.1 : le mobilier est financé)
+    p.budgetTotal  = p.prixTotal + p.prixMobilier + p.fraisNotaire;
     p.valeurImmoBase = p.prixTotal;
-    // amort : (prix total + notaire - foncier)/durAmI + mobilierHT/durAmM
-    var mobilierHT = p.prixMobilier / 1.20;
+    // amort : (prix total + notaire - foncier)/durAmI + mobilier TTC/durAmM (réf. Excel V1.1)
     p.amortImmoAn  = (p.prixTotal + p.fraisNotaire - p.partFoncier) / p.durAmI;
-    p.amortMobAn   = mobilierHT / p.durAmM;
+    p.amortMobAn   = p.prixMobilier / p.durAmM;
   } else if(mode==='coloc') {
     var pFAI=gv('prixFAI',175000), trav=gv('travaux',80000), qaVA=gv('qaVA',60)/100;
     var mobC=gv('mobilierC',18500), notC=gv('fraisNotaireC',14000), ingC=gv('ingenierieC',0);
@@ -494,10 +545,33 @@ function recalc() {
     p.loyerBrut    = loyerMens * 12;
     p.loyerAnnuel  = loyerMens * 12;
     p.tauxCNR      = 0;
-    var mobilierHT = mobC / 1.20;
-    p.amortImmoAn  = (pFAI + trav + notC) / p.durAmI;
-    p.amortMobAn   = mobilierHT / p.durAmM;
+    // Base amortissable (réf. Excel V2.2) : FAI hors terrain (20%) + notaire + travaux + ingénierie, mobilier TTC
+    p.amortImmoAn  = (pFAI * 0.80 + notC + trav + ingC) / p.durAmI;
+    p.amortMobAn   = mobC / p.durAmM;
     p.cCFE         = gv('cCFE',335);
+  } else if(mode==='denorm') {
+    var pD=gv('prixDenorm',150000), travD=gv('travauxDenorm',60000), notD=gv('fraisNotaireD',12000);
+    p.prixTotal    = pD;
+    p.partFoncier  = 0;
+    p.fraisNotaire = notD;
+    p.prixMobilier = 0;
+    p.budgetTotal  = pD + travD + notD;
+    p.prixImmo     = pD + travD;
+    p.valeurImmoBase = pD + travD;
+    p.loyerBrut    = gv('loyerMD',650) * 12;
+    p.loyerAnnuel  = p.loyerBrut;
+    p.tauxCNR      = gv('tauxCNRD',30) / 100;
+    p.amortImmoAn  = 0;
+    p.amortMobAn   = 0;
+    // Dispositif Denormandie (paramètres légaux)
+    p.tmi          = gv('dTMI',30) / 100;
+    p.engagement   = Math.round(gv('dEngagement',9));
+    p.travauxD     = travD;
+    p.prixRevient  = pD + travD + notD;
+    p.denormEligible = travD >= 0.25 * (pD + travD);
+    p.denormBase   = Math.min(300000, p.prixRevient);
+    p.denormTaux   = p.engagement===12 ? 0.21 : (p.engagement===6 ? 0.12 : 0.18);
+    p.denormReducTotale = p.denormEligible ? p.denormBase * p.denormTaux : 0;
   } else { // resid
     var pTotR=gv('prixTotalR',120000), foncR=gv('prixFoncierR',15000);
     var immoHT=gv('prixImmoHT',85000), mobR=gv('prixMobilierR',5400);
@@ -506,7 +580,7 @@ function recalc() {
     p.partFoncier  = foncR;
     p.fraisNotaire = notR;
     p.prixMobilier = mobR;
-    p.budgetTotal  = pTotR + notR;
+    p.budgetTotal  = pTotR + mobR + notR;
     p.prixImmo     = pTotR;
     p.valeurImmoBase = immoHT * 1.20; // valeur immo commerciale (HT→TTC)
     var loyerAHT   = gv('loyerAHT',5000);
@@ -523,11 +597,17 @@ function recalc() {
   var tvaDiscount = (mode==='resid') ? (p.tvaRec||0) : 0;
   p.montantEmprunte = p.budgetTotal - p.apport + p.fDoss + p.fHypo - tvaDiscount;
 
-  // Charges annuelles
-  var cPctLoyer = gv('cGest',8)/100 * p.loyerBrut + gv('cMEL',5)/100 * p.loyerBrut + gv('cGar',4.5)/100 * p.loyerBrut;
-  var cFixes = p.cCopro + p.cTF + p.cPNO + p.cCompta + (mode==='coloc'?p.cCFE:0);
-  var chargesNR = (mode!=='coloc') ? p.loyerBrut * p.tauxCNR : 0;
-  p.chargesAn = cPctLoyer + cFixes + chargesNR;
+  // Charges annuelles (réf. simulateurs Excel) :
+  // - coloc : charges détaillées réelles
+  // - autres modes : taux de charges non récupérables UNIQUEMENT
+  //   (le détail copro/TF/gestion... ne fait que justifier ce taux, il n'est pas déduit en plus)
+  if(mode==='coloc'){
+    var cPctLoyer = gv('cGest',8)/100 * p.loyerBrut + gv('cMEL',5)/100 * p.loyerBrut + gv('cGar',4.5)/100 * p.loyerBrut;
+    var cFixes = p.cCopro + p.cTF + p.cPNO + p.cCompta + p.cCFE;
+    p.chargesAn = cPctLoyer + cFixes;
+  } else {
+    p.chargesAn = p.loyerBrut * p.tauxCNR;
+  }
 
   // Loyer net mensuel de charges
   p.loyerNetAn = p.loyerBrut - p.chargesAn;
@@ -545,7 +625,7 @@ function recalc() {
   var mensADI_init = capDiff * tauxADI_mensuel;
   var mensTotal_init = mensHorsADI + mensADI_init; // Mensualité après différé
 
-  // Participation mensuelle pendant le prêt
+  // Participation mensuelle pendant le prêt (recalculée après la boucle : année 1, fiscalité incluse)
   var partM = mensTotal_init - p.loyerNetM;
 
   // ── Simulation annuelle ──
@@ -554,6 +634,8 @@ function recalc() {
   var partCumul = 0;
   var loyerNetCumul = 0;
   var reserve = 0;
+  var impotCumul = 0, reducCumul = 0;
+  var partAn1 = 0;
   var chartPartCumul = [], chartLoyerCumul = [];
 
   for(var an=1; an<=p.dureePret; an++) {
@@ -566,27 +648,45 @@ function recalc() {
     for(var m=0; m<12; m++) {
       var intM = crd * tauxM;
       var capM = mensHorsADI - intM;
-      var adiM = crd * tauxADI_mensuel;
+      // ADI constante sur le capital emprunté (réf. Excel), comme la mensualité payée
+      var adiM = capDiff * tauxADI_mensuel;
       intAn += intM; capRembAn += capM; adiAn += adiM;
       crd = Math.max(0, crd - capM);
       if(crd < 1) break;
     }
     var mensAn = (mensHorsADI + crd * tauxADI_mensuel) ; // approx
     var mensAn_tot = (mensHorsADI + capDiff * tauxADI_mensuel); // constante après différé
-    var partAn = mensAn_tot * 12 - loyerNetAn_an;
-    partCumul += partAn;
-    loyerNetCumul += loyerNetAn_an;
+    // Frais d'emprunt déductibles : intérêts + ADI (+ frais dossier/hypothèque en année 1, réf. Excel)
+    var fraisEmprunt = intAn + adiAn + (an===1 ? p.fDoss + p.fHypo : 0);
 
     // Amortissement LMNP
     var amortImmoAn_an = (an <= p.durAmI) ? p.amortImmoAn : 0;
     var amortMobAn_an  = (an <= p.durAmM) ? p.amortMobAn  : 0;
     var amortGenere = amortImmoAn_an + amortMobAn_an;
-    var fraisEmprunt = intAn + adiAn;
     var recettesNettes = loyerNetAn_an;
     var baseImpCourante = recettesNettes - fraisEmprunt;
-    var amortConso = Math.max(0, Math.min(amortGenere, Math.max(0, -baseImpCourante)));
+    // Consommé = la part du résultat positif neutralisée par l'amortissement (réf. Excel)
+    var amortConso = Math.min(amortGenere, Math.max(0, baseImpCourante));
     var amortMisEnReserve = amortGenere - amortConso;
     reserve += amortMisEnReserve;
+
+    // Fiscalité Denormandie : location nue → revenus fonciers imposés TMI + 17,2% PS,
+    // compensés par la réduction d'impôt pendant l'engagement (2%/an, puis 1%/an de 10 à 12 ans)
+    var impotAn = 0, reducAn = 0;
+    var partAn = mensAn_tot * 12 - loyerNetAn_an;
+    if(mode==='denorm'){
+      var revFoncier = loyerNetAn_an - fraisEmprunt;
+      impotAn = Math.max(0, revFoncier) * (p.tmi + 0.172);
+      if(p.denormEligible && an <= p.engagement){
+        reducAn = (p.engagement===12 && an>9) ? p.denormBase*0.01 : p.denormBase*0.02;
+      }
+      partAn = partAn + impotAn - reducAn;
+    }
+    if(an===1) partAn1 = partAn;
+    partCumul += partAn;
+    loyerNetCumul += loyerNetAn_an;
+    impotCumul += impotAn;
+    reducCumul += reducAn;
 
     // Valeur immo
     var valeurImmo = p.valeurImmoBase * Math.pow(1+p.revaloV, an);
@@ -599,6 +699,7 @@ function recalc() {
     rows.push({ an, crdDebut, crdFin:crd, loyerBrut:Math.round(loyerAn), loyerNet:Math.round(loyerNetAn_an),
       mensTotal:Math.round(mensAn_tot), partAn:Math.round(partAn), partCumul:Math.round(partCumul),
       amortGenere:Math.round(amortGenere), reserve:Math.round(reserve), valeurImmo:Math.round(valeurImmo),
+      impot:Math.round(impotAn), reduc:Math.round(reducAn),
       patrimoineNet:Math.round(patrimoineNet) });
   }
 
@@ -607,9 +708,24 @@ function recalc() {
   var reserveFinale = last.reserve;
   var patrimoineNet = last.patrimoineNet;
 
-  // Années défiscalisées après prêt
-  var loyerNetApres = p.loyerNetM * 12;
-  var anneesDefisc = loyerNetApres > 0 && reserveFinale > 0 ? Math.floor(reserveFinale / loyerNetApres) : 0;
+  // Années défiscalisées après le prêt : on poursuit la réserve d'amortissement
+  // (génération tant que durée d'amort. non échue, puis consommation de la réserve — réf. Excel)
+  var anneesDefisc = 0;
+  if(mode!=='denorm'){
+    var resPost = reserveFinale;
+    for(var an2=p.dureePret+1; an2<=p.dureePret+60; an2++){
+      var lNetPost = p.loyerBrut * Math.pow(1+p.revaloL, an2-1) - p.chargesAn;
+      var gen2 = (an2 <= p.durAmI ? p.amortImmoAn : 0) + (an2 <= p.durAmM ? p.amortMobAn : 0);
+      var conso2 = Math.min(gen2, Math.max(0, lNetPost));
+      resPost += gen2 - conso2;
+      var reste2 = Math.max(0, lNetPost - conso2);
+      // Année d'épuisement de la réserve : comptée comme défiscalisée (réf. Excel)
+      if(reste2 > resPost + 0.01){ anneesDefisc++; break; }
+      resPost -= reste2;
+      anneesDefisc++;
+      if(resPost <= 0.01 && gen2 <= 0) break;
+    }
+  }
 
   // Loyers nets cumulés pendant le prêt
   var loyerNetsCumules = last.partCumul > 0 ? loyerNetCumul : 0;
@@ -617,16 +733,20 @@ function recalc() {
   // ── Affichage ──
   document.getElementById('emptyPanel').style.display='none';
   document.getElementById('results').style.display='block';
+  partM = partAn1 / 12;
   var pos = partM <= 0;
   var partAbs = Math.abs(partM);
-  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':'LMNP R\u00e9sidence de Services';
+  var modeLabel = mode==='mono'?'LMNP Sans exploitant':mode==='coloc'?'LMNP Colocation':mode==='denorm'?'Denormandie (location nue)':'LMNP R\u00e9sidence de Services';
   var h = '';
 
   // 1. Bloc emprunteur / projet
   var _revM = gv('immoRev',60000)/12;
   var _chgM = gv('immoChg',0);
+  // Loyers valorisés dans les revenus (réf. Excel : 70% classique, 75% x 0,8 en coloc)
+  var _coefLoyer = mode==='coloc' ? 0.60 : 0.70;
+  var _revApr = _revM + _coefLoyer * p.loyerBrut/12;
   var _endAvt = _revM>0 ? (_chgM/_revM*100) : 0;
-  var _endApr = _revM>0 ? ((_chgM+mensTotal_init)/_revM*100) : 0;
+  var _endApr = _revApr>0 ? ((_chgM+mensTotal_init)/_revApr*100) : 0;
   var cEndAvt = _endAvt>35?'var(--red)':_endAvt>28?'var(--ambre)':'var(--green)';
   var cEndApr = _endApr>35?'var(--red)':_endApr>28?'var(--ambre)':'var(--green)';
   var _cl = (document.getElementById('immoClient')||{}).value||'Client';
@@ -654,7 +774,7 @@ function recalc() {
   h+='<div style="margin-top:6px">';
   h+='<div class="eb-label"><span>Endettement apr\u00e8s</span><span style="font-family:var(--sans);font-weight:700;color:'+cEndApr+'">'+_endApr.toFixed(1)+'%</span></div>';
   h+='<div class="prog-track"><div class="prog-fill" style="width:'+Math.min(_endApr,50)/50*100+'%;background:'+cEndApr+'"></div></div>';
-  h+='<div style="font-size:10px;color:var(--gris);margin-top:4px;text-align:right">Seuil : <strong>35%</strong></div>';
+  h+='<div style="font-size:10px;color:var(--gris);margin-top:4px;text-align:right">Loyers retenus \u00e0 '+Math.round(_coefLoyer*100)+'% \u2014 Seuil : <strong>35%</strong></div>';
   h+='</div>';
   h+='</div>';
   h+='</div>';
@@ -663,6 +783,7 @@ function recalc() {
   var iRows = [];
   if(mode==='mono') iRows = [['Prix du bien TTC', fmtE(p.prixTotal)],['Frais de notaire', fmtE(p.fraisNotaire)],['Mobilier', fmtE(p.prixMobilier)]];
   else if(mode==='coloc') iRows = [['Prix FAI', fmtE(gv('prixFAI'))],['Travaux', fmtE(gv('travaux'))],['Mobilier', fmtE(gv('mobilierC'))],['Notaire', fmtE(gv('fraisNotaireC'))]];
+  else if(mode==='denorm') iRows = [['Prix d\'acquisition', fmtE(gv('prixDenorm'))],['Travaux de r\u00e9novation', fmtE(gv('travauxDenorm'))],['Notaire', fmtE(gv('fraisNotaireD'))]];
   else iRows = [['Prix TTC', fmtE(gv('prixTotalR'))],['TVA r\u00e9cup\u00e9r\u00e9e', '\u2212 '+fmtE(gv('tvaRec'))],['Notaire', fmtE(gv('fraisNotaireR'))]];
 
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
@@ -687,6 +808,11 @@ function recalc() {
   h+='<div class="eq-b mens"><div class="eq-lbl">Mensualit\u00e9 + ADI</div><div class="eq-val">'+fmtE(mensTotal_init)+'</div><div class="eq-sub">/mois</div></div>';
   h+='<div class="eq-op">\u2212</div>';
   h+='<div class="eq-b divs"><div class="eq-lbl">Loyer net</div><div class="eq-val" style="color:var(--green)">'+fmtE(p.loyerNetM)+'</div><div class="eq-sub">/mois</div></div>';
+  if(mode==='denorm'){
+    var avFisc1M = (rows[0].reduc - rows[0].impot) / 12;
+    h+='<div class="eq-op">'+(avFisc1M>=0?'\u2212':'+')+'</div>';
+    h+='<div class="eq-b divs"><div class="eq-lbl">'+(avFisc1M>=0?'Avantage fiscal (an 1)':'Imp\u00f4t net (an 1)')+'</div><div class="eq-val" style="color:'+(avFisc1M>=0?'var(--green)':'var(--red)')+'">'+fmtE(Math.abs(avFisc1M))+'</div><div class="eq-sub">r\u00e9duction IR \u2212 imp\u00f4t foncier</div></div>';
+  }
   h+='<div class="eq-op">=</div>';
   h+='<div class="eq-b '+(pos?'pos':'neg')+'"><div class="eq-lbl">'+(pos?'Gain mensuel':'Effort mensuel')+'</div><div class="eq-val" style="color:'+(pos?'var(--green)':'var(--red)')+'">'+fmtE(partAbs)+'</div><div class="eq-sub">'+(pos?'Vous percevez plus que vous ne payez':'/mois \u00e0 votre charge')+'</div></div>';
   h+='</div>';
@@ -695,47 +821,105 @@ function recalc() {
   h+='<div class="bilan-2">';
   h+='<div class="bl"><div class="bl-title">Pendant le financement</div>';
   h+='<div class="bl-row"><span class="bl-k">Loyers nets cumul\u00e9s</span><span class="bl-v green">'+fmtE(loyerNetCumul)+'</span></div>';
+  if(mode==='denorm'){
+    h+='<div class="bl-row"><span class="bl-k">Imp\u00f4ts fonciers cumul\u00e9s</span><span class="bl-v red">'+fmtE(impotCumul)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">R\u00e9duction d\'imp\u00f4t cumul\u00e9e</span><span class="bl-v green">'+fmtE(reducCumul)+'</span></div>';
+  }
   h+='<div class="bl-row"><span class="bl-k">Participation cumul\u00e9e</span><span class="bl-v '+(last.partCumul>0?'red':'green')+'">'+fmtE(Math.abs(last.partCumul))+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">D\u00e9fiscalis\u00e9 pendant</span><span class="bl-v">'+anneesDefisc+' ans</span></div>';
+  if(mode!=='denorm'){
+    h+='<div class="bl-row"><span class="bl-k">D\u00e9fiscalis\u00e9 apr\u00e8s le pr\u00eat</span><span class="bl-v">'+anneesDefisc+' ans</span></div>';
+  }
   h+='</div>';
   h+='<div class="bl hi"><div class="bl-title">Au terme</div>';
   h+='<div class="bl-row"><span class="bl-k">Patrimoine constitu\u00e9</span><span class="bl-v gold">'+fmtE(valeurImmoFinale)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">R\u00e9serve amortissement</span><span class="bl-v">'+fmtE(reserveFinale)+'</span></div>';
+  if(mode!=='denorm'){
+    h+='<div class="bl-row"><span class="bl-k">R\u00e9serve amortissement</span><span class="bl-v">'+fmtE(reserveFinale)+'</span></div>';
+  }
   h+='<div class="bl-row"><span class="bl-k">Patrimoine net</span><span class="bl-v '+(patrimoineNet>0?'green':'red')+'" style="font-size:15px">'+fmtE(patrimoineNet)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Rente mensuelle nette</span><span class="bl-v green">'+fmtE(p.loyerNetM)+' /mois</span></div>';
+  if(mode==='denorm'){
+    var renteNetteD = p.loyerNetM * (1 - (p.tmi + 0.172));
+    h+='<div class="bl-row"><span class="bl-k">Rente mensuelle nette d\'imp\u00f4t</span><span class="bl-v green">'+fmtE(renteNetteD)+' /mois</span></div>';
+  } else {
+    h+='<div class="bl-row"><span class="bl-k">Rente mensuelle nette</span><span class="bl-v green">'+fmtE(p.loyerNetM)+' /mois</span></div>';
+  }
   h+='</div></div>';
 
   // 5. Doughnut
   h+='<div class="card"><div class="card-title"><span class="dot"></span>R\u00e9partition du financement</div><div style="max-width:320px;margin:0 auto;height:220px"><canvas id="mainChart"></canvas></div></div>';
 
-  // 6. Charges + Amortissement
-  var chargesRows = [['Copropri\u00e9t\u00e9', fmtE(p.cCopro)],['Taxe fonci\u00e8re', fmtE(p.cTF)],['Gestion', fmtE(gv('cGest',8)/100*p.loyerBrut)],['PNO', fmtE(p.cPNO)],['Comptabilit\u00e9', fmtE(p.cCompta)]];
+  // 6. Charges + Avantage fiscal (Amortissement LMNP ou Denormandie)
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
-  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Charges annuelles</div>';
-  chargesRows.forEach(function(r){h+='<div class="bl-row"><span class="bl-k">'+r[0]+'</span><span class="bl-v">'+r[1]+'</span></div>';});
-  h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total / an</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
-  h+='</div>';
-  h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Amortissement LMNP</div>';
-  h+='<div class="bl-row"><span class="bl-k">Amort. immo / an ('+p.durAmI+' ans)</span><span class="bl-v gold">'+fmtE(p.amortImmoAn)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Amort. mobilier / an ('+p.durAmM+' ans)</span><span class="bl-v gold">'+fmtE(p.amortMobAn)+'</span></div>';
-  h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total amort. / an</span><span class="bl-v gold">'+fmtE(p.amortImmoAn+p.amortMobAn)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'</span></div>';
-  h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'</span></div>';
-  h+='</div></div>';
+  if(mode==='coloc'){
+    var chargesRows = [['Copropri\u00e9t\u00e9', fmtE(p.cCopro)],['Taxe fonci\u00e8re', fmtE(p.cTF)],['Gestion', fmtE(gv('cGest',8)/100*p.loyerBrut)],['Mise en location', fmtE(gv('cMEL',5)/100*p.loyerBrut)],['Garanties locatives', fmtE(gv('cGar',4.5)/100*p.loyerBrut)],['PNO', fmtE(p.cPNO)],['Comptabilit\u00e9', fmtE(p.cCompta)],['CFE', fmtE(p.cCFE)]];
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Charges annuelles</div>';
+    chargesRows.forEach(function(r){h+='<div class="bl-row"><span class="bl-k">'+r[0]+'</span><span class="bl-v">'+r[1]+'</span></div>';});
+    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total / an</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
+    h+='</div>';
+  } else {
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Charges (taux forfaitaire)</div>';
+    h+='<div class="bl-row"><span class="bl-k">Loyer brut annuel</span><span class="bl-v">'+fmtE(p.loyerBrut)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Charges non r\u00e9cup\u00e9rables</span><span class="bl-v">'+fmtPct(p.tauxCNR*100,0)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Charges annuelles</span><span class="bl-v red">'+fmtE(p.chargesAn)+'</span></div>';
+    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Loyer net annuel</span><span class="bl-v green">'+fmtE(p.loyerNetAn)+'</span></div>';
+    h+='<div style="font-size:10px;color:var(--gris);margin-top:8px;line-height:1.5">Le taux couvre copropri\u00e9t\u00e9, taxe fonci\u00e8re, gestion, PNO, comptabilit\u00e9, etc.</div>';
+    h+='</div>';
+  }
+  if(mode==='denorm'){
+    var pctTravaux = p.travauxD / Math.max(1, gv('prixDenorm',150000) + p.travauxD) * 100;
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Dispositif Denormandie</div>';
+    h+='<div class="bl-row"><span class="bl-k">Prix de revient</span><span class="bl-v">'+fmtE(p.prixRevient)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Base retenue (plafond 300 k\u20ac)</span><span class="bl-v">'+fmtE(p.denormBase)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Part travaux (min. 25%)</span><span class="bl-v '+(p.denormEligible?'green':'red')+'">'+fmtPct(pctTravaux,1)+' '+(p.denormEligible?'\u2713':'\u2717')+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Engagement / taux</span><span class="bl-v gold">'+p.engagement+' ans \u2014 '+fmtPct(p.denormTaux*100,0)+'</span></div>';
+    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">R\u00e9duction d\'imp\u00f4t totale</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.denormReducTotale)+'</span></div>';
+    if(p.denormEligible){
+      h+='<div class="bl-row"><span class="bl-k">R\u00e9duction annuelle</span><span class="bl-v green">'+fmtE(p.denormBase*0.02)+(p.engagement===12?' puis '+fmtE(p.denormBase*0.01)+' (ans 10-12)':'')+'</span></div>';
+    } else {
+      h+='<div style="font-size:11px;color:var(--red);margin-top:8px;font-weight:600">\u26a0 Travaux &lt; 25% du co\u00fbt total : op\u00e9ration non \u00e9ligible, r\u00e9duction non appliqu\u00e9e.</div>';
+    }
+    h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'</span></div>';
+    h+='</div></div>';
+  } else {
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Amortissement LMNP</div>';
+    h+='<div class="bl-row"><span class="bl-k">Amort. immo / an ('+p.durAmI+' ans)</span><span class="bl-v gold">'+fmtE(p.amortImmoAn)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Amort. mobilier / an ('+p.durAmM+' ans)</span><span class="bl-v gold">'+fmtE(p.amortMobAn)+'</span></div>';
+    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">Total amort. / an</span><span class="bl-v gold">'+fmtE(p.amortImmoAn+p.amortMobAn)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Rendement brut</span><span class="bl-v">'+fmtPct(p.loyerBrut/p.budgetTotal*100)+'</span></div>';
+    h+='<div class="bl-row"><span class="bl-k">Rendement net</span><span class="bl-v green">'+fmtPct(p.loyerNetAn/p.budgetTotal*100)+'</span></div>';
+    h+='</div></div>';
+  }
 
   // 7. Tableau annuel
   h+='<div class="card"><div class="card-title"><span class="dot"></span>Tableau de bord annuel</div>';
-  h+='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>An</th><th>Loyer brut</th><th>Loyer net</th><th>Mensualit\u00e9</th><th>Participation</th><th>Part. cumul.</th><th>R\u00e9serve amort.</th><th>Patrimoine net</th></tr></thead><tbody>';
-  rows.forEach(function(r){
-    h+='<tr><td>'+r.an+'</td><td>'+fmtE(r.loyerBrut)+'</td><td class="green">'+fmtE(r.loyerNet)+'</td><td>'+fmtE(r.mensTotal)+'</td>';
-    h+='<td class="'+(r.partAn>0?'red':'green')+'">'+fmtE(Math.abs(r.partAn))+'</td>';
-    h+='<td>'+fmtE(Math.abs(r.partCumul))+'</td>';
-    h+='<td>'+fmtE(r.reserve)+'</td>';
-    h+='<td class="'+(r.patrimoineNet>0?'green':'red')+'">'+fmtE(r.patrimoineNet)+'</td></tr>';
-  });
-  h+='</tbody></table></div></div>';
+  if(mode==='denorm'){
+    h+='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>An</th><th>Loyer brut</th><th>Loyer net</th><th>Mensualit\u00e9</th><th>Imp\u00f4t foncier</th><th>R\u00e9duction IR</th><th>Participation</th><th>Part. cumul.</th><th>Patrimoine net</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+r.an+'</td><td>'+fmtE(r.loyerBrut)+'</td><td class="green">'+fmtE(r.loyerNet)+'</td><td>'+fmtE(r.mensTotal)+'</td>';
+      h+='<td class="red">'+fmtE(r.impot)+'</td>';
+      h+='<td class="gold">'+fmtE(r.reduc)+'</td>';
+      h+='<td class="'+(r.partAn>0?'red':'green')+'">'+fmtE(Math.abs(r.partAn))+'</td>';
+      h+='<td>'+fmtE(Math.abs(r.partCumul))+'</td>';
+      h+='<td class="'+(r.patrimoineNet>0?'green':'red')+'">'+fmtE(r.patrimoineNet)+'</td></tr>';
+    });
+    h+='</tbody></table></div></div>';
+  } else {
+    h+='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>An</th><th>Loyer brut</th><th>Loyer net</th><th>Mensualit\u00e9</th><th>Participation</th><th>Part. cumul.</th><th>R\u00e9serve amort.</th><th>Patrimoine net</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+r.an+'</td><td>'+fmtE(r.loyerBrut)+'</td><td class="green">'+fmtE(r.loyerNet)+'</td><td>'+fmtE(r.mensTotal)+'</td>';
+      h+='<td class="'+(r.partAn>0?'red':'green')+'">'+fmtE(Math.abs(r.partAn))+'</td>';
+      h+='<td>'+fmtE(Math.abs(r.partCumul))+'</td>';
+      h+='<td>'+fmtE(r.reserve)+'</td>';
+      h+='<td class="'+(r.patrimoineNet>0?'green':'red')+'">'+fmtE(r.patrimoineNet)+'</td></tr>';
+    });
+    h+='</tbody></table></div></div>';
+  }
 
-  h+='<div style="font-size:10px;color:var(--gris);margin-top:8px;line-height:1.5">Simulation indicative \u2014 '+modeLabel+'. Taux '+fmtPct(p.tauxN*100)+', dur\u00e9e '+p.dureePret+' ans.</div>';
+  h+='<div style="font-size:10px;color:var(--gris);margin-top:8px;line-height:1.5">Simulation indicative \u2014 '+modeLabel+'. Taux '+fmtPct(p.tauxN*100)+', dur\u00e9e '+p.dureePret+' ans.';
+  if(mode==='denorm'){
+    h+=' Denormandie : r\u00e9duction sous conditions (commune \u00e9ligible Action c&oelig;ur de ville / ORT, plafonds de loyers et de ressources du locataire, plafond 5 500 \u20ac/m\u00b2 non contr\u00f4l\u00e9s ici). D\u00e9ficit foncier non mod\u00e9lis\u00e9.';
+  }
+  h+='</div>';
 
   document.getElementById('results').innerHTML = h;
 
@@ -744,12 +928,17 @@ function recalc() {
   var pieData = [Math.round(Math.abs(last.partCumul)), Math.round(loyerNetCumul)];
   var pieLabels = ['Votre participation', 'Loyers nets'];
   var pieColors = ['rgba(212,98,42,0.75)', 'rgba(45,122,91,0.75)'];
+  if(mode==='denorm' && reducCumul > 0){
+    pieData.push(Math.round(reducCumul));
+    pieLabels.push('Réduction d\'impôt');
+    pieColors.push('rgba(212,167,42,0.75)');
+  }
   chartInst = new Chart(document.getElementById('mainChart'), {
     type: 'doughnut',
     data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: pieColors, borderWidth: 0, hoverOffset: 6 }] },
     options: { responsive: true, maintainAspectRatio: false, cutout: '58%',
       plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, padding: 8 } },
-        tooltip: { callbacks: { label: function(ctx) { var t=pieData[0]+pieData[1]; return ctx.label+': '+fmt(ctx.parsed)+' \u20ac ('+Math.round(ctx.parsed/t*100)+'%)'; } } }
+        tooltip: { callbacks: { label: function(ctx) { var t=pieData.reduce(function(a,b){return a+b;},0); return ctx.label+': '+fmt(ctx.parsed)+' \u20ac ('+Math.round(ctx.parsed/t*100)+'%)'; } } }
       }
     }
   });
@@ -760,7 +949,7 @@ function recalc() {
 document.addEventListener('DOMContentLoaded', function() {
   // Afficher blocs mono par défaut
   ['B-mono','R-mono'].forEach(id => { var el=document.getElementById(id); if(el) el.style.display=''; });
-  ['B-coloc','R-coloc','B-resid','R-resid'].forEach(id => { var el=document.getElementById(id); if(el) el.style.display='none'; });
+  ['B-coloc','R-coloc','B-resid','R-resid','B-denorm','R-denorm'].forEach(id => { var el=document.getElementById(id); if(el) el.style.display='none'; });
   recalc();
   updateProgress();
 });
@@ -807,6 +996,13 @@ CGP.project.registerModule('immo-simulator', {
       cCFE: +document.getElementById('cCFE').value,
       durAmI: +document.getElementById('durAmI').value,
       durAmM: +document.getElementById('durAmM').value,
+      prixDenorm: +document.getElementById('prixDenorm').value,
+      travauxDenorm: +document.getElementById('travauxDenorm').value,
+      fraisNotaireD: +document.getElementById('fraisNotaireD').value,
+      loyerMD: +document.getElementById('loyerMD').value,
+      tauxCNRD: +document.getElementById('tauxCNRD').value,
+      dEngagement: +document.getElementById('dEngagement').value,
+      dTMI: +document.getElementById('dTMI').value,
       apport: +document.getElementById('apport').value,
       fDoss: +document.getElementById('fDoss').value,
       fHypo: +document.getElementById('fHypo').value,
@@ -816,7 +1012,7 @@ CGP.project.registerModule('immo-simulator', {
     };
   },
   setState: function(d) {
-    if (d.mode !== undefined) { mode = d.mode; document.querySelectorAll('.mode-tab').forEach(function(b){ b.classList.remove('active'); }); document.querySelectorAll('.mode-tab').forEach(function(b){ if (b.textContent.toLowerCase().indexOf(d.mode) !== -1 || (d.mode === 'mono' && b.textContent.indexOf('Sans') !== -1) || (d.mode === 'coloc' && b.textContent.indexOf('Colocation') !== -1) || (d.mode === 'resid' && b.textContent.indexOf('Services') !== -1)) b.classList.add('active'); }); }
+    if (d.mode !== undefined) { mode = d.mode; document.querySelectorAll('.mode-tab').forEach(function(b){ b.classList.remove('active'); }); document.querySelectorAll('.mode-tab').forEach(function(b){ if (b.textContent.toLowerCase().indexOf(d.mode) !== -1 || (d.mode === 'mono' && b.textContent.indexOf('Sans') !== -1) || (d.mode === 'coloc' && b.textContent.indexOf('Colocation') !== -1) || (d.mode === 'resid' && b.textContent.indexOf('Services') !== -1) || (d.mode === 'denorm' && b.textContent.indexOf('Denormandie') !== -1)) b.classList.add('active'); }); ['mono','coloc','resid','denorm'].forEach(function(k){ var s=(k===d.mode)?'':'none'; ['B-','R-'].forEach(function(pf){ var el=document.getElementById(pf+k); if(el) el.style.display=s; }); }); var _cfe=document.getElementById('pr-cfe'); if(_cfe) _cfe.style.display = d.mode==='coloc'?'':'none'; var _cd=document.getElementById('chargesDetail'); if(_cd) _cd.style.display = d.mode==='coloc'?'':'none'; var _cn=document.getElementById('chargesNote'); if(_cn) _cn.style.display = d.mode==='coloc'?'none':''; var _la=document.getElementById('lblAmort'); if(_la) _la.style.display = d.mode==='denorm'?'none':''; var _ba=document.getElementById('bodyAmort'); if(_ba) _ba.style.display = d.mode==='denorm'?'none':''; }
     if (d.prixTotal !== undefined) document.getElementById('prixTotal').value = d.prixTotal;
     if (d.partFoncier !== undefined) document.getElementById('partFoncier').value = d.partFoncier;
     if (d.fraisNotaire !== undefined) document.getElementById('fraisNotaire').value = d.fraisNotaire;
@@ -852,6 +1048,13 @@ CGP.project.registerModule('immo-simulator', {
     if (d.cCFE !== undefined) document.getElementById('cCFE').value = d.cCFE;
     if (d.durAmI !== undefined) document.getElementById('durAmI').value = d.durAmI;
     if (d.durAmM !== undefined) document.getElementById('durAmM').value = d.durAmM;
+    if (d.prixDenorm !== undefined) document.getElementById('prixDenorm').value = d.prixDenorm;
+    if (d.travauxDenorm !== undefined) document.getElementById('travauxDenorm').value = d.travauxDenorm;
+    if (d.fraisNotaireD !== undefined) document.getElementById('fraisNotaireD').value = d.fraisNotaireD;
+    if (d.loyerMD !== undefined) document.getElementById('loyerMD').value = d.loyerMD;
+    if (d.tauxCNRD !== undefined) document.getElementById('tauxCNRD').value = d.tauxCNRD;
+    if (d.dEngagement !== undefined) document.getElementById('dEngagement').value = d.dEngagement;
+    if (d.dTMI !== undefined) document.getElementById('dTMI').value = d.dTMI;
     if (d.apport !== undefined) document.getElementById('apport').value = d.apport;
     if (d.fDoss !== undefined) document.getElementById('fDoss').value = d.fDoss;
     if (d.fHypo !== undefined) document.getElementById('fHypo').value = d.fHypo;
