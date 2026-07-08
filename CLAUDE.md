@@ -314,7 +314,9 @@ Specs bouton : `width:100%; padding:10px; font-size:13px; font-weight:500; font-
 
 Par défaut, Chrome/Edge strip les fonds/couleurs à l'impression pour économiser l'encre. Sans la règle, les KPI orange/verts, badges, headers de tableau, card backgrounds, etc. apparaissent en gris/blanc dans le PDF exporté.
 
-**Tout nouveau module avec des fonds colorés, bordures colorées, ou textes en couleur DOIT inclure une règle `print-color-adjust: exact` ciblée** (pas sur `*` — ça rend le texte flou) :
+**Couverture globale** : `cgp-skool-layout.css` (`@media print` → section 8b) préserve déjà les classes standard (`.card`, `.card-title .dot`, `.kpi`, `.bl`, `.eq-b`, `.prog-track`, `.prog-fill`, `.tbl th`, `.badge`, `.gold/.green/.red`, etc.) **et tous les fonds posés en `style` inline** (`[style*="background"]`). Un module qui n'utilise que ces classes n'a rien à ajouter.
+
+**Tout nouveau module avec des classes colorées NON standard DOIT inclure une règle `print-color-adjust: exact` ciblée** (pas sur `*` — ça rend le texte flou) :
 
 ```css
 /* ✅ BON — ciblé : élargir la liste selon les classes du module */
