@@ -6935,7 +6935,7 @@ function rSynthese(){
     return s+Math.round((sol.vi||0)*Math.pow(1+r,h)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r,h)-1)/r):0));
   },0);
 
-  // Economie fiscale totale (PER + FIP/FCPI)
+  // Economie fiscale totale (PER + FIP/FCPI + Girardin + Denormandie)
   var economieFiscTotale=sorted.reduce(function(s,sol){
     var prodLC=(sol.produit||'').toLowerCase();
     var tmi=ED.fiscal.tmi||0;
@@ -6943,6 +6943,14 @@ function rSynthese(){
     if(prodLC.indexOf('girar')>=0) return s+Math.round((sol.vi||0)*1.10);
     if(prodLC.indexOf('fip')>=0||prodLC.indexOf('fcpi')>=0||prodLC.indexOf('g3f')>=0)
       return s+Math.round(Math.min(sol.vi||0,ED.type!=='seul'?24000:12000)*0.18);
+    if(prodLC.indexOf('denorm')>=0){
+      // Reduction annuelle : memes regles que la card preconisation
+      // (base plafonnee a 300 k, taux 12/18/21 % selon duree, lissee sur la duree)
+      var dnS=sol._denorm||{};
+      var dnDuree=dnS.duree||9;
+      var dnTx={6:0.12,9:0.18,12:0.21}[dnDuree]||0.18;
+      return s+Math.round(Math.min(dnS.prixBien||0,300000)*dnTx/dnDuree);
+    }
     return s;
   },0);
   var irApres=Math.max(0,irNet-economieFiscTotale);
