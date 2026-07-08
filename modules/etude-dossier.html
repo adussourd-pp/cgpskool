@@ -1008,8 +1008,9 @@ select.span2{grid-column:span 2}
       <div class="fiscal-row"><span class="fr-l">Ann&#233;e d'imposition</span><span class="fr-v"><input class="fi" type="number" id="projAnnee" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Situation</span><span class="fr-v"><select class="fi" id="projSitmat" onchange="calcProjectionIR()" style="width:140px;padding:3px 6px;font-size:12px"><option value="marie">Mari&#233;</option><option value="celibataire">C&#233;lib.</option><option value="celibataire_seul">Parent isol&#233; (T)</option><option value="parent_isole">A &#233;lev&#233; enfant seul (L)</option></select></span></div>
       <div class="fiscal-row"><span class="fr-l">Nb enfants</span><span class="fr-v"><input class="fi" type="number" id="projEnfants" min="0" value="0" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
+      <div class="fiscal-row"><span class="fr-l" style="padding-left:12px" title="Enfants en r&#233;sidence altern&#233;e (case H de la d&#233;claration) : la part fiscale est partag&#233;e entre les deux parents. Chacun compte pour 0,25 part (au lieu de 0,5) pour les deux premiers, 0,5 part (au lieu de 1) &#224; partir du 3e. Ex : 1 parent seul + 2 enfants en garde altern&#233;e = 1,5 part (et non 2).">&#8627; dont en r&#233;sidence altern&#233;e</span><span class="fr-v"><input class="fi" type="number" id="projGardeAlt" min="0" value="0" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l" title="Demi-part suppl&#233;mentaire si enfant &#224; charge invalide">Invalidit&#233; enfant (W)</span><span class="fr-v"><label style="display:inline-flex;align-items:center;gap:6px;font-size:12px"><input type="checkbox" id="projCaseW" onchange="calcProjectionIR()" style="accent-color:var(--orange)"> +0,5 part</label></span></div>
-      <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange);background:#FAFAFA" title="Calcul&#233; automatiquement depuis Situation + Nb enfants + cases T/L/W"></span></div>
+      <div class="fiscal-row"><span class="fr-l">Nb parts fiscales</span><span class="fr-v"><input class="fi" type="number" id="projParts" min="1" step="0.5" value="1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px;font-weight:700;color:var(--orange);background:#FAFAFA" title="Calcul&#233; automatiquement depuis Situation + Nb enfants (dont r&#233;sidence altern&#233;e) + cases T/L/W"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C1</span><span class="fr-v"><input class="fi" type="number" id="projSal1" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row"><span class="fr-l">Salaires C2</span><span class="fr-v"><input class="fi" type="number" id="projSal2" oninput="calcProjectionIR()" style="width:100px;text-align:right;padding:3px 6px;font-size:13px"></span></div>
       <div class="fiscal-row" style="padding:10px 0;background:var(--gris-l);margin:0 -20px;padding-left:20px;padding-right:20px"><span class="fr-l" style="font-weight:700;font-size:13px">Revenu brut global</span><span class="fr-v"><input class="fi" type="number" id="projRBG" oninput="this._manualOverride=true;calcProjectionIR()" style="width:120px;text-align:right;padding:4px 8px;font-size:14px;font-weight:700"></span></div>
@@ -8269,11 +8270,17 @@ function calcProjectionIR(){
     if(projSit==='celibataire_seul'){ caseT=true; sitForCalc='celibataire'; }
     else if(projSit==='parent_isole'){ caseL=true; sitForCalc='celibataire'; }
     var nbEnf=n('projEnfants')||0;
+    // Enfants en residence alternee : la part est partagee entre les deux parents
+    // -> chaque enfant en alternee compte pour moitie dans l'index du bareme
+    //    (0,25 part au lieu de 0,5 pour les 2 premiers, 0,5 au lieu de 1 des le 3e)
+    var nbAlt=n('projGardeAlt')||0;
+    if(nbAlt>nbEnf){nbAlt=nbEnf;var altEl=document.getElementById('projGardeAlt');if(altEl)altEl.value=nbAlt;}
+    var nbEnfEff=nbEnf-nbAlt*0.5;
     // Calcul IR via la nouvelle signature (cases T/L/W appliquees au bareme)
-    var res=calcIR(rbg, sitForCalc, nbEnf, caseT, 0, 0, caseL, caseW);
+    var res=calcIR(rbg, sitForCalc, nbEnfEff, caseT, 0, 0, caseL, caseW);
     // Refleter le nb de parts effectif issu du bareme dans projParts (informational)
     try{
-      var cfg=getBaremeIR(sitForCalc, nbEnf, caseT, caseL, caseW);
+      var cfg=getBaremeIR(sitForCalc, nbEnfEff, caseT, caseL, caseW);
       var pp=document.getElementById('projParts');
       if(pp)pp.value=cfg.parts;
     }catch(_e){}
