@@ -214,6 +214,8 @@ table tr.after-pret td { color: var(--ink-60); font-style: italic; }
           <div class="fi-row"><input type="number" id="travauxDenorm" value="60000" step="5000" oninput="recalc()"><span class="fi-unit">€</span></div></div>
         <div class="fg"><label>Frais de notaire</label>
           <div class="fi-row"><input type="number" id="fraisNotaireD" value="12000" step="500" oninput="recalc()"><span class="fi-unit">€</span></div></div>
+        <div class="fg"><label>Surface habitable <small>(0 = plafond 5 500 €/m² ignor&#233;)</small></label>
+          <div class="fi-row"><input type="number" id="surfaceD" value="0" step="0.5" oninput="recalc()"><span class="fi-unit">m²</span></div></div>
         <div class="fg"><label>Engagement de location</label>
           <select class="fi" id="dEngagement" onchange="recalc()">
             <option value="6">6 ans &#8212; r&#233;duction 12%</option>
@@ -462,7 +464,7 @@ function setMode(m, btn) {
     setV('cGest',10); setV('cMEL',5);
   } else if(m==='denorm') {
     setV('prixDenorm',150000); setV('travauxDenorm',60000); setV('fraisNotaireD',12000);
-    setV('loyerMD',650); setV('tauxCNRD',30);
+    setV('surfaceD',0); setV('loyerMD',650); setV('tauxCNRD',30);
     setV('apport',10000); setV('tauxN',3.5); setV('dureePret',20); setV('differe',0);
     setV('adi1',0.15); setV('adi2',0.15); setV('q1',50); setV('q2',50);
   } else {
@@ -569,7 +571,10 @@ function recalc() {
     p.travauxD     = travD;
     p.prixRevient  = pD + travD + notD;
     p.denormEligible = travD >= 0.25 * (pD + travD);
-    p.denormBase   = Math.min(300000, p.prixRevient);
+    // Assiette : prix de revient plafonné à 300 000 € et 5 500 €/m² (si surface renseignée)
+    p.surfaceD     = gv('surfaceD',0);
+    var plafM2     = p.surfaceD > 0 ? p.surfaceD * 5500 : Infinity;
+    p.denormBase   = Math.min(300000, plafM2, p.prixRevient);
     p.denormTaux   = p.engagement===12 ? 0.21 : (p.engagement===6 ? 0.12 : 0.18);
     p.denormReducTotale = p.denormEligible ? p.denormBase * p.denormTaux : 0;
   } else { // resid
@@ -868,10 +873,15 @@ function recalc() {
     var pctTravaux = p.travauxD / Math.max(1, gv('prixDenorm',150000) + p.travauxD) * 100;
     h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Dispositif Denormandie</div>';
     h+='<div class="bl-row"><span class="bl-k">Prix de revient</span><span class="bl-v">'+fmtE(p.prixRevient)+'</span></div>';
-    h+='<div class="bl-row"><span class="bl-k">Base retenue (plafond 300 k\u20ac)</span><span class="bl-v">'+fmtE(p.denormBase)+'</span></div>';
+    var _plafLbl = p.surfaceD > 0 ? 'Assiette (plafonds 300 k\u20ac et '+p.surfaceD+' m\u00b2 \u00d7 5 500 \u20ac)' : 'Assiette retenue (plafond 300 k\u20ac)';
+    h+='<div class="bl-row"><span class="bl-k">'+_plafLbl+'</span><span class="bl-v">'+fmtE(p.denormBase)+'</span></div>';
     h+='<div class="bl-row"><span class="bl-k">Part travaux (min. 25%)</span><span class="bl-v '+(p.denormEligible?'green':'red')+'">'+fmtPct(pctTravaux,1)+' '+(p.denormEligible?'\u2713':'\u2717')+'</span></div>';
-    h+='<div class="bl-row"><span class="bl-k">Engagement / taux</span><span class="bl-v gold">'+p.engagement+' ans \u2014 '+fmtPct(p.denormTaux*100,0)+'</span></div>';
-    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">R\u00e9duction d\'imp\u00f4t totale</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.denormReducTotale)+'</span></div>';
+    // R\u00e9duction totale pour les 3 engagements possibles, celui choisi en \u00e9vidence
+    [[6,0.12],[9,0.18],[12,0.21]].forEach(function(rr){
+      var sel = rr[0]===p.engagement;
+      h+='<div class="bl-row"><span class="bl-k"'+(sel?' style="font-weight:700;color:var(--noir)"':'')+'>R\u00e9duction '+rr[0]+' ans ('+Math.round(rr[1]*100)+'%)</span><span class="bl-v'+(sel?' gold':'')+'">'+fmtE(p.denormEligible?p.denormBase*rr[1]:0)+(sel?' \u2713':'')+'</span></div>';
+    });
+    h+='<div class="bl-row" style="border-top:2px solid var(--ambre-m);padding-top:6px;margin-top:4px"><span class="bl-k" style="font-weight:700">R\u00e9duction retenue ('+p.engagement+' ans)</span><span class="bl-v gold" style="font-size:15px">'+fmtE(p.denormReducTotale)+'</span></div>';
     if(p.denormEligible){
       h+='<div class="bl-row"><span class="bl-k">R\u00e9duction annuelle</span><span class="bl-v green">'+fmtE(p.denormBase*0.02)+(p.engagement===12?' puis '+fmtE(p.denormBase*0.01)+' (ans 10-12)':'')+'</span></div>';
     } else {
@@ -999,6 +1009,7 @@ CGP.project.registerModule('immo-simulator', {
       prixDenorm: +document.getElementById('prixDenorm').value,
       travauxDenorm: +document.getElementById('travauxDenorm').value,
       fraisNotaireD: +document.getElementById('fraisNotaireD').value,
+      surfaceD: +document.getElementById('surfaceD').value,
       loyerMD: +document.getElementById('loyerMD').value,
       tauxCNRD: +document.getElementById('tauxCNRD').value,
       dEngagement: +document.getElementById('dEngagement').value,
@@ -1051,6 +1062,7 @@ CGP.project.registerModule('immo-simulator', {
     if (d.prixDenorm !== undefined) document.getElementById('prixDenorm').value = d.prixDenorm;
     if (d.travauxDenorm !== undefined) document.getElementById('travauxDenorm').value = d.travauxDenorm;
     if (d.fraisNotaireD !== undefined) document.getElementById('fraisNotaireD').value = d.fraisNotaireD;
+    if (d.surfaceD !== undefined) document.getElementById('surfaceD').value = d.surfaceD;
     if (d.loyerMD !== undefined) document.getElementById('loyerMD').value = d.loyerMD;
     if (d.tauxCNRD !== undefined) document.getElementById('tauxCNRD').value = d.tauxCNRD;
     if (d.dEngagement !== undefined) document.getElementById('dEngagement').value = d.dEngagement;
