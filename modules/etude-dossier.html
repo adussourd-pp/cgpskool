@@ -576,6 +576,7 @@ select.span2{grid-column:span 2}
   <div style="flex:1;min-height:16px"></div>
   <div style="height:1px;background:var(--bord);margin:12px 0"></div>
   <div style="padding:0 10px;display:flex;flex-direction:column;gap:4px">
+    <button class="btn btn-secondary" onclick="openModeEmploi()" style="width:100%;justify-content:center;padding:10px;font-size:12px;color:var(--ambre);border-color:rgba(212,98,42,0.35)">&#128214; Mode d'emploi</button>
     <button class="btn btn-success" onclick="exportPDF()" style="width:100%;justify-content:center;padding:11px;font-size:13px">&#11015; Exporter PDF</button>
     <button class="btn btn-secondary" onclick="sauvegarderEtude()" style="width:100%;justify-content:center;padding:10px;font-size:12px">&#128190; Sauvegarder l'&#233;tude</button>
     <button class="btn btn-secondary" onclick="document.getElementById('chargerEtudeInput').click()" style="width:100%;justify-content:center;padding:10px;font-size:12px">&#128194; Charger une &#233;tude</button>
@@ -1506,6 +1507,149 @@ select.span2{grid-column:span 2}
 
 <div class="notif" id="notif"></div>
 
+<!-- ── MODE D'EMPLOI (volet detaille section par section) ── -->
+<style>
+.me-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9997}
+.me-backdrop.open{display:block}
+.me-panel{position:fixed;top:0;left:-480px;width:460px;max-width:92vw;height:100vh;background:#fff;z-index:9998;box-shadow:4px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:left 0.25s ease}
+.me-panel.open{left:0}
+.me-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1.5px solid var(--bord);flex-shrink:0}
+.me-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--noir)}
+.me-sub{font-size:11px;color:var(--gris);margin-top:2px}
+.me-close{background:none;border:none;font-size:20px;color:var(--gris);cursor:pointer;padding:4px 8px}
+.me-close:hover{color:var(--noir)}
+.me-body{flex:1;overflow-y:auto;padding:14px 16px 24px}
+.me-item{border:1.5px solid var(--bord);border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff}
+.me-item.current{border-color:var(--ambre)}
+.me-item-head{display:flex;gap:10px;align-items:center;padding:11px 14px;cursor:pointer;user-select:none}
+.me-item-head:hover{background:var(--gris-l)}
+.me-num{width:24px;height:24px;border-radius:50%;background:var(--ambre-l);color:var(--ambre);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.me-item.current .me-num{background:var(--ambre);color:#fff}
+.me-item-title{flex:1;font-size:13px;font-weight:600;color:var(--noir)}
+.me-badge{font-size:8.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--gris-l);color:var(--gris)}
+.me-badge.opt{background:rgba(43,94,167,0.1);color:#2B5EA7}
+.me-chev{font-size:9px;color:var(--gris);transition:transform 0.2s}
+.me-item.open .me-chev{transform:rotate(90deg)}
+.me-item-body{display:none;padding:2px 14px 13px 48px;font-size:12px;color:var(--gris-f);line-height:1.75}
+.me-item.open .me-item-body{display:block}
+.me-item-body strong{color:var(--noir)}
+.me-item-body ul{margin:6px 0;padding-left:16px}
+.me-item-body li{margin-bottom:3px}
+.me-pdf{margin-top:8px;padding:8px 10px;background:rgba(45,122,91,0.06);border-left:2.5px solid #2D7A5B;border-radius:0 6px 6px 0;font-size:11px}
+</style>
+<div class="me-backdrop" id="meBackdrop" onclick="closeModeEmploi()"></div>
+<div class="me-panel" id="mePanel">
+  <div class="me-head">
+    <div>
+      <div class="me-title">&#128214; Mode d'emploi</div>
+      <div class="me-sub">Le d&#233;tail de chaque section, dans l'ordre de l'&#233;tude</div>
+    </div>
+    <button class="me-close" onclick="closeModeEmploi()">&#10005;</button>
+  </div>
+  <div class="me-body" id="meBody"></div>
+</div>
+
+<script>
+var ME_SECTIONS = [
+ { id:'import', t:"Import / Saisie", b:"<ul>"+
+   "<li><strong>Recueil d'informations (RI)</strong> : ouvre le Word ou le PDF Proxeema, Ctrl+A puis Ctrl+C, colle tout dans la zone RI et clique <strong>Valider</strong>. Le parser extrait identité, situation familiale, revenus, patrimoine, objectifs.</li>"+
+   "<li><strong>Fiche légale (DER)</strong> : même principe dans la zone dédiée — les habilitations ORIAS sont détectées automatiquement et alimentent les Mentions légales.</li>"+
+   "<li><strong>Avis d'imposition</strong> : sa propre zone de copier-coller, pour fiabiliser la section Impôts (revenu fiscal de référence, parts, impôt payé).</li>"+
+   "<li>Après chaque import, un <strong>volet de vérification</strong> s'ouvre : corrige, complète (épargne mensuelle, épargne de précaution), puis <strong>Appliquer les modifications</strong> — c'est la source de vérité de toute l'étude.</li>"+
+   "<li>Pas de document ? Tout est saisissable à la main dans le même volet.</li></ul>" },
+ { id:'pagegarde', t:"Page de garde", b:"Générée automatiquement : noms des clients, date, ton identité conseiller (nom, cabinet, logo, couleurs) issue du <strong>profil</strong> configuré sur la page d'accueil des outils. Rien à saisir ici — si le logo manque, complète ton profil via ⚙ Mon profil sur la page Outils.<div class='me-pdf'>&#128196; PDF : première page de l'étude exportée.</div>" },
+ { id:'sommaire', t:"Sommaire", b:"Se construit tout seul selon les sections cochées pour l'export. Les sections décochées (Transmission, Entreprise, Avis clients...) n'y apparaissent pas.<div class='me-pdf'>&#128196; PDF : pagination recalculée à chaque export.</div>" },
+ { id:'situation', t:"Situation & Objectifs", b:"<ul>"+
+   "<li>Vérifie l'<strong>identité</strong> de chaque déclarant : âge, CSP, situation matrimoniale, enfants à charge.</li>"+
+   "<li>Les <strong>revenus sont annuels</strong> — le mensuel affiché est calculé automatiquement.</li>"+
+   "<li>Coche / décoche les <strong>objectifs patrimoniaux</strong> : ils orientent les préconisations et se retrouvent dans la synthèse.</li>"+
+   "<li>Chaque zone de texte est éditable directement sur la page si tu veux affiner la formulation.</li></ul>" },
+ { id:'patrimoine', t:"Patrimoine", b:"<ul>"+
+   "<li>La <strong>pyramide patrimoniale</strong> classe les actifs par nature (liquidités, financier, immobilier...).</li>"+
+   "<li>Les <strong>horizons CT / MT / LT</strong> se calculent selon la répartition — vérifie que l'épargne de précaution est bien renseignée.</li>"+
+   "<li>Ajoute ou retire des actifs/passifs depuis le volet de vérification de l'Import (bouton en haut de page).</li></ul>" },
+ { id:'fiscal', t:"Impôts", b:"<ul>"+
+   "<li>TMI, impôt estimé, décomposition par tranches — calculés depuis les revenus saisis (barème en vigueur).</li>"+
+   "<li>Si tu as collé l'<strong>avis d'imposition</strong>, les chiffres réels remplacent l'estimation.</li>"+
+   "<li>L'encart <strong>IFI</strong> s'active si le patrimoine immobilier net dépasse le seuil.</li>"+
+   "<li>Les <strong>leviers fiscaux</strong> identifiés (PER, déficit foncier...) préparent la section Préconisations.</li></ul>" },
+ { id:'financement', t:"Financement", b:"<ul>"+
+   "<li><strong>Capacité d'emprunt</strong> : calculée depuis revenus et charges (taux d'endettement 35 %).</li>"+
+   "<li>Ajuste taux, durée et apport pour simuler une enveloppe de projet immobilier.</li>"+
+   "<li>Le tableau d'amortissement alimenté apparaît dans le PDF si la section est cochée.</li></ul>" },
+ { id:'retraite', t:"Retraite", b:"<ul>"+
+   "<li><strong>Projection de pension</strong> par déclarant selon la CSP et les revenus (taux COPERNIC).</li>"+
+   "<li>Le <strong>taux de remplacement</strong> met en évidence l'écart de revenus à la retraite — argument clé pour le PER.</li>"+
+   "<li>Personne déjà retraitée ? Le <strong>switch de désactivation</strong> masque les calculs et n'affiche que ta note conseiller.</li></ul>" },
+ { id:'transmission', t:"Transmission", opt:true, b:"Section <strong>optionnelle</strong> (case à cocher pour l'inclure au PDF).<ul>"+
+   "<li>Simulation de succession : actif successoral, abattements, droits estimés par héritier.</li>"+
+   "<li>Compare la situation actuelle avec une stratégie (donation, assurance vie, démembrement).</li></ul>" },
+ { id:'entreprise', t:"Entreprise", opt:true, b:"Section <strong>optionnelle</strong> pour les clients dirigeants : valorisation, rémunération vs dividendes, prévoyance du dirigeant. À activer seulement si le client est concerné." },
+ { id:'preconisations', t:"Préconisations", b:"Le cœur de l'étude — tout se passe dans le <strong>panneau conseiller</strong> (non imprimé) :<ul>"+
+   "<li><strong>Cliquer</strong> sur une solution = l'ajouter. Re-cliquer = la retirer (si aucun montant saisi).</li>"+
+   "<li><strong>+ Ajouter un contrat</strong> : crée un 2e contrat de la même solution pour l'autre titulaire.</li>"+
+   "<li>Renseigne <strong>VI</strong> (versement initial), <strong>VP</strong> (versements programmés) et l'horizon.</li>"+
+   "<li>Le <strong>libellé PDF</strong> est modifiable — c'est ce que verra le client.</li>"+
+   "<li>Les <strong>recommandations cochées</strong> deviennent des Points de vigilance dans le PDF ; la <strong>note client</strong> (switch) s'affiche sous la solution.</li></ul>" },
+ { id:'synthese', t:"Synthèse", b:"<ul>"+
+   "<li>Graphiques <strong>avant / après</strong> : patrimoine, impôts et revenus retraite intègrent les solutions retenues.</li>"+
+   "<li>Vérifie la cohérence des chiffres avant l'export — c'est la page que le client retient.</li>"+
+   "<li>Ton badge conseiller (photo, coordonnées) apparaît en bas.</li></ul>" },
+ { id:'mentions', t:"Mentions légales", b:"Générées depuis la <strong>fiche légale (DER)</strong> collée à l'Import : habilitations détectées (ORIAS, IAS, IOBSP, CIF, immobilier), RCP, réclamations, médiateurs. Relis une fois — c'est ta conformité qui est affichée." },
+ { id:'avis', t:"Avis clients", opt:true, b:"Section <strong>optionnelle</strong> : affiche tes avis clients (saisis dans ton profil ou lien Trustpilot) pour renforcer la crédibilité en fin d'étude." },
+ { id:'compterendu', t:"Compte rendu", b:"3 templates de mails pré-remplis avec les données du client :<ul>"+
+   "<li><strong>R1 Audit</strong> : après le rendez-vous de découverte.</li>"+
+   "<li><strong>R2 Présentation</strong> : envoi de l'étude et des solutions.</li>"+
+   "<li><strong>R3 Confirmation</strong> : validation des souscriptions.</li></ul>Copie en un clic, personnalise dans ta messagerie. Cette page ne fait pas partie du PDF client." }
+];
+
+function buildModeEmploi(){
+  var body=document.getElementById('meBody');
+  if(body.childNodes.length) return;
+  var h='';
+  for(var i=0;i<ME_SECTIONS.length;i++){
+    var s=ME_SECTIONS[i];
+    h+='<div class="me-item" id="me-'+s.id+'">'+
+       '<div class="me-item-head" onclick="this.parentNode.classList.toggle(\'open\')">'+
+       '<div class="me-num">'+(i+1)+'</div>'+
+       '<div class="me-item-title">'+s.t+'</div>'+
+       (s.opt?'<span class="me-badge opt">Optionnelle</span>':'')+
+       '<span class="me-chev">▶</span></div>'+
+       '<div class="me-item-body">'+s.b+'</div></div>';
+  }
+  body.innerHTML=h;
+}
+function openModeEmploi(secId){
+  buildModeEmploi();
+  var items=document.querySelectorAll('.me-item');
+  for(var i=0;i<items.length;i++){items[i].classList.remove('open','current');}
+  // section courante : parametre > section active a l'ecran
+  var cur=secId;
+  if(!cur){
+    var act=document.querySelector('.section-page.active');
+    if(act) cur=act.id.replace('sec-','');
+  }
+  var target=cur?document.getElementById('me-'+cur):null;
+  if(target){ target.classList.add('open','current'); }
+  else if(items.length){ items[0].classList.add('open'); }
+  document.getElementById('meBackdrop').classList.add('open');
+  document.getElementById('mePanel').classList.add('open');
+  if(target){ setTimeout(function(){ target.scrollIntoView({block:'nearest'}); },260); }
+}
+function closeModeEmploi(){
+  document.getElementById('meBackdrop').classList.remove('open');
+  document.getElementById('mePanel').classList.remove('open');
+}
+(function(){
+  try{
+    if(new URLSearchParams(window.location.search).get('modeEmploi')){
+      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){openModeEmploi();});}
+      else{openModeEmploi();}
+    }
+  }catch(e){}
+})();
+</script>
+
 <!-- ── ONBOARDING ── -->
 <div id="onboardingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 12px 48px rgba(0,0,0,0.25)">
@@ -1604,7 +1748,7 @@ select.span2{grid-column:span 2}
       <strong>Astuces :</strong><br>
       &#8226; Le fichier JSON sauvegard&#233; contient TOUTE l'&#233;tude. Conserve-le pr&#233;cieusement pour pouvoir la reprendre 3, 6 ou 12 mois plus tard.<br>
       &#8226; Les mentions l&#233;gales sont g&#233;n&#233;r&#233;es automatiquement depuis ton profil (page d'accueil). L'avis d'imposition a sa propre zone de copier-coller dans Import / Saisie.<br>
-      &#8226; Tu peux revoir ce guide &#224; tout moment via "&#128214; Revoir le guide" en bas de la sidebar.
+      &#8226; Tu peux revoir ce guide via le bouton "&#10067; Guide" en haut &#224; droite, et ouvrir le <strong>"&#128214; Mode d'emploi"</strong> d&#233;taill&#233; section par section depuis le bas de la sidebar.
     </div>
 
     <div style="text-align:center">
