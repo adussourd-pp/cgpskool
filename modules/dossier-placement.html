@@ -422,7 +422,7 @@ function loadAnnexes(){
   ANNEXE_MODULES.forEach(function(m){
     var key='cgpskool_state_'+m.id;
     var data=null;
-    try{var raw=localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
+    try{var raw=sessionStorage.getItem(key)||localStorage.getItem(key);if(raw)data=JSON.parse(raw);}catch(e){}
     if(data){
       found=true;
       html+='<label class="cb-row"><input type="checkbox" data-annexe="'+m.id+'" checked onchange="renderAnnexesContent()"> '+m.icon+' '+m.label+'</label>';
@@ -475,7 +475,7 @@ function saveDossier(){
   ['cbGarde','cbAccompagnement','cbContrat','cbGestion','cbFrais','cbSchema','cbWorkflow','cbAnnexes'].forEach(function(id){
     state.checkboxes[id]=V(id).checked;
   });
-  try{localStorage.setItem('cgpskool_state_dossier-placement',JSON.stringify(state));}catch(e){}
+  try{sessionStorage.setItem('cgpskool_state_dossier-placement',JSON.stringify(state));}catch(e){}
   var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);

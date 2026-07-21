@@ -32,7 +32,7 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 │ sidebar  │  <main class="main">                  │
 │ 240px    │  .section-page (une par étape)         │
 │ sticky   │  Format A4 (794×1123px)                │
-│          │  blanc sur fond beige #ECEAE6          │
+│          │  blanc sur fond beige var(--paper-2)          │
 │ Étapes:  │                                        │
 │ Import   │  panneau-interne = zones conseiller    │
 │ Situation│  (hors PDF, display:none en print)     │
@@ -122,9 +122,8 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 ### Stockage des données — à garder EXACT
 
 - **Aucun module n'envoie de données sur un serveur** : tout est 100 % navigateur (GitHub Pages n'héberge que le code). Seul le tracker Dev Action (`tracker/`) passe par un Worker Cloudflare — il ne traite aucune donnée client.
-- `DATA_KIND` dans `cgp-skool-nav.js` classe chaque module :
-  - `'session'` (`etude-dossier`, `suivi-contrat`) : données client **en mémoire uniquement**, rien de persisté — la seule conservation est le JSON exporté manuellement par le conseiller
-  - `'local'` (défaut) : paramètres mémorisés dans le localStorage de l'appareil (`cgpskool_state_<id>` via `CGP.project.autoSave`)
+- **Persistance limitée (RGPD)** : `CGP.project.PERSIST` dans `cgp-skool-core.js` liste les seuls modules autorisés à persister leur état (`bp-simulator`, `equipe-builder`, `productivite` — outils internes sans données client). Pour tous les autres, l'état passe par **sessionStorage** (effacé à la fermeture de l'onglet — permet le flux simulateur → dossier-placement pendant la session) : rien ne persiste sur l'appareil, conservation = JSON exporté manuellement. Un nettoyage au chargement purge les `cgpskool_state_<id>` non whitelistés stockés en localStorage par les anciennes versions.
+- `DATA_KIND` dans `cgp-skool-nav.js` pilote le texte « Vos données » des guides : `'session'` par défaut, `'local'` pour les modules whitelistés — **garder aligné avec `CGP.project.PERSIST`**
 - Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, ligne `.privacy-foot` en pied de page de `outils.html`, section Confidentialité sur la vitrine `index.html`
 
 ### Pages d'entrée
@@ -171,7 +170,7 @@ Chaque module outil (simulateur, étude) doit suivre ce format.
 ┌─────────────────────────────────────────────────────┐
 │  <nav class="cs-nav"> — barre noire, logo C, Accueil│
 ├───────────┬─────────────────────────────────────────┤
-│ sidebar   │  .cs-main (fond beige #ECEAE6)          │
+│ sidebar   │  .cs-main (fond beige --paper-2)          │
 │ 320px     │  └─ .cs-page (page A4, fond blanc)      │
 │ #F2F1EE   │     ├─ Header (tag orange + titre gras) │
 │ sticky    │     ├─ Contenu (cards, KPIs, charts)     │
@@ -198,7 +197,7 @@ Chaque module outil (simulateur, étude) doit suivre ce format.
 
 | Élément | Classe | Specs |
 |---|---|---|
-| Conteneur | `.cs-sidebar` (layout.css) | fond `var(--paper)` (#F2F1EE), 320px, sticky, padding `16px 14px` |
+| Conteneur | `.cs-sidebar` (layout.css) | fond `var(--paper)` (#F6F3EE), 320px, sticky, padding `16px 14px` |
 | Toggle label | `.cs-sidebar-lbl` (layout.css) | 9px, weight 700, uppercase, letter-spacing 0.18em, couleur `var(--ink-60)` |
 | Toggle icône | `<span class="acc">▶</span>` | 7px, rotate 90deg quand `.open` |
 | Toggle body | `.sb-body` | max-height 0→2000px, transition 0.3s |
@@ -321,7 +320,7 @@ Specs bouton : `width:100%; padding:10px; font-size:13px; font-weight:500; font-
 
 ### Pied de page conseiller
 
-- Fond beige `#F2F1EE`, pleine largeur via `margin: 28px -40px -40px -40px`
+- Fond beige `#F6F3EE` (--paper), pleine largeur via `margin: 28px -40px -40px -40px`
 - Gauche : nom (16px bold), cabinet (11px gris), tel + email en ligne (11px gris, icônes ☎ ✉)
 - Droite : logo cabinet dans un rond (52px, fond blanc, bordure, `border-radius:50%`)
 - Données chargées depuis `localStorage('cgpskool_profil_v1')` + `localStorage('cgpskool_logo')`
@@ -374,7 +373,7 @@ Les `<canvas>` apparaissent vides/blancs en impression. Solution :
 
 **R25 — Le footer conseiller (`#conseillerFooter`) DOIT rester le dernier bloc et NE PAS être enveloppé.**
 
-`CGP.footer.render` génère `<div style="background:#F2F1EE;margin:28px -40px -40px -40px;...">` — les `-40px` débordent les 40px de padding de `.cs-page` en écran. En print le padding tombe à 20px et le `-40px` bas ferait déborder le fond beige sur la page suivante (symptôme = "barre grise sous le footer") + le bloc peut se couper en deux (symptôme = "footer coupé").
+`CGP.footer.render` génère `<div style="background:#F6F3EE;margin:28px -40px -40px -40px;...">` — les `-40px` débordent les 40px de padding de `.cs-page` en écran. En print le padding tombe à 20px et le `-40px` bas ferait déborder le fond beige sur la page suivante (symptôme = "barre grise sous le footer") + le bloc peut se couper en deux (symptôme = "footer coupé").
 
 La correction globale est dans `cgp-skool-layout.css` (`@media print` → section 9b) :
 ```css

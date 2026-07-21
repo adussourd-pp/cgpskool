@@ -31,10 +31,13 @@
   /* Stockage des donnees par module :
    *  'session' = donnees client en memoire uniquement (rien de conserve, sauvegarde = JSON manuel)
    *  'local'   = parametres memorises dans le localStorage du navigateur (cet appareil uniquement)
-   * Par defaut : 'local'. Aucun module n'envoie de donnees sur un serveur. */
+   * Par defaut : 'session' (RGPD). Seuls les outils internes sans donnees client persistent
+   * (doit rester aligne avec CGP.project.PERSIST dans cgp-skool-core.js).
+   * Aucun module n'envoie de donnees sur un serveur. */
   var DATA_KIND = {
-    'etude-dossier': 'session',
-    'suivi-contrat': 'session'
+    'bp-simulator': 'local',
+    'equipe-builder': 'local',
+    'productivite': 'local'
   };
   var DATA_NOTES = {
     'session': 'Les donn&eacute;es du client ne quittent jamais votre navigateur : rien n\'est envoy&eacute; ni stock&eacute; sur un serveur. Elles restent en m&eacute;moire le temps de la session et sont effac&eacute;es &agrave; la fermeture de l\'onglet. Seul le fichier JSON que vous t&eacute;l&eacute;chargez vous-m&ecirc;me conserve l\'&eacute;tude : archivez-le dans votre propre syst&egrave;me.',
@@ -83,7 +86,7 @@
       guide.tips.forEach(function(t) { h += '<li>\uD83D\uDCA1 ' + t + '</li>'; });
       h += '</ul>';
     }
-    var kind = DATA_KIND[moduleId] || 'local';
+    var kind = DATA_KIND[moduleId] || 'session';
     h += '<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6B6B6B;margin:20px 0 8px">\uD83D\uDD12 Vos donn&eacute;es</div>';
     h += '<div class="cgp-guide-privacy">' + DATA_NOTES[kind] + '</div>';
     h += '<div class="cgp-guide-rgpd">\u2713 Conforme RGPD &mdash; aucune collecte, aucun cookie de suivi, aucune transmission &agrave; un serveur.</div>';

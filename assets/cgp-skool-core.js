@@ -196,7 +196,7 @@ CGP.footer.render = function(el) {
   var nom = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
   // Si rien dans le profil → afficher placeholder
   if (!nom && !p.cabinet) {
-    el.innerHTML = '<div style="background:#F2F1EE;margin:28px -40px -40px -40px;padding:20px 40px;text-align:center;font-size:11px;color:#9C9A96;font-style:italic">Renseignez votre profil sur la page d\'accueil pour personnaliser ce pied de page</div>';
+    el.innerHTML = '<div style="background:#F6F3EE;margin:28px -40px -40px -40px;padding:20px 40px;text-align:center;font-size:11px;color:#9C9A96;font-style:italic">Renseignez votre profil sur la page d\'accueil pour personnaliser ce pied de page</div>';
     el.style.display = '';
     return;
   }
@@ -250,7 +250,7 @@ CGP.footer.render = function(el) {
       + '</div>';
   }
 
-  el.innerHTML = '<div style="background:#F2F1EE;margin:28px -40px -40px -40px;padding:12px 40px;display:flex;align-items:center;gap:14px">'
+  el.innerHTML = '<div style="background:#F6F3EE;margin:28px -40px -40px -40px;padding:12px 40px;display:flex;align-items:center;gap:14px">'
     + photoBlock
     + center
     + right
@@ -389,11 +389,43 @@ CGP.project._modules = {};
  * @param {string} id - Module identifier (e.g. 'simulateur-avance-av')
  * @param {object} handlers - {getState: function, setState: function}
  */
+/*
+ * RGPD - persistance localStorage limitee aux modules SANS donnees client
+ * (outils internes du conseiller). Tous les autres modules restent en
+ * memoire de session uniquement : la seule conservation est le JSON
+ * exporte manuellement. Voir CLAUDE.md (Onboarding & stockage des donnees).
+ */
+CGP.project.PERSIST = ['bp-simulator', 'equipe-builder', 'productivite'];
+CGP.project._canPersist = function(id) {
+  return CGP.project.PERSIST.indexOf(id) !== -1;
+};
+// Modules client -> sessionStorage (efface a la fermeture de l'onglet),
+// modules whitelistes -> localStorage (persistant).
+CGP.project._store = function(id) {
+  return CGP.project._canPersist(id) ? localStorage : sessionStorage;
+};
+
+// Nettoyage RGPD : purge les etats de modules client deja stockes
+// sur l'appareil par les versions precedentes.
+(function() {
+  try {
+    var toDrop = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.indexOf('cgpskool_state_') === 0) {
+        var modId = key.replace('cgpskool_state_', '');
+        if (!CGP.project._canPersist(modId)) toDrop.push(key);
+      }
+    }
+    for (var j = 0; j < toDrop.length; j++) localStorage.removeItem(toDrop[j]);
+  } catch(e) {}
+})();
+
 CGP.project.registerModule = function(id, handlers) {
   CGP.project._modules[id] = handlers;
-  // Auto-load saved state from localStorage
+  // Auto-load saved state (sessionStorage pour les modules client)
   try {
-    var saved = localStorage.getItem('cgpskool_state_' + id);
+    var saved = CGP.project._store(id).getItem('cgpskool_state_' + id);
     if (saved && handlers.setState) {
       handlers.setState(JSON.parse(saved));
     }
@@ -402,12 +434,13 @@ CGP.project.registerModule = function(id, handlers) {
 
 /**
  * Save current module state to localStorage (call after calc).
+ * No-op pour les modules hors whitelist RGPD (donnees client en memoire).
  */
 CGP.project.autoSave = function(id) {
   var mod = CGP.project._modules[id];
   if (!mod || !mod.getState) return;
   try {
-    localStorage.setItem('cgpskool_state_' + id, JSON.stringify(mod.getState()));
+    CGP.project._store(id).setItem('cgpskool_state_' + id, JSON.stringify(mod.getState()));
   } catch(e) {}
 };
 
@@ -425,14 +458,18 @@ CGP.project.exportAll = function() {
   var img = CGP.profil.loadImages();
   if (img.photo) data.profilPhoto = img.photo;
   if (img.logo) data.profilLogo = img.logo;
-  // Collect all module states from localStorage
-  for (var i = 0; i < localStorage.length; i++) {
-    var key = localStorage.key(i);
-    if (key && key.indexOf('cgpskool_state_') === 0) {
-      var modId = key.replace('cgpskool_state_', '');
-      try { data.modules[modId] = JSON.parse(localStorage.getItem(key)); } catch(e) {}
-    }
-  }
+  // Collect all module states (localStorage + sessionStorage)
+  [localStorage, sessionStorage].forEach(function(store) {
+    try {
+      for (var i = 0; i < store.length; i++) {
+        var key = store.key(i);
+        if (key && key.indexOf('cgpskool_state_') === 0) {
+          var modId = key.replace('cgpskool_state_', '');
+          try { data.modules[modId] = JSON.parse(store.getItem(key)); } catch(e) {}
+        }
+      }
+    } catch(e) {}
+  });
   // Also get current module state (fresh)
   Object.keys(CGP.project._modules).forEach(function(id) {
     var mod = CGP.project._modules[id];
@@ -468,11 +505,12 @@ CGP.project.importAll = function(file, callback) {
       if (data.profilLogo) {
         try { localStorage.setItem('cgpskool_logo', data.profilLogo); } catch(err) {}
       }
-      // Restore module states to localStorage
+      // Restore module states (localStorage : whitelist RGPD uniquement,
+      // les modules client sont restaures en memoire s'ils sont ouverts)
       if (data.modules) {
         Object.keys(data.modules).forEach(function(modId) {
           try {
-            localStorage.setItem('cgpskool_state_' + modId, JSON.stringify(data.modules[modId]));
+            CGP.project._store(modId).setItem('cgpskool_state_' + modId, JSON.stringify(data.modules[modId]));
           } catch(err) {}
           // If this module is currently loaded, call setState
           var mod = CGP.project._modules[modId];
@@ -482,7 +520,7 @@ CGP.project.importAll = function(file, callback) {
         });
       }
       if (callback) callback(data);
-      else alert('Projet charge avec succes. Naviguez vers les autres modules pour voir les donnees restaurees.');
+      else alert('Projet charge avec succes. Les donnees client ne sont restaurees que dans le module ouvert (rien n\'est conserve sur l\'appareil).');
     } catch(err) {
       alert('Erreur lors du chargement : ' + err.message);
     }
