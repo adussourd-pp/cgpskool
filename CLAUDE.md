@@ -54,7 +54,7 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 | # | ID section | Fonction render | Rôle |
 |---|---|---|---|
-| 0 | `sec-import` | — | Import Word/texte, avis d'imposition |
+| 0 | `sec-import` | — | Import Word/texte (RI + fiche légale DER) — l'avis d'imposition se reporte manuellement dans la section Impôts |
 | 1 | `sec-situation` | `rSituation()` | Identité, situation familiale, objectifs |
 | 2 | `sec-patrimoine` | `rPatrimoine()` | Pyramide actifs, horizons CT/MT/LT |
 | 3 | `sec-fiscal` | `rFiscal()` | TMI, IFI, leviers fiscaux |
