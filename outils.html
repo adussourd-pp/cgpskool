@@ -141,15 +141,15 @@
 /* Bandeau données / RGPD */
 /* Ligne données / RGPD (pied de page) */
 .privacy-foot {
-  background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06);
+  background: var(--paper-2); border-top: 1px solid var(--rule-l);
   padding: 14px 52px; text-align: center;
-  font-size: 11.5px; font-weight: 300; line-height: 1.65; color: rgba(255,255,255,0.35);
+  font-size: 11.5px; font-weight: 300; line-height: 1.65; color: var(--ink-60);
 }
-.privacy-foot strong { color: #5FB08D; font-weight: 600; }
+.privacy-foot strong { color: #2D7A5B; font-weight: 600; }
 
 /* Footer */
 .site-footer {
-  background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06);
+  background: var(--paper); border-top: 1px solid var(--rule-l);
   padding: 36px 52px; display: flex; align-items: center; justify-content: space-between;
 }
 .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -158,8 +158,8 @@
   display: flex; align-items: center; justify-content: center;
 }
 .footer-mark span { font-family: var(--serif); font-size: 12px; color: var(--orange); line-height: 1; }
-.footer-name { font-size: 10.5px; color: rgba(255,255,255,0.25); letter-spacing: 0.2em; text-transform: uppercase; }
-.footer-copy { font-size: 11px; color: rgba(255,255,255,0.16); }
+.footer-name { font-size: 10.5px; color: var(--ink-30); letter-spacing: 0.2em; text-transform: uppercase; }
+.footer-copy { font-size: 11px; color: var(--ink-30); }
 
 /* Modale */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
@@ -181,6 +181,11 @@
 /* ── Nav pleine largeur sur index (pas de max-width comme le footer) ── */
 .cs-nav-inner { max-width: none; padding: 0 36px; }
 
+/* ── DA claire : header aligne sur la vitrine (surcharges locales) ── */
+.cs-nav { background: rgba(246,243,238,0.92); border-bottom: 1px solid var(--rule-l); }
+.cs-logo-name { color: var(--ink-60); }
+.cs-btn-ghost { border-color: rgba(24,22,20,0.15); color: var(--ink-60); }
+
 /* ── Menu dans la top-nav ── */
 .top-menu {
   display: flex;
@@ -190,30 +195,30 @@
 .top-menu-item {
   font-size: 13px;
   font-weight: 400;
-  color: rgba(255,255,255,0.55);
+  color: var(--ink-60);
   text-decoration: none;
   letter-spacing: 0.01em;
   padding: 7px 16px;
   transition: color 0.15s;
 }
-.top-menu-item:hover { color: rgba(255,255,255,0.9); }
+.top-menu-item:hover { color: var(--ink); }
 .top-menu-item.active { color: var(--orange); font-weight: 500; }
 .top-menu-sep { display: none; }
 .top-menu-ext { margin-left: 0; gap: 4px; flex-shrink: 0; }
 .top-menu-ext .top-menu-item.ext {
   display: inline-flex; align-items: center;
   padding: 4px 9px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #fff;
+  border: 1px solid var(--rule-l);
   border-radius: 5px;
   font-size: 11px;
-  color: rgba(255,255,255,0.65);
+  color: var(--ink-60);
   white-space: nowrap;
 }
 .top-menu-ext .top-menu-item.ext:hover {
   border-color: rgba(212,98,42,0.45);
-  color: #fff;
-  background: rgba(212,98,42,0.08);
+  color: var(--orange);
+  background: rgba(212,98,42,0.06);
 }
 @media (max-width: 1100px) {
   .top-menu-ext { display: none; }
@@ -361,7 +366,7 @@
 </div>
 <style>
 /* ── TOP STRIPS — 3 cellules horizontales (Évènements + Dev Action + Ma journée) ── */
-.top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--paper);border-top:1px solid var(--rule-l)}
+.top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--paper-2);border-bottom:1px solid var(--rule-l)}
 .ts-cell{position:relative;padding:18px 22px;border-right:1px solid var(--rule-l);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
 .ts-cell:last-child{border-right:none}
 .ts-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);line-height:1.2}
@@ -387,7 +392,7 @@
 [data-fold]:not(.closed) .ts-cta-chev{transform:rotate(180deg)}
 
 /* Body dépliable Évènements (full width sous la barre) */
-.ts-body-wrap{background:var(--paper);overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid var(--rule-l)}
+.ts-body-wrap{background:var(--paper-2);overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid var(--rule-l)}
 .ts-body-wrap.closed{max-height:0;border-top-color:transparent}
 .ts-body-inner{max-width:1100px;margin:0 auto;padding:22px 52px}
 
