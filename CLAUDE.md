@@ -110,6 +110,26 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 
 ---
 
+## Onboarding & stockage des données (RGPD)
+
+### Guides par module
+
+- `cgp-skool-nav.js` : tableau `GUIDES` (titre, intro, étapes, astuces) + bouton « ❓ Guide » injecté dans la barre du haut de chaque module
+- À la **première visite** d'un module, le panneau guide s'ouvre automatiquement (clé localStorage `cgpskool_guide_seen_<moduleId>`) — sauf `etude-dossier` qui a son propre overlay d'onboarding (`cgpskool_onboarding_done`)
+- Tant que le guide n'a pas été vu, le bouton est mis en avant : classe `.cgp-guide-attn` (orange + pastille pulsante, définie dans `cgp-skool-layout.css`)
+- Tout nouveau module DOIT avoir son entrée dans `GUIDES`
+
+### Stockage des données — à garder EXACT
+
+- **Aucun module n'envoie de données sur un serveur** : tout est 100 % navigateur (GitHub Pages n'héberge que le code). Seul le tracker Dev Action (`tracker/`) passe par un Worker Cloudflare — il ne traite aucune donnée client.
+- `DATA_KIND` dans `cgp-skool-nav.js` classe chaque module :
+  - `'session'` (`etude-dossier`, `suivi-contrat`) : données client **en mémoire uniquement**, rien de persisté — la seule conservation est le JSON exporté manuellement par le conseiller
+  - `'local'` (défaut) : paramètres mémorisés dans le localStorage de l'appareil (`cgpskool_state_<id>` via `CGP.project.autoSave`)
+- Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, bandeau `.privacy-strip` sur l'accueil
+- **Si un module se met à persister des données client ou à appeler un serveur, mettre à jour `DATA_KIND` et tous ces textes**
+
+---
+
 ## Mentions légales
 
 ### Fonctionnement
