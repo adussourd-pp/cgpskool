@@ -125,7 +125,13 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 - `DATA_KIND` dans `cgp-skool-nav.js` classe chaque module :
   - `'session'` (`etude-dossier`, `suivi-contrat`) : données client **en mémoire uniquement**, rien de persisté — la seule conservation est le JSON exporté manuellement par le conseiller
   - `'local'` (défaut) : paramètres mémorisés dans le localStorage de l'appareil (`cgpskool_state_<id>` via `CGP.project.autoSave`)
-- Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, bandeau `.privacy-strip` sur l'accueil
+- Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, bandeau `.privacy-strip` sur `outils.html`, section Confidentialité sur la vitrine `index.html`
+
+### Pages d'entrée
+
+- `index.html` : **page de garde vitrine** (hero, piliers, RGPD, étapes) — aucune logique applicative
+- `outils.html` : **hub de travail** (grille des modules, top strips, modal profil) — c'est l'ex-`index.html`
+- Le bouton « ← Accueil » des modules et des articles pointe vers `outils.html` (pas la vitrine, pour ne pas ajouter de clic aux utilisateurs quotidiens) ; le logo de `outils.html` pointe vers la vitrine
 - **Si un module se met à persister des données client ou à appeler un serveur, mettre à jour `DATA_KIND` et tous ces textes**
 
 ---
@@ -444,10 +450,10 @@ Ajouter une entrée dans le tableau `MODULES` de `cgp-skool-nav.js` :
 
 ### Profil conseiller
 
-- Édité uniquement dans `index.html` (modal profil)
+- Édité uniquement dans `outils.html` (modal profil)
 - Lu partout via `CGP.profil.load()` (retourne les 2 formats : `prenom` + `pPrenom`)
 - Sauvé via `CGP.profil.save(data)` (écrit les 2 formats)
-- `index.html?openProfil=1` ouvre automatiquement le modal
+- `outils.html?openProfil=1` ouvre automatiquement le modal
 
 ### Export/Import projet JSON
 

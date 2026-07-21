@@ -106,7 +106,7 @@
     // 1. Barre du haut : Accueil + Guide
     var navSlot = document.getElementById('cs-nav-actions');
     if (navSlot) {
-      var homeHref = (window.location.pathname.indexOf('/modules/') !== -1 || window.location.pathname.indexOf('/articles/') !== -1) ? '../index.html' : 'index.html';
+      var homeHref = (window.location.pathname.indexOf('/modules/') !== -1 || window.location.pathname.indexOf('/articles/') !== -1) ? '../outils.html' : 'outils.html';
       var html = '<a class="cs-nav-btn" href="' + homeHref + '">\u2190 Accueil</a>';
       if (guide) html += '<button class="cs-nav-btn' + (guideSeen() ? '' : ' cgp-guide-attn') + '" id="cgp-guide-btn" onclick="CGP.nav.toggleGuide()">\u2753 Guide</button>';
       navSlot.className = 'cs-nav-actions';

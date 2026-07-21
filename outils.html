@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>CGP Skool — Outils patrimoniaux</title>
+<link rel="stylesheet" href="assets/cgp-skool-theme.css">
+<style>
+/* ── Spécifique index ── */
+.hero {
+  background: #1D1A16;
+  padding: 22px 52px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+.hero-title {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hero-piliers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.pilier-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.pilier-btn:hover {
+  border-color: rgba(212,98,42,0.55);
+  background: rgba(212,98,42,0.08);
+  transform: translateY(-1px);
+}
+.pilier-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.pilier-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pilier-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+.pilier-sub {
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+@media (max-width: 720px) {
+  .hero-body { padding: 16px 24px 18px; }
+  .hero-piliers { grid-template-columns: 1fr; }
+}
+
+/* Grille outils */
+.tools-section {
+  background: var(--paper);
+  padding: 56px 52px 72px;
+}
+.tools-inner { max-width: 1100px; margin: 0 auto; }
+.tools-label {
+  font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-30); margin-bottom: 28px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 3px;
+}
+.tool-card {
+  border: 1px solid var(--rule-l); padding: 28px 26px;
+  background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer; text-decoration: none; color: inherit;
+  display: block; position: relative;
+}
+.tool-card:hover {
+  border-color: rgba(212,98,42,0.28);
+  box-shadow: 0 4px 24px rgba(212,98,42,0.05);
+}
+.tool-card.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.tool-bar { width: 24px; height: 2px; background: var(--orange); margin-bottom: 20px; }
+.tool-card.disabled .tool-bar { background: var(--ink-30); }
+.tool-badge {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 3px 8px;
+  background: var(--o-dim); color: var(--orange);
+}
+.tool-badge.soon { background: rgba(24,22,20,0.06); color: var(--ink-30); }
+.tool-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+.tool-name {
+  font-family: var(--serif); font-size: 17px; font-weight: 400;
+  color: var(--ink); margin-bottom: 8px; line-height: 1.2;
+}
+.tool-desc { font-size: 13px; font-weight: 300; color: var(--ink-60); line-height: 1.7; margin-bottom: 16px; }
+.tool-features { display: flex; flex-wrap: wrap; gap: 5px; }
+.tool-feature {
+  font-size: 9.5px; font-weight: 500; padding: 2px 9px;
+  letter-spacing: 0.06em; background: rgba(24,22,20,0.05); color: var(--ink-60);
+}
+
+/* Bandeau données / RGPD */
+.privacy-strip {
+  display: flex; gap: 14px; align-items: flex-start;
+  border: 1px solid rgba(45,122,91,0.3); background: rgba(45,122,91,0.05);
+  padding: 16px 20px; margin-bottom: 28px;
+  font-size: 12.5px; font-weight: 300; line-height: 1.7; color: var(--ink-60);
+}
+.privacy-strip strong { color: #2D7A5B; font-weight: 600; }
+.privacy-strip-icon { font-size: 18px; line-height: 1.4; }
+
+/* Footer */
+.site-footer {
+  background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 36px 52px; display: flex; align-items: center; justify-content: space-between;
+}
+.footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.footer-mark {
+  width: 26px; height: 26px; border: 1px solid rgba(212,98,42,0.38);
+  display: flex; align-items: center; justify-content: center;
+}
+.footer-mark span { font-family: var(--serif); font-size: 12px; color: var(--orange); line-height: 1; }
+.footer-name { font-size: 10.5px; color: rgba(255,255,255,0.25); letter-spacing: 0.2em; text-transform: uppercase; }
+.footer-copy { font-size: 11px; color: rgba(255,255,255,0.16); }
+
+/* Modale */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--paper); padding: 36px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal-title { font-family: var(--serif); font-size: 20px; font-weight: 400; color: var(--ink); margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--ink-60); margin-bottom: 28px; }
+.modal-close { position: absolute; top: 18px; right: 20px; background: transparent; border: none; font-size: 20px; color: var(--ink-60); cursor: pointer; }
+.modal-close:hover { color: var(--ink); }
+.fg { margin-bottom: 14px; }
+.fg label { display: block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-30); margin-bottom: 5px; }
+.fi { width: 100%; padding: 10px 12px; border: 1px solid var(--rule-l); background: #fff; font-family: var(--sans); font-size: 13px; color: var(--ink); outline: none; transition: border-color 0.2s; }
+.fi:focus { border-color: var(--orange); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule-l); }
+.btn-ghost-ink { display: inline-flex; align-items: center; padding: 10px 18px; border: 1px solid var(--rule-l); background: transparent; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-60); cursor: pointer; transition: all 0.2s; }
+.btn-ghost-ink:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ── Nav pleine largeur sur index (pas de max-width comme le footer) ── */
+.cs-nav-inner { max-width: none; padding: 0 36px; }
+
+/* ── Menu dans la top-nav ── */
+.top-menu {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.top-menu-item {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  padding: 7px 16px;
+  transition: color 0.15s;
+}
+.top-menu-item:hover { color: rgba(255,255,255,0.9); }
+.top-menu-item.active { color: var(--orange); font-weight: 500; }
+.top-menu-sep { display: none; }
+.top-menu-ext { margin-left: 0; gap: 4px; flex-shrink: 0; }
+.top-menu-ext .top-menu-item.ext {
+  display: inline-flex; align-items: center;
+  padding: 4px 9px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  white-space: nowrap;
+}
+.top-menu-ext .top-menu-item.ext:hover {
+  border-color: rgba(212,98,42,0.45);
+  color: #fff;
+  background: rgba(212,98,42,0.08);
+}
+@media (max-width: 1100px) {
+  .top-menu-ext { display: none; }
+}
+@media (max-width: 900px) {
+  .top-menu { display: none; }
+}
+
+/* ── Fold/unfold sections (Acces, Agenda, Ma journée) ── */
+.fold-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+}
+.fold-chevron {
+  margin-left: auto;
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+[data-fold].closed .fold-chevron { transform: rotate(-90deg); }
+.fold-body {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.2s ease;
+  max-height: 2000px;
+  opacity: 1;
+}
+[data-fold].closed .fold-body {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0 !important;
+}
+.fold-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+[data-fold].closed .fold-preview { opacity: 1; pointer-events: auto; }
+
+/* Mini chip pour events cochés (aperçu Agenda plié) */
+.mini-event-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+}
+.mini-event-chip.forman { background: rgba(168,85,247,0.18); color: #c4b5fd; }
+.mini-event-chip.prodemial { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.mini-event-more {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="index.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <nav class="top-menu top-menu-ext">
+      <a href="https://my.prodemial.fr" target="_blank" class="top-menu-item ext">my.prodemial</a>
+      <a href="https://asso-forman.fr" target="_blank" class="top-menu-item ext">asso-forman</a>
+      <a href="https://www.skool.com/cgp-skool-1992" target="_blank" class="top-menu-item ext">Onboarding</a>
+    </nav>
+    <div class="cs-nav-actions">
+      <button class="cs-btn-ghost missing" id="btnProfil" onclick="openProfil()">⚙ Mon profil</button>
+    </div>
+  </div>
+</nav>
+
+<!-- TOP STRIPS — 3 cellules : Évènements + Dev Action + Ma journée -->
+<div class="top-strips">
+  <!-- Cellule 1 : Évènements -->
+  <section class="ts-cell" data-fold="agenda" id="agenda">
+    <span class="ts-tag">&#128197; &Eacute;v&egrave;nements</span>
+    <span class="ts-preview" id="agendaPreview"></span>
+    <button class="ts-cta ts-cta-fold" onclick="toggleFold('agenda')" type="button">
+      <span class="ts-cta-txt-open">Voir les &eacute;v&egrave;nements</span>
+      <span class="ts-cta-txt-close">Masquer</span>
+      <span class="ts-cta-chev">&#9662;</span>
+    </button>
+  </section>
+
+  <!-- Cellule 2 : Dev Action CGP Skool -->
+  <a href="tracker/index.html" class="ts-cell ts-devaction" id="devactionStrip">
+    <span class="ts-tag">&#127919; Dev Action CGP Skool</span>
+    <div class="ts-line">
+      <span class="ts-num" id="devActionInscritsCount">&mdash;</span>
+      <span class="ts-suf">inscrits gr&acirc;ce aux Dev Actions</span>
+    </div>
+    <span class="ts-cta">
+      Participer au Dev Action
+      <span class="ts-cta-arrow">&rarr;</span>
+    </span>
+  </a>
+
+  <!-- Cellule 3 : Ma journée -->
+  <section class="ts-cell" id="dailyStrip">
+    <span class="ts-tag">&#9889; Ma journ&eacute;e</span>
+    <div class="ts-line">
+      <span class="ts-num"><span id="dailyWeekTotal">0</span>/<span id="dailyWeekGoal">250</span></span>
+      <span class="ts-suf">pts &middot; <span id="dailyWeekPct">0&nbsp;%</span></span>
+    </div>
+    <a href="modules/productivite.html" class="ts-cta">
+      Compl&eacute;ter ma journ&eacute;e
+      <span class="ts-cta-arrow">&rarr;</span>
+    </a>
+  </section>
+</div>
+
+<!-- Body dépliable Évènements -->
+<div class="ts-body-wrap closed" data-fold-body="agenda">
+  <div class="ts-body-inner">
+    <div class="events-grid" id="eventsGrid"></div>
+  </div>
+</div>
+<style>
+/* ── TOP STRIPS — 3 cellules horizontales (Évènements + Dev Action + Ma journée) ── */
+.top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1D1A16;border-top:1px solid rgba(212,98,42,0.18)}
+.ts-cell{position:relative;padding:18px 22px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
+.ts-cell:last-child{border-right:none}
+.ts-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);line-height:1.2}
+.ts-preview{font-size:12px;color:var(--fog);line-height:1.45;display:block;flex:1}
+.ts-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;flex:1}
+.ts-num{font-size:26px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.ts-suf{font-size:12px;color:var(--fog)}
+
+/* Bouton CTA unifié pour les 3 cellules */
+.ts-cta{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:9px 14px;background:var(--orange);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s;white-space:nowrap;margin-top:auto}
+.ts-cta:hover{background:var(--orange-hover)}
+.ts-cta-arrow{font-size:14px;transition:transform .15s}
+.ts-cta:hover .ts-cta-arrow{transform:translateX(3px)}
+
+/* Cellule Dev Action — même fond que les autres, juste différenciée par son contenu */
+.ts-devaction:hover{background:rgba(255,255,255,0.02)}
+
+/* Bouton fold (Évènements) : chevron au lieu de flèche, texte conditionnel */
+.ts-cta-fold .ts-cta-txt-close{display:none}
+[data-fold]:not(.closed) .ts-cta-fold .ts-cta-txt-open{display:none}
+[data-fold]:not(.closed) .ts-cta-fold .ts-cta-txt-close{display:inline}
+.ts-cta-chev{font-size:11px;transition:transform .18s}
+[data-fold]:not(.closed) .ts-cta-chev{transform:rotate(180deg)}
+
+/* Body dépliable Évènements (full width sous la barre) */
+.ts-body-wrap{background:#1D1A16;overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid rgba(255,255,255,0.05)}
+.ts-body-wrap.closed{max-height:0;border-top-color:transparent}
+.ts-body-inner{max-width:1100px;margin:0 auto;padding:22px 52px}
+
+@media (max-width:900px){.top-strips{grid-template-columns:1fr}.ts-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,0.06)}.ts-cell:last-child{border-bottom:none}.ts-devaction{border-left:none;border-right:none}.ts-body-inner{padding:18px 24px}}
+
+.daily-strip{display:block;background:#1D1A16;padding:24px 52px;border-top:1px solid rgba(212,98,42,0.18);text-decoration:none;color:inherit}
+.daily-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.daily-left{flex:1;min-width:240px}
+.daily-tag{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.daily-title{font-family:var(--serif);font-size:20px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:4px}
+.daily-sub{font-size:12px;color:rgba(255,255,255,0.5);font-weight:300;max-width:420px;line-height:1.5}
+.daily-mid{display:flex;align-items:center;gap:18px}
+.daily-week-block{display:flex;flex-direction:column;gap:6px;min-width:260px}
+.daily-week-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.daily-week-lbl{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+.daily-week-val{font-size:18px;font-weight:700;color:#fff;font-family:var(--sans);line-height:1.1}
+.daily-week-val .pct{color:var(--orange);font-weight:700}
+.daily-week-val .sep{color:rgba(255,255,255,0.25);margin:0 2px}
+.daily-week-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.daily-week-bar > span{display:block;height:100%;background:var(--orange);transition:width 0.4s}
+.daily-days{display:flex;gap:6px;margin-top:2px}
+.daily-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35)}
+.daily-day-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.12);background:transparent;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);transition:all 0.15s}
+.daily-day.has .daily-day-dot{background:var(--orange);border-color:var(--orange);color:#fff}
+.daily-day.partial .daily-day-dot{background:rgba(212,98,42,0.35);border-color:rgba(212,98,42,0.45);color:#fff}
+.daily-day.full .daily-day-dot{background:#10B981;border-color:#10B981;color:#fff}
+.daily-day.today .daily-day-dot{box-shadow:0 0 0 2px rgba(212,98,42,0.35)}
+.daily-day.today{color:var(--orange)}
+.daily-day.future .daily-day-dot{border-style:dashed;border-color:rgba(255,255,255,0.08)}
+.daily-streak{font-size:11px;color:var(--orange);font-weight:600;white-space:nowrap}
+.daily-cta{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--orange);color:#fff;font-size:13px;font-weight:600;border-radius:6px;transition:background 0.15s;text-decoration:none}
+.daily-cta:hover{background:var(--orange-hover)}
+.daily-strip:hover .daily-cta{background:var(--orange-hover)}
+.daily-cta-arrow{font-size:16px;transition:transform 0.2s}
+.daily-strip:hover .daily-cta-arrow{transform:translateX(3px)}
+@media (max-width:720px){.daily-strip{padding:20px 24px}.daily-inner{gap:16px}.daily-score{font-size:34px}.daily-cta{width:100%;justify-content:center}}
+
+/* ── AGENDA — événements Forman / Prodémial ── */
+.events-section{background:#1D1A16;padding:22px 52px;border-top:1px solid rgba(212,98,42,0.18)}
+
+/* ── BANDEAU DEV ACTION (compteur + CTA) ── */
+.devaction-strip{display:block;background:linear-gradient(135deg,#1D1A16 0%,#2A2118 100%);padding:22px 52px;border-top:1px solid rgba(212,98,42,0.28);text-decoration:none;color:inherit;transition:background .25s}
+.devaction-strip:hover{background:linear-gradient(135deg,#241F1A 0%,#332618 100%)}
+.devaction-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.devaction-head{display:flex;flex-direction:column;gap:4px;min-width:0}
+.devaction-tag{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange)}
+.devaction-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.devaction-num{font-size:38px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.devaction-suf{font-size:14px;font-weight:500;color:rgba(255,255,255,0.85)}
+.devaction-sub{font-size:12px;color:var(--fog);margin-top:2px}
+.devaction-cta{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--orange);color:#fff;font-size:13px;font-weight:600;border-radius:6px;transition:background 0.15s;text-decoration:none;white-space:nowrap}
+.devaction-strip:hover .devaction-cta{background:var(--orange-hover)}
+.devaction-cta-arrow{font-size:16px;transition:transform 0.2s}
+.devaction-strip:hover .devaction-cta-arrow{transform:translateX(3px)}
+@media (max-width:720px){.devaction-strip{padding:18px 24px}.devaction-num{font-size:30px}.devaction-cta{width:100%;justify-content:center}}
+.events-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.events-head{flex-shrink:0}
+.events-label{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.events-sub{font-size:11px;color:rgba(255,255,255,0.45);font-weight:300;max-width:200px;line-height:1.5}
+.events-grid{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;min-width:0}
+.event-card{position:relative;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:5px;transition:all 0.15s;min-width:0}
+.event-card:hover{border-color:rgba(212,98,42,0.45);background:rgba(212,98,42,0.06)}
+.event-card.featured{border-color:rgba(212,98,42,0.35)}
+.event-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--orange);border-radius:6px 6px 0 0}
+.event-card.passed{opacity:0.38}
+.event-card.going{border-color:var(--orange);background:rgba(212,98,42,0.12)}
+.event-month{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);line-height:1.2}
+.event-host{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 6px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);align-self:flex-start;border-radius:2px}
+.event-host.forman{background:rgba(168,85,247,0.18);color:#c4b5fd}
+.event-host.prodemial{background:rgba(239,68,68,0.2);color:#fca5a5}
+.event-title{font-family:var(--sans);font-size:12px;font-weight:600;color:#fff;line-height:1.3;letter-spacing:-0.01em}
+.event-check{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto}
+.event-check input{position:absolute;opacity:0;pointer-events:none}
+.event-check-track{position:relative;display:inline-block;width:28px;height:16px;background:rgba(255,255,255,0.12);border-radius:20px;transition:background 0.2s;flex-shrink:0}
+.event-check-dot{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.25);transition:transform 0.2s}
+.event-check input:checked + .event-check-track{background:var(--orange)}
+.event-check input:checked + .event-check-track .event-check-dot{transform:translateX(12px)}
+.event-check-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.55);transition:color 0.2s}
+.event-check input:checked ~ .event-check-lbl{color:var(--orange)}
+@media (max-width:900px){.events-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:720px){.events-section{padding:18px 24px}.events-inner{flex-direction:column;align-items:flex-start}.events-sub{max-width:100%}}
+</style>
+
+<script>
+(function(){
+  var EVENTS = [
+    { id:'udp-janv',    month:'D\u00e9but janvier', sort:1, host:'Forman',    title:'Universit\u00e9 du Patrimoine' },
+    { id:'forum-janv',  month:'Fin janvier',        sort:2, host:'Prod\u00e9mial', title:'Forum du Patrimoine' },
+    { id:'udp-avril',   month:'Avril',              sort:3, host:'Forman',    title:'Universit\u00e9 du Patrimoine' },
+    { id:'udp-rentree', month:'D\u00e9but septembre', sort:4, host:'Forman', title:'Universit\u00e9 du Patrimoine' },
+    { id:'convention',  month:'Fin septembre',      sort:5, host:'Prod\u00e9mial', title:'Convention Nationale' }
+  ];
+  var STORE = 'cgpskool_events_v1';
+  function load(){ try{return JSON.parse(localStorage.getItem(STORE))||{};}catch(e){return {};} }
+  function save(s){ try{localStorage.setItem(STORE, JSON.stringify(s));}catch(e){} }
+
+  // Ordre du mois dans l'annee (0-11) pour savoir si passe
+  var MONTH_ORDER = { 'udp-janv':0, 'forum-janv':0, 'udp-avril':3, 'udp-rentree':8, 'convention':8 };
+  function isPassed(id){
+    var now = new Date();
+    var m = MONTH_ORDER[id];
+    if(m === undefined) return false;
+    // Considerer passe si on est dans un mois strictement posterieur
+    return now.getMonth() > m;
+  }
+
+  function render(){
+    var state = load();
+    var grid = document.getElementById('eventsGrid');
+    if(!grid) return;
+    grid.innerHTML = EVENTS.map(function(ev){
+      var checked = !!state[ev.id];
+      var passed = isPassed(ev.id);
+      var hostCls = ev.host === 'Forman' ? 'forman' : 'prodemial';
+      var classes = 'event-card' + (ev.featured?' featured':'') + (passed?' passed':'') + (checked?' going':'');
+      return '<article class="'+classes+'" data-event="'+ev.id+'">'+
+        '<div class="event-month">'+ev.month+'</div>'+
+        '<span class="event-host '+hostCls+'">'+ev.host+'</span>'+
+        '<div class="event-title">'+ev.title+'</div>'+
+        '<label class="event-check">'+
+          '<input type="checkbox" '+(checked?'checked':'')+' onchange="window.__toggleEvent(\''+ev.id+'\',this.checked,this)">'+
+          '<span class="event-check-track"><span class="event-check-dot"></span></span>'+
+          '<span class="event-check-lbl">'+(checked?"J'y vais \u2713":"J'y vais")+'</span>'+
+        '</label>'+
+      '</article>';
+    }).join('');
+  }
+
+  window.__toggleEvent = function(id, val, inputEl){
+    var state = load();
+    if(val) state[id] = true; else delete state[id];
+    save(state);
+    // Maj visuelle sans re-render complet
+    var card = inputEl.closest('.event-card');
+    if(card) card.classList.toggle('going', val);
+    var lbl = card ? card.querySelector('.event-check-lbl') : null;
+    if(lbl) lbl.textContent = val ? "J'y vais \u2713" : "J'y vais";
+    updateAgendaPreview();
+  };
+
+  // Aperçu des events cochés (mini-chips dans le header plié)
+  function shortTitle(t){
+    if(/Universit/i.test(t)) return 'UDP';
+    if(/Forum/i.test(t)) return 'Forum';
+    if(/Convention/i.test(t)) return 'Convention';
+    return t;
+  }
+  function updateAgendaPreview(){
+    var el = document.getElementById('agendaPreview');
+    if(!el) return;
+    var state = load();
+    var checked = EVENTS.filter(function(ev){return !!state[ev.id];});
+    if(checked.length === 0){ el.innerHTML = ''; return; }
+    var html = checked.map(function(ev){
+      var cls = ev.host === 'Forman' ? 'forman' : 'prodemial';
+      return '<span class="mini-event-chip '+cls+'">'+shortTitle(ev.title)+'</span>';
+    }).join('');
+    el.innerHTML = html;
+  }
+  window.__updateAgendaPreview = updateAgendaPreview;
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ render(); updateAgendaPreview(); });
+  } else {
+    render();
+    updateAgendaPreview();
+  }
+})();
+</script>
+
+<script>
+/* ── Fold/unfold des 3 bandes (Accès, Agenda, Ma journée) ── */
+(function(){
+  var FOLD_KEY = 'cgpskool_fold_v1';
+  function load(){
+    try { return JSON.parse(localStorage.getItem(FOLD_KEY)||'{}') || {}; } catch(e){ return {}; }
+  }
+  function save(s){
+    try { localStorage.setItem(FOLD_KEY, JSON.stringify(s)); } catch(e){}
+  }
+  window.toggleFold = function(id){
+    var head = document.querySelector('[data-fold="'+id+'"]');
+    var body = document.querySelector('[data-fold-body="'+id+'"]');
+    if(!head && !body) return;
+    var closed = head ? head.classList.toggle('closed') : !body.classList.contains('closed');
+    if(body){
+      if(closed) body.classList.add('closed'); else body.classList.remove('closed');
+    }
+    var state = load();
+    state[id] = closed;
+    save(state);
+  };
+  function init(){
+    var state = load();
+    ['agenda'].forEach(function(id){
+      var head = document.querySelector('[data-fold="'+id+'"]');
+      var body = document.querySelector('[data-fold-body="'+id+'"]');
+      // Par défaut fermé. Ouvert seulement si l'utilisateur l'a explicitement ouvert (state[id]===false).
+      var isClosed = state[id] !== false;
+      if(head) head.classList.toggle('closed', isClosed);
+      if(body) body.classList.toggle('closed', isClosed);
+    });
+    updateJourneePreview();
+  }
+  function updateJourneePreview(){
+    var el = document.getElementById('journeePreview');
+    if(!el) return;
+    var dateEl = document.getElementById('dailyDate');
+    var totalEl = document.getElementById('dailyWeekTotal');
+    var goalEl = document.getElementById('dailyWeekGoal');
+    var pctEl = document.getElementById('dailyWeekPct');
+    var parts = [];
+    if(dateEl && dateEl.textContent && dateEl.textContent !== "Aujourd'hui") parts.push(dateEl.textContent);
+    if(totalEl && goalEl) parts.push(totalEl.textContent + ' / ' + goalEl.textContent + ' pts');
+    if(pctEl) parts.push(pctEl.textContent);
+    el.textContent = parts.join(' \u00b7 ');
+  }
+  window.__updateJourneePreview = updateJourneePreview;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+/* ── Scroll-spy sur le top-menu ── */
+(function(){
+  function scrollSpy(){
+    var items = document.querySelectorAll('.top-menu-item[data-target]');
+    if(!items.length) return;
+    var scrollY = window.scrollY + 120;
+    var bestId = null, bestTop = -1;
+    items.forEach(function(it){
+      var target = document.getElementById(it.dataset.target);
+      if(!target) return;
+      var top = target.getBoundingClientRect().top + window.scrollY;
+      if(top <= scrollY && top > bestTop){ bestTop = top; bestId = it.dataset.target; }
+    });
+    items.forEach(function(it){
+      it.classList.toggle('active', it.dataset.target === bestId);
+    });
+  }
+  window.addEventListener('scroll', scrollSpy, {passive:true});
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scrollSpy);
+  else scrollSpy();
+
+  // Smooth scroll sur clic
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.top-menu-item');
+    if(!a) return;
+    var id = a.dataset.target;
+    var target = id ? document.getElementById(id) : null;
+    if(!target) return;
+    e.preventDefault();
+    var y = target.getBoundingClientRect().top + window.scrollY - 70;
+    window.scrollTo({top:y, behavior:'smooth'});
+  });
+})();
+</script>
+
+<div class="tools-section" id="analyse">
+  <div class="tools-inner">
+
+    <div class="privacy-strip">
+      <span class="privacy-strip-icon">&#128274;</span>
+      <div>
+        <strong>100 % navigateur &mdash; conforme RGPD.</strong>
+        Aucune donn&eacute;e client n'est envoy&eacute;e ni conserv&eacute;e sur un serveur : les &eacute;tudes restent en m&eacute;moire le temps de la session, et seuls les fichiers JSON que vous exportez vous-m&ecirc;me en gardent une trace. Les param&egrave;tres des simulateurs sont m&eacute;moris&eacute;s uniquement sur votre appareil.
+        &Agrave; la premi&egrave;re ouverture de chaque module, un <strong>guide d'onboarding</strong> pr&eacute;sente son fonctionnement et le stockage de ses donn&eacute;es &mdash; bouton &laquo; &#10067; Guide &raquo; en haut &agrave; droite pour le revoir &agrave; tout moment.
+      </div>
+    </div>
+
+    <div class="tools-label">Analyse, suivi &amp; optimisation</div>
+    <div class="tools-grid">
+
+      <a href="modules/etude-dossier.html" class="tool-card">
+        <span class="tool-badge" style="background:rgba(43,94,167,0.12);color:#2B5EA7">Analyse</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#128203;</span>
+        <div class="tool-name">&Eacute;tude de Dossier</div>
+        <div class="tool-desc">Import RI Word, analyse patrimoniale compl&#232;te, pr&#233;conisations, synth&#232;se avant/apr&#232;s et export PDF.</div>
+        <div class="tool-features">
+          <span class="tool-feature">Import Word</span>
+          <span class="tool-feature">Retraite</span>
+          <span class="tool-feature">Synth&#232;se PDF</span>
+        </div>
+      </a>
+
+      <a href="modules/etude-transfert-per.html" class="tool-card">
+        <span class="tool-badge" style="background:rgba(43,94,167,0.12);color:#2B5EA7">Analyse</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#128260;</span>
+        <div class="tool-name">Analyse contrat</div>
+        <div class="tool-desc">D&#233;taillez les fonds d'un contrat existant (PER ou AV) et comparez, si besoin, &#224; une AV recommand&#233;e avec gestion et frais.</div>
+        <div class="tool-features">
+          <span class="tool-feature">PER</span>
+          <span class="tool-feature">Assurance Vie</span>
+          <span class="tool-feature">R&#233;partition</span>
+        </div>
+      </a>
+
+      <a href="modules/suivi-contrat.html" class="tool-card">
+        <span class="tool-badge" style="background:rgba(43,94,167,0.12);color:#2B5EA7">Analyse</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#128202;</span>
+        <div class="tool-name">Suivi de contrat</div>
+        <div class="tool-desc">Collez un export contrat (AV, PER, PEA, CTO) et obtenez une annexe structur&#233;e avec TRI annualis&#233; (XIRR), allocation, mouvements et commentaires conseiller.</div>
+        <div class="tool-features">
+          <span class="tool-feature">TRI / XIRR</span>
+          <span class="tool-feature">Annexe PDF</span>
+          <span class="tool-feature">Multi-contrats</span>
+        </div>
+      </a>
+
+      <a href="modules/allocation-cible.html" class="tool-card">
+        <span class="tool-badge" style="background:rgba(212,98,42,0.12);color:#D4622A">Nouveau</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#9881;</span>
+        <div class="tool-name">Allocation Cible</div>
+        <div class="tool-desc">Calculez l'allocation finale d'une assurance vie apr&#232;s dynamique progressive : versement initial, arbitrages programm&#233;s, allocation cible.</div>
+        <div class="tool-features">
+          <span class="tool-feature">AV</span>
+          <span class="tool-feature">Dyna prog</span>
+          <span class="tool-feature">Arbitrages</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="tools-section" id="simulateurs" style="border-top:1px solid var(--rule-l)">
+  <div class="tools-inner">
+    <div class="tools-label">Simulateurs &amp; projections</div>
+    <div class="tools-grid">
+
+      <a href="modules/immo-simulator.html" class="tool-card">
+        <span class="tool-badge">Simulateur</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#127968;</span>
+        <div class="tool-name">Immobilier locatif</div>
+        <div class="tool-desc">LMNP mono, colocation ou r&#233;sidence de services &mdash; amortissement, cashflow, r&#233;serve et rentabilit&#233; nette.</div>
+        <div class="tool-features">
+          <span class="tool-feature">LMNP</span>
+          <span class="tool-feature">Amortissement</span>
+          <span class="tool-feature">Cashflow</span>
+        </div>
+      </a>
+
+      <a href="modules/scpi-simulator.html" class="tool-card">
+        <span class="tool-badge">Simulateur</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#128200;</span>
+        <div class="tool-name">SCPI Cash</div>
+        <div class="tool-desc">Simulateur SCPI comptant &mdash; projection du capital, des revenus, fiscalit&#233; IR et plus-value.</div>
+        <div class="tool-features">
+          <span class="tool-feature">Rendement</span>
+          <span class="tool-feature">Capital</span>
+          <span class="tool-feature">Fiscalit&#233; IR</span>
+        </div>
+      </a>
+
+      <a href="modules/scpi-financement.html" class="tool-card">
+        <span class="tool-badge">Simulateur</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#127974;</span>
+        <div class="tool-name">SCPI Financement</div>
+        <div class="tool-desc">Simulation SCPI &#224; cr&#233;dit &mdash; levier bancaire, amortissement et rendement net.</div>
+        <div class="tool-features">
+          <span class="tool-feature">Levier cr&#233;dit</span>
+          <span class="tool-feature">Amortissement</span>
+          <span class="tool-feature">IFI</span>
+        </div>
+      </a>
+
+      <a href="modules/per-vs-av.html" class="tool-card">
+        <span class="tool-badge">Comparateur</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#9878;&#65039;</span>
+        <div class="tool-name">PER vs Assurance Vie</div>
+        <div class="tool-desc">Comparateur d'efficacit&#233; nette selon la TMI d'entr&#233;e et de sortie. Vue matrice et calcul d&#233;taill&#233; sur 10, 20 ou 30 ans.</div>
+        <div class="tool-features">
+          <span class="tool-feature">TMI entr&#233;e / sortie</span>
+          <span class="tool-feature">Matrice</span>
+          <span class="tool-feature">Calcul d&#233;taill&#233;</span>
+        </div>
+      </a>
+
+      <a href="modules/interets-composes.html" class="tool-card">
+        <span class="tool-badge">Simulateur</span>
+        <div class="tool-bar"></div>
+        <span class="tool-icon">&#129518;</span>
+        <div class="tool-name">Int&#233;r&#234;ts compos&#233;s</div>
+        <div class="tool-desc">Capitalisation avec versements p&#233;riodiques, frais de gestion, frais sur versements et fiscalit&#233; configurable.</div>
+        <div class="tool-features">
+          <span class="tool-feature">Capitalisation</span>
+          <span class="tool-feature">Frais</span>
+          <span class="tool-feature">Fiscalit&#233;</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="tools-section" id="articles" style="border-top:1px solid var(--rule-l)">
+  <div class="tools-inner">
+    <div class="tools-label">Articles &amp; analyses</div>
+    <div class="tools-grid">
+
+      <a href="articles.html" class="tool-card" style="grid-column:1/-1">
+        <span class="tool-badge" style="background:rgba(200,85,32,0.12);color:#C85520">Biblioth&egrave;que</span>
+        <div class="tool-bar" style="background:#C85520"></div>
+        <span class="tool-icon">&#128218;</span>
+        <div class="tool-name">Biblioth&#232;que d'articles</div>
+        <div class="tool-desc">Notes d'analyse long-format &agrave; partager &agrave; vos clients &mdash; fiscalit&#233;, enveloppes, march&#233;s, strat&#233;gie patrimoniale. Un point d'entr&#233;e unique, mis &agrave; jour au fil des publications.</div>
+        <div class="tool-features">
+          <span class="tool-feature">Fiscalit&#233;</span>
+          <span class="tool-feature">Enveloppes</span>
+          <span class="tool-feature">March&#233;s</span>
+          <span class="tool-feature">Strat&#233;gie</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="tools-section" id="formation" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+  <div class="tools-inner">
+    <div class="tools-label" style="color:var(--orange);font-weight:700">Formation</div>
+    <div class="tools-grid">
+
+      <a href="https://adussourd-pp.github.io/cgpskool_quiz_habilitation/" target="_blank" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d);grid-column:1/-1">
+        <span class="tool-badge" style="background:rgba(212,98,42,0.12);color:#D4622A">Habilitations</span>
+        <div class="tool-bar" style="background:var(--orange)"></div>
+        <span class="tool-icon">&#127891;</span>
+        <div class="tool-name" style="color:var(--white)">Quiz Habilitations</div>
+        <div class="tool-desc" style="color:var(--fog)">R&#233;visez vos habilitations comme les formations continues : IAS, IOBSP, CIF, immobilier, agent li&#233;.</div>
+        <div class="tool-features">
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">IAS / IOBSP</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">CIF</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">R&#233;vision</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="tools-section" id="mon-activite" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+  <div class="tools-inner">
+    <div class="tools-label" style="color:var(--orange);font-weight:700">D&eacute;veloppement d'&eacute;quipe</div>
+    <div class="tools-grid">
+
+      <a href="modules/bp-simulator.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
+        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Projection</span>
+        <div class="tool-bar" style="background:var(--orange)"></div>
+        <span class="tool-icon">&#128200;</span>
+        <div class="tool-name" style="color:var(--white)">Business Plan</div>
+        <div class="tool-desc" style="color:var(--fog)">Projetez votre progression dans le r&#233;seau &mdash; qualifications PMR, CA personnel &amp; &#233;quipe, commissions d&#233;marrage / expansion / d&#233;veloppement.</div>
+        <div class="tool-features">
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">PMR Prod&#233;mial</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Qualifications</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Organisation</span>
+        </div>
+      </a>
+
+      <a href="modules/equipe-builder.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
+        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Organisation</span>
+        <div class="tool-bar" style="background:var(--orange)"></div>
+        <span class="tool-icon">&#128101;</span>
+        <div class="tool-name" style="color:var(--white)">Construire son &#233;quipe</div>
+        <div class="tool-desc" style="color:var(--fog)">G&#233;rez votre &#233;quipe, ajoutez vos collaborateurs, suivez les statuts et qualifications, visualisez l'organigramme.</div>
+        <div class="tool-features">
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Membres</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Organigramme</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Export JSON</span>
+        </div>
+      </a>
+
+      <a href="tracker/index.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
+        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Suivi commun</span>
+        <div class="tool-bar" style="background:var(--orange)"></div>
+        <span class="tool-icon">&#127919;</span>
+        <div class="tool-name" style="color:var(--white)">Dev Action</div>
+        <div class="tool-desc" style="color:var(--fog)">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
+        <div class="tool-features">
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Kanban</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Top parrains&#183;marraines</span>
+          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Slack</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <a href="index.html" class="footer-logo">
+    <div class="footer-mark"><span>C</span></div>
+    <span class="footer-name">CGP Skool</span>
+  </a>
+  <span class="footer-copy">&copy; 2025 &mdash; Outil interne r&#233;serv&#233; aux consultants du r&#233;seau &nbsp;&middot;&nbsp; <span style="color:var(--ink-30)">v1.4 &mdash; 9 avril 2026</span></span>
+</footer>
+
+<div class="modal-overlay" id="modalProfil" onclick="if(event.target===this)closeProfil()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProfil()">×</button>
+    <div class="modal-title">Mon profil conseiller</div>
+    <div class="modal-sub">Ces informations s'injectent automatiquement dans chaque étude.</div>
+    <div class="grid2">
+      <div class="fg"><label>Prénom</label><input class="fi" id="pPrenom" placeholder="Alexandre" oninput="saveProfil()"></div>
+      <div class="fg"><label>Nom</label><input class="fi" id="pNom" placeholder="DUSSOURD" oninput="saveProfil()"></div>
+    </div>
+    <div class="fg"><label>Cabinet</label><input class="fi" id="pCabinet" placeholder="Peak Patrimoine" oninput="saveProfil()"></div>
+    <div class="grid2">
+      <div class="fg"><label>ORIAS</label><input class="fi" id="pOrias" placeholder="22002240" oninput="saveProfil()"></div>
+      <div class="fg"><label>Téléphone</label><input class="fi" id="pTel" placeholder="06 XX XX XX XX" oninput="saveProfil()"></div>
+    </div>
+    <div class="fg"><label>Email</label><input class="fi" id="pEmail" placeholder="contact@monsite.fr" oninput="saveProfil()"></div>
+    <div class="fg"><label>Adresse</label><input class="fi" id="pAdresse" placeholder="3 avenue de la République" oninput="saveProfil()"></div>
+    <div class="grid2">
+      <div class="fg"><label>Code postal</label><input class="fi" id="pCp" placeholder="06000" oninput="saveProfil()"></div>
+      <div class="fg"><label>Ville</label><input class="fi" id="pVille" placeholder="Nice" oninput="saveProfil()"></div>
+    </div>
+    <div class="grid2">
+      <div class="fg"><label>Photo de profil</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="photoPreview" style="width:48px;height:48px;border-radius:50%;background:var(--rule-l);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="font-size:10px;color:var(--ink-30)">Photo</span></div>
+          <label style="cursor:pointer;padding:6px 12px;border:1px solid var(--rule-l);font-size:11px;color:var(--ink-60);text-transform:none;letter-spacing:0">
+            Choisir<input type="file" accept="image/*" onchange="handlePhotoUpload(this)" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="fg"><label>Logo cabinet</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="logoPreview" style="height:48px;display:flex;align-items:center;overflow:hidden"><span style="font-size:10px;color:var(--ink-30)">Logo</span></div>
+          <label style="cursor:pointer;padding:6px 12px;border:1px solid var(--rule-l);font-size:11px;color:var(--ink-60);text-transform:none;letter-spacing:0">
+            Choisir<input type="file" accept="image/*" onchange="handleLogoUpload(this)" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Statut</div>
+    <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)"><input type="checkbox" id="pJunior" onchange="onJuniorToggle();saveProfil()"> Consultant junior</label></div>
+    <div id="parrainBlock" style="display:none;background:var(--paper-2);border:1px solid var(--rule-l);padding:14px;border-radius:8px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink-60);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Mon parrain / ma marraine habilit&#233;(e)</div>
+      <div class="grid2">
+        <div class="fg"><label>Pr&#233;nom</label><input class="fi" id="pParrainPrenom" oninput="saveProfil()"></div>
+        <div class="fg"><label>Nom</label><input class="fi" id="pParrainNom" oninput="saveProfil()"></div>
+      </div>
+      <div class="fg"><label>Cabinet</label><input class="fi" id="pParrainCabinet" oninput="saveProfil()"></div>
+      <div class="grid2">
+        <div class="fg"><label>ORIAS</label><input class="fi" id="pParrainOrias" oninput="saveProfil()"></div>
+        <div class="fg"><label>T&#233;l&#233;phone</label><input class="fi" id="pParrainTel" oninput="saveProfil()"></div>
+      </div>
+      <div class="fg"><label>Email</label><input class="fi" id="pParrainEmail" oninput="saveProfil()"></div>
+    </div>
+
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Habilitations &amp; mandats</div>
+    <div class="fg"><label>Habilitations actives</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hImmo" onchange="saveProfil()"> Immobilier</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hIobsp" onchange="saveProfil()"> IOBSP</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hIas" onchange="saveProfil()"> IAS</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hAgent" onchange="saveProfil()"> Agent li&#233;</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-60);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="hCif" onchange="saveProfil()"> CIF</label>
+      </div>
+    </div>
+    <div class="fg"><label>Mandataire IOBSP &mdash; libell&#233;</label><input class="fi" id="pMandIobsp" placeholder="Stellium Financement" oninput="saveProfil()"></div>
+    <div class="fg"><label>Mandataire IAS &mdash; libell&#233;</label><input class="fi" id="pMandIas" placeholder="Stellium Courtage" oninput="saveProfil()"></div>
+    <div class="fg"><label>Agent li&#233; CIF &mdash; libell&#233;</label><input class="fi" id="pMandCif" placeholder="Stellium Invest (ACPR n&deg; 10983)" oninput="saveProfil()"></div>
+    <div class="fg"><label>Immobilier &mdash; libell&#233; + CPI</label><input class="fi" id="pMandImmo" placeholder="Stellium Immobilier &mdash; CPI 3101 2015 000 001 813" oninput="saveProfil()"></div>
+
+    <div style="border-top:1px solid var(--rule-l);margin:18px 0 14px"></div>
+    <div class="modal-section-title" style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Coordonn&#233;es l&#233;gales</div>
+    <div class="fg"><label>Adresse ACPR (contr&ocirc;le)</label><input class="fi" id="pAcpr" placeholder="4 Place de Budapest, 75436 Paris" oninput="saveProfil()"></div>
+    <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:12px"><input type="checkbox" id="pAnacofi" onchange="saveProfil()"> Membre ANACOFI (agr&#233;&#233;e AMF)</label></div>
+    <div class="fg"><label>RCP (assureur + adresse)</label><input class="fi" id="pRcp" placeholder="Zurich Insurance &mdash; 112 av. de Wagram, 75017 Paris" oninput="saveProfil()"></div>
+    <div class="fg"><label>R&#233;clamations &mdash; email</label><input class="fi" id="pReclamation" placeholder="reclamations@stellium.fr" oninput="saveProfil()"></div>
+    <div class="grid2">
+      <div class="fg"><label>M&#233;diateur AMF</label><input class="fi" id="pMediateurAmf" placeholder="17 place de la Bourse, 75082 Paris" oninput="saveProfil()"></div>
+      <div class="fg"><label>M&#233;diateur Assurance</label><input class="fi" id="pMediateurAss" placeholder="AME Conso, 11 place Dauphine, 75001 Paris" oninput="saveProfil()"></div>
+    </div>
+
+    <div class="fg"><label>Mentions légales libres (pied de page PDF)</label>
+      <textarea class="fi" id="pMentions" rows="3" placeholder="Conseiller en Gestion de Patrimoine — ORIAS…" oninput="saveProfil()" style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="cs-btn-primary" onclick="closeProfil()">Enregistrer</button>
+      <button class="btn-ghost-ink" onclick="if(confirm('Effacer le profil ?'))clearProfil()">Effacer</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/cgp-skool-feedback.js" defer></script>
+
+<script>
+var PROFIL_KEY='cgpskool_profil_v1';
+var FIELDS=['pPrenom','pNom','pCabinet','pOrias','pTel','pEmail','pAdresse','pCp','pVille','pMentions','pParrainPrenom','pParrainNom','pParrainCabinet','pParrainOrias','pParrainTel','pParrainEmail','pMandIobsp','pMandIas','pMandCif','pMandImmo','pAcpr','pRcp','pReclamation','pMediateurAmf','pMediateurAss'];
+var HABILS=['hImmo','hIobsp','hIas','hAgent','hCif','pJunior','pAnacofi'];
+function onJuniorToggle(){var cb=document.getElementById('pJunior');var bl=document.getElementById('parrainBlock');if(bl)bl.style.display=cb&&cb.checked?'block':'none';}
+function saveProfil(){var p={};FIELDS.forEach(function(id){var el=document.getElementById(id);if(el)p[id]=el.value;});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)p[id]=el.checked;});var MAP={pPrenom:'prenom',pNom:'nom',pCabinet:'cabinet',pOrias:'orias',pTel:'tel',pEmail:'email',pAdresse:'adresse',pCp:'cp',pVille:'ville',pMentions:'mentions'};Object.keys(MAP).forEach(function(k){if(p[k]!==undefined)p[MAP[k]]=p[k];});localStorage.setItem(PROFIL_KEY,JSON.stringify(p));updateProfilBtn();}
+function loadProfil(){try{var raw=localStorage.getItem(PROFIL_KEY);if(!raw){onJuniorToggle();return;}var p=JSON.parse(raw);FIELDS.forEach(function(id){var el=document.getElementById(id);if(el&&p[id])el.value=p[id];});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=!!p[id];});}catch(e){}onJuniorToggle();updateProfilBtn();}
+function clearProfil(){localStorage.removeItem(PROFIL_KEY);FIELDS.forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});HABILS.forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});onJuniorToggle();updateProfilBtn();}
+function updateProfilBtn(){
+  var p=null;try{p=JSON.parse(localStorage.getItem(PROFIL_KEY)||'{}')}catch(e){}
+  var has=p&&(p.pPrenom||p.pNom||p.pCabinet);
+  var btn=document.getElementById('btnProfil');if(!btn)return;
+  btn.textContent=has?('⚙ '+(p.pPrenom||p.pNom||'Mon profil')):'⚙ Mon profil';
+  btn.className='cs-btn-ghost '+(has?'ok':'missing');
+}
+function handlePhotoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{localStorage.setItem('cgpskool_photo',e.target.result);}catch(err){}
+    showPhotoPreview(e.target.result);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showPhotoPreview(url){
+  var el=document.getElementById('photoPreview');
+  if(el&&url)el.innerHTML='<img src="'+url+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover">';
+}
+function handleLogoUpload(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{localStorage.setItem('cgpskool_logo',e.target.result);}catch(err){}
+    showLogoPreview(e.target.result);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function showLogoPreview(url){
+  var el=document.getElementById('logoPreview');
+  if(el&&url)el.innerHTML='<img src="'+url+'" style="max-height:40px;max-width:140px">';
+}
+function loadImages(){
+  try{var p=localStorage.getItem('cgpskool_photo');if(p)showPhotoPreview(p);}catch(e){}
+  try{var l=localStorage.getItem('cgpskool_logo');if(l)showLogoPreview(l);}catch(e){}
+}
+function openProfil(){document.getElementById('modalProfil').classList.add('open');loadProfil();loadImages();}
+function closeProfil(){document.getElementById('modalProfil').classList.remove('open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeProfil();});
+document.addEventListener('DOMContentLoaded',function(){loadProfil();if(new URLSearchParams(window.location.search).get('openProfil'))openProfil();});
+
+// ── Bandeau productivite du jour ────────────────────────────
+(function(){
+  var PROD_KEY='cgpskool_productivite_v1';
+  var ACTIONS_PTS={conv:10,r1:15,inv:15,rel:5,sign:20,insc:20,pro:7,lead:8};
+  var DAY_FULL=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  var MONTH_NAMES=['janvier','f\u00e9vrier','mars','avril','mai','juin','juillet','ao\u00fbt','septembre','octobre','novembre','d\u00e9cembre'];
+
+  function dateKey(d){var mm=String(d.getMonth()+1).padStart(2,'0');var dd=String(d.getDate()).padStart(2,'0');return d.getFullYear()+'-'+mm+'-'+dd;}
+
+  function getDayScore(state,dayKey){
+    var total=0;var found=false;
+    Object.keys(state.history||{}).forEach(function(wk){
+      var week=state.history[wk];
+      if(week[dayKey]){
+        found=true;
+        Object.keys(ACTIONS_PTS).forEach(function(id){
+          var w=(state.weights&&state.weights[id]!==undefined)?state.weights[id]:ACTIONS_PTS[id];
+          total+=(week[dayKey][id]||0)*w;
+        });
+      }
+    });
+    return Math.min(total,100);
+  }
+
+  function getMonday(d){var x=new Date(d);var day=x.getDay();var diff=(day===0)?-6:1-day;x.setDate(x.getDate()+diff);x.setHours(0,0,0,0);return x;}
+
+  function getWeekTotal(state){
+    var monday=getMonday(new Date());var total=0;
+    for(var i=0;i<7;i++){
+      var d=new Date(monday);d.setDate(monday.getDate()+i);
+      total+=getDayScore(state,dateKey(d));
+    }
+    return total;
+  }
+
+  function computeStreak(state){
+    var streak=0;var d=new Date();
+    for(var i=0;i<60;i++){
+      var key=dateKey(d);
+      var s=getDayScore(state,key);
+      if(i===0&&s===0){d.setDate(d.getDate()-1);continue;}
+      if(s>=30)streak++;else break;
+      d.setDate(d.getDate()-1);
+    }
+    return streak;
+  }
+
+  function scoreClass(s){if(s===0)return '';if(s<30)return 'low';if(s<55)return 'med';if(s<75)return 'good';return 'great';}
+
+  function refresh(){
+    var state={history:{},weights:{}};
+    try{var raw=localStorage.getItem(PROD_KEY);if(raw)state=JSON.parse(raw);}catch(e){}
+
+    var now=new Date();
+    var today=dateKey(now);
+    var score=getDayScore(state,today);
+    var streak=computeStreak(state);
+
+    var dateEl=document.getElementById('dailyDate');
+    if(dateEl)dateEl.textContent=DAY_FULL[now.getDay()]+' '+now.getDate()+' '+MONTH_NAMES[now.getMonth()];
+
+    var goal=(state.goal!==undefined?state.goal:250);
+    var weekTotal=getWeekTotal(state);
+    var weekPct=goal>0?Math.round((weekTotal/goal)*100):0;
+    var barPct=Math.min(weekPct,100);
+
+    var wt=document.getElementById('dailyWeekTotal');if(wt)wt.textContent=weekTotal;
+    var wg=document.getElementById('dailyWeekGoal');if(wg)wg.textContent=goal;
+    var wp=document.getElementById('dailyWeekPct');if(wp)wp.textContent=weekPct+'\u00a0%';
+    var wb=document.getElementById('dailyWeekBar');if(wb)wb.style.width=barPct+'%';
+
+    // 7 jours de la semaine avec dots colores selon le score
+    var daysEl=document.getElementById('dailyDays');
+    if(daysEl){
+      var DAY_LETTERS=['L','M','M','J','V','S','D'];
+      var monday=getMonday(new Date());
+      var todayKey=dateKey(new Date());
+      var h='';
+      for(var i=0;i<7;i++){
+        var d=new Date(monday);d.setDate(monday.getDate()+i);
+        var k=dateKey(d);
+        var s=getDayScore(state,k);
+        var cls='daily-day';
+        var isFuture=d>now&&k!==todayKey;
+        if(isFuture)cls+=' future';
+        else if(s>=75)cls+=' full';
+        else if(s>=30)cls+=' has';
+        else if(s>0)cls+=' partial';
+        if(k===todayKey)cls+=' today';
+        var dotContent=s>0?s:(isFuture?'':'&middot;');
+        h+='<div class="'+cls+'"><div class="daily-day-dot">'+dotContent+'</div>'+DAY_LETTERS[i]+'</div>';
+      }
+      daysEl.innerHTML=h;
+    }
+
+    var subEl=document.getElementById('dailySub');
+    if(subEl){
+      if(score===0)subEl.textContent='Pas encore d\u2019actions aujourd\u2019hui. Notez vos conversations, R1, invitations\u2026';
+      else if(score<30)subEl.textContent='Bon d\u00e9part ! Continuez pour atteindre le seuil de la journ\u00e9e productive (30 pts).';
+      else if(score<55)subEl.textContent='Journ\u00e9e en cours. Une prise de R1 ou une invitation peut tout changer.';
+      else if(score<75)subEl.textContent='Tr\u00e8s bonne journ\u00e9e en cours ! Encore un effort pour viser l\u2019excellence.';
+      else subEl.textContent='Excellente journ\u00e9e ! Vous tenez le rythme d\u2019un top performer.';
+    }
+
+    var streakEl=document.getElementById('dailyStreak');
+    if(streakEl){
+      if(streak>=3)streakEl.innerHTML='\uD83D\uDD25 '+streak+' jours cons\u00e9cutifs';
+      else if(streak>=1)streakEl.innerHTML='\uD83C\uDF31 '+streak+' jour'+(streak>1?'s':'');
+      else streakEl.innerHTML='';
+    }
+    if(typeof window.__updateJourneePreview === 'function') window.__updateJourneePreview();
+  }
+
+  document.addEventListener('DOMContentLoaded',refresh);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
+})();
+
+// Compteur live des inscrits Dev Action
+(function(){
+  var TRACKER_API='https://cgpskool-tracker.a-dussourd.workers.dev/';
+  function fetchCount(){
+    fetch(TRACKER_API,{cache:'no-store'})
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(d){
+        if(!d||!d.ok||!Array.isArray(d.data))return;
+        var n=d.data.filter(function(x){return x&&x.etape==='INSCRIT';}).length;
+        var el=document.getElementById('devActionInscritsCount');
+        if(el)el.textContent=n;
+      })
+      .catch(function(){});
+  }
+  document.addEventListener('DOMContentLoaded',fetchCount);
+})();
+</script>
+</body>
+</html>
