@@ -181,6 +181,68 @@ CGP.profil.loadImages = function() {
   return { photo: photo, logo: logo };
 };
 
+/* ── SAUVEGARDE JSON (fenetre "Enregistrer sous" + nommage) ── */
+/**
+ * Sauvegarde un objet en .json via la fenetre "Enregistrer sous" du
+ * navigateur (File System Access API). Fallback : telechargement classique
+ * (Firefox / Safari). onDone(true) si sauvegarde, onDone(false) si annulee.
+ */
+CGP.saveJSON = function(data, filename, onDone) {
+  var json = (typeof data === 'string') ? data : JSON.stringify(data, null, 2);
+  function download() {
+    var blob = new Blob([json], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (onDone) onDone(true);
+  }
+  if (window.showSaveFilePicker) {
+    window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [{ description: 'Fichier CGP Skool', accept: { 'application/json': ['.json'] } }]
+    }).then(function(handle) {
+      return handle.createWritable().then(function(w) {
+        return w.write(new Blob([json], { type: 'application/json' })).then(function() { return w.close(); });
+      });
+    }).then(function() {
+      if (onDone) onDone(true);
+    }).catch(function(err) {
+      if (err && err.name === 'AbortError') { if (onDone) onDone(false); return; }
+      download();
+    });
+  } else {
+    download();
+  }
+};
+
+CGP.project = CGP.project || {};
+
+/**
+ * Nom du client renseigne dans le module courant (ids connus des modules).
+ */
+CGP.project.clientNameFromDOM = function() {
+  var ids = ['clientNom', 'pClient', 'immoClient', 'fClient1', 'cNom', 'gardeClient', 'navClient', 'clientName'];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    var v = el && (el.value !== undefined ? el.value : el.textContent);
+    if (v && v.trim()) return v.trim();
+  }
+  return '';
+};
+
+/**
+ * Nom de fichier normalise : <module>_<Prenom-Nom>_<AAAA-MM-JJ>.json
+ */
+CGP.project.buildFilename = function(moduleId, clientName) {
+  var id = moduleId || (window.location.pathname.split('/').pop() || 'projet').replace('.html', '');
+  var client = (clientName !== undefined ? clientName : CGP.project.clientNameFromDOM())
+    .replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '-');
+  var date = new Date().toISOString().slice(0, 10);
+  return id + (client ? '_' + client : '') + '_' + date + '.json';
+};
+
 /* ── FOOTER CONSEILLER ──────────────────────────── */
 CGP.footer = {};
 
@@ -381,7 +443,7 @@ CGP.header.render = function(target, opts) {
 };
 
 /* ── PROJECT EXPORT/IMPORT ──────────────────────── */
-CGP.project = {};
+CGP.project = CGP.project || {};
 CGP.project._modules = {};
 
 /**
@@ -478,12 +540,9 @@ CGP.project.exportAll = function() {
     }
   });
 
-  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'cgp-skool-projet_' + new Date().toLocaleDateString('fr-FR').replace(/\//g, '-') + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
+  CGP.saveJSON(data, CGP.project.buildFilename(), function(saved) {
+    if (saved && typeof showNotif === 'function') { try { showNotif('Sauvegarde effectuee'); } catch(e) {} }
+  });
 };
 
 /**

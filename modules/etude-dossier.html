@@ -9335,20 +9335,16 @@ function sauvegarderEtude(){
     // Stocker la date de création si première sauvegarde
     if(!ED._dateCreation)ED._dateCreation=dateStr;
     ED._dateMAJ=dateStr;
-    var nom=((ED.c1.prenom||'')+'_'+(ED.c1.nom||'')).trim().replace(/\s+/g,'_')||'client';
-    var dateFile=now.toISOString().slice(0,10);
-    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    var a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='etude_'+nom+'_'+dateFile+'.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    // Mettre à jour l'affichage
-    var lbl=document.getElementById('etudeLastSave');
-    if(lbl)lbl.textContent='Sauvegard\u00e9 '+dateStr;
-    var majEl=document.getElementById('gardeDateMAJ');
-    if(majEl)majEl.textContent='Mise \u00e0 jour : '+dateStr;
-    showNotif('Etude sauvegard\u00e9e');
+    var nom=((ED.c1.prenom||'')+'-'+(ED.c1.nom||'')).trim().replace(/^-|-$/g,'').replace(/\s+/g,'-')||'client';
+    var fichier=CGP.project.buildFilename('etude-dossier',nom);
+    CGP.saveJSON(data,fichier,function(saved){
+      if(!saved)return;
+      var lbl=document.getElementById('etudeLastSave');
+      if(lbl)lbl.textContent='Sauvegard\u00e9 '+dateStr;
+      var majEl=document.getElementById('gardeDateMAJ');
+      if(majEl)majEl.textContent='Mise \u00e0 jour : '+dateStr;
+      showNotif('Etude sauvegard\u00e9e');
+    });
   }catch(e){console.warn('Sauvegarde erreur:',e);showNotif('Erreur sauvegarde');}
 }
 
