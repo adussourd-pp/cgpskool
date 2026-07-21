@@ -610,7 +610,7 @@ select.span2{grid-column:span 2}
     <div>
       <div class="sec-tag">Étape 0</div>
       <div class="sec-h1">Import</div>
-      <div class="sec-sub">Recueil d'informations et avis d'imposition</div>
+      <div class="sec-sub">Recueil d'informations et fiche légale (DER)</div>
     </div>
   </div>
 
@@ -1591,7 +1591,7 @@ var ME_SECTIONS = [
  { id:'import', t:"Import / Saisie", b:"<ul>"+
    "<li><strong>Recueil d'informations (RI)</strong> : ouvre le Word ou le PDF Proxeema, Ctrl+A puis Ctrl+C, colle tout dans la zone RI et clique <strong>Valider</strong>. Le parser extrait identité, situation familiale, revenus, patrimoine, objectifs.</li>"+
    "<li><strong>Fiche légale (DER)</strong> : même principe dans la zone dédiée — les habilitations ORIAS sont détectées automatiquement et alimentent les Mentions légales.</li>"+
-   "<li><strong>Avis d'imposition</strong> : sa propre zone de copier-coller, pour fiabiliser la section Impôts (revenu fiscal de référence, parts, impôt payé).</li>"+
+   "<li><strong>Avis d'imposition</strong> : pas de zone d'import dédiée — garde-le sous la main, ses chiffres (revenu fiscal de référence, impôt payé, plafond PER) se reportent manuellement dans la section Impôts.</li>"+
    "<li>Après chaque import, un <strong>volet de vérification</strong> s'ouvre : corrige, complète (épargne mensuelle, épargne de précaution), puis <strong>Appliquer les modifications</strong> — c'est la source de vérité de toute l'étude.</li>"+
    "<li>Pas de document ? Tout est saisissable à la main dans le même volet.</li></ul>" },
  { id:'pagegarde', t:"Page de garde", b:"Générée automatiquement : noms des clients, date, ton identité conseiller (nom, cabinet, logo, couleurs) issue du <strong>profil</strong> configuré sur la page d'accueil des outils. Rien à saisir ici — si le logo manque, complète ton profil via ⚙ Mon profil sur la page Outils.<div class='me-pdf'>&#128196; PDF : première page de l'étude exportée.</div>" },
@@ -1607,7 +1607,7 @@ var ME_SECTIONS = [
    "<li>Ajoute ou retire des actifs/passifs depuis le volet de vérification de l'Import (bouton en haut de page).</li></ul>" },
  { id:'fiscal', t:"Impôts", b:"<ul>"+
    "<li>TMI, impôt estimé, décomposition par tranches — calculés depuis les revenus saisis (barème en vigueur).</li>"+
-   "<li>Si tu as collé l'<strong>avis d'imposition</strong>, les chiffres réels remplacent l'estimation.</li>"+
+   "<li>Les chiffres réels de l'<strong>avis d'imposition</strong> se saisissent à la main pour remplacer l'estimation — pas d'import automatique pour ce document.</li>"+
    "<li>L'encart <strong>IFI</strong> s'active si le patrimoine immobilier net dépasse le seuil.</li>"+
    "<li>Les <strong>leviers fiscaux</strong> identifiés (PER, déficit foncier...) préparent la section Préconisations.</li></ul>" },
  { id:'financement', t:"Financement", b:"<ul>"+
@@ -1796,7 +1796,7 @@ function closeModeEmploi(){
     <div style="padding:14px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f);line-height:1.7">
       <strong>Astuces :</strong><br>
       &#8226; Le fichier JSON sauvegard&#233; contient TOUTE l'&#233;tude. Conserve-le pr&#233;cieusement pour pouvoir la reprendre 3, 6 ou 12 mois plus tard.<br>
-      &#8226; Les mentions l&#233;gales sont g&#233;n&#233;r&#233;es automatiquement depuis ton profil (page d'accueil). L'avis d'imposition a sa propre zone de copier-coller dans Import / Saisie.<br>
+      &#8226; Les mentions l&#233;gales sont g&#233;n&#233;r&#233;es automatiquement depuis ton profil (page d'accueil). Les chiffres de l'avis d'imposition (RFR, impôt payé, plafond PER) se reportent à la main dans la section Impôts.<br>
       &#8226; Tu peux revoir ce guide via le bouton "&#10067; Guide" en haut &#224; droite, et ouvrir le <strong>"&#128214; Mode d'emploi"</strong> d&#233;taill&#233; section par section depuis le bas de la sidebar.
     </div>
 
