@@ -90,6 +90,17 @@
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--ink-30); margin-bottom: 28px;
 }
+/* Têtes de famille (cohérence avec la vitrine : 2 piliers) */
+.tools-family-head { margin-bottom: 34px; }
+.tools-family-kicker {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 8px;
+}
+.tools-family-title {
+  font-family: var(--serif); font-size: 26px;
+  color: var(--ink); line-height: 1.2;
+}
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -128,18 +139,17 @@
 }
 
 /* Bandeau données / RGPD */
-.privacy-strip {
-  display: flex; gap: 14px; align-items: flex-start;
-  border: 1px solid rgba(45,122,91,0.3); background: rgba(45,122,91,0.05);
-  padding: 16px 20px; margin-bottom: 28px;
-  font-size: 12.5px; font-weight: 300; line-height: 1.7; color: var(--ink-60);
+/* Ligne données / RGPD (pied de page) */
+.privacy-foot {
+  background: var(--paper-2); border-top: 1px solid var(--rule-l);
+  padding: 14px 52px; text-align: center;
+  font-size: 11.5px; font-weight: 300; line-height: 1.65; color: var(--ink-60);
 }
-.privacy-strip strong { color: #2D7A5B; font-weight: 600; }
-.privacy-strip-icon { font-size: 18px; line-height: 1.4; }
+.privacy-foot strong { color: #2D7A5B; font-weight: 600; }
 
 /* Footer */
 .site-footer {
-  background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06);
+  background: var(--paper); border-top: 1px solid var(--rule-l);
   padding: 36px 52px; display: flex; align-items: center; justify-content: space-between;
 }
 .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -148,8 +158,8 @@
   display: flex; align-items: center; justify-content: center;
 }
 .footer-mark span { font-family: var(--serif); font-size: 12px; color: var(--orange); line-height: 1; }
-.footer-name { font-size: 10.5px; color: rgba(255,255,255,0.25); letter-spacing: 0.2em; text-transform: uppercase; }
-.footer-copy { font-size: 11px; color: rgba(255,255,255,0.16); }
+.footer-name { font-size: 10.5px; color: var(--ink-30); letter-spacing: 0.2em; text-transform: uppercase; }
+.footer-copy { font-size: 11px; color: var(--ink-30); }
 
 /* Modale */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
@@ -171,6 +181,7 @@
 /* ── Nav pleine largeur sur index (pas de max-width comme le footer) ── */
 .cs-nav-inner { max-width: none; padding: 0 36px; }
 
+
 /* ── Menu dans la top-nav ── */
 .top-menu {
   display: flex;
@@ -180,30 +191,30 @@
 .top-menu-item {
   font-size: 13px;
   font-weight: 400;
-  color: rgba(255,255,255,0.55);
+  color: var(--ink-60);
   text-decoration: none;
   letter-spacing: 0.01em;
   padding: 7px 16px;
   transition: color 0.15s;
 }
-.top-menu-item:hover { color: rgba(255,255,255,0.9); }
+.top-menu-item:hover { color: var(--ink); }
 .top-menu-item.active { color: var(--orange); font-weight: 500; }
 .top-menu-sep { display: none; }
 .top-menu-ext { margin-left: 0; gap: 4px; flex-shrink: 0; }
 .top-menu-ext .top-menu-item.ext {
   display: inline-flex; align-items: center;
   padding: 4px 9px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #fff;
+  border: 1px solid var(--rule-l);
   border-radius: 5px;
   font-size: 11px;
-  color: rgba(255,255,255,0.65);
+  color: var(--ink-60);
   white-space: nowrap;
 }
 .top-menu-ext .top-menu-item.ext:hover {
   border-color: rgba(212,98,42,0.45);
-  color: #fff;
-  background: rgba(212,98,42,0.08);
+  color: var(--orange);
+  background: rgba(212,98,42,0.06);
 }
 @media (max-width: 1100px) {
   .top-menu-ext { display: none; }
@@ -252,7 +263,7 @@
   gap: 6px;
   flex-wrap: wrap;
   font-size: 11px;
-  color: rgba(255,255,255,0.55);
+  color: var(--ink-60);
   opacity: 0;
   transition: opacity 0.2s;
   pointer-events: none;
@@ -270,15 +281,15 @@
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 3px;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.6);
+  background: rgba(24,22,20,0.06);
+  color: var(--ink-60);
 }
-.mini-event-chip.forman { background: rgba(168,85,247,0.18); color: #c4b5fd; }
-.mini-event-chip.prodemial { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.mini-event-chip.forman { background: rgba(168,85,247,0.14); color: #6D28D9; }
+.mini-event-chip.prodemial { background: rgba(239,68,68,0.12); color: #B91C1C; }
 .mini-event-more {
   font-size: 9px;
   font-weight: 600;
-  color: rgba(255,255,255,0.4);
+  color: var(--ink-30);
   letter-spacing: 0.04em;
 }
 </style>
@@ -351,14 +362,14 @@
 </div>
 <style>
 /* ── TOP STRIPS — 3 cellules horizontales (Évènements + Dev Action + Ma journée) ── */
-.top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1D1A16;border-top:1px solid rgba(212,98,42,0.18)}
-.ts-cell{position:relative;padding:18px 22px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
+.top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--paper-2);border-bottom:1px solid var(--rule-l)}
+.ts-cell{position:relative;padding:18px 22px;border-right:1px solid var(--rule-l);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
 .ts-cell:last-child{border-right:none}
 .ts-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);line-height:1.2}
-.ts-preview{font-size:12px;color:var(--fog);line-height:1.45;display:block;flex:1}
+.ts-preview{font-size:12px;color:var(--ink-60);line-height:1.45;display:block;flex:1}
 .ts-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;flex:1}
-.ts-num{font-size:26px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
-.ts-suf{font-size:12px;color:var(--fog)}
+.ts-num{font-size:26px;font-weight:700;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.ts-suf{font-size:12px;color:var(--ink-60)}
 
 /* Bouton CTA unifié pour les 3 cellules */
 .ts-cta{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:9px 14px;background:var(--orange);color:#fff;border:none;border-radius:5px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s;white-space:nowrap;margin-top:auto}
@@ -367,7 +378,7 @@
 .ts-cta:hover .ts-cta-arrow{transform:translateX(3px)}
 
 /* Cellule Dev Action — même fond que les autres, juste différenciée par son contenu */
-.ts-devaction:hover{background:rgba(255,255,255,0.02)}
+.ts-devaction:hover{background:rgba(24,22,20,0.02)}
 
 /* Bouton fold (Évènements) : chevron au lieu de flèche, texte conditionnel */
 .ts-cta-fold .ts-cta-txt-close{display:none}
@@ -377,11 +388,11 @@
 [data-fold]:not(.closed) .ts-cta-chev{transform:rotate(180deg)}
 
 /* Body dépliable Évènements (full width sous la barre) */
-.ts-body-wrap{background:#1D1A16;overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid rgba(255,255,255,0.05)}
+.ts-body-wrap{background:var(--paper-2);overflow:hidden;max-height:1200px;transition:max-height .35s ease,border-top-color .25s ease;border-top:1px solid var(--rule-l)}
 .ts-body-wrap.closed{max-height:0;border-top-color:transparent}
 .ts-body-inner{max-width:1100px;margin:0 auto;padding:22px 52px}
 
-@media (max-width:900px){.top-strips{grid-template-columns:1fr}.ts-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,0.06)}.ts-cell:last-child{border-bottom:none}.ts-devaction{border-left:none;border-right:none}.ts-body-inner{padding:18px 24px}}
+@media (max-width:900px){.top-strips{grid-template-columns:1fr}.ts-cell{border-right:none;border-bottom:1px solid var(--rule-l)}.ts-cell:last-child{border-bottom:none}.ts-devaction{border-left:none;border-right:none}.ts-body-inner{padding:18px 24px}}
 
 .daily-strip{display:block;background:#1D1A16;padding:24px 52px;border-top:1px solid rgba(212,98,42,0.18);text-decoration:none;color:inherit}
 .daily-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
@@ -438,24 +449,24 @@
 .events-label{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
 .events-sub{font-size:11px;color:rgba(255,255,255,0.45);font-weight:300;max-width:200px;line-height:1.5}
 .events-grid{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;min-width:0}
-.event-card{position:relative;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:5px;transition:all 0.15s;min-width:0}
+.event-card{position:relative;background:#fff;border:1px solid var(--rule-l);border-radius:6px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:5px;transition:all 0.15s;min-width:0}
 .event-card:hover{border-color:rgba(212,98,42,0.45);background:rgba(212,98,42,0.06)}
 .event-card.featured{border-color:rgba(212,98,42,0.35)}
 .event-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--orange);border-radius:6px 6px 0 0}
 .event-card.passed{opacity:0.38}
 .event-card.going{border-color:var(--orange);background:rgba(212,98,42,0.12)}
 .event-month{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);line-height:1.2}
-.event-host{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 6px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);align-self:flex-start;border-radius:2px}
-.event-host.forman{background:rgba(168,85,247,0.18);color:#c4b5fd}
-.event-host.prodemial{background:rgba(239,68,68,0.2);color:#fca5a5}
-.event-title{font-family:var(--sans);font-size:12px;font-weight:600;color:#fff;line-height:1.3;letter-spacing:-0.01em}
-.event-check{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto}
+.event-host{display:inline-block;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 6px;background:rgba(24,22,20,0.06);color:var(--ink-60);align-self:flex-start;border-radius:2px}
+.event-host.forman{background:rgba(168,85,247,0.14);color:#6D28D9}
+.event-host.prodemial{background:rgba(239,68,68,0.12);color:#B91C1C}
+.event-title{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;letter-spacing:-0.01em}
+.event-check{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding-top:5px;border-top:1px solid var(--rule-l);margin-top:auto}
 .event-check input{position:absolute;opacity:0;pointer-events:none}
-.event-check-track{position:relative;display:inline-block;width:28px;height:16px;background:rgba(255,255,255,0.12);border-radius:20px;transition:background 0.2s;flex-shrink:0}
+.event-check-track{position:relative;display:inline-block;width:28px;height:16px;background:rgba(24,22,20,0.15);border-radius:20px;transition:background 0.2s;flex-shrink:0}
 .event-check-dot{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.25);transition:transform 0.2s}
 .event-check input:checked + .event-check-track{background:var(--orange)}
 .event-check input:checked + .event-check-track .event-check-dot{transform:translateX(12px)}
-.event-check-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.55);transition:color 0.2s}
+.event-check-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60);transition:color 0.2s}
 .event-check input:checked ~ .event-check-lbl{color:var(--orange)}
 @media (max-width:900px){.events-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:720px){.events-section{padding:18px 24px}.events-inner{flex-direction:column;align-items:flex-start}.events-sub{max-width:100%}}
@@ -638,13 +649,9 @@
 <div class="tools-section" id="analyse">
   <div class="tools-inner">
 
-    <div class="privacy-strip">
-      <span class="privacy-strip-icon">&#128274;</span>
-      <div>
-        <strong>100 % navigateur &mdash; conforme RGPD.</strong>
-        Aucune donn&eacute;e client n'est envoy&eacute;e ni conserv&eacute;e sur un serveur : les &eacute;tudes restent en m&eacute;moire le temps de la session, et seuls les fichiers JSON que vous exportez vous-m&ecirc;me en gardent une trace. Les param&egrave;tres des simulateurs sont m&eacute;moris&eacute;s uniquement sur votre appareil.
-        &Agrave; la premi&egrave;re ouverture de chaque module, un <strong>guide d'onboarding</strong> pr&eacute;sente son fonctionnement et le stockage de ses donn&eacute;es &mdash; bouton &laquo; &#10067; Guide &raquo; en haut &agrave; droite pour le revoir &agrave; tout moment.
-      </div>
+    <div class="tools-family-head">
+      <div class="tools-family-kicker">Pilier 1</div>
+      <div class="tools-family-title">Outils patrimoniaux</div>
     </div>
 
     <div class="tools-label">Analyse, suivi &amp; optimisation</div>
@@ -803,21 +810,25 @@
   </div>
 </div>
 
-<div class="tools-section" id="formation" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+<div class="tools-section" id="formation" style="border-top:1px solid var(--rule-l)">
   <div class="tools-inner">
+    <div class="tools-family-head">
+      <div class="tools-family-kicker">Pilier 2</div>
+      <div class="tools-family-title">Outils d&eacute;veloppement entreprise</div>
+    </div>
     <div class="tools-label" style="color:var(--orange);font-weight:700">Formation</div>
     <div class="tools-grid">
 
-      <a href="https://adussourd-pp.github.io/cgpskool_quiz_habilitation/" target="_blank" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d);grid-column:1/-1">
+      <a href="https://adussourd-pp.github.io/cgpskool_quiz_habilitation/" target="_blank" class="tool-card" style="grid-column:1/-1">
         <span class="tool-badge" style="background:rgba(212,98,42,0.12);color:#D4622A">Habilitations</span>
         <div class="tool-bar" style="background:var(--orange)"></div>
         <span class="tool-icon">&#127891;</span>
-        <div class="tool-name" style="color:var(--white)">Quiz Habilitations</div>
-        <div class="tool-desc" style="color:var(--fog)">R&#233;visez vos habilitations comme les formations continues : IAS, IOBSP, CIF, immobilier, agent li&#233;.</div>
+        <div class="tool-name">Quiz Habilitations</div>
+        <div class="tool-desc">R&#233;visez vos habilitations comme les formations continues : IAS, IOBSP, CIF, immobilier, agent li&#233;.</div>
         <div class="tool-features">
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">IAS / IOBSP</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">CIF</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">R&#233;vision</span>
+          <span class="tool-feature">IAS / IOBSP</span>
+          <span class="tool-feature">CIF</span>
+          <span class="tool-feature">R&#233;vision</span>
         </div>
       </a>
 
@@ -825,52 +836,57 @@
   </div>
 </div>
 
-<div class="tools-section" id="mon-activite" style="background:var(--bg);border-top:1px solid var(--rule-d)">
+<div class="tools-section" id="mon-activite" style="border-top:1px solid var(--rule-l)">
   <div class="tools-inner">
     <div class="tools-label" style="color:var(--orange);font-weight:700">D&eacute;veloppement d'&eacute;quipe</div>
     <div class="tools-grid">
 
-      <a href="modules/bp-simulator.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
-        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Projection</span>
+      <a href="modules/bp-simulator.html" class="tool-card">
+        <span class="tool-badge">Projection</span>
         <div class="tool-bar" style="background:var(--orange)"></div>
         <span class="tool-icon">&#128200;</span>
-        <div class="tool-name" style="color:var(--white)">Business Plan</div>
-        <div class="tool-desc" style="color:var(--fog)">Projetez votre progression dans le r&#233;seau &mdash; qualifications PMR, CA personnel &amp; &#233;quipe, commissions d&#233;marrage / expansion / d&#233;veloppement.</div>
+        <div class="tool-name">Business Plan</div>
+        <div class="tool-desc">Projetez votre progression dans le r&#233;seau &mdash; qualifications PMR, CA personnel &amp; &#233;quipe, commissions d&#233;marrage / expansion / d&#233;veloppement.</div>
         <div class="tool-features">
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">PMR Prod&#233;mial</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Qualifications</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Organisation</span>
+          <span class="tool-feature">PMR Prod&#233;mial</span>
+          <span class="tool-feature">Qualifications</span>
+          <span class="tool-feature">Organisation</span>
         </div>
       </a>
 
-      <a href="modules/equipe-builder.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
-        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Organisation</span>
+      <a href="modules/equipe-builder.html" class="tool-card">
+        <span class="tool-badge">Organisation</span>
         <div class="tool-bar" style="background:var(--orange)"></div>
         <span class="tool-icon">&#128101;</span>
-        <div class="tool-name" style="color:var(--white)">Construire son &#233;quipe</div>
-        <div class="tool-desc" style="color:var(--fog)">G&#233;rez votre &#233;quipe, ajoutez vos collaborateurs, suivez les statuts et qualifications, visualisez l'organigramme.</div>
+        <div class="tool-name">Construire son &#233;quipe</div>
+        <div class="tool-desc">G&#233;rez votre &#233;quipe, ajoutez vos collaborateurs, suivez les statuts et qualifications, visualisez l'organigramme.</div>
         <div class="tool-features">
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Membres</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Organigramme</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Export JSON</span>
+          <span class="tool-feature">Membres</span>
+          <span class="tool-feature">Organigramme</span>
+          <span class="tool-feature">Export JSON</span>
         </div>
       </a>
 
-      <a href="tracker/index.html" class="tool-card" style="background:var(--bg-2);border-color:var(--rule-d)">
-        <span class="tool-badge" style="background:rgba(255,255,255,0.08);color:var(--fog)">Suivi commun</span>
+      <a href="tracker/index.html" class="tool-card">
+        <span class="tool-badge">Suivi commun</span>
         <div class="tool-bar" style="background:var(--orange)"></div>
         <span class="tool-icon">&#127919;</span>
-        <div class="tool-name" style="color:var(--white)">Dev Action</div>
-        <div class="tool-desc" style="color:var(--fog)">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
+        <div class="tool-name">Dev Action</div>
+        <div class="tool-desc">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
         <div class="tool-features">
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Kanban</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Top parrains&#183;marraines</span>
-          <span class="tool-feature" style="background:rgba(255,255,255,0.06);color:var(--fog)">Slack</span>
+          <span class="tool-feature">Kanban</span>
+          <span class="tool-feature">Top parrains&#183;marraines</span>
+          <span class="tool-feature">Slack</span>
         </div>
       </a>
 
     </div>
   </div>
+</div>
+
+<div class="privacy-foot">
+  &#128274; <strong>100 % navigateur &mdash; conforme RGPD.</strong>
+  Aucune donn&eacute;e client n'est envoy&eacute;e ni conserv&eacute;e sur un serveur &mdash; les &eacute;tudes restent en m&eacute;moire, seuls vos exports JSON en gardent une trace. D&eacute;tails dans le guide &laquo; &#10067; &raquo; de chaque module.
 </div>
 
 <footer class="site-footer">
@@ -878,7 +894,7 @@
     <div class="footer-mark"><span>C</span></div>
     <span class="footer-name">CGP Skool</span>
   </a>
-  <span class="footer-copy">&copy; 2025 &mdash; Outil interne r&#233;serv&#233; aux consultants du r&#233;seau &nbsp;&middot;&nbsp; <span style="color:var(--ink-30)">v1.4 &mdash; 9 avril 2026</span></span>
+  <span class="footer-copy">&copy; 2025 &mdash; Outil interne r&#233;serv&#233; aux consultants du r&#233;seau &nbsp;&middot;&nbsp; <span style="color:var(--ink-30)">v1.5 &mdash; 21 juillet 2026</span></span>
 </footer>
 
 <div class="modal-overlay" id="modalProfil" onclick="if(event.target===this)closeProfil()">

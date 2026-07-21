@@ -125,7 +125,7 @@ Application 100% front-end (zéro serveur), déployée via GitHub Pages.
 - `DATA_KIND` dans `cgp-skool-nav.js` classe chaque module :
   - `'session'` (`etude-dossier`, `suivi-contrat`) : données client **en mémoire uniquement**, rien de persisté — la seule conservation est le JSON exporté manuellement par le conseiller
   - `'local'` (défaut) : paramètres mémorisés dans le localStorage de l'appareil (`cgpskool_state_<id>` via `CGP.project.autoSave`)
-- Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, bandeau `.privacy-strip` sur `outils.html`, section Confidentialité sur la vitrine `index.html`
+- Ces informations sont affichées : section « 🔒 Vos données » dans chaque panneau guide, encart Confidentialité & RGPD dans l'onboarding d'`etude-dossier`, ligne `.privacy-foot` en pied de page de `outils.html`, section Confidentialité sur la vitrine `index.html`
 
 ### Pages d'entrée
 
