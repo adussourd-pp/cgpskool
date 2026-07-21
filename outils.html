@@ -90,6 +90,18 @@
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--ink-30); margin-bottom: 28px;
 }
+/* Têtes de famille (cohérence avec la vitrine : 2 piliers) */
+.tools-family-head { margin-bottom: 34px; }
+.tools-family-kicker {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 8px;
+}
+.tools-family-title {
+  font-family: var(--serif); font-size: 26px;
+  color: var(--ink); line-height: 1.2;
+}
+.tools-family-title.on-dark { color: #fff; }
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -129,11 +141,18 @@
 
 /* Bandeau données / RGPD */
 .privacy-strip {
+  position: relative;
   display: flex; gap: 14px; align-items: flex-start;
   border: 1px solid rgba(45,122,91,0.3); background: rgba(45,122,91,0.05);
-  padding: 16px 20px; margin-bottom: 28px;
-  font-size: 12.5px; font-weight: 300; line-height: 1.7; color: var(--ink-60);
+  padding: 12px 44px 12px 20px; margin-bottom: 28px;
+  font-size: 12px; font-weight: 300; line-height: 1.65; color: var(--ink-60);
 }
+.privacy-strip-close {
+  position: absolute; top: 8px; right: 10px;
+  background: none; border: none; padding: 4px;
+  font-size: 13px; color: var(--ink-30); cursor: pointer;
+}
+.privacy-strip-close:hover { color: var(--ink); }
 .privacy-strip strong { color: #2D7A5B; font-weight: 600; }
 .privacy-strip-icon { font-size: 18px; line-height: 1.4; }
 
@@ -638,13 +657,19 @@
 <div class="tools-section" id="analyse">
   <div class="tools-inner">
 
-    <div class="privacy-strip">
+    <div class="privacy-strip" id="privacyStrip">
       <span class="privacy-strip-icon">&#128274;</span>
       <div>
         <strong>100 % navigateur &mdash; conforme RGPD.</strong>
-        Aucune donn&eacute;e client n'est envoy&eacute;e ni conserv&eacute;e sur un serveur : les &eacute;tudes restent en m&eacute;moire le temps de la session, et seuls les fichiers JSON que vous exportez vous-m&ecirc;me en gardent une trace. Les param&egrave;tres des simulateurs sont m&eacute;moris&eacute;s uniquement sur votre appareil.
-        &Agrave; la premi&egrave;re ouverture de chaque module, un <strong>guide d'onboarding</strong> pr&eacute;sente son fonctionnement et le stockage de ses donn&eacute;es &mdash; bouton &laquo; &#10067; Guide &raquo; en haut &agrave; droite pour le revoir &agrave; tout moment.
+        Aucune donn&eacute;e client n'est envoy&eacute;e ni conserv&eacute;e sur un serveur &mdash; les &eacute;tudes restent en m&eacute;moire, seuls vos exports JSON en gardent une trace. D&eacute;tails dans le guide &laquo; &#10067; &raquo; de chaque module.
       </div>
+      <button class="privacy-strip-close" onclick="try{localStorage.setItem('cgpskool_privacy_hide','1')}catch(e){};document.getElementById('privacyStrip').style.display='none'" title="Compris, ne plus afficher">&#10005;</button>
+    </div>
+    <script>try{if(localStorage.getItem('cgpskool_privacy_hide'))document.getElementById('privacyStrip').style.display='none';}catch(e){}</script>
+
+    <div class="tools-family-head">
+      <div class="tools-family-kicker">Pilier 1</div>
+      <div class="tools-family-title">Outils patrimoniaux</div>
     </div>
 
     <div class="tools-label">Analyse, suivi &amp; optimisation</div>
@@ -805,6 +830,10 @@
 
 <div class="tools-section" id="formation" style="background:var(--bg);border-top:1px solid var(--rule-d)">
   <div class="tools-inner">
+    <div class="tools-family-head">
+      <div class="tools-family-kicker">Pilier 2</div>
+      <div class="tools-family-title on-dark">Outils d&eacute;veloppement entreprise</div>
+    </div>
     <div class="tools-label" style="color:var(--orange);font-weight:700">Formation</div>
     <div class="tools-grid">
 
