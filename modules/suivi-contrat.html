@@ -137,10 +137,10 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
     </div>
     <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
 
-    <div class="cs-sidebar-lbl open" data-step="import" onclick="openStep('import',this)"><span class="acc">&#9654;</span>Coller l'import Ariane</div>
+    <div class="cs-sidebar-lbl open" data-step="import" onclick="openStep('import',this)"><span class="acc">&#9654;</span>Coller l'import extranet</div>
     <div class="sb-body open" id="body_import">
       <div class="fg">
-        <textarea class="fi" id="rawExport" rows="10" placeholder="Copiez-collez ici l'export complet de la fiche contrat Ariane..."></textarea>
+        <textarea class="fi" id="rawExport" rows="10" placeholder="Copiez-collez ici la fiche contrat compl&egrave;te (Proxeema, Ariane/Apicil...)"></textarea>
       </div>
       <button class="btn-primary" onclick="parseAll()">&#9889; Analyser l'export</button>
       <div id="parseStatus"></div>
@@ -153,7 +153,7 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
         <div class="sb-body" style="padding-top:8px" id="body_imported">
           <div class="id-group">Client</div>
           <div class="fg"><label>Nom complet</label><input class="fi" type="text" id="cNom" placeholder="M. Jean DUPONT" oninput="renderAll()"></div>
-          <input type="hidden" id="cAge"><input type="hidden" id="cTel"><input type="hidden" id="cEmail">
+          <input type="hidden" id="cAge"><input type="hidden" id="cTel"><input type="hidden" id="cEmail"><input type="hidden" id="kGestion">
 
           <div class="id-group">Contrat</div>
           <div class="fg"><label>Compagnie</label><input class="fi" type="text" id="kCompagnie" oninput="renderAll()"></div>
@@ -171,6 +171,12 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
           <div class="fg"><label>Valorisation</label><div class="fi-row"><input type="number" step="0.01" id="vVal" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
           <div class="fg"><label>Versements nets</label><div class="fi-row"><input type="number" step="0.01" id="vVersNets" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
           <div class="fg"><label>Rachats bruts</label><div class="fi-row"><input type="number" step="0.01" id="vRachats" value="0" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
+          <div class="grid2">
+            <div class="fg"><label>Vers. programm&eacute;</label><div class="fi-row"><input type="number" step="0.01" id="vpMontant" oninput="renderAll()"><span class="fi-unit">&euro;</span></div></div>
+            <div class="fg"><label>P&eacute;riodicit&eacute;</label><select class="fi" id="vpPeriode" onchange="renderAll()">
+              <option value="mois">Mensuelle</option><option value="trimestre">Trimestrielle</option><option value="semestre">Semestrielle</option><option value="an">Annuelle</option>
+            </select></div>
+          </div>
 
           <div class="id-group">Allocation</div>
           <div id="sbAllocList" style="font-size:11px;color:var(--gris-f)"></div>
@@ -265,7 +271,7 @@ textarea.fi{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;fo
           </label>
         </div>
         <div class="card" style="border-style:dashed;background:#fafafa">
-          <div class="card-title">Historique complet des mouvements</div>
+          <div class="card-title" id="movTitle">Historique complet des mouvements</div>
           <table class="tbl" id="movTbl"></table>
         </div>
       </div>
@@ -329,13 +335,149 @@ function parseDateFr(s){if(!s)return null;var m=s.match(/(\d{1,2})\/(\d{1,2})\/(
 function dateFmt(d){if(!d)return '';return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 
 // ══════════════════════════════════════════════════════════════
-// PARSER (Apicil + formats similaires)
+// PARSER — dispatch selon le format d'extranet
 // ══════════════════════════════════════════════════════════════
 function parseAll(){
   var raw=document.getElementById('rawExport').value;
   if(!raw||raw.length<100){setStatus('err','Collez d\'abord l\'export complet du contrat.');return;}
-
   try{
+    if(isProxeema(raw)){parseProxeema(raw);}
+    else{parseApicil(raw);}
+    renderAll();
+    showImportedPanel();
+    var extra=(STATE.movements.length===0)?' Pas d\'historique des mouvements : le TRI sera estimé à partir des versements programmés.':'';
+    setStatus('ok','Export analysé : '+STATE.allocation.length+' support(s), '+STATE.movements.length+' mouvement(s) détecté(s).'+extra);
+  }catch(e){
+    setStatus('err','Erreur pendant l\'analyse : '+e.message);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARSER PROXEEMA (pas d'historique des mouvements dans cet extranet)
+// ══════════════════════════════════════════════════════════════
+function isProxeema(raw){
+  return /Valorisation\s+du\s+contrat|Derni[eè]re\s+agr[eé]gation|Supports\s+du\s+contrat/i.test(raw);
+}
+function splitToks(L){return L.split(/\t/).map(function(t){return t.trim();}).filter(function(t){return t;});}
+
+function parseProxeema(raw){
+  var ICONS=/^(logo|menu|home|groups|chart_data|signature|help|arrow_left_alt|expand_more|expand_less|info|open_in_new|trending_up|trending_down|search|settings|notifications)$/i;
+  var lines=raw.split(/\r?\n/).map(function(l){return l.trim();}).filter(function(l){return l&&!ICONS.test(l);});
+  function idx(re,from){for(var i=from||0;i<lines.length;i++){if(re.test(lines[i]))return i;}return -1;}
+  function after(re){var i=idx(re);return (i>=0&&i+1<lines.length)?lines[i+1]:'';}
+
+  // --- Categorie + compagnie (ligne "Assurance Vie" puis "SurAvenir") ---
+  var iCat=idx(/^(Assurance[\s\-]?Vie|PER|PERIN|PEA(\s|$)|Compte[\s\-]?titres|CTO)$/i);
+  if(iCat>=0){
+    var cat=lines[iCat];
+    if(/vie/i.test(cat))setCategorie('Assurance-vie');
+    else if(/PER/i.test(cat))setCategorie('PER');
+    else if(/PEA/i.test(cat))setCategorie('PEA');
+    else setCategorie('Compte-titres');
+    var comp=lines[iCat+1]||'';
+    if(comp&&!/^Informations?$/i.test(comp))setV('kCompagnie',comp);
+  }
+
+  // --- Titre contrat : "CRISTALLIANCE AVENIR N°9E 271197930" ---
+  var maxT=(iCat>0)?iCat:lines.length;
+  for(var i=0;i<maxT;i++){
+    var mT=lines[i].match(/^(.+?)\s+N[°º]\s*(.+)$/);
+    if(mT){setV('kPrestation',mT[1].trim());setV('kNum',mT[2].trim());break;}
+  }
+
+  // --- Champs "label sur une ligne / valeur sur la suivante" ---
+  var vOpen=after(/^Date d[\u2019']ouverture$/i);
+  var mO=vOpen.match(/\d{1,2}\/\d{1,2}\/\d{4}/);if(mO)setV('kOpen',mO[0]);
+  var gest=after(/^Mode de gestion$/i);if(gest&&!/^Souscripteur/i.test(gest))setV('kGestion',gest);
+  var sous=after(/^Souscripteur$/i);
+  if(sous&&!/^(Non|Oui|Co-souscripteur)$/i.test(sous))setV('cNom',sous);
+  var vp=after(/^Versements? programm[eé]s$/i);
+  var mVp=vp.match(/([\d\s\u00a0\u202f]*[\d]+[,\.]?\d*)\s*\u20ac\s*\/\s*(mois|trimestre|semestre|an)/i);
+  if(mVp){setV('vpMontant',String(parseFr(mVp[1])));setV('vpPeriode',mVp[2].toLowerCase());}
+  else if(/^(Non|Aucun|0)/i.test(vp)){setV('vpMontant','0');}
+
+  // --- Synthese financiere ---
+  var mAgg=raw.match(/Derni[eè]re\s+agr[eé]gation\s+le\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+  if(mAgg)setV('kArret',mAgg[1]);
+  var vVal=after(/^Valorisation du contrat$/i);if(vVal)setV('vVal',String(parseFr(vVal)));
+  var vVers=after(/^Montant vers[eé]$/i);if(vVers)setV('vVersNets',String(parseFr(vVers)));
+  var vRach=after(/^Rachats$/i);if(vRach&&/€/.test(vRach))setV('vRachats',String(parseFr(vRach)));
+
+  // --- Supports ---
+  STATE.allocation=parseProxeemaSupports(lines);
+  // SRI du contrat : approximation = SRI pondere par les poids si dispo
+  if(!V('kSri')){
+    var wS=0,wT=0;
+    STATE.allocation.forEach(function(a){var s=parseInt(a.sri)||0;if(s>0&&a.poids>0){wS+=s*a.poids;wT+=a.poids;}});
+    if(wT>0)setV('kSri',Math.round(wS/wT));
+  }
+  // Proxeema n'exporte pas l'historique des mouvements
+  STATE.movements=[];
+}
+
+function parseProxeemaSupports(lines){
+  var out=[];
+  var start=-1;
+  for(var i=0;i<lines.length;i++){if(/^Supports? du contrat/i.test(lines[i])){start=i+1;break;}}
+  if(start<0)return out;
+  var ISIN_RE=/^[A-Z]{2}[A-Z0-9]{9}\d$/;
+  var CLS_RE=/^([^\t:]{2,60})\s:\s[^\t]/;
+  function isClsLine(L){return CLS_RE.test(L)&&!/€|%|\d{2}\/\d{2}\/\d{4}/.test(L);}
+  var cls='';
+  var i=start;
+  while(i<lines.length){
+    var L=lines[i];
+    if(isClsLine(L)){cls=L.match(CLS_RE)[1].trim();i++;continue;}
+    var toks=splitToks(L);
+    if(toks.length&&ISIN_RE.test(toks[0])){
+      var isin=toks[0];
+      var supToks=toks.slice(1);
+      var label='';
+      var j=i+1;
+      for(;j<lines.length;j++){
+        var LJ=lines[j];
+        var tj=splitToks(LJ);
+        if(tj.length&&ISIN_RE.test(tj[0]))break;
+        if(isClsLine(LJ))break;
+        // Ligne libelle : uniquement juste apres l'ISIN (texte sans montant/%/chiffre initial)
+        if(j===i+1&&/[A-Za-z]{3,}/.test(LJ)&&!/€|%/.test(LJ)&&!/^[\d\+\-]/.test(LJ)&&!/^Article/i.test(LJ)){
+          label=LJ.split('|')[0].trim();continue;
+        }
+        supToks=supToks.concat(tj);
+      }
+      out.push(buildProxSupport(isin,supToks,label,cls));
+      i=j;continue;
+    }
+    i++;
+  }
+  return out;
+}
+
+function buildProxSupport(isin,toks,label,cls){
+  var sup={label:label||cls||'Support',isin:isin,cls:cls,sri:'',esg:'',date:'',nbParts:0,valeurUnit:0,valTot:0,poids:0,pma:0,plusVal:0,perf:0};
+  var stage=0; // 0=nb parts, 1=VL, 2=valeur totale, 3=poids, 4=perf, 5=extras (SRI/ESG/date)
+  for(var k=0;k<toks.length;k++){
+    var t=toks[k];
+    if(/^(trending_up|trending_down)$/i.test(t))continue;
+    var isEuro=/€/.test(t),isPct=/%/.test(t),isDate=/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(t);
+    if(isDate){if(stage>=3){sup.date=t;break;}continue;}
+    if(/^Article\s*\d/i.test(t)){sup.esg=t;continue;}
+    if(stage===0&&!isEuro&&!isPct&&/^[\d\s\u00a0\u202f,\.]+$/.test(t)){sup.nbParts=parseFr(t);stage=1;continue;}
+    if(stage===1&&isEuro){sup.valeurUnit=parseFr(t);stage=2;continue;}
+    if(stage===2&&isEuro){sup.valTot=parseFr(t);stage=3;continue;}
+    if(stage===3&&isPct){sup.poids=parseFr(t);stage=4;continue;}
+    if(stage===4&&isPct){sup.perf=parseFr(t);stage=5;continue;}
+    if(stage>=5&&/^[1-7]$/.test(t)){sup.sri=t;continue;}
+  }
+  // Proxeema ne donne que la perf % par support : on en deduit PMA et +/- value
+  if(sup.perf&&sup.valTot){sup.pma=sup.valTot/(1+sup.perf/100);sup.plusVal=sup.valTot-sup.pma;}
+  return sup;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARSER APICIL / ARIANE (avec historique des mouvements)
+// ══════════════════════════════════════════════════════════════
+function parseApicil(raw){
     // --- Contact ---
     var mAge=raw.match(/(\d{1,3})\s*ans?\b/);if(mAge)setV('cAge',mAge[1]);
     var mTel=raw.match(/(?:phone|T[eé]l[\.\s:]*)[\s+]*((?:\+?33|0)[\s\.\-]?[1-9](?:[\s\.\-]?\d{2}){4})/i);
@@ -395,13 +537,6 @@ function parseAll(){
 
     // --- Mouvements (blocs de 4 lignes : Type / Valid\u00e9 / Montant / Date) ---
     STATE.movements=parseMovements(raw);
-
-    renderAll();
-    showImportedPanel();
-    setStatus('ok','Export analys\u00e9 : '+STATE.allocation.length+' support(s), '+STATE.movements.length+' mouvement(s) d\u00e9tect\u00e9(s).');
-  }catch(e){
-    setStatus('err','Erreur pendant l\'analyse : '+e.message);
-  }
 }
 
 function parseAllocation(raw){
@@ -525,12 +660,19 @@ function xirr(flows,guess){
   return r;
 }
 
+function addMonths(d,n){
+  var nd=new Date(d.getFullYear(),d.getMonth()+n,d.getDate());
+  // debordement fin de mois (ex: 31 -> 28/30) : on retombe sur le dernier jour du mois
+  if(nd.getDate()!==d.getDate())nd=new Date(nd.getFullYear(),nd.getMonth(),0);
+  return nd;
+}
+
 function computeTri(){
   var dateArret=parseDateFr(V('kArret'));
   var valo=num('vVal');
   if(!dateArret||valo<=0){STATE.tri={error:'Date d\'arr\u00eat\u00e9 ou valorisation manquante'};return;}
 
-  var flows=[];
+  var flows=[],estimated=false;
   STATE.movements.forEach(function(m){
     var side=isExternalFlow(m.type);
     if(!side||!m.dateObj)return;
@@ -540,12 +682,40 @@ function computeTri(){
       label:m.type+' '+m.dateFr
     });
   });
+
+  // Pas d'historique des mouvements (extranet Proxeema) : reconstitution des flux
+  // a partir du total verse + des versements programmes declares.
+  if(flows.length===0){
+    var dOpen=parseDateFr(V('kOpen'));
+    var total=num('vVersNets');
+    if(dOpen&&total>0&&dOpen<dateArret){
+      estimated=true;
+      var vp=num('vpMontant');
+      var stepM={mois:1,trimestre:3,semestre:6,an:12}[V('vpPeriode')||'mois']||1;
+      var vpDates=[];
+      if(vp>0){
+        var d=addMonths(dOpen,stepM);
+        while(d<=dateArret){vpDates.push(d);d=addMonths(d,stepM);}
+        // Le versement initial reconstitue ne peut pas etre negatif
+        var maxN=Math.floor(total/vp);
+        if(vpDates.length>maxN)vpDates=vpDates.slice(0,Math.max(0,maxN));
+      }
+      var v0=total-vp*vpDates.length;
+      if(v0>0.005)flows.push({date:dOpen,amount:-v0,label:'Versement initial (reconstitu\u00e9)'});
+      vpDates.forEach(function(d2){flows.push({date:d2,amount:-vp,label:'Versement programm\u00e9 (reconstitu\u00e9)'});});
+      if(flows.length===0)flows.push({date:dOpen,amount:-total,label:'Versements (reconstitu\u00e9s)'});
+      var rach=num('vRachats');
+      if(rach>0)flows.push({date:new Date((dOpen.getTime()+dateArret.getTime())/2),amount:+rach,label:'Rachats (date m\u00e9diane estim\u00e9e)'});
+    }
+  }
+
+  if(flows.length===0){STATE.tri={error:'Aucun flux exploitable (mouvements ou versements manquants)'};return;}
   // Valorisation finale = flux positif
   flows.push({date:dateArret,amount:+valo,label:'Valorisation finale '+V('kArret')});
   flows.sort(function(a,b){return a.date-b.date;});
 
   var r=xirr(flows);
-  STATE.tri={rate:r,flows:flows};
+  STATE.tri={rate:r,flows:flows,estimated:estimated};
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -596,6 +766,9 @@ function renderHeadTbl(){
     ['Date d\'arr\u00eat\u00e9',V('kArret')],
     ['SRI du contrat',V('kSri')?(V('kSri')+' / 7'):'']
   ];
+  if(V('kGestion'))rows.push(['Mode de gestion',V('kGestion')]);
+  var vpM=num('vpMontant');
+  if(vpM>0)rows.push(['Versements programm\u00e9s',fmtE(vpM)+' / '+({mois:'mois',trimestre:'trimestre',semestre:'semestre',an:'an'}[V('vpPeriode')]||'mois')]);
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl" style="width:38%">'+esc(r[0])+'</td><td>'+esc(r[1]||'\u2014')+'</td></tr>';});
   document.getElementById('headTbl').innerHTML=h;
 }
@@ -611,6 +784,17 @@ var ASSET_CLASSES=[
   {id:'autres',   label:'Autres',                     color:'#6B7280'}
 ];
 function classifyAsset(a){
+  // Classe d'actifs fournie par l'extranet (Proxeema) : prioritaire sur l'analyse du libelle
+  if(a.cls){
+    var c=a.cls.toLowerCase();
+    if(/structur/.test(c))return 'struct';
+    if(/^action/.test(c))return 'actions';
+    if(/fcpr|fcpi|fpci|fip|private/.test(c))return 'pe';
+    if(/oblig/.test(c))return 'oblig';
+    if(/scpi|opci|immo/.test(c))return 'scpi';
+    if(/euro|mon[eé]taire|tr[eé]sorerie|s[eé]cur/.test(c))return 'fondsE';
+    // "Classe non renseignee" -> on retombe sur l'analyse du libelle
+  }
   var lbl=(a.label||'').toLowerCase();
   var sri=parseInt(a.sri)||0;
   // SCPI / Immobilier
@@ -688,10 +872,14 @@ function renderSynth(){
     ['Dur\u00e9e de d\u00e9tention',dureeTxt]
   ]);
   var hideTri=(document.getElementById('hideTri')||{}).checked;
+  var triEst=!!(STATE.tri&&STATE.tri.estimated);
   if(!hideTri){
-    rows.push(['TRI annualis\u00e9'+(dureeAns>0?' (sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')+')':''),'<strong>'+(triPct!==null?(triPct>=0?'+':'')+fmtPct(triPct,2):'\u2014')+'</strong>']);
+    rows.push(['TRI annualis\u00e9'+(triEst?' estim\u00e9*':'')+(dureeAns>0?' (sur '+Math.round(dureeAns)+' an'+(Math.round(dureeAns)>1?'s':'')+')':''),'<strong>'+(triPct!==null?(triPct>=0?'+':'')+fmtPct(triPct,2):'\u2014')+'</strong>']);
   }
   var h='';rows.forEach(function(r){h+='<tr><td class="lbl">'+r[0]+'</td><td class="r">'+r[1]+'</td></tr>';});
+  if(triEst&&!hideTri&&triPct!==null){
+    h+='<tr><td colspan="2" class="mut" style="font-size:10px;border-bottom:none">* L\'extranet ne fournit pas l\'historique des mouvements : flux reconstitu\u00e9s \u00e0 partir du versement initial estim\u00e9 et des versements programm\u00e9s'+(num('vpMontant')>0?' ('+fmtE(num('vpMontant'))+' / '+(V('vpPeriode')||'mois')+')':'')+'.</td></tr>';
+  }
   document.getElementById('synthTbl').innerHTML=h;
 }
 
@@ -764,7 +952,36 @@ function renderAlloc(){
 
 function renderMouv(){
   var el=document.getElementById('movTbl');if(!el)return;
+  var title=document.getElementById('movTitle');
   var h='<thead><tr><th>Date</th><th>Type</th><th class="r">Montant</th></tr></thead><tbody>';
+
+  if(STATE.movements.length===0&&STATE.tri&&STATE.tri.estimated&&STATE.tri.flows){
+    // Pas d'historique fourni par l'extranet : on affiche les flux reconstitues pour le TRI
+    if(title)title.textContent='Flux reconstitu\u00e9s (estimation)';
+    var vps=[],items=[];
+    STATE.tri.flows.forEach(function(f){
+      if(/programm\u00e9 \(reconstitu\u00e9\)/.test(f.label))vps.push(f);
+      else items.push({date:f.date,label:f.label,amount:f.amount});
+    });
+    if(vps.length){
+      var totVp=0;vps.forEach(function(f){totVp+=-f.amount;});
+      items.push({date:vps[0].date,label:vps.length+' versements programm\u00e9s (reconstitu\u00e9s) de '+fmtE(-vps[0].amount)+', du '+dateFmt(vps[0].date)+' au '+dateFmt(vps[vps.length-1].date),amount:-totVp});
+    }
+    items.sort(function(a,b){return a.date-b.date;});
+    items.forEach(function(f){
+      h+='<tr>';
+      h+='<td style="white-space:nowrap;font-size:11px">'+dateFmt(f.date)+'</td>';
+      h+='<td class="lbl" style="font-size:11px">'+esc(f.label)+'</td>';
+      h+='<td class="r '+(f.amount>0?'pos':'neg')+'" style="font-size:11px">'+fmtE(Math.abs(f.amount))+'</td>';
+      h+='</tr>';
+    });
+    h+='<tr><td colspan="3" class="mut" style="font-size:10px;padding:8px">Estimation : l\'extranet ne fournit pas l\'historique des mouvements. Les dates et montants ci-dessus sont reconstitu\u00e9s pour le calcul du TRI.</td></tr>';
+    h+='</tbody>';
+    el.innerHTML=h;
+    return;
+  }
+
+  if(title)title.textContent='Historique complet des mouvements';
   // Tri chronologique descendant (plus recent en haut)
   var sorted=STATE.movements.slice().sort(function(a,b){return (b.dateObj||0)-(a.dateObj||0);});
   sorted.forEach(function(m){
@@ -815,8 +1032,8 @@ function collectState(){
   var cbTri=document.getElementById('hideTri');
   return {
     client:{nom:V('cNom'),age:V('cAge'),tel:V('cTel'),email:V('cEmail')},
-    contrat:{compagnie:V('kCompagnie'),prestation:V('kPrestation'),num:V('kNum'),sri:V('kSri'),open:V('kOpen'),arret:V('kArret'),cat:V('kCat')},
-    valo:{valo:V('vVal'),versNets:V('vVersNets'),rachats:V('vRachats')},
+    contrat:{compagnie:V('kCompagnie'),prestation:V('kPrestation'),num:V('kNum'),sri:V('kSri'),open:V('kOpen'),arret:V('kArret'),cat:V('kCat'),gestion:V('kGestion')},
+    valo:{valo:V('vVal'),versNets:V('vVersNets'),rachats:V('vRachats'),vpMontant:V('vpMontant'),vpPeriode:V('vpPeriode')},
     alloc:STATE.allocation,
     allocComms:STATE.allocComms||{},
     allocCommentsOn:!!(cbAlloc&&cbAlloc.checked),
@@ -833,8 +1050,8 @@ function collectState(){
 function applyState(s){
   if(!s)return;
   if(s.client){setV('cNom',s.client.nom);setV('cAge',s.client.age);setV('cTel',s.client.tel);setV('cEmail',s.client.email);}
-  if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);if(s.contrat.cat)setCategorie(s.contrat.cat);}
-  if(s.valo){setV('vVal',s.valo.valo);setV('vVersNets',s.valo.versNets);setV('vRachats',s.valo.rachats);}
+  if(s.contrat){setV('kCompagnie',s.contrat.compagnie);setV('kPrestation',s.contrat.prestation);setV('kNum',s.contrat.num);setV('kSri',s.contrat.sri);setV('kOpen',s.contrat.open);setV('kArret',s.contrat.arret);setV('kGestion',s.contrat.gestion);if(s.contrat.cat)setCategorie(s.contrat.cat);}
+  if(s.valo){setV('vVal',s.valo.valo);setV('vVersNets',s.valo.versNets);setV('vRachats',s.valo.rachats);setV('vpMontant',s.valo.vpMontant);if(s.valo.vpPeriode)setV('vpPeriode',s.valo.vpPeriode);}
   if(s.alloc)STATE.allocation=s.alloc;
   if(s.allocComms)STATE.allocComms=s.allocComms;
   if(s.movs)STATE.movements=s.movs.map(function(m){return {type:m.type,amount:m.amount,dateFr:m.dateFr,dateObj:parseDateFr(m.dateFr)};});
