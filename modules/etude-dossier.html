@@ -1542,6 +1542,12 @@ select.span2{grid-column:span 2}
 .me-item-body ul{margin:6px 0;padding-left:16px}
 .me-item-body li{margin-bottom:3px}
 .me-pdf{margin-top:8px;padding:8px 10px;background:rgba(45,122,91,0.06);border-left:2.5px solid #2D7A5B;border-radius:0 6px 6px 0;font-size:11px}
+.me-video{margin-bottom:12px;border-radius:9px;overflow:hidden;border:1.5px solid var(--bord);background:#000}
+.me-video iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+.me-video-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;aspect-ratio:16/9;background:var(--gris-l);color:var(--gris);font-size:12px}
+.me-video-soon .ico{font-size:28px}
+.me-warn{margin-top:8px;padding:8px 10px;background:rgba(212,98,42,0.07);border-left:2.5px solid var(--ambre);border-radius:0 6px 6px 0;font-size:11px}
+.me-step{font-weight:700;color:var(--noir);margin:10px 0 4px}
 </style>
 <div class="me-backdrop" id="meBackdrop" onclick="closeModeEmploi()"></div>
 <div class="me-panel" id="mePanel">
@@ -1556,6 +1562,32 @@ select.span2{grid-column:span 2}
 </div>
 
 <script>
+// URL d'embed du tutoriel video (YouTube : https://www.youtube.com/embed/XXXX - Loom : https://www.loom.com/embed/XXXX)
+var ME_VIDEO_URL = 'https://www.youtube.com/embed/S2NHv3HtO7I';
+
+var ME_PASAPAS = { id:'pasapas', t:"Pas \u00e0 pas : du RI Pr\u00e9alable \u00e0 l'\u00e9tude compl\u00e8te", video:true, b:
+   "Tu as ton <strong>02_RI_Pr\u00e9alable_CLEAN</strong> pr\u00eat ? Voici le circuit complet pour g\u00e9n\u00e9rer l'\u00c9tude de Dossier \u00e0 pr\u00e9senter \u00e0 ton Manager. Regarde d'abord la vid\u00e9o ci-dessus : elle montre exactement comment utiliser l'outil."+
+   "<div class='me-step'>\u00c9tape 1 \u2014 Importer le RI Pr\u00e9alable</div>"+
+   "Copie le contenu du 02_RI_Pr\u00e9alable_CLEAN, colle-le dans le champ d'import puis <strong>Valider</strong> : l'outil extrait automatiquement les donn\u00e9es."+
+   "<div class='me-step'>\u00c9tape 2 \u2014 Compl\u00e9ter les champs jaunes</div>"+
+   "Les champs jaunes n'ont pas pu \u00eatre remplis par le parsing. Depuis ton <strong>03_Identification_Besoins</strong>, reporte dans \u00ab V\u00e9rifier &amp; compl\u00e9ter \u00bb :<ul>"+
+   "<li>\uD83C\uDFAF Objectifs patrimoniaux (section 8/10) \u2192 bloc Objectifs</li>"+
+   "<li>\uD83D\uDCB0 \u00c9pargne de pr\u00e9caution souhait\u00e9e I1/I2 (section 6/10) \u2192 bloc \u00c9pargne</li>"+
+   "<li>\uD83D\uDCC5 Capacit\u00e9 d'\u00e9pargne mensuelle I1/I2 (section 7/10) \u2192 bloc \u00c9pargne</li>"+
+   "<li>\uD83C\uDFD6 \u00c2ge de d\u00e9part + revenus retraite souhait\u00e9s I1/I2 (section 2/10) \u2192 \u00e9cran Retraite</li>"+
+   "<li>\uD83D\uDCCA Plafond PER disponible I1/I2 \u2192 depuis l'avis d'imposition</li></ul>"+
+   "Si le prospect est retrait\u00e9 ou sans activit\u00e9 : renseigne l'<strong>ancienne cat\u00e9gorie socio-professionnelle</strong> (champ conditionnel sous CSP) pour que le graphe retraite utilise la bonne courbe."+
+   "<div class='me-step'>\u00c9tape 3 \u2014 Compl\u00e9ter Pr\u00e9conisations et Retraite</div>"+
+   "<ul><li>\u26A1 Ajuste le <strong>rendement</strong> de chaque solution selon la courbe de risque retenue (section 9/10)</li>"+
+   "<li>\uD83D\uDCDD Ajoute des <strong>notes conseiller</strong> dans les 3 cadres leviers (Imp\u00f4ts / Placement / Financement)</li>"+
+   "<li>\u2705 Coche les <strong>objectifs valid\u00e9s</strong> pour chaque solution retenue</li>"+
+   "<li>\uD83C\uDFAF \u00c9cran Retraite : saisis l'\u00e2ge de d\u00e9part + la pension souhait\u00e9e par personne</li></ul>"+
+   "<div class='me-step'>\u00c9tape 4 \u2014 Sauvegarder le JSON et exporter le PDF</div>"+
+   "<ul><li><strong>Sauvegarder JSON</strong> \u2192 range le fichier dans ton dossier prospect (Drive)</li>"+
+   "<li><strong>Exporter PDF</strong> \u2192 envoie-le \u00e0 ton Manager avec l'avis d'imposition</li></ul>"+
+   "<div class='me-warn'>\u26A0\uFE0F <strong>Sauvegarde apr\u00e8s chaque \u00e9cran compl\u00e9t\u00e9</strong> \u2014 pas seulement \u00e0 la fin. Si tu fermes l'onglet avant de sauvegarder, tu perds tout.</div>"+
+   "<div class='me-pdf'>\uD83D\uDCA1 <strong>JSON d'abord, PDF ensuite.</strong> Le PDF est pour ton Manager. Le JSON est pour toi : il permet de rouvrir et modifier l'\u00e9tude \u00e0 tout moment via \u00ab Charger une \u00e9tude \u00bb.</div>" };
+
 var ME_SECTIONS = [
  { id:'import', t:"Import / Saisie", b:"<ul>"+
    "<li><strong>Recueil d'informations (RI)</strong> : ouvre le Word ou le PDF Proxeema, Ctrl+A puis Ctrl+C, colle tout dans la zone RI et clique <strong>Valider</strong>. Le parser extrait identité, situation familiale, revenus, patrimoine, objectifs.</li>"+
@@ -1613,6 +1645,18 @@ function buildModeEmploi(){
   var body=document.getElementById('meBody');
   if(body.childNodes.length) return;
   var h='';
+  if(ME_VIDEO_URL){
+    h+='<div class="me-video"><iframe src="'+ME_VIDEO_URL+'" allowfullscreen loading="lazy"></iframe></div>';
+  } else {
+    h+='<div class="me-video"><div class="me-video-soon"><span class="ico">\uD83C\uDFAC</span><span>Tutoriel vid\u00e9o (16 min) \u2014 bient\u00f4t disponible ici</span></div></div>';
+  }
+  var s0=ME_PASAPAS;
+  h+='<div class="me-item" id="me-'+s0.id+'">'+
+     '<div class="me-item-head" onclick="this.parentNode.classList.toggle(\'open\')">'+
+     '<div class="me-num">\uD83C\uDFAC</div>'+
+     '<div class="me-item-title">'+s0.t+'</div>'+
+     '<span class="me-chev">\u25B6</span></div>'+
+     '<div class="me-item-body">'+s0.b+'</div></div>';
   for(var i=0;i<ME_SECTIONS.length;i++){
     var s=ME_SECTIONS[i];
     h+='<div class="me-item" id="me-'+s.id+'">'+
