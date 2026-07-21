@@ -28,16 +28,43 @@
     'dossier-placement':   { title: 'Dossier Placement',       intro: 'Generez un dossier solution editable pour AV, PER, SCPI ou LMNP avec trame A4, frais et workflow.', steps: ['Choisissez le type : AV / PER / SCPI / LMNP','Renseignez le nom du client et la date','Cochez les blocs a afficher sur le dossier','Editez librement les zones de texte (accompagnement, contrat, gestion, frais)','Cochez les annexes projections disponibles'], tips: ['Chaque zone est contenteditable : cliquez pour modifier','Les projections sauvegardees dans les autres modules s\'ajoutent automatiquement'] }
   };
 
+  /* Stockage des donnees par module :
+   *  'session' = donnees client en memoire uniquement (rien de conserve, sauvegarde = JSON manuel)
+   *  'local'   = parametres memorises dans le localStorage du navigateur (cet appareil uniquement)
+   * Par defaut : 'local'. Aucun module n'envoie de donnees sur un serveur. */
+  var DATA_KIND = {
+    'etude-dossier': 'session',
+    'suivi-contrat': 'session'
+  };
+  var DATA_NOTES = {
+    'session': 'Les donn&eacute;es du client ne quittent jamais votre navigateur : rien n\'est envoy&eacute; ni stock&eacute; sur un serveur. Elles restent en m&eacute;moire le temps de la session et sont effac&eacute;es &agrave; la fermeture de l\'onglet. Seul le fichier JSON que vous t&eacute;l&eacute;chargez vous-m&ecirc;me conserve l\'&eacute;tude : archivez-le dans votre propre syst&egrave;me.',
+    'local': 'Aucune donn&eacute;e n\'est envoy&eacute;e sur un serveur : l\'outil fonctionne 100 % dans votre navigateur. Vos param&egrave;tres sont m&eacute;moris&eacute;s uniquement sur cet appareil (stockage local du navigateur) pour retrouver votre travail &agrave; la prochaine visite.'
+  };
+
   var currentPage = window.location.pathname.split('/').pop() || 'index.html';
   var moduleId = currentPage.replace('.html', '');
   var guide = GUIDES[moduleId];
+
+  function guideSeen() {
+    try { return !!localStorage.getItem('cgpskool_guide_seen_' + moduleId); } catch(e) { return true; }
+  }
+  function markGuideSeen() {
+    try { localStorage.setItem('cgpskool_guide_seen_' + moduleId, '1'); } catch(e) {}
+    var b = document.getElementById('cgp-guide-btn');
+    if (b) b.classList.remove('cgp-guide-attn');
+  }
 
   /* ── GUIDE PANEL ──────────────────────────────── */
   CGP.nav = CGP.nav || {};
   CGP.nav.toggleGuide = function() {
     var panel = document.getElementById('cgp-guide-panel');
-    if (panel) { panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; return; }
+    if (panel) {
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      if (panel.style.display === 'block') markGuideSeen();
+      return;
+    }
     if (!guide) return;
+    markGuideSeen();
     panel = document.createElement('div');
     panel.id = 'cgp-guide-panel';
     panel.className = 'cgp-guide-panel';
@@ -56,6 +83,10 @@
       guide.tips.forEach(function(t) { h += '<li>\uD83D\uDCA1 ' + t + '</li>'; });
       h += '</ul>';
     }
+    var kind = DATA_KIND[moduleId] || 'local';
+    h += '<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6B6B6B;margin:20px 0 8px">\uD83D\uDD12 Vos donn&eacute;es</div>';
+    h += '<div class="cgp-guide-privacy">' + DATA_NOTES[kind] + '</div>';
+    h += '<div class="cgp-guide-rgpd">\u2713 Conforme RGPD &mdash; aucune collecte, aucun cookie de suivi, aucune transmission &agrave; un serveur.</div>';
     h += '</div>';
     panel.innerHTML = h;
     document.body.appendChild(panel);
@@ -75,9 +106,9 @@
     // 1. Barre du haut : Accueil + Guide
     var navSlot = document.getElementById('cs-nav-actions');
     if (navSlot) {
-      var homeHref = (window.location.pathname.indexOf('/modules/') !== -1 || window.location.pathname.indexOf('/articles/') !== -1) ? '../index.html' : 'index.html';
+      var homeHref = (window.location.pathname.indexOf('/modules/') !== -1 || window.location.pathname.indexOf('/articles/') !== -1) ? '../outils.html' : 'outils.html';
       var html = '<a class="cs-nav-btn" href="' + homeHref + '">\u2190 Accueil</a>';
-      if (guide) html += '<button class="cs-nav-btn" onclick="CGP.nav.toggleGuide()">\u2753 Guide</button>';
+      if (guide) html += '<button class="cs-nav-btn' + (guideSeen() ? '' : ' cgp-guide-attn') + '" id="cgp-guide-btn" onclick="CGP.nav.toggleGuide()">\u2753 Guide</button>';
       navSlot.className = 'cs-nav-actions';
       navSlot.innerHTML = html;
     }
@@ -121,7 +152,7 @@
     if (!sidebar) return;
     var v = document.createElement('div');
     v.style.cssText = 'margin-top:auto;padding-top:12px;font-size:9px;color:rgba(0,0,0,0.2);text-align:center;font-family:var(--sans)';
-    v.textContent = 'v1.4 \u2014 9 avr. 2026';
+    v.textContent = 'v1.5 \u2014 21 juil. 2026';
     v.className = 'no-print';
     sidebar.appendChild(v);
   }
@@ -129,6 +160,11 @@
   function boot() {
     init();
     injectVersion();
+    // Onboarding : a la premiere visite d'un module, le guide s'ouvre tout seul.
+    // (sauf etude-dossier qui a son propre overlay d'onboarding plus complet)
+    if (guide && !guideSeen() && moduleId !== 'etude-dossier') {
+      setTimeout(function() { CGP.nav.toggleGuide(); }, 400);
+    }
   }
 
   if (document.readyState === 'loading') {
