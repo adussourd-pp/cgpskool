@@ -2023,12 +2023,12 @@ var ACTIFS_CONFIG = {
   'Compte courant':                     {h:'CT', immo:false},
   'Compte Epargne Logement (CEL)':      {h:'CT', immo:false},
   'CEL':                                {h:'CT', immo:false},
+  'Autre liquidite':                    {h:'CT', immo:false},
   // Moyen terme
   'Compte a terme (CAT)':               {h:'MT', immo:false},
   'CAT':                                {h:'MT', immo:false},
   "Plan d'Epargne Logement (PEL)":      {h:'MT', immo:false},
   'PEL':                                {h:'MT', immo:false},
-  'Autre liquidite':                    {h:'MT', immo:false},
   'Assurance-vie':                      {h:'MT', immo:false},
   'Assurance vie':                      {h:'MT', immo:false},
   'Contrat de capitalisation':          {h:'MT', immo:false},
@@ -2099,7 +2099,7 @@ function getActifConfig(label) {
   var low = l.toLowerCase().replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ç]/g,'c');
   // Patterns prioritaires AVANT fuzzy (évite faux positifs type 'cat' dans 'locatif')
   if (/locatif|r[eé]sidence|\bimmo\b|immobilier|\bsci\b|terrain|\blmnp\b|\blmp\b|pinel|malraux|monument hist|denormandie|duflot|robien|scellier|borloo|jeanbrun/i.test(l)) return {h:'LT', immo:true};
-  if (/\blivret\b|\blep\b|\bldds?\b|\bcel\b|compte courant|\bcc\b/i.test(l)) return {h:'CT', immo:false};
+  if (/\blivret\b|\blep\b|\bldds?\b|\bcel\b|compte courant|\bcc\b|liquidit/i.test(l)) return {h:'CT', immo:false};
   if (/assurance.?vie|capitalisation/i.test(l)) return {h:'MT', immo:false};
   if (/\bpea\b|\bcto\b|\bpee\b|compte.titre/i.test(l)) return {h:'MT', immo:false};
   if (/\bper\b|\bperp\b|\bperco\b|\bpero\b|madelin|article\s*8[23]/i.test(l)) return {h:'LT', immo:false};
@@ -3351,7 +3351,7 @@ function parseTextRI(txt){
     var secAcD = sectionLinesD(/^Actifs$/i,[/^Passifs$/i]);
     parseTableLeavesD(secAcD,function(nom,titulaire,amount){
       var nl=nom.toLowerCase(),horizon='lt';
-      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|\bcsl\b|compte sur livret/.test(nl))horizon='ct';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|\bcsl\b|compte sur livret|liquidit/.test(nl))horizon='ct';
       else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizon='ct';
       else if(/\bpel\b|\bcat\b|assurance.?vie|capitalisation|\bpea\b|\bpee\b|compte titre|\bcto\b|\bper\b|perco|madelin/.test(nl))horizon='mt';
       if(/immobilier|r[ée]sidence|\brp\b|lmnp|locatif|\bscpi\b|parking|appartement|studio|maison|\bt[1-9]\b/.test(nl))horizon='lt';
@@ -4023,7 +4023,7 @@ function parseTextRI(txt){
       else if(v1>0)tit='C1';
       else if(v2>0)tit='C2';
       var nl=nom.toLowerCase(),horizon='lt';
-      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b/.test(nl))horizon='ct';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|liquidit/.test(nl))horizon='ct';
       else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizon='ct';
       else if(/\bpel\b|\bcat\b|assurance.vie|capitalisation|\bpea\b|\bpee\b/.test(nl))horizon='mt';
       ED.actifs.push({nom:nom,horizon:horizon,titulaire:tit,montant:mont});
