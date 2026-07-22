@@ -2023,12 +2023,12 @@ var ACTIFS_CONFIG = {
   'Compte courant':                     {h:'CT', immo:false},
   'Compte Epargne Logement (CEL)':      {h:'CT', immo:false},
   'CEL':                                {h:'CT', immo:false},
+  'Autre liquidite':                    {h:'CT', immo:false},
   // Moyen terme
   'Compte a terme (CAT)':               {h:'MT', immo:false},
   'CAT':                                {h:'MT', immo:false},
   "Plan d'Epargne Logement (PEL)":      {h:'MT', immo:false},
   'PEL':                                {h:'MT', immo:false},
-  'Autre liquidite':                    {h:'MT', immo:false},
   'Assurance-vie':                      {h:'MT', immo:false},
   'Assurance vie':                      {h:'MT', immo:false},
   'Contrat de capitalisation':          {h:'MT', immo:false},
@@ -2099,7 +2099,7 @@ function getActifConfig(label) {
   var low = l.toLowerCase().replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ç]/g,'c');
   // Patterns prioritaires AVANT fuzzy (évite faux positifs type 'cat' dans 'locatif')
   if (/locatif|r[eé]sidence|\bimmo\b|immobilier|\bsci\b|terrain|\blmnp\b|\blmp\b|pinel|malraux|monument hist|denormandie|duflot|robien|scellier|borloo|jeanbrun/i.test(l)) return {h:'LT', immo:true};
-  if (/\blivret\b|\blep\b|\bldds?\b|\bcel\b|compte courant|\bcc\b/i.test(l)) return {h:'CT', immo:false};
+  if (/\blivret\b|\blep\b|\bldds?\b|\bcel\b|compte courant|\bcc\b|liquidit/i.test(l)) return {h:'CT', immo:false};
   if (/assurance.?vie|capitalisation/i.test(l)) return {h:'MT', immo:false};
   if (/\bpea\b|\bcto\b|\bpee\b|compte.titre/i.test(l)) return {h:'MT', immo:false};
   if (/\bper\b|\bperp\b|\bperco\b|\bpero\b|madelin|article\s*8[23]/i.test(l)) return {h:'LT', immo:false};
@@ -2236,6 +2236,7 @@ function getBaremeIR(sitmat, nbEnfants, caseT, caseL, caseW) {
  */
 function getRetTaux(csp, age) {
   var key = CSP_MAP[csp] || CSP_MAP[(csp||'').replace(/\u00e9/g,'e').replace(/\u00e7/g,'c')] || 'Sal. cadre';
+  if (!RET_TAUX[key]) key = CSP_MAP[key] || 'Sal. cadre'; // 'Retraite'/'Sans activite' -> cle graphe
   var arr = RET_TAUX[key] || RET_TAUX['Sal. cadre'];
   var idx = 0;
   for (var i=0; i<RET_AGES.length; i++) { if (RET_AGES[i]>=age) idx=i; }
@@ -3351,7 +3352,7 @@ function parseTextRI(txt){
     var secAcD = sectionLinesD(/^Actifs$/i,[/^Passifs$/i]);
     parseTableLeavesD(secAcD,function(nom,titulaire,amount){
       var nl=nom.toLowerCase(),horizon='lt';
-      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|\bcsl\b|compte sur livret/.test(nl))horizon='ct';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|\bcsl\b|compte sur livret|liquidit/.test(nl))horizon='ct';
       else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizon='ct';
       else if(/\bpel\b|\bcat\b|assurance.?vie|capitalisation|\bpea\b|\bpee\b|compte titre|\bcto\b|\bper\b|perco|madelin/.test(nl))horizon='mt';
       if(/immobilier|r[ée]sidence|\brp\b|lmnp|locatif|\bscpi\b|parking|appartement|studio|maison|\bt[1-9]\b/.test(nl))horizon='lt';
@@ -4023,7 +4024,7 @@ function parseTextRI(txt){
       else if(v1>0)tit='C1';
       else if(v2>0)tit='C2';
       var nl=nom.toLowerCase(),horizon='lt';
-      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b/.test(nl))horizon='ct';
+      if(/livret a\b|livret bleu|livret classique|livret jeune|compte courant|\bcc\b|\bldds?\b|\blep\b|\bcel\b|liquidit/.test(nl))horizon='ct';
       else if(/\blivret\b/.test(nl)&&!/pel/.test(nl))horizon='ct';
       else if(/\bpel\b|\bcat\b|assurance.vie|capitalisation|\bpea\b|\bpee\b/.test(nl))horizon='mt';
       ED.actifs.push({nom:nom,horizon:horizon,titulaire:tit,montant:mont});
@@ -5177,6 +5178,8 @@ function rRetraite(){
   var COLORS=['#2B5EA7','#C0392B','#5D9E4B','#7B4FA6','#1A9E8F','#E8842A'];
   var rawCSP=ED.c1.sitpro||ED.c1.profession||'';
   var cspKey=CSP_MAP[rawCSP]||'Sal. cadre';
+  // 'Retraité'/'Sans activité' mappent vers des tags hors RET_TAUX -> re-résoudre vers la clé graphe
+  if(!TAUX[cspKey])cspKey=CSP_MAP[cspKey]||'Sal. cadre';
   var age1=ageFrom(ED.c1.dob)||40;
   var ageIdx=AGES.reduce(function(bi,a,i){return a>=age1?i:bi;},0);
   var tauxClient=TAUX[cspKey][ageIdx];
@@ -5195,6 +5198,7 @@ function rRetraite(){
     age2=ageFrom(ED.c2.dob)||40;
     var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';
     cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';
+    if(!TAUX[cspKey2])cspKey2=CSP_MAP[cspKey2]||'Sal. cadre';
     ageIdx2=AGES.reduce(function(bi,a,i){return a>=age2?i:bi;},0);
     tauxC2=(TAUX[cspKey2]||TAUX['Sal. cadre'])[ageIdx2];
     var c2LineIdx=keys.indexOf(cspKey2);
@@ -5307,7 +5311,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   var foncC1=Math.round((isCouple?(foncNomC1||0):fonc)*0.70); // si seul → fonciers nominatifs
   var foncC2=Math.round((isCouple?(foncNomC2||0):0)*0.70);
   clients=[{c:ED.c1,retAge:ED.retraite.age1||64,pension:ED.retraite.pension1||2500,rev:(ED.revenus.sal1||ED.revenus.c1||0)+foncC1,csp:cspKey}];
-  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:(ED.revenus.sal2||ED.revenus.c2||0)+foncC2,csp:cspKey2});}
+  if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';if(!TAUX[cspKey2])cspKey2=CSP_MAP[cspKey2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:(ED.revenus.sal2||ED.revenus.c2||0)+foncC2,csp:cspKey2});}
   var cardsHtml='';
   var impactFoyer=0;
   clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,i){return a>=age?i:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);
