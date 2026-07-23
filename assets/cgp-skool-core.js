@@ -457,7 +457,7 @@ CGP.project._modules = {};
  * memoire de session uniquement : la seule conservation est le JSON
  * exporte manuellement. Voir CLAUDE.md (Onboarding & stockage des donnees).
  */
-CGP.project.PERSIST = ['bp-simulator', 'equipe-builder', 'productivite'];
+CGP.project.PERSIST = ['bp-simulator', 'equipe-builder', 'productivite', 'udp-prep'];
 CGP.project._canPersist = function(id) {
   return CGP.project.PERSIST.indexOf(id) !== -1;
 };
