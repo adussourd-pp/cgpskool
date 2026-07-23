@@ -330,6 +330,7 @@ var MODE_OPTS = [
 ];
 
 var NIVEAU_LABELS = ['Niveau 1 — prochain palier', 'Niveau 2 — le cap d\'après', 'Niveau 3 — la vision'];
+var NIVEAU_DEFAULTS = [{ horizon: 6, unit: 'mois' }, { horizon: 3, unit: 'années' }, { horizon: 5, unit: 'années' }];
 var HZ_UNITS = ['semaines', 'mois', 'années'];
 var TOTAL_CHECKS = FILS.reduce(function(n, f) { return n + f.items.length; }, 0);
 
@@ -619,7 +620,8 @@ function renderModeles() {
 
 function addModele() {
   if (state.modeles.length >= 3) return;
-  state.modeles.push({ nom: '', horizon: 6, unit: 'mois', pourquoi: '' });
+  var d = NIVEAU_DEFAULTS[state.modeles.length];
+  state.modeles.push({ nom: '', horizon: d.horizon, unit: d.unit, pourquoi: '' });
   save();
   renderModeles();
   renderKPIs();
