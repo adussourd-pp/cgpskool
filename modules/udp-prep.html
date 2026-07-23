@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<title>CGP Skool &mdash; Preparation UDP</title>
+<link rel="stylesheet" href="../assets/cgp-skool-theme.css">
+<link rel="stylesheet" href="../assets/cgp-skool-layout.css">
+<script src="../assets/cgp-skool-core.js"></script>
+<script src="../assets/cgp-skool-nav.js" defer></script>
+<script src="../assets/cgp-skool-feedback.js" defer></script>
+<style>
+/* ── Sidebar inputs (standard) ── */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+select.fi{cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* ── Sliders objectifs ── */
+.obj-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.obj-row label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.obj-val{font-size:12px;font-weight:700;color:var(--orange)}
+.obj-slider{width:100%;accent-color:var(--orange);height:4px;margin-bottom:2px}
+.obj-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-30);margin-bottom:12px}
+
+/* ── Countdown sidebar ── */
+.sb-count{background:#fff;border:1.5px solid var(--bord);border-radius:9px;padding:12px;text-align:center;margin-bottom:14px}
+.sb-count-j{font-size:26px;font-weight:800;color:var(--orange);line-height:1;font-family:var(--sans)}
+.sb-count-sub{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-top:4px}
+
+/* ── Page header ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--bord)}
+.ph-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.ph-title{font-size:20px;font-weight:700;color:var(--noir);font-family:var(--sans);line-height:1.2}
+.ph-date{font-size:12px;font-weight:300;color:var(--gris)}
+.ph-jour{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#fff;background:var(--orange);padding:3px 10px;border-radius:12px}
+
+/* ── KPI cards ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.kpi-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:12px 14px}
+.kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
+.kpi-val{font-size:20px;font-weight:800;color:var(--noir);line-height:1;font-family:var(--sans)}
+.kpi-val .of{font-size:11px;font-weight:600;color:var(--ink-30)}
+.kpi-val.orange{color:var(--orange)}
+.kpi-val.green{color:var(--green)}
+.kpi-bar{height:4px;background:rgba(0,0,0,0.06);border-radius:2px;margin-top:8px;overflow:hidden}
+.kpi-bar>span{display:block;height:100%;background:var(--orange);transition:width 0.4s}
+.kpi-bar>span.done{background:#10B981}
+
+/* ── Score de preparation ── */
+.ready-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:16px 18px;margin-bottom:20px}
+.ready-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.ready-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--noir)}
+.ready-pct{font-size:18px;font-weight:800;color:var(--orange);font-family:var(--sans)}
+.ready-bar{height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.ready-bar>span{display:block;height:100%;background:var(--orange);border-radius:3px;transition:width 0.4s}
+.ready-bar>span.done{background:#10B981}
+.ck-list{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
+.ck{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--gris-f)}
+.ck .dot-ck{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--bord);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;flex-shrink:0}
+.ck.done{color:var(--noir);font-weight:600}
+.ck.done .dot-ck{background:#10B981;border-color:#10B981}
+
+/* ── Methode ── */
+.method-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.method-step{background:var(--gris-l);border:1px solid var(--bord);border-radius:9px;padding:10px 12px}
+.step-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:800;margin-bottom:6px;font-family:var(--sans)}
+.step-t{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:2px}
+.step-d{font-size:10px;color:var(--gris);line-height:1.5}
+
+/* ── Fils rouges ── */
+.fils-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.fil-card{border-radius:9px;padding:10px 12px;border:1px solid var(--bord)}
+.fil-card.client{background:rgba(212,98,42,0.06);border-color:rgba(212,98,42,0.25)}
+.fil-card.reseau{background:rgba(45,122,91,0.06);border-color:rgba(45,122,91,0.25)}
+.fil-t{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:2px}
+.fil-d{font-size:10px;color:var(--gris);line-height:1.5}
+
+/* ── Section labels ── */
+.sec-lbl{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-30);margin:0 0 10px}
+.divider{height:1px;background:var(--bord);margin:22px 0}
+
+/* ── Table contacts ── */
+.ct-wrap{overflow-x:auto;margin-bottom:8px}
+.ct-table{border-collapse:collapse;width:100%;min-width:560px}
+.ct-table th{padding:6px 6px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);border-bottom:2px solid var(--bord)}
+.ct-table td{padding:4px 4px;border-bottom:1px solid var(--bord);vertical-align:middle}
+.ct-table .fi{padding:6px 8px;font-size:12px;border-width:1px}
+.ct-table select.fi{font-size:11px}
+.st-todo{color:var(--gris)}
+.st-warm{color:#B45309;font-weight:600}
+.st-win{color:var(--green);font-weight:700}
+.del-btn{width:24px;height:24px;border:none;border-radius:5px;background:rgba(0,0,0,0.04);color:var(--ink-30);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.del-btn:hover{background:rgba(239,68,68,0.12);color:#EF4444}
+.add-btn{padding:8px 14px;background:transparent;border:1.5px dashed var(--bord);color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;width:100%;transition:all 0.15s}
+.add-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── Formateurs / questions ── */
+.fm-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.fm-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fm-head .fi{flex:1}
+.fm-q-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gris);margin-bottom:4px}
+.fm-ta{width:100%;min-height:52px;border:1px dashed var(--bord);border-radius:7px;background:#FFFBF5;font-family:var(--sans);font-size:12px;color:var(--gris-f);line-height:1.6;outline:none;resize:none;padding:8px 10px;box-sizing:border-box;overflow:hidden}
+.fm-ta:focus{border-color:var(--orange)}
+.fm-ta::placeholder{color:var(--ink-30);font-style:italic}
+
+/* ── Modeles ── */
+.md-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.md-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:12px 14px;position:relative}
+.md-niv{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);background:rgba(212,98,42,0.1);padding:2px 8px;border-radius:10px;margin-bottom:8px}
+.md-hz{display:flex;align-items:center;gap:6px;margin:8px 0}
+.md-hz .pre{font-size:10px;color:var(--gris);white-space:nowrap}
+.md-hz input{width:52px;text-align:center}
+.md-del{position:absolute;top:8px;right:8px}
+@media (max-width:900px){.md-grid,.method-row{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:1fr 1fr}}
+
+/* ── Print ── */
+@media print{
+  .add-btn,.del-btn,.no-print{display:none!important}
+  .fi,.fm-ta{border-color:transparent!important;background:transparent!important;padding-left:0!important}
+  .ct-table .fi{padding:2px 0!important}
+  .ready-card,.kpi-card,.fm-card,.md-card,.method-step,.fil-card{break-inside:avoid;page-break-inside:avoid}
+  /* R23 : preserver les couleurs (selecteurs cibles, jamais *) */
+  .kpi-card,.kpi-bar,.kpi-bar>span,.ready-bar,.ready-bar>span,.ck .dot-ck,
+  .step-n,.method-step,.fil-card,.md-niv,.ph-jour,.sb-count,
+  .st-warm,.st-win,.kpi-val.orange,.kpi-val.green,.ready-pct,
+  [style*="background"]{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="../outils.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <div class="sb-count">
+      <div class="sb-count-j" id="sbCountJ">J&ndash;?</div>
+      <div class="sb-count-sub" id="sbCountSub">Renseignez la date de l'UDP</div>
+    </div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Mon UDP</div>
+    <div class="sb-body open">
+      <div class="fg"><label>&Eacute;dition</label>
+        <select class="fi" id="udpEdition" onchange="onMeta()">
+          <option value="janv">UDP D&eacute;but janvier</option>
+          <option value="avril">UDP Avril</option>
+          <option value="rentree" selected>UDP Rentr&eacute;e (septembre)</option>
+          <option value="autre">Autre &eacute;v&eacute;nement</option>
+        </select>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Date</label><input class="fi" type="date" id="udpDate" onchange="onMeta()"></div>
+        <div class="fg"><label>Lieu</label><input class="fi" type="text" id="udpLieu" placeholder="Ville..." oninput="onMeta()"></div>
+      </div>
+    </div>
+
+    <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Mes objectifs</div>
+    <div class="sb-body open">
+      <div class="obj-row"><label>R1 fix&eacute;s avant l'UDP</label><span class="obj-val" id="objR1Val">5</span></div>
+      <input type="range" class="obj-slider" id="objR1" min="0" max="20" value="5" oninput="onObj()">
+      <div class="obj-labs"><span>0</span><span>20</span></div>
+
+      <div class="obj-row"><label>Invitations DM</label><span class="obj-val" id="objDmVal">3</span></div>
+      <input type="range" class="obj-slider" id="objDm" min="0" max="20" value="3" oninput="onObj()">
+      <div class="obj-labs"><span>0</span><span>20</span></div>
+
+      <div class="obj-row"><label>Appels de mise en action</label><span class="obj-val" id="objAppelsVal">20</span></div>
+      <input type="range" class="obj-slider" id="objAppels" min="0" max="60" step="5" value="20" oninput="onObj()">
+      <div class="obj-labs"><span>0</span><span>60</span></div>
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button onclick="CGP.pdf.print()" style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer">&#11015; Exporter PDF</button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <div class="ph-tag">Pr&eacute;paration UDP</div>
+          <div class="ph-title" id="pageTitle">Universit&eacute; du Patrimoine</div>
+          <span class="ph-jour" id="phJour" style="display:none"></span>
+        </div>
+        <div style="text-align:right">
+          <div class="ph-date" id="pageDate"></div>
+          <div class="ph-date" id="pageLieu"></div>
+        </div>
+      </div>
+
+      <!-- Methode -->
+      <div class="sec-lbl">La m&eacute;thode &mdash; une UDP se pr&eacute;pare comme une campagne</div>
+      <div class="method-row">
+        <div class="method-step"><span class="step-n">1</span><div class="step-t">Fixe tes objectifs</div><div class="step-d">Nombre de R1 &agrave; fixer et d'invitations DM &agrave; obtenir avant le jour J.</div></div>
+        <div class="method-step"><span class="step-n">2</span><div class="step-t">Construis ta liste</div><div class="step-d">Une liste de noms pr&ecirc;te &mdash; clients potentiels et futurs associ&eacute;s.</div></div>
+        <div class="method-step"><span class="step-n">3</span><div class="step-t">R&eacute;chauffe-la</div><div class="step-d">Mise en action d'appels fa&ccedil;on Dev Action : chaque contact est appel&eacute; avant l'UDP.</div></div>
+        <div class="method-step"><span class="step-n">4</span><div class="step-t">Pr&eacute;pare le jour J</div><div class="step-d">Questions aux formateurs + mod&egrave;les identifi&eacute;s : tu sais qui aller voir et quoi demander.</div></div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-label">Compte &agrave; rebours</div><div class="kpi-val orange" id="kpiJour">&ndash;</div><div class="kpi-bar"><span id="kpiJourBar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#128197; R1 fix&eacute;s</div><div class="kpi-val" id="kpiR1">0<span class="of"> / 5</span></div><div class="kpi-bar"><span id="kpiR1Bar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#128226; Invitations DM</div><div class="kpi-val" id="kpiDm">0<span class="of"> / 3</span></div><div class="kpi-bar"><span id="kpiDmBar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#128293; Liste r&eacute;chauff&eacute;e</div><div class="kpi-val" id="kpiWarm">0<span class="of"> / 20</span></div><div class="kpi-bar"><span id="kpiWarmBar" style="width:0%"></span></div></div>
+      </div>
+
+      <!-- Score de preparation -->
+      <div class="ready-card">
+        <div class="ready-head"><div class="ready-title">&#127919; Suis-je pr&ecirc;t pour l'UDP ?</div><div class="ready-pct" id="readyPct">0&nbsp;%</div></div>
+        <div class="ready-bar"><span id="readyBar" style="width:0%"></span></div>
+        <div class="ck-list" id="ckList"></div>
+      </div>
+
+      <!-- Liste de mise en action -->
+      <div class="sec-lbl">Ma liste &mdash; mise en action avant l'UDP</div>
+      <div class="fils-row">
+        <div class="fil-card client"><div class="fil-t">&#127919; Conqu&ecirc;te client</div><div class="fil-d">Objectif : fixer des R1 avant et pendant l'UDP. Chaque contact r&eacute;chauff&eacute; est un rendez-vous potentiel.</div></div>
+        <div class="fil-card reseau"><div class="fil-t">&#128640; Dev Action &mdash; recrutement</div><div class="fil-d">Objectif : inviter au DM / &agrave; la Pr&eacute;sentation d'Opportunit&eacute;. Les deux fils rouges de l'UDP se travaillent ensemble.</div></div>
+      </div>
+      <div class="ct-wrap">
+        <table class="ct-table">
+          <thead><tr><th style="width:26%">Contact</th><th style="width:22%">Fil rouge</th><th style="width:22%">Statut</th><th>Note</th><th style="width:30px" class="no-print"></th></tr></thead>
+          <tbody id="ctBody"></tbody>
+        </table>
+      </div>
+      <button class="add-btn" onclick="addContact()">+ Ajouter un contact &agrave; ma liste</button>
+
+      <div class="divider"></div>
+
+      <!-- Formateurs -->
+      <div class="sec-lbl">Consultants &amp; formateurs qui m'inspirent &mdash; mes questions pour le jour J</div>
+      <div id="fmList"></div>
+      <button class="add-btn" onclick="addFormateur()">+ Ajouter un consultant / formateur</button>
+
+      <div class="divider"></div>
+
+      <!-- Modeles -->
+      <div class="sec-lbl">Mes mod&egrave;les &mdash; je veux devenir comme eux (1 &agrave; 3 niveaux)</div>
+      <div class="md-grid" id="mdGrid"></div>
+      <button class="add-btn" id="mdAddBtn" style="margin-top:10px" onclick="addModele()">+ Ajouter un mod&egrave;le</button>
+
+      <div id="conseillerFooter"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────
+var state = {
+  edition: 'rentree',
+  date: '',
+  lieu: '',
+  obj: { r1: 5, dm: 3, appels: 20 },
+  contacts: [],
+  formateurs: [],
+  modeles: []
+};
+
+var EDITION_LABELS = {
+  janv:    'Université du Patrimoine — Janvier',
+  avril:   'Université du Patrimoine — Avril',
+  rentree: 'Université du Patrimoine — Rentrée',
+  autre:   'Mon événement'
+};
+
+var FILS = [
+  { id: 'client', label: '🎯 Conquête client' },
+  { id: 'reseau', label: '🚀 Dev Action' },
+  { id: 'deux',   label: '🔀 Les deux' }
+];
+
+var STATUTS = [
+  { id: 'todo',  label: '☎ À appeler',    cls: 'st-todo' },
+  { id: 'warm',  label: '🔥 Réchauffé', cls: 'st-warm' },
+  { id: 'r1',    label: '📅 R1 fixé',  cls: 'st-win' },
+  { id: 'dm',    label: '📣 Invité DM', cls: 'st-win' },
+  { id: 'r1dm',  label: '⭐ R1 + DM',            cls: 'st-win' },
+  { id: 'later', label: '⏳ Plus tard',           cls: 'st-todo' }
+];
+
+var NIVEAU_LABELS = ['Niveau 1 — prochain palier', 'Niveau 2 — le cap d\'après', 'Niveau 3 — la vision'];
+var HZ_UNITS = ['semaines', 'mois', 'années'];
+
+function esc(s) { return CGP.esc(s || ''); }
+
+// ── PERSISTENCE (via CGP.project, module whiteliste RGPD) ────
+function getState() { return state; }
+function setState(s) {
+  if (!s) return;
+  if (s.edition) state.edition = s.edition;
+  if (s.date !== undefined) state.date = s.date;
+  if (s.lieu !== undefined) state.lieu = s.lieu;
+  if (s.obj) state.obj = { r1: s.obj.r1 || 0, dm: s.obj.dm || 0, appels: s.obj.appels || 0 };
+  if (s.contacts) state.contacts = s.contacts;
+  if (s.formateurs) state.formateurs = s.formateurs;
+  if (s.modeles) state.modeles = s.modeles.slice(0, 3);
+  syncInputs();
+  render();
+}
+function save() { CGP.project.autoSave('udp-prep'); }
+
+// ── SYNC SIDEBAR INPUTS ──────────────────────────────────────
+function syncInputs() {
+  document.getElementById('udpEdition').value = state.edition;
+  document.getElementById('udpDate').value = state.date;
+  document.getElementById('udpLieu').value = state.lieu;
+  document.getElementById('objR1').value = state.obj.r1;
+  document.getElementById('objDm').value = state.obj.dm;
+  document.getElementById('objAppels').value = state.obj.appels;
+}
+
+function onMeta() {
+  state.edition = document.getElementById('udpEdition').value;
+  state.date = document.getElementById('udpDate').value;
+  state.lieu = document.getElementById('udpLieu').value;
+  save();
+  renderHeader();
+  renderKPIs();
+}
+
+function onObj() {
+  state.obj.r1 = parseInt(document.getElementById('objR1').value) || 0;
+  state.obj.dm = parseInt(document.getElementById('objDm').value) || 0;
+  state.obj.appels = parseInt(document.getElementById('objAppels').value) || 0;
+  save();
+  renderKPIs();
+}
+
+// ── COUNTS ───────────────────────────────────────────────────
+function counts() {
+  var c = { r1: 0, dm: 0, warm: 0, total: state.contacts.length };
+  state.contacts.forEach(function(ct) {
+    if (ct.statut !== 'todo') c.warm++;
+    if (ct.statut === 'r1' || ct.statut === 'r1dm') c.r1++;
+    if (ct.statut === 'dm' || ct.statut === 'r1dm') c.dm++;
+  });
+  return c;
+}
+
+function daysToUdp() {
+  if (!state.date) return null;
+  var d = new Date(state.date + 'T00:00:00');
+  if (isNaN(d)) return null;
+  var now = new Date(); now.setHours(0, 0, 0, 0);
+  return Math.round((d - now) / 86400000);
+}
+
+// ── RENDER : HEADER ──────────────────────────────────────────
+function renderHeader() {
+  document.getElementById('pageTitle').textContent = EDITION_LABELS[state.edition] || EDITION_LABELS.rentree;
+  document.getElementById('pageDate').textContent = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  var lieuEl = document.getElementById('pageLieu');
+  var parts = [];
+  if (state.date) {
+    var d = new Date(state.date + 'T00:00:00');
+    if (!isNaN(d)) parts.push('UDP le ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }));
+  }
+  if (state.lieu) parts.push(state.lieu);
+  lieuEl.textContent = parts.join(' — ');
+
+  var j = daysToUdp();
+  var badge = document.getElementById('phJour');
+  var sbJ = document.getElementById('sbCountJ');
+  var sbSub = document.getElementById('sbCountSub');
+  if (j === null) {
+    badge.style.display = 'none';
+    sbJ.textContent = 'J–?';
+    sbSub.textContent = "Renseignez la date de l'UDP";
+  } else if (j > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = 'J–' + j;
+    sbJ.textContent = 'J–' + j;
+    sbSub.textContent = j + ' jour' + (j > 1 ? 's' : '') + ' pour se préparer';
+  } else if (j === 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = "C'est aujourd'hui !";
+    sbJ.textContent = 'Jour J';
+    sbSub.textContent = 'Bonne UDP !';
+  } else {
+    badge.style.display = 'inline-block';
+    badge.textContent = 'UDP passée';
+    sbJ.textContent = 'J+' + (-j);
+    sbSub.textContent = 'Debrief : notez vos actions de suivi';
+  }
+}
+
+// ── RENDER : KPIs + CHECKLIST ────────────────────────────────
+function setKpi(valId, barId, val, obj) {
+  var el = document.getElementById(valId);
+  el.innerHTML = val + '<span class="of"> / ' + obj + '</span>';
+  el.className = 'kpi-val' + (obj > 0 && val >= obj ? ' green' : '');
+  var pct = obj > 0 ? Math.min((val / obj) * 100, 100) : 0;
+  var bar = document.getElementById(barId);
+  bar.style.width = pct + '%';
+  bar.className = (obj > 0 && val >= obj) ? 'done' : '';
+}
+
+function renderKPIs() {
+  var c = counts();
+  var j = daysToUdp();
+  document.getElementById('kpiJour').textContent = (j === null) ? '–' : (j > 0 ? 'J–' + j : (j === 0 ? 'Jour J' : 'J+' + (-j)));
+  var jBar = document.getElementById('kpiJourBar');
+  if (j !== null && j >= 0) jBar.style.width = Math.max(0, Math.min(100, 100 - (j / 60) * 100)) + '%';
+  else jBar.style.width = (j === null ? '0' : '100') + '%';
+
+  setKpi('kpiR1', 'kpiR1Bar', c.r1, state.obj.r1);
+  setKpi('kpiDm', 'kpiDmBar', c.dm, state.obj.dm);
+  setKpi('kpiWarm', 'kpiWarmBar', c.warm, state.obj.appels);
+
+  document.getElementById('objR1Val').textContent = state.obj.r1;
+  document.getElementById('objDmVal').textContent = state.obj.dm;
+  document.getElementById('objAppelsVal').textContent = state.obj.appels;
+
+  renderChecklist(c);
+}
+
+function renderChecklist(c) {
+  var fmOk = state.formateurs.some(function(f) { return (f.nom || '').trim() && (f.questions || '').trim(); });
+  var mdOk = state.modeles.some(function(m) { return (m.nom || '').trim(); });
+  var items = [
+    { ok: !!state.date,                                        label: "Date de l'UDP renseignée" },
+    { ok: state.obj.r1 > 0 && state.obj.dm > 0,                label: 'Objectifs R1 + DM définis' },
+    { ok: c.total >= Math.max(1, state.obj.appels),            label: 'Liste construite (' + c.total + ' / ' + Math.max(1, state.obj.appels) + ' contacts)' },
+    { ok: state.obj.appels > 0 && c.warm >= state.obj.appels,  label: 'Liste réchauffée (' + c.warm + ' appelés)' },
+    { ok: state.obj.r1 > 0 && c.r1 >= state.obj.r1,            label: 'Objectif R1 atteint' },
+    { ok: state.obj.dm > 0 && c.dm >= state.obj.dm,            label: 'Objectif invitations DM atteint' },
+    { ok: fmOk,                                                label: 'Questions préparées pour un formateur' },
+    { ok: mdOk,                                                label: 'Modèle(s) identifié(s)' }
+  ];
+  var done = items.filter(function(i) { return i.ok; }).length;
+  var pct = Math.round((done / items.length) * 100);
+  document.getElementById('readyPct').innerHTML = pct + '\u00a0%';
+  var bar = document.getElementById('readyBar');
+  bar.style.width = pct + '%';
+  bar.className = pct >= 100 ? 'done' : '';
+  document.getElementById('ckList').innerHTML = items.map(function(i) {
+    return '<div class="ck' + (i.ok ? ' done' : '') + '"><span class="dot-ck">' + (i.ok ? '✓' : '') + '</span>' + i.label + '</div>';
+  }).join('');
+}
+
+// ── RENDER : CONTACTS ────────────────────────────────────────
+function renderContacts() {
+  var html = state.contacts.map(function(ct, i) {
+    var st = STATUTS.find(function(s) { return s.id === ct.statut; }) || STATUTS[0];
+    var filOpts = FILS.map(function(f) {
+      return '<option value="' + f.id + '"' + (ct.fil === f.id ? ' selected' : '') + '>' + f.label + '</option>';
+    }).join('');
+    var stOpts = STATUTS.map(function(s) {
+      return '<option value="' + s.id + '"' + (ct.statut === s.id ? ' selected' : '') + '>' + s.label + '</option>';
+    }).join('');
+    return '<tr>' +
+      '<td><input class="fi" type="text" value="' + esc(ct.nom) + '" placeholder="Prénom N." oninput="upContact(' + i + ',\'nom\',this.value)"></td>' +
+      '<td><select class="fi" onchange="upContact(' + i + ',\'fil\',this.value)">' + filOpts + '</select></td>' +
+      '<td><select class="fi ' + st.cls + '" onchange="upContact(' + i + ',\'statut\',this.value);renderContacts()">' + stOpts + '</select></td>' +
+      '<td><input class="fi" type="text" value="' + esc(ct.note) + '" placeholder="Rappel, objection, contexte..." oninput="upContact(' + i + ',\'note\',this.value)"></td>' +
+      '<td class="no-print"><button class="del-btn" title="Supprimer" onclick="delContact(' + i + ')">✕</button></td>' +
+      '</tr>';
+  }).join('');
+  if (!html) {
+    html = '<tr><td colspan="5" style="padding:14px 6px;font-size:11px;color:var(--ink-30);font-style:italic">Aucun contact pour l\'instant — commencez votre liste : anciens clients, entourage, recommandations, contacts dormants...</td></tr>';
+  }
+  document.getElementById('ctBody').innerHTML = html;
+}
+
+function addContact() {
+  state.contacts.push({ nom: '', fil: 'client', statut: 'todo', note: '' });
+  save();
+  renderContacts();
+  renderKPIs();
+  var last = document.querySelectorAll('#ctBody tr');
+  if (last.length) { var inp = last[last.length - 1].querySelector('input'); if (inp) inp.focus(); }
+}
+
+function upContact(i, key, val) {
+  if (!state.contacts[i]) return;
+  state.contacts[i][key] = val;
+  save();
+  renderKPIs();
+}
+
+function delContact(i) {
+  state.contacts.splice(i, 1);
+  save();
+  renderContacts();
+  renderKPIs();
+}
+
+// ── RENDER : FORMATEURS ──────────────────────────────────────
+function renderFormateurs() {
+  var html = state.formateurs.map(function(f, i) {
+    return '<div class="fm-card">' +
+      '<div class="fm-head">' +
+      '<input class="fi" type="text" value="' + esc(f.nom) + '" placeholder="Nom du consultant / formateur qui m\'inspire" oninput="upFormateur(' + i + ',\'nom\',this.value)">' +
+      '<button class="del-btn" title="Supprimer" onclick="delFormateur(' + i + ')">✕</button>' +
+      '</div>' +
+      '<div class="fm-q-lbl">Mes questions — « j\'aimerais savoir comment tu fais... »</div>' +
+      '<textarea class="fm-ta" placeholder="Ex : Comment structures-tu tes R1 ? Comment as-tu construit ta liste au début ? Comment gères-tu les objections sur le statut ?" oninput="upFormateur(' + i + ',\'questions\',this.value);autoGrow(this)">' + esc(f.questions) + '</textarea>' +
+      '</div>';
+  }).join('');
+  if (!html) {
+    html = '<div style="padding:10px 0 14px;font-size:11px;color:var(--ink-30);font-style:italic">Repérez 2-3 intervenants du programme et préparez des questions concrètes : on repart d\'une UDP avec des réponses quand on est venu avec des questions.</div>';
+  }
+  document.getElementById('fmList').innerHTML = html;
+  document.querySelectorAll('#fmList .fm-ta').forEach(autoGrow);
+}
+
+function addFormateur() {
+  state.formateurs.push({ nom: '', questions: '' });
+  save();
+  renderFormateurs();
+  renderKPIs();
+}
+
+function upFormateur(i, key, val) {
+  if (!state.formateurs[i]) return;
+  state.formateurs[i][key] = val;
+  save();
+  renderKPIs();
+}
+
+function delFormateur(i) {
+  state.formateurs.splice(i, 1);
+  save();
+  renderFormateurs();
+  renderKPIs();
+}
+
+function autoGrow(ta) {
+  if (!ta || !ta.style) return;
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(52, ta.scrollHeight) + 'px';
+}
+
+// ── RENDER : MODELES ─────────────────────────────────────────
+function renderModeles() {
+  var html = state.modeles.map(function(m, i) {
+    var unitOpts = HZ_UNITS.map(function(u) {
+      return '<option value="' + u + '"' + (m.unit === u ? ' selected' : '') + '>' + u + '</option>';
+    }).join('');
+    return '<div class="md-card">' +
+      '<button class="del-btn md-del no-print" title="Supprimer" onclick="delModele(' + i + ')">✕</button>' +
+      '<span class="md-niv">' + NIVEAU_LABELS[i] + '</span>' +
+      '<div class="fg" style="margin-bottom:8px"><label>Consultant qui m\'inspire</label>' +
+      '<input class="fi" type="text" value="' + esc(m.nom) + '" placeholder="Son nom" oninput="upModele(' + i + ',\'nom\',this.value)"></div>' +
+      '<div class="md-hz"><span class="pre">Je veux devenir comme lui/elle dans</span>' +
+      '<input class="fi" type="number" min="1" value="' + esc(m.horizon) + '" oninput="upModele(' + i + ',\'horizon\',this.value)">' +
+      '<select class="fi" style="width:auto" onchange="upModele(' + i + ',\'unit\',this.value)">' + unitOpts + '</select></div>' +
+      '<div class="fm-q-lbl">Ce qui m\'inspire chez lui/elle</div>' +
+      '<textarea class="fm-ta" style="min-height:44px" placeholder="Sa posture, ses résultats, son équipe, son équilibre de vie..." oninput="upModele(' + i + ',\'pourquoi\',this.value);autoGrow(this)">' + esc(m.pourquoi) + '</textarea>' +
+      '</div>';
+  }).join('');
+  if (!html) {
+    html = '<div style="grid-column:1/-1;padding:4px 0 8px;font-size:11px;color:var(--ink-30);font-style:italic">Identifiez 1 &agrave; 3 consultants plus avanc&eacute;s : un objectif proche, un cap interm&eacute;diaire, une vision long terme. L\'UDP est le moment pour aller leur parler.</div>';
+  }
+  document.getElementById('mdGrid').innerHTML = html;
+  document.getElementById('mdAddBtn').style.display = state.modeles.length >= 3 ? 'none' : '';
+  document.querySelectorAll('#mdGrid .fm-ta').forEach(autoGrow);
+}
+
+function addModele() {
+  if (state.modeles.length >= 3) return;
+  state.modeles.push({ nom: '', horizon: 6, unit: 'mois', pourquoi: '' });
+  save();
+  renderModeles();
+  renderKPIs();
+}
+
+function upModele(i, key, val) {
+  if (!state.modeles[i]) return;
+  state.modeles[i][key] = val;
+  save();
+  renderKPIs();
+}
+
+function delModele(i) {
+  state.modeles.splice(i, 1);
+  save();
+  renderModeles();
+  renderKPIs();
+}
+
+// ── FULL RENDER ──────────────────────────────────────────────
+function render() {
+  renderHeader();
+  renderContacts();
+  renderFormateurs();
+  renderModeles();
+  renderKPIs();
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+CGP.project.registerModule('udp-prep', { getState: getState, setState: setState });
+syncInputs();
+render();
+CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+
+</body>
+</html>
