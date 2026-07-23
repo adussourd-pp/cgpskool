@@ -2659,6 +2659,59 @@ function calcRente(capital) {
 }
 
 /**
+ * CRD projete d'un passif apres N annees (amortissement du credit)
+ *
+ * Formule annuites : CRD(t) = CRD0*(1+i)^t - E*((1+i)^t - 1)/i
+ * - i : taux annuel du pret si renseigne ; 0 pour un PTZ/pret taux 0
+ *   (detecte sur le nom) ; sinon hypothese prudente de 3 %
+ * - si la date de fin est connue (dateEcheance, ou dateEmprunt + duree)
+ *   et depassee a l'horizon, le credit est solde (CRD = 0)
+ * - sans echeance connue (pret in fine ou donnee absente), le CRD est
+ *   conserve tel quel (pas de desendettement suppose)
+ *
+ * @param {Object} p       passif {crd, echeance (annuelle), taux?, duree?, dateEmprunt?, dateEcheance?, nom?}
+ * @param {number} annees  horizon de projection en annees
+ * @returns {number} CRD projete, borne entre 0 et le CRD actuel
+ */
+function calcCrdProjete(p, annees) {
+  var crd = Math.max(0, (p && p.crd) || 0);
+  if (crd <= 0 || !(annees > 0)) return crd;
+  var ech = (p.echeance || 0);
+  if (ech <= 0) return crd;
+
+  function parseDateFR(s) {
+    var m = String(s || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+    if (!m) return null;
+    var y = +m[3]; if (y < 100) y += 2000;
+    return new Date(y, +m[2] - 1, +m[1]);
+  }
+  // Duree restante si connue : date de fin directe, ou date d'emprunt + duree
+  var dFin = parseDateFR(p.dateEcheance);
+  if (!dFin) {
+    var dDeb = parseDateFR(p.dateEmprunt);
+    if (dDeb && (p.duree || 0) > 0) {
+      dFin = new Date(dDeb.getTime());
+      dFin.setFullYear(dFin.getFullYear() + p.duree);
+    }
+  }
+  if (dFin) {
+    var nRest = (dFin.getTime() - Date.now()) / (365.25 * 24 * 3600 * 1000);
+    if (annees >= nRest) return 0;
+  }
+
+  var i = (p.taux || 0) / 100;
+  if (i <= 0) i = /taux\s*(0|z[eé]ro)|\bptz\b/i.test(p.nom || '') ? 0 : 0.03;
+  var crdT;
+  if (i > 0) {
+    var f = Math.pow(1 + i, annees);
+    crdT = crd * f - ech * ((f - 1) / i);
+  } else {
+    crdT = crd - ech * annees;
+  }
+  return Math.max(0, Math.min(crd, Math.round(crdT)));
+}
+
+/**
  * Economie fiscale PER (versements deductibles)
  * @param {number} versements  versements PER annuels
  * @param {number} tmi         taux marginal imposition (ex: 30)
@@ -7200,6 +7253,20 @@ function rSynthese(){
       capPlacement+=Math.round((sol.vi||0)*Math.pow(1+r3,h3)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r3,h3)-1)/r3):0));
       vpPlacement+=(sol.vp||0);
     });
+    // Désendettement : amortissement des prêts IMMOBILIERS uniquement sur
+    // l'horizon de projection — le patrimoine net augmente mécaniquement du
+    // capital rembourse, meme hors solutions (voir calcCrdProjete).
+    // Les credits conso/revolving sont exclus : leur CRD reste fige.
+    var hProj=0,desendett=0,pSumProj=pSum;
+    try{
+      hProj=sorted.reduce(function(m,sol){return Math.max(m,parseInt(sol.horizon)||10);},0);
+      if(!hProj){var ageC1p=calcAge(ED.c1.dob)||40;hProj=Math.max(0,((ED.retraite&&ED.retraite.age1)||64)-ageC1p)||10;}
+      pSumProj=ED.passifs.reduce(function(s,p){
+        var isImmo=/immo|habitat|foncier|\bptz\b|taux\s*(0|z[eé]ro)/i.test(p.nom||'');
+        return s+(isImmo?calcCrdProjete(p,hProj):(p.crd||0));
+      },0);
+      desendett=Math.max(0,pSum-pSumProj);
+    }catch(e){hProj=0;desendett=0;pSumProj=pSum;}
     aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
     aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Patrimoine \u2014 Avant</div>';
     aaH+=kpiRow('Patrimoine net',fmt(patNet)+' \u20ac',{bold:true});
@@ -7209,11 +7276,17 @@ function rSynthese(){
     aaH+=kpiRow('\u00c9pargne mensuelle',fmt(ED.epMens||0)+' \u20ac');
     aaH+='</div>';
     aaH+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Patrimoine \u2014 Apr\u00e8s</div>';
-    if(levGrps.placement.length){
-      aaH+=kpiRow('Patrimoine net projet\u00e9',fmt(patNet+capPlacement)+' \u20ac',{bold:true,color:'var(--green)'});
-      aaH+=kpiRow('Capital constitu\u00e9 (placement)','+'+fmt(capPlacement)+' \u20ac',{color:'var(--green)'});
-      aaH+=sepGreen+kpiRow('VP placement',fmt(vpPlacement)+' \u20ac/mois');
-      aaH+=kpiRow('Compl\u00e9ment revenus','~'+fmt(Math.round(capPlacement*0.04/12))+' \u20ac/mois',{color:'var(--green)'});
+    if(levGrps.placement.length||desendett>0){
+      aaH+=kpiRow('Patrimoine net projet\u00e9'+(hProj?' \u00e0 '+hProj+' ans':''),fmt(patNet+capPlacement+desendett)+' \u20ac',{bold:true,color:'var(--green)'});
+      if(capPlacement>0)aaH+=kpiRow('Capital constitu\u00e9 (placement)','+'+fmt(capPlacement)+' \u20ac',{color:'var(--green)'});
+      if(desendett>0){
+        aaH+=kpiRow('Capital emprunts immo rembours\u00e9','+'+fmt(desendett)+' \u20ac',{color:'var(--green)'});
+        aaH+=kpiRow('Passifs restants (CRD projet\u00e9)',fmt(pSumProj)+' \u20ac');
+      }
+      if(levGrps.placement.length){
+        aaH+=sepGreen+kpiRow('VP placement',fmt(vpPlacement)+' \u20ac/mois');
+        aaH+=kpiRow('Compl\u00e9ment revenus','~'+fmt(Math.round(capPlacement*0.04/12))+' \u20ac/mois',{color:'var(--green)'});
+      }
     } else {aaH+='<div style="color:var(--gris);font-size:12px;font-style:italic;padding:8px 0">Aucune solution placement</div>';}
     aaH+='</div></div>';
 
