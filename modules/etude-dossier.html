@@ -7251,14 +7251,18 @@ function rSynthese(){
       capPlacement+=Math.round((sol.vi||0)*Math.pow(1+r3,h3)+(sol.vp>0?(sol.vp||0)*12*((Math.pow(1+r3,h3)-1)/r3):0));
       vpPlacement+=(sol.vp||0);
     });
-    // Désendettement : amortissement des crédits existants sur l'horizon de
-    // projection — le patrimoine net augmente mécaniquement du capital
-    // rembourse, meme hors solutions (voir calcCrdProjete)
+    // Désendettement : amortissement des prêts IMMOBILIERS uniquement sur
+    // l'horizon de projection — le patrimoine net augmente mécaniquement du
+    // capital rembourse, meme hors solutions (voir calcCrdProjete).
+    // Les credits conso/revolving sont exclus : leur CRD reste fige.
     var hProj=0,desendett=0,pSumProj=pSum;
     try{
       hProj=sorted.reduce(function(m,sol){return Math.max(m,parseInt(sol.horizon)||10);},0);
       if(!hProj){var ageC1p=calcAge(ED.c1.dob)||40;hProj=Math.max(0,((ED.retraite&&ED.retraite.age1)||64)-ageC1p)||10;}
-      pSumProj=ED.passifs.reduce(function(s,p){return s+calcCrdProjete(p,hProj);},0);
+      pSumProj=ED.passifs.reduce(function(s,p){
+        var isImmo=/immo|habitat|foncier|\bptz\b|taux\s*(0|z[eé]ro)/i.test(p.nom||'');
+        return s+(isImmo?calcCrdProjete(p,hProj):(p.crd||0));
+      },0);
       desendett=Math.max(0,pSum-pSumProj);
     }catch(e){hProj=0;desendett=0;pSumProj=pSum;}
     aaH+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">';
@@ -7274,7 +7278,7 @@ function rSynthese(){
       aaH+=kpiRow('Patrimoine net projet\u00e9'+(hProj?' \u00e0 '+hProj+' ans':''),fmt(patNet+capPlacement+desendett)+' \u20ac',{bold:true,color:'var(--green)'});
       if(capPlacement>0)aaH+=kpiRow('Capital constitu\u00e9 (placement)','+'+fmt(capPlacement)+' \u20ac',{color:'var(--green)'});
       if(desendett>0){
-        aaH+=kpiRow('Capital emprunts rembours\u00e9','+'+fmt(desendett)+' \u20ac',{color:'var(--green)'});
+        aaH+=kpiRow('Capital emprunts immo rembours\u00e9','+'+fmt(desendett)+' \u20ac',{color:'var(--green)'});
         aaH+=kpiRow('Passifs restants (CRD projet\u00e9)',fmt(pSumProj)+' \u20ac');
       }
       if(levGrps.placement.length){
