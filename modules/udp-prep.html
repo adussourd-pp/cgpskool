@@ -49,6 +49,9 @@ select.fi{cursor:pointer}
 .kpi-bar{height:4px;background:rgba(0,0,0,0.06);border-radius:2px;margin-top:8px;overflow:hidden}
 .kpi-bar>span{display:block;height:100%;background:var(--orange);transition:width 0.4s}
 .kpi-bar>span.done{background:#10B981}
+.kpi-count{display:flex;align-items:center;gap:6px}
+.kpi-count button{width:22px;height:22px;border:none;border-radius:5px;background:rgba(0,0,0,0.05);color:var(--gris);font-size:14px;font-weight:600;cursor:pointer;line-height:1;font-family:var(--sans);flex-shrink:0}
+.kpi-count button:hover{background:var(--orange);color:#fff}
 
 /* ── Score de preparation ── */
 .ready-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:16px 18px;margin-bottom:20px}
@@ -71,28 +74,33 @@ select.fi{cursor:pointer}
 .step-t{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:2px}
 .step-d{font-size:10px;color:var(--gris);line-height:1.5}
 
-/* ── Fils rouges ── */
-.fils-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.fil-card{border-radius:9px;padding:10px 12px;border:1px solid var(--bord)}
-.fil-card.client{background:rgba(212,98,42,0.06);border-color:rgba(212,98,42,0.25)}
-.fil-card.reseau{background:rgba(45,122,91,0.06);border-color:rgba(45,122,91,0.25)}
-.fil-t{font-size:11px;font-weight:700;color:var(--noir);margin-bottom:2px}
-.fil-d{font-size:10px;color:var(--gris);line-height:1.5}
+/* ── Cards mise en action (fils rouges) ── */
+.fil-card{border-radius:10px;padding:14px 16px;border:1.5px solid var(--bord);margin-bottom:12px;background:#fff}
+.fil-card.client{border-color:rgba(212,98,42,0.35)}
+.fil-card.reseau{border-color:rgba(45,122,91,0.35)}
+.fil-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.fil-t{font-size:13px;font-weight:700;color:var(--noir)}
+.fil-prog{font-size:11px;font-weight:700;color:var(--orange);white-space:nowrap}
+.fil-prog.done{color:var(--green)}
+.fil-d{font-size:11px;color:var(--gris);line-height:1.6;margin-bottom:8px}
+.fil-mode{display:flex;align-items:center;gap:6px}
+.fil-mode span{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris)}
+.fil-mode select{padding:4px 8px;border:1px solid var(--bord);border-radius:6px;font-family:var(--sans);font-size:11px;color:var(--noir);background:#fff;cursor:pointer;outline:none}
+.fil-mode select:focus{border-color:var(--orange)}
+.ck-item{display:flex;align-items:flex-start;gap:9px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;user-select:none}
+.ck-item:last-child{border-bottom:none}
+.ck-item input{width:15px;height:15px;accent-color:var(--orange);margin-top:1px;cursor:pointer;flex-shrink:0}
+.ck-item .lb{font-size:12px;color:var(--gris-f);line-height:1.5}
+.ck-item.checked .lb{color:var(--ink-30);text-decoration:line-through}
+.fil-script{margin-top:10px;padding:8px 10px;background:var(--gris-l);border-radius:7px;font-size:10px;color:var(--gris);line-height:1.6}
+.fil-script b{color:var(--gris-f)}
 
 /* ── Section labels ── */
 .sec-lbl{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-30);margin:0 0 10px}
+.sec-note{font-size:11px;color:var(--gris);line-height:1.6;margin:-4px 0 12px}
 .divider{height:1px;background:var(--bord);margin:22px 0}
 
-/* ── Table contacts ── */
-.ct-wrap{overflow-x:auto;margin-bottom:8px}
-.ct-table{border-collapse:collapse;width:100%;min-width:560px}
-.ct-table th{padding:6px 6px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris);border-bottom:2px solid var(--bord)}
-.ct-table td{padding:4px 4px;border-bottom:1px solid var(--bord);vertical-align:middle}
-.ct-table .fi{padding:6px 8px;font-size:12px;border-width:1px}
-.ct-table select.fi{font-size:11px}
-.st-todo{color:var(--gris)}
-.st-warm{color:#B45309;font-weight:600}
-.st-win{color:var(--green);font-weight:700}
+/* ── Boutons ajout / suppression ── */
 .del-btn{width:24px;height:24px;border:none;border-radius:5px;background:rgba(0,0,0,0.04);color:var(--ink-30);font-size:12px;cursor:pointer;font-family:var(--sans)}
 .del-btn:hover{background:rgba(239,68,68,0.12);color:#EF4444}
 .add-btn{padding:8px 14px;background:transparent;border:1.5px dashed var(--bord);color:var(--gris);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;width:100%;transition:all 0.15s}
@@ -107,26 +115,28 @@ select.fi{cursor:pointer}
 .fm-ta:focus{border-color:var(--orange)}
 .fm-ta::placeholder{color:var(--ink-30);font-style:italic}
 
-/* ── Modeles ── */
-.md-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+/* ── Modeles (empiles verticalement — lisibles en print) ── */
+.md-list{display:flex;flex-direction:column;gap:10px}
 .md-card{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:12px 14px;position:relative}
 .md-niv{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);background:rgba(212,98,42,0.1);padding:2px 8px;border-radius:10px;margin-bottom:8px}
-.md-hz{display:flex;align-items:center;gap:6px;margin:8px 0}
+.md-top{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.md-top .fg{margin-bottom:0;flex:1;min-width:200px}
+.md-hz{display:flex;align-items:center;gap:6px}
 .md-hz .pre{font-size:10px;color:var(--gris);white-space:nowrap}
 .md-hz input{width:52px;text-align:center}
 .md-del{position:absolute;top:8px;right:8px}
-@media (max-width:900px){.md-grid,.method-row{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.method-row{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:1fr 1fr}}
 
 /* ── Print ── */
 @media print{
   .add-btn,.del-btn,.no-print{display:none!important}
   .fi,.fm-ta{border-color:transparent!important;background:transparent!important;padding-left:0!important}
-  .ct-table .fi{padding:2px 0!important}
   .ready-card,.kpi-card,.fm-card,.md-card,.method-step,.fil-card{break-inside:avoid;page-break-inside:avoid}
+  .kpi-count button{display:none!important}
   /* R23 : preserver les couleurs (selecteurs cibles, jamais *) */
   .kpi-card,.kpi-bar,.kpi-bar>span,.ready-bar,.ready-bar>span,.ck .dot-ck,
-  .step-n,.method-step,.fil-card,.md-niv,.ph-jour,.sb-count,
-  .st-warm,.st-win,.kpi-val.orange,.kpi-val.green,.ready-pct,
+  .step-n,.method-step,.fil-card,.fil-script,.md-niv,.ph-jour,.sb-count,
+  .kpi-val.orange,.kpi-val.green,.ready-pct,.fil-prog,
   [style*="background"]{
     -webkit-print-color-adjust:exact!important;
     print-color-adjust:exact!important;
@@ -182,10 +192,6 @@ select.fi{cursor:pointer}
       <div class="obj-row"><label>Invitations DM</label><span class="obj-val" id="objDmVal">3</span></div>
       <input type="range" class="obj-slider" id="objDm" min="0" max="20" value="3" oninput="onObj()">
       <div class="obj-labs"><span>0</span><span>20</span></div>
-
-      <div class="obj-row"><label>Appels de mise en action</label><span class="obj-val" id="objAppelsVal">20</span></div>
-      <input type="range" class="obj-slider" id="objAppels" min="0" max="60" step="5" value="20" oninput="onObj()">
-      <div class="obj-labs"><span>0</span><span>60</span></div>
     </div>
 
     <div style="flex:1"></div>
@@ -215,17 +221,21 @@ select.fi{cursor:pointer}
       <div class="sec-lbl">La m&eacute;thode &mdash; une UDP se pr&eacute;pare comme une campagne</div>
       <div class="method-row">
         <div class="method-step"><span class="step-n">1</span><div class="step-t">Fixe tes objectifs</div><div class="step-d">Nombre de R1 &agrave; fixer et d'invitations DM &agrave; obtenir avant le jour J.</div></div>
-        <div class="method-step"><span class="step-n">2</span><div class="step-t">Construis ta liste</div><div class="step-d">Une liste de noms pr&ecirc;te &mdash; clients potentiels et futurs associ&eacute;s.</div></div>
-        <div class="method-step"><span class="step-n">3</span><div class="step-t">R&eacute;chauffe-la</div><div class="step-d">Mise en action d'appels fa&ccedil;on Dev Action : chaque contact est appel&eacute; avant l'UDP.</div></div>
+        <div class="method-step"><span class="step-n">2</span><div class="step-t">Identifie tes contacts</div><div class="step-d">Primoliste c&ocirc;t&eacute; client, &eacute;quipe id&eacute;ale c&ocirc;t&eacute; dev &mdash; avec le jeu du &laquo; pourquoi je l'appelle &raquo;.</div></div>
+        <div class="method-step"><span class="step-n">3</span><div class="step-t">Passe &agrave; l'action</div><div class="step-d">Sessions d'appels communes si pr&eacute;vues, sinon en solo &mdash; toujours avec les scripts sous les yeux.</div></div>
         <div class="method-step"><span class="step-n">4</span><div class="step-t">Pr&eacute;pare le jour J</div><div class="step-d">Questions aux formateurs + mod&egrave;les identifi&eacute;s : tu sais qui aller voir et quoi demander.</div></div>
       </div>
 
       <!-- KPIs -->
       <div class="kpi-row">
         <div class="kpi-card"><div class="kpi-label">Compte &agrave; rebours</div><div class="kpi-val orange" id="kpiJour">&ndash;</div><div class="kpi-bar"><span id="kpiJourBar" style="width:0%"></span></div></div>
-        <div class="kpi-card"><div class="kpi-label">&#128197; R1 fix&eacute;s</div><div class="kpi-val" id="kpiR1">0<span class="of"> / 5</span></div><div class="kpi-bar"><span id="kpiR1Bar" style="width:0%"></span></div></div>
-        <div class="kpi-card"><div class="kpi-label">&#128226; Invitations DM</div><div class="kpi-val" id="kpiDm">0<span class="of"> / 3</span></div><div class="kpi-bar"><span id="kpiDmBar" style="width:0%"></span></div></div>
-        <div class="kpi-card"><div class="kpi-label">&#128293; Liste r&eacute;chauff&eacute;e</div><div class="kpi-val" id="kpiWarm">0<span class="of"> / 20</span></div><div class="kpi-bar"><span id="kpiWarmBar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#128197; R1 fix&eacute;s</div>
+          <div class="kpi-count"><button class="no-print" onclick="bump('r1',-1)">&#8722;</button><div class="kpi-val" id="kpiR1">0<span class="of"> / 5</span></div><button class="no-print" onclick="bump('r1',1)">+</button></div>
+          <div class="kpi-bar"><span id="kpiR1Bar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#128226; Invitations DM</div>
+          <div class="kpi-count"><button class="no-print" onclick="bump('dm',-1)">&#8722;</button><div class="kpi-val" id="kpiDm">0<span class="of"> / 3</span></div><button class="no-print" onclick="bump('dm',1)">+</button></div>
+          <div class="kpi-bar"><span id="kpiDmBar" style="width:0%"></span></div></div>
+        <div class="kpi-card"><div class="kpi-label">&#9989; Mise en action</div><div class="kpi-val" id="kpiCheck">0<span class="of"> / 11</span></div><div class="kpi-bar"><span id="kpiCheckBar" style="width:0%"></span></div></div>
       </div>
 
       <!-- Score de preparation -->
@@ -235,24 +245,15 @@ select.fi{cursor:pointer}
         <div class="ck-list" id="ckList"></div>
       </div>
 
-      <!-- Liste de mise en action -->
-      <div class="sec-lbl">Ma liste &mdash; mise en action avant l'UDP</div>
-      <div class="fils-row">
-        <div class="fil-card client"><div class="fil-t">&#127919; Conqu&ecirc;te client</div><div class="fil-d">Objectif : fixer des R1 avant et pendant l'UDP. Chaque contact r&eacute;chauff&eacute; est un rendez-vous potentiel.</div></div>
-        <div class="fil-card reseau"><div class="fil-t">&#128640; Dev Action &mdash; recrutement</div><div class="fil-d">Objectif : inviter au DM / &agrave; la Pr&eacute;sentation d'Opportunit&eacute;. Les deux fils rouges de l'UDP se travaillent ensemble.</div></div>
-      </div>
-      <div class="ct-wrap">
-        <table class="ct-table">
-          <thead><tr><th style="width:26%">Contact</th><th style="width:22%">Fil rouge</th><th style="width:22%">Statut</th><th>Note</th><th style="width:30px" class="no-print"></th></tr></thead>
-          <tbody id="ctBody"></tbody>
-        </table>
-      </div>
-      <button class="add-btn" onclick="addContact()">+ Ajouter un contact &agrave; ma liste</button>
+      <!-- Mise en action : les 2 fils rouges -->
+      <div class="sec-lbl">Mise en action avant l'UDP &mdash; mes 2 fils rouges</div>
+      <div class="sec-note">Ces actions se font lors des <b>sessions d'appels communes</b> quand elles sont pr&eacute;vues, et/ou <b>en solo</b> &mdash; dans tous les cas avec le script sous les yeux. Coche au fur et &agrave; mesure.</div>
+      <div id="filCards"></div>
 
       <div class="divider"></div>
 
-      <!-- Formateurs -->
-      <div class="sec-lbl">Consultants &amp; formateurs qui m'inspirent &mdash; mes questions pour le jour J</div>
+      <!-- Questions aux formateurs -->
+      <div class="sec-lbl">Mes questions aux consultants &amp; formateurs &mdash; pour le jour J</div>
       <div id="fmList"></div>
       <button class="add-btn" onclick="addFormateur()">+ Ajouter un consultant / formateur</button>
 
@@ -260,7 +261,7 @@ select.fi{cursor:pointer}
 
       <!-- Modeles -->
       <div class="sec-lbl">Mes mod&egrave;les &mdash; je veux devenir comme eux (1 &agrave; 3 niveaux)</div>
-      <div class="md-grid" id="mdGrid"></div>
+      <div class="md-list" id="mdList"></div>
       <button class="add-btn" id="mdAddBtn" style="margin-top:10px" onclick="addModele()">+ Ajouter un mod&egrave;le</button>
 
       <div id="conseillerFooter"></div>
@@ -274,8 +275,10 @@ var state = {
   edition: 'rentree',
   date: '',
   lieu: '',
-  obj: { r1: 5, dm: 3, appels: 20 },
-  contacts: [],
+  obj: { r1: 5, dm: 3 },
+  done: { r1: 0, dm: 0 },
+  checks: {},
+  mode: { cc: 'solo', da: 'commun' },
   formateurs: [],
   modeles: []
 };
@@ -287,23 +290,48 @@ var EDITION_LABELS = {
   autre:   'Mon événement'
 };
 
+// ── CHECK-LISTS DES 2 FILS ROUGES ────────────────────────────
 var FILS = [
-  { id: 'client', label: '🎯 Conquête client' },
-  { id: 'reseau', label: '🚀 Dev Action' },
-  { id: 'deux',   label: '🔀 Les deux' }
+  {
+    id: 'cc',
+    cls: 'client',
+    titre: '🎯 Conquête client — prise de R1',
+    desc: 'Identifier ses contacts à appeler dans la <b>primoliste</b> et jouer le jeu du « pourquoi je l\'appelle, pourquoi maintenant » avant de décrocher.',
+    script: '<b>Script Prise de R1 :</b> B1 Créer le lien &rarr; B2 Faire émerger l\'intérêt (impôts, épargne, retraite, protection) &rarr; B3 Cadre pro &amp; passage au RDV &mdash; et le réflexe mise en relation : 3 à 5 recos demandées à chaque appel.',
+    items: [
+      { id: 'cc_liste',    label: 'Contacts à appeler identifiés dans ma primoliste' },
+      { id: 'cc_pourquoi', label: 'Pour chacun, le jeu du « pourquoi je l\'appelle, pourquoi maintenant » est noté en 1 phrase' },
+      { id: 'cc_script',   label: 'Script Prise de R1 relu — je le garde sous les yeux pendant les appels' },
+      { id: 'cc_creneau',  label: 'Mon créneau d\'appels est bloqué dans l\'agenda' },
+      { id: 'cc_reco',     label: 'Réflexe mise en relation prêt : je demande 3 à 5 recos à chaque appel' }
+    ]
+  },
+  {
+    id: 'da',
+    cls: 'reseau',
+    titre: '🚀 Dev Action — invitation DM',
+    desc: 'Opération coup de poing : partir de son <b>équipe idéale</b> — pour chaque personne, ce que j\'aime chez elle, pourquoi j\'aimerais bosser avec elle, et ses insatisfactions déjà repérées avant le call.',
+    script: '<b>Script DEV :</b> B1 Connexion humaine &rarr; B2 La Page Blanche (temps, argent, reconnaissance) &rarr; B3 Proposition (4 libertés) &rarr; B4 « Si je... est-ce que tu ? » &rarr; B5 Invitation &rarr; B6 Inscription guidée sur asso-forman.fr + débrief à chaud calé.',
+    items: [
+      { id: 'da_equipe',   label: 'Exercice « Visualise ton équipe idéale » fait — 10 à 20 personnes max' },
+      { id: 'da_pourquoi', label: 'Pour chaque personne : ce que j\'aime chez elle, pourquoi j\'aimerais bosser avec elle' },
+      { id: 'da_insatisf', label: 'Ses insatisfactions déjà repérées avant le call (temps, argent, reconnaissance)' },
+      { id: 'da_sms',      label: 'J-1 : SMS envoyés — un créneau précis, un seul SMS par personne' },
+      { id: 'da_bloc',     label: 'Jour J : bloc d\'appels avec le Script DEV, 3 dates de DM + pilotes sous la main' },
+      { id: 'da_debrief',  label: 'Débrief à chaud calé pour chaque inscrit — non négociable' }
+    ]
+  }
 ];
 
-var STATUTS = [
-  { id: 'todo',  label: '☎ À appeler',    cls: 'st-todo' },
-  { id: 'warm',  label: '🔥 Réchauffé', cls: 'st-warm' },
-  { id: 'r1',    label: '📅 R1 fixé',  cls: 'st-win' },
-  { id: 'dm',    label: '📣 Invité DM', cls: 'st-win' },
-  { id: 'r1dm',  label: '⭐ R1 + DM',            cls: 'st-win' },
-  { id: 'later', label: '⏳ Plus tard',           cls: 'st-todo' }
+var MODE_OPTS = [
+  { id: 'commun', label: 'Session commune' },
+  { id: 'solo',   label: 'En solo' },
+  { id: 'deux',   label: 'Commun + solo' }
 ];
 
 var NIVEAU_LABELS = ['Niveau 1 — prochain palier', 'Niveau 2 — le cap d\'après', 'Niveau 3 — la vision'];
 var HZ_UNITS = ['semaines', 'mois', 'années'];
+var TOTAL_CHECKS = FILS.reduce(function(n, f) { return n + f.items.length; }, 0);
 
 function esc(s) { return CGP.esc(s || ''); }
 
@@ -314,10 +342,19 @@ function setState(s) {
   if (s.edition) state.edition = s.edition;
   if (s.date !== undefined) state.date = s.date;
   if (s.lieu !== undefined) state.lieu = s.lieu;
-  if (s.obj) state.obj = { r1: s.obj.r1 || 0, dm: s.obj.dm || 0, appels: s.obj.appels || 0 };
-  if (s.contacts) state.contacts = s.contacts;
+  if (s.obj) state.obj = { r1: s.obj.r1 || 0, dm: s.obj.dm || 0 };
+  if (s.done) state.done = { r1: s.done.r1 || 0, dm: s.done.dm || 0 };
+  if (s.checks) state.checks = s.checks;
+  if (s.mode) state.mode = { cc: s.mode.cc || 'solo', da: s.mode.da || 'commun' };
   if (s.formateurs) state.formateurs = s.formateurs;
   if (s.modeles) state.modeles = s.modeles.slice(0, 3);
+  // Migration ancienne version (liste de contacts) : recupere les compteurs
+  if (s.contacts && !s.done) {
+    s.contacts.forEach(function(ct) {
+      if (ct.statut === 'r1' || ct.statut === 'r1dm') state.done.r1++;
+      if (ct.statut === 'dm' || ct.statut === 'r1dm') state.done.dm++;
+    });
+  }
   syncInputs();
   render();
 }
@@ -330,7 +367,6 @@ function syncInputs() {
   document.getElementById('udpLieu').value = state.lieu;
   document.getElementById('objR1').value = state.obj.r1;
   document.getElementById('objDm').value = state.obj.dm;
-  document.getElementById('objAppels').value = state.obj.appels;
 }
 
 function onMeta() {
@@ -345,20 +381,27 @@ function onMeta() {
 function onObj() {
   state.obj.r1 = parseInt(document.getElementById('objR1').value) || 0;
   state.obj.dm = parseInt(document.getElementById('objDm').value) || 0;
-  state.obj.appels = parseInt(document.getElementById('objAppels').value) || 0;
   save();
   renderKPIs();
 }
 
-// ── COUNTS ───────────────────────────────────────────────────
-function counts() {
-  var c = { r1: 0, dm: 0, warm: 0, total: state.contacts.length };
-  state.contacts.forEach(function(ct) {
-    if (ct.statut !== 'todo') c.warm++;
-    if (ct.statut === 'r1' || ct.statut === 'r1dm') c.r1++;
-    if (ct.statut === 'dm' || ct.statut === 'r1dm') c.dm++;
-  });
-  return c;
+function bump(key, delta) {
+  state.done[key] = Math.max(0, (state.done[key] || 0) + delta);
+  save();
+  renderKPIs();
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function checkedCount(filId) {
+  var fil = FILS.find(function(f) { return f.id === filId; });
+  if (!fil) return 0;
+  return fil.items.filter(function(it) { return !!state.checks[it.id]; }).length;
+}
+
+function totalChecked() {
+  var n = 0;
+  FILS.forEach(function(f) { n += checkedCount(f.id); });
+  return n;
 }
 
 function daysToUdp() {
@@ -420,36 +463,35 @@ function setKpi(valId, barId, val, obj) {
 }
 
 function renderKPIs() {
-  var c = counts();
   var j = daysToUdp();
   document.getElementById('kpiJour').textContent = (j === null) ? '–' : (j > 0 ? 'J–' + j : (j === 0 ? 'Jour J' : 'J+' + (-j)));
   var jBar = document.getElementById('kpiJourBar');
   if (j !== null && j >= 0) jBar.style.width = Math.max(0, Math.min(100, 100 - (j / 60) * 100)) + '%';
   else jBar.style.width = (j === null ? '0' : '100') + '%';
 
-  setKpi('kpiR1', 'kpiR1Bar', c.r1, state.obj.r1);
-  setKpi('kpiDm', 'kpiDmBar', c.dm, state.obj.dm);
-  setKpi('kpiWarm', 'kpiWarmBar', c.warm, state.obj.appels);
+  setKpi('kpiR1', 'kpiR1Bar', state.done.r1, state.obj.r1);
+  setKpi('kpiDm', 'kpiDmBar', state.done.dm, state.obj.dm);
+  setKpi('kpiCheck', 'kpiCheckBar', totalChecked(), TOTAL_CHECKS);
 
   document.getElementById('objR1Val').textContent = state.obj.r1;
   document.getElementById('objDmVal').textContent = state.obj.dm;
-  document.getElementById('objAppelsVal').textContent = state.obj.appels;
 
-  renderChecklist(c);
+  renderChecklist();
 }
 
-function renderChecklist(c) {
+function renderChecklist() {
   var fmOk = state.formateurs.some(function(f) { return (f.nom || '').trim() && (f.questions || '').trim(); });
   var mdOk = state.modeles.some(function(m) { return (m.nom || '').trim(); });
+  var ccN = checkedCount('cc'), daN = checkedCount('da');
   var items = [
-    { ok: !!state.date,                                        label: "Date de l'UDP renseignée" },
-    { ok: state.obj.r1 > 0 && state.obj.dm > 0,                label: 'Objectifs R1 + DM définis' },
-    { ok: c.total >= Math.max(1, state.obj.appels),            label: 'Liste construite (' + c.total + ' / ' + Math.max(1, state.obj.appels) + ' contacts)' },
-    { ok: state.obj.appels > 0 && c.warm >= state.obj.appels,  label: 'Liste réchauffée (' + c.warm + ' appelés)' },
-    { ok: state.obj.r1 > 0 && c.r1 >= state.obj.r1,            label: 'Objectif R1 atteint' },
-    { ok: state.obj.dm > 0 && c.dm >= state.obj.dm,            label: 'Objectif invitations DM atteint' },
-    { ok: fmOk,                                                label: 'Questions préparées pour un formateur' },
-    { ok: mdOk,                                                label: 'Modèle(s) identifié(s)' }
+    { ok: !!state.date,                                label: "Date de l'UDP renseignée" },
+    { ok: state.obj.r1 > 0 && state.obj.dm > 0,        label: 'Objectifs R1 + DM définis' },
+    { ok: ccN >= FILS[0].items.length,                 label: 'Mise en action Conquête client (' + ccN + ' / ' + FILS[0].items.length + ')' },
+    { ok: daN >= FILS[1].items.length,                 label: 'Mise en action Dev Action (' + daN + ' / ' + FILS[1].items.length + ')' },
+    { ok: state.obj.r1 > 0 && state.done.r1 >= state.obj.r1, label: 'Objectif R1 atteint' },
+    { ok: state.obj.dm > 0 && state.done.dm >= state.obj.dm, label: 'Objectif invitations DM atteint' },
+    { ok: fmOk,                                        label: 'Questions préparées pour un formateur' },
+    { ok: mdOk,                                        label: 'Modèle(s) identifié(s)' }
   ];
   var done = items.filter(function(i) { return i.ok; }).length;
   var pct = Math.round((done / items.length) * 100);
@@ -462,59 +504,51 @@ function renderChecklist(c) {
   }).join('');
 }
 
-// ── RENDER : CONTACTS ────────────────────────────────────────
-function renderContacts() {
-  var html = state.contacts.map(function(ct, i) {
-    var st = STATUTS.find(function(s) { return s.id === ct.statut; }) || STATUTS[0];
-    var filOpts = FILS.map(function(f) {
-      return '<option value="' + f.id + '"' + (ct.fil === f.id ? ' selected' : '') + '>' + f.label + '</option>';
+// ── RENDER : CARDS MISE EN ACTION ────────────────────────────
+function renderFils() {
+  var html = FILS.map(function(f) {
+    var n = checkedCount(f.id), total = f.items.length;
+    var modeOpts = MODE_OPTS.map(function(m) {
+      return '<option value="' + m.id + '"' + (state.mode[f.id] === m.id ? ' selected' : '') + '>' + m.label + '</option>';
     }).join('');
-    var stOpts = STATUTS.map(function(s) {
-      return '<option value="' + s.id + '"' + (ct.statut === s.id ? ' selected' : '') + '>' + s.label + '</option>';
+    var items = f.items.map(function(it) {
+      var on = !!state.checks[it.id];
+      return '<label class="ck-item' + (on ? ' checked' : '') + '">' +
+        '<input type="checkbox"' + (on ? ' checked' : '') + ' onchange="toggleCheck(\'' + it.id + '\',this.checked)">' +
+        '<span class="lb">' + it.label + '</span></label>';
     }).join('');
-    return '<tr>' +
-      '<td><input class="fi" type="text" value="' + esc(ct.nom) + '" placeholder="Prénom N." oninput="upContact(' + i + ',\'nom\',this.value)"></td>' +
-      '<td><select class="fi" onchange="upContact(' + i + ',\'fil\',this.value)">' + filOpts + '</select></td>' +
-      '<td><select class="fi ' + st.cls + '" onchange="upContact(' + i + ',\'statut\',this.value);renderContacts()">' + stOpts + '</select></td>' +
-      '<td><input class="fi" type="text" value="' + esc(ct.note) + '" placeholder="Rappel, objection, contexte..." oninput="upContact(' + i + ',\'note\',this.value)"></td>' +
-      '<td class="no-print"><button class="del-btn" title="Supprimer" onclick="delContact(' + i + ')">✕</button></td>' +
-      '</tr>';
+    return '<div class="fil-card ' + f.cls + '">' +
+      '<div class="fil-head"><div class="fil-t">' + f.titre + '</div>' +
+      '<div style="display:flex;align-items:center;gap:12px">' +
+      '<div class="fil-mode no-print"><span>Je le fais</span><select onchange="setMode(\'' + f.id + '\',this.value)">' + modeOpts + '</select></div>' +
+      '<div class="fil-prog' + (n >= total ? ' done' : '') + '">' + n + ' / ' + total + '</div>' +
+      '</div></div>' +
+      '<div class="fil-d">' + f.desc + '</div>' +
+      items +
+      '<div class="fil-script">📄 ' + f.script + '</div>' +
+      '</div>';
   }).join('');
-  if (!html) {
-    html = '<tr><td colspan="5" style="padding:14px 6px;font-size:11px;color:var(--ink-30);font-style:italic">Aucun contact pour l\'instant — commencez votre liste : anciens clients, entourage, recommandations, contacts dormants...</td></tr>';
-  }
-  document.getElementById('ctBody').innerHTML = html;
+  document.getElementById('filCards').innerHTML = html;
 }
 
-function addContact() {
-  state.contacts.push({ nom: '', fil: 'client', statut: 'todo', note: '' });
+function toggleCheck(id, val) {
+  if (val) state.checks[id] = true; else delete state.checks[id];
   save();
-  renderContacts();
-  renderKPIs();
-  var last = document.querySelectorAll('#ctBody tr');
-  if (last.length) { var inp = last[last.length - 1].querySelector('input'); if (inp) inp.focus(); }
-}
-
-function upContact(i, key, val) {
-  if (!state.contacts[i]) return;
-  state.contacts[i][key] = val;
-  save();
+  renderFils();
   renderKPIs();
 }
 
-function delContact(i) {
-  state.contacts.splice(i, 1);
+function setMode(filId, val) {
+  state.mode[filId] = val;
   save();
-  renderContacts();
-  renderKPIs();
 }
 
-// ── RENDER : FORMATEURS ──────────────────────────────────────
+// ── RENDER : QUESTIONS AUX FORMATEURS ────────────────────────
 function renderFormateurs() {
   var html = state.formateurs.map(function(f, i) {
     return '<div class="fm-card">' +
       '<div class="fm-head">' +
-      '<input class="fi" type="text" value="' + esc(f.nom) + '" placeholder="Nom du consultant / formateur qui m\'inspire" oninput="upFormateur(' + i + ',\'nom\',this.value)">' +
+      '<input class="fi" type="text" value="' + esc(f.nom) + '" placeholder="Nom du consultant / formateur" oninput="upFormateur(' + i + ',\'nom\',this.value)">' +
       '<button class="del-btn" title="Supprimer" onclick="delFormateur(' + i + ')">✕</button>' +
       '</div>' +
       '<div class="fm-q-lbl">Mes questions — « j\'aimerais savoir comment tu fais... »</div>' +
@@ -564,21 +598,23 @@ function renderModeles() {
     return '<div class="md-card">' +
       '<button class="del-btn md-del no-print" title="Supprimer" onclick="delModele(' + i + ')">✕</button>' +
       '<span class="md-niv">' + NIVEAU_LABELS[i] + '</span>' +
-      '<div class="fg" style="margin-bottom:8px"><label>Consultant qui m\'inspire</label>' +
+      '<div class="md-top">' +
+      '<div class="fg"><label>Consultant</label>' +
       '<input class="fi" type="text" value="' + esc(m.nom) + '" placeholder="Son nom" oninput="upModele(' + i + ',\'nom\',this.value)"></div>' +
       '<div class="md-hz"><span class="pre">Je veux devenir comme lui/elle dans</span>' +
       '<input class="fi" type="number" min="1" value="' + esc(m.horizon) + '" oninput="upModele(' + i + ',\'horizon\',this.value)">' +
       '<select class="fi" style="width:auto" onchange="upModele(' + i + ',\'unit\',this.value)">' + unitOpts + '</select></div>' +
+      '</div>' +
       '<div class="fm-q-lbl">Ce qui m\'inspire chez lui/elle</div>' +
       '<textarea class="fm-ta" style="min-height:44px" placeholder="Sa posture, ses résultats, son équipe, son équilibre de vie..." oninput="upModele(' + i + ',\'pourquoi\',this.value);autoGrow(this)">' + esc(m.pourquoi) + '</textarea>' +
       '</div>';
   }).join('');
   if (!html) {
-    html = '<div style="grid-column:1/-1;padding:4px 0 8px;font-size:11px;color:var(--ink-30);font-style:italic">Identifiez 1 &agrave; 3 consultants plus avanc&eacute;s : un objectif proche, un cap interm&eacute;diaire, une vision long terme. L\'UDP est le moment pour aller leur parler.</div>';
+    html = '<div style="padding:4px 0 8px;font-size:11px;color:var(--ink-30);font-style:italic">Identifiez 1 &agrave; 3 consultants plus avanc&eacute;s : un objectif proche, un cap interm&eacute;diaire, une vision long terme. L\'UDP est le moment pour aller leur parler.</div>';
   }
-  document.getElementById('mdGrid').innerHTML = html;
+  document.getElementById('mdList').innerHTML = html;
   document.getElementById('mdAddBtn').style.display = state.modeles.length >= 3 ? 'none' : '';
-  document.querySelectorAll('#mdGrid .fm-ta').forEach(autoGrow);
+  document.querySelectorAll('#mdList .fm-ta').forEach(autoGrow);
 }
 
 function addModele() {
@@ -606,7 +642,7 @@ function delModele(i) {
 // ── FULL RENDER ──────────────────────────────────────────────
 function render() {
   renderHeader();
-  renderContacts();
+  renderFils();
   renderFormateurs();
   renderModeles();
   renderKPIs();
