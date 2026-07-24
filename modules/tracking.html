@@ -1593,14 +1593,21 @@ function orgWriteToEquipe() {
   try { localStorage.setItem('cgpskool_equipe_v2', JSON.stringify(raw)); } catch(e) {}
   return n;
 }
-// bouton : pousse les infos (avec confirmation)
+// bouton : pousse les infos (avec confirmation + feedback clair)
 function orgPushToEquipe() {
-  if (!orgEquipeTree()) { alert('Aucune equipe trouvee dans "Construire son equipe" sur cet appareil.'); return; }
+  var raw = orgEquipeTree();
+  if (!raw) { alert('Aucune equipe trouvee dans "Construire son equipe" sur cet appareil. Cree ton equipe la-bas d\'abord.'); return; }
+  var map = orgEquipeNodeMap(raw), matched = 0, missing = [];
+  orgPeople().forEach(function(p){ if (!(p.nom || '').trim()) return; if (map[orgNorm(p.nom)]) matched++; else missing.push(p.nom); });
+  if (!matched) {
+    alert('Aucun filleul du mail ne correspond (par nom) a une personne de Construire son equipe.\n\nDeux options : soit tu crees ces personnes dans Construire son equipe, soit tu utilises le bouton "Reprendre du Mail Manager" la-bas (il les cree automatiquement).');
+    return;
+  }
   var div = orgDivergences();
-  if (!div.length) { alert('Tout est deja synchronise avec Construire son equipe.'); return; }
-  if (!confirm(div.length + ' filleul(s) vont etre mis a jour dans Construire son equipe avec les infos du mail (VA, habilitations, qualification, Forman, evenements). Continuer ?')) return;
+  var info = matched + ' correspondance(s)' + (missing.length ? ' — ' + missing.length + ' non trouve(s) dans l\'equipe : ' + missing.slice(0,3).join(', ') + (missing.length > 3 ? '...' : '') : '');
+  if (!confirm('Mettre a jour Construire son equipe avec les infos du mail ?\n' + info + '\n\nContinuer ?')) return;
   orgWriteToEquipe(); renderOrg();
-  alert('✓ Construire son equipe mis a jour avec les infos du mail.');
+  alert('✓ Construire son equipe mis a jour (' + matched + ' personne(s)).' + (missing.length ? '\n' + missing.length + ' non trouve(s) — a creer dans l\'equipe, ou via "Reprendre du Mail Manager".' : ''));
 }
 // rappel automatique une fois par ouverture si divergence
 var orgSyncNudged = false;

@@ -137,6 +137,7 @@
     <div class="cs-sidebar-section">
       <button onclick="if(tree){openAdd([])}" class="cs-sidebar-btn" style="justify-content:center;color:var(--orange);border-color:rgba(212,98,42,0.2)">+ Ajouter</button>
       <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" class="cs-sidebar-btn" id="sidebarEffacer" style="justify-content:center;color:#dc2626;border-color:rgba(220,38,38,0.2)">Effacer</button>
+      <button onclick="ebPullFromMail()" class="cs-sidebar-btn" style="justify-content:center" title="Reprendre les chiffres et habilitations saisis dans le Mail Manager (VA, habilitations, Forman, événements)">&#8635; Reprendre du Mail Manager</button>
     </div>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     <div style="height:1px;background:var(--bord);margin:10px 0"></div>
@@ -386,6 +387,45 @@ function loadTree(){
 
 function saveTree(){
   try{if(tree)localStorage.setItem(STORAGE_KEY,JSON.stringify(tree));else localStorage.removeItem(STORAGE_KEY);}catch(e){}
+}
+
+// ── Reprendre la version la plus recente du Mail Manager ──────
+function ebNorm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');}
+function ebPullFromMail(){
+  if(!tree){alert('Cree d\'abord ton arbre (ta racine) avant de reprendre du Mail Manager.');return;}
+  var mail;try{mail=JSON.parse(localStorage.getItem('cgpskool_tracking_v1'));}catch(e){}
+  var org=mail&&mail.org&&mail.org.people;
+  if(!org||!org.length){alert('Aucun filleul trouve dans le Mail Manager sur cet appareil.');return;}
+  if(!confirm('Reprendre la version la plus recente du Mail Manager ?\nLes VA, habilitations, Forman et evenements des personnes correspondantes seront mis a jour (correspondance par nom). Les personnes absentes seront ajoutees.'))return;
+  // index des noeuds equipe existants par nom normalise
+  var byName={};(function walk(n){(n.children||[]).forEach(function(ch){byName[ebNorm(ch.prenom+' '+ch.nom)]=ch;walk(ch);});})(tree);
+  var mailById={};org.forEach(function(p){mailById[p.id]=p;});
+  function splitName(full){var parts=String(full||'').trim().split(/\s+/);return{prenom:parts.shift()||'',nom:parts.join(' ')};}
+  function applyFields(node,p){
+    if(p.vaVc!==undefined)node.vaVc=p.vaVc; if(p.vaEc!==undefined)node.vaEc=p.vaEc; if(p.vaClos!==undefined)node.vaClos=p.vaClos;
+    var habs={miobsp:!!p.miobsp,mia:!!p.mia,alpsi:!!p.alpsi,cif:!!p.cif};
+    node.habs=(habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
+    if(p.forman)node.forman=p.forman; if(p.qualif&&p.qualif!=='(auto)')node.trackQualif=p.qualif; if(p.inscription)node.inscription=p.inscription;
+    var ev={},any=false;EB_EVENTS.forEach(function(k){if(p[k]){ev[k]=true;any=true;}});node.events=any?ev:undefined;
+  }
+  // ordre parents avant enfants (BFS depuis les directs)
+  var order=[],seen={};
+  function pushChain(p){if(!p||seen[p.id])return;if(p.parentId&&mailById[p.parentId])pushChain(mailById[p.parentId]);seen[p.id]=1;order.push(p);}
+  org.forEach(pushChain);
+  var created=0,updated=0,rootChildren=(tree.children=tree.children||[]);
+  order.forEach(function(p){
+    var key=ebNorm(p.nom),node=byName[key];
+    if(node){applyFields(node,p);updated++;}
+    else{
+      var nm=splitName(p.nom),nn={prenom:nm.prenom,nom:nm.nom,children:[]};
+      applyFields(nn,p);
+      var parent=(p.parentId&&mailById[p.parentId])?byName[ebNorm(mailById[p.parentId].nom)]:null;
+      (parent?(parent.children=parent.children||[]):rootChildren).push(nn);
+      byName[key]=nn;created++;
+    }
+  });
+  saveTree();render();
+  alert('Mail Manager repris : '+updated+' mis a jour, '+created+' ajoute(s).');
 }
 
 function createRoot(){
