@@ -134,14 +134,15 @@
 <div class="cs-app">
   <div class="cs-sidebar">
     <div class="cs-sidebar-lbl">Construire son equipe</div>
+    <div class="me-pill-wrap"><button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button></div>
     <div class="cs-sidebar-section">
-      <button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button>
       <button onclick="if(tree){openAdd([])}" class="sb-btn sb-btn-copy">&#10133; Ajouter un membre</button>
       <button onclick="ebPullFromMail()" class="sb-btn sb-btn-sync" title="Reprendre les chiffres et habilitations saisis dans le Mail Manager (VA, habilitations, Forman, événements)">&#8635; Reprendre du Mail Manager</button>
     </div>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    <div style="height:1px;background:var(--rule-l);margin:10px 0"></div>
-    <button class="sb-btn sb-btn-ghost" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--rule-l);margin:12px 0"></div>
+    <button class="sb-btn sb-btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
     <button class="sb-btn sb-btn-ghost" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
     <label class="sb-btn sb-btn-ghost" style="cursor:pointer">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
     <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" class="sb-btn sb-btn-danger" id="sidebarEffacer">&#9100; Tout effacer</button>
@@ -905,12 +906,15 @@ CGP.project.registerModule('equipe-builder', {
 .sb-btn-copy:hover{opacity:0.9}
 .sb-btn-sync{background:#2D7A5B;color:#fff}
 .sb-btn-sync:hover{opacity:0.88}
+.sb-btn-pdf{background:#2D7A5B;color:#fff}
+.sb-btn-pdf:hover{opacity:0.88}
 .sb-btn-ghost{background:transparent;border:1.5px solid var(--rule-l);color:var(--ink-60);font-size:12px;padding:9px;border-radius:7px;display:block;text-align:center}
 .sb-btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
 .sb-btn-danger{background:transparent;border:1px solid rgba(220,38,38,0.3);color:#dc2626;font-size:11px;padding:9px;border-radius:7px}
 /* volet mode d'emploi */
-.me-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--orange);border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;margin-bottom:8px}
-.me-pill:hover{opacity:0.9}
+.me-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;background:#fff;border:1.5px solid var(--rule-l);border-radius:999px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink-60);cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,0.06);transition:all 0.15s}
+.me-pill:hover{border-color:var(--orange);color:var(--orange)}
+.me-pill-wrap{text-align:center;margin-bottom:12px}
 .me-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9997}
 .me-backdrop.open{display:block}
 .me-panel{position:fixed;top:0;left:-500px;width:480px;max-width:92vw;height:100vh;background:#fff;z-index:9998;box-shadow:4px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:left 0.25s ease}

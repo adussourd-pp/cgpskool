@@ -24,7 +24,10 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
 /* ── Week nav (sidebar) ── */
-.week-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.week-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.week-sent{text-align:center;font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:20px;margin-bottom:14px}
+.week-sent.ok{background:rgba(45,122,91,0.12);color:#2D7A5B}
+.week-sent.no{background:rgba(0,0,0,0.04);color:var(--gris)}
 .week-nav button{background:#fff;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:16px;width:32px;height:32px;border-radius:7px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .week-nav button:hover{border-color:var(--orange);color:var(--orange)}
 .week-label{font-size:11px;font-weight:700;color:var(--noir);text-align:center;flex:1;line-height:1.3}
@@ -237,22 +240,21 @@ details.card>summary .memo+.arr{margin-left:8px}
       <div class="week-label" id="weekLabel">Chargement...</div>
       <button onclick="changeWeek(1)" title="Semaine suivante">&#8250;</button>
     </div>
+    <div class="week-sent" id="weekSent"></div>
 
     <div class="sb-hint" id="modeHint"></div>
 
     <!-- Productivite de la semaine (lien avec la semaine du mail) -->
     <div class="sb-prod" id="sbProd"></div>
 
-    <button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button>
+    <div class="me-pill-wrap"><button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button></div>
     <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn">&#128203; Copier l'email</button>
-    <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter en PDF</button>
 
-    <div style="height:1px;background:var(--bord);margin:6px 0 12px"></div>
+    <div style="flex:1;min-height:16px"></div>
+    <div style="height:1px;background:var(--bord);margin:12px 0"></div>
 
-    <button class="sb-btn sb-btn-ghost" onclick="reportPrev()" title="Recopier l'activite 'Cette semaine' de la semaine precedente dans 'Semaine passee'">&#8635; Reporter la semaine pr&eacute;c&eacute;dente</button>
-    <button class="sb-btn sb-btn-ghost" onclick="exportJSON()" title="T&eacute;l&eacute;charger toutes tes donn&eacute;es en JSON (sauvegarde)">&#128190; Exporter en JSON</button>
-    <label class="sb-btn sb-btn-ghost" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px" title="Restaurer depuis un fichier JSON">&#128194; Importer un JSON
-      <input type="file" accept="application/json,.json" onchange="importJSON(this)" style="position:absolute;width:0;height:0;opacity:0"></label>
+    <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter PDF</button>
+    <button class="sb-btn sb-btn-ghost" onclick="exportJSON()" title="Sauvegarder toutes tes semaines en JSON">&#128220; Exporter toutes les semaines</button>
     <button class="sb-btn sb-btn-danger" onclick="resetWeek()" title="Effacer l'activite hebdo de cette semaine (les objectifs memorises sont conserves)">&#9100; Effacer cette semaine</button>
 
   </div>
@@ -1193,6 +1195,7 @@ function markMailSent() {
     d[weekKey(getMonday(new Date()))] = 1;
     localStorage.setItem('cgpskool_tracking_sent', JSON.stringify(d));
   } catch(e) {}
+  updateWeekSent();
 }
 function copyEmail() {
   markMailSent();   // memorise que le mail de la semaine a ete copie/envoye
@@ -1247,6 +1250,15 @@ function renderHeader() {
   document.getElementById('weekLabel').textContent = 'Sem. ' + n + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
   document.getElementById('pageTitle').textContent = 'Semaine ' + n + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
   document.getElementById('pageDate').textContent = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+  updateWeekSent();
+}
+// badge "mail envoye" pour la semaine affichee
+function updateWeekSent() {
+  var el = document.getElementById('weekSent'); if (!el) return;
+  var sent = {}; try { sent = JSON.parse(localStorage.getItem('cgpskool_tracking_sent')) || {}; } catch(e) {}
+  var ok = !!sent[weekKey(getCurrentMonday())];
+  el.className = 'week-sent ' + (ok ? 'ok' : 'no');
+  el.innerHTML = ok ? '&#10003; Mail envoy&eacute; cette semaine' : '&#9711; Mail pas encore envoy&eacute;';
 }
 function render() {
   renderHeader();
@@ -1735,8 +1747,9 @@ CGP.footer.render(document.getElementById('conseillerFooter'));
 
 <!-- ═══════════ MODE D'EMPLOI (volet detaille) ═══════════ -->
 <style>
-.me-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--orange);border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;margin-bottom:8px}
-.me-pill:hover{opacity:0.9}
+.me-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;background:#fff;border:1.5px solid var(--bord);border-radius:999px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gris);cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,0.06);transition:all 0.15s}
+.me-pill:hover{border-color:var(--orange);color:var(--orange)}
+.me-pill-wrap{text-align:center;margin-bottom:12px}
 .me-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9997}
 .me-backdrop.open{display:block}
 .me-panel{position:fixed;top:0;left:-500px;width:480px;max-width:92vw;height:100vh;background:#fff;z-index:9998;box-shadow:4px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:left 0.25s ease}
