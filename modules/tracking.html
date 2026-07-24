@@ -34,6 +34,20 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .sb-hint{font-size:10px;color:var(--gris);line-height:1.55;background:#FFFBF5;border:1px dashed #E6CFA8;border-radius:8px;padding:9px 11px;margin-bottom:14px}
 .sb-hint b{color:var(--gris-f)}
 
+/* ── Productivite (widget sidebar) ── */
+.sb-prod{background:var(--gris-l);border:1px solid var(--bord);border-radius:9px;padding:11px 12px;margin-bottom:14px}
+.sb-prod-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:8px}
+.sb-prod-t{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gris)}
+.sb-prod-score{font-size:13px;font-weight:800;color:var(--noir);white-space:nowrap}
+.sb-prod-score b{color:var(--orange)}
+.sb-prod-bar{height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;margin-bottom:7px}
+.sb-prod-bar>span{display:block;height:100%;background:var(--orange)}
+.sb-prod-foot{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.sb-prod-foot span{font-size:10px;color:var(--gris)}
+.sb-prod a{font-size:10px;color:var(--orange);text-decoration:none;font-weight:600;white-space:nowrap}
+.sb-prod a:hover{text-decoration:underline}
+.sb-prod-empty{font-size:10px;color:var(--gris);line-height:1.5}
+
 .sb-btn{width:100%;padding:11px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border-radius:0;margin-bottom:8px}
 .sb-btn-copy{background:var(--orange);color:#fff}
 .sb-btn-copy:hover{background:var(--orange-hover)}
@@ -89,7 +103,8 @@ details.card>summary .memo+.arr{margin-left:8px}
 .preview-copy{background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:700;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.15s}
 .preview-copy:hover{background:var(--orange-hover)}
 .preview-copy.ok{background:var(--green)}
-.preview-body{margin:0;padding:18px 20px;font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--noir);background:#fff;white-space:pre-wrap;word-wrap:break-word;max-height:640px;overflow:auto}
+.preview-body{margin:0;padding:18px 20px;font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--noir);background:#fff;white-space:pre-wrap;word-wrap:break-word;min-height:200px;max-height:640px;overflow:auto}
+.preview-body:focus{outline:none;box-shadow:inset 0 0 0 2px rgba(212,98,42,0.25)}
 
 /* ── Print ── */
 @media print{
@@ -136,12 +151,18 @@ details.card>summary .memo+.arr{margin-left:8px}
 
     <div class="sb-hint" id="modeHint"></div>
 
+    <!-- Productivite de la semaine (lien avec la semaine du mail) -->
+    <div class="sb-prod" id="sbProd"></div>
+
     <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn">&#128203; Copier l'email</button>
     <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter en PDF</button>
 
     <div style="height:1px;background:var(--bord);margin:6px 0 12px"></div>
 
     <button class="sb-btn sb-btn-ghost" onclick="reportPrev()" title="Recopier l'activite 'Cette semaine' de la semaine precedente dans 'Semaine passee'">&#8635; Reporter la semaine pr&eacute;c&eacute;dente</button>
+    <button class="sb-btn sb-btn-ghost" onclick="exportJSON()" title="T&eacute;l&eacute;charger toutes tes donn&eacute;es en JSON (sauvegarde)">&#128190; Exporter en JSON</button>
+    <label class="sb-btn sb-btn-ghost" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px" title="Restaurer depuis un fichier JSON">&#128194; Importer un JSON
+      <input type="file" accept="application/json,.json" onchange="importJSON(this)" style="position:absolute;width:0;height:0;opacity:0"></label>
     <button class="sb-btn sb-btn-danger" onclick="resetWeek()" title="Effacer l'activite hebdo de cette semaine (les objectifs memorises sont conserves)">&#9100; Effacer cette semaine</button>
 
   </div>
@@ -161,236 +182,208 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </div>
 
-      <!-- ══ ACTIVITE DE LA SEMAINE (hebdo) ══ -->
+      <!-- ══ 1. IDENTITE (en haut, ordre du mail) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="card-sub">Galaxie = manager de galaxie (haut de lign&eacute;e). Parrain/Marraine = ton manager direct. Pour tes filleuls : Galaxie = ta marraine, Parrain/Marraine = toi.</div>
+        <div class="grid2">
+          <div class="fg"><label>Manager Galaxie &amp; marraine</label>
+            <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
+          <div class="fg"><label>Parrain / Marraine (manager direct)</label>
+            <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Entr&eacute;e dans le r&eacute;seau</label>
+            <input class="fi" type="text" data-fld="entree" data-store="profil" placeholder="Janvier 2025"></div>
+          <div class="fg"><label>Signature (pr&eacute;nom)</label>
+            <input class="fi" type="text" data-fld="signature" data-store="profil" placeholder="Alexandre"></div>
+        </div>
+        <div class="fg"><label>Contexte / statut (optionnel)</label>
+          <input class="fi" type="text" data-fld="contexte" data-store="profil" placeholder="En double activit&eacute; depuis d&eacute;cembre 2025"></div>
+      </div>
+
+      <!-- ══ 2. ACTIVITE (hebdo) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Activit&eacute; de la semaine<span class="wk">Hebdo</span></div>
-        <div class="card-sub">Une ligne par action. Le <b>Cette semaine</b> se reporte automatiquement dans le <b>Semaine pass&eacute;e</b> de la semaine suivante (&eacute;ditable).</div>
+        <div class="card-sub">Une ligne par action. Le <b>Cette semaine</b> se reporte automatiquement dans le <b>Semaine pass&eacute;e</b> de la semaine suivante.</div>
         <div class="grid2">
-          <div class="fg">
-            <label>&#128197; Semaine pass&eacute;e</label>
-            <textarea class="fi" style="min-height:170px" data-fld="passee" data-store="week" placeholder="ED filleul x3&#10;R1 x2&#10;RX =&gt; VC 25k&euro; AV&#10;RX =&gt; VC 2x12,5k&euro; AV"></textarea>
-          </div>
-          <div class="fg">
-            <label>&#128197; Cette semaine / prochaine</label>
-            <textarea class="fi" style="min-height:170px" data-fld="cette" data-store="week" placeholder="ED filleul x2&#10;Booster filleuls&#10;RX x3&#10;R2&#10;R1"></textarea>
-          </div>
+          <div class="fg"><label>&#128197; Semaine pass&eacute;e</label>
+            <textarea class="fi" style="min-height:170px" data-fld="passee" data-store="week" placeholder="R1bis - Nathalie&#10;ED filleul x3"></textarea></div>
+          <div class="fg"><label>&#128197; Cette semaine / prochaine</label>
+            <textarea class="fi" style="min-height:170px" data-fld="cette" data-store="week" placeholder="ED filleul x2&#10;R2 - Gael => OK SCPI"></textarea></div>
         </div>
       </div>
 
-      <!-- ══ RDV D'AVANCE + CHIFFRES (hebdo) ══ -->
+      <!-- ══ 3. RDV D'AVANCE + CLIENTS (hebdo) ══ -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span>RDV d'avance &amp; chiffres<span class="wk">Hebdo</span></div>
+        <div class="card-title"><span class="dot"></span>Nbr de RDV d'avance<span class="wk">Hebdo</span></div>
         <div class="rdv-grid" id="rdvGrid"></div>
         <div class="rdv-total">Total RDV d'avance&nbsp;: <b id="rdvTotal">0</b></div>
-
         <div style="height:1px;background:var(--bord);margin:16px 0"></div>
-
-        <div class="card-sub" style="margin:0 0 10px"><b>Objectif VA Perso</b></div>
         <div class="grid2">
-          <div class="fg"><label>&#128176; VP annualis&eacute;s &mdash; actuel</label>
-            <input class="fi" type="text" data-fld="vpActuel" data-store="week" placeholder="221k&euro;"></div>
-          <div class="fg" data-mode="manager"><label>&#128176; Pipe (ann&eacute;e N+1)</label>
-            <input class="fi" type="text" data-fld="pipe" data-store="week" placeholder="2,4 m&euro;"></div>
+          <div class="fg"><label>Objectif Nbr de clients</label>
+            <input class="fi" type="text" data-fld="objClients" data-store="profil" placeholder="10"></div>
+          <div class="fg"><label>Nbr de clients (actuel)</label>
+            <input class="fi" type="text" data-fld="nbClients" data-store="profil" placeholder="2"></div>
+        </div>
+      </div>
+
+      <!-- ══ 4. OBJECTIF DEVELOPPEMENT (pipeline empile, ordre du mail) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Objectif D&eacute;veloppement<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="grid2">
+          <div class="fg"><label>Objectif nb conseillers</label>
+            <input class="fi" type="text" data-fld="objDevNb" data-store="profil" placeholder="16"></div>
+          <div class="fg"><label>&hellip; &agrave; la date du</label>
+            <input class="fi" type="text" data-fld="objDevDate" data-store="profil" placeholder="31/12/2026"></div>
+        </div>
+        <div class="fg"><label>&Agrave; date : &eacute;quipe de</label>
+          <input class="fi" type="text" data-fld="equipeActuelle" data-store="profil" placeholder="6 conseillers"></div>
+        <div class="card-sub" style="margin:12px 0 8px"><b>Compteurs pipeline</b> &mdash; un par ligne, dans l'ordre du mail</div>
+        <div class="fg"><label>Qualification Manager</label>
+          <input class="fi" type="text" data-fld="devQualif" data-store="profil" placeholder="&hellip;"></div>
+        <div class="fg"><label>Actif</label>
+          <input class="fi" type="text" data-fld="devActif" data-store="profil" placeholder="Arnaud / Louis-Victor"></div>
+        <div class="fg"><label>Inscription Prod&eacute;mial</label>
+          <input class="fi" type="text" data-fld="devProdemial" data-store="profil" placeholder="Simon / Pierre / Maell"></div>
+        <div class="fg"><label>Inscription 3J</label>
+          <input class="fi" type="text" data-fld="devJ3" data-store="profil" placeholder="&hellip;"></div>
+        <div class="fg"><label>Inscription AD</label>
+          <input class="fi" type="text" data-fld="devAd" data-store="profil" placeholder="&hellip;"></div>
+        <div class="fg"><label>Inscription DM</label>
+          <input class="fi" type="text" data-fld="devDm" data-store="profil" placeholder="Julie.M / Elodie"></div>
+        <div class="fg"><label>Inscription PO</label>
+          <input class="fi" type="text" data-fld="devPo" data-store="profil" placeholder="&hellip;"></div>
+        <div class="fg"><label>&Agrave; inviter</label>
+          <input class="fi" type="text" data-fld="devInviter" data-store="profil" placeholder="Mathieu.T / Marine"></div>
+        <div class="fg"><label>SBY</label>
+          <input class="fi" type="text" data-fld="devSby" data-store="profil" placeholder="Davy.T (3J) / Ilia.M (AD)"></div>
+        <div class="grid2" data-mode="expert">
+          <div class="fg"><label>Branche Manager act&eacute;e</label>
+            <input class="fi" type="text" data-fld="brancheActe" data-store="profil" placeholder="5"></div>
+          <div class="fg"><label>Branche Manager en cours</label>
+            <input class="fi" type="text" data-fld="brancheEnCours" data-store="profil" placeholder="1"></div>
+        </div>
+      </div>
+
+      <!-- ══ 5. OBJECTIF VA PERSO (obj memorises + montants hebdo) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Objectif VA Perso<span class="wk">Hebdo</span></div>
+        <div class="card-sub">Montants : tape uniquement les chiffres, la mise en forme <b>1&nbsp;000&nbsp;000&euro;</b> se fait toute seule.</div>
+        <div class="grid2">
+          <div class="fg"><label>Objectif VA Perso</label>
+            <input class="fi" type="text" data-fld="objVaPerso" data-store="profil" placeholder="1 M&euro; (101% ...)"></div>
+          <div class="fg"><label>&hellip; &agrave; la date du</label>
+            <input class="fi" type="text" data-fld="objVaPersoDate" data-store="profil" placeholder="31/12/2026"></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>Objectif VP</label>
+            <input class="fi" type="text" inputmode="numeric" data-fld="objVp" data-store="profil" data-money="1" placeholder="300 000"></div>
+          <div class="fg"><label>VP annualis&eacute;s (actuel)</label>
+            <input class="fi" type="text" inputmode="numeric" data-fld="vpActuel" data-store="week" data-money="1" placeholder="221 000"></div>
         </div>
         <div class="grid2">
           <div class="fg"><label>VA VC (act&eacute;e)</label>
-            <input class="fi" type="text" data-fld="vaPersoActe" data-store="week" placeholder="809k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoActe" data-store="week" data-money="1" placeholder="809 000"></div>
           <div class="fg"><label>VA EC (en cours)</label>
-            <input class="fi" type="text" data-fld="vaPersoEnCours" data-store="week" placeholder="150k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
         </div>
         <div class="grid2" data-mode="manager">
           <div class="fg"><label>Valid&eacute; Stellium</label>
-            <input class="fi" type="text" data-fld="valideStellium" data-store="week" placeholder="82k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="valideStellium" data-store="week" data-money="1" placeholder="82 000"></div>
           <div class="fg"><label>En cours traitement Stellium</label>
-            <input class="fi" type="text" data-fld="enCoursStellium" data-store="week" placeholder="60k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="enCoursStellium" data-store="week" data-money="1" placeholder="60 000"></div>
         </div>
         <div class="grid2" data-mode="manager">
           <div class="fg"><label>En signature client</label>
-            <input class="fi" type="text" data-fld="enSignature" data-store="week" placeholder="0k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="enSignature" data-store="week" data-money="1" placeholder="0"></div>
           <div class="fg"><label>Validation client</label>
-            <input class="fi" type="text" data-fld="validationClient" data-store="week" placeholder="43k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="validationClient" data-store="week" data-money="1" placeholder="43 000"></div>
         </div>
+        <div class="fg" data-mode="manager"><label>Pipe (ann&eacute;e N+1)</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="pipe" data-store="week" data-money="1" placeholder="2 400 000"></div>
+      </div>
 
-        <div style="height:1px;background:var(--bord);margin:14px 0"></div>
-        <div class="card-sub" style="margin:0 0 10px"><b data-mode="manager">Objectif VA Orga</b><b data-mode="expert">VA &eacute;quipe</b></div>
+      <!-- ══ 6. OBJECTIF VA ORGA / VA EQUIPE ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span><span data-mode="manager">Objectif VA Orga</span><span data-mode="expert">VA &eacute;quipe</span><span class="wk">Hebdo</span></div>
+        <div class="grid2">
+          <div class="fg"><label><span data-mode="manager">Objectif VA Orga</span><span data-mode="expert">Objectif VA &eacute;quipe</span></label>
+            <input class="fi" type="text" data-fld="objVaEquipe" data-store="profil" placeholder="2 M&euro;"></div>
+          <div class="fg"><label>&hellip; &agrave; la date du</label>
+            <input class="fi" type="text" data-fld="objVaEquipeDate" data-store="profil" placeholder="31/07/2026"></div>
+        </div>
         <div class="grid2">
           <div class="fg"><label>&#128640; VA VC (act&eacute;e)</label>
-            <input class="fi" type="text" data-fld="vaEquipeActe" data-store="week" placeholder="952k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="vaEquipeActe" data-store="week" data-money="1" placeholder="952 000"></div>
           <div class="fg"><label>&#128640; VA EC (en cours)</label>
-            <input class="fi" type="text" data-fld="vaEquipeEnCours" data-store="week" placeholder="150k&euro;"></div>
+            <input class="fi" type="text" inputmode="numeric" data-fld="vaEquipeEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
         </div>
         <div class="grid2" data-mode="expert">
-          <div class="fg"><label>Encours sous gestion &mdash; actuel</label>
-            <input class="fi" type="text" data-fld="encoursActuel" data-store="week" placeholder="8.28 M&euro;"></div>
-          <div class="fg"></div>
+          <div class="fg"><label>Objectif encours sous gestion</label>
+            <input class="fi" type="text" inputmode="numeric" data-fld="objEncours" data-store="profil" data-money="1" placeholder="8 000 000"></div>
+          <div class="fg"><label>Encours sous gestion (actuel)</label>
+            <input class="fi" type="text" inputmode="numeric" data-fld="encoursActuel" data-store="week" data-money="1" placeholder="8 280 000"></div>
         </div>
       </div>
 
-      <!-- ══ PRODUCTIVITE (lecture live du tracker) ══ -->
+      <!-- ══ 7. OBJECTIF FORMAN (manager) ══ -->
+      <div class="card" data-mode="manager">
+        <div class="card-title"><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="fg"><label>Progression Forman</label>
+          <input class="fi" type="text" data-fld="formanResume" data-store="profil" placeholder="Man 10/12"></div>
+      </div>
+
+      <!-- ══ 8. HABILITATIONS (manager, avant les ateliers) ══ -->
+      <div class="card" data-mode="manager">
+        <div class="card-title"><span class="dot"></span>Habilitations<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="fg"><label>Habilitations (une par ligne)</label>
+          <textarea class="fi" data-fld="habilitations" data-store="profil" placeholder="Assurance Niveau II (MIA) : valid&eacute; le 24/03/2026&#10;Immobilier - IOBSP Niveau II : en cours"></textarea></div>
+        <div class="fg"><label>Objectif habilitation final</label>
+          <input class="fi" type="text" data-fld="habObjectif" data-store="profil" placeholder="CIF"></div>
+      </div>
+
+      <!-- ══ 9. ATELIERS FORMAN & EVENEMENTS ══ -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Productivit&eacute; de la semaine<span class="wk">Hebdo</span></div>
-        <div class="card-sub">Reprise automatique de ton tracker <b>Compl&eacute;ter ma journ&eacute;e</b> pour la semaine affich&eacute;e.</div>
-        <div id="prodBody"></div>
-        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--gris-f);cursor:pointer">
-          <input type="checkbox" id="prodInclude" onchange="onProdInclude()" style="accent-color:var(--orange);width:15px;height:15px"> Inclure la productivit&eacute; dans l'email
-        </label>
+        <div class="card-title"><span class="dot"></span>Ateliers Forman &amp; &eacute;v&eacute;nements<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="grid2">
+          <div class="fg"><label>&#127891; Ateliers Forman r&eacute;alis&eacute;s</label>
+            <textarea class="fi" data-fld="formationsRealisees" data-store="profil" placeholder="Fiscalit&eacute; - Niveau 1 &mdash; 18/05/2026"></textarea></div>
+          <div class="fg"><label>&#127891; Ateliers Forman &agrave; venir</label>
+            <textarea class="fi" data-fld="formationsAVenir" data-store="profil" placeholder="PER - Niveau I : 31/10/2026"></textarea></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>&#10024; &Eacute;v&eacute;nements r&eacute;alis&eacute;s</label>
+            <textarea class="fi" data-fld="evenementsRealises" data-store="profil" placeholder="&hellip;"></textarea></div>
+          <div class="fg"><label>&#10024; &Eacute;v&eacute;nements &agrave; venir</label>
+            <textarea class="fi" data-fld="evenementsAVenir" data-store="profil" placeholder="UDP septembre&#10;Convention nationale"></textarea></div>
+        </div>
       </div>
 
-      <!-- ══ IDENTITE & LIGNEE (memorise) ══ -->
-      <details class="card">
-        <summary><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e amont<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>Manager Galaxie &amp; marraine</label>
-              <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
-            <div class="fg" data-mode="manager"><label>Parrain / Marraine (manager direct)</label>
-              <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Entr&eacute;e dans le r&eacute;seau</label>
-              <input class="fi" type="text" data-fld="entree" data-store="profil" placeholder="Janvier 2025"></div>
-            <div class="fg"><label>Signature (pr&eacute;nom)</label>
-              <input class="fi" type="text" data-fld="signature" data-store="profil" placeholder="Simon"></div>
-          </div>
-          <div class="fg"><label>Contexte / statut (optionnel)</label>
-            <input class="fi" type="text" data-fld="contexte" data-store="profil" placeholder="En double activit&eacute; (dans le r&eacute;seau depuis le 21 d&eacute;cembre 2025)"></div>
+      <!-- ══ 10. POINT BUSINESS (expert) ══ -->
+      <div class="card" data-mode="expert">
+        <div class="card-title"><span class="dot"></span>Point business d&eacute;taill&eacute;<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="grid2">
+          <div class="fg"><label>Conseillers actifs</label>
+            <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
+          <div class="fg"><label>Inscrits lign&eacute;e (bilan parrainage)</label>
+            <input class="fi" type="text" data-fld="inscritsLignee" data-store="profil" placeholder="27 (objectif 20)"></div>
         </div>
-      </details>
-
-      <!-- ══ OBJECTIFS (memorise) ══ -->
-      <details class="card" open>
-        <summary><span class="dot"></span>Objectifs perso &amp; &eacute;quipe<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>Nb clients &mdash; actuel</label>
-              <input class="fi" type="text" data-fld="nbClients" data-store="profil" placeholder="2"></div>
-            <div class="fg"><label>Nb clients &mdash; objectif</label>
-              <input class="fi" type="text" data-fld="objClients" data-store="profil" placeholder="10"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Objectif VA perso</label>
-              <input class="fi" type="text" data-fld="objVaPerso" data-store="profil" placeholder="1 M&euro;"></div>
-            <div class="fg"><label>&hellip; &agrave; la date du</label>
-              <input class="fi" type="text" data-fld="objVaPersoDate" data-store="profil" placeholder="31/12/2026"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Objectif VP annualis&eacute;s</label>
-              <input class="fi" type="text" data-fld="objVp" data-store="profil" placeholder="300k&euro;"></div>
-            <div class="fg" data-mode="expert"><label>Objectif encours sous gestion</label>
-              <input class="fi" type="text" data-fld="objEncours" data-store="profil" placeholder="8 M&euro;"></div>
-          </div>
-          <div class="grid2" data-mode="manager expert">
-            <div class="fg"><label>Objectif VA &eacute;quipe</label>
-              <input class="fi" type="text" data-fld="objVaEquipe" data-store="profil" placeholder="2 M&euro;"></div>
-            <div class="fg"><label>&hellip; &agrave; la date du</label>
-              <input class="fi" type="text" data-fld="objVaEquipeDate" data-store="profil" placeholder="31/07/2026"></div>
-          </div>
-        </div>
-      </details>
-
-      <!-- ══ DEVELOPPEMENT / PIPELINE (memorise) ══ -->
-      <details class="card">
-        <summary><span class="dot"></span>D&eacute;veloppement d'&eacute;quipe<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>&Eacute;quipe actuelle</label>
-              <input class="fi" type="text" data-fld="equipeActuelle" data-store="profil" placeholder="6 conseillers"></div>
-            <div class="fg"><label>Objectif nb conseillers</label>
-              <input class="fi" type="text" data-fld="objDevNb" data-store="profil" placeholder="16"></div>
-          </div>
-          <div class="fg"><label>&hellip; &agrave; la date du</label>
-            <input class="fi" type="text" data-fld="objDevDate" data-store="profil" placeholder="31/12/2026"></div>
-
-          <div class="card-sub" style="margin:14px 0 10px"><b>Compteurs pipeline</b> &mdash; noms ou nombre &agrave; chaque &eacute;tape</div>
-          <div class="grid2">
-            <div class="fg"><label>Qualification Manager</label>
-              <input class="fi" type="text" data-fld="devQualif" data-store="profil" placeholder="Arnaud / Louis-Victor"></div>
-            <div class="fg"><label>Actif</label>
-              <input class="fi" type="text" data-fld="devActif" data-store="profil" placeholder="&hellip;"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Inscription Prod&eacute;mial</label>
-              <input class="fi" type="text" data-fld="devProdemial" data-store="profil" placeholder="Simon / Pierre / Maell"></div>
-            <div class="fg"><label>Inscription 3J</label>
-              <input class="fi" type="text" data-fld="devJ3" data-store="profil" placeholder="&hellip;"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Inscription AD</label>
-              <input class="fi" type="text" data-fld="devAd" data-store="profil" placeholder="&hellip;"></div>
-            <div class="fg"><label>Inscription DM</label>
-              <input class="fi" type="text" data-fld="devDm" data-store="profil" placeholder="Julie.M / Elodie"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Inscription PO</label>
-              <input class="fi" type="text" data-fld="devPo" data-store="profil" placeholder="&hellip;"></div>
-            <div class="fg"><label>&Agrave; inviter</label>
-              <input class="fi" type="text" data-fld="devInviter" data-store="profil" placeholder="Mathieu.T / Marine"></div>
-          </div>
-          <div class="fg"><label>SBY</label>
-            <input class="fi" type="text" data-fld="devSby" data-store="profil" placeholder="Davy.T (3J) / Ilia.M (AD)"></div>
-
-          <div class="grid2" data-mode="expert">
-            <div class="fg"><label>Branche Manager act&eacute;e</label>
-              <input class="fi" type="text" data-fld="brancheActe" data-store="profil" placeholder="5"></div>
-            <div class="fg"><label>Branche Manager en cours</label>
-              <input class="fi" type="text" data-fld="brancheEnCours" data-store="profil" placeholder="1"></div>
-          </div>
-        </div>
-      </details>
-
-      <!-- ══ FORMAN (memorise, manager) ══ -->
-      <details class="card" data-mode="manager">
-        <summary><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="fg"><label>Progression Forman</label>
-            <input class="fi" type="text" data-fld="formanResume" data-store="profil" placeholder="Man 10/12"></div>
-          <div class="card-sub" style="margin:8px 0 0">Ex : <b>Man 10/12</b> (niveau + objectifs valid&eacute;s). Se reporte tel quel dans l'email.</div>
-        </div>
-      </details>
-
-      <!-- ══ FORMATIONS & EVENEMENTS (memorise) ══ -->
-      <details class="card">
-        <summary><span class="dot"></span>Formations &amp; &eacute;v&eacute;nements<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>&#127891; Formations r&eacute;alis&eacute;es</label>
-              <textarea class="fi" data-fld="formationsRealisees" data-store="profil" placeholder="Fiscalit&eacute; - Niveau 1 &mdash; 18/05/2026&#10;Art de la mise en relation &mdash; 29/03/2026"></textarea></div>
-            <div class="fg"><label>&#127891; Formations &agrave; venir</label>
-              <textarea class="fi" data-fld="formationsAVenir" data-store="profil" placeholder="PER - Niveau I : 31/10/2026"></textarea></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>&#10024; &Eacute;v&eacute;nements r&eacute;alis&eacute;s</label>
-              <textarea class="fi" data-fld="evenementsRealises" data-store="profil" placeholder="&hellip;"></textarea></div>
-            <div class="fg"><label>&#10024; &Eacute;v&eacute;nements &agrave; venir</label>
-              <textarea class="fi" data-fld="evenementsAVenir" data-store="profil" placeholder="UDP septembre&#10;Convention nationale"></textarea></div>
-          </div>
-        </div>
-      </details>
-
-      <!-- ══ BUSINESS DETAILLE (memorise, expert) ══ -->
-      <details class="card" data-mode="expert">
-        <summary><span class="dot"></span>Point business d&eacute;taill&eacute;<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
-        <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>Conseillers actifs</label>
-              <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
-            <div class="fg"><label>Inscrits lign&eacute;e (bilan parrainage)</label>
-              <input class="fi" type="text" data-fld="inscritsLignee" data-store="profil" placeholder="27 (objectif 20)"></div>
-          </div>
-          <div class="fg"><label>Tableau des lign&eacute;es (optionnel, coll&eacute; tel quel)</label>
-            <textarea class="fi" data-fld="ligneeTable" data-store="profil" placeholder="Galaxie : 3 189 273 &euro;&#10;Lign&eacute;e Manu : 4 133 558 &euro;&#10;&hellip;"></textarea></div>
-          <div class="fg"><label>Voyages / Ambitions (optionnel)</label>
-            <textarea class="fi" data-fld="voyages" data-store="profil" placeholder="Ambition Galaxie : 5 pts &agrave; date&#10;Montenegro : 1 place"></textarea></div>
-        </div>
-      </details>
-
-      <!-- ══ PREVIEW ══ -->
+        <div class="fg"><label>Tableau des lign&eacute;es (optionnel)</label>
+          <textarea class="fi" data-fld="ligneeTable" data-store="profil" placeholder="Galaxie : 3 189 273 &euro;&#10;Lign&eacute;e Manu : 4 133 558 &euro;"></textarea></div>
+        <div class="fg"><label>Voyages / Ambitions (optionnel)</label>
+          <textarea class="fi" data-fld="voyages" data-store="profil" placeholder="Ambition Galaxie : 5 pts&#10;Montenegro : 1 place"></textarea></div>
+      </div>
+      <!-- ══ PREVIEW (editable) ══ -->
       <div class="preview-wrap">
         <div class="preview-bar no-print">
-          <span class="pv-t">Aper&ccedil;u de l'email &mdash; pr&ecirc;t &agrave; copier</span>
-          <button class="preview-copy" id="previewCopy" onclick="copyEmail()">&#128203; Copier</button>
+          <span class="pv-t">Aper&ccedil;u &mdash; &eacute;ditable, puis copie</span>
+          <span style="display:flex;gap:8px">
+            <button class="preview-copy" onclick="regeneratePreview()" style="background:transparent;border:1.5px solid var(--bord);color:var(--gris)" title="Reconstruire l'email depuis le formulaire">&#8635; R&eacute;g&eacute;n&eacute;rer</button>
+            <button class="preview-copy" id="previewCopy" onclick="copyEmail()">&#128203; Copier</button>
+          </span>
         </div>
-        <pre class="preview-body" id="previewBody"></pre>
+        <pre class="preview-body" id="previewBody" contenteditable="true" spellcheck="false" oninput="onPreviewEdit()"></pre>
       </div>
 
       <div id="conseillerFooter"></div>
@@ -513,12 +506,17 @@ function loadForm() {
 }
 function bindForm() {
   document.querySelectorAll('[data-fld]').forEach(function(el) {
-    el.addEventListener('input', function() {
-      var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
-      if (store === 'week') setW(id, el.value);
-      else { state.profil[id] = el.value; saveState(); }
-      updatePreview();
-    });
+    var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
+    var isMoney = !!el.getAttribute('data-money');
+    function save(v) { if (store === 'week') setW(id, v); else { state.profil[id] = v; saveState(); } }
+    el.addEventListener('input', function() { save(el.value); updatePreview(); });
+    if (isMoney) {
+      // a la saisie : on montre les chiffres bruts ; a la sortie : format "1 000 000€"
+      el.addEventListener('focus', function() { el.value = digitsOnly(el.value); });
+      el.addEventListener('blur', function() {
+        el.value = fmtEuro(el.value); save(el.value); updatePreview();
+      });
+    }
   });
 }
 
@@ -605,7 +603,14 @@ function parseMoney(s) {
 function fmtMoney(n) {
   var neg = n < 0; n = Math.abs(Math.round(n));
   var s = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  return (neg ? '-' : '') + s + ' €';
+  return (neg ? '-' : '') + s + '€';
+}
+// ── SAISIE MONTANTS : l'utilisateur tape les chiffres, format auto "1 000 000€"
+function digitsOnly(s) { return String(s == null ? '' : s).replace(/[^\d]/g, ''); }
+function fmtEuro(s) {
+  var d = digitsOnly(s); if (!d) return '';
+  d = d.replace(/^0+(?=\d)/, '');
+  return d.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + '€';
 }
 // reste a faire = objectif - (acte + en cours) ; '' si non calculable
 function resteAFaire(objId, acteVal, enCoursVal) {
@@ -658,7 +663,7 @@ function buildManager() {
 
   // Lignee amont
   if (p('galaxie')) o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
-  if (p('parrain')) o.push(bold('Parrain / Manager') + ' : ' + p('parrain'));
+  if (p('parrain')) o.push(bold('Parrain / Marraine') + ' : ' + p('parrain'));
   if (p('entree'))  o.push('Entrée dans le réseau : ' + p('entree'));
   if (p('contexte')) o.push(p('contexte'));
 
@@ -713,15 +718,19 @@ function buildManager() {
     if (getW('vaEquipeEnCours')) o.push('VA EC : ' + getW('vaEquipeEnCours'));
   }
 
-  // Productivite
-  prodSection().forEach(function(l) { o.push(l); });
-
   // Objectif Forman
   if (p('formanResume')) { secTitle(o, 'Objectif Forman'); o.push(p('formanResume')); }
 
-  // Formations & evenements
+  // Habilitations (avant les ateliers)
+  if (p('habilitations') || p('habObjectif')) {
+    secTitle(o, 'Habilitations');
+    var hab = lines(p('habilitations')); if (hab) o.push(hab);
+    if (p('habObjectif')) o.push('Objectif final : ' + p('habObjectif'));
+  }
+
+  // Ateliers Forman & evenements
   var fe = feLines();
-  if (fe) { secTitle(o, 'Formations & événements'); o.push(fe); }
+  if (fe) { secTitle(o, 'Ateliers Forman & événements'); o.push(fe); }
 
   if (p('signature')) { o.push(''); o.push('Bonne semaine,'); o.push(p('signature')); }
   return o.join('\n').replace(/\n{3,}/g, '\n\n');
@@ -743,6 +752,7 @@ function buildExpert() {
   o.push('');
 
   if (p('galaxie'))  o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
+  if (p('parrain'))  o.push(bold('Parrain / Marraine') + ' : ' + p('parrain'));
   if (p('contexte')) o.push(p('contexte'));
 
   secTitle(o, 'Semaine passée');
@@ -781,10 +791,8 @@ function buildExpert() {
 
   if (p('inscritsLignee')) { secTitle(o, 'Bilan parrainage'); o.push('Inscrits lignée : ' + p('inscritsLignee')); }
 
-  prodSection().forEach(function(l) { o.push(l); });
-
   var fe = feLines();
-  if (fe) { secTitle(o, 'Formations & événements'); o.push(fe); }
+  if (fe) { secTitle(o, 'Ateliers Forman & événements'); o.push(fe); }
 
   if (p('voyages')) { secTitle(o, 'Voyages / Ambitions'); o.push(lines(p('voyages'))); }
 
@@ -798,14 +806,24 @@ function totalVA(acteVal, enCoursVal) {
   return fmtMoney((isNaN(a) ? 0 : a) + (isNaN(e) ? 0 : e));
 }
 
-// ── PREVIEW ───────────────────────────────────────────────────
-function updatePreview() {
-  document.getElementById('previewBody').textContent = buildEmail();
+// ── PREVIEW (editable) ────────────────────────────────────────
+var previewDirty = false;   // true = l'utilisateur a edite l'apercu a la main
+function updatePreview(force) {
+  var el = document.getElementById('previewBody'); if (!el) return;
+  if (previewDirty && !force) return;   // ne pas ecraser les retouches manuelles
+  el.textContent = buildEmail();
+  previewDirty = false;
+}
+function onPreviewEdit() { previewDirty = true; }
+function regeneratePreview() {
+  if (previewDirty && !confirm('Regenerer l\'email depuis le formulaire ?\n\nTes retouches manuelles seront perdues.')) return;
+  previewDirty = false; updatePreview(true);
 }
 
 // ── COPIER ────────────────────────────────────────────────────
 function copyEmail() {
-  var txt = buildEmail();
+  var el = document.getElementById('previewBody');
+  var txt = el ? el.textContent : buildEmail();   // copie l'apercu (retouches incluses)
   var done = function() { flashCopied(); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(txt).then(done, function() { fallbackCopy(txt, done); });
@@ -833,13 +851,13 @@ function reportPrev() {
   var pw = state.history[prevWk()];
   if (!pw || !pw.cette) { alert('Aucune activité "Cette semaine" sur la semaine précédente à reporter.'); return; }
   setW('passee', pw.cette);
-  loadForm(); updatePreview();
+  loadForm(); updatePreview(true);
 }
 
 function resetWeek() {
   if (!confirm('Effacer l\'activité hebdo de cette semaine ?\n\n(Les objectifs et l\'identité mémorisés sont conservés.)')) return;
   delete state.history[curWk()]; saveState();
-  loadForm(); updatePreview();
+  loadForm(); updatePreview(true);
 }
 
 // ── EXPORT PDF ────────────────────────────────────────────────
@@ -859,40 +877,53 @@ function renderHeader() {
 function render() {
   renderHeader();
   loadForm();
-  renderProd();
-  updatePreview();
+  renderProdSidebar();
+  updatePreview(true);
 }
 
-// ── RENDER PRODUCTIVITE CARD ──────────────────────────────────
-function prodKpi(val, lab, color) {
-  return '<div style="text-align:center"><div style="font-size:20px;font-weight:800;color:' + color + ';line-height:1">' + val +
-    '</div><div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-top:4px">' + lab + '</div></div>';
-}
-function renderProd() {
-  var box = document.getElementById('prodBody'); if (!box) return;
-  var chk = document.getElementById('prodInclude');
-  if (chk) chk.checked = (state.profil.prodInclude !== false);
+// ── PRODUCTIVITE (widget sidebar, lie a la semaine affichee) ──
+function renderProdSidebar() {
+  var box = document.getElementById('sbProd'); if (!box) return;
+  var n = curWk().split('-W')[1];
   var pw = prodWeek();
   if (!pw) {
-    box.innerHTML = '<div style="font-size:12px;color:var(--gris);line-height:1.6">Aucune activit&eacute; saisie cette semaine dans <b>Compl&eacute;ter ma journ&eacute;e</b>. ' +
-      '<a href="productivite.html" style="color:var(--orange);font-weight:600;text-decoration:none">Compl&eacute;ter ma journ&eacute;e &rarr;</a></div>';
+    box.innerHTML = '<div class="sb-prod-h"><span class="sb-prod-t">Productivit&eacute; &middot; sem. ' + n + '</span></div>' +
+      '<div class="sb-prod-empty">Aucune activit&eacute; cette semaine. <a href="productivite.html">Compl&eacute;ter ma journ&eacute;e &rarr;</a></div>';
     return;
   }
   var barPct = Math.min(pw.pct, 100);
   box.innerHTML =
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">' +
-      prodKpi(pw.total + ' <span style="font-size:12px;color:var(--gris)">/ ' + pw.goal + '</span>', 'Score semaine', 'var(--orange)') +
-      prodKpi(pw.avg, 'Moy. / jour actif', 'var(--noir)') +
-      prodKpi(pw.best, 'Meilleur jour', 'var(--green)') +
-    '</div>' +
-    '<div style="height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + barPct + '%;background:' + (pw.pct >= 100 ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
-    '<div style="margin-top:6px;font-size:11px;color:var(--gris)">' + pw.pct + '&nbsp;% de l\'objectif &middot; <a href="productivite.html" style="color:var(--orange);text-decoration:none;font-weight:600">Ouvrir le tracker &rarr;</a></div>';
+    '<div class="sb-prod-h"><span class="sb-prod-t">Productivit&eacute; &middot; sem. ' + n + '</span>' +
+      '<span class="sb-prod-score"><b>' + pw.total + '</b> / ' + pw.goal + '</span></div>' +
+    '<div class="sb-prod-bar"><span style="width:' + barPct + '%;background:' + (pw.pct >= 100 ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
+    '<div class="sb-prod-foot"><span>' + pw.pct + '&nbsp;% &middot; moy. ' + pw.avg + '/j</span>' +
+      '<a href="productivite.html">Compl&eacute;ter &rarr;</a></div>';
 }
-function onProdInclude() {
-  var chk = document.getElementById('prodInclude');
-  state.profil.prodInclude = chk ? chk.checked : true;
-  saveState();
-  updatePreview();
+
+// ── EXPORT / IMPORT JSON ──────────────────────────────────────
+function exportJSON() {
+  var data = JSON.stringify({ mode: state.mode, profil: state.profil, history: state.history }, null, 2);
+  var blob = new Blob([data], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'cgpskool-tracking.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+function importJSON(input) {
+  var file = input.files && input.files[0]; if (!file) return;
+  var r = new FileReader();
+  r.onload = function() {
+    try {
+      var s = JSON.parse(r.result);
+      if (s.mode) state.mode = s.mode;
+      if (s.profil) state.profil = s.profil;
+      if (s.history) state.history = s.history;
+      saveState(); applyMode(); previewDirty = false; render();
+    } catch (e) { alert('Fichier JSON invalide.'); }
+    input.value = '';
+  };
+  r.readAsText(file);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
