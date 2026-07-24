@@ -139,7 +139,6 @@
       <button onclick="if(tree){openAdd([])}" class="sb-btn sb-btn-copy">&#10133; Ajouter un membre</button>
       <button onclick="ebPullFromMail()" class="sb-btn sb-btn-sync" title="Reprendre les chiffres et habilitations saisis dans le Mail Manager (VA, habilitations, Forman, événements)">&#8635; Reprendre du Mail Manager</button>
     </div>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     <div style="flex:1;min-height:16px"></div>
     <div style="height:1px;background:var(--rule-l);margin:12px 0"></div>
     <button class="sb-btn sb-btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
@@ -860,27 +859,6 @@ function render(){
   CGP.project.autoSave('equipe-builder');
 }
 
-function exportJSON(){
-  if(!tree)return;
-  var blob=new Blob([JSON.stringify(tree,null,2)],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='equipe-cgpskool.json';
-  a.click();
-}
-
-function importJSON(e){
-  var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    try{
-      var data=JSON.parse(ev.target.result);
-      if(data&&data.prenom!==undefined){tree=data;saveTree();render()}
-    }catch(err){alert('Fichier invalide')}
-  };
-  reader.readAsText(file);
-  e.target.value='';
-}
 
 loadTree();
 CGP.footer.render(document.getElementById('conseillerFooter'));
