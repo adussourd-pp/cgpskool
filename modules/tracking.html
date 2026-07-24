@@ -16,6 +16,9 @@
 .fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
 .fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
 .fi:focus{border-color:var(--orange)}
+.fi-obj{background:#FFF8EF;border-color:#E8C79A}
+.fg:has(.fi-obj) label{color:#B8701F}
+.fi-obj:focus{border-color:var(--orange)}
 textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -81,6 +84,15 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .org-add{width:100%;padding:12px;background:transparent;border:1.5px dashed var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;font-weight:600;border-radius:10px;cursor:pointer;margin-top:6px}
 .org-add:hover{border-color:var(--orange);color:var(--orange)}
 .org-empty{text-align:center;color:var(--gris);font-size:13px;padding:30px 20px;line-height:1.7}
+
+/* ── Jauges d'avancement (formulaire) ── */
+.fg-gauge{margin:8px 0 2px}
+.fg-gauge:empty{display:none}
+.fg-gauge-bar{height:7px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden}
+.fg-gauge-bar>span{display:block;height:100%;border-radius:4px;transition:width 0.3s}
+.fg-gauge-lbl{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--gris);margin-top:5px;flex-wrap:wrap}
+.fg-gauge-lbl b{color:var(--noir)}
+.fg-gauge-lbl .green{color:var(--green);font-weight:700}
 
 .sb-btn{width:100%;padding:11px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border-radius:0;margin-bottom:8px}
 .sb-btn-copy{background:var(--orange);color:#fff}
@@ -175,7 +187,6 @@ details.card>summary .memo+.arr{margin-left:8px}
     <div class="mode-seg">
       <button id="tabManager" onclick="setTab('manager')">Manager</button>
       <button id="tabExpert" onclick="setTab('expert')">Expert</button>
-      <button id="tabOrg" onclick="setTab('org')">Organisation</button>
     </div>
 
     <div class="week-nav">
@@ -187,19 +198,18 @@ details.card>summary .memo+.arr{margin-left:8px}
     <div class="sb-hint" id="modeHint"></div>
 
     <!-- Productivite de la semaine (lien avec la semaine du mail) -->
-    <div class="sb-prod" id="sbProd" data-view="mail"></div>
+    <div class="sb-prod" id="sbProd"></div>
 
-    <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn" data-view="mail">&#128203; Copier l'email</button>
+    <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn">&#128203; Copier l'email</button>
     <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter en PDF</button>
 
     <div style="height:1px;background:var(--bord);margin:6px 0 12px"></div>
 
-    <button class="sb-btn sb-btn-ghost" onclick="reportPrev()" data-view="mail" title="Recopier l'activite 'Cette semaine' de la semaine precedente dans 'Semaine passee'">&#8635; Reporter la semaine pr&eacute;c&eacute;dente</button>
-    <button class="sb-btn sb-btn-ghost" onclick="orgAdd(null)" data-view="org" style="display:none">&#10133; Ajouter un filleul direct</button>
+    <button class="sb-btn sb-btn-ghost" onclick="reportPrev()" title="Recopier l'activite 'Cette semaine' de la semaine precedente dans 'Semaine passee'">&#8635; Reporter la semaine pr&eacute;c&eacute;dente</button>
     <button class="sb-btn sb-btn-ghost" onclick="exportJSON()" title="T&eacute;l&eacute;charger toutes tes donn&eacute;es en JSON (sauvegarde)">&#128190; Exporter en JSON</button>
     <label class="sb-btn sb-btn-ghost" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px" title="Restaurer depuis un fichier JSON">&#128194; Importer un JSON
       <input type="file" accept="application/json,.json" onchange="importJSON(this)" style="position:absolute;width:0;height:0;opacity:0"></label>
-    <button class="sb-btn sb-btn-danger" onclick="resetWeek()" data-view="mail" title="Effacer l'activite hebdo de cette semaine (les objectifs memorises sont conserves)">&#9100; Effacer cette semaine</button>
+    <button class="sb-btn sb-btn-danger" onclick="resetWeek()" title="Effacer l'activite hebdo de cette semaine (les objectifs memorises sont conserves)">&#9100; Effacer cette semaine</button>
 
   </div>
 
@@ -219,15 +229,14 @@ details.card>summary .memo+.arr{margin-left:8px}
       </div>
 
       <!-- ═══════════ VUE MAIL ═══════════ -->
-      <div id="mailView" data-view="mail">
 
       <!-- ══ 1. IDENTITE (en haut, ordre du mail) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="grid2">
-          <div class="fg"><label>Manager Galaxie</label>
+          <div class="fg"><label>Galaxie (manager de galaxie)</label>
             <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
-          <div class="fg"><label>Parrain / Marraine manager</label>
+          <div class="fg"><label>Manager direct (parrain / marraine)</label>
             <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
         </div>
         <label style="display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--gris-f);cursor:pointer">
@@ -262,7 +271,7 @@ details.card>summary .memo+.arr{margin-left:8px}
         <div style="height:1px;background:var(--bord);margin:16px 0"></div>
         <div class="grid2">
           <div class="fg"><label>Objectif Nbr de clients</label>
-            <input class="fi" type="text" data-fld="objClients" data-store="profil" placeholder="10"></div>
+            <input class="fi fi-obj" type="text" data-fld="objClients" data-store="profil" placeholder="10"></div>
           <div class="fg"><label>Nbr de clients (actuel)</label>
             <input class="fi" type="text" data-fld="nbClients" data-store="profil" placeholder="2"></div>
         </div>
@@ -273,13 +282,13 @@ details.card>summary .memo+.arr{margin-left:8px}
         <div class="card-title"><span class="dot"></span>Objectif D&eacute;veloppement<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="grid2">
           <div class="fg"><label>Objectif nb conseillers</label>
-            <input class="fi" type="text" data-fld="objDevNb" data-store="profil" placeholder="16"></div>
+            <input class="fi fi-obj" type="text" data-fld="objDevNb" data-store="profil" placeholder="16"></div>
           <div class="fg"><label>&hellip; &agrave; la date du</label>
             <input class="fi" type="text" data-fld="objDevDate" data-store="profil" placeholder="31/12/2026"></div>
         </div>
         <div class="fg"><label>&Agrave; date : &eacute;quipe de</label>
           <input class="fi" type="text" data-fld="equipeActuelle" data-store="profil" placeholder="6 conseillers"></div>
-        <div class="card-sub" style="margin:12px 0 8px"><b>Compteurs pipeline</b> &mdash; un par ligne, dans l'ordre du mail</div>
+        <div class="card-sub" style="margin:12px 0 8px"><b>Compteurs pipeline</b></div>
         <div class="fg"><label>Qualification Manager</label>
           <input class="fi" type="text" data-fld="devQualif" data-store="profil" placeholder="&hellip;"></div>
         <div class="fg"><label>Actif</label>
@@ -303,47 +312,48 @@ details.card>summary .memo+.arr{margin-left:8px}
       <!-- ══ 5. OBJECTIF VA PERSO (obj memorises + montants hebdo) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Objectif VA Perso<span class="wk">Hebdo</span></div>
-        <div class="card-sub">Montants : tape uniquement les chiffres, la mise en forme <b>1&nbsp;000&nbsp;000&euro;</b> se fait toute seule.</div>
         <div class="grid2">
           <div class="fg"><label>Objectif VA Perso</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="objVaPerso" data-store="profil" data-money="1" placeholder="1 000 000"></div>
+            <input class="fi fi-obj" type="text" inputmode="numeric" data-fld="objVaPerso" data-store="profil" data-money="1" placeholder="1 000 000"></div>
           <div class="fg"><label>&hellip; &agrave; la date du</label>
             <input class="fi" type="text" data-fld="objVaPersoDate" data-store="profil" placeholder="31/12/2026"></div>
         </div>
         <div class="grid2">
           <div class="fg"><label>Objectif VP</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="objVp" data-store="profil" data-money="1" placeholder="300 000"></div>
+            <input class="fi fi-obj" type="text" inputmode="numeric" data-fld="objVp" data-store="profil" data-money="1" placeholder="300 000"></div>
           <div class="fg"><label>VP annualis&eacute;s (actuel)</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="vpActuel" data-store="week" data-money="1" placeholder="221 000"></div>
         </div>
+        <div class="fg-gauge" id="gaugeVp"></div>
         <div class="grid2">
           <div class="fg"><label>VA VC (act&eacute;e)</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoActe" data-store="week" data-money="1" placeholder="809 000"></div>
           <div class="fg"><label>VA EC (en cours)</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
         </div>
-        <div class="grid2" data-mode="manager">
+        <div class="grid2">
           <div class="fg"><label>Valid&eacute; Stellium</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="valideStellium" data-store="week" data-money="1" placeholder="82 000"></div>
           <div class="fg"><label>En cours traitement Stellium</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="enCoursStellium" data-store="week" data-money="1" placeholder="60 000"></div>
         </div>
-        <div class="grid2" data-mode="manager">
+        <div class="grid2">
           <div class="fg"><label>En signature client</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="enSignature" data-store="week" data-money="1" placeholder="0"></div>
           <div class="fg"><label>Validation client</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="validationClient" data-store="week" data-money="1" placeholder="43 000"></div>
         </div>
-        <div class="fg" data-mode="manager"><label>Pipe (ann&eacute;e N+1)</label>
+        <div class="fg"><label>Pipe (ann&eacute;e N+1)</label>
           <input class="fi" type="text" inputmode="numeric" data-fld="pipe" data-store="week" data-money="1" placeholder="2 400 000"></div>
+        <div class="fg-gauge" id="gaugePerso"></div>
       </div>
 
       <!-- ══ 6. OBJECTIF VA ORGA / VA EQUIPE ══ -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span><span data-mode="manager">Objectif VA Orga</span><span data-mode="expert">VA &eacute;quipe</span><span class="wk">Hebdo</span></div>
+        <div class="card-title"><span class="dot"></span>Objectif VA Orga<span class="wk">Hebdo</span></div>
         <div class="grid2">
-          <div class="fg"><label><span data-mode="manager">Objectif VA Orga</span><span data-mode="expert">Objectif VA &eacute;quipe</span></label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="objVaEquipe" data-store="profil" data-money="1" placeholder="2 000 000"></div>
+          <div class="fg"><label>Objectif VA Orga</label>
+            <input class="fi fi-obj" type="text" inputmode="numeric" data-fld="objVaEquipe" data-store="profil" data-money="1" placeholder="2 000 000"></div>
           <div class="fg"><label>&hellip; &agrave; la date du</label>
             <input class="fi" type="text" data-fld="objVaEquipeDate" data-store="profil" placeholder="31/07/2026"></div>
         </div>
@@ -353,23 +363,24 @@ details.card>summary .memo+.arr{margin-left:8px}
           <div class="fg"><label>&#128640; VA EC (en cours)</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="vaEquipeEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
         </div>
-        <div class="grid2" data-mode="expert">
+        <div class="fg-gauge" id="gaugeOrga"></div>
+        <div class="grid2">
           <div class="fg"><label>Objectif encours sous gestion</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="objEncours" data-store="profil" data-money="1" placeholder="8 000 000"></div>
+            <input class="fi fi-obj" type="text" inputmode="numeric" data-fld="objEncours" data-store="profil" data-money="1" placeholder="8 000 000"></div>
           <div class="fg"><label>Encours sous gestion (actuel)</label>
             <input class="fi" type="text" inputmode="numeric" data-fld="encoursActuel" data-store="week" data-money="1" placeholder="8 280 000"></div>
         </div>
       </div>
 
       <!-- ══ 7. OBJECTIF FORMAN (manager) ══ -->
-      <div class="card" data-mode="manager">
+      <div class="card">
         <div class="card-title"><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="fg"><label>Progression Forman</label>
           <input class="fi" type="text" data-fld="formanResume" data-store="profil" placeholder="Man 10/12"></div>
       </div>
 
       <!-- ══ 8. HABILITATIONS (manager, avant les ateliers) ══ -->
-      <div class="card" data-mode="manager">
+      <div class="card">
         <div class="card-title"><span class="dot"></span>Habilitations<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="fg"><label>Habilitations (une par ligne)</label>
           <textarea class="fi" data-fld="habilitations" data-store="profil" placeholder="Assurance Niveau II (MIA) : valid&eacute; le 24/03/2026&#10;Immobilier - IOBSP Niveau II : en cours"></textarea></div>
@@ -394,9 +405,9 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </div>
 
-      <!-- ══ 10. POINT BUSINESS (expert) ══ -->
-      <div class="card" data-mode="expert">
-        <div class="card-title"><span class="dot"></span>Point business d&eacute;taill&eacute;<span class="memo">M&eacute;moris&eacute;</span></div>
+      <!-- 10. VA ORGA - equipe & lignees -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>VA Orga &mdash; &eacute;quipe &amp; lign&eacute;es<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="grid2">
           <div class="fg"><label>Conseillers actifs</label>
             <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
@@ -408,10 +419,26 @@ details.card>summary .memo+.arr{margin-left:8px}
         <div class="fg"><label>Voyages / Ambitions (optionnel)</label>
           <textarea class="fi" data-fld="voyages" data-store="profil" placeholder="Ambition Galaxie : 5 pts&#10;Montenegro : 1 place"></textarea></div>
       </div>
+      <!-- ══ ORGANISATION (option, dans le formulaire) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Suivi de mon organisation<span class="wk" style="background:rgba(0,0,0,0.06);color:var(--gris)">Option</span></div>
+        <label style="display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--gris-f);cursor:pointer">
+          <input type="checkbox" id="orgOn" onchange="onOrgToggle()" style="accent-color:var(--orange);width:15px;height:15px"> Activer le suivi de mes filleuls (arbre, VA, habilitations, qualification 500 k&euro;)
+        </label>
+        <div id="orgBox" style="display:none">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+            <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgAdd(null)">&#10133; Filleul direct</button>
+            <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgImportEquipe()" title="Reprendre l'arbre du module Construire son equipe">&#8681; Importer depuis Construire son &eacute;quipe</button>
+          </div>
+          <div class="org-summary" id="orgSummary"></div>
+          <div id="orgList"></div>
+        </div>
+      </div>
+
       <!-- ══ PREVIEW (editable) ══ -->
       <div class="preview-wrap">
         <div class="preview-bar no-print">
-          <span class="pv-t">Aper&ccedil;u &mdash; &eacute;ditable, puis copie</span>
+          <span class="pv-t">Aper&ccedil;u &eacute;ditable</span>
           <span style="display:flex;gap:8px">
             <button class="preview-copy" onclick="regeneratePreview()" style="background:transparent;border:1.5px solid var(--bord);color:var(--gris)" title="Reconstruire l'email depuis le formulaire">&#8635; R&eacute;g&eacute;n&eacute;rer</button>
             <button class="preview-copy" id="previewCopy" onclick="copyEmail()">&#128203; Copier</button>
@@ -420,14 +447,7 @@ details.card>summary .memo+.arr{margin-left:8px}
         <pre class="preview-body" id="previewBody" contenteditable="true" spellcheck="false" oninput="onPreviewEdit()"></pre>
       </div>
 
-      </div><!-- /mailView -->
 
-      <!-- ═══════════ VUE ORGANISATION ═══════════ -->
-      <div id="orgView" data-view="org" style="display:none">
-        <div class="org-summary" id="orgSummary"></div>
-        <div id="orgList"></div>
-        <button class="org-add" onclick="orgAdd(null)">+ Ajouter un filleul direct</button>
-      </div>
 
       <div id="conseillerFooter"></div>
     </div>
@@ -525,36 +545,19 @@ function setRdv(type, val) {
   var w = ensureWeek(curWk()); w.rdv[type] = Math.max(0, val); saveState();
 }
 
-// ── ONGLETS (Manager / Expert / Organisation) ─────────────────
+// -- ONGLETS (Manager / Expert : meme structure de mail) -------
 function setTab(tab) {
-  if (tab === 'org') { state.view = 'org'; }
-  else { state.view = 'mail'; state.mode = tab; }
-  saveState(); applyMode();
-  if (state.view === 'mail') render(); else renderOrg();
+  state.mode = tab; saveState(); applyMode(); updatePreview(true);
 }
 function applyMode() {
-  var view = state.view || 'mail';
-  document.getElementById('tabManager').classList.toggle('active', view === 'mail' && state.mode === 'manager');
-  document.getElementById('tabExpert').classList.toggle('active', view === 'mail' && state.mode === 'expert');
-  document.getElementById('tabOrg').classList.toggle('active', view === 'org');
-  // vues (mail / org) + boutons sidebar
-  document.querySelectorAll('[data-view]').forEach(function(el) {
-    el.style.display = (el.getAttribute('data-view') === view) ? '' : 'none';
-  });
-  var tag = document.getElementById('pageTag'), pm2 = document.getElementById('pageMode');
-  if (tag) tag.textContent = (view === 'org') ? 'Suivi de mon équipe' : 'Mail hebdomadaire';
-  if (pm2) pm2.textContent = (view === 'org') ? 'Organisation' : (state.mode === 'manager' ? 'Mail Manager' : 'Mail Expert');
+  document.getElementById('tabManager').classList.toggle('active', state.mode === 'manager');
+  document.getElementById('tabExpert').classList.toggle('active', state.mode === 'expert');
+  var pm2 = document.getElementById('pageMode');
+  if (pm2) pm2.textContent = state.mode === 'manager' ? 'Mail Manager' : 'Mail Expert';
   var hint = document.getElementById('modeHint');
-  if (hint) hint.innerHTML = (view === 'org')
-    ? '<b>Organisation</b> &mdash; ton équipe en cours (option). Chaque branche directe se qualifie Manager à 500 k€/an.'
-    : (state.mode === 'manager'
-      ? '<b>Mode Manager</b> &mdash; pour les filleuls qui aspirent à devenir manager.'
-      : '<b>Mode Expert</b> &mdash; une fois manager, objectif 1,5 M€ minimum.');
-  // visibilite des blocs selon le mode du mail
-  document.querySelectorAll('[data-mode]').forEach(function(el) {
-    var modes = el.getAttribute('data-mode').split(' ');
-    el.style.display = (modes.indexOf(state.mode) !== -1) ? '' : 'none';
-  });
+  if (hint) hint.innerHTML = state.mode === 'manager'
+    ? '<b>Mode Manager</b> &mdash; pour les filleuls qui aspirent \u00e0 devenir manager.'
+    : '<b>Mode Expert</b> &mdash; une fois manager, objectif 1,5 M\u20ac minimum.';
 }
 
 // ── PARRAIN = GALAXIE (coche) ─────────────────────────────────
@@ -569,8 +572,9 @@ function onParrainSame() {
 function applyParrainSame() {
   var inp = document.querySelector('[data-fld="parrain"]');
   if (!inp) return;
-  if (parrainSame()) { inp.value = ''; inp.disabled = true; inp.placeholder = 'Identique à la Galaxie'; }
-  else { inp.disabled = false; inp.placeholder = 'Alexandre Dussourd'; }
+  var fg = inp.parentNode;
+  if (parrainSame()) { inp.value = ''; if (fg) fg.style.display = 'none'; }
+  else { if (fg) fg.style.display = ''; }
 }
 
 // ── FORMULAIRE ────────────────────────────────────────────────
@@ -583,18 +587,24 @@ function loadForm() {
   if (chk) chk.checked = parrainSame();
   applyParrainSame();
   renderRdv();
+  renderFormGauges();
+  var org = document.getElementById('orgOn');
+  if (org) org.checked = state.profil.orgOn === true;
+  var obox = document.getElementById('orgBox');
+  if (obox) obox.style.display = (state.profil.orgOn === true) ? '' : 'none';
+  if (state.profil.orgOn === true) renderOrg();
 }
 function bindForm() {
   document.querySelectorAll('[data-fld]').forEach(function(el) {
     var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
     var isMoney = !!el.getAttribute('data-money');
     function save(v) { if (store === 'week') setW(id, v); else { state.profil[id] = v; saveState(); } }
-    el.addEventListener('input', function() { save(el.value); updatePreview(); });
+    el.addEventListener('input', function() { save(el.value); updatePreview(); renderFormGauges(); });
     if (isMoney) {
       // a la saisie : on montre les chiffres bruts ; a la sortie : format "1 000 000€"
       el.addEventListener('focus', function() { el.value = digitsOnly(el.value); });
       el.addEventListener('blur', function() {
-        el.value = fmtEuro(el.value); save(el.value); updatePreview();
+        el.value = fmtEuro(el.value); save(el.value); updatePreview(); renderFormGauges();
       });
     }
   });
@@ -700,6 +710,21 @@ function pctOf(total, objStr) {
   if (isNaN(o) || o <= 0) return null;
   return Math.round(total / o * 100);
 }
+// jauge d'avancement dans le formulaire
+function fmtGauge(total, objStr, elId) {
+  var el = document.getElementById(elId); if (!el) return;
+  var o = parseMoney(objStr);
+  if (isNaN(o) || o <= 0) { el.innerHTML = ''; return; }
+  var pc = Math.round(total / o * 100), bar = Math.min(pc, 100), ok = total >= o;
+  el.innerHTML = '<div class="fg-gauge-bar"><span style="width:' + bar + '%;background:' + (ok ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
+    '<div class="fg-gauge-lbl"><span><b>' + fmtMoney(total) + '</b> / ' + fmtMoney(o) + '</span>' +
+    '<span class="' + (ok ? 'green' : '') + '">' + pc + '%' + (ok ? ' ✓' : ' · reste ' + fmtMoney(o - total)) + '</span></div>';
+}
+function renderFormGauges() {
+  fmtGauge(pm(getW('vpActuel')), p('objVp'), 'gaugeVp');
+  fmtGauge(pm(getW('vaPersoActe')) + pm(getW('vaPersoEnCours')), p('objVaPerso'), 'gaugePerso');
+  fmtGauge(pm(getW('vaEquipeActe')) + pm(getW('vaEquipeEnCours')), p('objVaEquipe'), 'gaugeOrga');
+}
 // reste a faire = objectif - (acte + en cours) ; '' si non calculable
 function resteAFaire(objId, acteVal, enCoursVal) {
   var obj = parseMoney(p(objId)), a = parseMoney(acteVal), e = parseMoney(enCoursVal);
@@ -730,9 +755,9 @@ function prodWeek() {
     avg: Math.round(total / active), pct: goal ? Math.round(total / goal * 100) : 0 };
 }
 
-// ── GENERATION EMAIL (format sobre, titres en gras) ───────────
+// ── GENERATION EMAIL (structure UNIQUE, identique Manager/Expert) ──
 function buildEmail() {
-  return (state.mode === 'manager') ? buildManager() : buildExpert();
+  return buildManager();
 }
 // nouvelle section : ligne vide + titre en gras
 function secTitle(o, t) { o.push(''); o.push(bold(t)); }
@@ -743,8 +768,8 @@ function buildManager() {
   o.push('');
 
   // Lignee amont
-  if (p('galaxie')) o.push(bold('Manager Galaxie' + (parrainSame() ? ' & marraine' : '')) + ' : ' + p('galaxie'));
-  if (!parrainSame() && p('parrain')) o.push(bold('Parrain / Marraine manager') + ' : ' + p('parrain'));
+  if (p('galaxie')) o.push(bold('Galaxie' + (parrainSame() ? ' & manager' : '')) + ' : ' + p('galaxie'));
+  if (!parrainSame() && p('parrain')) o.push(bold('Manager') + ' : ' + p('parrain'));
   if (p('entree'))  o.push('Entrée dans le réseau : ' + p('entree'));
   if (p('contexte')) o.push(p('contexte'));
 
@@ -765,19 +790,8 @@ function buildManager() {
     o.push(t.lab + ' : ' + getRdv(t.id));
   });
 
-  // Objectif Developpement
-  secTitle(o, 'Objectif Développement');
-  if (p('objDevNb'))       o.push('Objectif' + (p('objDevDate') ? ' au ' + p('objDevDate') : '') + ' : ' + p('objDevNb') + ' conseillers');
-  if (p('equipeActuelle')) o.push('à date : équipe de ' + p('equipeActuelle'));
-  o.push('Qualification Manager : ' + p('devQualif'));
-  o.push('Actif : ' + p('devActif'));
-  o.push('Inscription Prodémial : ' + p('devProdemial'));
-  o.push('Inscription 3J : ' + p('devJ3'));
-  o.push('Inscription AD : ' + p('devAd'));
-  o.push('Inscription DM : ' + p('devDm'));
-  o.push('Inscription PO : ' + p('devPo'));
-  o.push('à inviter : ' + p('devInviter'));
-  o.push('SBY : ' + p('devSby'));
+  // Objectif Developpement (pipeline avec les noms a chaque etape)
+  emitDev(o);
 
   // Objectif VA Perso
   secTitle(o, 'Objectif VA Perso');
@@ -796,16 +810,21 @@ function buildManager() {
   if (getW('enSignature'))      o.push('En signature client : ' + getW('enSignature'));
   if (getW('validationClient')) o.push('Validation client : ' + getW('validationClient'));
   if (getW('pipe'))             o.push('Pipe : ' + getW('pipe'));
+  if (getW('encoursActuel') || p('objEncours'))
+    o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' / ' + p('objEncours') : ''));
 
   // Objectif VA Orga
-  if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours')) {
+  if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours') || p('conseillersActifs') || p('inscritsLignee')) {
     secTitle(o, 'Objectif VA Orga');
+    if (p('conseillersActifs')) o.push('Conseillers actifs : ' + p('conseillersActifs'));
     if (p('objVaEquipe')) {
       var opc = pctOf(pm(getW('vaEquipeActe')) + pm(getW('vaEquipeEnCours')), p('objVaEquipe'));
       o.push('Objectif VA Orga' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' = ' + p('objVaEquipe') + (opc != null ? ' (' + opc + '% de l\'objectif)' : ''));
     }
     if (getW('vaEquipeActe'))    o.push('VA VC : ' + getW('vaEquipeActe'));
     if (getW('vaEquipeEnCours')) o.push('VA EC : ' + getW('vaEquipeEnCours'));
+    if (p('inscritsLignee'))     o.push('Inscrits lignée : ' + p('inscritsLignee'));
+    if (p('ligneeTable'))        { o.push(''); o.push(lines(p('ligneeTable'))); }
   }
 
   // Objectif Forman
@@ -817,6 +836,9 @@ function buildManager() {
   // Evenements
   var ev = evenementsLines();
   if (ev) { secTitle(o, 'Événements'); o.push(ev); }
+
+  // Voyages / Ambitions
+  if (p('voyages')) { secTitle(o, 'Voyages / Ambitions'); o.push(lines(p('voyages'))); }
 
   if (p('signature')) { o.push(''); o.push('Bonne semaine,'); o.push(p('signature')); }
   return o.join('\n').replace(/\n{3,}/g, '\n\n');
@@ -852,14 +874,29 @@ function evenementsLines() {
   if (lines(p('evenementsAVenir')))   a.push(lines(p('evenementsAVenir')));
   return a.join('\n');
 }
+// Objectif Developpement : pipeline avec les noms a chaque etape (les deux modes)
+function emitDev(o) {
+  secTitle(o, 'Objectif Développement');
+  if (p('objDevNb'))       o.push('Objectif' + (p('objDevDate') ? ' au ' + p('objDevDate') : '') + ' : ' + p('objDevNb') + ' conseillers');
+  if (p('equipeActuelle')) o.push('à date : équipe de ' + p('equipeActuelle'));
+  o.push('Qualification Manager : ' + p('devQualif'));
+  o.push('Actif : ' + p('devActif'));
+  o.push('Inscription Prodémial : ' + p('devProdemial'));
+  o.push('Inscription 3J : ' + p('devJ3'));
+  o.push('Inscription AD : ' + p('devAd'));
+  o.push('Inscription DM : ' + p('devDm'));
+  o.push('Inscription PO : ' + p('devPo'));
+  o.push('à inviter : ' + p('devInviter'));
+  o.push('SBY : ' + p('devSby'));
+}
 
 function buildExpert() {
   var o = [];
   o.push('Bonjour à toutes et à tous,');
   o.push('');
 
-  if (p('galaxie'))  o.push(bold('Manager Galaxie' + (parrainSame() ? ' & marraine' : '')) + ' : ' + p('galaxie'));
-  if (!parrainSame() && p('parrain'))  o.push(bold('Parrain / Marraine manager') + ' : ' + p('parrain'));
+  if (p('galaxie'))  o.push(bold('Galaxie' + (parrainSame() ? ' & manager' : '')) + ' : ' + p('galaxie'));
+  if (!parrainSame() && p('parrain'))  o.push(bold('Manager') + ' : ' + p('parrain'));
   if (p('contexte')) o.push(p('contexte'));
 
   secTitle(o, 'Semaine passée');
@@ -1091,22 +1128,31 @@ function orgSet(id, field, val) {
   if (field === 'parentId' && !val) val = null;
   pers[field] = val; saveState();
   if (field === 'parentId') renderOrg();
-  else if (field === 'vaVc' || field === 'vaEc') updateOrgGauge(id);
+  else if (field === 'vaVc' || field === 'vaEc') renderOrg();
 }
 function orgSetHab(id, key, el) {
   var pers = orgById(id); if (!pers) return;
   pers[key] = !pers[key]; el.classList.toggle('on', pers[key]); saveState();
 }
 function orgMoneyBlur(id, field, el) { el.value = fmtEuro(el.value); orgSet(id, field, el.value); }
+function orgBranchTotal(id) {
+  var t = orgTotal(orgById(id));
+  orgDescendants(id).forEach(function(d){ var p2 = orgById(d); if (p2) t += orgTotal(p2); });
+  return t;
+}
+function orgGaugeRow(label, tot) {
+  var raf = tot - ORG_SEUIL, ok = raf >= 0;
+  var pct = ORG_SEUIL > 0 ? Math.min(Math.round(tot / ORG_SEUIL * 100), 100) : 0;
+  var txt = ok ? 'Qualifie (+' + fmtMoney(raf) + ')' : label + ' : ' + fmtMoney(ORG_SEUIL - tot);
+  return '<div class="org-gauge-bar" style="margin-top:6px"><span style="width:' + pct + '%;background:' + (ok ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
+    '<div class="org-gauge-lbl"><span>' + label + ' \u2014 ' + fmtMoney(tot) + ' / ' + fmtMoney(ORG_SEUIL) + '</span>' +
+    '<span class="raf ' + (ok ? 'green' : 'red') + '">' + txt + '</span></div>';
+}
 
 function orgGaugeHtml(pers) {
-  var tot = orgTotal(pers), raf = tot - ORG_SEUIL;
-  var pct = ORG_SEUIL > 0 ? Math.min(Math.round(tot / ORG_SEUIL * 100), 100) : 0;
-  var ok = raf >= 0;
-  var lbl = ok ? '✓ Qualifié Manager (+' + fmtMoney(raf) + ')' : 'RAF Manager : ' + fmtMoney(ORG_SEUIL - tot);
-  return '<div class="org-gauge-bar"><span style="width:' + pct + '%;background:' + (ok ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
-    '<div class="org-gauge-lbl"><span>' + fmtMoney(tot) + ' / ' + fmtMoney(ORG_SEUIL) + '</span>' +
-    '<span class="raf ' + (ok ? 'green' : 'red') + '">' + lbl + '</span></div>';
+  var h = orgGaugeRow('RAF Manager', orgTotal(pers));
+  if (orgDescendants(pers.id).length) h += orgGaugeRow('RAF branche', orgBranchTotal(pers.id));
+  return h;
 }
 function updateOrgGauge(id) {
   var pers = orgById(id), box = document.getElementById('gauge_' + id);
@@ -1174,6 +1220,35 @@ function renderOrg() {
     list.innerHTML = ordered.map(function(n){ return orgCardHtml(n.p, n.depth); }).join('');
   }
   updateOrgSummary();
+}
+
+function onOrgToggle() {
+  var chk = document.getElementById('orgOn');
+  state.profil.orgOn = !!(chk && chk.checked);
+  saveState();
+  var box = document.getElementById('orgBox');
+  if (box) box.style.display = state.profil.orgOn ? '' : 'none';
+  if (state.profil.orgOn) renderOrg();
+}
+function orgImportEquipe() {
+  var raw = null;
+  try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) {}
+  if (!raw) { alert('Aucune equipe trouvee dans "Construire son equipe" sur cet appareil. Ouvre ce module et cree ton equipe d\'abord.'); return; }
+  if (orgPeople().length && !confirm('Remplacer l\'organisation actuelle par ton equipe importee ?')) return;
+  state.org = { seq: 1, people: [] };
+  (function walk(node, parentId) {
+    (node.children || []).forEach(function(ch) {
+      var id = 'f' + (state.org.seq++);
+      var st = ch.statut || 'actif';
+      var qualif = (st === 'en-cours') ? 'Conseiller junior' : 'Conseiller';
+      state.org.people.push({ id:id, parentId:parentId, nom:((ch.prenom || '') + ' ' + (ch.nom || '')).trim(),
+        inscription:'', miobsp:false, mia:false, alpsi:false, cif:false, qualif:qualif, forman:'Neoman',
+        inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
+      walk(ch, id);
+    });
+  })(raw, null);
+  state.profil.orgOn = true;
+  saveState(); loadForm();
 }
 
 // ── INIT ──────────────────────────────────────────────────────
