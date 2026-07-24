@@ -931,13 +931,13 @@ function buildManager() {
     var ppc = pctOf(pm(getW('vaPersoActe')) + pm(getW('vaPersoEnCours')), p('objVaPerso'));
     o.push('Objectif VA Perso = ' + p('objVaPerso') + (ppc != null ? ' (' + ppc + '% de l\'objectif)' : ''));
   }
-  if (getW('vaPersoActe'))      o.push('VA VC : ' + getW('vaPersoActe'));
-  if (getW('vaPersoEnCours'))   o.push('VA EC : ' + getW('vaPersoEnCours'));
-  if (getW('valideStellium'))   o.push('Validé Stellium : ' + getW('valideStellium'));
-  if (getW('enCoursStellium'))  o.push('En cours de traitement Stellium : ' + getW('enCoursStellium'));
-  if (getW('enSignature'))      o.push('En signature client : ' + getW('enSignature'));
-  if (getW('validationClient')) o.push('Validation client : ' + getW('validationClient'));
-  if (getW('pipe'))             o.push('Opportunité : ' + getW('pipe'));
+  if (getW('vaPersoActe'))      o.push('🟢 VA VC : ' + getW('vaPersoActe'));
+  if (getW('vaPersoEnCours'))   o.push('🔵 VA EC : ' + getW('vaPersoEnCours'));
+  if (getW('valideStellium'))   o.push('🔷 Validé Stellium : ' + getW('valideStellium'));
+  if (getW('enCoursStellium'))  o.push('🔹 En cours de traitement Stellium : ' + getW('enCoursStellium'));
+  if (getW('enSignature'))      o.push('🟣 En signature client : ' + getW('enSignature'));
+  if (getW('validationClient')) o.push('🟡 Validation client : ' + getW('validationClient'));
+  if (getW('pipe'))             o.push('⚪ Opportunité : ' + getW('pipe'));
   if (getW('encoursActuel') || p('objEncours')) {
     o.push('');
     o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' / ' + p('objEncours') : ''));
@@ -950,8 +950,8 @@ function buildManager() {
       var opc = pctOf(pm(getW('vaEquipeActe')) + pm(getW('vaEquipeEnCours')), p('objVaEquipe'));
       o.push('Objectif VA Orga' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' = ' + p('objVaEquipe') + (opc != null ? ' (' + opc + '% de l\'objectif)' : ''));
     }
-    if (getW('vaEquipeActe'))    o.push('VA VC : ' + getW('vaEquipeActe'));
-    if (getW('vaEquipeEnCours')) o.push('VA EC : ' + getW('vaEquipeEnCours'));
+    if (getW('vaEquipeActe'))    o.push('🟢 VA VC : ' + getW('vaEquipeActe'));
+    if (getW('vaEquipeEnCours')) o.push('🔵 VA EC : ' + getW('vaEquipeEnCours'));
   }
 
   // Objectif Forman
@@ -984,12 +984,12 @@ function emitOrg(o) {
   o.push('Branches directes actives (≥ 500k€ exercice + 1 manager) : ' + myActiveBranches() + ' → ' + myQualif());
   // libelle habilitations obtenues
   function habStr(pers) {
-    var h = []; if (pers.immo) h.push('Immo'); if (pers.miobsp) h.push('Fin'); if (pers.mia) h.push('Ass'); if (pers.alpsi) h.push('AL'); if (pers.cif) h.push('CIF');
+    var h = []; if (pers.miobsp) h.push('M-IOBSP'); if (pers.mia) h.push('Ass'); if (pers.alpsi) h.push('AL'); if (pers.cif) h.push('CIF');
     return h.join('+');
   }
   // statut PMR + ce qu'il reste a faire pour la prochaine etape
   function statutStr(pers) {
-    var q = qualifAuto(pers), t = titrePerso(pers);
+    var q = qualifShown(pers), t = titrePerso(pers);
     if (t) q += ' · titre ' + t;
     if (!isManager(pers)) {
       var ec = equipeCumul(pers.id);
@@ -997,12 +997,6 @@ function emitOrg(o) {
       else if (!habilitePMR(pers) && equipeEx(pers.id) < ORG_PERSO) q += ' · 500k OK, manque habilitations ou 50k équipe/exercice';
     }
     return q;
-  }
-  // recrues en cours (parcours decouverte)
-  function recruesStr(pers) {
-    var r = (pers.recrues || []).filter(function(x){ return x.nom || x.etape; });
-    if (!r.length) return '';
-    return r.map(function(x){ return (x.nom || '(recrue)') + ' (' + (x.etape || 'DM') + ')'; }).join(', ');
   }
   function emitPerson(pers, depth) {
     var ind = new Array(depth + 1).join('  ');
@@ -1017,8 +1011,6 @@ function emitOrg(o) {
       head = ind + '- ' + (pers.nom || '(sans nom)') + ' : branche ' + fmtMoney(vg) + ' · ' + meta.join(' · ');
     }
     o.push(head);
-    var rc = recruesStr(pers);
-    if (rc) o.push(ind + '  Parcours découverte : ' + rc);
   }
   directs.forEach(function(dir) {
     o.push('');
@@ -1307,8 +1299,8 @@ function importJSON(input) {
 // ══════════════════════════════════════════════════════════════
 var ORG_QUALIF = ['(auto)', 'Consultant Junior', 'Consultant', 'Consultant Confirmé', 'Manager', 'Manager Planète', 'Manager Étoile', 'Manager Constellation', 'Manager Galaxie'];
 var ORG_FORMAN = ['Neoman', 'Beman', 'Adman', 'Man', 'Devman', 'DXman', 'Xman'];
-// Habilitations voie Manager PMR : Immobilier + Financement(IOBSP) + Assurance + (Agent lié/ALPSI ou CIF)
-var ORG_HAB = [['immo','Immobilier'], ['miobsp','Financement'], ['mia','Assurance'], ['alpsi','Agent lié'], ['cif','CIF']];
+// Habilitations voie Manager PMR : M-IOBSP (immo + financement) + Assurance + (Agent lié/ALPSI ou CIF)
+var ORG_HAB = [['miobsp','M-IOBSP'], ['mia','Assurance'], ['alpsi','Agent lié'], ['cif','CIF']];
 var ORG_ETAPES = ['DM', 'AD', '3J', 'Inscrit'];
 var ORG_SEUIL = 500000;    // 500k€ : Consultant Confirmé (VA équipe cumulé) + branche active (VA branche exercice)
 var ORG_PERSO = 50000;     // 50k€ VA perso : minimum Consultant Confirmé (cumul) et maintien Manager (exercice)
@@ -1369,8 +1361,8 @@ function equipeEx(id) { return equipeSum(id, orgTotal); }
 function equipeCumul(id) { return equipeSum(id, persoCumul); }
 
 // ── QUALIFICATIONS PMR ────────────────────────────────────────
-// Habilité voie Manager : Immobilier + Financement + Assurance + (Agent lié OU CIF)
-function habilitePMR(pers) { return !!(pers.immo && pers.miobsp && pers.mia && (pers.alpsi || pers.cif)); }
+// Habilité voie Manager : M-IOBSP (immo + financement) + Assurance + (Agent lié OU CIF)
+function habilitePMR(pers) { return !!(pers.miobsp && pers.mia && (pers.alpsi || pers.cif)); }
 // Consultant Confirmé : VA équipe cumulé ≥ 500k dont ≥ 50k perso (cumul, sans limite de temps)
 function isConfirme(pers) { return equipeCumul(pers.id) >= ORG_SEUIL && persoCumul(pers) >= ORG_PERSO; }
 // Manager : Confirmé + (habilité OU VA équipe ≥ 50k dans l'exercice) — ou qualif officielle saisie
@@ -1394,7 +1386,7 @@ function branchHasGalaxie(id) {
 // Qualification calculée d'un filleul
 function qualifAuto(pers) {
   if (!isConfirme(pers)) {
-    var anyHab = pers.immo || pers.miobsp || pers.mia || pers.alpsi || pers.cif;
+    var anyHab = pers.miobsp || pers.mia || pers.alpsi || pers.cif;
     return anyHab ? 'Consultant' : 'Consultant Junior';   // junior = pas encore habilité
   }
   if (!isManager(pers)) return 'Consultant Confirmé';
@@ -1405,6 +1397,8 @@ function qualifAuto(pers) {
   }
   return n === 3 ? 'Manager Constellation' : n === 2 ? 'Manager Étoile' : n === 1 ? 'Manager Planète' : 'Manager';
 }
+// Qualification affichée : override manuel si saisi, sinon calcul auto
+function qualifShown(pers) { return (pers.qualif && pers.qualif !== '(auto)') ? pers.qualif : qualifAuto(pers); }
 // Titre perso (VA perso exercice + enquête satisfaction positive)
 function titrePerso(pers) {
   if (!pers.enquete) return '';
@@ -1426,7 +1420,7 @@ function orgAdd(parentId) {
   if (!state.org.seq) state.org.seq = 1;
   var id = 'f' + (state.org.seq++);
   state.org.people.push({ id:id, parentId:parentId || null, nom:'', inscription:'',
-    immo:false, miobsp:false, mia:false, alpsi:false, cif:false, qualif:'(auto)', forman:'Neoman',
+    miobsp:false, mia:false, alpsi:false, cif:false, qualif:'(auto)', forman:'Neoman',
     enquete:false, recrues:[], vaVc:'', vaEc:'', vaClos:'' });
   saveState();
   if (state.view !== 'org') { state.view = 'org'; applyMode(); }
@@ -1465,12 +1459,12 @@ function orgGaugeHtml(pers) {
     h += '<div class="org-gauge-lbl"><span>Route Manager — VA équipe cumulé : ' + fmtMoney(ec) + ' / ' + fmtMoney(ORG_SEUIL) + '</span><span class="raf ' + (okv ? 'green' : 'red') + '">' + (okv ? '✓' : 'RAF ' + fmtMoney(ORG_SEUIL - ec)) + '</span></div>';
     var pc = persoCumul(pers), okp = pc >= ORG_PERSO;
     h += gLine('dont VA perso cumulé (≥ ' + fmtMoney(ORG_PERSO) + ')', okp ? '✓ ' + fmtMoney(pc) : fmtMoney(pc), okp ? 'green' : 'red');
-    h += gLine('Habilitations (Immo + Fin + Ass + Agent lié/CIF)', habilitePMR(pers) ? '✓ habilité' : 'incomplet', habilitePMR(pers) ? 'green' : 'red');
-    h += gLine('Statut PMR', qualifAuto(pers), '');
+    h += gLine('Habilitations (M-IOBSP + Assurance + Agent lié/CIF)', habilitePMR(pers) ? '✓ habilité' : 'incomplet', habilitePMR(pers) ? 'green' : 'red');
+    h += gLine('Statut PMR', qualifShown(pers), '');
   } else {
     var n = activeBranchesOf(pers.id);
     var next = n >= 4 ? '' : ' · prochaine : ' + (n === 0 ? 'Planète (1)' : n === 1 ? 'Étoile (2)' : n === 2 ? 'Constellation (3)' : 'Galaxie (4)');
-    h += gLine('Qualification', qualifAuto(pers), 'green');
+    h += gLine('Qualification', qualifShown(pers), 'green');
     h += gLine('Branches actives', n + next, '');
     var pe = orgTotal(pers), okm = pe >= ORG_PERSO;
     h += gLine('Maintien Manager (VA perso exercice ≥ ' + fmtMoney(ORG_PERSO) + ')', okm ? '✓ ' + fmtMoney(pe) : 'RAF ' + fmtMoney(ORG_PERSO - pe), okm ? 'green' : 'red');
@@ -1522,15 +1516,6 @@ function orgCardHtml(pers, depth) {
   h += orgF('VA cumulé exercices clos', '<input inputmode="numeric" value="' + esc(pers.vaClos) + '" placeholder="0" onfocus="this.value=digitsOnly(this.value)" onblur="orgMoneyBlur(' + q + ',\'vaClos\',this)">');
   h += orgF('Enquête satisfaction', '<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;cursor:pointer"><input type="checkbox"' + (pers.enquete ? ' checked' : '') + ' onchange="orgSetChk(' + q + ',\'enquete\',this)" style="accent-color:var(--orange)"> positive (titres/prime)</label>');
   h += '</div>';
-  // Recrues en cours — parcours découverte
-  h += '<div class="org-f" style="margin-bottom:10px"><label>Recrues en cours — parcours découverte</label>';
-  (pers.recrues || []).forEach(function(rc, i){
-    h += '<div style="display:flex;gap:4px;margin-bottom:4px">' +
-      '<input style="flex:1" value="' + esc(rc.nom) + '" placeholder="Prénom recrue" onchange="orgSetRecrue(' + q + ',' + i + ',\'nom\',this.value)">' +
-      '<select onchange="orgSetRecrue(' + q + ',' + i + ',\'etape\',this.value)">' + ORG_ETAPES.map(function(e){ return '<option' + (rc.etape === e ? ' selected' : '') + '>' + e + '</option>'; }).join('') + '</select>' +
-      '<button class="org-del" title="Retirer" onclick="orgRemoveRecrue(' + q + ',' + i + ')">✕</button></div>';
-  });
-  h += '<button class="org-del" style="color:var(--orange);font-size:11px;font-weight:600" onclick="orgAddRecrue(' + q + ')">+ recrue</button></div>';
   h += '<div class="org-gauge" id="gauge_' + pers.id + '">' + orgGaugeHtml(pers) + '</div>';
   h += '<div style="margin-top:8px"><button class="org-del" style="color:var(--orange);font-size:11px;font-weight:600" onclick="orgAdd(' + q + ')">+ filleul de ' + (esc(pers.nom) || 'ce filleul') + '</button></div>';
   h += '</div>';
@@ -1544,19 +1529,20 @@ function updateOrgSummary() {
   box.innerHTML = orgSum(ppl.length, 'Filleuls') + orgSum(orgChildren(null).length, 'Directs') +
     orgSum(actives, 'Branches actives', 'green') + orgSum(myQualifShort(), 'Ta qualif', 'orange');
 }
+// normalisation robuste des noms (accents/casse/espaces) pour matcher les 2 modules
+function orgNorm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' '); }
 function orgSyncToEquipe() {
   var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
   if (!raw) return;
-  var byName = {}; orgPeople().forEach(function(pp){ byName[(pp.nom || '').trim().toLowerCase()] = pp; });
+  var byName = {}; orgPeople().forEach(function(pp){ byName[orgNorm(pp.nom)] = pp; });
   (function walk(node) {
     (node.children || []).forEach(function(ch) {
-      var pp = byName[((ch.prenom || '') + ' ' + (ch.nom || '')).trim().toLowerCase()];
+      var pp = byName[orgNorm((ch.prenom || '') + ' ' + (ch.nom || ''))];
       if (pp) {
         ch.vaVc = pp.vaVc; ch.vaEc = pp.vaEc; ch.vaClos = pp.vaClos;
-        ch.habs = { immo:pp.immo, miobsp:pp.miobsp, mia:pp.mia, alpsi:pp.alpsi, cif:pp.cif };
-        ch.trackQualif = pp.qualif; ch.trackForman = pp.forman;
+        ch.habs = { miobsp:pp.miobsp, mia:pp.mia, alpsi:pp.alpsi, cif:pp.cif };
+        ch.trackQualif = pp.qualif; ch.forman = pp.forman;
         ch.inscription = pp.inscription; ch.enquete = pp.enquete;
-        ch.recrues = (pp.recrues || []).map(function(r){ return { nom:r.nom, etape:r.etape }; });
       }
       walk(ch);
     });
@@ -1600,7 +1586,7 @@ function orgImportEquipe() {
   // les valeurs deja saisies ici (VA, habilitations...) sont conservees.
   if (!state.org.seq) state.org.seq = 1;
   var people = orgPeople(), used = {};
-  function norm(s) { return String(s || '').trim().toLowerCase(); }
+  function norm(s) { return orgNorm(s); }
   function findByName(nom) {
     var n = norm(nom);
     for (var i = 0; i < people.length; i++) { if (!used[people[i].id] && norm(people[i].nom) === n) return people[i]; }
@@ -1615,14 +1601,13 @@ function orgImportEquipe() {
     if (has(ch.vaEc)) p.vaEc = ch.vaEc;
     if (has(ch.vaClos)) p.vaClos = ch.vaClos;
     if (ch.habs) {
-      p.immo = !!ch.habs.immo; p.miobsp = !!ch.habs.miobsp; p.mia = !!ch.habs.mia;
+      p.miobsp = !!ch.habs.miobsp; p.mia = !!ch.habs.mia;
       p.alpsi = !!ch.habs.alpsi; p.cif = !!ch.habs.cif;
     }
     if (has(ch.inscription)) p.inscription = ch.inscription;
     if (has(ch.trackQualif)) p.qualif = ch.trackQualif;
-    if (has(ch.trackForman)) p.forman = ch.trackForman;
+    if (has(ch.forman)) p.forman = ch.forman;
     if (ch.enquete !== undefined) p.enquete = !!ch.enquete;
-    if (ch.recrues && ch.recrues.length) p.recrues = ch.recrues.map(function(r){ return { nom:r.nom, etape:r.etape }; });
   }
   (function walk(node, parentId) {
     (node.children || []).forEach(function(ch) {
@@ -1633,9 +1618,9 @@ function orgImportEquipe() {
       else {
         id = 'f' + (state.org.seq++);
         p = { id:id, parentId:parentId, nom:nom,
-          inscription:'', immo:false, miobsp:false, mia:false, alpsi:false, cif:false,
+          inscription:'', miobsp:false, mia:false, alpsi:false, cif:false,
           qualif:'(auto)', forman:'Neoman',
-          enquete:false, recrues:[], vaVc:'', vaEc:'', vaClos:'' };
+          enquete:false, vaVc:'', vaEc:'', vaClos:'' };
         people.push(p);
         used[id] = 1;
       }

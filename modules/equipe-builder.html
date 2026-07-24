@@ -233,11 +233,14 @@
       <input type="text" id="modalVaVc" inputmode="numeric" placeholder="VA VC (année) €">
       <input type="text" id="modalVaEc" inputmode="numeric" placeholder="VA EC (année) €">
     </div>
+    <select id="modalForman" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
+      <option value="">Chemin Forman (aucun)</option>
+      <option>Neoman</option><option>Beman</option><option>Adman</option><option>Man</option><option>Devman</option><option>DXman</option><option>Xman</option>
+    </select>
     <div style="margin-bottom:12px">
       <div style="font-size:11px;font-weight:600;color:var(--ink-60);margin-bottom:6px">Habilitations</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <label class="eb-hab"><input type="checkbox" id="habImmo"> Immobilier</label>
-        <label class="eb-hab"><input type="checkbox" id="habMiobsp"> Financement (IOBSP)</label>
+        <label class="eb-hab"><input type="checkbox" id="habMiobsp"> M-IOBSP</label>
         <label class="eb-hab"><input type="checkbox" id="habMia"> Assurance (MIA)</label>
         <label class="eb-hab"><input type="checkbox" id="habAlpsi"> ALPSI/Agent li&#233;</label>
         <label class="eb-hab"><input type="checkbox" id="habCif"> CIF</label>
@@ -358,8 +361,8 @@ function ebPm(s){var d=ebDigits(s);return d?parseInt(d,10):0;}
 function ebFmtShort(n){if(n>=1e6)return (Math.round(n/1e5)/10).toString().replace('.',',')+'M';if(n>=1e3)return Math.round(n/1e3)+'k';return ''+Math.round(n);}
 // Volume Global Organisation = VA du noeud + toute sa descendance
 function ebVolGlobal(node){var t=ebPm(node.vaVc)+ebPm(node.vaEc);if(node.children)node.children.forEach(function(ch){t+=ebVolGlobal(ch);});return t;}
-// Habilite au sens du PMR : Immobilier + Financement(IOBSP) + Assurance + (ALPSI/agent lie ou CIF)
-function ebHabilite(node){var h=node.habs||{};return !!(h.immo&&h.mia&&h.miobsp&&(h.alpsi||h.cif));}
+// Habilite au sens du PMR : M-IOBSP (immo + financement) + Assurance + (ALPSI/agent lie ou CIF)
+function ebHabilite(node){var h=node.habs||{};return !!(h.mia&&h.miobsp&&(h.alpsi||h.cif));}
 // Manager = qualif manager+ (structure) OU volume orga >= 500k ET habilite PMR
 function ebIsManager(node){var q=getQualif(node);if(isManagerQualif(q.code))return true;return ebVolGlobal(node)>=500000&&ebHabilite(node);}
 function ebHasManager(node){if(ebIsManager(node))return true;if(node.children){for(var i=0;i<node.children.length;i++){if(ebHasManager(node.children[i]))return true;}}return false;}
@@ -447,13 +450,15 @@ function ebSetModalExtra(node){
   V('modalVaVc').value=node?(node.vaVc||''):'';
   V('modalVaEc').value=node?(node.vaEc||''):'';
   var h=(node&&node.habs)||{};
-  V('habImmo').checked=!!h.immo;V('habMiobsp').checked=!!h.miobsp;V('habMia').checked=!!h.mia;V('habAlpsi').checked=!!h.alpsi;V('habCif').checked=!!h.cif;
+  V('habMiobsp').checked=!!h.miobsp;V('habMia').checked=!!h.mia;V('habAlpsi').checked=!!h.alpsi;V('habCif').checked=!!h.cif;
+  V('modalForman').value=(node&&node.forman)||'';
 }
 function ebReadModalExtra(target){
   target.vaVc=ebFmtEuro(V('modalVaVc').value)||undefined;
   target.vaEc=ebFmtEuro(V('modalVaEc').value)||undefined;
-  var habs={immo:V('habImmo').checked,miobsp:V('habMiobsp').checked,mia:V('habMia').checked,alpsi:V('habAlpsi').checked,cif:V('habCif').checked};
-  target.habs=(habs.immo||habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
+  var habs={miobsp:V('habMiobsp').checked,mia:V('habMia').checked,alpsi:V('habAlpsi').checked,cif:V('habCif').checked};
+  target.habs=(habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
+  target.forman=V('modalForman').value||undefined;
 }
 
 function closeModal(){
@@ -701,7 +706,7 @@ function renderNode(node,path,depth){
   html+='<div class="node-avatar" style="background:'+qColor+'">'+getInitials(node)+'</div>';
   html+='<div class="node-info">';
   html+='<div class="node-name">'+esc(node.prenom)+' '+esc(node.nom)+statutPill+'</div>';
-  html+='<div class="node-level" style="color:'+qColor+'">'+q.label+'</div>';
+  html+='<div class="node-level" style="color:'+qColor+'">'+q.label+(node.forman?' <span style="color:var(--ink-30);font-weight:600">&middot; '+esc(node.forman)+'</span>':'')+'</div>';
   var meta=[];
   if(directs>0)meta.push(directs+' direct'+(directs>1?'s':''));
   if(branchesActives>0)meta.push(branchesActives+' branche'+(branchesActives>1?'s':'')+' active'+(branchesActives>1?'s':''));
