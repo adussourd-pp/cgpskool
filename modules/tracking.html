@@ -1004,18 +1004,27 @@ function emitOrg(o) {
   var directs = orgChildren(null); if (!directs.length) return;
   secTitle(o, 'Organisation — qualification Galaxie');
   o.push('Branches directes actives (≥ 500k€ + 1 manager) : ' + myActiveBranches() + ' → ' + myQualif());
+  function habStr(pers) {
+    var h = []; if (pers.mia) h.push('MIA'); if (pers.miobsp) h.push('IOBSP'); if (pers.alpsi) h.push('ALPSI'); if (pers.cif) h.push('CIF');
+    return h.join('/');
+  }
+  function qualifStr(pers) { return pers.qualif ? pers.qualif : (isManagerQualif(pers) ? 'Manager' : ''); }
   directs.forEach(function(dir) {
     var vg = orgBranchTotal(dir.id), act = branchActive(dir.id);
+    var meta = [];
+    if (qualifStr(dir)) meta.push(qualifStr(dir));
+    if (habStr(dir)) meta.push(habStr(dir));
     o.push('');
+    // en-tete = direct + volume cumule de TOUTE la branche (toutes profondeurs)
     o.push((dir.nom || '(sans nom)') + ' — branche ' + fmtMoney(vg) + ' → ' +
-      (act ? 'active ✓' : (vg >= ORG_SEUIL ? 'volume OK, manque 1 manager' : 'RAF ' + fmtMoney(ORG_SEUIL - vg))));
-    [{ p:dir, depth:0 }].concat(subtreeOrdered(dir.id, 1)).forEach(function(m) {
-      var pers = m.p, meta = [], indent = new Array(m.depth + 1).join('  ');
-      meta.push('orga ' + fmtMoney(orgBranchTotal(pers.id)));
-      if (isManagerQualif(pers)) meta.push('Manager✓');
-      var habs = []; if (pers.mia) habs.push('MIA'); if (pers.miobsp) habs.push('IOBSP'); if (pers.alpsi) habs.push('ALPSI'); if (pers.cif) habs.push('CIF');
-      if (habs.length) meta.push(habs.join('/'));
-      o.push(indent + '- ' + (pers.nom || '(sans nom)') + ' : ' + meta.join(' · '));
+      (act ? 'active ✓' : (vg >= ORG_SEUIL ? 'volume OK, manque 1 manager' : 'RAF ' + fmtMoney(ORG_SEUIL - vg))) +
+      (meta.length ? ' · ' + meta.join(' · ') : ''));
+    // uniquement les filleuls en profondeur (pas de repetition du direct)
+    subtreeOrdered(dir.id, 1).forEach(function(m) {
+      var pers = m.p, mm = ['orga ' + fmtMoney(orgBranchTotal(pers.id))];
+      if (qualifStr(pers)) mm.push(qualifStr(pers));
+      if (habStr(pers)) mm.push(habStr(pers));
+      o.push(new Array(m.depth + 1).join('  ') + '- ' + (pers.nom || '(sans nom)') + ' : ' + mm.join(' · '));
     });
   });
 }
