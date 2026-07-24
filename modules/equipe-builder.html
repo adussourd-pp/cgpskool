@@ -207,10 +207,13 @@
     <div class="add-sub" id="modalSub">sous Alexandre DUSSOURD</div>
     <input type="text" id="modalPrenom" placeholder="Pr&#233;nom" onkeydown="if(event.key==='Enter')document.getElementById('modalNom').focus()">
     <input type="text" id="modalNom" placeholder="Nom" onkeydown="if(event.key==='Enter')confirmAdd()">
-    <div class="statut-toggle" id="modalStatut" data-value="actif">
-      <button type="button" data-statut="actif" class="on" onclick="setStatut('actif')">Actif</button>
-      <button type="button" data-statut="inscrit" onclick="setStatut('inscrit')">Inscrit</button>
-      <button type="button" data-statut="en-cours" onclick="setStatut('en-cours')">En cours</button>
+    <div style="font-size:11px;font-weight:600;color:var(--ink-60);margin-bottom:5px">Parcours d&#233;couverte <span style="font-weight:400;color:var(--ink-30)">&mdash; DM &rarr; AD &rarr; 3J &rarr; Inscrit &rarr; Actif</span></div>
+    <div class="statut-toggle" id="modalStatut" data-value="Actif">
+      <button type="button" data-statut="DM" onclick="setStatut('DM')">DM</button>
+      <button type="button" data-statut="AD" onclick="setStatut('AD')">AD</button>
+      <button type="button" data-statut="3J" onclick="setStatut('3J')">3J</button>
+      <button type="button" data-statut="Inscrit" onclick="setStatut('Inscrit')">Inscrit</button>
+      <button type="button" data-statut="Actif" class="on" onclick="setStatut('Actif')">Actif</button>
     </div>
     <select id="modalQualif" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
       <option value="">Qualification auto (selon &#233;quipe)</option>
@@ -402,8 +405,11 @@ function setStatut(v){
 
 function getModalStatut(){
   var box=V('modalStatut');
-  return (box&&box.getAttribute('data-value'))||'actif';
+  return (box&&box.getAttribute('data-value'))||'Actif';
 }
+// etape de parcours <-> statut interne (DM/AD/3J = en-cours ; Inscrit ; Actif)
+function stageToStatut(stage){ return stage==='Inscrit'?'inscrit':(stage==='Actif'||!stage)?'actif':'en-cours'; }
+function nodeStage(node){ var s=node.statut||'actif'; if(s==='inscrit')return 'Inscrit'; if(s==='en-cours')return node.parcours||'DM'; return 'Actif'; }
 
 function openAdd(path){
   var parent=getNode(path);
@@ -416,7 +422,7 @@ function openAdd(path){
   V('modalNom').value='';
   V('modalQualif').value='';
   ebSetModalExtra(null);
-  setStatut('actif');
+  setStatut('Actif');
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -432,7 +438,7 @@ function openEdit(path){
   V('modalNom').value=node.nom;
   V('modalQualif').value=node.qualif||'';
   ebSetModalExtra(node);
-  setStatut(node.statut||'actif');
+  setStatut(nodeStage(node));
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
 }
@@ -461,13 +467,16 @@ function confirmAdd(){
   if(!p&&!n){V('modalPrenom').focus();return}
 
   var qualif=V('modalQualif').value||'';
-  var statut=getModalStatut();
+  var stage=getModalStatut();
+  var statut=stageToStatut(stage);
+  var parcours=(statut==='en-cours')?stage:undefined;
   if(editTarget!==null){
     var node=getNode(editTarget);
     if(node){
       node.prenom=p;node.nom=n;
       node.qualif=qualif||undefined;
-      node.statut=(statut&&statut!=='actif')?statut:undefined;
+      node.statut=(statut!=='actif')?statut:undefined;
+      node.parcours=parcours;
       ebReadModalExtra(node);
     }
   } else if(addTarget!==null){
@@ -476,7 +485,8 @@ function confirmAdd(){
       if(!parent.children)parent.children=[];
       var newNode={prenom:p,nom:n,children:[]};
       if(qualif)newNode.qualif=qualif;
-      if(statut&&statut!=='actif')newNode.statut=statut;
+      if(statut!=='actif')newNode.statut=statut;
+      if(parcours)newNode.parcours=parcours;
       ebReadModalExtra(newNode);
       parent.children.push(newNode);
     }
@@ -510,9 +520,10 @@ function countNodes(node){
 }
 
 function countByStatut(node,acc){
-  acc=acc||{actif:0,inscrit:0,'en-cours':0};
+  acc=acc||{actif:0,inscrit:0,'en-cours':0,DM:0,AD:0,'3J':0};
   var st=node.statut||'actif';
   if(acc[st]!==undefined)acc[st]++;
+  if(st==='en-cours'){var pc=node.parcours||'DM';if(acc[pc]!==undefined)acc[pc]++;}
   if(node.children)node.children.forEach(function(ch){countByStatut(ch,acc)});
   return acc;
 }
@@ -677,7 +688,7 @@ function renderNode(node,path,depth){
   var statutPill='';
   if(statut==='actif')statutPill=' <span class="node-statut-pill actif">Actif</span>';
   else if(statut==='inscrit')statutPill=' <span class="node-statut-pill inscrit">Inscrit</span>';
-  else if(statut==='en-cours')statutPill=' <span class="node-statut-pill en-cours">En cours</span>';
+  else if(statut==='en-cours')statutPill=' <span class="node-statut-pill en-cours">'+(node.parcours||'En cours')+'</span>';
 
   var html='<div class="node-group">';
   var dragAttrs=isRoot?'':' draggable="true"'
@@ -764,7 +775,8 @@ function render(){
   V('statTotal').textContent=total;
   V('statActifs').textContent=st.actif;
   V('statInscrits').textContent=st.inscrit;
-  V('statEnCours').textContent=st['en-cours'];
+  var brk=['DM','AD','3J'].filter(function(k){return st[k]}).map(function(k){return st[k]+' '+k}).join(' · ');
+  V('statEnCours').textContent=st['en-cours']+(brk?' ('+brk+')':'');
   V('statInscritsPill').style.display=st.inscrit>0?'':'none';
   V('statEnCoursPill').style.display=st['en-cours']>0?'':'none';
   V('statDepth').textContent=depth;
