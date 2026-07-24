@@ -1192,7 +1192,7 @@ function regeneratePreview() {
 function markMailSent() {
   try {
     var d = {}; try { d = JSON.parse(localStorage.getItem('cgpskool_tracking_sent')) || {}; } catch(e) {}
-    d[weekKey(getMonday(new Date()))] = 1;
+    d[weekKey(getCurrentMonday())] = 1;
     localStorage.setItem('cgpskool_tracking_sent', JSON.stringify(d));
   } catch(e) {}
   updateWeekSent();
