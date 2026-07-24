@@ -1411,22 +1411,37 @@ function orgImportEquipe() {
   var raw = null;
   try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) {}
   if (!raw) { alert('Aucune equipe trouvee dans "Construire son equipe" sur cet appareil. Ouvre ce module et cree ton equipe d\'abord.'); return; }
-  if (orgPeople().length && !confirm('Remplacer l\'organisation actuelle par ton equipe importee ?')) return;
-  state.org = { seq: 1, people: [] };
+  // FUSION : la structure suit "Construire son equipe" (derniere version),
+  // les valeurs deja saisies ici (VA, habilitations...) sont conservees.
+  if (!state.org.seq) state.org.seq = 1;
+  var people = orgPeople(), used = {};
+  function norm(s) { return String(s || '').trim().toLowerCase(); }
+  function findByName(nom) {
+    var n = norm(nom);
+    for (var i = 0; i < people.length; i++) { if (!used[people[i].id] && norm(people[i].nom) === n) return people[i]; }
+    return null;
+  }
   (function walk(node, parentId) {
     (node.children || []).forEach(function(ch) {
       if ((ch.statut || 'actif') === 'en-cours') return;   // pas reellement inscrit -> ignore
-      var id = 'f' + (state.org.seq++);
-      var st = ch.statut || 'actif';
-      var qualif = (st === 'inscrit') ? 'Conseiller junior' : 'Conseiller';
-      state.org.people.push({ id:id, parentId:parentId, nom:((ch.prenom || '') + ' ' + (ch.nom || '')).trim(),
-        inscription:'', miobsp:false, mia:false, alpsi:false, cif:false, qualif:qualif, forman:'Neoman',
-        inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
+      var nom = ((ch.prenom || '') + ' ' + (ch.nom || '')).trim();
+      var ex = findByName(nom), id;
+      if (ex) { ex.parentId = parentId; ex.nom = nom; used[ex.id] = 1; id = ex.id; }   // garde ses volumes/habilitations
+      else {
+        id = 'f' + (state.org.seq++);
+        people.push({ id:id, parentId:parentId, nom:nom,
+          inscription:'', miobsp:false, mia:false, alpsi:false, cif:false,
+          qualif:((ch.statut === 'inscrit') ? 'Conseiller junior' : 'Conseiller'), forman:'Neoman',
+          inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
+        used[id] = 1;
+      }
       walk(ch, id);
     });
   })(raw, null);
+  state.org.people = people;
   state.profil.orgOn = true;
   saveState(); loadForm();
+  alert('Organisation synchronisee avec "Construire son equipe" : structure mise a jour, tes volumes et habilitations conserves.');
 }
 
 // ── INIT ──────────────────────────────────────────────────────
