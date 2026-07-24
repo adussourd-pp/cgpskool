@@ -231,10 +231,11 @@
       <option value="galaxie-3e">Manager Galaxie 3 &#233;toiles</option>
       <option value="galaxie-4e">Manager Galaxie 4 &#233;toiles</option>
     </select>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <input type="text" id="modalVaVc" inputmode="numeric" placeholder="VA VC (année) €">
       <input type="text" id="modalVaEc" inputmode="numeric" placeholder="VA EC (année) €">
     </div>
+    <input type="text" id="modalVaClos" inputmode="numeric" placeholder="VA cumulé exercices clos (carrière) €" style="width:100%;margin-bottom:10px">
     <select id="modalForman" style="width:100%;padding:10px 14px;border:1.5px solid var(--rule-l);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:#fff;outline:none;margin-bottom:10px">
       <option value="">Chemin Forman (aucun)</option>
       <option>Neoman</option><option>Beman</option><option>Adman</option><option>Man</option><option>Devman</option><option>DXman</option><option>Xman</option>
@@ -372,11 +373,14 @@ function ebFmtEuro(s){var d=ebDigits(s);if(!d)return '';d=d.replace(/^0+(?=\d)/,
 function ebPm(s){var d=ebDigits(s);return d?parseInt(d,10):0;}
 function ebFmtShort(n){if(n>=1e6)return (Math.round(n/1e5)/10).toString().replace('.',',')+'M';if(n>=1e3)return Math.round(n/1e3)+'k';return ''+Math.round(n);}
 // Volume Global Organisation = VA du noeud + toute sa descendance
+// exercice en cours (VA VC + EC) — sert aux branches actives
 function ebVolGlobal(node){var t=ebPm(node.vaVc)+ebPm(node.vaEc);if(node.children)node.children.forEach(function(ch){t+=ebVolGlobal(ch);});return t;}
+// cumul carriere (VA VC + EC + exercices clos) — sert au passage Manager
+function ebVolCumul(node){var t=ebPm(node.vaVc)+ebPm(node.vaEc)+ebPm(node.vaClos);if(node.children)node.children.forEach(function(ch){t+=ebVolCumul(ch);});return t;}
 // Habilite au sens du PMR : M-IOBSP (immo + financement) + Assurance + (ALPSI/agent lie ou CIF)
 function ebHabilite(node){var h=node.habs||{};return !!(h.mia&&h.miobsp&&(h.alpsi||h.cif));}
 // Manager = qualif manager+ (structure) OU volume orga >= 500k ET habilite PMR
-function ebIsManager(node){var q=getQualif(node);if(isManagerQualif(q.code))return true;return ebVolGlobal(node)>=500000&&ebHabilite(node);}
+function ebIsManager(node){var q=getQualif(node);if(isManagerQualif(q.code))return true;return ebVolCumul(node)>=500000&&ebHabilite(node);}
 function ebHasManager(node){if(ebIsManager(node))return true;if(node.children){for(var i=0;i<node.children.length;i++){if(ebHasManager(node.children[i]))return true;}}return false;}
 // Branche active = >= 500k Volume Global ET au moins 1 manager dans la branche
 function ebBranchActive(node){return ebVolGlobal(node)>=500000&&ebHasManager(node);}
@@ -500,6 +504,7 @@ function openEdit(path){
 function ebSetModalExtra(node){
   V('modalVaVc').value=node?(node.vaVc||''):'';
   V('modalVaEc').value=node?(node.vaEc||''):'';
+  V('modalVaClos').value=node?(node.vaClos||''):'';
   var h=(node&&node.habs)||{};
   V('habMiobsp').checked=!!h.miobsp;V('habMia').checked=!!h.mia;V('habAlpsi').checked=!!h.alpsi;V('habCif').checked=!!h.cif;
   V('modalForman').value=(node&&node.forman)||'';
@@ -510,6 +515,7 @@ var EB_EVENTS=['evUdpJanv','evForum','evUdpAvril','evUdpRentree','evConvention']
 function ebReadModalExtra(target){
   target.vaVc=ebFmtEuro(V('modalVaVc').value)||undefined;
   target.vaEc=ebFmtEuro(V('modalVaEc').value)||undefined;
+  target.vaClos=ebFmtEuro(V('modalVaClos').value)||undefined;
   var habs={miobsp:V('habMiobsp').checked,mia:V('habMia').checked,alpsi:V('habAlpsi').checked,cif:V('habCif').checked};
   target.habs=(habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
   target.forman=V('modalForman').value||undefined;
@@ -768,9 +774,9 @@ function renderNode(node,path,depth){
   if(branchesActives>0)meta.push(branchesActives+' branche'+(branchesActives>1?'s':'')+' active'+(branchesActives>1?'s':''));
   if(childCount>0)meta.push(childCount+' total');
   if(meta.length)html+='<div class="node-count">'+meta.join(' \u00b7 ')+'</div>';
-  var vol=ebVolGlobal(node),volOk=vol>=500000,volPct=Math.min(Math.round(vol/500000*100),100);
+  var vol=ebVolCumul(node),volOk=vol>=500000,volPct=Math.min(Math.round(vol/500000*100),100);
   html+='<div class="node-vol"><div class="node-vol-bar"><span style="width:'+volPct+'%;background:'+(volOk?'#2da064':'var(--orange)')+'"></span></div>'+
-    '<div class="node-vol-lbl">Vol orga <b>'+ebFmtShort(vol)+'</b> / 500k\u20ac '+(volOk?(ebHabilite(node)?'<span class="ok">\u2713 Manager</span>':'<span class="ok">seuil OK</span> \u00b7 habilit. ?'):'<span class="no">RAF '+ebFmtShort(500000-vol)+'</span>')+'</div></div>';
+    '<div class="node-vol-lbl">Vol cumul&eacute; <b>'+ebFmtShort(vol)+'</b> / 500k\u20ac '+(volOk?(ebHabilite(node)?'<span class="ok">\u2713 Manager</span>':'<span class="ok">seuil OK</span> \u00b7 habilit. ?'):'<span class="no">RAF '+ebFmtShort(500000-vol)+'</span>')+'</div></div>';
   html+='</div>';
   html+='<div class="node-actions">';
   html+='<button class="node-act" title="Modifier" onclick="event.stopPropagation();openEdit('+pathStr+')">&#9998;</button>';
@@ -889,7 +895,7 @@ CGP.project.registerModule('equipe-builder', {
   <div class="me-body">
     <div class="me-item open"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">1</span><span class="me-item-title">Cr&eacute;e ta racine (toi)</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">La premi&egrave;re fois, saisis ton pr&eacute;nom et ton nom : tu es la racine de ton organisation. Tous tes filleuls viendront se rattacher sous toi.</div></div>
     <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">2</span><span class="me-item-title">Ajoute tes membres</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Clique <b>&laquo; Ajouter un membre &raquo;</b> (ou le + sur un n&oelig;ud pour un filleul en profondeur). Pour chaque personne, choisis son &eacute;tape dans le <b>parcours d&eacute;couverte</b> : <b>DM &rarr; AD &rarr; 3J &rarr; Inscrit &rarr; Actif</b>. Les DM/AD/3J sont des recrues en cours (non encore inscrites).<div class="me-tip">Le compteur &laquo; En cours &raquo; en haut se d&eacute;taille par &eacute;tape (ex. 3 dont 1 DM &middot; 1 AD &middot; 1 3J).</div></div></div>
-    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">3</span><span class="me-item-title">Renseigne les VA</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Dans la fiche d'un membre : <b>VA VC</b> et <b>VA EC</b> de l'exercice en cours. Le volume alimente la jauge 500k&euro; et les branches actives. Le VA cumul&eacute; des exercices clos (cumul carri&egrave;re) se renseigne c&ocirc;t&eacute; Mail Manager et remonte via &laquo; Reprendre du Mail Manager &raquo;.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">3</span><span class="me-item-title">Renseigne les VA</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Dans la fiche d'un membre : <b>VA VC</b> et <b>VA EC</b> de l'exercice en cours, et le <b>VA cumul&eacute; des exercices clos</b> (les ann&eacute;es pass&eacute;es). Le <b>cumul carri&egrave;re</b> (clos + exercice) alimente la jauge 500k&euro; du passage Manager ; l'<b>exercice</b> seul d&eacute;termine les branches actives.</div></div>
     <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">4</span><span class="me-item-title">Habilitations</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Coche les habilitations obtenues : <b>M-IOBSP</b> (immobilier + financement), <b>ASS II</b>, <b>Agent li&eacute;</b>, <b>CIF</b>. Au sens du PMR, &ecirc;tre <b>habilit&eacute;</b> = M-IOBSP + ASS II + (Agent li&eacute; ou CIF) &mdash; une des voies pour devenir Manager.</div></div>
     <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">5</span><span class="me-item-title">Chemin Forman &amp; 5 &eacute;v&eacute;nements cl&eacute;s</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Indique le <b>chemin Forman</b> (Neoman &rarr; Beman &rarr; ... &rarr; Xman) et coche la <b>participation aux 5 &eacute;v&eacute;nements cl&eacute;s</b> (UDP Janv, Forum, UDP Avril, UDP Rentr&eacute;e, Convention), comme les habilitations.</div></div>
     <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">6</span><span class="me-item-title">La jauge 500k&euro; &amp; la qualification</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Chaque n&oelig;ud affiche son <b>Volume Global Organisation</b> (sa VA + toute sa descendance) sur 500k&euro;. Une <b>branche est active</b> quand elle d&eacute;passe 500k&euro; sur l'exercice avec au moins 1 manager. Ton nombre de branches actives d&eacute;termine ta qualif : <b>Plan&egrave;te / &Eacute;toile / Constellation / Galaxie</b>.</div></div>
