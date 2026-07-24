@@ -56,6 +56,15 @@
 .node-name{font-size:13px;font-weight:600;color:var(--ink)}
 .node-level{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
 .node-count{font-size:9px;color:var(--ink-30)}
+.eb-hab{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-60);background:#f5f4f1;border:1px solid var(--rule-l);border-radius:6px;padding:5px 8px;cursor:pointer;user-select:none}
+.eb-hab input{accent-color:var(--orange);margin:0}
+.node-vol{margin-top:5px;min-width:150px}
+.node-vol-bar{height:5px;background:rgba(0,0,0,0.07);border-radius:3px;overflow:hidden}
+.node-vol-bar>span{display:block;height:100%;border-radius:3px}
+.node-vol-lbl{font-size:9px;color:var(--ink-60);margin-top:2px;white-space:nowrap}
+.node-vol-lbl b{color:var(--ink)}
+.node-vol-lbl .ok{color:#2da064;font-weight:700}
+.node-vol-lbl .no{color:#c0392b;font-weight:700}
 
 /* Node actions */
 .node-actions{position:absolute;right:-8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:3px;opacity:0;transition:opacity 0.15s}
@@ -217,6 +226,19 @@
       <option value="galaxie-3e">Manager Galaxie 3 &#233;toiles</option>
       <option value="galaxie-4e">Manager Galaxie 4 &#233;toiles</option>
     </select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <input type="text" id="modalVaVc" inputmode="numeric" placeholder="VA VC (année) €">
+      <input type="text" id="modalVaEc" inputmode="numeric" placeholder="VA EC (année) €">
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink-60);margin-bottom:6px">Habilitations</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <label class="eb-hab"><input type="checkbox" id="habMiobsp"> Immo-IOBSP</label>
+        <label class="eb-hab"><input type="checkbox" id="habMia"> Assurance (MIA)</label>
+        <label class="eb-hab"><input type="checkbox" id="habAlpsi"> ALPSI/Agent li&#233;</label>
+        <label class="eb-hab"><input type="checkbox" id="habCif"> CIF</label>
+      </div>
+    </div>
     <div class="add-actions">
       <button class="btn-dismiss" onclick="closeModal()">Annuler</button>
       <button class="btn-confirm" onclick="confirmAdd()">Ajouter</button>
@@ -325,6 +347,21 @@ var QUALIF_COLORS={
 
 function V(id){return document.getElementById(id)}
 
+// ── PMR : volumes & qualification 500k€ ───────────────────────
+function ebDigits(s){return String(s==null?'':s).replace(/[^\d]/g,'');}
+function ebFmtEuro(s){var d=ebDigits(s);if(!d)return '';d=d.replace(/^0+(?=\d)/,'');return d.replace(/\B(?=(\d{3})+(?!\d))/g,' ')+'€';}
+function ebPm(s){var d=ebDigits(s);return d?parseInt(d,10):0;}
+function ebFmtShort(n){if(n>=1e6)return (Math.round(n/1e5)/10).toString().replace('.',',')+'M';if(n>=1e3)return Math.round(n/1e3)+'k';return ''+Math.round(n);}
+// Volume Global Organisation = VA du noeud + toute sa descendance
+function ebVolGlobal(node){var t=ebPm(node.vaVc)+ebPm(node.vaEc);if(node.children)node.children.forEach(function(ch){t+=ebVolGlobal(ch);});return t;}
+// Habilite au sens du PMR : Assurance (MIA) + IOBSP + (ALPSI/agent lie ou CIF)
+function ebHabilite(node){var h=node.habs||{};return !!(h.mia&&h.miobsp&&(h.alpsi||h.cif));}
+// Manager = qualif manager+ (structure) OU volume orga >= 500k ET habilite PMR
+function ebIsManager(node){var q=getQualif(node);if(isManagerQualif(q.code))return true;return ebVolGlobal(node)>=500000&&ebHabilite(node);}
+function ebHasManager(node){if(ebIsManager(node))return true;if(node.children){for(var i=0;i<node.children.length;i++){if(ebHasManager(node.children[i]))return true;}}return false;}
+// Branche active = >= 500k Volume Global ET au moins 1 manager dans la branche
+function ebBranchActive(node){return ebVolGlobal(node)>=500000&&ebHasManager(node);}
+
 function loadTree(){
   try{var raw=localStorage.getItem(STORAGE_KEY);if(raw)tree=JSON.parse(raw);}catch(e){}
   render();
@@ -377,6 +414,7 @@ function openAdd(path){
   V('modalPrenom').value='';
   V('modalNom').value='';
   V('modalQualif').value='';
+  ebSetModalExtra(null);
   setStatut('actif');
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
@@ -392,9 +430,23 @@ function openEdit(path){
   V('modalPrenom').value=node.prenom;
   V('modalNom').value=node.nom;
   V('modalQualif').value=node.qualif||'';
+  ebSetModalExtra(node);
   setStatut(node.statut||'actif');
   V('addModal').classList.add('open');
   setTimeout(function(){V('modalPrenom').focus()},100);
+}
+// remplit / vide les champs VA + habilitations du modal
+function ebSetModalExtra(node){
+  V('modalVaVc').value=node?(node.vaVc||''):'';
+  V('modalVaEc').value=node?(node.vaEc||''):'';
+  var h=(node&&node.habs)||{};
+  V('habMiobsp').checked=!!h.miobsp;V('habMia').checked=!!h.mia;V('habAlpsi').checked=!!h.alpsi;V('habCif').checked=!!h.cif;
+}
+function ebReadModalExtra(target){
+  target.vaVc=ebFmtEuro(V('modalVaVc').value)||undefined;
+  target.vaEc=ebFmtEuro(V('modalVaEc').value)||undefined;
+  var habs={miobsp:V('habMiobsp').checked,mia:V('habMia').checked,alpsi:V('habAlpsi').checked,cif:V('habCif').checked};
+  target.habs=(habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
 }
 
 function closeModal(){
@@ -415,6 +467,7 @@ function confirmAdd(){
       node.prenom=p;node.nom=n;
       node.qualif=qualif||undefined;
       node.statut=(statut&&statut!=='actif')?statut:undefined;
+      ebReadModalExtra(node);
     }
   } else if(addTarget!==null){
     var parent=getNode(addTarget);
@@ -423,6 +476,7 @@ function confirmAdd(){
       var newNode={prenom:p,nom:n,children:[]};
       if(qualif)newNode.qualif=qualif;
       if(statut&&statut!=='actif')newNode.statut=statut;
+      ebReadModalExtra(newNode);
       parent.children.push(newNode);
     }
   }
@@ -613,7 +667,7 @@ function renderNode(node,path,depth){
   var childCount=countNodes(node)-1;
   var directs=node.children?node.children.length:0;
   var branchesActives=0;
-  if(node.children)node.children.forEach(function(ch){if(ch.children&&ch.children.length>0)branchesActives++});
+  if(node.children)node.children.forEach(function(ch){if(ebBranchActive(ch))branchesActives++});
   var pathStr=JSON.stringify(path);
   var isRoot=path.length===0;
 
@@ -641,6 +695,9 @@ function renderNode(node,path,depth){
   if(branchesActives>0)meta.push(branchesActives+' branche'+(branchesActives>1?'s':'')+' active'+(branchesActives>1?'s':''));
   if(childCount>0)meta.push(childCount+' total');
   if(meta.length)html+='<div class="node-count">'+meta.join(' \u00b7 ')+'</div>';
+  var vol=ebVolGlobal(node),volOk=vol>=500000,volPct=Math.min(Math.round(vol/500000*100),100);
+  html+='<div class="node-vol"><div class="node-vol-bar"><span style="width:'+volPct+'%;background:'+(volOk?'#2da064':'var(--orange)')+'"></span></div>'+
+    '<div class="node-vol-lbl">Vol orga <b>'+ebFmtShort(vol)+'</b> / 500k\u20ac '+(volOk?(ebHabilite(node)?'<span class="ok">\u2713 Manager</span>':'<span class="ok">seuil OK</span> \u00b7 habilit. ?'):'<span class="no">RAF '+ebFmtShort(500000-vol)+'</span>')+'</div></div>';
   html+='</div>';
   html+='<div class="node-actions">';
   html+='<button class="node-act" title="Modifier" onclick="event.stopPropagation();openEdit('+pathStr+')">&#9998;</button>';

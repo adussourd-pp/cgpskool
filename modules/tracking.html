@@ -1509,20 +1509,43 @@ function orgImportEquipe() {
     for (var i = 0; i < people.length; i++) { if (!used[people[i].id] && norm(people[i].nom) === n) return people[i]; }
     return null;
   }
+  // "Construire son equipe" est la reference : si un noeud y porte des valeurs
+  // enrichies (VA VC/EC, habilitations, inscription, PMR, qualif/forman), on les
+  // reprend. Sinon on conserve ce qui a deja ete saisi ici.
+  function has(v) { return v !== undefined && v !== null && v !== ''; }
+  function applyFromNode(p, ch) {
+    if (has(ch.vaVc)) p.vaVc = ch.vaVc;
+    if (has(ch.vaEc)) p.vaEc = ch.vaEc;
+    if (ch.habs) {
+      p.miobsp = !!ch.habs.miobsp; p.mia = !!ch.habs.mia;
+      p.alpsi = !!ch.habs.alpsi; p.cif = !!ch.habs.cif;
+    }
+    if (has(ch.inscription)) p.inscription = ch.inscription;
+    if (has(ch.trackQualif)) p.qualif = ch.trackQualif;
+    if (has(ch.trackForman)) p.forman = ch.trackForman;
+    if (ch.pmr) {
+      if (has(ch.pmr.inscrits)) p.inscrits = ch.pmr.inscrits;
+      if (has(ch.pmr.dm)) p.dm = ch.pmr.dm;
+      if (has(ch.pmr.ad)) p.ad = ch.pmr.ad;
+      if (has(ch.pmr.j3)) p.j3 = ch.pmr.j3;
+    }
+  }
   (function walk(node, parentId) {
     (node.children || []).forEach(function(ch) {
       if ((ch.statut || 'actif') === 'en-cours') return;   // pas reellement inscrit -> ignore
       var nom = ((ch.prenom || '') + ' ' + (ch.nom || '')).trim();
-      var ex = findByName(nom), id;
-      if (ex) { ex.parentId = parentId; ex.nom = nom; used[ex.id] = 1; id = ex.id; }   // garde ses volumes/habilitations
+      var ex = findByName(nom), id, p;
+      if (ex) { ex.parentId = parentId; ex.nom = nom; used[ex.id] = 1; id = ex.id; p = ex; }
       else {
         id = 'f' + (state.org.seq++);
-        people.push({ id:id, parentId:parentId, nom:nom,
+        p = { id:id, parentId:parentId, nom:nom,
           inscription:'', miobsp:false, mia:false, alpsi:false, cif:false,
           qualif:((ch.statut === 'inscrit') ? 'Conseiller junior' : 'Conseiller'), forman:'Neoman',
-          inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
+          inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' };
+        people.push(p);
         used[id] = 1;
       }
+      applyFromNode(p, ch);   // equipe-builder = reference pour les champs presents
       walk(ch, id);
     });
   })(raw, null);
