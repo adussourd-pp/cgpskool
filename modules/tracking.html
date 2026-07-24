@@ -406,16 +406,21 @@ details.card>summary .memo+.arr{margin-left:8px}
       <!-- ══ 6b. GRAPHE PROGRESSION HEBDO ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Progression hebdo VA<span class="wk">Hebdo</span></div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
           <div class="chart-seg">
-            <button id="chartLine" class="on" onclick="setChartType('line')">Courbe</button>
-            <button id="chartBar" onclick="setChartType('bar')">B&acirc;ton</button>
+            <button id="chartBar" class="on" onclick="setChartType('bar')">B&acirc;ton cumul&eacute;</button>
+            <button id="chartLine" onclick="setChartType('line')">Courbe</button>
           </div>
           <select class="fi" style="width:auto;padding:6px 10px;font-size:12px" id="chartMetric" onchange="setChartMetric(this.value)">
-            <option value="perso">VA perso (VC+EC)</option>
-            <option value="orga">VA orga (VC+EC)</option>
+            <option value="perso">VA perso</option>
+            <option value="orga">VA orga</option>
+            <option value="both">Perso + &Eacute;quipe</option>
           </select>
-          <span style="font-size:11px;color:var(--gris)">&mdash; objectif en pointill&eacute;</span>
+        </div>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--gris);margin-bottom:6px;flex-wrap:wrap" id="chartLegend">
+          <span><span class="cdot" style="background:#2D7A5B"></span>VA VC (base)</span>
+          <span><span class="cdot" style="background:#3B82C4"></span>VA EC (au-dessus)</span>
+          <span style="color:var(--orange)">&#9476;&#9476; objectif</span>
         </div>
         <svg id="vaChart" viewBox="0 0 600 210" style="width:100%;height:auto;display:block"></svg>
       </div>
@@ -474,7 +479,7 @@ details.card>summary .memo+.arr{margin-left:8px}
         <div id="orgBox" style="display:none">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgAdd(null)">&#10133; Filleul direct</button>
-            <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgImportEquipe()" title="Reprendre l'arbre du module Construire son equipe">&#8681; Importer depuis Construire son &eacute;quipe</button>
+            <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgImportEquipe()" title="Structure reprise de Construire son equipe ; tes volumes et habilitations sont conserves">&#8646; Synchroniser avec Construire son &eacute;quipe</button>
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0;border-color:rgba(192,57,43,0.3);color:var(--red)" onclick="orgClearAll()" title="Effacer tous les filleuls">&#9100; Tout supprimer</button>
           </div>
           <div class="org-summary" id="orgSummary"></div>
@@ -806,43 +811,59 @@ function fmtShort(n) {
   if (n >= 1e3) return Math.round(n / 1e3) + 'k';
   return '' + Math.round(n);
 }
+function weekVCEC(monday, metric) {
+  if (metric === 'orga') return { vc: valAtWeek(monday, 'vaEquipeActe'), ec: valAtWeek(monday, 'vaEquipeEnCours') };
+  return { vc: valAtWeek(monday, 'vaPersoActe'), ec: valAtWeek(monday, 'vaPersoEnCours') };
+}
 function renderChart() {
   var svg = document.getElementById('vaChart'); if (!svg) return;
   var metric = state.profil.chartMetric || 'perso';
-  var af = metric === 'orga' ? 'vaEquipeActe' : 'vaPersoActe';
-  var ef = metric === 'orga' ? 'vaEquipeEnCours' : 'vaPersoEnCours';
-  var obj = parseMoney(metric === 'orga' ? p('objVaEquipe') : p('objVaPerso')); if (isNaN(obj)) obj = 0;
-  var base = getCurrentMonday(), N = 8, pts = [];
-  for (var i = N - 1; i >= 0; i--) { var mm = new Date(base); mm.setDate(base.getDate() - i * 7); pts.push({ monday: mm, val: valAtWeek(mm, af) + valAtWeek(mm, ef) }); }
+  var type = state.profil.chartType || 'bar';
+  var series = metric === 'both' ? ['perso', 'orga'] : [metric];
+  var objs = [];
+  if (metric === 'perso' || metric === 'both') { var op = parseMoney(p('objVaPerso')); if (!isNaN(op)) objs.push({ v: op, label: metric === 'both' ? 'obj perso' : 'obj' }); }
+  if (metric === 'orga' || metric === 'both') { var oo = parseMoney(p('objVaEquipe')); if (!isNaN(oo)) objs.push({ v: oo, label: metric === 'both' ? 'obj orga' : 'obj' }); }
+  var base = getCurrentMonday(), N = 8, weeks = [];
+  for (var i = N - 1; i >= 0; i--) { var mm = new Date(base); mm.setDate(base.getDate() - i * 7);
+    var wk = { monday: mm, s: {} }; series.forEach(function(s){ wk.s[s] = weekVCEC(mm, s); }); weeks.push(wk); }
   var W = 600, H = 210, padL = 52, padR = 14, padT = 14, padB = 26, iW = W - padL - padR, iH = H - padT - padB;
-  var maxY = niceMax(Math.max(obj, pts.reduce(function(a, pp){ return Math.max(a, pp.val); }, 0), 1));
+  var maxV = 1;
+  weeks.forEach(function(w){ series.forEach(function(s){ maxV = Math.max(maxV, w.s[s].vc + w.s[s].ec); }); });
+  objs.forEach(function(o){ maxV = Math.max(maxV, o.v); });
+  var maxY = niceMax(maxV);
   function x(i) { return padL + (N > 1 ? i * (iW / (N - 1)) : iW / 2); }
   function y(v) { return padT + iH - (v / maxY) * iH; }
-  var type = state.profil.chartType || 'line', h = '';
+  var h = '';
   for (var g = 0; g <= 4; g++) {
     var gy = padT + iH / 4 * g, gv = Math.round(maxY - maxY / 4 * g);
     h += '<line class="evo-grid" x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '"/>';
     h += '<text class="evo-lbl" x="' + (padL - 6) + '" y="' + (gy + 3) + '" text-anchor="end">' + fmtShort(gv) + '</text>';
   }
-  if (obj > 0 && obj <= maxY) {
-    h += '<line class="evo-obj" x1="' + padL + '" y1="' + y(obj) + '" x2="' + (W - padR) + '" y2="' + y(obj) + '"/>';
-    h += '<text class="evo-val" x="' + (W - padR) + '" y="' + (y(obj) - 4) + '" text-anchor="end" fill="#D4622A">obj ' + fmtShort(obj) + '</text>';
-  }
+  objs.forEach(function(o) { if (o.v > 0 && o.v <= maxY) {
+    h += '<line class="evo-obj" x1="' + padL + '" y1="' + y(o.v) + '" x2="' + (W - padR) + '" y2="' + y(o.v) + '"/>';
+    h += '<text class="evo-val" x="' + (W - padR) + '" y="' + (y(o.v) - 4) + '" text-anchor="end" fill="#D4622A">' + o.label + ' ' + fmtShort(o.v) + '</text>';
+  } });
   if (type === 'bar') {
-    var bw = Math.min(34, iW / N * 0.62);
-    pts.forEach(function(pp, i) { if (pp.val <= 0) return;
-      h += '<rect class="evo-bar" x="' + (x(i) - bw / 2) + '" y="' + y(pp.val) + '" width="' + bw + '" height="' + (padT + iH - y(pp.val)) + '" rx="3" opacity="' + (i === N - 1 ? 1 : 0.5) + '"/>';
+    var nb = series.length, slot = iW / N, bw = Math.min(30, slot * 0.62 / nb);
+    weeks.forEach(function(w, i) {
+      series.forEach(function(s, si) {
+        var d = w.s[s], tot = d.vc + d.ec; if (tot <= 0) return;
+        var cx = x(i) - (nb - 1) * (bw + 3) / 2 + si * (bw + 3);
+        var yVc = y(d.vc);
+        h += '<rect x="' + (cx - bw / 2) + '" y="' + yVc + '" width="' + bw + '" height="' + (padT + iH - yVc) + '" fill="#2D7A5B" rx="2"/>';
+        if (d.ec > 0) { var yTot = y(tot); h += '<rect x="' + (cx - bw / 2) + '" y="' + yTot + '" width="' + bw + '" height="' + (yVc - yTot) + '" fill="#3B82C4" rx="2"/>'; }
+        if (metric === 'both') h += '<text class="evo-lbl" x="' + cx + '" y="' + (y(tot) - 4) + '" text-anchor="middle" font-size="8">' + (s === 'perso' ? 'P' : 'O') + '</text>';
+      });
     });
   } else {
-    var line = pts.map(function(pp, i){ return x(i) + ',' + y(pp.val); }).join(' ');
-    var area = 'M' + x(0) + ',' + y(0); pts.forEach(function(pp, i){ area += ' L' + x(i) + ',' + y(pp.val); }); area += ' L' + x(N - 1) + ',' + y(0) + ' Z';
-    h += '<path class="evo-area" d="' + area + '"/><polyline class="evo-line" points="' + line + '"/>';
-    pts.forEach(function(pp, i){ h += '<circle class="evo-dot' + (i === N - 1 ? ' cur' : '') + '" cx="' + x(i) + '" cy="' + y(pp.val) + '" r="' + (i === N - 1 ? 4 : 3) + '"/>'; });
+    series.forEach(function(s, si) {
+      var color = si === 0 ? '#D4622A' : '#3B82C4';
+      var line = weeks.map(function(w, i){ return x(i) + ',' + y(w.s[s].vc + w.s[s].ec); }).join(' ');
+      h += '<polyline points="' + line + '" fill="none" stroke="' + color + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+      weeks.forEach(function(w, i){ h += '<circle cx="' + x(i) + '" cy="' + y(w.s[s].vc + w.s[s].ec) + '" r="3" fill="#fff" stroke="' + color + '" stroke-width="2"/>'; });
+    });
   }
-  pts.forEach(function(pp, i) {
-    if (pp.val > 0) h += '<text class="evo-val" x="' + x(i) + '" y="' + (y(pp.val) - 8) + '" text-anchor="middle">' + fmtShort(pp.val) + '</text>';
-    h += '<text class="evo-lbl" x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle">S' + weekKey(pp.monday).split('-W')[1] + '</text>';
-  });
+  weeks.forEach(function(w, i){ h += '<text class="evo-lbl" x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle">S' + weekKey(w.monday).split('-W')[1] + '</text>'; });
   svg.innerHTML = h;
 }
 function setChartType(t) {
@@ -969,6 +990,9 @@ function buildManager() {
   // Objectif Forman
   if (p('formanResume')) { secTitle(o, 'Objectif Forman'); o.push(p('formanResume')); }
 
+  // Organisation : pilotage de la qualification des branches directes a 500k€
+  emitOrg(o);
+
   // Formation : d'abord les habilitations (au demarrage), puis les ateliers Forman (formations continues)
   emitFormation(o);
 
@@ -983,8 +1007,35 @@ function buildManager() {
   return o.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
+// ── ORGANISATION dans le mail (pilotage qualif branches 500k€) ─
+function subtreeOrdered(id, depth) {
+  var out = [];
+  orgChildren(id).forEach(function(c){ out.push({ p:c, depth:depth }); out = out.concat(subtreeOrdered(c.id, depth + 1)); });
+  return out;
+}
+function emitOrg(o) {
+  if (state.profil.orgOn !== true) return;
+  var directs = orgChildren(null); if (!directs.length) return;
+  secTitle(o, 'Organisation — qualif branches 500k€');
+  directs.forEach(function(dir) {
+    var bt = orgBranchTotal(dir.id), raf = bt - ORG_SEUIL;
+    o.push((dir.nom || '(sans nom)') + ' — branche ' + fmtMoney(bt) + ' → ' +
+      (raf >= 0 ? 'qualifiée (+' + fmtMoney(raf) + ')' : 'RAF ' + fmtMoney(ORG_SEUIL - bt)));
+    [{ p:dir, depth:0 }].concat(subtreeOrdered(dir.id, 1)).forEach(function(m) {
+      var pers = m.p, meta = [], indent = new Array(m.depth + 1).join('  ');
+      var tot = orgTotal(pers); if (tot > 0) meta.push('VA ' + fmtMoney(tot));
+      if (pers.qualif) meta.push(pers.qualif);
+      var habs = []; if (pers.mia) habs.push('MIA'); if (pers.miobsp) habs.push('MIOBSP'); if (pers.alpsi) habs.push('ALPSI'); if (pers.cif) habs.push('CIF');
+      if (habs.length) meta.push(habs.join('/'));
+      o.push(indent + '- ' + (pers.nom || '(sans nom)') + (meta.length ? ' : ' + meta.join(' · ') : ''));
+    });
+  });
+}
+
 // ── HABILITATIONS (set fixe + coche "obtenue") ────────────────
-var HABS = [['assii','ASS II'], ['iobsp','M-IOBSP'], ['agent','Agent lié'], ['cif','CIF'], ['amf','AMF']];
+// [cle, libelle, optionnel] — 3 obligatoires ; CIF & AMF optionnels
+var HABS = [['assii','ASS II',0], ['iobsp','M-IOBSP',0], ['agent','Agent lié',0], ['cif','CIF',1], ['amf','AMF',1]];
+var HAB_OBLIG = HABS.filter(function(h){ return !h[2]; }).length;
 function habState() { if (!state.profil.habs) state.profil.habs = {}; return state.profil.habs; }
 // habilitations non obtenues (avec echeance) -> pour le mail
 function habLines() {
@@ -1008,15 +1059,15 @@ function emitFormation(o) {
 function renderHabs() {
   var box = document.getElementById('habsBox'); if (!box) return;
   var hs = habState();
-  var done = HABS.filter(function(h){ return hs[h[0]] && hs[h[0]].done; }).length;
-  var pct = Math.round(done / HABS.length * 100);
-  var html = '<div class="hab-gauge"><div class="hab-gauge-bar"><span style="width:' + pct + '%"></span></div>' +
-    '<span class="hab-gauge-n">' + done + ' / ' + HABS.length + ' obtenues</span></div>';
+  var done = HABS.filter(function(h){ return !h[2] && hs[h[0]] && hs[h[0]].done; }).length;
+  var pct = Math.round(done / HAB_OBLIG * 100);
+  var html = '<div class="hab-gauge"><div class="hab-gauge-bar"><span style="width:' + pct + '%' + (done >= HAB_OBLIG ? ';background:var(--green)' : '') + '"></span></div>' +
+    '<span class="hab-gauge-n">' + done + ' / ' + HAB_OBLIG + ' obligatoires</span></div>';
   HABS.forEach(function(h) {
     var d = hs[h[0]] || { done:false, note:'' };
     html += '<div class="hab-row' + (d.done ? ' done' : '') + '">' +
       '<input type="checkbox" class="hab-chk"' + (d.done ? ' checked' : '') + ' onchange="toggleHab(\'' + h[0] + '\',this.checked)">' +
-      '<span class="hab-name">' + h[1] + '</span>' +
+      '<span class="hab-name">' + h[1] + (h[2] ? ' <span style="font-size:9px;font-weight:600;color:var(--ink-30);text-transform:uppercase;letter-spacing:0.04em">optionnel</span>' : '') + '</span>' +
       '<input class="hab-note" value="' + esc(d.note) + '" placeholder="' + (d.done ? 'validé le ...' : 'échéance / en cours') + '" onchange="setHabNote(\'' + h[0] + '\',this.value)">' +
       '</div>';
   });
@@ -1199,7 +1250,7 @@ function render() {
   renderProdSidebar();
   // sync controles du graphe
   var cm = document.getElementById('chartMetric'); if (cm) cm.value = state.profil.chartMetric || 'perso';
-  var t = state.profil.chartType || 'line';
+  var t = state.profil.chartType || 'bar';
   var cl = document.getElementById('chartLine'), cb = document.getElementById('chartBar');
   if (cl) cl.classList.toggle('on', t === 'line'); if (cb) cb.classList.toggle('on', t === 'bar');
   renderChart();
