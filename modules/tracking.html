@@ -116,6 +116,43 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .card-title .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
 .card-title .memo{margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);background:var(--green-l);padding:3px 7px;border-radius:20px}
 .card-title .wk{margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);background:rgba(212,98,42,0.1);padding:3px 7px;border-radius:20px}
+/* cartes repliables */
+.card-title{cursor:pointer}
+.card-arr{margin-left:10px;font-size:10px;color:var(--ink-30);transition:transform 0.2s;flex-shrink:0}
+.card.collapsed .card-arr{transform:rotate(-90deg)}
+.card.collapsed>*:not(.card-title){display:none}
+.card.collapsed>.card-title{margin-bottom:0}
+/* champ montant reporte de la semaine precedente (a verifier) */
+.fi-carry{background:#EAF4FB;border-color:#9EC7E6;color:#12689E}
+.fi-carry:focus{border-color:var(--orange);color:var(--noir)}
+/* graphe progression */
+.chart-seg{display:inline-flex;background:var(--gris-l);border:1.5px solid var(--bord);border-radius:8px;padding:3px;gap:3px}
+.chart-seg button{border:none;background:transparent;font-family:var(--sans);font-size:11px;font-weight:700;color:var(--gris);padding:6px 12px;border-radius:5px;cursor:pointer}
+.chart-seg button.on{background:var(--orange);color:#fff}
+.evo-grid{stroke:rgba(0,0,0,0.06);stroke-width:1}
+.evo-obj{stroke:var(--orange);stroke-width:1.5;stroke-dasharray:4,3;opacity:0.75}
+.evo-line{fill:none;stroke:var(--orange);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.evo-area{fill:var(--orange);opacity:0.10}
+.evo-dot{fill:#fff;stroke:var(--orange);stroke-width:2}
+.evo-dot.cur{fill:var(--orange)}
+.evo-bar{fill:var(--orange)}
+.evo-lbl{font-size:9px;fill:var(--gris);font-family:var(--sans)}
+.evo-val{font-size:9px;fill:var(--noir);font-weight:700;font-family:var(--sans)}
+/* pastille couleur poste VA */
+.cdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;flex-shrink:0}
+/* habilitations */
+.hab-gauge{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hab-gauge-bar{flex:1;height:8px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden}
+.hab-gauge-bar>span{display:block;height:100%;background:var(--green);border-radius:4px;transition:width 0.3s}
+.hab-gauge-n{font-size:12px;font-weight:700;color:var(--green);white-space:nowrap}
+.hab-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bord)}
+.hab-row:last-child{border-bottom:none}
+.hab-chk{width:18px;height:18px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+.hab-name{font-size:13px;font-weight:600;color:var(--noir);min-width:92px}
+.hab-row.done .hab-name{color:var(--green)}
+.hab-note{flex:1;border:1.5px solid var(--bord);border-radius:6px;padding:6px 9px;font-size:12px;font-family:var(--sans);color:var(--noir);background:#fff;outline:none;min-width:0}
+.hab-note:focus{border-color:var(--orange)}
+.hab-row.done .hab-note{opacity:0.55}
 .card-sub{font-size:11px;color:var(--gris);margin:-8px 0 14px;line-height:1.5}
 
 /* collapsible via details */
@@ -325,25 +362,19 @@ details.card>summary .memo+.arr{margin-left:8px}
             <input class="fi" type="text" inputmode="numeric" data-fld="vpActuel" data-store="week" data-money="1" placeholder="221 000"></div>
         </div>
         <div class="fg-gauge" id="gaugeVp"></div>
-        <div class="grid2">
-          <div class="fg"><label>VA VC (act&eacute;e)</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoActe" data-store="week" data-money="1" placeholder="809 000"></div>
-          <div class="fg"><label>VA EC (en cours)</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>Valid&eacute; Stellium</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="valideStellium" data-store="week" data-money="1" placeholder="82 000"></div>
-          <div class="fg"><label>En cours traitement Stellium</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="enCoursStellium" data-store="week" data-money="1" placeholder="60 000"></div>
-        </div>
-        <div class="grid2">
-          <div class="fg"><label>En signature client</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="enSignature" data-store="week" data-money="1" placeholder="0"></div>
-          <div class="fg"><label>Validation client</label>
-            <input class="fi" type="text" inputmode="numeric" data-fld="validationClient" data-store="week" data-money="1" placeholder="43 000"></div>
-        </div>
-        <div class="fg"><label>Pipe (ann&eacute;e N+1)</label>
+        <div class="fg"><label><span class="cdot" style="background:#2D7A5B"></span>VA VC (act&eacute;e)</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoActe" data-store="week" data-money="1" placeholder="809 000"></div>
+        <div class="fg"><label><span class="cdot" style="background:#3B82C4"></span>VA EC (en cours)</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="vaPersoEnCours" data-store="week" data-money="1" placeholder="150 000"></div>
+        <div class="fg"><label><span class="cdot" style="background:#2E7DBF"></span>Valid&eacute; Stellium</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="valideStellium" data-store="week" data-money="1" placeholder="82 000"></div>
+        <div class="fg"><label><span class="cdot" style="background:#6AA9E0"></span>En cours de traitement Stellium</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="enCoursStellium" data-store="week" data-money="1" placeholder="60 000"></div>
+        <div class="fg"><label><span class="cdot" style="background:#8B5CF6"></span>En signature client</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="enSignature" data-store="week" data-money="1" placeholder="0"></div>
+        <div class="fg"><label><span class="cdot" style="background:#E0A93B"></span>Validation client</label>
+          <input class="fi" type="text" inputmode="numeric" data-fld="validationClient" data-store="week" data-money="1" placeholder="43 000"></div>
+        <div class="fg"><label><span class="cdot" style="background:#9CA3AF"></span>Pipe (ann&eacute;e N+1)</label>
           <input class="fi" type="text" inputmode="numeric" data-fld="pipe" data-store="week" data-money="1" placeholder="2 400 000"></div>
         <div class="fg-gauge" id="gaugePerso"></div>
       </div>
@@ -372,6 +403,23 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </div>
 
+      <!-- ══ 6b. GRAPHE PROGRESSION HEBDO ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Progression hebdo VA<span class="wk">Hebdo</span></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <div class="chart-seg">
+            <button id="chartLine" class="on" onclick="setChartType('line')">Courbe</button>
+            <button id="chartBar" onclick="setChartType('bar')">B&acirc;ton</button>
+          </div>
+          <select class="fi" style="width:auto;padding:6px 10px;font-size:12px" id="chartMetric" onchange="setChartMetric(this.value)">
+            <option value="perso">VA perso (VC+EC)</option>
+            <option value="orga">VA orga (VC+EC)</option>
+          </select>
+          <span style="font-size:11px;color:var(--gris)">&mdash; objectif en pointill&eacute;</span>
+        </div>
+        <svg id="vaChart" viewBox="0 0 600 210" style="width:100%;height:auto;display:block"></svg>
+      </div>
+
       <!-- ══ 7. OBJECTIF FORMAN (manager) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span></div>
@@ -379,13 +427,11 @@ details.card>summary .memo+.arr{margin-left:8px}
           <input class="fi" type="text" data-fld="formanResume" data-store="profil" placeholder="Man 10/12"></div>
       </div>
 
-      <!-- ══ 8. HABILITATIONS (manager, avant les ateliers) ══ -->
+      <!-- ══ 8. HABILITATION / FORMATIONS CONTINUES (memorise) ══ -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Habilitations<span class="memo">M&eacute;moris&eacute;</span></div>
-        <div class="fg"><label>Habilitations (une par ligne)</label>
-          <textarea class="fi" data-fld="habilitations" data-store="profil" placeholder="Assurance Niveau II (MIA) : valid&eacute; le 24/03/2026&#10;Immobilier - IOBSP Niveau II : en cours"></textarea></div>
-        <div class="fg"><label>Objectif habilitation final</label>
-          <input class="fi" type="text" data-fld="habObjectif" data-store="profil" placeholder="CIF"></div>
+        <div class="card-title"><span class="dot"></span>Habilitation / formations continues<span class="memo">M&eacute;moris&eacute;</span></div>
+        <div class="card-sub">Coche celles obtenues (exclues de l'email). Les autres apparaissent dans le mail avec leur &eacute;ch&eacute;ance.</div>
+        <div id="habsBox"></div>
       </div>
 
       <!-- ══ 9. ATELIERS FORMAN & EVENEMENTS ══ -->
@@ -429,6 +475,7 @@ details.card>summary .memo+.arr{margin-left:8px}
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgAdd(null)">&#10133; Filleul direct</button>
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgImportEquipe()" title="Reprendre l'arbre du module Construire son equipe">&#8681; Importer depuis Construire son &eacute;quipe</button>
+            <button class="org-add" style="width:auto;padding:9px 14px;margin:0;border-color:rgba(192,57,43,0.3);color:var(--red)" onclick="orgClearAll()" title="Effacer tous les filleuls">&#9100; Tout supprimer</button>
           </div>
           <div class="org-summary" id="orgSummary"></div>
           <div id="orgList"></div>
@@ -523,9 +570,23 @@ function ensureWeek(wk) {
   if (!state.history[wk].rdv) state.history[wk].rdv = {};
   return state.history[wk];
 }
+// montants VA reportes d'une semaine a l'autre (on repart pas de zero)
+var CARRY_FIELDS = { vaPersoActe:1, vaPersoEnCours:1, vaEquipeActe:1, vaEquipeEnCours:1,
+  vpActuel:1, encoursActuel:1, valideStellium:1, enCoursStellium:1, enSignature:1, validationClient:1, pipe:1 };
 function getW(field) {
   var wk = curWk(), w = state.history[wk];
   if (w && w[field] !== undefined && w[field] !== '') return w[field];
+  // report auto des montants : on garde la derniere valeur connue des semaines precedentes
+  if (CARRY_FIELDS[field]) {
+    if (w && w[field] === '') return '';   // efface volontairement pour cette semaine
+    var m = getCurrentMonday();
+    for (var i = 0; i < 12; i++) {
+      m.setDate(m.getDate() - 7);
+      var pv = state.history[weekKey(m)];
+      if (pv && pv[field]) return pv[field];
+    }
+    return '';
+  }
   if (w && w[field] === '') return '';
   // report auto : 'passee' herite du 'cette' de la semaine precedente si vide
   if (field === 'passee') {
@@ -533,6 +594,11 @@ function getW(field) {
     if (pw && pw.cette) return pw.cette;
   }
   return '';
+}
+// vrai si la valeur affichee est heritee (pas saisie pour la semaine courante)
+function isCarried(field) {
+  var w = state.history[curWk()];
+  return CARRY_FIELDS[field] && getW(field) && (!w || w[field] === undefined);
 }
 function setW(field, val) {
   var w = ensureWeek(curWk()); w[field] = val; saveState();
@@ -582,12 +648,14 @@ function loadForm() {
   document.querySelectorAll('[data-fld]').forEach(function(el) {
     var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
     el.value = (store === 'week') ? getW(id) : (state.profil[id] || '');
+    if (store === 'week' && CARRY_FIELDS[id]) el.classList.toggle('fi-carry', isCarried(id));
   });
   var chk = document.getElementById('parrainSame');
   if (chk) chk.checked = parrainSame();
   applyParrainSame();
   renderRdv();
   renderFormGauges();
+  renderHabs();
   var org = document.getElementById('orgOn');
   if (org) org.checked = state.profil.orgOn === true;
   var obox = document.getElementById('orgBox');
@@ -599,12 +667,12 @@ function bindForm() {
     var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
     var isMoney = !!el.getAttribute('data-money');
     function save(v) { if (store === 'week') setW(id, v); else { state.profil[id] = v; saveState(); } }
-    el.addEventListener('input', function() { save(el.value); updatePreview(); renderFormGauges(); });
+    el.addEventListener('input', function() { save(el.value); el.classList.remove('fi-carry'); updatePreview(); renderFormGauges(); });
     if (isMoney) {
       // a la saisie : on montre les chiffres bruts ; a la sortie : format "1 000 000€"
       el.addEventListener('focus', function() { el.value = digitsOnly(el.value); });
       el.addEventListener('blur', function() {
-        el.value = fmtEuro(el.value); save(el.value); updatePreview(); renderFormGauges();
+        el.value = fmtEuro(el.value); save(el.value); el.classList.remove('fi-carry'); updatePreview(); renderFormGauges(); renderChart();
       });
     }
   });
@@ -725,6 +793,77 @@ function renderFormGauges() {
   fmtGauge(pm(getW('vaPersoActe')) + pm(getW('vaPersoEnCours')), p('objVaPerso'), 'gaugePerso');
   fmtGauge(pm(getW('vaEquipeActe')) + pm(getW('vaEquipeEnCours')), p('objVaEquipe'), 'gaugeOrga');
 }
+
+// ── GRAPHE PROGRESSION HEBDO ──────────────────────────────────
+function valAtWeek(monday, field) {
+  var m = new Date(monday);
+  for (var i = 0; i < 26; i++) { var w = state.history[weekKey(m)]; if (w && w[field]) return pm(w[field]); m.setDate(m.getDate() - 7); }
+  return 0;
+}
+function niceMax(v) { if (v <= 0) return 1; var mag = Math.pow(10, Math.floor(Math.log10(v))); return Math.ceil(v / mag) * mag; }
+function fmtShort(n) {
+  if (n >= 1e6) return (Math.round(n / 1e5) / 10).toString().replace('.', ',') + 'M';
+  if (n >= 1e3) return Math.round(n / 1e3) + 'k';
+  return '' + Math.round(n);
+}
+function renderChart() {
+  var svg = document.getElementById('vaChart'); if (!svg) return;
+  var metric = state.profil.chartMetric || 'perso';
+  var af = metric === 'orga' ? 'vaEquipeActe' : 'vaPersoActe';
+  var ef = metric === 'orga' ? 'vaEquipeEnCours' : 'vaPersoEnCours';
+  var obj = parseMoney(metric === 'orga' ? p('objVaEquipe') : p('objVaPerso')); if (isNaN(obj)) obj = 0;
+  var base = getCurrentMonday(), N = 8, pts = [];
+  for (var i = N - 1; i >= 0; i--) { var mm = new Date(base); mm.setDate(base.getDate() - i * 7); pts.push({ monday: mm, val: valAtWeek(mm, af) + valAtWeek(mm, ef) }); }
+  var W = 600, H = 210, padL = 52, padR = 14, padT = 14, padB = 26, iW = W - padL - padR, iH = H - padT - padB;
+  var maxY = niceMax(Math.max(obj, pts.reduce(function(a, pp){ return Math.max(a, pp.val); }, 0), 1));
+  function x(i) { return padL + (N > 1 ? i * (iW / (N - 1)) : iW / 2); }
+  function y(v) { return padT + iH - (v / maxY) * iH; }
+  var type = state.profil.chartType || 'line', h = '';
+  for (var g = 0; g <= 4; g++) {
+    var gy = padT + iH / 4 * g, gv = Math.round(maxY - maxY / 4 * g);
+    h += '<line class="evo-grid" x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '"/>';
+    h += '<text class="evo-lbl" x="' + (padL - 6) + '" y="' + (gy + 3) + '" text-anchor="end">' + fmtShort(gv) + '</text>';
+  }
+  if (obj > 0 && obj <= maxY) {
+    h += '<line class="evo-obj" x1="' + padL + '" y1="' + y(obj) + '" x2="' + (W - padR) + '" y2="' + y(obj) + '"/>';
+    h += '<text class="evo-val" x="' + (W - padR) + '" y="' + (y(obj) - 4) + '" text-anchor="end" fill="#D4622A">obj ' + fmtShort(obj) + '</text>';
+  }
+  if (type === 'bar') {
+    var bw = Math.min(34, iW / N * 0.62);
+    pts.forEach(function(pp, i) { if (pp.val <= 0) return;
+      h += '<rect class="evo-bar" x="' + (x(i) - bw / 2) + '" y="' + y(pp.val) + '" width="' + bw + '" height="' + (padT + iH - y(pp.val)) + '" rx="3" opacity="' + (i === N - 1 ? 1 : 0.5) + '"/>';
+    });
+  } else {
+    var line = pts.map(function(pp, i){ return x(i) + ',' + y(pp.val); }).join(' ');
+    var area = 'M' + x(0) + ',' + y(0); pts.forEach(function(pp, i){ area += ' L' + x(i) + ',' + y(pp.val); }); area += ' L' + x(N - 1) + ',' + y(0) + ' Z';
+    h += '<path class="evo-area" d="' + area + '"/><polyline class="evo-line" points="' + line + '"/>';
+    pts.forEach(function(pp, i){ h += '<circle class="evo-dot' + (i === N - 1 ? ' cur' : '') + '" cx="' + x(i) + '" cy="' + y(pp.val) + '" r="' + (i === N - 1 ? 4 : 3) + '"/>'; });
+  }
+  pts.forEach(function(pp, i) {
+    if (pp.val > 0) h += '<text class="evo-val" x="' + x(i) + '" y="' + (y(pp.val) - 8) + '" text-anchor="middle">' + fmtShort(pp.val) + '</text>';
+    h += '<text class="evo-lbl" x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle">S' + weekKey(pp.monday).split('-W')[1] + '</text>';
+  });
+  svg.innerHTML = h;
+}
+function setChartType(t) {
+  state.profil.chartType = t; saveState();
+  var l = document.getElementById('chartLine'), b = document.getElementById('chartBar');
+  if (l) l.classList.toggle('on', t === 'line'); if (b) b.classList.toggle('on', t === 'bar');
+  renderChart();
+}
+function setChartMetric(m) { state.profil.chartMetric = m; saveState(); renderChart(); }
+// ── CARTES REPLIABLES ─────────────────────────────────────────
+function initCollapsibles() {
+  document.querySelectorAll('.cs-page .card').forEach(function(card) {
+    var title = card.querySelector('.card-title');
+    if (!title || title.parentNode !== card || title.getAttribute('data-collap')) return;
+    title.setAttribute('data-collap', '1');
+    var arr = document.createElement('span');
+    arr.className = 'card-arr'; arr.textContent = '▼';
+    title.appendChild(arr);
+    title.addEventListener('click', function() { card.classList.toggle('collapsed'); });
+  });
+}
 // reste a faire = objectif - (acte + en cours) ; '' si non calculable
 function resteAFaire(objId, acteVal, enCoursVal) {
   var obj = parseMoney(p(objId)), a = parseMoney(acteVal), e = parseMoney(enCoursVal);
@@ -844,21 +983,47 @@ function buildManager() {
   return o.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
-// Section "Formation" = Habilitations (demarrage) + Ateliers Forman (formations continues)
-function emitFormation(o) {
-  var hab = lines(p('habilitations')), at = ateliersLines();
-  if (!hab && !p('habObjectif') && !at) return;
-  secTitle(o, 'Formation');
-  if (hab || p('habObjectif')) {
-    o.push(bold('Habilitations') + ' :');
-    if (hab) o.push(hab);
-    if (p('habObjectif')) o.push('Objectif final : ' + p('habObjectif'));
-  }
-  if (at) {
-    o.push(bold('Ateliers Forman') + ' (formations continues) :');
-    o.push(at);
-  }
+// ── HABILITATIONS (set fixe + coche "obtenue") ────────────────
+var HABS = [['assii','ASS II'], ['iobsp','M-IOBSP'], ['agent','Agent lié'], ['cif','CIF'], ['amf','AMF']];
+function habState() { if (!state.profil.habs) state.profil.habs = {}; return state.profil.habs; }
+// habilitations non obtenues (avec echeance) -> pour le mail
+function habLines() {
+  var hs = state.profil.habs || {}, out = [];
+  HABS.forEach(function(h) {
+    var d = hs[h[0]]; if (d && d.done) return;           // obtenues : exclues du mail
+    var note = d && d.note ? d.note.trim() : '';
+    if (note) out.push(h[1] + ' : ' + note);
+  });
+  return out.join('\n');
 }
+
+// Section "Formation" = Habilitations en cours + Ateliers Forman (formations continues)
+function emitFormation(o) {
+  var hab = habLines(), at = ateliersLines();
+  if (!hab && !at) return;
+  secTitle(o, 'Formation');
+  if (hab) { o.push(bold('Habilitations') + ' :'); o.push(hab); }
+  if (at) { o.push(bold('Ateliers Forman') + ' (formations continues) :'); o.push(at); }
+}
+function renderHabs() {
+  var box = document.getElementById('habsBox'); if (!box) return;
+  var hs = habState();
+  var done = HABS.filter(function(h){ return hs[h[0]] && hs[h[0]].done; }).length;
+  var pct = Math.round(done / HABS.length * 100);
+  var html = '<div class="hab-gauge"><div class="hab-gauge-bar"><span style="width:' + pct + '%"></span></div>' +
+    '<span class="hab-gauge-n">' + done + ' / ' + HABS.length + ' obtenues</span></div>';
+  HABS.forEach(function(h) {
+    var d = hs[h[0]] || { done:false, note:'' };
+    html += '<div class="hab-row' + (d.done ? ' done' : '') + '">' +
+      '<input type="checkbox" class="hab-chk"' + (d.done ? ' checked' : '') + ' onchange="toggleHab(\'' + h[0] + '\',this.checked)">' +
+      '<span class="hab-name">' + h[1] + '</span>' +
+      '<input class="hab-note" value="' + esc(d.note) + '" placeholder="' + (d.done ? 'validé le ...' : 'échéance / en cours') + '" onchange="setHabNote(\'' + h[0] + '\',this.value)">' +
+      '</div>';
+  });
+  box.innerHTML = html;
+}
+function toggleHab(key, val) { var hs = habState(); if (!hs[key]) hs[key] = { done:false, note:'' }; hs[key].done = val; saveState(); renderHabs(); updatePreview(true); }
+function setHabNote(key, val) { var hs = habState(); if (!hs[key]) hs[key] = { done:false, note:'' }; hs[key].note = val; saveState(); updatePreview(); }
 
 // ateliers Forman (formations realisees + a venir)
 function ateliersLines() {
@@ -1032,6 +1197,12 @@ function render() {
   renderHeader();
   loadForm();
   renderProdSidebar();
+  // sync controles du graphe
+  var cm = document.getElementById('chartMetric'); if (cm) cm.value = state.profil.chartMetric || 'perso';
+  var t = state.profil.chartType || 'line';
+  var cl = document.getElementById('chartLine'), cb = document.getElementById('chartBar');
+  if (cl) cl.classList.toggle('on', t === 'line'); if (cb) cb.classList.toggle('on', t === 'bar');
+  renderChart();
   updatePreview(true);
 }
 
@@ -1222,6 +1393,12 @@ function renderOrg() {
   updateOrgSummary();
 }
 
+function orgClearAll() {
+  if (!orgPeople().length) return;
+  if (!confirm('Effacer TOUS les filleuls de l\'organisation ?')) return;
+  state.org = { seq: 1, people: [] };
+  saveState(); renderOrg();
+}
 function onOrgToggle() {
   var chk = document.getElementById('orgOn');
   state.profil.orgOn = !!(chk && chk.checked);
@@ -1238,9 +1415,10 @@ function orgImportEquipe() {
   state.org = { seq: 1, people: [] };
   (function walk(node, parentId) {
     (node.children || []).forEach(function(ch) {
+      if ((ch.statut || 'actif') === 'en-cours') return;   // pas reellement inscrit -> ignore
       var id = 'f' + (state.org.seq++);
       var st = ch.statut || 'actif';
-      var qualif = (st === 'en-cours') ? 'Conseiller junior' : 'Conseiller';
+      var qualif = (st === 'inscrit') ? 'Conseiller junior' : 'Conseiller';
       state.org.people.push({ id:id, parentId:parentId, nom:((ch.prenom || '') + ' ' + (ch.nom || '')).trim(),
         inscription:'', miobsp:false, mia:false, alpsi:false, cif:false, qualif:qualif, forman:'Neoman',
         inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
@@ -1257,6 +1435,7 @@ applyMode();
 bindForm();
 render();
 renderOrg();
+initCollapsibles();
 CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
 
