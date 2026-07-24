@@ -403,28 +403,6 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </div>
 
-      <!-- ══ 6b. GRAPHE PROGRESSION HEBDO ══ -->
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Progression hebdo VA<span class="wk">Hebdo</span></div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-          <div class="chart-seg">
-            <button id="chartBar" class="on" onclick="setChartType('bar')">B&acirc;ton cumul&eacute;</button>
-            <button id="chartLine" onclick="setChartType('line')">Courbe</button>
-          </div>
-          <select class="fi" style="width:auto;padding:6px 10px;font-size:12px" id="chartMetric" onchange="setChartMetric(this.value)">
-            <option value="perso">VA perso</option>
-            <option value="orga">VA orga</option>
-            <option value="both">Perso + &Eacute;quipe</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:14px;font-size:11px;color:var(--gris);margin-bottom:6px;flex-wrap:wrap" id="chartLegend">
-          <span><span class="cdot" style="background:#2D7A5B"></span>VA VC (base)</span>
-          <span><span class="cdot" style="background:#3B82C4"></span>VA EC (au-dessus)</span>
-          <span style="color:var(--orange)">&#9476;&#9476; objectif</span>
-        </div>
-        <svg id="vaChart" viewBox="0 0 600 210" style="width:100%;height:auto;display:block"></svg>
-      </div>
-
       <!-- ══ 7. OBJECTIF FORMAN (manager) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span></div>
@@ -1327,7 +1305,7 @@ function importJSON(input) {
 // ══════════════════════════════════════════════════════════════
 // ORGANISATION (filleuls) — moteur PMR (Annexe 1 convention cadre)
 // ══════════════════════════════════════════════════════════════
-var ORG_QUALIF = ['(auto)', 'Consultant', 'Consultant Confirmé', 'Manager', 'Manager Planète', 'Manager Étoile', 'Manager Constellation', 'Manager Galaxie'];
+var ORG_QUALIF = ['(auto)', 'Consultant Junior', 'Consultant', 'Consultant Confirmé', 'Manager', 'Manager Planète', 'Manager Étoile', 'Manager Constellation', 'Manager Galaxie'];
 var ORG_FORMAN = ['Neoman', 'Beman', 'Adman', 'Man', 'Devman', 'DXman', 'Xman'];
 // Habilitations voie Manager PMR : Immobilier + Financement(IOBSP) + Assurance + (Agent lié/ALPSI ou CIF)
 var ORG_HAB = [['immo','Immobilier'], ['miobsp','Financement'], ['mia','Assurance'], ['alpsi','Agent lié'], ['cif','CIF']];
@@ -1415,7 +1393,10 @@ function branchHasGalaxie(id) {
 }
 // Qualification calculée d'un filleul
 function qualifAuto(pers) {
-  if (!isConfirme(pers)) return 'Consultant';
+  if (!isConfirme(pers)) {
+    var anyHab = pers.immo || pers.miobsp || pers.mia || pers.alpsi || pers.cif;
+    return anyHab ? 'Consultant' : 'Consultant Junior';   // junior = pas encore habilité
+  }
   if (!isManager(pers)) return 'Consultant Confirmé';
   var n = activeBranchesOf(pers.id);
   if (n >= 4) {
