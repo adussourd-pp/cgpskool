@@ -947,6 +947,7 @@ function buildManager() {
   if (getW('vpActuel') || p('objVp')) {
     var vpc = pctOf(pm(getW('vpActuel')), p('objVp'));
     o.push('Objectif VP = ' + (getW('vpActuel') || '?') + (p('objVp') ? ' / ' + p('objVp') : '') + (vpc != null ? ' (' + vpc + '%)' : ''));
+    o.push('');
   }
   if (p('objVaPerso')) {
     var ppc = pctOf(pm(getW('vaPersoActe')) + pm(getW('vaPersoEnCours')), p('objVaPerso'));
@@ -959,8 +960,10 @@ function buildManager() {
   if (getW('enSignature'))      o.push('En signature client : ' + getW('enSignature'));
   if (getW('validationClient')) o.push('Validation client : ' + getW('validationClient'));
   if (getW('pipe'))             o.push('Opportunité : ' + getW('pipe'));
-  if (getW('encoursActuel') || p('objEncours'))
+  if (getW('encoursActuel') || p('objEncours')) {
+    o.push('');
     o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' / ' + p('objEncours') : ''));
+  }
 
   // Objectif VA Orga
   if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours')) {
