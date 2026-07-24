@@ -64,6 +64,9 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .org-r1{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .org-gen{font-size:9px;font-weight:800;color:var(--orange);background:rgba(212,98,42,0.1);padding:3px 7px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em}
 .org-nom{flex:1;font-weight:700;font-size:14px;border:none;border-bottom:1.5px solid transparent;padding:4px 2px;background:transparent;color:var(--noir);font-family:var(--sans);min-width:0}
+.org-link{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;letter-spacing:0.02em;cursor:help}
+.org-link.ok{color:#2D7A5B;background:rgba(45,122,91,0.12)}
+.org-link.no{color:#C0622A;background:rgba(212,98,42,0.14)}
 .org-nom:focus{outline:none;border-bottom-color:var(--orange)}
 .org-del{background:transparent;border:none;color:var(--ink-30);cursor:pointer;font-size:14px;padding:4px 6px;font-family:var(--sans)}
 .org-del:hover{color:var(--red)}
@@ -1497,9 +1500,13 @@ function orgCardHtml(pers, depth) {
   var opts = '<option value="">Direct (moi)</option>';
   orgPeople().forEach(function(o){ if (excl.indexOf(o.id) === -1) opts += '<option value="' + o.id + '"' + (pers.parentId === o.id ? ' selected' : '') + '>' + (esc(o.nom) || '(sans nom)') + '</option>'; });
   var q = "'" + pers.id + "'";
+  var linked = orgInEquipe(pers);
+  var badge = (pers.nom || '').trim()
+    ? '<span class="org-link ' + (linked ? 'ok' : 'no') + '" title="' + (linked ? 'Relié à Construire son équipe (synchronisé)' : 'Pas trouvé dans Construire son équipe — vérifie que le nom est identique') + '">' + (linked ? '✓ équipe' : '⚠ hors équipe') + '</span>'
+    : '';
   var h = '<div class="' + cls + '" style="margin-left:' + indent + 'px">';
   h += '<div class="org-r1"><span class="org-gen">(' + gen + ')' + (depth === 0 ? ' direct' : '') + '</span>' +
-    '<input class="org-nom" value="' + esc(pers.nom) + '" placeholder="Nom Prénom" onchange="orgSet(' + q + ',\'nom\',this.value)">' +
+    '<input class="org-nom" value="' + esc(pers.nom) + '" placeholder="Nom Prénom" onchange="orgSet(' + q + ',\'nom\',this.value)">' + badge +
     '<button class="org-del" title="Supprimer" onclick="orgRemove(' + q + ')">✕</button></div>';
   h += '<div class="org-fields">';
   h += orgF('Rattaché à', '<select onchange="orgSet(' + q + ',\'parentId\',this.value)">' + opts + '</select>');
@@ -1531,6 +1538,15 @@ function updateOrgSummary() {
 }
 // normalisation robuste des noms (accents/casse/espaces) pour matcher les 2 modules
 function orgNorm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' '); }
+// ensemble des noms presents dans "Construire son equipe" (rafraichi a chaque rendu)
+var orgEquipeSet = null;
+function orgRefreshEquipeSet() {
+  orgEquipeSet = {};
+  var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
+  if (!raw) return;
+  (function walk(node) { (node.children || []).forEach(function(ch){ orgEquipeSet[orgNorm((ch.prenom || '') + ' ' + (ch.nom || ''))] = 1; walk(ch); }); })(raw);
+}
+function orgInEquipe(pers) { return !!(orgEquipeSet && orgEquipeSet[orgNorm(pers.nom)]); }
 function orgSyncToEquipe() {
   var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
   if (!raw) return;
@@ -1552,6 +1568,7 @@ function orgSyncToEquipe() {
 function renderOrg() {
   var list = document.getElementById('orgList'); if (!list) return;
   orgSyncToEquipe();
+  orgRefreshEquipeSet();
   var ordered = orgOrdered();
   if (!ordered.length) {
     list.innerHTML = '<div class="org-empty">Aucun filleul pour l\'instant.<br>Ajoute tes filleuls directs, puis leurs propres filleuls, pour reconstituer toute la profondeur de ton organisation.</div>';
