@@ -90,6 +90,30 @@
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--ink-30); margin-bottom: 28px;
 }
+/* Cluster d'outils qui partagent leurs donnees */
+.tools-cluster {
+  border: 1.5px solid var(--rule-l); border-radius: 16px;
+  padding: 20px 20px 8px; margin-bottom: 28px;
+  background: linear-gradient(180deg, rgba(212,98,42,0.035), transparent 60%);
+}
+.tools-cluster .tools-label { margin-bottom: 14px; }
+/* Toggle explicatif "Comment ca marche ?" */
+.tools-how { margin-bottom: 20px; border: 1px solid var(--rule-l); border-radius: 10px; background: #fff; }
+.tools-how > summary {
+  list-style: none; cursor: pointer; padding: 11px 14px;
+  font-size: 12px; font-weight: 600; color: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+}
+.tools-how > summary::-webkit-details-marker { display: none; }
+.tools-how > summary .chev { color: var(--orange); font-size: 11px; transition: transform 0.2s; }
+.tools-how[open] > summary .chev { transform: rotate(90deg); }
+.tools-how > summary .q { color: var(--orange); font-weight: 700; }
+.tools-how-body { padding: 0 14px 14px 34px; }
+.tools-how-body ol { margin: 0; padding-left: 18px; }
+.tools-how-body li { font-size: 12px; line-height: 1.6; color: var(--ink-60); margin-bottom: 7px; }
+.tools-how-body li b { color: var(--ink); font-weight: 600; }
+.tools-how-body .flow { color: var(--orange); font-weight: 700; }
+.tools-how-note { font-size: 11px; color: var(--ink-30); margin-top: 8px; }
 /* Têtes de famille (cohérence avec la vitrine : 2 piliers) */
 .tools-family-head { margin-bottom: 34px; }
 .tools-family-kicker {
@@ -798,91 +822,104 @@
       <div class="tools-family-kicker">Pilier 2</div>
       <div class="tools-family-title">Outils d&eacute;veloppement entreprise</div>
     </div>
-    <div class="tools-label" style="color:var(--orange);font-weight:700">D&eacute;veloppement d'&eacute;quipe</div>
-    <div class="tools-grid">
-
-      <a href="modules/bp-simulator.html" class="tool-card">
-        <span class="tool-badge">Projection</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon">&#128200;</span>
-        <div class="tool-name">Business Plan</div>
-        <div class="tool-desc">Projetez votre progression dans le r&#233;seau &mdash; qualifications PMR, CA personnel &amp; &#233;quipe, commissions d&#233;marrage / expansion / d&#233;veloppement.</div>
-        <div class="tool-features">
-          <span class="tool-feature">PMR Prod&#233;mial</span>
-          <span class="tool-feature">Qualifications</span>
-          <span class="tool-feature">Organisation</span>
+    <div class="tools-cluster">
+      <div class="tools-label" style="color:var(--orange);font-weight:700">Piloter ta semaine &mdash; outils connect&eacute;s</div>
+      <details class="tools-how">
+        <summary><span class="chev">&#9654;</span> <span class="q">Comment &ccedil;a marche ?</span> &mdash; ces 3 outils se parlent</summary>
+        <div class="tools-how-body">
+          <ol>
+            <li><span class="flow">Construire son &eacute;quipe</span> est la <b>r&eacute;f&eacute;rence</b> : structure de l'organisation, VA, habilitations, parcours d&eacute;couverte (DM &rarr; AD &rarr; 3J &rarr; Inscrit) et qualifications PMR.</li>
+            <li><span class="flow">Compl&eacute;ter ma journ&eacute;e</span> enregistre ton <b>score de productivit&eacute;</b> de la semaine.</li>
+            <li><span class="flow">Mail Manager &amp; Expert</span> <b>reprend automatiquement</b> les deux : l'organisation et la productivit&eacute; de la semaine remontent dans le mail, sans double saisie.</li>
+          </ol>
+          <div class="tools-how-note">Astuce : tiens &agrave; jour ton &eacute;quipe et ta journ&eacute;e, puis g&eacute;n&egrave;re le mail &mdash; il est d&eacute;j&agrave; pr&eacute;-rempli.</div>
         </div>
-      </a>
+      </details>
+      <div class="tools-grid">
 
-      <a href="modules/equipe-builder.html" class="tool-card">
-        <span class="tool-badge">Organisation</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon">&#128101;</span>
-        <div class="tool-name">Construire son &#233;quipe</div>
-        <div class="tool-desc">G&#233;rez votre &#233;quipe, ajoutez vos collaborateurs, suivez les statuts et qualifications, visualisez l'organigramme.</div>
-        <div class="tool-features">
-          <span class="tool-feature">Membres</span>
-          <span class="tool-feature">Organigramme</span>
-          <span class="tool-feature">Export JSON</span>
-        </div>
-      </a>
+              <a href="modules/equipe-builder.html" class="tool-card">
+                <span class="tool-badge">Organisation</span>
+                <div class="tool-bar" style="background:var(--orange)"></div>
+                <span class="tool-icon">&#128101;</span>
+                <div class="tool-name">Construire son &#233;quipe</div>
+                <div class="tool-desc">G&#233;rez votre &#233;quipe, ajoutez vos collaborateurs, suivez les statuts et qualifications, visualisez l'organigramme.</div>
+                <div class="tool-features">
+                  <span class="tool-feature">Membres</span>
+                  <span class="tool-feature">Organigramme</span>
+                  <span class="tool-feature">Export JSON</span>
+                </div>
+              </a>
 
-      <a href="tracker/index.html" class="tool-card">
-        <span class="tool-badge">Suivi commun</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon">&#127919;</span>
-        <div class="tool-name">Dev Action</div>
-        <div class="tool-desc">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
-        <div class="tool-features">
-          <span class="tool-feature">Kanban</span>
-          <span class="tool-feature">Top parrains&#183;marraines</span>
-          <span class="tool-feature">Slack</span>
-        </div>
-      </a>
+              <a href="modules/productivite.html" class="tool-card">
+                <span class="tool-badge">Quotidien</span>
+                <div class="tool-bar" style="background:var(--orange)"></div>
+                <span class="tool-icon">&#128203;</span>
+                <div class="tool-name">Compl&#233;ter ma journ&#233;e</div>
+                <div class="tool-desc">Note tes actions du jour et visualise ton score de productivit&#233; 0-100 sur la semaine &mdash; prospection, r&#233;sultats, d&#233;veloppement. Historique et objectif hebdo m&#233;moris&#233;s.</div>
+                <div class="tool-features">
+                  <span class="tool-feature">Score 0-100</span>
+                  <span class="tool-feature">Semaine</span>
+                  <span class="tool-feature">Historique</span>
+                </div>
+              </a>
 
-      <a href="modules/udp-prep.html" class="tool-card">
-        <span class="tool-badge">&Eacute;v&eacute;nements</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon" style="margin-bottom:14px"><img src="assets/forman-logo.png" alt="FORMAN" style="height:32px;display:block"></span>
-        <div class="tool-name">Pr&#233;paration UDP</div>
-        <div class="tool-desc">Pr&#233;parez chaque Universit&#233; du Patrimoine comme une campagne : objectifs R1 &amp; invitations DM, check-lists de mise en action (primoliste + &#233;quipe id&#233;ale, avec les scripts), questions aux formateurs et mod&#232;les &#224; suivre.</div>
-        <div class="tool-features">
-          <span class="tool-feature">Objectifs R1 / DM</span>
-          <span class="tool-feature">Check-lists scripts</span>
-          <span class="tool-feature">Questions &amp; mod&#232;les</span>
-        </div>
-      </a>
+              <a href="modules/tracking.html" class="tool-card">
+                <span class="tool-badge">Hebdo</span>
+                <div class="tool-bar" style="background:var(--orange)"></div>
+                <span class="tool-icon">&#128231;</span>
+                <div class="tool-name">Mail Manager &amp; Expert</div>
+                <div class="tool-desc">R&#233;digez en un clic votre mail hebdomadaire de suivi &mdash; mode Manager (filleuls) ou Expert (1,5 M&euro; min.). Objectifs m&#233;moris&#233;s une fois, report auto de semaine en semaine, copier-coller pr&#234;t pour Gmail.</div>
+                <div class="tool-features">
+                  <span class="tool-feature">Manager / Expert</span>
+                  <span class="tool-feature">M&#233;moire persistante</span>
+                  <span class="tool-feature">Copier-coller</span>
+                </div>
+              </a>
 
+      </div>
     </div>
 
-    <div class="tools-label" style="color:var(--orange);font-weight:700;margin-top:28px">Productivit&eacute;</div>
+    <div class="tools-label" style="color:var(--orange);font-weight:700">D&eacute;veloppement &amp; &eacute;v&eacute;nements</div>
     <div class="tools-grid">
 
-      <a href="modules/productivite.html" class="tool-card">
-        <span class="tool-badge">Quotidien</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon">&#128203;</span>
-        <div class="tool-name">Compl&#233;ter ma journ&#233;e</div>
-        <div class="tool-desc">Note tes actions du jour et visualise ton score de productivit&#233; 0-100 sur la semaine &mdash; prospection, r&#233;sultats, d&#233;veloppement. Historique et objectif hebdo m&#233;moris&#233;s.</div>
-        <div class="tool-features">
-          <span class="tool-feature">Score 0-100</span>
-          <span class="tool-feature">Semaine</span>
-          <span class="tool-feature">Historique</span>
-        </div>
-      </a>
+            <a href="modules/bp-simulator.html" class="tool-card">
+              <span class="tool-badge">Projection</span>
+              <div class="tool-bar" style="background:var(--orange)"></div>
+              <span class="tool-icon">&#128200;</span>
+              <div class="tool-name">Business Plan</div>
+              <div class="tool-desc">Projetez votre progression dans le r&#233;seau &mdash; qualifications PMR, CA personnel &amp; &#233;quipe, commissions d&#233;marrage / expansion / d&#233;veloppement.</div>
+              <div class="tool-features">
+                <span class="tool-feature">PMR Prod&#233;mial</span>
+                <span class="tool-feature">Qualifications</span>
+                <span class="tool-feature">Organisation</span>
+              </div>
+            </a>
 
-      <a href="modules/tracking.html" class="tool-card">
-        <span class="tool-badge">Hebdo</span>
-        <div class="tool-bar" style="background:var(--orange)"></div>
-        <span class="tool-icon">&#128231;</span>
-        <div class="tool-name">Mail Manager &amp; Expert</div>
-        <div class="tool-desc">R&#233;digez en un clic votre mail hebdomadaire de suivi &mdash; mode Manager (filleuls) ou Expert (1,5 M&euro; min.). Objectifs m&#233;moris&#233;s une fois, report auto de semaine en semaine, copier-coller pr&#234;t pour Gmail.</div>
-        <div class="tool-features">
-          <span class="tool-feature">Manager / Expert</span>
-          <span class="tool-feature">M&#233;moire persistante</span>
-          <span class="tool-feature">Copier-coller</span>
-        </div>
-      </a>
+            <a href="tracker/index.html" class="tool-card">
+              <span class="tool-badge">Suivi commun</span>
+              <div class="tool-bar" style="background:var(--orange)"></div>
+              <span class="tool-icon">&#127919;</span>
+              <div class="tool-name">Dev Action</div>
+              <div class="tool-desc">Op&#233;ration coup de poing : suivi commun de tes invit&#233;s du DM &#224; l'Inscription R&#233;seau. Classement parrains&#183;marraines, taux de conversion, notifications Slack sign&#233;es.</div>
+              <div class="tool-features">
+                <span class="tool-feature">Kanban</span>
+                <span class="tool-feature">Top parrains&#183;marraines</span>
+                <span class="tool-feature">Slack</span>
+              </div>
+            </a>
+
+            <a href="modules/udp-prep.html" class="tool-card">
+              <span class="tool-badge">&Eacute;v&eacute;nements</span>
+              <div class="tool-bar" style="background:var(--orange)"></div>
+              <span class="tool-icon" style="margin-bottom:14px"><img src="assets/forman-logo.png" alt="FORMAN" style="height:32px;display:block"></span>
+              <div class="tool-name">Pr&#233;paration UDP</div>
+              <div class="tool-desc">Pr&#233;parez chaque Universit&#233; du Patrimoine comme une campagne : objectifs R1 &amp; invitations DM, check-lists de mise en action (primoliste + &#233;quipe id&#233;ale, avec les scripts), questions aux formateurs et mod&#232;les &#224; suivre.</div>
+              <div class="tool-features">
+                <span class="tool-feature">Objectifs R1 / DM</span>
+                <span class="tool-feature">Check-lists scripts</span>
+                <span class="tool-feature">Questions &amp; mod&#232;les</span>
+              </div>
+            </a>
 
     </div>
   </div>
