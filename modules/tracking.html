@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<title>CGP Skool &mdash; Mail Manager &amp; Expert</title>
+<link rel="stylesheet" href="../assets/cgp-skool-theme.css">
+<link rel="stylesheet" href="../assets/cgp-skool-layout.css">
+<script src="../assets/cgp-skool-core.js"></script>
+<script src="../assets/cgp-skool-nav.js" defer></script>
+<script src="../assets/cgp-skool-feedback.js" defer></script>
+<style>
+/* ── Sidebar ── */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fi{padding:8px 10px;border:1.5px solid var(--bord);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--noir);background:#fff;outline:none;width:100%;box-sizing:border-box}
+.fi:focus{border-color:var(--orange)}
+textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ── Week nav (sidebar) ── */
+.week-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.week-nav button{background:#fff;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:16px;width:32px;height:32px;border-radius:7px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.week-nav button:hover{border-color:var(--orange);color:var(--orange)}
+.week-label{font-size:11px;font-weight:700;color:var(--noir);text-align:center;flex:1;line-height:1.3}
+
+/* ── Mode toggle (segmented) ── */
+.mode-seg{display:flex;background:var(--gris-l);border:1.5px solid var(--bord);border-radius:9px;padding:3px;margin-bottom:14px;gap:3px}
+.mode-seg button{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--gris);padding:8px 4px;border-radius:6px;cursor:pointer;transition:all 0.15s}
+.mode-seg button.active{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(212,98,42,0.35)}
+
+.sb-hint{font-size:10px;color:var(--gris);line-height:1.55;background:#FFFBF5;border:1px dashed #E6CFA8;border-radius:8px;padding:9px 11px;margin-bottom:14px}
+.sb-hint b{color:var(--gris-f)}
+
+.sb-btn{width:100%;padding:11px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border-radius:0;margin-bottom:8px}
+.sb-btn-copy{background:var(--orange);color:#fff}
+.sb-btn-copy:hover{background:var(--orange-hover)}
+.sb-btn-pdf{background:#2D7A5B;color:#fff}
+.sb-btn-pdf:hover{opacity:0.88}
+.sb-btn-ghost{background:transparent;border:1.5px solid var(--bord)!important;color:var(--gris);font-size:12px;padding:9px;border-radius:7px}
+.sb-btn-ghost:hover{border-color:var(--orange)!important;color:var(--orange)}
+.sb-btn-danger{background:transparent;border:1px solid rgba(192,57,43,0.25)!important;color:var(--red);font-size:11px;padding:9px;border-radius:7px}
+
+/* ── Page ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--bord)}
+.ph-tag{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.ph-title{font-size:20px;font-weight:700;color:var(--noir);font-family:var(--sans);line-height:1.2}
+.ph-date{font-size:12px;font-weight:300;color:var(--gris);text-align:right}
+.ph-mode{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--orange);background:var(--o-dim,rgba(212,98,42,0.1));padding:3px 9px;border-radius:20px}
+
+/* ── Cards ── */
+.card{background:#fff;border:1.5px solid var(--bord);border-radius:11px;padding:16px 18px;margin-bottom:16px}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--noir);margin-bottom:14px}
+.card-title .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.card-title .memo{margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);background:var(--green-l);padding:3px 7px;border-radius:20px}
+.card-title .wk{margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);background:rgba(212,98,42,0.1);padding:3px 7px;border-radius:20px}
+.card-sub{font-size:11px;color:var(--gris);margin:-8px 0 14px;line-height:1.5}
+
+/* collapsible via details */
+details.card{padding:0}
+details.card>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--noir)}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
+details.card>summary .memo{margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);background:var(--green-l);padding:3px 7px;border-radius:20px}
+details.card>summary .arr{font-size:10px;color:var(--ink-30);transition:transform 0.2s;margin-left:8px}
+details.card[open]>summary .arr{transform:rotate(180deg)}
+details.card[open]>summary .memo{margin-left:auto}
+details.card>summary .memo+.arr{margin-left:8px}
+.details-body{padding:0 18px 16px}
+
+/* ── RDV counters ── */
+.rdv-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.rdv-cell{border:1.5px solid var(--bord);border-radius:9px;padding:8px 6px;text-align:center;background:#fff}
+.rdv-cell .rdv-lab{font-size:10px;font-weight:700;color:var(--gris);letter-spacing:0.04em;margin-bottom:6px}
+.rdv-counter{display:flex;align-items:center;justify-content:center;gap:5px}
+.rdv-counter button{width:22px;height:22px;border:none;border-radius:5px;background:rgba(0,0,0,0.05);color:var(--gris);font-size:14px;font-weight:600;cursor:pointer;line-height:1;transition:all 0.1s;font-family:var(--sans);flex-shrink:0}
+.rdv-counter button:hover{background:var(--orange);color:#fff}
+.rdv-val{min-width:20px;text-align:center;font-size:15px;font-weight:800;color:var(--noir);font-family:var(--sans)}
+.rdv-val.zero{color:rgba(0,0,0,0.2)}
+.rdv-total{margin-top:12px;font-size:12px;color:var(--gris)}
+.rdv-total b{color:var(--orange);font-size:15px}
+
+/* ── Preview ── */
+.preview-wrap{background:#0D0D0D;border-radius:12px;padding:0;overflow:hidden}
+.preview-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:#161513;border-bottom:1px solid #2a2825}
+.preview-bar .pv-t{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#E8855A}
+.preview-copy{background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:700;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.15s}
+.preview-copy:hover{background:var(--orange-hover)}
+.preview-copy.ok{background:var(--green)}
+.preview-body{margin:0;padding:18px 20px;font-family:var(--sans);font-size:13px;line-height:1.65;color:#F2F1EE;white-space:pre-wrap;word-wrap:break-word;max-height:640px;overflow:auto}
+
+/* ── Print ── */
+@media print{
+  .card,.card-title .dot,.card-title .memo,.card-title .wk,.rdv-cell,.ph-mode,
+  .preview-wrap,.preview-bar,.mode-seg button.active,[style*="background"]{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important
+  }
+  .no-print,.sb-btn,.week-nav{display:none!important}
+  .preview-wrap{background:#fff!important;border:1.5px solid var(--bord)}
+  .preview-bar{display:none!important}
+  .preview-body{color:var(--noir)!important;max-height:none!important;overflow:visible!important}
+  details.card{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<nav class="cs-nav">
+  <div class="cs-nav-inner">
+    <a class="cs-logo" href="../outils.html">
+      <div class="cs-logo-mark"><span>C</span></div>
+      <span class="cs-logo-name">CGP Skool</span>
+    </a>
+    <div style="flex:1"></div>
+    <div id="cs-nav-actions"></div>
+  </div>
+</nav>
+
+<div class="cs-app">
+
+  <!-- SIDEBAR -->
+  <div class="cs-sidebar">
+
+    <div class="mode-seg">
+      <button id="modeManager" onclick="setMode('manager')">Manager</button>
+      <button id="modeExpert" onclick="setMode('expert')">Expert</button>
+    </div>
+
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)" title="Semaine precedente">&#8249;</button>
+      <div class="week-label" id="weekLabel">Chargement...</div>
+      <button onclick="changeWeek(1)" title="Semaine suivante">&#8250;</button>
+    </div>
+
+    <div class="sb-hint" id="modeHint"></div>
+
+    <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn">&#128203; Copier l'email</button>
+    <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter en PDF</button>
+
+    <div style="height:1px;background:var(--bord);margin:6px 0 12px"></div>
+
+    <button class="sb-btn sb-btn-ghost" onclick="reportPrev()" title="Recopier l'activite 'Cette semaine' de la semaine precedente dans 'Semaine passee'">&#8635; Reporter la semaine pr&eacute;c&eacute;dente</button>
+    <button class="sb-btn sb-btn-danger" onclick="resetWeek()" title="Effacer l'activite hebdo de cette semaine (les objectifs memorises sont conserves)">&#9100; Effacer cette semaine</button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="cs-main">
+    <div class="cs-page">
+
+      <div class="page-header">
+        <div>
+          <div class="ph-tag">Mail hebdomadaire</div>
+          <div class="ph-title" id="pageTitle">Semaine du...</div>
+          <span class="ph-mode" id="pageMode">Mail Manager</span>
+        </div>
+        <div>
+          <div class="ph-date" id="pageDate"></div>
+        </div>
+      </div>
+
+      <!-- ══ ACTIVITE DE LA SEMAINE (hebdo) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Activit&eacute; de la semaine<span class="wk">Hebdo</span></div>
+        <div class="card-sub">Une ligne par action. Le <b>Cette semaine</b> se reporte automatiquement dans le <b>Semaine pass&eacute;e</b> de la semaine suivante (&eacute;ditable).</div>
+        <div class="grid2">
+          <div class="fg">
+            <label>&#128197; Semaine pass&eacute;e</label>
+            <textarea class="fi" data-fld="passee" data-store="week" placeholder="ED filleul x3&#10;R1 x2&#10;RX =&gt; VC 25k&euro; AV"></textarea>
+          </div>
+          <div class="fg">
+            <label>&#128197; Cette semaine / prochaine</label>
+            <textarea class="fi" data-fld="cette" data-store="week" placeholder="ED filleul x2&#10;Booster filleuls&#10;RX x3&#10;R2 / R1"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ RDV D'AVANCE + CHIFFRES (hebdo) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>RDV d'avance &amp; chiffres<span class="wk">Hebdo</span></div>
+        <div class="rdv-grid" id="rdvGrid"></div>
+        <div class="rdv-total">Total RDV d'avance&nbsp;: <b id="rdvTotal">0</b></div>
+
+        <div style="height:1px;background:var(--bord);margin:16px 0"></div>
+
+        <div class="grid2">
+          <div class="fg"><label>&#128176; VA perso &mdash; act&eacute;e</label>
+            <input class="fi" type="text" data-fld="vaPersoActe" data-store="week" placeholder="809k&euro;"></div>
+          <div class="fg"><label>&#128176; VA perso &mdash; en cours</label>
+            <input class="fi" type="text" data-fld="vaPersoEnCours" data-store="week" placeholder="150k&euro;"></div>
+        </div>
+        <div class="grid2" data-mode="manager expert">
+          <div class="fg"><label>&#128640; VA &eacute;quipe &mdash; act&eacute;e</label>
+            <input class="fi" type="text" data-fld="vaEquipeActe" data-store="week" placeholder="952k&euro;"></div>
+          <div class="fg"><label>&#128640; VA &eacute;quipe &mdash; en cours</label>
+            <input class="fi" type="text" data-fld="vaEquipeEnCours" data-store="week" placeholder="150k&euro;"></div>
+        </div>
+      </div>
+
+      <!-- ══ IDENTITE & LIGNEE (memorise) ══ -->
+      <details class="card">
+        <summary><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e amont<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="grid2">
+            <div class="fg"><label>Galaxie &amp; marraine</label>
+              <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
+            <div class="fg" data-mode="manager"><label>Manager / Parrain</label>
+              <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Entr&eacute;e dans le r&eacute;seau</label>
+              <input class="fi" type="text" data-fld="entree" data-store="profil" placeholder="Janvier 2025"></div>
+            <div class="fg"><label>Signature (pr&eacute;nom)</label>
+              <input class="fi" type="text" data-fld="signature" data-store="profil" placeholder="Simon"></div>
+          </div>
+          <div class="fg"><label>Contexte / statut (optionnel)</label>
+            <input class="fi" type="text" data-fld="contexte" data-store="profil" placeholder="En double activit&eacute; (dans le r&eacute;seau depuis le 21 d&eacute;cembre 2025)"></div>
+        </div>
+      </details>
+
+      <!-- ══ OBJECTIFS (memorise) ══ -->
+      <details class="card" open>
+        <summary><span class="dot"></span>Objectifs perso &amp; &eacute;quipe<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="grid2">
+            <div class="fg"><label>Nb clients &mdash; actuel</label>
+              <input class="fi" type="text" data-fld="nbClients" data-store="profil" placeholder="2"></div>
+            <div class="fg"><label>Nb clients &mdash; objectif</label>
+              <input class="fi" type="text" data-fld="objClients" data-store="profil" placeholder="10"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Objectif VA perso</label>
+              <input class="fi" type="text" data-fld="objVaPerso" data-store="profil" placeholder="1 M&euro;"></div>
+            <div class="fg"><label>&hellip; &agrave; la date du</label>
+              <input class="fi" type="text" data-fld="objVaPersoDate" data-store="profil" placeholder="31/12/2026"></div>
+          </div>
+          <div class="grid2" data-mode="manager expert">
+            <div class="fg"><label>Objectif VA &eacute;quipe</label>
+              <input class="fi" type="text" data-fld="objVaEquipe" data-store="profil" placeholder="2 M&euro;"></div>
+            <div class="fg"><label>&hellip; &agrave; la date du</label>
+              <input class="fi" type="text" data-fld="objVaEquipeDate" data-store="profil" placeholder="31/07/2026"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- ══ DEVELOPPEMENT / PIPELINE (memorise) ══ -->
+      <details class="card">
+        <summary><span class="dot"></span>D&eacute;veloppement d'&eacute;quipe<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="grid2">
+            <div class="fg"><label>&Eacute;quipe actuelle</label>
+              <input class="fi" type="text" data-fld="equipeActuelle" data-store="profil" placeholder="6 conseillers"></div>
+            <div class="fg"><label>Objectif nb conseillers</label>
+              <input class="fi" type="text" data-fld="objDevNb" data-store="profil" placeholder="16"></div>
+          </div>
+          <div class="fg"><label>&hellip; &agrave; la date du</label>
+            <input class="fi" type="text" data-fld="objDevDate" data-store="profil" placeholder="31/12/2026"></div>
+
+          <div class="card-sub" style="margin:14px 0 10px"><b>Compteurs pipeline</b> &mdash; noms ou nombre &agrave; chaque &eacute;tape</div>
+          <div class="grid2">
+            <div class="fg"><label>Qualification Manager</label>
+              <input class="fi" type="text" data-fld="devQualif" data-store="profil" placeholder="Arnaud / Louis-Victor"></div>
+            <div class="fg"><label>Actif</label>
+              <input class="fi" type="text" data-fld="devActif" data-store="profil" placeholder="&hellip;"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Inscription Prod&eacute;mial</label>
+              <input class="fi" type="text" data-fld="devProdemial" data-store="profil" placeholder="Simon / Pierre / Maell"></div>
+            <div class="fg"><label>Inscription 3J</label>
+              <input class="fi" type="text" data-fld="devJ3" data-store="profil" placeholder="&hellip;"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Inscription AD</label>
+              <input class="fi" type="text" data-fld="devAd" data-store="profil" placeholder="&hellip;"></div>
+            <div class="fg"><label>Inscription DM</label>
+              <input class="fi" type="text" data-fld="devDm" data-store="profil" placeholder="Julie.M / Elodie"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Inscription PO</label>
+              <input class="fi" type="text" data-fld="devPo" data-store="profil" placeholder="&hellip;"></div>
+            <div class="fg"><label>&Agrave; inviter</label>
+              <input class="fi" type="text" data-fld="devInviter" data-store="profil" placeholder="Mathieu.T / Marine"></div>
+          </div>
+          <div class="fg"><label>SBY</label>
+            <input class="fi" type="text" data-fld="devSby" data-store="profil" placeholder="Davy.T (3J) / Ilia.M (AD)"></div>
+
+          <div class="grid2" data-mode="expert">
+            <div class="fg"><label>Branche Manager act&eacute;e</label>
+              <input class="fi" type="text" data-fld="brancheActe" data-store="profil" placeholder="5"></div>
+            <div class="fg"><label>Branche Manager en cours</label>
+              <input class="fi" type="text" data-fld="brancheEnCours" data-store="profil" placeholder="1"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- ══ HABILITATIONS & FORMAN (memorise, manager) ══ -->
+      <details class="card" data-mode="manager">
+        <summary><span class="dot"></span>Habilitations &amp; Forman<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="fg"><label>Habilitations (une par ligne)</label>
+            <textarea class="fi" data-fld="habilitations" data-store="profil" placeholder="Assurance Niveau II (MIA) : valid&eacute; le 24/03/2026&#10;Immobilier - IOBSP Niveau II : en cours"></textarea></div>
+          <div class="fg"><label>Objectif habilitation final</label>
+            <input class="fi" type="text" data-fld="habObjectif" data-store="profil" placeholder="CIF"></div>
+
+          <div style="height:1px;background:var(--bord);margin:8px 0 14px"></div>
+
+          <div class="grid2">
+            <div class="fg"><label>Niveau Forman actuel</label>
+              <input class="fi" type="text" data-fld="formanActuel" data-store="profil" placeholder="Neoman"></div>
+            <div class="fg"><label>Niveau Forman vis&eacute;</label>
+              <input class="fi" type="text" data-fld="formanVise" data-store="profil" placeholder="Xman"></div>
+          </div>
+          <div class="fg"><label>Objectifs Forman &agrave; valider (une par ligne)</label>
+            <textarea class="fi" data-fld="formanObjectifs" data-store="profil" placeholder="Avoir particip&eacute; &agrave; la formation D&eacute;veloppement &Eacute;quipe niveau 1&#10;Avoir 3 rendez-vous d'avance&#10;Passer Beman fin d'ann&eacute;e 2026"></textarea></div>
+        </div>
+      </details>
+
+      <!-- ══ FORMATIONS & EVENEMENTS (memorise) ══ -->
+      <details class="card">
+        <summary><span class="dot"></span>Formations &amp; &eacute;v&eacute;nements<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="grid2">
+            <div class="fg"><label>&#127891; Formations r&eacute;alis&eacute;es</label>
+              <textarea class="fi" data-fld="formationsRealisees" data-store="profil" placeholder="Fiscalit&eacute; - Niveau 1 &mdash; 18/05/2026&#10;Art de la mise en relation &mdash; 29/03/2026"></textarea></div>
+            <div class="fg"><label>&#127891; Formations &agrave; venir</label>
+              <textarea class="fi" data-fld="formationsAVenir" data-store="profil" placeholder="PER - Niveau I : 31/10/2026"></textarea></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>&#10024; &Eacute;v&eacute;nements r&eacute;alis&eacute;s</label>
+              <textarea class="fi" data-fld="evenementsRealises" data-store="profil" placeholder="&hellip;"></textarea></div>
+            <div class="fg"><label>&#10024; &Eacute;v&eacute;nements &agrave; venir</label>
+              <textarea class="fi" data-fld="evenementsAVenir" data-store="profil" placeholder="UDP septembre&#10;Convention nationale"></textarea></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- ══ BUSINESS DETAILLE (memorise, expert) ══ -->
+      <details class="card" data-mode="expert">
+        <summary><span class="dot"></span>Point business d&eacute;taill&eacute;<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <div class="details-body">
+          <div class="grid2">
+            <div class="fg"><label>Objectif encours sous gestion</label>
+              <input class="fi" type="text" data-fld="objEncours" data-store="profil" placeholder="8 M&euro;"></div>
+            <div class="fg"><label>Encours sous gestion &mdash; actuel</label>
+              <input class="fi" type="text" data-fld="encoursActuel" data-store="week" placeholder="8.28 M&euro;"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Objectif VP annualis&eacute;s</label>
+              <input class="fi" type="text" data-fld="objVp" data-store="profil" placeholder="400K&euro;"></div>
+            <div class="fg"><label>VP annualis&eacute;s &mdash; actuel</label>
+              <input class="fi" type="text" data-fld="vpActuel" data-store="week" placeholder="379K&euro;"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Conseillers actifs</label>
+              <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
+            <div class="fg"><label>Inscrits lign&eacute;e (bilan parrainage)</label>
+              <input class="fi" type="text" data-fld="inscritsLignee" data-store="profil" placeholder="27 (objectif 20)"></div>
+          </div>
+          <div class="fg"><label>Tableau des lign&eacute;es (optionnel, coll&eacute; tel quel)</label>
+            <textarea class="fi" data-fld="ligneeTable" data-store="profil" placeholder="Galaxie : 3 189 273 &euro;&#10;Lign&eacute;e Manu : 4 133 558 &euro;&#10;&hellip;"></textarea></div>
+          <div class="fg"><label>Voyages / Ambitions (optionnel)</label>
+            <textarea class="fi" data-fld="voyages" data-store="profil" placeholder="Ambition Galaxie : 5 pts &agrave; date&#10;Montenegro : 1 place"></textarea></div>
+        </div>
+      </details>
+
+      <!-- ══ PREVIEW ══ -->
+      <div class="preview-wrap">
+        <div class="preview-bar no-print">
+          <span class="pv-t">Aper&ccedil;u de l'email &mdash; pr&ecirc;t &agrave; copier</span>
+          <button class="preview-copy" id="previewCopy" onclick="copyEmail()">&#128203; Copier</button>
+        </div>
+        <pre class="preview-body" id="previewBody"></pre>
+      </div>
+
+      <div id="conseillerFooter"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// MAIL MANAGER & EXPERT — generateur d'email hebdomadaire
+// Memoire persistante (localStorage) + report semaine N -> N-1
+// ══════════════════════════════════════════════════════════════
+
+var STORE_KEY = 'cgpskool_tracking_v1';
+var RDV_TYPES = [
+  { id:'r0', lab:'R0' }, { id:'r1', lab:'R1' }, { id:'r2', lab:'R2' },
+  { id:'r3', lab:'R3' }, { id:'rx', lab:'RX' }
+];
+var MONTH_NAMES = ['jan.','fev.','mar.','avr.','mai','juin','juil.','aout','sept.','oct.','nov.','dec.'];
+
+// ── STATE ─────────────────────────────────────────────────────
+var state = {
+  mode: 'manager',
+  weekOffset: 0,
+  profil: {},        // champs memorises (identite + objectifs)
+  history: {}        // weekKey -> { passee, cette, rdv:{}, vaPersoActe, ... }
+};
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      var s = JSON.parse(raw);
+      if (s.mode) state.mode = s.mode;
+      if (s.profil) state.profil = s.profil;
+      if (s.history) state.history = s.history;
+    }
+  } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      mode: state.mode, profil: state.profil, history: state.history
+    }));
+  } catch(e) {}
+}
+
+// ── DATES ─────────────────────────────────────────────────────
+function getMonday(date) {
+  var d = new Date(date), day = d.getDay(), diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff); d.setHours(0,0,0,0); return d;
+}
+function getCurrentMonday() {
+  var now = new Date(); now.setDate(now.getDate() + state.weekOffset * 7); return getMonday(now);
+}
+function weekKey(monday) {
+  var jan1 = new Date(monday.getFullYear(), 0, 1);
+  var weekNum = Math.ceil((((monday - jan1) / 86400000) + jan1.getDay() + 1) / 7);
+  return monday.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
+}
+function curWk() { return weekKey(getCurrentMonday()); }
+function prevWk() {
+  var m = getCurrentMonday(); m.setDate(m.getDate() - 7); return weekKey(m);
+}
+function formatDate(d) { return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()]; }
+
+// ── ACCESS DONNEES SEMAINE ────────────────────────────────────
+function ensureWeek(wk) {
+  if (!state.history[wk]) state.history[wk] = { rdv:{} };
+  if (!state.history[wk].rdv) state.history[wk].rdv = {};
+  return state.history[wk];
+}
+function getW(field) {
+  var wk = curWk(), w = state.history[wk];
+  if (w && w[field] !== undefined && w[field] !== '') return w[field];
+  if (w && w[field] === '') return '';
+  // report auto : 'passee' herite du 'cette' de la semaine precedente si vide
+  if (field === 'passee') {
+    var pw = state.history[prevWk()];
+    if (pw && pw.cette) return pw.cette;
+  }
+  return '';
+}
+function setW(field, val) {
+  var w = ensureWeek(curWk()); w[field] = val; saveState();
+}
+function getRdv(type) {
+  var w = state.history[curWk()];
+  return (w && w.rdv && w.rdv[type]) ? w.rdv[type] : 0;
+}
+function setRdv(type, val) {
+  var w = ensureWeek(curWk()); w.rdv[type] = Math.max(0, val); saveState();
+}
+
+// ── MODE ──────────────────────────────────────────────────────
+function setMode(m) {
+  state.mode = m; saveState(); applyMode(); render();
+}
+function applyMode() {
+  document.getElementById('modeManager').classList.toggle('active', state.mode === 'manager');
+  document.getElementById('modeExpert').classList.toggle('active', state.mode === 'expert');
+  document.getElementById('pageMode').textContent = state.mode === 'manager' ? 'Mail Manager' : 'Mail Expert';
+  document.getElementById('modeHint').innerHTML = state.mode === 'manager'
+    ? '<b>Mode Manager</b> &mdash; pour les filleuls qui aspirent &agrave; devenir manager. Sections habilitations, Forman et d&eacute;veloppement mises en avant.'
+    : '<b>Mode Expert</b> &mdash; une fois manager, objectif 1,5 M&euro; minimum. Point business d&eacute;taill&eacute; (encours, VP, lign&eacute;es) mis en avant.';
+  // visibilite des blocs selon le mode
+  document.querySelectorAll('[data-mode]').forEach(function(el) {
+    var modes = el.getAttribute('data-mode').split(' ');
+    el.style.display = (modes.indexOf(state.mode) !== -1) ? '' : 'none';
+  });
+}
+
+// ── FORMULAIRE ────────────────────────────────────────────────
+function loadForm() {
+  document.querySelectorAll('[data-fld]').forEach(function(el) {
+    var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
+    el.value = (store === 'week') ? getW(id) : (state.profil[id] || '');
+  });
+  renderRdv();
+}
+function bindForm() {
+  document.querySelectorAll('[data-fld]').forEach(function(el) {
+    el.addEventListener('input', function() {
+      var id = el.getAttribute('data-fld'), store = el.getAttribute('data-store');
+      if (store === 'week') setW(id, el.value);
+      else { state.profil[id] = el.value; saveState(); }
+      updatePreview();
+    });
+  });
+}
+
+// ── RDV COUNTERS ──────────────────────────────────────────────
+function renderRdv() {
+  var html = '';
+  RDV_TYPES.forEach(function(t) {
+    var v = getRdv(t.id);
+    html += '<div class="rdv-cell">';
+    html += '<div class="rdv-lab">' + t.lab + '</div>';
+    html += '<div class="rdv-counter">';
+    html += '<button onclick="adjustRdv(\'' + t.id + '\',-1)">&#8722;</button>';
+    html += '<span class="rdv-val' + (v === 0 ? ' zero' : '') + '" id="rdv_' + t.id + '">' + v + '</span>';
+    html += '<button onclick="adjustRdv(\'' + t.id + '\',1)">+</button>';
+    html += '</div></div>';
+  });
+  document.getElementById('rdvGrid').innerHTML = html;
+  updateRdvTotal();
+}
+function adjustRdv(type, delta) {
+  setRdv(type, getRdv(type) + delta);
+  var el = document.getElementById('rdv_' + type), v = getRdv(type);
+  if (el) { el.textContent = v; el.className = 'rdv-val' + (v === 0 ? ' zero' : ''); }
+  updateRdvTotal();
+  updatePreview();
+}
+function rdvTotal() {
+  var t = 0; RDV_TYPES.forEach(function(x) { t += getRdv(x.id); }); return t;
+}
+function updateRdvTotal() {
+  var el = document.getElementById('rdvTotal'); if (el) el.textContent = rdvTotal();
+}
+function rdvLine() {
+  return 'R0/R1/R2/R3/RX = ' + RDV_TYPES.map(function(t){ return getRdv(t.id); }).join('/');
+}
+
+// ── HELPERS TEXTE / ARGENT ────────────────────────────────────
+// Gras Unicode (Mathematical Sans-Serif Bold) : survit au copier-coller
+// dans Gmail / Outlook. Les accents restent en normal (comme les exemples).
+function bold(s) {
+  return String(s).replace(/[A-Za-z0-9]/g, function(c) {
+    var code = c.charCodeAt(0);
+    if (c >= 'A' && c <= 'Z') return String.fromCodePoint(0x1D5D4 + code - 65);
+    if (c >= 'a' && c <= 'z') return String.fromCodePoint(0x1D5EE + code - 97);
+    return String.fromCodePoint(0x1D7EC + code - 48);
+  });
+}
+// aere l'email : une ligne vide avant chaque en-tete de section (emoji)
+function spaceSections(txt) {
+  var re = /^(👤|📅|🤝|✅|👥|💰|🚀|🏆|🎓|✨|🌱|🏝)/;
+  var res = [];
+  txt.split('\n').forEach(function(l) {
+    if (re.test(l) && res.length && res[res.length - 1].trim() !== '') res.push('');
+    res.push(l);
+  });
+  return res.join('\n');
+}
+function p(id) { return (state.profil[id] || '').trim(); }
+// liste : prefixe chaque ligne non vide par "- "
+function bullet(txt) {
+  if (!txt) return '';
+  return String(txt).split('\n').map(function(l) {
+    l = l.trim(); if (!l) return '';
+    return (l.charAt(0) === '-' || l.charAt(0) === '•') ? l : '- ' + l;
+  }).filter(Boolean).join('\n');
+}
+// texte brut ligne a ligne (sans puce)
+function lines(txt) {
+  if (!txt) return '';
+  return String(txt).split('\n').map(function(l){ return l.trim(); }).filter(Boolean).join('\n');
+}
+// parse "5 000 &euro;", "3M", "82k&euro;", "1,5 M&euro;" -> nombre (ou NaN)
+function parseMoney(s) {
+  if (!s) return NaN;
+  var t = String(s).toLowerCase().replace(/€/g, '').replace(/euros?/g, '')
+    .replace(/\s/g, '').replace(',', '.').trim();
+  if (!t) return NaN;
+  var mult = 1;
+  if (/m$/.test(t)) { mult = 1e6; t = t.slice(0, -1); }
+  else if (/k$/.test(t)) { mult = 1e3; t = t.slice(0, -1); }
+  var n = parseFloat(t);
+  return isNaN(n) ? NaN : n * mult;
+}
+function fmtMoney(n) {
+  var neg = n < 0; n = Math.abs(Math.round(n));
+  var s = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return (neg ? '-' : '') + s + ' €';
+}
+// reste a faire = objectif - (acte + en cours) ; '' si non calculable
+function resteAFaire(objId, acteVal, enCoursVal) {
+  var obj = parseMoney(p(objId)), a = parseMoney(acteVal), e = parseMoney(enCoursVal);
+  if (isNaN(obj)) return '';
+  var done = (isNaN(a) ? 0 : a) + (isNaN(e) ? 0 : e);
+  if (isNaN(a) && isNaN(e)) return '';
+  return fmtMoney(obj - done);
+}
+
+// ── GENERATION EMAIL ──────────────────────────────────────────
+function buildEmail() {
+  return (state.mode === 'manager') ? buildManager() : buildExpert();
+}
+
+function section(num, emoji, title) {
+  return '\n' + emoji + ' ' + bold((num ? num + ' - ' : '') + title) + ' :\n';
+}
+
+function buildManager() {
+  var o = [];
+  o.push('Bonjour à toutes et à tous,');
+  o.push('');
+
+  // Lignee amont
+  o.push('👤 ' + bold('Lignée amont') + ' :');
+  if (p('galaxie'))  o.push('- Galaxie : ' + p('galaxie'));
+  if (p('parrain'))  o.push('- Manager/Parrain : ' + p('parrain'));
+  if (p('entree'))   o.push('- Entrée dans le réseau : ' + p('entree'));
+  if (p('contexte')) o.push('- ' + p('contexte'));
+
+  // 1 - Semaine passee
+  o.push(section('1', '📅', 'Semaine passée').trim());
+  var passee = bullet(getW('passee')); if (passee) o.push(passee);
+
+  // 2 - Semaine prochaine
+  o.push(section('2', '📅', 'Semaine prochaine').trim());
+  var cette = bullet(getW('cette')); if (cette) o.push(cette);
+
+  // 3 - RDV d'avance
+  o.push(section('3', '🤝', 'Nombre de RDVs d\'avance').trim());
+  o.push('Total = ' + rdvTotal() + ' (' + rdvLine() + ')');
+  if (p('nbClients') || p('objClients'))
+    o.push('Nombre de clients : ' + (p('nbClients') || '0') + ' / ' + (p('objClients') || '?'));
+
+  // 4 - Habilitations
+  if (p('habilitations') || p('habObjectif')) {
+    o.push(section('4', '✅', 'Habilitations').trim());
+    var hab = bullet(p('habilitations')); if (hab) o.push(hab);
+    if (p('habObjectif')) o.push('- Objectif final : ' + p('habObjectif'));
+  }
+
+  // 5 - Developpement
+  o.push(section('5', '👥', 'Objectifs Développement').trim());
+  if (p('equipeActuelle')) o.push('- Équipe actuelle : ' + p('equipeActuelle'));
+  if (p('objDevNb'))       o.push('- Objectif' + (p('objDevDate') ? ' au ' + p('objDevDate') : '') + ' : ' + p('objDevNb') + ' conseillers');
+  var comp = devCompteurs();
+  if (comp) o.push('- Compteurs : ' + comp);
+
+  // 6 - VA perso
+  o.push(section('6', '💰', 'Objectif VA perso').trim());
+  if (p('objVaPerso')) o.push('- Objectif' + (p('objVaPersoDate') ? ' au ' + p('objVaPersoDate') : '') + ' : ' + p('objVaPerso'));
+  o.push('- VA acté : ' + (getW('vaPersoActe') || '0 €'));
+  o.push('- VA en cours : ' + (getW('vaPersoEnCours') || '0 €'));
+  var rp = resteAFaire('objVaPerso', getW('vaPersoActe'), getW('vaPersoEnCours'));
+  if (rp) o.push('- Reste à faire : ' + rp);
+
+  // 7 - VA equipe
+  o.push(section('7', '🚀', 'Objectif VA équipe').trim());
+  var hasEq = getW('vaEquipeActe') || getW('vaEquipeEnCours') || p('objVaEquipe');
+  if (!hasEq) { o.push('- VA acté : //'); o.push('- VA en cours : //'); }
+  else {
+    if (p('objVaEquipe')) o.push('- Objectif' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' : ' + p('objVaEquipe'));
+    o.push('- VA acté : ' + (getW('vaEquipeActe') || '0 €'));
+    o.push('- VA en cours : ' + (getW('vaEquipeEnCours') || '0 €'));
+    var re = resteAFaire('objVaEquipe', getW('vaEquipeActe'), getW('vaEquipeEnCours'));
+    if (re) o.push('- Reste à faire : ' + re);
+  }
+
+  // 8 - Forman
+  if (p('formanActuel') || p('formanVise') || p('formanObjectifs')) {
+    o.push(section('8', '🏆', 'Objectifs Forman').trim());
+    if (p('formanActuel')) o.push('- Niveau actuel : ' + p('formanActuel'));
+    if (p('formanVise'))   o.push('- Niveau visé : ' + p('formanVise'));
+    var fo = bullet(p('formanObjectifs'));
+    if (fo) { o.push('- Objectifs à valider :'); o.push(fo); }
+  }
+
+  // 9 - Formations
+  if (p('formationsRealisees') || p('formationsAVenir')) {
+    o.push(section('9', '🎓', 'Formations').trim());
+    o.push('Réalisées : ' + (lines(p('formationsRealisees')) ? '\n' + bullet(p('formationsRealisees')) : 'aucune pour l\'instant.'));
+    o.push('À venir : ' + (lines(p('formationsAVenir')) ? '\n' + bullet(p('formationsAVenir')) : 'aucune formation planifiée pour l\'instant.'));
+  }
+
+  // 10 - Evenements
+  if (p('evenementsRealises') || p('evenementsAVenir')) {
+    o.push(section('10', '✨', 'Évènements').trim());
+    o.push('Réalisés : ' + (lines(p('evenementsRealises')) ? '\n' + bullet(p('evenementsRealises')) : 'aucun pour l\'instant.'));
+    o.push('À venir : ' + (lines(p('evenementsAVenir')) ? '\n' + bullet(p('evenementsAVenir')) : 'aucun pour l\'instant.'));
+  }
+
+  o.push('');
+  o.push('Bonne semaine,');
+  o.push(p('signature') || '');
+  return spaceSections(o.join('\n')).replace(/\n{3,}/g, '\n\n');
+}
+
+function devCompteurs() {
+  var parts = [];
+  var map = [
+    ['devQualif','Qualif. Manager'], ['devActif','Actif'], ['devProdemial','Inscr. Prodémial'],
+    ['devJ3','3J'], ['devAd','AD'], ['devDm','DM'], ['devPo','PO'],
+    ['devInviter','À inviter'], ['devSby','SBY']
+  ];
+  map.forEach(function(m) { if (p(m[0])) parts.push(m[1] + ' : ' + p(m[0])); });
+  return parts.join(' | ');
+}
+
+function buildExpert() {
+  var o = [];
+  o.push('Bonjour à toutes et à tous,');
+  o.push('');
+
+  o.push('👤 ' + bold('Lignée') + ' :');
+  if (p('galaxie'))  o.push('Galaxie & marraine : ' + p('galaxie'));
+  if (p('contexte')) o.push(p('contexte'));
+
+  // Semaine passee
+  o.push('\n📅 ' + bold('Semaine passée') + ' :');
+  var passee = bullet(getW('passee')); if (passee) o.push(passee);
+
+  // Cette semaine
+  o.push('\n📅 ' + bold('Cette semaine') + ' :');
+  var cette = bullet(getW('cette')); if (cette) o.push(cette);
+
+  // RDV
+  o.push('\n🤝 ' + bold('Rendez-vous à venir') + ' : ' + rdvTotal());
+  o.push(rdvLine());
+
+  // Point business perso
+  o.push('\n💰 ' + bold('Point business — Perso') + ' :');
+  if (p('objVaPerso')) o.push('Objectif perso' + (p('objVaPersoDate') ? ' au ' + p('objVaPersoDate') : '') + ' : ' + p('objVaPerso'));
+  o.push('VA acté : ' + (getW('vaPersoActe') || '0 €'));
+  o.push('VA en cours : ' + (getW('vaPersoEnCours') || '0 €'));
+  var totPerso = totalVA(getW('vaPersoActe'), getW('vaPersoEnCours'));
+  if (totPerso) o.push('Total VA + en-cours : ' + totPerso);
+  if (getW('encoursActuel') || p('objEncours'))
+    o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' (objectif ' + p('objEncours') + ')' : ''));
+  if (getW('vpActuel') || p('objVp'))
+    o.push('Objectif VP annualisés : ' + (getW('vpActuel') || '?') + (p('objVp') ? ' / ' + p('objVp') : ''));
+
+  // Equipe
+  o.push('\n👥 ' + bold('Équipe') + ' :');
+  if (p('conseillersActifs')) o.push('Conseillers actifs : ' + p('conseillersActifs'));
+  else if (p('equipeActuelle')) o.push('Équipe : ' + p('equipeActuelle'));
+  if (p('brancheActe'))    o.push('Branche Manager actée : ' + p('brancheActe'));
+  if (p('brancheEnCours')) o.push('Branche Manager en cours : ' + p('brancheEnCours'));
+  if (p('objVaEquipe'))    o.push('Objectif VA acté équipe' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' : ' + p('objVaEquipe'));
+  o.push('VA acté équipe : ' + (getW('vaEquipeActe') || '0 €'));
+  o.push('VA en cours équipe : ' + (getW('vaEquipeEnCours') || '0 €'));
+  if (p('ligneeTable')) { o.push(''); o.push(lines(p('ligneeTable'))); }
+
+  // Bilan parrainage
+  if (p('inscritsLignee')) {
+    o.push('\n🌱 ' + bold('Bilan parrainage') + ' :');
+    o.push('Inscrits lignée : ' + p('inscritsLignee'));
+  }
+
+  // Formations & evenements
+  if (p('formationsAVenir') || p('formationsRealisees') || p('evenementsAVenir') || p('evenementsRealises')) {
+    o.push('\n🎓 ' + bold('Formations & événements') + ' :');
+    if (p('formationsRealisees')) o.push('Formations réalisées :\n' + bullet(p('formationsRealisees')));
+    if (p('formationsAVenir'))    o.push('Formations à venir :\n' + bullet(p('formationsAVenir')));
+    if (p('evenementsAVenir'))    o.push('Événements à venir :\n' + bullet(p('evenementsAVenir')));
+  }
+
+  // Voyages
+  if (p('voyages')) {
+    o.push('\n🏝️ ' + bold('Voyages / Ambitions') + ' :');
+    o.push(lines(p('voyages')));
+  }
+
+  o.push('');
+  o.push('Bonne semaine,');
+  o.push(p('signature') || '');
+  return spaceSections(o.join('\n')).replace(/\n{3,}/g, '\n\n');
+}
+
+function totalVA(acteVal, enCoursVal) {
+  var a = parseMoney(acteVal), e = parseMoney(enCoursVal);
+  if (isNaN(a) && isNaN(e)) return '';
+  return fmtMoney((isNaN(a) ? 0 : a) + (isNaN(e) ? 0 : e));
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────
+function updatePreview() {
+  document.getElementById('previewBody').textContent = buildEmail();
+}
+
+// ── COPIER ────────────────────────────────────────────────────
+function copyEmail() {
+  var txt = buildEmail();
+  var done = function() { flashCopied(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done, function() { fallbackCopy(txt, done); });
+  } else { fallbackCopy(txt, done); }
+}
+function fallbackCopy(txt, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta); if (cb) cb();
+}
+function flashCopied() {
+  var b1 = document.getElementById('previewCopy'), b2 = document.getElementById('copyBtn');
+  if (b1) { b1.textContent = '✓ Copié !'; b1.classList.add('ok');
+    setTimeout(function(){ b1.innerHTML = '📋 Copier'; b1.classList.remove('ok'); }, 1600); }
+  if (b2) { var old = b2.innerHTML; b2.innerHTML = '✓ Copié dans le presse-papier';
+    setTimeout(function(){ b2.innerHTML = old; }, 1600); }
+}
+
+// ── ACTIONS SEMAINE ───────────────────────────────────────────
+function changeWeek(delta) { state.weekOffset += delta; render(); }
+
+function reportPrev() {
+  var pw = state.history[prevWk()];
+  if (!pw || !pw.cette) { alert('Aucune activité "Cette semaine" sur la semaine précédente à reporter.'); return; }
+  setW('passee', pw.cette);
+  loadForm(); updatePreview();
+}
+
+function resetWeek() {
+  if (!confirm('Effacer l\'activité hebdo de cette semaine ?\n\n(Les objectifs et l\'identité mémorisés sont conservés.)')) return;
+  delete state.history[curWk()]; saveState();
+  loadForm(); updatePreview();
+}
+
+// ── EXPORT PDF ────────────────────────────────────────────────
+function exportPDF() {
+  if (typeof CGP !== 'undefined' && CGP.pdf && CGP.pdf.print) CGP.pdf.print();
+  else window.print();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderHeader() {
+  var monday = getCurrentMonday(), sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  var wk = weekKey(monday), n = wk.split('-W')[1];
+  document.getElementById('weekLabel').textContent = 'Sem. ' + n + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
+  document.getElementById('pageTitle').textContent = 'Semaine ' + n + ' — ' + formatDate(monday) + ' au ' + formatDate(sunday);
+  document.getElementById('pageDate').textContent = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+}
+function render() {
+  renderHeader();
+  loadForm();
+  updatePreview();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+loadState();
+applyMode();
+bindForm();
+render();
+CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+
+</body>
+</html>
