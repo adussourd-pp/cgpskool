@@ -225,9 +225,9 @@ details.card>summary .memo+.arr{margin-left:8px}
       <div class="card">
         <div class="card-title"><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e<span class="memo">M&eacute;moris&eacute;</span></div>
         <div class="grid2">
-          <div class="fg"><label>Manager Galaxie &amp; marraine</label>
+          <div class="fg"><label>Manager Galaxie</label>
             <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
-          <div class="fg"><label>Parrain / Marraine (manager direct)</label>
+          <div class="fg"><label>Parrain / Marraine manager</label>
             <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
         </div>
         <label style="display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--gris-f);cursor:pointer">
@@ -743,8 +743,8 @@ function buildManager() {
   o.push('');
 
   // Lignee amont
-  if (p('galaxie')) o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
-  if (!parrainSame() && p('parrain')) o.push(bold('Parrain / Marraine') + ' : ' + p('parrain'));
+  if (p('galaxie')) o.push(bold('Manager Galaxie' + (parrainSame() ? ' & marraine' : '')) + ' : ' + p('galaxie'));
+  if (!parrainSame() && p('parrain')) o.push(bold('Parrain / Marraine manager') + ' : ' + p('parrain'));
   if (p('entree'))  o.push('Entrée dans le réseau : ' + p('entree'));
   if (p('contexte')) o.push(p('contexte'));
 
@@ -858,8 +858,8 @@ function buildExpert() {
   o.push('Bonjour à toutes et à tous,');
   o.push('');
 
-  if (p('galaxie'))  o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
-  if (!parrainSame() && p('parrain'))  o.push(bold('Parrain / Marraine') + ' : ' + p('parrain'));
+  if (p('galaxie'))  o.push(bold('Manager Galaxie' + (parrainSame() ? ' & marraine' : '')) + ' : ' + p('galaxie'));
+  if (!parrainSame() && p('parrain'))  o.push(bold('Parrain / Marraine manager') + ' : ' + p('parrain'));
   if (p('contexte')) o.push(p('contexte'));
 
   secTitle(o, 'Semaine passée');
