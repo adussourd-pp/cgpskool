@@ -246,6 +246,16 @@
         <label class="eb-hab"><input type="checkbox" id="habCif"> CIF</label>
       </div>
     </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink-60);margin-bottom:6px">Participation aux 5 &#233;v&#233;nements cl&#233;s</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <label class="eb-hab"><input type="checkbox" id="evUdpJanv"> UDP Janv</label>
+        <label class="eb-hab"><input type="checkbox" id="evForum"> Forum</label>
+        <label class="eb-hab"><input type="checkbox" id="evUdpAvril"> UDP Avril</label>
+        <label class="eb-hab"><input type="checkbox" id="evUdpRentree"> UDP Rentr&#233;e</label>
+        <label class="eb-hab"><input type="checkbox" id="evConvention"> Convention</label>
+      </div>
+    </div>
     <div class="add-actions">
       <button class="btn-dismiss" onclick="closeModal()">Annuler</button>
       <button class="btn-confirm" onclick="confirmAdd()">Ajouter</button>
@@ -452,13 +462,18 @@ function ebSetModalExtra(node){
   var h=(node&&node.habs)||{};
   V('habMiobsp').checked=!!h.miobsp;V('habMia').checked=!!h.mia;V('habAlpsi').checked=!!h.alpsi;V('habCif').checked=!!h.cif;
   V('modalForman').value=(node&&node.forman)||'';
+  var ev=(node&&node.events)||{};
+  EB_EVENTS.forEach(function(k){ V(k).checked=!!ev[k]; });
 }
+var EB_EVENTS=['evUdpJanv','evForum','evUdpAvril','evUdpRentree','evConvention'];
 function ebReadModalExtra(target){
   target.vaVc=ebFmtEuro(V('modalVaVc').value)||undefined;
   target.vaEc=ebFmtEuro(V('modalVaEc').value)||undefined;
   var habs={miobsp:V('habMiobsp').checked,mia:V('habMia').checked,alpsi:V('habAlpsi').checked,cif:V('habCif').checked};
   target.habs=(habs.miobsp||habs.mia||habs.alpsi||habs.cif)?habs:undefined;
   target.forman=V('modalForman').value||undefined;
+  var ev={},any=false;EB_EVENTS.forEach(function(k){if(V(k).checked){ev[k]=true;any=true;}});
+  target.events=any?ev:undefined;
 }
 
 function closeModal(){

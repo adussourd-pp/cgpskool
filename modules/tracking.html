@@ -53,6 +53,9 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 
 /* ── Organisation (filleuls) ── */
 .org-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.org-sync-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(212,98,42,0.08);border:1.5px solid rgba(212,98,42,0.35);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;font-weight:600;color:var(--orange)}
+.org-sync-banner button{border:none;background:var(--orange);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.org-sync-banner button:hover{opacity:0.9}
 .org-sum-cell{background:#fff;border:1.5px solid var(--bord);border-radius:10px;padding:12px 10px;text-align:center}
 .org-sum-v{font-size:20px;font-weight:800;color:var(--noir);line-height:1}
 .org-sum-v.green{color:var(--green)}
@@ -450,6 +453,7 @@ details.card>summary .memo+.arr{margin-left:8px}
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgImportEquipe()" title="Structure reprise de Construire son equipe ; tes volumes et habilitations sont conserves">&#8646; Synchroniser avec Construire son &eacute;quipe</button>
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0;border-color:rgba(192,57,43,0.3);color:var(--red)" onclick="orgClearAll()" title="Effacer tous les filleuls">&#9100; Tout supprimer</button>
           </div>
+          <div id="orgSyncBanner" class="org-sync-banner" style="display:none"></div>
           <div class="org-summary" id="orgSummary"></div>
           <div id="orgList"></div>
         </div>
@@ -1304,6 +1308,8 @@ var ORG_QUALIF = ['(auto)', 'Consultant Junior', 'Consultant', 'Consultant Confi
 var ORG_FORMAN = ['Neoman', 'Beman', 'Adman', 'Man', 'Devman', 'DXman', 'Xman'];
 // Habilitations voie Manager PMR : M-IOBSP (immo + financement) + Assurance + (Agent lié/ALPSI ou CIF)
 var ORG_HAB = [['miobsp','M-IOBSP'], ['mia','ASS II'], ['alpsi','Agent lié'], ['cif','CIF']];
+// 5 événements clés (participation, comme les habilitations)
+var ORG_EVENTS = [['evUdpJanv','UDP Janv'], ['evForum','Forum'], ['evUdpAvril','UDP Avril'], ['evUdpRentree','UDP Rentrée'], ['evConvention','Convention']];
 var ORG_ETAPES = ['DM', 'AD', '3J', 'Inscrit'];
 var ORG_SEUIL = 500000;    // 500k€ : Consultant Confirmé (VA équipe cumulé) + branche active (VA branche exercice)
 var ORG_PERSO = 50000;     // 50k€ VA perso : minimum Consultant Confirmé (cumul) et maintien Manager (exercice)
@@ -1516,6 +1522,9 @@ function orgCardHtml(pers, depth) {
   h += '<div class="org-f" style="margin-bottom:10px"><label>Habilitations</label><div class="org-hab">';
   ORG_HAB.forEach(function(hb){ h += '<span class="org-hab-chip' + (pers[hb[0]] ? ' on' : '') + '" onclick="orgSetHab(' + q + ',\'' + hb[0] + '\',this)">' + hb[1] + '</span>'; });
   h += '</div></div>';
+  h += '<div class="org-f" style="margin-bottom:10px"><label>Participation aux 5 événements clés</label><div class="org-hab">';
+  ORG_EVENTS.forEach(function(ev){ h += '<span class="org-hab-chip' + (pers[ev[0]] ? ' on' : '') + '" onclick="orgSetHab(' + q + ',\'' + ev[0] + '\',this)">' + ev[1] + '</span>'; });
+  h += '</div></div>';
   h += '<div class="org-fields">';
   h += orgF('VA VC exercice', '<input inputmode="numeric" value="' + esc(pers.vaVc) + '" placeholder="0" onfocus="this.value=digitsOnly(this.value)" onblur="orgMoneyBlur(' + q + ',\'vaVc\',this)">');
   h += orgF('VA EC exercice', '<input inputmode="numeric" value="' + esc(pers.vaEc) + '" placeholder="0" onfocus="this.value=digitsOnly(this.value)" onblur="orgMoneyBlur(' + q + ',\'vaEc\',this)">');
@@ -1545,27 +1554,72 @@ function orgRefreshEquipeSet() {
   (function walk(node) { (node.children || []).forEach(function(ch){ orgEquipeSet[orgNorm((ch.prenom || '') + ' ' + (ch.nom || ''))] = 1; walk(ch); }); })(raw);
 }
 function orgInEquipe(pers) { return !!(orgEquipeSet && orgEquipeSet[orgNorm(pers.nom)]); }
-function orgSyncToEquipe() {
-  var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
-  if (!raw) return;
-  var byName = {}; orgPeople().forEach(function(pp){ byName[orgNorm(pp.nom)] = pp; });
-  (function walk(node) {
-    (node.children || []).forEach(function(ch) {
-      var pp = byName[orgNorm((ch.prenom || '') + ' ' + (ch.nom || ''))];
-      if (pp) {
-        ch.vaVc = pp.vaVc; ch.vaEc = pp.vaEc; ch.vaClos = pp.vaClos;
-        ch.habs = { miobsp:pp.miobsp, mia:pp.mia, alpsi:pp.alpsi, cif:pp.cif };
-        ch.trackQualif = pp.qualif; ch.forman = pp.forman;
-        ch.inscription = pp.inscription;
-      }
-      walk(ch);
-    });
-  })(raw);
+// ── SYNCHRO Mail Manager -> Construire son equipe (explicite + rappel divergence) ──
+function orgEquipeTree() { try { return JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return null; } }
+function orgEquipeNodeMap(raw) { var m = {}; (function walk(n){ (n.children || []).forEach(function(ch){ m[orgNorm((ch.prenom || '') + ' ' + (ch.nom || ''))] = ch; walk(ch); }); })(raw); return m; }
+// signature comparable de TOUTES les infos synchronisees
+function orgSigPers(p) {
+  return JSON.stringify({ va:pm(p.vaVc) + '/' + pm(p.vaEc) + '/' + pm(p.vaClos),
+    hab:[!!p.miobsp, !!p.mia, !!p.alpsi, !!p.cif].join(''),
+    q:(p.qualif || ''), f:(p.forman || ''), i:(p.inscription || ''),
+    ev:ORG_EVENTS.map(function(e){ return p[e[0]] ? '1' : '0'; }).join('') });
+}
+function orgSigNode(ch) {
+  var h = ch.habs || {}, e = ch.events || {};
+  return JSON.stringify({ va:pm(ch.vaVc) + '/' + pm(ch.vaEc) + '/' + pm(ch.vaClos),
+    hab:[!!h.miobsp, !!h.mia, !!h.alpsi, !!h.cif].join(''),
+    q:(ch.trackQualif || ''), f:(ch.forman || ''), i:(ch.inscription || ''),
+    ev:ORG_EVENTS.map(function(ev){ return e[ev[0]] ? '1' : '0'; }).join('') });
+}
+// filleuls dont les infos du mail different de Construire son equipe
+function orgDivergences() {
+  var raw = orgEquipeTree(); if (!raw) return [];
+  var map = orgEquipeNodeMap(raw), out = [];
+  orgPeople().forEach(function(p){ var ch = map[orgNorm(p.nom)]; if (ch && orgSigPers(p) !== orgSigNode(ch)) out.push(p); });
+  return out;
+}
+// ecriture effective de toutes les infos du mail vers l'equipe (sans prompt)
+function orgWriteToEquipe() {
+  var raw = orgEquipeTree(); if (!raw) return 0;
+  var map = orgEquipeNodeMap(raw), n = 0;
+  orgPeople().forEach(function(p){
+    var ch = map[orgNorm(p.nom)]; if (!ch) return;
+    ch.vaVc = p.vaVc; ch.vaEc = p.vaEc; ch.vaClos = p.vaClos;
+    ch.habs = { miobsp:!!p.miobsp, mia:!!p.mia, alpsi:!!p.alpsi, cif:!!p.cif };
+    ch.trackQualif = p.qualif; ch.forman = p.forman; ch.inscription = p.inscription;
+    ch.events = {}; ORG_EVENTS.forEach(function(e){ ch.events[e[0]] = !!p[e[0]]; });
+    n++;
+  });
   try { localStorage.setItem('cgpskool_equipe_v2', JSON.stringify(raw)); } catch(e) {}
+  return n;
+}
+// bouton : pousse les infos (avec confirmation)
+function orgPushToEquipe() {
+  if (!orgEquipeTree()) { alert('Aucune equipe trouvee dans "Construire son equipe" sur cet appareil.'); return; }
+  var div = orgDivergences();
+  if (!div.length) { alert('Tout est deja synchronise avec Construire son equipe.'); return; }
+  if (!confirm(div.length + ' filleul(s) vont etre mis a jour dans Construire son equipe avec les infos du mail (VA, habilitations, qualification, Forman, evenements). Continuer ?')) return;
+  orgWriteToEquipe(); renderOrg();
+  alert('✓ Construire son equipe mis a jour avec les infos du mail.');
+}
+// rappel automatique une fois par ouverture si divergence
+var orgSyncNudged = false;
+function orgSyncNudge() {
+  if (orgSyncNudged) return;
+  var div = orgDivergences(); if (!div.length) return;
+  orgSyncNudged = true;
+  if (confirm(div.length + ' filleul(s) ont des chiffres non synchronises vers Construire son equipe. Mettre a jour Construire son equipe maintenant ?')) { orgWriteToEquipe(); renderOrg(); }
+}
+function orgSyncBanner() {
+  var el = document.getElementById('orgSyncBanner'); if (!el) return;
+  var div = orgDivergences();
+  if (!div.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = '';
+  el.innerHTML = '<span>⚠ ' + div.length + ' filleul' + (div.length > 1 ? 's' : '') + ' avec des infos non synchronisees vers Construire son equipe.</span>' +
+    '<button onclick="orgPushToEquipe()">→ Mettre a jour l\'equipe</button>';
 }
 function renderOrg() {
   var list = document.getElementById('orgList'); if (!list) return;
-  orgSyncToEquipe();
   orgRefreshEquipeSet();
   var ordered = orgOrdered();
   if (!ordered.length) {
@@ -1574,6 +1628,7 @@ function renderOrg() {
     list.innerHTML = ordered.map(function(n){ return orgCardHtml(n.p, n.depth); }).join('');
   }
   updateOrgSummary();
+  orgSyncBanner();
   if (typeof updatePreview === 'function') updatePreview(true);
 }
 
@@ -1591,7 +1646,7 @@ function onOrgToggle() {
   if (box) box.style.display = state.profil.orgOn ? '' : 'none';
   var note = document.getElementById('orgNote');
   if (note) note.style.display = state.profil.orgOn ? '' : 'none';
-  if (state.profil.orgOn) renderOrg();
+  if (state.profil.orgOn) { renderOrg(); orgSyncNudge(); }
 }
 function orgImportEquipe() {
   var raw = null;
@@ -1622,6 +1677,7 @@ function orgImportEquipe() {
     if (has(ch.inscription)) p.inscription = ch.inscription;
     if (has(ch.trackQualif)) p.qualif = ch.trackQualif;
     if (has(ch.forman)) p.forman = ch.forman;
+    if (ch.events) { ORG_EVENTS.forEach(function(e){ p[e[0]] = !!ch.events[e[0]]; }); }
   }
   (function walk(node, parentId) {
     (node.children || []).forEach(function(ch) {
@@ -1655,6 +1711,7 @@ applyMode();
 bindForm();
 render();
 renderOrg();
+if (state.profil.orgOn) orgSyncNudge();
 initCollapsibles();
 CGP.footer.render(document.getElementById('conseillerFooter'));
 </script>
