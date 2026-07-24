@@ -83,13 +83,13 @@ details.card>summary .memo+.arr{margin-left:8px}
 .rdv-total b{color:var(--orange);font-size:15px}
 
 /* ── Preview ── */
-.preview-wrap{background:#0D0D0D;border-radius:12px;padding:0;overflow:hidden}
-.preview-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:#161513;border-bottom:1px solid #2a2825}
-.preview-bar .pv-t{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#E8855A}
+.preview-wrap{background:#fff;border:1.5px solid var(--bord);border-radius:12px;padding:0;overflow:hidden}
+.preview-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--paper);border-bottom:1px solid var(--bord)}
+.preview-bar .pv-t{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris-f)}
 .preview-copy{background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:12px;font-weight:700;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.15s}
 .preview-copy:hover{background:var(--orange-hover)}
 .preview-copy.ok{background:var(--green)}
-.preview-body{margin:0;padding:18px 20px;font-family:var(--sans);font-size:13px;line-height:1.65;color:#F2F1EE;white-space:pre-wrap;word-wrap:break-word;max-height:640px;overflow:auto}
+.preview-body{margin:0;padding:18px 20px;font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--noir);background:#fff;white-space:pre-wrap;word-wrap:break-word;max-height:640px;overflow:auto}
 
 /* ── Print ── */
 @media print{
@@ -168,11 +168,11 @@ details.card>summary .memo+.arr{margin-left:8px}
         <div class="grid2">
           <div class="fg">
             <label>&#128197; Semaine pass&eacute;e</label>
-            <textarea class="fi" data-fld="passee" data-store="week" placeholder="ED filleul x3&#10;R1 x2&#10;RX =&gt; VC 25k&euro; AV"></textarea>
+            <textarea class="fi" style="min-height:170px" data-fld="passee" data-store="week" placeholder="ED filleul x3&#10;R1 x2&#10;RX =&gt; VC 25k&euro; AV&#10;RX =&gt; VC 2x12,5k&euro; AV"></textarea>
           </div>
           <div class="fg">
             <label>&#128197; Cette semaine / prochaine</label>
-            <textarea class="fi" data-fld="cette" data-store="week" placeholder="ED filleul x2&#10;Booster filleuls&#10;RX x3&#10;R2 / R1"></textarea>
+            <textarea class="fi" style="min-height:170px" data-fld="cette" data-store="week" placeholder="ED filleul x2&#10;Booster filleuls&#10;RX x3&#10;R2&#10;R1"></textarea>
           </div>
         </div>
       </div>
@@ -185,18 +185,55 @@ details.card>summary .memo+.arr{margin-left:8px}
 
         <div style="height:1px;background:var(--bord);margin:16px 0"></div>
 
+        <div class="card-sub" style="margin:0 0 10px"><b>Objectif VA Perso</b></div>
         <div class="grid2">
-          <div class="fg"><label>&#128176; VA perso &mdash; act&eacute;e</label>
+          <div class="fg"><label>&#128176; VP annualis&eacute;s &mdash; actuel</label>
+            <input class="fi" type="text" data-fld="vpActuel" data-store="week" placeholder="221k&euro;"></div>
+          <div class="fg" data-mode="manager"><label>&#128176; Pipe (ann&eacute;e N+1)</label>
+            <input class="fi" type="text" data-fld="pipe" data-store="week" placeholder="2,4 m&euro;"></div>
+        </div>
+        <div class="grid2">
+          <div class="fg"><label>VA VC (act&eacute;e)</label>
             <input class="fi" type="text" data-fld="vaPersoActe" data-store="week" placeholder="809k&euro;"></div>
-          <div class="fg"><label>&#128176; VA perso &mdash; en cours</label>
+          <div class="fg"><label>VA EC (en cours)</label>
             <input class="fi" type="text" data-fld="vaPersoEnCours" data-store="week" placeholder="150k&euro;"></div>
         </div>
-        <div class="grid2" data-mode="manager expert">
-          <div class="fg"><label>&#128640; VA &eacute;quipe &mdash; act&eacute;e</label>
+        <div class="grid2" data-mode="manager">
+          <div class="fg"><label>Valid&eacute; Stellium</label>
+            <input class="fi" type="text" data-fld="valideStellium" data-store="week" placeholder="82k&euro;"></div>
+          <div class="fg"><label>En cours traitement Stellium</label>
+            <input class="fi" type="text" data-fld="enCoursStellium" data-store="week" placeholder="60k&euro;"></div>
+        </div>
+        <div class="grid2" data-mode="manager">
+          <div class="fg"><label>En signature client</label>
+            <input class="fi" type="text" data-fld="enSignature" data-store="week" placeholder="0k&euro;"></div>
+          <div class="fg"><label>Validation client</label>
+            <input class="fi" type="text" data-fld="validationClient" data-store="week" placeholder="43k&euro;"></div>
+        </div>
+
+        <div style="height:1px;background:var(--bord);margin:14px 0"></div>
+        <div class="card-sub" style="margin:0 0 10px"><b data-mode="manager">Objectif VA Orga</b><b data-mode="expert">VA &eacute;quipe</b></div>
+        <div class="grid2">
+          <div class="fg"><label>&#128640; VA VC (act&eacute;e)</label>
             <input class="fi" type="text" data-fld="vaEquipeActe" data-store="week" placeholder="952k&euro;"></div>
-          <div class="fg"><label>&#128640; VA &eacute;quipe &mdash; en cours</label>
+          <div class="fg"><label>&#128640; VA EC (en cours)</label>
             <input class="fi" type="text" data-fld="vaEquipeEnCours" data-store="week" placeholder="150k&euro;"></div>
         </div>
+        <div class="grid2" data-mode="expert">
+          <div class="fg"><label>Encours sous gestion &mdash; actuel</label>
+            <input class="fi" type="text" data-fld="encoursActuel" data-store="week" placeholder="8.28 M&euro;"></div>
+          <div class="fg"></div>
+        </div>
+      </div>
+
+      <!-- ══ PRODUCTIVITE (lecture live du tracker) ══ -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Productivit&eacute; de la semaine<span class="wk">Hebdo</span></div>
+        <div class="card-sub">Reprise automatique de ton tracker <b>Compl&eacute;ter ma journ&eacute;e</b> pour la semaine affich&eacute;e.</div>
+        <div id="prodBody"></div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--gris-f);cursor:pointer">
+          <input type="checkbox" id="prodInclude" onchange="onProdInclude()" style="accent-color:var(--orange);width:15px;height:15px"> Inclure la productivit&eacute; dans l'email
+        </label>
       </div>
 
       <!-- ══ IDENTITE & LIGNEE (memorise) ══ -->
@@ -204,9 +241,9 @@ details.card>summary .memo+.arr{margin-left:8px}
         <summary><span class="dot"></span>Identit&eacute; &amp; lign&eacute;e amont<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
         <div class="details-body">
           <div class="grid2">
-            <div class="fg"><label>Galaxie &amp; marraine</label>
+            <div class="fg"><label>Manager Galaxie &amp; marraine</label>
               <input class="fi" type="text" data-fld="galaxie" data-store="profil" placeholder="Murielle Guillemain"></div>
-            <div class="fg" data-mode="manager"><label>Manager / Parrain</label>
+            <div class="fg" data-mode="manager"><label>Parrain / Marraine (manager direct)</label>
               <input class="fi" type="text" data-fld="parrain" data-store="profil" placeholder="Alexandre Dussourd"></div>
           </div>
           <div class="grid2">
@@ -235,6 +272,12 @@ details.card>summary .memo+.arr{margin-left:8px}
               <input class="fi" type="text" data-fld="objVaPerso" data-store="profil" placeholder="1 M&euro;"></div>
             <div class="fg"><label>&hellip; &agrave; la date du</label>
               <input class="fi" type="text" data-fld="objVaPersoDate" data-store="profil" placeholder="31/12/2026"></div>
+          </div>
+          <div class="grid2">
+            <div class="fg"><label>Objectif VP annualis&eacute;s</label>
+              <input class="fi" type="text" data-fld="objVp" data-store="profil" placeholder="300k&euro;"></div>
+            <div class="fg" data-mode="expert"><label>Objectif encours sous gestion</label>
+              <input class="fi" type="text" data-fld="objEncours" data-store="profil" placeholder="8 M&euro;"></div>
           </div>
           <div class="grid2" data-mode="manager expert">
             <div class="fg"><label>Objectif VA &eacute;quipe</label>
@@ -295,25 +338,13 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </details>
 
-      <!-- ══ HABILITATIONS & FORMAN (memorise, manager) ══ -->
+      <!-- ══ FORMAN (memorise, manager) ══ -->
       <details class="card" data-mode="manager">
-        <summary><span class="dot"></span>Habilitations &amp; Forman<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
+        <summary><span class="dot"></span>Objectif Forman<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
         <div class="details-body">
-          <div class="fg"><label>Habilitations (une par ligne)</label>
-            <textarea class="fi" data-fld="habilitations" data-store="profil" placeholder="Assurance Niveau II (MIA) : valid&eacute; le 24/03/2026&#10;Immobilier - IOBSP Niveau II : en cours"></textarea></div>
-          <div class="fg"><label>Objectif habilitation final</label>
-            <input class="fi" type="text" data-fld="habObjectif" data-store="profil" placeholder="CIF"></div>
-
-          <div style="height:1px;background:var(--bord);margin:8px 0 14px"></div>
-
-          <div class="grid2">
-            <div class="fg"><label>Niveau Forman actuel</label>
-              <input class="fi" type="text" data-fld="formanActuel" data-store="profil" placeholder="Neoman"></div>
-            <div class="fg"><label>Niveau Forman vis&eacute;</label>
-              <input class="fi" type="text" data-fld="formanVise" data-store="profil" placeholder="Xman"></div>
-          </div>
-          <div class="fg"><label>Objectifs Forman &agrave; valider (une par ligne)</label>
-            <textarea class="fi" data-fld="formanObjectifs" data-store="profil" placeholder="Avoir particip&eacute; &agrave; la formation D&eacute;veloppement &Eacute;quipe niveau 1&#10;Avoir 3 rendez-vous d'avance&#10;Passer Beman fin d'ann&eacute;e 2026"></textarea></div>
+          <div class="fg"><label>Progression Forman</label>
+            <input class="fi" type="text" data-fld="formanResume" data-store="profil" placeholder="Man 10/12"></div>
+          <div class="card-sub" style="margin:8px 0 0">Ex : <b>Man 10/12</b> (niveau + objectifs valid&eacute;s). Se reporte tel quel dans l'email.</div>
         </div>
       </details>
 
@@ -340,18 +371,6 @@ details.card>summary .memo+.arr{margin-left:8px}
       <details class="card" data-mode="expert">
         <summary><span class="dot"></span>Point business d&eacute;taill&eacute;<span class="memo">M&eacute;moris&eacute;</span><span class="arr">&#9660;</span></summary>
         <div class="details-body">
-          <div class="grid2">
-            <div class="fg"><label>Objectif encours sous gestion</label>
-              <input class="fi" type="text" data-fld="objEncours" data-store="profil" placeholder="8 M&euro;"></div>
-            <div class="fg"><label>Encours sous gestion &mdash; actuel</label>
-              <input class="fi" type="text" data-fld="encoursActuel" data-store="week" placeholder="8.28 M&euro;"></div>
-          </div>
-          <div class="grid2">
-            <div class="fg"><label>Objectif VP annualis&eacute;s</label>
-              <input class="fi" type="text" data-fld="objVp" data-store="profil" placeholder="400K&euro;"></div>
-            <div class="fg"><label>VP annualis&eacute;s &mdash; actuel</label>
-              <input class="fi" type="text" data-fld="vpActuel" data-store="week" placeholder="379K&euro;"></div>
-          </div>
           <div class="grid2">
             <div class="fg"><label>Conseillers actifs</label>
               <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
@@ -597,113 +616,125 @@ function resteAFaire(objId, acteVal, enCoursVal) {
   return fmtMoney(obj - done);
 }
 
-// ── GENERATION EMAIL ──────────────────────────────────────────
+// ── PRODUCTIVITE (lecture du tracker "Completer ma journee") ───
+var PROD_KEY = 'cgpskool_productivite_v1';
+var PROD_PTS = { conv:10, r1:15, inv:15, rel:5, sign:20, insc:20, pro:7, lead:8 };
+function prodRaw() { try { return JSON.parse(localStorage.getItem(PROD_KEY)); } catch(e) { return null; } }
+function prodWeek() {
+  var d = prodRaw(); if (!d || !d.history) return null;
+  var week = d.history[curWk()]; if (!week) return null;
+  var weights = d.weights || {}, goal = (d.goal !== undefined) ? d.goal : 250;
+  function pts(id) { return (weights[id] !== undefined) ? weights[id] : (PROD_PTS[id] || 0); }
+  var total = 0, best = 0, active = 0;
+  Object.keys(week).forEach(function(day) {
+    var s = 0, dd = week[day];
+    Object.keys(dd).forEach(function(id) { s += (dd[id] || 0) * pts(id); });
+    s = Math.min(s, 100);
+    if (s > 0) { total += s; active++; if (s > best) best = s; }
+  });
+  if (active === 0) return null;
+  return { total:total, goal:goal, best:best, active:active,
+    avg: Math.round(total / active), pct: goal ? Math.round(total / goal * 100) : 0 };
+}
+function prodSection() {
+  if (state.profil.prodInclude === false) return [];
+  var pw = prodWeek(); if (!pw) return [];
+  return ['', bold('Productivité de la semaine'),
+    'Score : ' + pw.total + ' / ' + pw.goal + ' pts (' + pw.pct + ' %)',
+    'Moyenne : ' + pw.avg + ' pts/jour actif · Meilleur jour : ' + pw.best];
+}
+
+// ── GENERATION EMAIL (format sobre, titres en gras) ───────────
 function buildEmail() {
   return (state.mode === 'manager') ? buildManager() : buildExpert();
 }
-
-function section(num, emoji, title) {
-  return '\n' + emoji + ' ' + bold((num ? num + ' - ' : '') + title) + ' :\n';
-}
+// nouvelle section : ligne vide + titre en gras
+function secTitle(o, t) { o.push(''); o.push(bold(t)); }
 
 function buildManager() {
   var o = [];
-  o.push('Bonjour à toutes et à tous,');
+  o.push('Bonjour,');
   o.push('');
 
   // Lignee amont
-  o.push('👤 ' + bold('Lignée amont') + ' :');
-  if (p('galaxie'))  o.push('- Galaxie : ' + p('galaxie'));
-  if (p('parrain'))  o.push('- Manager/Parrain : ' + p('parrain'));
-  if (p('entree'))   o.push('- Entrée dans le réseau : ' + p('entree'));
-  if (p('contexte')) o.push('- ' + p('contexte'));
+  if (p('galaxie')) o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
+  if (p('parrain')) o.push(bold('Parrain / Manager') + ' : ' + p('parrain'));
+  if (p('entree'))  o.push('Entrée dans le réseau : ' + p('entree'));
+  if (p('contexte')) o.push(p('contexte'));
 
-  // 1 - Semaine passee
-  o.push(section('1', '📅', 'Semaine passée').trim());
-  var passee = bullet(getW('passee')); if (passee) o.push(passee);
+  // Semaine passee
+  secTitle(o, 'Semaine Passée');
+  var passee = lines(getW('passee')); if (passee) o.push(passee);
 
-  // 2 - Semaine prochaine
-  o.push(section('2', '📅', 'Semaine prochaine').trim());
-  var cette = bullet(getW('cette')); if (cette) o.push(cette);
+  // Cette semaine
+  secTitle(o, 'Cette Semaine');
+  var cette = lines(getW('cette')); if (cette) o.push(cette);
 
-  // 3 - RDV d'avance
-  o.push(section('3', '🤝', 'Nombre de RDVs d\'avance').trim());
-  o.push('Total = ' + rdvTotal() + ' (' + rdvLine() + ')');
-  if (p('nbClients') || p('objClients'))
-    o.push('Nombre de clients : ' + (p('nbClients') || '0') + ' / ' + (p('objClients') || '?'));
+  // Nbr de RDV d'avance
+  secTitle(o, 'Nbr de RDV d\'avance');
+  if (p('objClients')) o.push('Objectif Nbr de clients = ' + p('objClients'));
+  if (p('nbClients'))  o.push('Nbr de clients = ' + p('nbClients'));
+  RDV_TYPES.forEach(function(t) {
+    if (t.id === 'r0') { if (getRdv('r0')) o.push('R0 : ' + getRdv('r0')); return; }
+    o.push(t.lab + ' : ' + getRdv(t.id));
+  });
 
-  // 4 - Habilitations
-  if (p('habilitations') || p('habObjectif')) {
-    o.push(section('4', '✅', 'Habilitations').trim());
-    var hab = bullet(p('habilitations')); if (hab) o.push(hab);
-    if (p('habObjectif')) o.push('- Objectif final : ' + p('habObjectif'));
+  // Objectif Developpement
+  secTitle(o, 'Objectif Développement');
+  if (p('objDevNb'))       o.push('Objectif' + (p('objDevDate') ? ' au ' + p('objDevDate') : '') + ' : ' + p('objDevNb') + ' conseillers');
+  if (p('equipeActuelle')) o.push('à date : équipe de ' + p('equipeActuelle'));
+  o.push('Qualification Manager : ' + p('devQualif'));
+  o.push('Actif : ' + p('devActif'));
+  o.push('Inscription Prodémial : ' + p('devProdemial'));
+  o.push('Inscription 3J : ' + p('devJ3'));
+  o.push('Inscription AD : ' + p('devAd'));
+  o.push('Inscription DM : ' + p('devDm'));
+  o.push('Inscription PO : ' + p('devPo'));
+  o.push('à inviter : ' + p('devInviter'));
+  o.push('SBY : ' + p('devSby'));
+
+  // Objectif VA Perso
+  secTitle(o, 'Objectif VA Perso');
+  if (getW('vpActuel') || p('objVp')) o.push('Objectif VP = ' + (getW('vpActuel') || '?') + (p('objVp') ? ' / ' + p('objVp') : ''));
+  if (p('objVaPerso'))          o.push('Objectif VA Perso = ' + p('objVaPerso'));
+  if (getW('vaPersoActe'))      o.push('VA VC : ' + getW('vaPersoActe'));
+  if (getW('vaPersoEnCours'))   o.push('VA EC : ' + getW('vaPersoEnCours'));
+  if (getW('valideStellium'))   o.push('Validé Stellium : ' + getW('valideStellium'));
+  if (getW('enCoursStellium'))  o.push('En cours de traitement Stellium : ' + getW('enCoursStellium'));
+  if (getW('enSignature'))      o.push('En signature client : ' + getW('enSignature'));
+  if (getW('validationClient')) o.push('Validation client : ' + getW('validationClient'));
+  if (getW('pipe'))             o.push('Pipe : ' + getW('pipe'));
+
+  // Objectif VA Orga
+  if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours')) {
+    secTitle(o, 'Objectif VA Orga');
+    if (p('objVaEquipe'))        o.push('Objectif VA Orga' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' = ' + p('objVaEquipe'));
+    if (getW('vaEquipeActe'))    o.push('VA VC : ' + getW('vaEquipeActe'));
+    if (getW('vaEquipeEnCours')) o.push('VA EC : ' + getW('vaEquipeEnCours'));
   }
 
-  // 5 - Developpement
-  o.push(section('5', '👥', 'Objectifs Développement').trim());
-  if (p('equipeActuelle')) o.push('- Équipe actuelle : ' + p('equipeActuelle'));
-  if (p('objDevNb'))       o.push('- Objectif' + (p('objDevDate') ? ' au ' + p('objDevDate') : '') + ' : ' + p('objDevNb') + ' conseillers');
-  var comp = devCompteurs();
-  if (comp) o.push('- Compteurs : ' + comp);
+  // Productivite
+  prodSection().forEach(function(l) { o.push(l); });
 
-  // 6 - VA perso
-  o.push(section('6', '💰', 'Objectif VA perso').trim());
-  if (p('objVaPerso')) o.push('- Objectif' + (p('objVaPersoDate') ? ' au ' + p('objVaPersoDate') : '') + ' : ' + p('objVaPerso'));
-  o.push('- VA acté : ' + (getW('vaPersoActe') || '0 €'));
-  o.push('- VA en cours : ' + (getW('vaPersoEnCours') || '0 €'));
-  var rp = resteAFaire('objVaPerso', getW('vaPersoActe'), getW('vaPersoEnCours'));
-  if (rp) o.push('- Reste à faire : ' + rp);
+  // Objectif Forman
+  if (p('formanResume')) { secTitle(o, 'Objectif Forman'); o.push(p('formanResume')); }
 
-  // 7 - VA equipe
-  o.push(section('7', '🚀', 'Objectif VA équipe').trim());
-  var hasEq = getW('vaEquipeActe') || getW('vaEquipeEnCours') || p('objVaEquipe');
-  if (!hasEq) { o.push('- VA acté : //'); o.push('- VA en cours : //'); }
-  else {
-    if (p('objVaEquipe')) o.push('- Objectif' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' : ' + p('objVaEquipe'));
-    o.push('- VA acté : ' + (getW('vaEquipeActe') || '0 €'));
-    o.push('- VA en cours : ' + (getW('vaEquipeEnCours') || '0 €'));
-    var re = resteAFaire('objVaEquipe', getW('vaEquipeActe'), getW('vaEquipeEnCours'));
-    if (re) o.push('- Reste à faire : ' + re);
-  }
+  // Formations & evenements
+  var fe = feLines();
+  if (fe) { secTitle(o, 'Formations & événements'); o.push(fe); }
 
-  // 8 - Forman
-  if (p('formanActuel') || p('formanVise') || p('formanObjectifs')) {
-    o.push(section('8', '🏆', 'Objectifs Forman').trim());
-    if (p('formanActuel')) o.push('- Niveau actuel : ' + p('formanActuel'));
-    if (p('formanVise'))   o.push('- Niveau visé : ' + p('formanVise'));
-    var fo = bullet(p('formanObjectifs'));
-    if (fo) { o.push('- Objectifs à valider :'); o.push(fo); }
-  }
-
-  // 9 - Formations
-  if (p('formationsRealisees') || p('formationsAVenir')) {
-    o.push(section('9', '🎓', 'Formations').trim());
-    o.push('Réalisées : ' + (lines(p('formationsRealisees')) ? '\n' + bullet(p('formationsRealisees')) : 'aucune pour l\'instant.'));
-    o.push('À venir : ' + (lines(p('formationsAVenir')) ? '\n' + bullet(p('formationsAVenir')) : 'aucune formation planifiée pour l\'instant.'));
-  }
-
-  // 10 - Evenements
-  if (p('evenementsRealises') || p('evenementsAVenir')) {
-    o.push(section('10', '✨', 'Évènements').trim());
-    o.push('Réalisés : ' + (lines(p('evenementsRealises')) ? '\n' + bullet(p('evenementsRealises')) : 'aucun pour l\'instant.'));
-    o.push('À venir : ' + (lines(p('evenementsAVenir')) ? '\n' + bullet(p('evenementsAVenir')) : 'aucun pour l\'instant.'));
-  }
-
-  o.push('');
-  o.push('Bonne semaine,');
-  o.push(p('signature') || '');
-  return spaceSections(o.join('\n')).replace(/\n{3,}/g, '\n\n');
+  if (p('signature')) { o.push(''); o.push('Bonne semaine,'); o.push(p('signature')); }
+  return o.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
-function devCompteurs() {
-  var parts = [];
-  var map = [
-    ['devQualif','Qualif. Manager'], ['devActif','Actif'], ['devProdemial','Inscr. Prodémial'],
-    ['devJ3','3J'], ['devAd','AD'], ['devDm','DM'], ['devPo','PO'],
-    ['devInviter','À inviter'], ['devSby','SBY']
-  ];
-  map.forEach(function(m) { if (p(m[0])) parts.push(m[1] + ' : ' + p(m[0])); });
-  return parts.join(' | ');
+// formations + evenements agreges (une liste)
+function feLines() {
+  var fe = [];
+  if (lines(p('formationsRealisees'))) fe.push(lines(p('formationsRealisees')));
+  if (lines(p('formationsAVenir')))    fe.push(lines(p('formationsAVenir')));
+  if (lines(p('evenementsRealises')))  fe.push(lines(p('evenementsRealises')));
+  if (lines(p('evenementsAVenir')))    fe.push(lines(p('evenementsAVenir')));
+  return fe.join('\n');
 }
 
 function buildExpert() {
@@ -711,69 +742,54 @@ function buildExpert() {
   o.push('Bonjour à toutes et à tous,');
   o.push('');
 
-  o.push('👤 ' + bold('Lignée') + ' :');
-  if (p('galaxie'))  o.push('Galaxie & marraine : ' + p('galaxie'));
+  if (p('galaxie'))  o.push(bold('Manager Galaxie & marraine') + ' : ' + p('galaxie'));
   if (p('contexte')) o.push(p('contexte'));
 
-  // Semaine passee
-  o.push('\n📅 ' + bold('Semaine passée') + ' :');
-  var passee = bullet(getW('passee')); if (passee) o.push(passee);
+  secTitle(o, 'Semaine passée');
+  var passee = lines(getW('passee')); if (passee) o.push(passee);
 
-  // Cette semaine
-  o.push('\n📅 ' + bold('Cette semaine') + ' :');
-  var cette = bullet(getW('cette')); if (cette) o.push(cette);
+  secTitle(o, 'Cette semaine');
+  var cette = lines(getW('cette')); if (cette) o.push(cette);
 
-  // RDV
-  o.push('\n🤝 ' + bold('Rendez-vous à venir') + ' : ' + rdvTotal());
-  o.push(rdvLine());
+  secTitle(o, 'Rendez-vous à venir');
+  o.push('Total = ' + rdvTotal());
+  RDV_TYPES.forEach(function(t) {
+    if (t.id === 'r0') { if (getRdv('r0')) o.push('R0 : ' + getRdv('r0')); return; }
+    o.push(t.lab + ' : ' + getRdv(t.id));
+  });
 
-  // Point business perso
-  o.push('\n💰 ' + bold('Point business — Perso') + ' :');
-  if (p('objVaPerso')) o.push('Objectif perso' + (p('objVaPersoDate') ? ' au ' + p('objVaPersoDate') : '') + ' : ' + p('objVaPerso'));
-  o.push('VA acté : ' + (getW('vaPersoActe') || '0 €'));
-  o.push('VA en cours : ' + (getW('vaPersoEnCours') || '0 €'));
+  secTitle(o, 'Point business — Perso');
+  if (p('objVaPerso'))        o.push('Objectif perso' + (p('objVaPersoDate') ? ' au ' + p('objVaPersoDate') : '') + ' : ' + p('objVaPerso'));
+  if (getW('vaPersoActe'))    o.push('VA acté : ' + getW('vaPersoActe'));
+  if (getW('vaPersoEnCours')) o.push('VA en cours : ' + getW('vaPersoEnCours'));
   var totPerso = totalVA(getW('vaPersoActe'), getW('vaPersoEnCours'));
   if (totPerso) o.push('Total VA + en-cours : ' + totPerso);
   if (getW('encoursActuel') || p('objEncours'))
     o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' (objectif ' + p('objEncours') + ')' : ''));
   if (getW('vpActuel') || p('objVp'))
-    o.push('Objectif VP annualisés : ' + (getW('vpActuel') || '?') + (p('objVp') ? ' / ' + p('objVp') : ''));
+    o.push('Objectif VP = ' + (getW('vpActuel') || '?') + (p('objVp') ? ' / ' + p('objVp') : ''));
 
-  // Equipe
-  o.push('\n👥 ' + bold('Équipe') + ' :');
+  secTitle(o, 'Équipe');
   if (p('conseillersActifs')) o.push('Conseillers actifs : ' + p('conseillersActifs'));
   else if (p('equipeActuelle')) o.push('Équipe : ' + p('equipeActuelle'));
   if (p('brancheActe'))    o.push('Branche Manager actée : ' + p('brancheActe'));
   if (p('brancheEnCours')) o.push('Branche Manager en cours : ' + p('brancheEnCours'));
   if (p('objVaEquipe'))    o.push('Objectif VA acté équipe' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' : ' + p('objVaEquipe'));
-  o.push('VA acté équipe : ' + (getW('vaEquipeActe') || '0 €'));
-  o.push('VA en cours équipe : ' + (getW('vaEquipeEnCours') || '0 €'));
+  if (getW('vaEquipeActe'))    o.push('VA acté équipe : ' + getW('vaEquipeActe'));
+  if (getW('vaEquipeEnCours')) o.push('VA en cours équipe : ' + getW('vaEquipeEnCours'));
   if (p('ligneeTable')) { o.push(''); o.push(lines(p('ligneeTable'))); }
 
-  // Bilan parrainage
-  if (p('inscritsLignee')) {
-    o.push('\n🌱 ' + bold('Bilan parrainage') + ' :');
-    o.push('Inscrits lignée : ' + p('inscritsLignee'));
-  }
+  if (p('inscritsLignee')) { secTitle(o, 'Bilan parrainage'); o.push('Inscrits lignée : ' + p('inscritsLignee')); }
 
-  // Formations & evenements
-  if (p('formationsAVenir') || p('formationsRealisees') || p('evenementsAVenir') || p('evenementsRealises')) {
-    o.push('\n🎓 ' + bold('Formations & événements') + ' :');
-    if (p('formationsRealisees')) o.push('Formations réalisées :\n' + bullet(p('formationsRealisees')));
-    if (p('formationsAVenir'))    o.push('Formations à venir :\n' + bullet(p('formationsAVenir')));
-    if (p('evenementsAVenir'))    o.push('Événements à venir :\n' + bullet(p('evenementsAVenir')));
-  }
+  prodSection().forEach(function(l) { o.push(l); });
 
-  // Voyages
-  if (p('voyages')) {
-    o.push('\n🏝️ ' + bold('Voyages / Ambitions') + ' :');
-    o.push(lines(p('voyages')));
-  }
+  var fe = feLines();
+  if (fe) { secTitle(o, 'Formations & événements'); o.push(fe); }
 
-  o.push('');
-  o.push('Bonne semaine,');
-  o.push(p('signature') || '');
-  return spaceSections(o.join('\n')).replace(/\n{3,}/g, '\n\n');
+  if (p('voyages')) { secTitle(o, 'Voyages / Ambitions'); o.push(lines(p('voyages'))); }
+
+  if (p('signature')) { o.push(''); o.push('Bonne semaine,'); o.push(p('signature')); }
+  return o.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 function totalVA(acteVal, enCoursVal) {
@@ -843,6 +859,39 @@ function renderHeader() {
 function render() {
   renderHeader();
   loadForm();
+  renderProd();
+  updatePreview();
+}
+
+// ── RENDER PRODUCTIVITE CARD ──────────────────────────────────
+function prodKpi(val, lab, color) {
+  return '<div style="text-align:center"><div style="font-size:20px;font-weight:800;color:' + color + ';line-height:1">' + val +
+    '</div><div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-top:4px">' + lab + '</div></div>';
+}
+function renderProd() {
+  var box = document.getElementById('prodBody'); if (!box) return;
+  var chk = document.getElementById('prodInclude');
+  if (chk) chk.checked = (state.profil.prodInclude !== false);
+  var pw = prodWeek();
+  if (!pw) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--gris);line-height:1.6">Aucune activit&eacute; saisie cette semaine dans <b>Compl&eacute;ter ma journ&eacute;e</b>. ' +
+      '<a href="productivite.html" style="color:var(--orange);font-weight:600;text-decoration:none">Compl&eacute;ter ma journ&eacute;e &rarr;</a></div>';
+    return;
+  }
+  var barPct = Math.min(pw.pct, 100);
+  box.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">' +
+      prodKpi(pw.total + ' <span style="font-size:12px;color:var(--gris)">/ ' + pw.goal + '</span>', 'Score semaine', 'var(--orange)') +
+      prodKpi(pw.avg, 'Moy. / jour actif', 'var(--noir)') +
+      prodKpi(pw.best, 'Meilleur jour', 'var(--green)') +
+    '</div>' +
+    '<div style="height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:' + barPct + '%;background:' + (pw.pct >= 100 ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
+    '<div style="margin-top:6px;font-size:11px;color:var(--gris)">' + pw.pct + '&nbsp;% de l\'objectif &middot; <a href="productivite.html" style="color:var(--orange);text-decoration:none;font-weight:600">Ouvrir le tracker &rarr;</a></div>';
+}
+function onProdInclude() {
+  var chk = document.getElementById('prodInclude');
+  state.profil.prodInclude = chk ? chk.checked : true;
+  saveState();
   updatePreview();
 }
 
