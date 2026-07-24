@@ -135,15 +135,16 @@
   <div class="cs-sidebar">
     <div class="cs-sidebar-lbl">Construire son equipe</div>
     <div class="cs-sidebar-section">
-      <button onclick="if(tree){openAdd([])}" class="cs-sidebar-btn" style="justify-content:center;color:var(--orange);border-color:rgba(212,98,42,0.2)">+ Ajouter</button>
-      <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" class="cs-sidebar-btn" id="sidebarEffacer" style="justify-content:center;color:#dc2626;border-color:rgba(220,38,38,0.2)">Effacer</button>
-      <button onclick="ebPullFromMail()" class="cs-sidebar-btn" style="justify-content:center" title="Reprendre les chiffres et habilitations saisis dans le Mail Manager (VA, habilitations, Forman, événements)">&#8635; Reprendre du Mail Manager</button>
+      <button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button>
+      <button onclick="if(tree){openAdd([])}" class="sb-btn sb-btn-copy">&#10133; Ajouter un membre</button>
+      <button onclick="ebPullFromMail()" class="sb-btn sb-btn-sync" title="Reprendre les chiffres et habilitations saisis dans le Mail Manager (VA, habilitations, Forman, événements)">&#8635; Reprendre du Mail Manager</button>
     </div>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    <div style="height:1px;background:var(--bord);margin:10px 0"></div>
-    <button style="width:100%;padding:10px;background:#2D7A5B;color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
-    <button style="width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
-    <label style="display:block;width:100%;padding:10px;background:transparent;border:1.5px solid var(--bord);color:var(--gris);font-family:var(--sans);font-size:13px;cursor:pointer;margin-top:4px;text-align:center">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <div style="height:1px;background:var(--rule-l);margin:10px 0"></div>
+    <button class="sb-btn sb-btn-ghost" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
+    <button class="sb-btn sb-btn-ghost" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
+    <label class="sb-btn sb-btn-ghost" style="cursor:pointer">&#128194; Charger<input type="file" accept=".json" style="display:none" onchange="CGP.project.importAll(this.files[0]);this.value=''"></label>
+    <button onclick="if(confirm('Tout effacer ?')){tree=null;saveTree();render()}" class="sb-btn sb-btn-danger" id="sidebarEffacer">&#9100; Tout effacer</button>
   </div>
   <div class="cs-main">
     <div class="cs-page" style="max-width:1200px">
@@ -896,5 +897,70 @@ CGP.project.registerModule('equipe-builder', {
   }
 });
 </script>
+<!-- ═══════════ MODE D'EMPLOI + boutons harmonisés ═══════════ -->
+<style>
+/* boutons sidebar alignés sur le Mail Manager */
+.sb-btn{width:100%;padding:11px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border-radius:0;margin-bottom:8px}
+.sb-btn-copy{background:var(--orange);color:#fff}
+.sb-btn-copy:hover{opacity:0.9}
+.sb-btn-sync{background:#2D7A5B;color:#fff}
+.sb-btn-sync:hover{opacity:0.88}
+.sb-btn-ghost{background:transparent;border:1.5px solid var(--rule-l);color:var(--ink-60);font-size:12px;padding:9px;border-radius:7px;display:block;text-align:center}
+.sb-btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.sb-btn-danger{background:transparent;border:1px solid rgba(220,38,38,0.3);color:#dc2626;font-size:11px;padding:9px;border-radius:7px}
+/* volet mode d'emploi */
+.me-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--orange);border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;margin-bottom:8px}
+.me-pill:hover{opacity:0.9}
+.me-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9997}
+.me-backdrop.open{display:block}
+.me-panel{position:fixed;top:0;left:-500px;width:480px;max-width:92vw;height:100vh;background:#fff;z-index:9998;box-shadow:4px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:left 0.25s ease}
+.me-panel.open{left:0}
+.me-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1.5px solid var(--rule-l);flex-shrink:0}
+.me-title{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink)}
+.me-sub{font-size:11px;color:var(--ink-60);margin-top:2px}
+.me-close{background:none;border:none;font-size:20px;color:var(--ink-60);cursor:pointer;padding:4px 8px}
+.me-close:hover{color:var(--ink)}
+.me-body{flex:1;overflow-y:auto;padding:14px 16px 24px}
+.me-item{border:1.5px solid var(--rule-l);border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff}
+.me-item-head{display:flex;gap:10px;align-items:center;padding:11px 14px;cursor:pointer;user-select:none}
+.me-item-head:hover{background:rgba(0,0,0,0.02)}
+.me-num{width:24px;height:24px;border-radius:50%;background:rgba(212,98,42,0.12);color:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.me-item.open .me-num{background:var(--orange);color:#fff}
+.me-item-title{flex:1;font-size:13px;font-weight:600;color:var(--ink)}
+.me-chev{font-size:9px;color:var(--ink-60);transition:transform 0.2s}
+.me-item.open .me-chev{transform:rotate(90deg)}
+.me-item-body{display:none;padding:2px 16px 14px 48px;font-size:12px;color:var(--ink-60);line-height:1.75}
+.me-item.open .me-item-body{display:block}
+.me-item-body b{color:var(--ink)}
+.me-item-body ul{margin:6px 0;padding-left:16px}
+.me-item-body li{margin-bottom:3px}
+.me-tip{margin-top:8px;padding:8px 10px;background:rgba(212,98,42,0.06);border-left:2.5px solid var(--orange);border-radius:0 6px 6px 0;font-size:11px}
+</style>
+<div class="me-backdrop" id="meBackdrop" onclick="closeModeEmploi()"></div>
+<div class="me-panel" id="mePanel">
+  <div class="me-head">
+    <div>
+      <div class="me-title">&#128214; Mode d'emploi</div>
+      <div class="me-sub">Construire son &eacute;quipe, &eacute;tape par &eacute;tape</div>
+    </div>
+    <button class="me-close" onclick="closeModeEmploi()">&#10005;</button>
+  </div>
+  <div class="me-body">
+    <div class="me-item open"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">1</span><span class="me-item-title">Cr&eacute;e ta racine (toi)</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">La premi&egrave;re fois, saisis ton pr&eacute;nom et ton nom : tu es la racine de ton organisation. Tous tes filleuls viendront se rattacher sous toi.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">2</span><span class="me-item-title">Ajoute tes membres</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Clique <b>&laquo; Ajouter un membre &raquo;</b> (ou le + sur un n&oelig;ud pour un filleul en profondeur). Pour chaque personne, choisis son &eacute;tape dans le <b>parcours d&eacute;couverte</b> : <b>DM &rarr; AD &rarr; 3J &rarr; Inscrit &rarr; Actif</b>. Les DM/AD/3J sont des recrues en cours (non encore inscrites).<div class="me-tip">Le compteur &laquo; En cours &raquo; en haut se d&eacute;taille par &eacute;tape (ex. 3 dont 1 DM &middot; 1 AD &middot; 1 3J).</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">3</span><span class="me-item-title">Renseigne les VA</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Dans la fiche d'un membre : <b>VA VC</b> et <b>VA EC</b> de l'exercice en cours, et le <b>VA cumul&eacute; des exercices clos</b> (les ann&eacute;es pass&eacute;es). Le cumul carri&egrave;re sert au passage Manager (500k&euro;), l'exercice sert aux branches actives.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">4</span><span class="me-item-title">Habilitations</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Coche les habilitations obtenues : <b>M-IOBSP</b> (immobilier + financement), <b>ASS II</b>, <b>Agent li&eacute;</b>, <b>CIF</b>. Au sens du PMR, &ecirc;tre <b>habilit&eacute;</b> = M-IOBSP + ASS II + (Agent li&eacute; ou CIF) &mdash; une des voies pour devenir Manager.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">5</span><span class="me-item-title">Chemin Forman &amp; 5 &eacute;v&eacute;nements cl&eacute;s</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Indique le <b>chemin Forman</b> (Neoman &rarr; Beman &rarr; ... &rarr; Xman) et coche la <b>participation aux 5 &eacute;v&eacute;nements cl&eacute;s</b> (UDP Janv, Forum, UDP Avril, UDP Rentr&eacute;e, Convention), comme les habilitations.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">6</span><span class="me-item-title">La jauge 500k&euro; &amp; la qualification</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Chaque n&oelig;ud affiche son <b>Volume Global Organisation</b> (sa VA + toute sa descendance) sur 500k&euro;. Une <b>branche est active</b> quand elle d&eacute;passe 500k&euro; sur l'exercice avec au moins 1 manager. Ton nombre de branches actives d&eacute;termine ta qualif : <b>Plan&egrave;te / &Eacute;toile / Constellation / Galaxie</b>.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">7</span><span class="me-item-title">Reprendre du Mail Manager</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Le bouton <b>&laquo; &#8635; Reprendre du Mail Manager &raquo;</b> (vert, dans la barre de gauche) reprend la <b>derni&egrave;re version</b> saisie dans le Mail Manager : VA, habilitations, Forman, &eacute;v&eacute;nements. Il met &agrave; jour les personnes existantes <b>et cr&eacute;e</b> celles qui manquent, au bon niveau de l'arbre.<div class="me-tip">La correspondance se fait <b>par le nom</b> (accents/majuscules ignor&eacute;s). Garde le m&ecirc;me nom des deux c&ocirc;t&eacute;s.</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">8</span><span class="me-item-title">L'organigramme</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Visualise ton arbre : <b>glisse</b> le fond pour naviguer, <b>zoome</b> avec les boutons +/-, et <b>d&eacute;place</b> un membre en le faisant glisser sur un autre pour le rattacher.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">9</span><span class="me-item-title">Sauvegarder &amp; exporter</span><span class="me-chev">&#9654;</span></div><div class="me-item-body"><b>Sauvegarder</b> t&eacute;l&eacute;charge ton &eacute;quipe en JSON (&agrave; archiver), <b>Charger</b> la restaure, et <b>Exporter PDF</b> g&eacute;n&egrave;re l'organigramme imprimable.</div></div>
+  </div>
+</div>
+<script>
+function openModeEmploi(){ document.getElementById('meBackdrop').classList.add('open'); document.getElementById('mePanel').classList.add('open'); }
+function closeModeEmploi(){ document.getElementById('meBackdrop').classList.remove('open'); document.getElementById('mePanel').classList.remove('open'); }
+</script>
+
 </body>
 </html>
