@@ -120,7 +120,7 @@ textarea.fi{resize:vertical;min-height:64px;line-height:1.5}
 .card-title{cursor:pointer}
 .card-arr{margin-left:10px;font-size:10px;color:var(--ink-30);transition:transform 0.2s;flex-shrink:0}
 .card.collapsed .card-arr{transform:rotate(-90deg)}
-.card.collapsed>*:not(.card-title){display:none}
+.card.collapsed>*:not(.card-title){display:none!important}
 .card.collapsed>.card-title{margin-bottom:0}
 /* champ montant reporte de la semaine precedente (a verifier) */
 .fi-carry{background:#EAF4FB;border-color:#9EC7E6;color:#12689E}
@@ -456,26 +456,13 @@ details.card>summary .memo+.arr{margin-left:8px}
         </div>
       </div>
 
-      <!-- 10. VA ORGA - equipe & lignees -->
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>VA Orga &mdash; &eacute;quipe &amp; lign&eacute;es<span class="memo">M&eacute;moris&eacute;</span></div>
-        <div class="grid2">
-          <div class="fg"><label>Conseillers actifs</label>
-            <input class="fi" type="text" data-fld="conseillersActifs" data-store="profil" placeholder="55 sur 62"></div>
-          <div class="fg"><label>Inscrits lign&eacute;e (bilan parrainage)</label>
-            <input class="fi" type="text" data-fld="inscritsLignee" data-store="profil" placeholder="27 (objectif 20)"></div>
-        </div>
-        <div class="fg"><label>Tableau des lign&eacute;es (optionnel)</label>
-          <textarea class="fi" data-fld="ligneeTable" data-store="profil" placeholder="Galaxie : 3 189 273 &euro;&#10;Lign&eacute;e Manu : 4 133 558 &euro;"></textarea></div>
-        <div class="fg"><label>Voyages / Ambitions (optionnel)</label>
-          <textarea class="fi" data-fld="voyages" data-store="profil" placeholder="Ambition Galaxie : 5 pts&#10;Montenegro : 1 place"></textarea></div>
-      </div>
       <!-- ══ ORGANISATION (option, dans le formulaire) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Suivi de mon organisation<span class="wk" style="background:rgba(0,0,0,0.06);color:var(--gris)">Option</span></div>
         <label style="display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--gris-f);cursor:pointer">
           <input type="checkbox" id="orgOn" onchange="onOrgToggle()" style="accent-color:var(--orange);width:15px;height:15px"> Activer le suivi de mes filleuls (arbre, VA, habilitations, qualification 500 k&euro;)
         </label>
+        <div class="card-sub" id="orgNote" style="display:none">Ton organisation vit dans <b>Construire son &eacute;quipe</b> (module de r&eacute;f&eacute;rence). Ici tu la synchronises, tu compl&egrave;tes les <b>VA VC/EC</b> et <b>habilitations</b>, et tu pilotes la <b>qualification 500 k&euro;</b> de chaque branche directe (reprise dans le mail).</div>
         <div id="orgBox" style="display:none">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
             <button class="org-add" style="width:auto;padding:9px 14px;margin:0" onclick="orgAdd(null)">&#10133; Filleul direct</button>
@@ -665,6 +652,8 @@ function loadForm() {
   if (org) org.checked = state.profil.orgOn === true;
   var obox = document.getElementById('orgBox');
   if (obox) obox.style.display = (state.profil.orgOn === true) ? '' : 'none';
+  var onote = document.getElementById('orgNote');
+  if (onote) onote.style.display = (state.profil.orgOn === true) ? '' : 'none';
   if (state.profil.orgOn === true) renderOrg();
 }
 function bindForm() {
@@ -974,17 +963,14 @@ function buildManager() {
     o.push('Encours sous gestion : ' + (getW('encoursActuel') || '?') + (p('objEncours') ? ' / ' + p('objEncours') : ''));
 
   // Objectif VA Orga
-  if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours') || p('conseillersActifs') || p('inscritsLignee')) {
+  if (p('objVaEquipe') || getW('vaEquipeActe') || getW('vaEquipeEnCours')) {
     secTitle(o, 'Objectif VA Orga');
-    if (p('conseillersActifs')) o.push('Conseillers actifs : ' + p('conseillersActifs'));
     if (p('objVaEquipe')) {
       var opc = pctOf(pm(getW('vaEquipeActe')) + pm(getW('vaEquipeEnCours')), p('objVaEquipe'));
       o.push('Objectif VA Orga' + (p('objVaEquipeDate') ? ' au ' + p('objVaEquipeDate') : '') + ' = ' + p('objVaEquipe') + (opc != null ? ' (' + opc + '% de l\'objectif)' : ''));
     }
     if (getW('vaEquipeActe'))    o.push('VA VC : ' + getW('vaEquipeActe'));
     if (getW('vaEquipeEnCours')) o.push('VA EC : ' + getW('vaEquipeEnCours'));
-    if (p('inscritsLignee'))     o.push('Inscrits lignée : ' + p('inscritsLignee'));
-    if (p('ligneeTable'))        { o.push(''); o.push(lines(p('ligneeTable'))); }
   }
 
   // Objectif Forman
@@ -999,9 +985,6 @@ function buildManager() {
   // Evenements
   var ev = evenementsLines();
   if (ev) { secTitle(o, 'Événements'); o.push(ev); }
-
-  // Voyages / Ambitions
-  if (p('voyages')) { secTitle(o, 'Voyages / Ambitions'); o.push(lines(p('voyages'))); }
 
   if (p('signature')) { o.push(''); o.push('Bonne semaine,'); o.push(p('signature')); }
   return o.join('\n').replace(/\n{3,}/g, '\n\n');
@@ -1433,8 +1416,28 @@ function updateOrgSummary() {
   box.innerHTML = orgSum(ppl.length, 'Filleuls') + orgSum(directs, 'Directs') +
     orgSum(qualif, 'Qualifiés 500k', 'green') + orgSum(fmtMoney(totVa), 'VA totale', 'orange');
 }
+function orgSyncToEquipe() {
+  var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
+  if (!raw) return;
+  var byName = {}; orgPeople().forEach(function(pp){ byName[(pp.nom || '').trim().toLowerCase()] = pp; });
+  (function walk(node) {
+    (node.children || []).forEach(function(ch) {
+      var pp = byName[((ch.prenom || '') + ' ' + (ch.nom || '')).trim().toLowerCase()];
+      if (pp) {
+        ch.vaVc = pp.vaVc; ch.vaEc = pp.vaEc;
+        ch.habs = { miobsp:pp.miobsp, mia:pp.mia, alpsi:pp.alpsi, cif:pp.cif };
+        ch.trackQualif = pp.qualif; ch.trackForman = pp.forman;
+        ch.inscription = pp.inscription;
+        ch.pmr = { inscrits:pp.inscrits, dm:pp.dm, ad:pp.ad, j3:pp.j3 };
+      }
+      walk(ch);
+    });
+  })(raw);
+  try { localStorage.setItem('cgpskool_equipe_v2', JSON.stringify(raw)); } catch(e) {}
+}
 function renderOrg() {
   var list = document.getElementById('orgList'); if (!list) return;
+  orgSyncToEquipe();
   var ordered = orgOrdered();
   if (!ordered.length) {
     list.innerHTML = '<div class="org-empty">Aucun filleul pour l\'instant.<br>Ajoute tes filleuls directs, puis leurs propres filleuls, pour reconstituer toute la profondeur de ton organisation.</div>';
@@ -1456,6 +1459,8 @@ function onOrgToggle() {
   saveState();
   var box = document.getElementById('orgBox');
   if (box) box.style.display = state.profil.orgOn ? '' : 'none';
+  var note = document.getElementById('orgNote');
+  if (note) note.style.display = state.profil.orgOn ? '' : 'none';
   if (state.profil.orgOn) renderOrg();
 }
 function orgImportEquipe() {
