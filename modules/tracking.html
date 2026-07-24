@@ -243,6 +243,7 @@ details.card>summary .memo+.arr{margin-left:8px}
     <!-- Productivite de la semaine (lien avec la semaine du mail) -->
     <div class="sb-prod" id="sbProd"></div>
 
+    <button class="me-pill" onclick="openModeEmploi()">&#128214; Mode d'emploi</button>
     <button class="sb-btn sb-btn-copy" onclick="copyEmail()" id="copyBtn">&#128203; Copier l'email</button>
     <button class="sb-btn sb-btn-pdf" onclick="exportPDF()">&#11015; Exporter en PDF</button>
 
@@ -1721,6 +1722,65 @@ renderOrg();
 if (state.profil.orgOn) orgSyncNudge();
 initCollapsibles();
 CGP.footer.render(document.getElementById('conseillerFooter'));
+</script>
+
+<!-- ═══════════ MODE D'EMPLOI (volet detaille) ═══════════ -->
+<style>
+.me-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--orange);border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;margin-bottom:8px}
+.me-pill:hover{opacity:0.9}
+.me-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9997}
+.me-backdrop.open{display:block}
+.me-panel{position:fixed;top:0;left:-500px;width:480px;max-width:92vw;height:100vh;background:#fff;z-index:9998;box-shadow:4px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:left 0.25s ease}
+.me-panel.open{left:0}
+.me-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1.5px solid var(--bord);flex-shrink:0}
+.me-title{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--noir)}
+.me-sub{font-size:11px;color:var(--gris);margin-top:2px}
+.me-close{background:none;border:none;font-size:20px;color:var(--gris);cursor:pointer;padding:4px 8px}
+.me-close:hover{color:var(--noir)}
+.me-body{flex:1;overflow-y:auto;padding:14px 16px 24px}
+.me-item{border:1.5px solid var(--bord);border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff}
+.me-item-head{display:flex;gap:10px;align-items:center;padding:11px 14px;cursor:pointer;user-select:none}
+.me-item-head:hover{background:rgba(0,0,0,0.02)}
+.me-num{width:24px;height:24px;border-radius:50%;background:var(--o-dim,rgba(212,98,42,0.12));color:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.me-item.open .me-num{background:var(--orange);color:#fff}
+.me-item-title{flex:1;font-size:13px;font-weight:600;color:var(--noir)}
+.me-badge{font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:10px}
+.me-badge.memo{background:var(--green-l,#e6f2ec);color:var(--green,#2D7A5B)}
+.me-badge.hebdo{background:rgba(212,98,42,0.1);color:var(--orange)}
+.me-badge.opt{background:rgba(0,0,0,0.05);color:var(--gris)}
+.me-chev{font-size:9px;color:var(--gris);transition:transform 0.2s}
+.me-item.open .me-chev{transform:rotate(90deg)}
+.me-item-body{display:none;padding:2px 16px 14px 48px;font-size:12px;color:var(--gris-f);line-height:1.75}
+.me-item.open .me-item-body{display:block}
+.me-item-body b{color:var(--noir)}
+.me-item-body ul{margin:6px 0;padding-left:16px}
+.me-item-body li{margin-bottom:3px}
+.me-tip{margin-top:8px;padding:8px 10px;background:rgba(212,98,42,0.06);border-left:2.5px solid var(--orange);border-radius:0 6px 6px 0;font-size:11px}
+</style>
+<div class="me-backdrop" id="meBackdrop" onclick="closeModeEmploi()"></div>
+<div class="me-panel" id="mePanel">
+  <div class="me-head">
+    <div>
+      <div class="me-title">&#128214; Mode d'emploi</div>
+      <div class="me-sub">Le Mail Manager &amp; Expert, &eacute;tape par &eacute;tape</div>
+    </div>
+    <button class="me-close" onclick="closeModeEmploi()">&#10005;</button>
+  </div>
+  <div class="me-body" id="meBody">
+    <div class="me-item open"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">1</span><span class="me-item-title">Choisis ton mode</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Deux onglets en haut : <b>Manager</b> (piloter tes filleuls vers le passage manager) ou <b>Expert</b> (une fois manager, objectif 1,5 M&euro; de VA perso). La structure du mail est identique dans les deux.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">2</span><span class="me-item-title">Tes objectifs &amp; ton identit&eacute;</span><span class="me-badge memo">Une fois</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Remplis <b>une seule fois</b> les blocs marqu&eacute;s <b>M&eacute;moris&eacute;</b> : identit&eacute; &amp; lign&eacute;e (Galaxie, parrain/marraine manager), et tes objectifs (VP, VA perso, VA orga, nombre de conseillers). Ils se <b>reportent automatiquement</b> chaque semaine.<div class="me-tip">Si ton parrain manager est aussi ta Galaxie, coche la case pr&eacute;vue : le mail affiche &laquo; Galaxie &amp; manager &raquo;.</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">3</span><span class="me-item-title">L'activit&eacute; de la semaine</span><span class="me-badge hebdo">Hebdo</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Chaque semaine, remplis <b>Semaine pass&eacute;e</b> / <b>Cette semaine</b> et les compteurs <b>RDV d'avance</b> (R0 &agrave; RX). Le contenu de &laquo; Cette semaine &raquo; devient automatiquement &laquo; Semaine pass&eacute;e &raquo; la semaine suivante.<div class="me-tip">Navigue entre les semaines avec les fl&egrave;ches en haut. &laquo; Effacer cette semaine &raquo; ne touche pas tes objectifs m&eacute;moris&eacute;s.</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">4</span><span class="me-item-title">Objectif D&eacute;veloppement (pipeline)</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Le pipeline de recrutement : nombre de conseillers vis&eacute;, et les compteurs par &eacute;tape (inscription, 3J, AD, DM, &agrave; inviter, SBY). Un par ligne, dans l'ordre du mail.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">5</span><span class="me-item-title">VA Perso &amp; VA Orga</span><span class="me-badge hebdo">Hebdo</span><span class="me-chev">&#9654;</span></div><div class="me-item-body"><b>VA Perso</b> : VA VC (valid&eacute; comptablement) + VA EC (en cours), puis le d&eacute;tail Stellium (valid&eacute;, en traitement, en signature, validation, opportunit&eacute;). <b>VA Orga</b> : la VA de ton &eacute;quipe (VC/EC). Tape juste les chiffres, le format &laquo; 1 000 000&euro; &raquo; et le <b>% d'avancement</b> se calculent tout seuls.<div class="me-tip">Les montants se reportent d'une semaine &agrave; l'autre (tu ne repars pas de z&eacute;ro) et s'affichent en couleur pour te rappeler de les revoir.</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">6</span><span class="me-item-title">Suivi de mon organisation</span><span class="me-badge opt">Option</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Coche &laquo; Activer le suivi de mes filleuls &raquo; pour reconstruire ton arbre. Pour chaque filleul : VA VC/EC + cumul&eacute;, habilitations (<b>M-IOBSP, ASS II, Agent li&eacute;, CIF</b>), chemin Forman, et participation aux <b>5 &eacute;v&eacute;nements cl&eacute;s</b>. Chaque filleul a sa <b>jauge PMR</b> :<ul><li><b>Route Manager</b> tant qu'il n'est pas manager : VA &eacute;quipe cumul&eacute; / 500k&euro; + habilitations.</li><li><b>Qualification</b> une fois manager : branches actives &rarr; Plan&egrave;te / &Eacute;toile / Constellation / Galaxie.</li></ul></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">7</span><span class="me-item-title">Synchro avec Construire son &eacute;quipe</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Les deux modules partagent les m&ecirc;mes personnes (li&eacute;es <b>par le nom</b>). La pastille <b>&#10003; &eacute;quipe</b> / <b>&#9888; hors &eacute;quipe</b> te montre qui est bien reli&eacute;.<ul><li>Un <b>bandeau orange</b> te pr&eacute;vient quand des chiffres du mail diff&egrave;rent de l'&eacute;quipe &rarr; clique <b>Mettre &agrave; jour l'&eacute;quipe</b>.</li><li>Dans l'autre sens, le bouton <b>&laquo; Reprendre du Mail Manager &raquo;</b> se trouve dans Construire son &eacute;quipe.</li></ul><div class="me-tip">Si un nom ne remonte pas : v&eacute;rifie qu'il est <b>identique</b> des deux c&ocirc;t&eacute;s (les accents et majuscules sont ignor&eacute;s, mais &laquo; Ma&euml;ll &raquo; &ne; &laquo; Ma&euml;ll Dupont &raquo;).</div></div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">8</span><span class="me-item-title">Habilitations, Forman &amp; &eacute;v&eacute;nements</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Coche <b>tes</b> habilitations obtenues (elles sortent du mail) ; celles qui restent apparaissent avec leur &eacute;ch&eacute;ance. Les <b>Ateliers Forman</b> r&eacute;alis&eacute;s / &agrave; venir et les <b>&eacute;v&eacute;nements</b> s'affichent ensuite.</div></div>
+    <div class="me-item"><div class="me-item-head" onclick="this.parentNode.classList.toggle('open')"><span class="me-num">9</span><span class="me-item-title">Copie ton mail</span><span class="me-chev">&#9654;</span></div><div class="me-item-body">Clique <b>&laquo; Copier l'email &raquo;</b> : tout est pr&ecirc;t, colle-le directement dans Gmail ou Outlook (les titres en <b>gras</b> survivent au copier-coller). Ou <b>&laquo; Exporter en PDF &raquo;</b> pour une version imprimable.</div></div>
+  </div>
+</div>
+<script>
+function openModeEmploi(){ document.getElementById('meBackdrop').classList.add('open'); document.getElementById('mePanel').classList.add('open'); }
+function closeModeEmploi(){ document.getElementById('meBackdrop').classList.remove('open'); document.getElementById('mePanel').classList.remove('open'); }
 </script>
 
 </body>
