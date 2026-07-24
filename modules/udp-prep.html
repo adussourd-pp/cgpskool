@@ -98,6 +98,8 @@ select.fi{cursor:pointer}
 /* ── Section labels ── */
 .sec-lbl{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-30);margin:0 0 10px}
 .sec-note{font-size:11px;color:var(--gris);line-height:1.6;margin:-4px 0 12px}
+.why-strip{background:rgba(212,98,42,0.06);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:10px 14px;font-size:11px;color:var(--gris-f);line-height:1.65;margin:0 0 12px}
+.why-strip b{color:var(--noir)}
 .scripts-link{display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:3px 10px;border:1.5px solid var(--orange);border-radius:14px;color:var(--orange);font-size:10px;font-weight:700;text-decoration:none;white-space:nowrap;transition:all 0.15s;vertical-align:middle}
 .scripts-link:hover{background:var(--orange);color:#fff}
 .divider{height:1px;background:var(--bord);margin:22px 0}
@@ -138,7 +140,7 @@ select.fi{cursor:pointer}
   /* R23 : preserver les couleurs (selecteurs cibles, jamais *) */
   .kpi-card,.kpi-bar,.kpi-bar>span,.ready-bar,.ready-bar>span,.ck .dot-ck,
   .step-n,.method-step,.fil-card,.fil-script,.md-niv,.ph-jour,.sb-count,
-  .kpi-val.orange,.kpi-val.green,.ready-pct,.fil-prog,
+  .why-strip,.kpi-val.orange,.kpi-val.green,.ready-pct,.fil-prog,
   [style*="background"]{
     -webkit-print-color-adjust:exact!important;
     print-color-adjust:exact!important;
@@ -166,7 +168,7 @@ select.fi{cursor:pointer}
 
     <div class="sb-count">
       <div class="sb-count-j" id="sbCountJ">J&ndash;?</div>
-      <div class="sb-count-sub" id="sbCountSub">Renseignez la date de l'UDP</div>
+      <div class="sb-count-sub" id="sbCountSub">Renseignez la date des UDP</div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Mon UDP</div>
@@ -183,11 +185,12 @@ select.fi{cursor:pointer}
         <div class="fg"><label>Date</label><input class="fi" type="date" id="udpDate" onchange="onMeta()"></div>
         <div class="fg"><label>Lieu</label><input class="fi" type="text" id="udpLieu" placeholder="Ville..." oninput="onMeta()"></div>
       </div>
+      <div id="agendaStatus" style="display:none;margin:-4px 0 12px"></div>
     </div>
 
     <div class="cs-sidebar-lbl open" onclick="CGP.toggleAcc(this)"><span class="acc">&#9654;</span> Mes objectifs</div>
     <div class="sb-body open">
-      <div class="obj-row"><label>R1 fix&eacute;s avant l'UDP</label><span class="obj-val" id="objR1Val">5</span></div>
+      <div class="obj-row"><label>R1 fix&eacute;s avant les UDP</label><span class="obj-val" id="objR1Val">5</span></div>
       <input type="range" class="obj-slider" id="objR1" min="0" max="20" value="5" oninput="onObj()">
       <div class="obj-labs"><span>0</span><span>20</span></div>
 
@@ -220,12 +223,12 @@ select.fi{cursor:pointer}
       </div>
 
       <!-- Methode -->
-      <div class="sec-lbl">La m&eacute;thode &mdash; une UDP se pr&eacute;pare comme une campagne</div>
+      <div class="sec-lbl">La m&eacute;thode &mdash; les UDP se pr&eacute;parent comme une campagne</div>
       <div class="method-row">
-        <div class="method-step"><span class="step-n">1</span><div class="step-t">Fixe tes objectifs</div><div class="step-d">Nombre de R1 &agrave; fixer et d'invitations DM &agrave; obtenir avant le jour J.</div></div>
-        <div class="method-step"><span class="step-n">2</span><div class="step-t">Identifie tes contacts</div><div class="step-d">Primoliste c&ocirc;t&eacute; client, &eacute;quipe id&eacute;ale c&ocirc;t&eacute; dev &mdash; avec le jeu du &laquo; pourquoi je l'appelle &raquo;.</div></div>
-        <div class="method-step"><span class="step-n">3</span><div class="step-t">Passe &agrave; l'action</div><div class="step-d">Sessions d'appels communes si pr&eacute;vues, sinon en solo &mdash; toujours avec les scripts sous les yeux.</div></div>
-        <div class="method-step"><span class="step-n">4</span><div class="step-t">Pr&eacute;pare le jour J</div><div class="step-d">Questions aux formateurs + mod&egrave;les identifi&eacute;s : tu sais qui aller voir et quoi demander.</div></div>
+        <div class="method-step"><span class="step-n">1</span><div class="step-t">Fixer ses objectifs</div><div class="step-d">Nombre de R1 &agrave; fixer et d'invitations DM &agrave; obtenir avant le jour J.</div></div>
+        <div class="method-step"><span class="step-n">2</span><div class="step-t">Identifier ses contacts</div><div class="step-d">Primoliste c&ocirc;t&eacute; client, &eacute;quipe id&eacute;ale c&ocirc;t&eacute; dev &mdash; avec le jeu du &laquo; pourquoi je l'appelle &raquo;.</div></div>
+        <div class="method-step"><span class="step-n">3</span><div class="step-t">Passer &agrave; l'action</div><div class="step-d">Sessions d'appels communes si pr&eacute;vues, sinon en solo &mdash; toujours avec les scripts sous les yeux.</div></div>
+        <div class="method-step"><span class="step-n">4</span><div class="step-t">Pr&eacute;parer le jour J</div><div class="step-d">Questions aux formateurs + mod&egrave;les identifi&eacute;s : savoir qui aller voir et quoi demander.</div></div>
       </div>
 
       <!-- KPIs -->
@@ -242,14 +245,15 @@ select.fi{cursor:pointer}
 
       <!-- Score de preparation -->
       <div class="ready-card">
-        <div class="ready-head"><div class="ready-title">&#127919; Suis-je pr&ecirc;t pour l'UDP ?</div><div class="ready-pct" id="readyPct">0&nbsp;%</div></div>
+        <div class="ready-head"><div class="ready-title">&#127919; Suis-je pr&ecirc;t pour les UDP ?</div><div class="ready-pct" id="readyPct">0&nbsp;%</div></div>
         <div class="ready-bar"><span id="readyBar" style="width:0%"></span></div>
         <div class="ck-list" id="ckList"></div>
       </div>
 
       <!-- Mise en action : les 2 fils rouges -->
-      <div class="sec-lbl">Mise en action avant l'UDP &mdash; mes 2 fils rouges</div>
-      <div class="sec-note">Ces actions se font lors des <b>sessions d'appels communes</b> quand elles sont pr&eacute;vues, et/ou <b>en solo</b> &mdash; dans tous les cas avec le script sous les yeux. Coche au fur et &agrave; mesure. <a class="scripts-link no-print" href="https://drive.google.com/drive/folders/1m65Sc4x4vcuGaI_moxMTV-z_jIKy-kYd?usp=drive_link" target="_blank" rel="noopener">&#128194; Ouvrir les scripts</a></div>
+      <div class="sec-lbl">Mise en action avant les UDP &mdash; mes 2 fils rouges</div>
+      <div class="why-strip">&#128161; <b>Pourquoi passer &agrave; l'action avant ?</b> R&eacute;chauffer sa primoliste par des SMS, passer ses premiers appels... Le but est double : <b>s'entra&icirc;ner</b> pour &ecirc;tre plus pr&ecirc;t, et se <b>conditionner &agrave; &ecirc;tre d&eacute;j&agrave; dans l'action</b>. On arrive aux UDP lanc&eacute;, et on profite &agrave; fond du <b>momentum</b> et de l'<b>&eacute;nergie du groupe</b> &mdash; au lieu de d&eacute;marrer &agrave; froid.</div>
+      <div class="sec-note">Ces actions se font lors des <b>sessions d'appels communes</b> quand elles sont pr&eacute;vues, et/ou <b>en solo</b> &mdash; dans tous les cas avec le script sous les yeux. Coche au fur et &agrave; mesure. <a class="scripts-link no-print" href="https://drive.google.com/drive/folders/1m65Sc4x4vcuGaI_moxMTV-z_jIKy-kYd?usp=drive_link" target="_blank" rel="noopener">&#129520; Ouvrir la bo&icirc;te &agrave; outils</a></div>
       <div id="filCards"></div>
 
       <div class="divider"></div>
@@ -313,7 +317,7 @@ var FILS = [
     cls: 'reseau',
     titre: '🚀 Dev Action — invitation DM',
     desc: 'Opération coup de poing : partir de son <b>équipe idéale</b> — pour chaque personne, ce que j\'aime chez elle, pourquoi j\'aimerais bosser avec elle, et ses insatisfactions déjà repérées avant le call.',
-    script: '<b>Script DEV :</b> B1 Connexion humaine &rarr; B2 La Page Blanche (temps, argent, reconnaissance) &rarr; B3 Proposition (4 libertés) &rarr; B4 « Si je... est-ce que tu ? » &rarr; B5 Invitation &rarr; B6 Inscription guidée sur asso-forman.fr + débrief à chaud calé.',
+    script: '<b>Script DEV :</b> B1 Connexion humaine &rarr; B2 La Page Blanche (temps, argent, reconnaissance) &rarr; B3 Proposition (4 libertés) &rarr; B4 « Si je... est-ce que tu ? » &rarr; B5 Invitation &rarr; B6 Inscription guidée sur asso-forman.fr + débrief à chaud calé. Voir aussi la ressource <b>Process Invitation</b> dans la boîte à outils.',
     items: [
       { id: 'da_equipe',   label: 'Exercice « Visualise ton équipe idéale » fait — 10 à 20 personnes max' },
       { id: 'da_pourquoi', label: 'Pour chaque personne : ce que j\'aime chez elle, pourquoi j\'aimerais bosser avec elle' },
@@ -330,6 +334,9 @@ var MODE_OPTS = [
   { id: 'solo',   label: 'En solo' },
   { id: 'deux',   label: 'Commun + solo' }
 ];
+
+// Lien avec la banner Agenda de outils.html (uniquement les editions UDP)
+var AGENDA_MAP = { janv: 'udp-janv', avril: 'udp-avril', rentree: 'udp-rentree' };
 
 var NIVEAU_LABELS = ['Niveau 1 — prochain palier', 'Niveau 2 — le cap d\'après', 'Niveau 3 — la vision'];
 var NIVEAU_DEFAULTS = [{ horizon: 6, unit: 'mois' }, { horizon: 3, unit: 'années' }, { horizon: 5, unit: 'années' }];
@@ -378,6 +385,7 @@ function onMeta() {
   state.lieu = document.getElementById('udpLieu').value;
   save();
   renderHeader();
+  renderAgenda();
   renderKPIs();
 }
 
@@ -405,6 +413,30 @@ function totalChecked() {
   var n = 0;
   FILS.forEach(function(f) { n += checkedCount(f.id); });
   return n;
+}
+
+// « J'y vais » coché (ou non) dans l'agenda evenements de outils.html.
+// null = edition sans equivalent agenda (ex : « Autre evenement »).
+function agendaGoing() {
+  var evId = AGENDA_MAP[state.edition];
+  if (!evId) return null;
+  try {
+    var s = JSON.parse(localStorage.getItem('cgpskool_events_v1')) || {};
+    return !!s[evId];
+  } catch(e) { return false; }
+}
+
+function renderAgenda() {
+  var el = document.getElementById('agendaStatus');
+  if (!el) return;
+  var g = agendaGoing();
+  if (g === null) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = '';
+  if (g) {
+    el.innerHTML = '<div style="font-size:10px;font-weight:700;color:#10B981">✓ « J\'y vais » coché dans l\'agenda</div>';
+  } else {
+    el.innerHTML = '<a href="../outils.html" style="font-size:10px;font-weight:600;color:var(--orange);text-decoration:none" title="Ouvrir la page Outils pour cocher l\'événement dans l\'agenda">⚠ « J\'y vais » pas encore coché dans l\'agenda →</a>';
+  }
 }
 
 function daysToUdp() {
@@ -435,7 +467,7 @@ function renderHeader() {
   if (j === null) {
     badge.style.display = 'none';
     sbJ.textContent = 'J–?';
-    sbSub.textContent = "Renseignez la date de l'UDP";
+    sbSub.textContent = "Renseignez la date des UDP";
   } else if (j > 0) {
     badge.style.display = 'inline-block';
     badge.textContent = 'J–' + j;
@@ -445,10 +477,10 @@ function renderHeader() {
     badge.style.display = 'inline-block';
     badge.textContent = "C'est aujourd'hui !";
     sbJ.textContent = 'Jour J';
-    sbSub.textContent = 'Bonne UDP !';
+    sbSub.textContent = 'Bonnes UDP !';
   } else {
     badge.style.display = 'inline-block';
-    badge.textContent = 'UDP passée';
+    badge.textContent = 'UDP passées';
     sbJ.textContent = 'J+' + (-j);
     sbSub.textContent = 'Debrief : notez vos actions de suivi';
   }
@@ -486,8 +518,9 @@ function renderChecklist() {
   var fmOk = state.formateurs.some(function(f) { return (f.nom || '').trim() && (f.questions || '').trim(); });
   var mdOk = state.modeles.some(function(m) { return (m.nom || '').trim(); });
   var ccN = checkedCount('cc'), daN = checkedCount('da');
+  var going = agendaGoing();
   var items = [
-    { ok: !!state.date,                                label: "Date de l'UDP renseignée" },
+    { ok: !!state.date,                                label: "Date des UDP renseignée" },
     { ok: state.obj.r1 > 0 && state.obj.dm > 0,        label: 'Objectifs R1 + DM définis' },
     { ok: ccN >= FILS[0].items.length,                 label: 'Mise en action Conquête client (' + ccN + ' / ' + FILS[0].items.length + ')' },
     { ok: daN >= FILS[1].items.length,                 label: 'Mise en action Dev Action (' + daN + ' / ' + FILS[1].items.length + ')' },
@@ -496,6 +529,9 @@ function renderChecklist() {
     { ok: fmOk,                                        label: 'Questions préparées pour un formateur' },
     { ok: mdOk,                                        label: 'Modèle(s) identifié(s)' }
   ];
+  if (going !== null) {
+    items.splice(1, 0, { ok: going, label: '« J\'y vais » coché dans l\'agenda (page Outils)' });
+  }
   var done = items.filter(function(i) { return i.ok; }).length;
   var pct = Math.round((done / items.length) * 100);
   document.getElementById('readyPct').innerHTML = pct + '\u00a0%';
@@ -559,7 +595,7 @@ function renderFormateurs() {
       '</div>';
   }).join('');
   if (!html) {
-    html = '<div style="padding:10px 0 14px;font-size:11px;color:var(--ink-30);font-style:italic">Repérez 2-3 intervenants du programme et préparez des questions concrètes : on repart d\'une UDP avec des réponses quand on est venu avec des questions.</div>';
+    html = '<div style="padding:10px 0 14px;font-size:11px;color:var(--ink-30);font-style:italic">Repérez 2-3 intervenants du programme et préparez des questions concrètes : on repart des UDP avec des réponses quand on est venu avec des questions.</div>';
   }
   document.getElementById('fmList').innerHTML = html;
   document.querySelectorAll('#fmList .fm-ta').forEach(autoGrow);
@@ -613,7 +649,7 @@ function renderModeles() {
       '</div>';
   }).join('');
   if (!html) {
-    html = '<div style="padding:4px 0 8px;font-size:11px;color:var(--ink-30);font-style:italic">Identifiez 1 &agrave; 3 consultants plus avanc&eacute;s : un objectif proche, un cap interm&eacute;diaire, une vision long terme. L\'UDP est le moment pour aller leur parler.</div>';
+    html = '<div style="padding:4px 0 8px;font-size:11px;color:var(--ink-30);font-style:italic">Identifiez 1 &agrave; 3 consultants plus avanc&eacute;s : un objectif proche, un cap interm&eacute;diaire, une vision long terme. Les UDP sont le moment d\'aller leur parler.</div>';
   }
   document.getElementById('mdList').innerHTML = html;
   document.getElementById('mdAddBtn').style.display = state.modeles.length >= 3 ? 'none' : '';
@@ -646,11 +682,20 @@ function delModele(i) {
 // ── FULL RENDER ──────────────────────────────────────────────
 function render() {
   renderHeader();
+  renderAgenda();
   renderFils();
   renderFormateurs();
   renderModeles();
   renderKPIs();
 }
+
+// Coche « J'y vais » modifiee dans un autre onglet (page Outils) -> maj live
+window.addEventListener('storage', function(e) {
+  if (e.key === 'cgpskool_events_v1') {
+    renderAgenda();
+    renderKPIs();
+  }
+});
 
 // ── INIT ─────────────────────────────────────────────────────
 CGP.project.registerModule('udp-prep', { getState: getState, setState: setState });
