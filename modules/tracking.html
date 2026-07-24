@@ -435,7 +435,7 @@ details.card>summary .memo+.arr{margin-left:8px}
       <!-- ══ 8. HABILITATION / FORMATIONS CONTINUES (memorise) ══ -->
       <div class="card">
         <div class="card-title"><span class="dot"></span>Habilitation / formations continues<span class="memo">M&eacute;moris&eacute;</span></div>
-        <div class="card-sub">Coche celles obtenues (exclues de l'email). Les autres apparaissent dans le mail avec leur &eacute;ch&eacute;ance.</div>
+        <div class="card-sub">Les 3 obligatoires (ASS II / M-IOBSP / Agent li&eacute;) = <b>habilit&eacute; PMR</b>, condition du passage Manager. Coche celles obtenues (exclues du mail) ; les autres apparaissent avec leur &eacute;ch&eacute;ance.</div>
         <div id="habsBox"></div>
       </div>
 
@@ -999,18 +999,20 @@ function subtreeOrdered(id, depth) {
 function emitOrg(o) {
   if (state.profil.orgOn !== true) return;
   var directs = orgChildren(null); if (!directs.length) return;
-  secTitle(o, 'Organisation — qualif branches 500k€');
+  secTitle(o, 'Organisation — qualification Galaxie');
+  o.push('Branches directes actives (≥ 500k€ + 1 manager) : ' + myActiveBranches() + ' → ' + myQualif());
   directs.forEach(function(dir) {
-    var bt = orgBranchTotal(dir.id), raf = bt - ORG_SEUIL;
-    o.push((dir.nom || '(sans nom)') + ' — branche ' + fmtMoney(bt) + ' → ' +
-      (raf >= 0 ? 'qualifiée (+' + fmtMoney(raf) + ')' : 'RAF ' + fmtMoney(ORG_SEUIL - bt)));
+    var vg = orgBranchTotal(dir.id), act = branchActive(dir.id);
+    o.push('');
+    o.push((dir.nom || '(sans nom)') + ' — branche ' + fmtMoney(vg) + ' → ' +
+      (act ? 'active ✓' : (vg >= ORG_SEUIL ? 'volume OK, manque 1 manager' : 'RAF ' + fmtMoney(ORG_SEUIL - vg))));
     [{ p:dir, depth:0 }].concat(subtreeOrdered(dir.id, 1)).forEach(function(m) {
       var pers = m.p, meta = [], indent = new Array(m.depth + 1).join('  ');
-      var tot = orgTotal(pers); if (tot > 0) meta.push('VA ' + fmtMoney(tot));
-      if (pers.qualif) meta.push(pers.qualif);
-      var habs = []; if (pers.mia) habs.push('MIA'); if (pers.miobsp) habs.push('MIOBSP'); if (pers.alpsi) habs.push('ALPSI'); if (pers.cif) habs.push('CIF');
+      meta.push('orga ' + fmtMoney(orgBranchTotal(pers.id)));
+      if (isManagerQualif(pers)) meta.push('Manager✓');
+      var habs = []; if (pers.mia) habs.push('MIA'); if (pers.miobsp) habs.push('IOBSP'); if (pers.alpsi) habs.push('ALPSI'); if (pers.cif) habs.push('CIF');
       if (habs.length) meta.push(habs.join('/'));
-      o.push(indent + '- ' + (pers.nom || '(sans nom)') + (meta.length ? ' : ' + meta.join(' · ') : ''));
+      o.push(indent + '- ' + (pers.nom || '(sans nom)') + ' : ' + meta.join(' · '));
     });
   });
 }
@@ -1290,10 +1292,10 @@ function importJSON(input) {
 // ══════════════════════════════════════════════════════════════
 // ORGANISATION (filleuls) — arbre a profondeur libre + jauge 500k€
 // ══════════════════════════════════════════════════════════════
-var ORG_QUALIF = ['Conseiller junior', 'Conseiller', 'Manager', 'Constellation'];
+var ORG_QUALIF = ['Consultant Junior', 'Consultant', 'Consultant Confirmé', 'Manager', 'Manager Planète', 'Manager Étoile', 'Manager Constellation', 'Manager Galaxie'];
 var ORG_FORMAN = ['Neoman', 'Beman', 'Adman', 'Man', 'Devman', 'DXman', 'Xman'];
 var ORG_HAB = [['miobsp','MIOBSP'], ['mia','MIA'], ['alpsi','ALPSI'], ['cif','CIF']];
-var ORG_SEUIL = 500000;   // 500k€/an = qualification/requalification Manager
+var ORG_SEUIL = 500000;   // 500k€ Volume Global Organisation = seuil Consultant Confirme -> Manager, et branche active
 
 function orgPeople() { return (state.org && state.org.people) || []; }
 function orgById(id) { return orgPeople().filter(function(x){ return x.id === id; })[0]; }
@@ -1316,7 +1318,7 @@ function orgAdd(parentId) {
   if (!state.org.seq) state.org.seq = 1;
   var id = 'f' + (state.org.seq++);
   state.org.people.push({ id:id, parentId:parentId || null, nom:'', inscription:'',
-    miobsp:false, mia:false, alpsi:false, cif:false, qualif:'Conseiller junior', forman:'Neoman',
+    miobsp:false, mia:false, alpsi:false, cif:false, qualif:'Consultant Junior', forman:'Neoman',
     inscrits:'', dm:'', ad:'', j3:'', vaVc:'', vaEc:'' });
   saveState();
   if (state.view !== 'org') { state.view = 'org'; applyMode(); }
@@ -1345,18 +1347,38 @@ function orgBranchTotal(id) {
   orgDescendants(id).forEach(function(d){ var p2 = orgById(d); if (p2) t += orgTotal(p2); });
   return t;
 }
-function orgGaugeRow(label, tot) {
-  var raf = tot - ORG_SEUIL, ok = raf >= 0;
-  var pct = ORG_SEUIL > 0 ? Math.min(Math.round(tot / ORG_SEUIL * 100), 100) : 0;
-  var txt = ok ? 'Qualifie (+' + fmtMoney(raf) + ')' : label + ' : ' + fmtMoney(ORG_SEUIL - tot);
-  return '<div class="org-gauge-bar" style="margin-top:6px"><span style="width:' + pct + '%;background:' + (ok ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
-    '<div class="org-gauge-lbl"><span>' + label + ' \u2014 ' + fmtMoney(tot) + ' / ' + fmtMoney(ORG_SEUIL) + '</span>' +
-    '<span class="raf ' + (ok ? 'green' : 'red') + '">' + txt + '</span></div>';
+// ── PMR : qualifications ──────────────────────────────────────
+// Habilite au sens du PMR : Assurance (MIA) + IOBSP + (Agent lié/ALPSI ou CIF)
+function habilitePMR(pers) { return !!(pers.mia && pers.miobsp && (pers.alpsi || pers.cif)); }
+// Manager = volume orga >= 500k ET habilite PMR, OU qualif Manager+ saisie manuellement
+function isManagerQualif(pers) {
+  if (pers.qualif && pers.qualif.indexOf('Manager') === 0) return true;
+  return orgBranchTotal(pers.id) >= ORG_SEUIL && habilitePMR(pers);
 }
+// une branche (direct + descendance) a-t-elle au moins 1 manager ?
+function branchHasManager(id) {
+  if (isManagerQualif(orgById(id))) return true;
+  return orgDescendants(id).filter(function(d){ return isManagerQualif(orgById(d)); }).length > 0;
+}
+// branche active = >= 500k Volume Global ET au moins 1 manager
+function branchActive(id) { return orgBranchTotal(id) >= ORG_SEUIL && branchHasManager(id); }
+function myActiveBranches() { return orgChildren(null).filter(function(d){ return branchActive(d.id); }).length; }
+function myQualifShort() { var n = myActiveBranches(); return n >= 4 ? 'Galaxie' : n === 3 ? 'Constellation' : n === 2 ? 'Étoile' : n === 1 ? 'Planète' : '—'; }
+function myQualif() { var n = myActiveBranches(); return n >= 4 ? 'Manager Galaxie' : n === 3 ? 'Manager Constellation' : n === 2 ? 'Manager Étoile' : n === 1 ? 'Manager Planète' : 'Manager (0 branche active)'; }
 
+// jauge par noeud : Volume Global Organisation vs 500k (seuil Manager), a tous les niveaux
 function orgGaugeHtml(pers) {
-  var h = orgGaugeRow('RAF Manager', orgTotal(pers));
-  if (orgDescendants(pers.id).length) h += orgGaugeRow('RAF branche', orgBranchTotal(pers.id));
+  var vg = orgBranchTotal(pers.id), ok = vg >= ORG_SEUIL;
+  var pct = Math.min(Math.round(vg / ORG_SEUIL * 100), 100);
+  var txt = ok ? (habilitePMR(pers) ? '✓ Manager' : 'seuil OK — habilitations ?') : 'RAF ' + fmtMoney(ORG_SEUIL - vg);
+  var h = '<div class="org-gauge-bar"><span style="width:' + pct + '%;background:' + (ok ? 'var(--green)' : 'var(--orange)') + '"></span></div>' +
+    '<div class="org-gauge-lbl"><span>Volume orga : ' + fmtMoney(vg) + ' / ' + fmtMoney(ORG_SEUIL) + '</span>' +
+    '<span class="raf ' + (ok ? 'green' : 'red') + '">' + txt + '</span></div>';
+  if ((pers.parentId || null) === null) {
+    var act = branchActive(pers.id);
+    h += '<div class="org-gauge-lbl" style="margin-top:3px"><span>Branche directe</span>' +
+      '<span class="raf ' + (act ? 'green' : 'red') + '">' + (act ? '✓ active (compte Galaxie)' : 'inactive (500k€ + 1 manager)') + '</span></div>';
+  }
   return h;
 }
 function updateOrgGauge(id) {
@@ -1410,11 +1432,9 @@ function orgSum(v, l, cls) { return '<div class="org-sum-cell"><div class="org-s
 function updateOrgSummary() {
   var box = document.getElementById('orgSummary'); if (!box) return;
   var ppl = orgPeople();
-  var directs = orgChildren(null).length;
-  var qualif = ppl.filter(function(x){ return orgTotal(x) >= ORG_SEUIL; }).length;
-  var totVa = ppl.reduce(function(a, x){ return a + orgTotal(x); }, 0);
-  box.innerHTML = orgSum(ppl.length, 'Filleuls') + orgSum(directs, 'Directs') +
-    orgSum(qualif, 'Qualifiés 500k', 'green') + orgSum(fmtMoney(totVa), 'VA totale', 'orange');
+  var actives = myActiveBranches();
+  box.innerHTML = orgSum(ppl.length, 'Filleuls') + orgSum(orgChildren(null).length, 'Directs') +
+    orgSum(actives, 'Branches actives', 'green') + orgSum(myQualifShort(), 'Ta qualif', 'orange');
 }
 function orgSyncToEquipe() {
   var raw; try { raw = JSON.parse(localStorage.getItem('cgpskool_equipe_v2')); } catch(e) { return; }
