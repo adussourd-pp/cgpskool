@@ -376,8 +376,23 @@
       Compl&eacute;ter ma journ&eacute;e
       <span class="ts-cta-arrow">&rarr;</span>
     </a>
+    <a href="modules/tracking.html" class="ts-mail" id="mailWeekStatus"><span class="ts-mail-dot"></span><span class="ts-mail-txt">Mail Manager</span></a>
   </section>
 </div>
+<script>
+(function(){
+  var el=document.getElementById('mailWeekStatus'); if(!el) return;
+  var sent={}; try{ sent=JSON.parse(localStorage.getItem('cgpskool_tracking_sent'))||{}; }catch(e){}
+  var now=new Date(),day=now.getDay(),diff=(day===0?-6:1-day);
+  var mon=new Date(now); mon.setDate(now.getDate()+diff); mon.setHours(0,0,0,0);
+  var jan1=new Date(mon.getFullYear(),0,1);
+  var wn=Math.ceil((((mon-jan1)/86400000)+jan1.getDay()+1)/7);
+  var wk=mon.getFullYear()+'-W'+String(wn).padStart(2,'0');
+  var ok=!!sent[wk];
+  el.className='ts-mail '+(ok?'ok':'no');
+  el.querySelector('.ts-mail-txt').textContent=ok?'Mail Manager envoyé cette semaine':'Mail Manager à envoyer';
+})();
+</script>
 
 <!-- Body dépliable Évènements -->
 <div class="ts-body-wrap closed" data-fold-body="agenda">
@@ -390,6 +405,14 @@
 .top-strips{display:grid;grid-template-columns:1fr 1fr 1fr;background:#fff;border-bottom:1px solid var(--rule-l)}
 .ts-cell{position:relative;padding:18px 22px;border-right:1px solid var(--rule-l);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:background .18s;min-width:0}
 .ts-cell:last-child{border-right:none}
+.ts-mail{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font-size:11px;font-weight:600;text-decoration:none;border-radius:20px;padding:5px 11px;width:fit-content;transition:opacity .15s}
+.ts-mail:hover{opacity:0.82}
+.ts-mail-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ts-mail.ok{background:rgba(45,122,91,0.12);color:#2D7A5B}
+.ts-mail.ok .ts-mail-dot{background:#2D7A5B}
+.ts-mail.no{background:rgba(212,98,42,0.12);color:var(--orange)}
+.ts-mail.no .ts-mail-dot{background:var(--orange);box-shadow:0 0 0 0 rgba(212,98,42,0.5);animation:tsMailPulse 1.8s infinite}
+@keyframes tsMailPulse{0%{box-shadow:0 0 0 0 rgba(212,98,42,0.5)}70%{box-shadow:0 0 0 6px rgba(212,98,42,0)}100%{box-shadow:0 0 0 0 rgba(212,98,42,0)}}
 .ts-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--orange);line-height:1.2}
 .ts-preview{font-size:12px;color:var(--ink-60);line-height:1.45;display:block;flex:1}
 .ts-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;flex:1}

@@ -1186,7 +1186,16 @@ function regeneratePreview() {
 }
 
 // ── COPIER ────────────────────────────────────────────────────
+// memorise la semaine ou le mail a ete copie/envoye (lu par la page Outils)
+function markMailSent() {
+  try {
+    var d = {}; try { d = JSON.parse(localStorage.getItem('cgpskool_tracking_sent')) || {}; } catch(e) {}
+    d[weekKey(getMonday(new Date()))] = 1;
+    localStorage.setItem('cgpskool_tracking_sent', JSON.stringify(d));
+  } catch(e) {}
+}
 function copyEmail() {
+  markMailSent();   // memorise que le mail de la semaine a ete copie/envoye
   var el = document.getElementById('previewBody');
   var txt = el ? el.textContent : buildEmail();   // copie l'apercu (retouches incluses)
   var done = function() { flashCopied(); };
