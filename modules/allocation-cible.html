@@ -13,6 +13,7 @@
 <style>
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
 .fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
+.fld-hint{font-size:9.5px;line-height:1.4;color:var(--gris);margin-top:3px;font-style:italic}
 .fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
 .fi-row:focus-within{border-color:var(--orange)}
 .fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
@@ -148,26 +149,9 @@
       <div class="fg"><label>Frais d'entr&#233;e</label>
         <div class="fi-row"><input type="number" id="fraisEntree" value="2.5" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
       </div>
-      <div class="fg"><label>Minimum par arbitrage</label>
+      <div class="fg"><label>Minimum par arbitrage (contrat)</label>
         <div class="fi-row"><input type="number" id="minArbitrage" value="50" min="0" step="10" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
-      </div>
-    </div>
-
-    <div class="cs-sidebar-lbl" data-step="programme" onclick="openStep('programme',this)"><span class="acc">&#9654;</span>Programme d'arbitrage</div>
-    <div class="sb-body" id="body_programme">
-      <div class="fg" id="dureeRow">
-        <label>Dur&#233;e (mois)</label>
-        <div class="sl-val" id="vDuree">12 mois</div>
-        <input type="range" id="duree" min="3" max="24" step="1" value="12" oninput="onDureeChange()" style="width:100%;accent-color:var(--orange)">
-        <div class="sl-labs"><span>3</span><span>24</span></div>
-      </div>
-      <div class="fg"><label>P&#233;riodicit&#233;</label>
-        <select class="fi" id="periodicite" onchange="recalc()">
-          <option value="1">Mensuelle</option>
-          <option value="3">Trimestrielle</option>
-          <option value="6">Semestrielle</option>
-          <option value="12">Annuelle</option>
-        </select>
+        <div class="fld-hint">Contrainte du contrat &#8212; sert uniquement d'alerte si le montant/arbitrage calcul&#233; passe en dessous.</div>
       </div>
     </div>
 
@@ -177,7 +161,37 @@
       <button class="btn-add" onclick="addDepart()" style="width:100%">+ Ajouter un fonds</button>
     </div>
 
-    <div class="cs-sidebar-lbl" data-step="cible" onclick="openStep('cible',this)"><span class="acc">&#9654;</span>Allocation cible</div>
+    <div class="cs-sidebar-lbl" data-step="programme" onclick="openStep('programme',this)"><span class="acc">&#9654;</span>Programme de dynamisation</div>
+    <div class="sb-body" id="body_programme">
+      <div class="fg"><label>Fonds &#224; dynamiser (source)</label>
+        <select class="fi" id="sourceFonds" onchange="onSourceChange()"></select>
+      </div>
+      <div class="fg"><label>Montant total &#224; dynamiser</label>
+        <div class="fi-row"><input type="number" id="montantADynamiser" value="5000" min="0" step="500" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
+      </div>
+      <div class="fg"><label>P&#233;riodicit&#233;</label>
+        <select class="fi" id="periodicite" onchange="recalc()">
+          <option value="1">Mensuelle</option>
+          <option value="3">Trimestrielle</option>
+          <option value="6">Semestrielle</option>
+          <option value="12">Annuelle</option>
+        </select>
+      </div>
+      <div class="fg" id="dureeRow">
+        <label>Dur&#233;e du programme (mois)</label>
+        <div class="sl-val" id="vDuree">12 mois</div>
+        <input type="range" id="duree" min="3" max="60" step="1" value="12" oninput="onDureeChange()" style="width:100%;accent-color:var(--orange)">
+        <div class="sl-labs"><span>3</span><span>60</span></div>
+        <div class="fld-hint" id="autoParArb">Montant/arbitrage calcul&#233; automatiquement.</div>
+      </div>
+      <div class="fg" id="montArbRow" style="display:none">
+        <label>Montant par arbitrage</label>
+        <div class="fi-row"><input type="number" id="montParArbInput" value="200" min="0" step="50" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
+        <div class="fld-hint" id="autoDuree">Dur&#233;e calcul&#233;e automatiquement jusqu'&#224; &#233;puisement du montant.</div>
+      </div>
+    </div>
+
+    <div class="cs-sidebar-lbl" data-step="cible" onclick="openStep('cible',this)"><span class="acc">&#9654;</span>Fonds actions (allocation cible)</div>
     <div class="sb-body" id="body_cible">
       <div id="sbCibleBody"></div>
       <button class="btn-add" onclick="addCible()" style="width:100%">+ Ajouter un fonds</button>
@@ -209,6 +223,7 @@
       <div class="card">
         <div class="card-title"><div class="card-title-l"><span class="dot"></span>Hypoth&#232;ses retenues</div></div>
         <div class="hyp-grid" id="hypGrid"></div>
+        <div id="hypAlerts"></div>
       </div>
 
       <!-- ALLOCATION DÉPART -->
@@ -221,7 +236,7 @@
             <th>Fonds</th>
             <th>% initial</th>
             <th>Montant &euro;</th>
-            <th>D&#233;sinv./arb.</th>
+            <th>&#192; dynamiser</th>
           </tr></thead>
           <tbody id="departBody"></tbody>
           <tfoot id="departFoot"></tfoot>
@@ -272,9 +287,10 @@
 // ── État ─────────────────────────────────────────────────────────
 var ALLOC = {
   mode: 'duree', // 'duree' | 'epuise'
+  source: 0,     // index du fonds source (poche a dynamiser) dans depart
   depart: [
-    {label:'Fonds Euros',      pct:95, montArb:750},
-    {label:'UC Actions Monde', pct:5,  montArb:0}
+    {label:'Fonds Euros',      pct:100},
+    {label:'UC Actions Monde', pct:0}
   ],
   cible: [
     {label:'UC Actions Monde', pct:60},
@@ -300,11 +316,34 @@ function setMode(m){
   V('modeBtnDuree').classList.toggle('active', m==='duree');
   V('modeBtnEpuise').classList.toggle('active', m==='epuise');
   var dR=V('dureeRow'); if(dR) dR.style.display = m==='duree' ? '' : 'none';
+  var aR=V('montArbRow'); if(aR) aR.style.display = m==='epuise' ? '' : 'none';
   recalc();
 }
 
+// ── Source a dynamiser ───────────────────────────────────────────
+function onSourceChange(){
+  ALLOC.source = parseInt(V('sourceFonds').value)||0;
+  recalc();
+}
+function populateSourceSelect(){
+  var sel = V('sourceFonds');
+  if(!sel) return;
+  var cur = ALLOC.source;
+  if(cur >= ALLOC.depart.length) cur = 0;
+  if(cur < 0) cur = 0;
+  ALLOC.source = cur;
+  sel.innerHTML = '';
+  ALLOC.depart.forEach(function(f, i){
+    var o = document.createElement('option');
+    o.value = i;
+    o.textContent = (f.label && f.label.trim()) ? f.label : ('Fonds '+(i+1));
+    sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
 // ── Progression (accordeon strict + compteur) ─────────────────────
-var _stepOpened={client:true, params:false, programme:false, depart:false, cible:false};
+var _stepOpened={client:true, params:false, depart:false, programme:false, cible:false};
 function openStep(id, el){
   if(id)_stepOpened[id]=true;
   document.querySelectorAll('.cs-sidebar-lbl').forEach(function(l){
@@ -324,13 +363,13 @@ function isStepComplete(id){
   if(!_stepOpened[id])return false;
   if(id==='client'){var v=V('clientNom');return !!(v&&v.value.trim())}
   if(id==='params'){return num('versementBrut')>0}
-  if(id==='programme')return true;
   if(id==='depart'){return ALLOC.depart.some(function(f){return f.pct>0})}
+  if(id==='programme'){return num('montantADynamiser')>0}
   if(id==='cible'){return ALLOC.cible.some(function(f){return f.pct>0})}
   return false;
 }
 function updateProgress(){
-  var steps=['client','params','programme','depart','cible'], done=0;
+  var steps=['client','params','depart','programme','cible'], done=0;
   steps.forEach(function(id){if(isStepComplete(id))done++});
   var c=V('progCount');
   if(c){c.innerHTML='<strong>'+done+'</strong> / 5 \u00e9tapes valid\u00e9es';
@@ -354,7 +393,6 @@ function renderDepart(){
       '<input type="text" value="'+escAttr(f.label)+'" oninput="updateDepart('+i+',\'label\',this.value)">'+
       '<div class="sb-row-inputs">'+
         '<div class="inp"><input type="number" min="0" max="100" step="1" value="'+f.pct+'" oninput="updateDepart('+i+',\'pct\',this.value)"><span class="u">%</span></div>'+
-        '<div class="inp"><input type="number" min="0" step="50" value="'+f.montArb+'" oninput="updateDepart('+i+',\'montArb\',this.value)"><span class="u">&euro;/arb</span></div>'+
       '</div>';
     sb.appendChild(d);
   });
@@ -367,9 +405,10 @@ function renderDepart(){
       '<td>'+escHtml(f.label)+'</td>'+
       '<td>'+Math.round(f.pct)+' %</td>'+
       '<td id="departMnt'+i+'">&mdash;</td>'+
-      '<td>'+fmt(f.montArb)+' &euro;</td>';
+      '<td id="departDyn'+i+'">&mdash;</td>';
     tb.appendChild(tr);
   });
+  populateSourceSelect();
 }
 function renderCible(){
   // Sidebar (editable)
@@ -402,8 +441,13 @@ function escAttr(s){return String(s||'').replace(/"/g,'&quot;');}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ── CRUD départ / cible ─────────────────────────────────────────
-function addDepart(){ALLOC.depart.push({label:'Nouveau fonds',pct:0,montArb:0});renderDepart();recalc();}
-function delDepart(i){ALLOC.depart.splice(i,1);renderDepart();recalc();}
+function addDepart(){ALLOC.depart.push({label:'Nouveau fonds',pct:0});renderDepart();recalc();}
+function delDepart(i){
+  ALLOC.depart.splice(i,1);
+  if(ALLOC.source >= ALLOC.depart.length) ALLOC.source = Math.max(0, ALLOC.depart.length-1);
+  else if(i < ALLOC.source) ALLOC.source--;
+  renderDepart();recalc();
+}
 function updateDepart(i,k,v){
   if(k==='label') ALLOC.depart[i].label = v;
   else ALLOC.depart[i][k] = parseFloat(v)||0;
@@ -420,91 +464,118 @@ function updateCible(i,k,v){
 // ── CALCUL ───────────────────────────────────────────────────────
 function recalc(){
   renderHeader();
+  populateSourceSelect();
   var brut = num('versementBrut');
   var frais = num('fraisEntree');
   var minArb = num('minArbitrage');
   var periodMois = parseInt(V('periodicite').value)||1;
   var net = brut * (1 - frais/100);
 
-  // Montant initial par fonds départ
+  // Montant initial par fonds de depart
   ALLOC.depart.forEach(function(f){
     f.montInitial = (f.pct/100) * net;
   });
 
-  // Nombre d'arbitrages selon mode
-  var nbArb;
+  // Fonds source + disponible
+  var srcIdx = ALLOC.source;
+  if(srcIdx >= ALLOC.depart.length) srcIdx = 0;
+  var srcFonds = ALLOC.depart[srcIdx] || null;
+  var srcDispo = srcFonds ? srcFonds.montInitial : 0;
+
+  // Montant a dynamiser (plafonne au disponible du fonds source)
+  var montantSaisi = num('montantADynamiser');
+  var montantADyn = Math.min(montantSaisi, srcDispo);
+  var capDepasse = montantSaisi > srcDispo + 0.5;
+
+  // Nombre d'arbitrages + montant/arbitrage (calcul automatique)
+  var nbArb, montParArb, dureeMois;
   if(ALLOC.mode === 'duree'){
-    var dureeMois = parseInt(V('duree').value)||12;
+    dureeMois = parseInt(V('duree').value)||12;
     nbArb = Math.floor(dureeMois / periodMois);
+    if(nbArb < 1) nbArb = 1;
+    montParArb = montantADyn / nbArb;
   } else {
-    // Mode épuisement : combien d'arbitrages pour vider le fonds le plus garni
-    nbArb = 0;
-    ALLOC.depart.forEach(function(f){
-      if(f.montArb > 0){
-        var n = Math.ceil(f.montInitial / f.montArb);
-        if(n > nbArb) nbArb = n;
-      }
-    });
-    // Plafond 24 mois / périodicité
-    var maxArb = Math.floor(24 / periodMois);
-    if(nbArb > maxArb) nbArb = maxArb;
+    // Epuisement : on fixe le montant/arbitrage, la duree se deduit
+    montParArb = num('montParArbInput');
+    if(montParArb <= 0){ montParArb = montantADyn; }
+    nbArb = montParArb > 0 ? Math.ceil(montantADyn / montParArb) : 1;
+    if(nbArb < 1) nbArb = 1;
+    dureeMois = nbArb * periodMois;
   }
-  if(nbArb < 1) nbArb = 1;
 
-  // Désinvesti par fonds départ (capé au montant disponible)
-  var totalDesinvesti = 0;
-  var alertesDepart = [];
+  // Desinvesti : uniquement le fonds source
   ALLOC.depart.forEach(function(f, i){
-    var theorique = f.montArb * nbArb;
-    var capped = Math.min(theorique, f.montInitial);
-    f.desinvesti = capped;
-    f.reste = f.montInitial - capped;
-    totalDesinvesti += capped;
-    if(theorique > f.montInitial && f.montArb > 0){
-      alertesDepart.push({type:'warn', msg:'« '+f.label+' » : la poche serait épuisée avant la fin (désinvesti plafonné à '+fmt(capped)+' €)'});
-    }
-    if(f.montArb > 0 && f.montArb < minArb){
-      alertesDepart.push({type:'err', msg:'« '+f.label+' » : '+fmt(f.montArb)+' €/arbitrage est inférieur au minimum requis ('+fmt(minArb)+' €)'});
+    if(i === srcIdx){
+      f.desinvesti = montantADyn;
+      f.reste = f.montInitial - montantADyn;
+    } else {
+      f.desinvesti = 0;
+      f.reste = f.montInitial;
     }
   });
 
-  // Réinvesti par fonds cible
+  // Reinvesti par fonds cible (au prorata du % cible)
   ALLOC.cible.forEach(function(f){
-    f.reinvesti = (f.pct/100) * totalDesinvesti;
+    f.reinvesti = (f.pct/100) * montantADyn;
   });
 
-  // ── Rendu Hypothèses ─────────────────────────────────────────
-  var dureeText;
+  // Alertes programme (affichees dans la carte Hypotheses)
+  var alertesHyp = [];
+  if(capDepasse){
+    alertesHyp.push({type:'err', msg:'Le montant a dynamiser ('+fmt(montantSaisi)+' &euro;) depasse la poche &laquo; '+escHtml(srcFonds?srcFonds.label:'')+' &raquo; ('+fmt(srcDispo)+' &euro;). Il est plafonne a '+fmt(montantADyn)+' &euro;.'});
+  }
+  if(minArb > 0 && montParArb > 0 && montParArb < minArb - 0.5){
+    var conseil = ALLOC.mode==='duree'
+      ? 'Raccourcissez la duree ou augmentez le montant a dynamiser.'
+      : 'Augmentez le montant par arbitrage.';
+    alertesHyp.push({type:'err', msg:'Le montant par arbitrage calcule ('+fmt(montParArb)+' &euro;) est inferieur au minimum du contrat ('+fmt(minArb)+' &euro;). '+conseil});
+  }
+
+  // ── Rendu Hypotheses ─────────────────────────────────────────
+  var dureeText, nbArbText;
   if(ALLOC.mode === 'duree'){
-    dureeText = (parseInt(V('duree').value)||12) + ' mois';
+    dureeText = dureeMois + ' mois';
+    nbArbText = String(nbArb);
   } else {
-    dureeText = nbArb + ' arb. (épuisement)';
+    dureeText = dureeMois + ' mois (epuisement)';
+    nbArbText = nbArb + ' (epuisement)';
   }
   var periodLbl = {1:'Mensuelle',3:'Trimestrielle',6:'Semestrielle',12:'Annuelle'}[periodMois];
   V('hypGrid').innerHTML =
-    hypItem('Versement brut', fmt(brut)+' €')+
-    hypItem('Frais d\'entrée', fmt1(frais)+' %')+
-    hypItem('Net investi', fmt(net)+' €')+
+    hypItem('Versement brut', fmt(brut)+' &euro;')+
+    hypItem('Frais d\'entree', fmt1(frais)+' %')+
+    hypItem('Net investi', fmt(net)+' &euro;')+
+    hypItem('Fonds dynamise', escHtml(srcFonds?srcFonds.label:'—'))+
+    hypItem('Montant a dynamiser', fmt(montantADyn)+' &euro;')+
     hypItem('Programme', dureeText)+
-    hypItem('Périodicité', periodLbl)+
-    hypItem('Nb arbitrages', String(nbArb));
+    hypItem('Periodicite', periodLbl)+
+    hypItem('Nb arbitrages', nbArbText)+
+    hypItem('Montant / arbitrage', fmt(montParArb)+' &euro;', true);
+  V('hypAlerts').innerHTML = alertesHyp.map(function(a){return '<div class="alert '+a.type+'" style="margin-top:12px">'+a.msg+'</div>';}).join('');
 
-  // ── Rendu Allocation départ ──────────────────────────────────
-  var totPctD = 0, totMntD = 0, totArbD = 0;
+  // Hints sidebar (valeurs calculees automatiquement)
+  var hParArb = V('autoParArb');
+  if(hParArb) hParArb.textContent = '→ ' + fmt(montParArb) + ' € par arbitrage (' + nbArb + ' arbitrages)';
+  var hEpuise = V('autoDuree');
+  if(hEpuise) hEpuise.textContent = '→ ' + nbArb + ' arbitrages, soit ' + dureeMois + ' mois';
+
+  // ── Rendu Allocation depart ──────────────────────────────────
+  var totPctD = 0, totMntD = 0;
   ALLOC.depart.forEach(function(f, i){
     var el = V('departMnt'+i);
     if(el) el.textContent = fmt(f.montInitial)+' €';
+    var elD = V('departDyn'+i);
+    if(elD) elD.textContent = (i===srcIdx && montantADyn>0) ? ('- '+fmt(montantADyn)+' €') : '—';
     totPctD += f.pct;
     totMntD += f.montInitial;
-    totArbD += f.montArb;
   });
   var pctOkD = Math.abs(totPctD - 100) < 0.01;
   V('departFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
     '<td class="'+(pctOkD?'ok':'err')+'">'+Math.round(totPctD)+' %</td>'+
-    '<td>'+fmt(totMntD)+' €</td>'+
-    '<td>'+fmt(totArbD)+' €</td></tr>';
-  V('departAlerts').innerHTML = (pctOkD?'':'<div class="alert err">Le total doit faire 100 %.</div>') + alertesDepart.map(function(a){return '<div class="alert '+a.type+'">'+a.msg+'</div>';}).join('');
+    '<td>'+fmt(totMntD)+' &euro;</td>'+
+    '<td>- '+fmt(montantADyn)+' &euro;</td></tr>';
+  V('departAlerts').innerHTML = pctOkD?'':'<div class="alert err">Le total doit faire 100 %.</div>';
 
   // ── Rendu Allocation cible ───────────────────────────────────
   var totPctC = 0, totReinvC = 0;
@@ -518,8 +589,11 @@ function recalc(){
   V('cibleFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
     '<td class="'+(pctOkC?'ok':'err')+'">'+Math.round(totPctC)+' %</td>'+
-    '<td>'+fmt(totReinvC)+' €</td></tr>';
-  V('cibleAlerts').innerHTML = pctOkC?'':'<div class="alert err">Le total doit faire 100 %.</div>';
+    '<td>'+fmt(totReinvC)+' &euro;</td></tr>';
+  var cibleAlert = '';
+  if(!pctOkC) cibleAlert = '<div class="alert err">Le total doit faire 100 %.</div>';
+  else if(ALLOC.cible.length===0 || totReinvC<0.5) cibleAlert = '<div class="alert warn">Ajoutez les fonds actions cible pour ventiler le montant dynamise.</div>';
+  V('cibleAlerts').innerHTML = cibleAlert;
 
   // ── Allocation finale (merge par label) ──────────────────────
   var merged = {};
@@ -572,6 +646,9 @@ CGP.project.registerModule('allocation-cible', {
       fraisEntree: num('fraisEntree'),
       minArbitrage: num('minArbitrage'),
       mode: ALLOC.mode,
+      source: ALLOC.source,
+      montantADynamiser: num('montantADynamiser'),
+      montParArbEpuise: num('montParArbInput'),
       duree: parseInt(V('duree').value)||12,
       periodicite: V('periodicite').value,
       depart: ALLOC.depart,
@@ -586,8 +663,31 @@ CGP.project.registerModule('allocation-cible', {
     if(d.minArbitrage !== undefined) V('minArbitrage').value = d.minArbitrage;
     if(d.duree !== undefined){V('duree').value = d.duree;V('vDuree').textContent = d.duree+' mois';}
     if(d.periodicite !== undefined) V('periodicite').value = d.periodicite;
-    if(d.depart !== undefined) ALLOC.depart = d.depart;
-    if(d.cible !== undefined) ALLOC.cible = d.cible;
+    // Fonds : on ne conserve que label + pct dans le nouveau modele
+    if(d.depart !== undefined) ALLOC.depart = d.depart.map(function(f){return {label:f.label, pct:parseFloat(f.pct)||0};});
+    if(d.cible !== undefined) ALLOC.cible = d.cible.map(function(f){return {label:f.label, pct:parseFloat(f.pct)||0};});
+    if(d.source !== undefined) ALLOC.source = d.source;
+    // Montant a dynamiser : migration depuis l'ancien format (desinvesti/montArb par fonds)
+    var mad = d.montantADynamiser;
+    if(mad === undefined && Array.isArray(d.depart)){
+      var sum = 0, srcIdx = -1, maxArb = 0;
+      d.depart.forEach(function(f, i){
+        sum += parseFloat(f.desinvesti)||0;
+        var ma = parseFloat(f.montArb)||0;
+        if(ma > maxArb){maxArb = ma; srcIdx = i;}
+      });
+      if(sum > 0) mad = sum;
+      if(srcIdx >= 0) ALLOC.source = srcIdx;
+    }
+    if(mad !== undefined && mad > 0) V('montantADynamiser').value = mad;
+    // Montant par arbitrage (mode epuisement) : migration depuis l'ancien montArb max
+    var mpa = d.montParArbEpuise;
+    if(mpa === undefined && Array.isArray(d.depart)){
+      var mx = 0;
+      d.depart.forEach(function(f){var ma = parseFloat(f.montArb)||0; if(ma > mx) mx = ma;});
+      if(mx > 0) mpa = mx;
+    }
+    if(mpa !== undefined && mpa > 0) V('montParArbInput').value = mpa;
     if(d.mode !== undefined) setMode(d.mode);
     renderDepart();
     renderCible();
