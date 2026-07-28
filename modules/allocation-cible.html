@@ -15,6 +15,9 @@
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
 .fg label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--gris)}
 .fld-hint{font-size:9.5px;line-height:1.4;color:var(--gris);margin-top:3px;font-style:italic}
+.chk-row{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;color:var(--noir);cursor:pointer;margin-bottom:6px;padding:9px 11px;background:#fff;border:1.5px solid var(--bord);border-radius:7px}
+.chk-row:hover{border-color:var(--orange)}
+.chk-row input{accent-color:var(--orange);width:15px;height:15px;cursor:pointer;flex-shrink:0}
 .fi-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--bord);border-radius:7px;transition:border-color 0.2s}
 .fi-row:focus-within{border-color:var(--orange)}
 .fi-row input{flex:1;background:transparent;border:none;outline:none;padding:8px 10px;font-family:var(--sans);font-size:13px;color:var(--noir);min-width:0}
@@ -23,13 +26,6 @@
 .fi:focus{border-color:var(--orange)}
 .sl-val{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--orange);text-align:center;margin-bottom:2px}
 .sl-labs{display:flex;justify-content:space-between;font-size:9px;color:var(--gris);margin-top:1px}
-
-/* Mode tabs (choix initial - cf. SIDEBAR_STANDARD) */
-.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.mode-tab{padding:10px 6px;border:1.5px solid var(--bord);border-radius:8px;background:#fff;color:var(--gris);font-size:11px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:var(--sans);font-weight:400;line-height:1.3}
-.mode-tab.active{border-color:var(--orange);color:var(--orange);background:rgba(212,98,42,0.08);font-weight:600}
-.mode-tab:hover:not(.active){border-color:var(--orange);color:var(--orange)}
-.mode-icon{font-size:16px;display:block;margin-bottom:4px}
 
 /* Bouton action + compteur etapes */
 .sim-btn{width:100%;padding:10px;background:var(--orange);color:#fff;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;flex-shrink:0}
@@ -134,16 +130,6 @@
   <!-- SIDEBAR -->
   <div class="cs-sidebar">
 
-    <!-- Mode (choix initial, sans toggle) -->
-    <div class="fg" style="margin-bottom:14px">
-      <label>Mode du programme</label>
-      <div class="mode-tabs">
-        <div class="mode-tab active" id="modeBtnDuree" onclick="setMode('duree',this)"><span class="mode-icon">&#128197;</span>Dur&#233;e fixe</div>
-        <div class="mode-tab" id="modeBtnEpuise" onclick="setMode('epuise',this)"><span class="mode-icon">&#8987;</span>Jusqu'&#224; &#233;puisement</div>
-      </div>
-    </div>
-    <div style="height:1px;background:var(--bord);margin-bottom:14px"></div>
-
     <!-- Client toggle (ouvert par defaut) -->
     <div class="cs-sidebar-lbl open" data-step="client" onclick="openStep('client',this)"><span class="acc">&#9654;</span>Client</div>
     <div class="sb-body open" id="body_client">
@@ -177,7 +163,11 @@
       <div class="fg"><label>Fonds &#224; dynamiser (source)</label>
         <select class="fi" id="sourceFonds" onchange="onSourceChange()"></select>
       </div>
-      <div class="fg"><label>Montant total &#224; dynamiser</label>
+
+      <label class="chk-row"><input type="checkbox" id="epuiseChk" onchange="onEpuiseToggle()"><span>Vider enti&#232;rement la poche source</span></label>
+      <div class="fld-hint" id="epuiseHint" style="margin-bottom:10px">Coch&#233; : on dynamise la totalit&#233; de la poche source (le fonds tombe &#224; z&#233;ro).</div>
+
+      <div class="fg" id="montantRow"><label>Montant total &#224; dynamiser</label>
         <div class="fi-row"><input type="number" id="montantADynamiser" value="5000" min="0" step="500" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
       </div>
       <div class="fg"><label>P&#233;riodicit&#233;</label>
@@ -186,6 +176,12 @@
           <option value="3">Trimestrielle</option>
           <option value="6">Semestrielle</option>
           <option value="12">Annuelle</option>
+        </select>
+      </div>
+      <div class="fg"><label>Rythme d&#233;fini par</label>
+        <select class="fi" id="driverSel" onchange="onDriverChange()">
+          <option value="duree">La dur&#233;e (montant/arbitrage calcul&#233;)</option>
+          <option value="montant">Le montant par arbitrage (dur&#233;e calcul&#233;e)</option>
         </select>
       </div>
       <div class="fg" id="dureeRow">
@@ -198,7 +194,7 @@
       <div class="fg" id="montArbRow" style="display:none">
         <label>Montant par arbitrage</label>
         <div class="fi-row"><input type="number" id="montParArbInput" value="200" min="0" step="50" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
-        <div class="fld-hint" id="autoDuree">Dur&#233;e calcul&#233;e automatiquement jusqu'&#224; &#233;puisement du montant.</div>
+        <div class="fld-hint" id="autoDuree">Dur&#233;e calcul&#233;e automatiquement.</div>
       </div>
     </div>
 
@@ -418,8 +414,9 @@ function closeManualAC(){
 <script>
 // ── État ─────────────────────────────────────────────────────────
 var ALLOC = {
-  mode: 'duree', // 'duree' | 'epuise'
-  source: 0,     // index du fonds source (poche a dynamiser) dans depart
+  epuise: false,   // true = vider entierement la poche source (fonds a zero)
+  driver: 'duree', // 'duree' | 'montant' : ce que l'utilisateur fixe pour le rythme
+  source: 0,       // index du fonds source (poche a dynamiser) dans depart
   depart: [
     {label:'Fonds Euros',      pct:100},
     {label:'UC Actions Monde', pct:0}
@@ -442,14 +439,14 @@ function renderHeader(){
   try{CGP.header.render('pageHeader',{tag:'ALLOCATION CIBLE',solutions:['AV'],clientId:'clientNom',savedKey:'allocation-cible'});}catch(e){}
 }
 
-// ── Mode (durée vs épuisement) ───────────────────────────────────
-function setMode(m){
-  ALLOC.mode = m;
-  V('modeBtnDuree').classList.toggle('active', m==='duree');
-  V('modeBtnEpuise').classList.toggle('active', m==='epuise');
-  var dR=V('dureeRow'); if(dR) dR.style.display = m==='duree' ? '' : 'none';
-  var aR=V('montArbRow'); if(aR) aR.style.display = m==='epuise' ? '' : 'none';
-  recalc();
+// ── Mode : epuisement (oui/non) + rythme (duree / montant) ──────
+function onEpuiseToggle(){ ALLOC.epuise = V('epuiseChk').checked; applyModeUI(); recalc(); }
+function onDriverChange(){ ALLOC.driver = V('driverSel').value; applyModeUI(); recalc(); }
+function applyModeUI(){
+  var mR=V('montantRow'); if(mR) mR.style.display = ALLOC.epuise ? 'none' : '';
+  var byDuree = ALLOC.driver === 'duree';
+  var dR=V('dureeRow'); if(dR) dR.style.display = byDuree ? '' : 'none';
+  var aR=V('montArbRow'); if(aR) aR.style.display = byDuree ? 'none' : '';
 }
 
 // ── Source a dynamiser ───────────────────────────────────────────
@@ -593,20 +590,24 @@ function recalc(){
   var srcFonds = ALLOC.depart[srcIdx] || null;
   var srcDispo = srcFonds ? srcFonds.montInitial : 0;
 
-  // Montant a dynamiser (plafonne au disponible du fonds source)
+  // Montant a dynamiser : totalite de la poche (epuisement) ou montant choisi
   var montantSaisi = num('montantADynamiser');
-  var montantADyn = Math.min(montantSaisi, srcDispo);
-  var capDepasse = montantSaisi > srcDispo + 0.5;
+  var montantADyn, capDepasse = false;
+  if(ALLOC.epuise){
+    montantADyn = srcDispo;
+  } else {
+    montantADyn = Math.min(montantSaisi, srcDispo);
+    capDepasse = montantSaisi > srcDispo + 0.5;
+  }
 
-  // Nombre d'arbitrages + montant/arbitrage (calcul automatique)
+  // Rythme : pilote par la duree (montant/arb deduit) ou par le montant/arb (duree deduite)
   var nbArb, montParArb, dureeMois;
-  if(ALLOC.mode === 'duree'){
+  if(ALLOC.driver === 'duree'){
     dureeMois = parseInt(V('duree').value)||12;
     nbArb = Math.floor(dureeMois / periodMois);
     if(nbArb < 1) nbArb = 1;
     montParArb = montantADyn / nbArb;
   } else {
-    // Epuisement : on fixe le montant/arbitrage, la duree se deduit
     montParArb = num('montParArbInput');
     if(montParArb <= 0){ montParArb = montantADyn; }
     nbArb = montParArb > 0 ? Math.ceil(montantADyn / montParArb) : 1;
@@ -636,21 +637,15 @@ function recalc(){
     alertesHyp.push({type:'err', msg:'Le montant a dynamiser ('+fmt(montantSaisi)+' &euro;) depasse la poche &laquo; '+escHtml(srcFonds?srcFonds.label:'')+' &raquo; ('+fmt(srcDispo)+' &euro;). Il est plafonne a '+fmt(montantADyn)+' &euro;.'});
   }
   if(minArb > 0 && montParArb > 0 && montParArb < minArb - 0.5){
-    var conseil = ALLOC.mode==='duree'
+    var conseil = ALLOC.driver==='duree'
       ? 'Raccourcissez la duree ou augmentez le montant a dynamiser.'
       : 'Augmentez le montant par arbitrage.';
     alertesHyp.push({type:'err', msg:'Le montant par arbitrage calcule ('+fmt(montParArb)+' &euro;) est inferieur au minimum du contrat ('+fmt(minArb)+' &euro;). '+conseil});
   }
 
   // ── Rendu Hypotheses ─────────────────────────────────────────
-  var dureeText, nbArbText;
-  if(ALLOC.mode === 'duree'){
-    dureeText = dureeMois + ' mois';
-    nbArbText = String(nbArb);
-  } else {
-    dureeText = dureeMois + ' mois (epuisement)';
-    nbArbText = nbArb + ' (epuisement)';
-  }
+  var dureeText = dureeMois + ' mois' + (ALLOC.driver==='montant' ? ' (calculee)' : '');
+  var nbArbText = String(nbArb) + (ALLOC.epuise ? ' (poche videe)' : '');
   var periodLbl = {1:'Mensuelle',3:'Trimestrielle',6:'Semestrielle',12:'Annuelle'}[periodMois];
   V('hypGrid').innerHTML =
     hypItem('Versement brut', fmt(brut)+' &euro;')+
@@ -809,7 +804,8 @@ CGP.project.registerModule('allocation-cible', {
       versementBrut: num('versementBrut'),
       fraisEntree: num('fraisEntree'),
       minArbitrage: num('minArbitrage'),
-      mode: ALLOC.mode,
+      epuise: ALLOC.epuise,
+      driver: ALLOC.driver,
       source: ALLOC.source,
       montantADynamiser: num('montantADynamiser'),
       montParArbEpuise: num('montParArbInput'),
@@ -852,7 +848,13 @@ CGP.project.registerModule('allocation-cible', {
       if(mx > 0) mpa = mx;
     }
     if(mpa !== undefined && mpa > 0) V('montParArbInput').value = mpa;
-    if(d.mode !== undefined) setMode(d.mode);
+    // Mode : nouveau format (epuise + driver) ou migration depuis l'ancien "mode"
+    ALLOC.epuise = (d.epuise !== undefined) ? !!d.epuise : false;
+    if(d.driver !== undefined) ALLOC.driver = d.driver;
+    else if(d.mode !== undefined) ALLOC.driver = (d.mode === 'epuise') ? 'montant' : 'duree';
+    var chk=V('epuiseChk'); if(chk) chk.checked = ALLOC.epuise;
+    var ds=V('driverSel'); if(ds) ds.value = ALLOC.driver;
+    applyModeUI();
     renderDepart();
     renderCible();
     recalc();
@@ -866,6 +868,8 @@ function resetModule(){
 }
 
 // ── Init ─────────────────────────────────────────────────────────
+(function(){var c=V('epuiseChk'); if(c) c.checked=ALLOC.epuise; var d=V('driverSel'); if(d) d.value=ALLOC.driver;})();
+applyModeUI();
 renderDepart();
 renderCible();
 recalc();
