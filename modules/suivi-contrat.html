@@ -1081,8 +1081,8 @@ function applyState(s){
   if(cbTri)cbTri.checked=!!s.hideTri;
 }
 
-function saveLocal(){try{localStorage.setItem(STORE_KEY,JSON.stringify(collectState()));}catch(e){}}
-function loadLocal(){try{var raw=localStorage.getItem(STORE_KEY);if(raw)applyState(JSON.parse(raw));}catch(e){}}
+function saveLocal(){try{sessionStorage.setItem(STORE_KEY,JSON.stringify(collectState()));}catch(e){}}
+function loadLocal(){try{localStorage.removeItem(STORE_KEY);var raw=sessionStorage.getItem(STORE_KEY);if(raw)applyState(JSON.parse(raw));}catch(e){}}
 function saveAll(){
   var s=collectState();
   var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
@@ -1097,7 +1097,7 @@ function loadAll(file){
 }
 function resetAll(){
   if(!confirm('R\u00e9initialiser tous les champs ?'))return;
-  localStorage.removeItem(STORE_KEY);location.reload();
+  sessionStorage.removeItem(STORE_KEY);localStorage.removeItem(STORE_KEY);location.reload();
 }
 
 // ══════════════════════════════════════════════════════════════

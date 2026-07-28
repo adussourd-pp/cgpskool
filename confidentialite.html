@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<title>Confidentialité & RGPD — CGP Skool</title>
+<link rel="stylesheet" href="assets/cgp-skool-theme.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper-2); color: var(--ink);
+    font-family: var(--sans); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Barre du haut (sombre) */
+  .cf-top {
+    background: var(--bg); border-bottom: 1px solid var(--rule-d);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 54px; position: sticky; top: 0; z-index: 10;
+  }
+  .cf-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .cf-mark {
+    width: 26px; height: 26px; border-radius: 6px; background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px; font-family: var(--serif);
+  }
+  .cf-brand-name { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
+  .cf-back {
+    color: var(--fog); text-decoration: none; font-size: 12.5px; font-weight: 500;
+    padding: 7px 14px; border: 1px solid var(--rule-d); border-radius: 7px;
+    transition: color .15s, border-color .15s;
+  }
+  .cf-back:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+
+  /* Article */
+  .cf-wrap { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  .cf-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 12px;
+  }
+  .cf-h1 {
+    font-family: var(--serif); font-weight: 700; font-size: 34px; line-height: 1.15;
+    color: var(--ink); margin: 0 0 14px;
+  }
+  .cf-lead { font-size: 15px; color: var(--ink-60); font-weight: 300; margin: 0 0 8px; }
+  .cf-updated { font-size: 12px; color: var(--ink-30); margin-top: 18px; }
+
+  .cf-card {
+    background: #fff; border: 1px solid var(--rule-l); border-radius: 14px;
+    padding: 26px 30px; margin-top: 22px;
+  }
+  .cf-h2 {
+    font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--ink);
+    margin: 0 0 12px; display: flex; align-items: baseline; gap: 10px;
+  }
+  .cf-h2 .num {
+    font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--orange);
+    letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  .cf-card p { margin: 0 0 12px; font-size: 14.5px; color: var(--gris-f); }
+  .cf-card p:last-child { margin-bottom: 0; }
+  .cf-card strong { color: var(--ink); font-weight: 600; }
+  .cf-card ul { margin: 0 0 12px; padding-left: 20px; }
+  .cf-card li { font-size: 14.5px; color: var(--gris-f); margin-bottom: 7px; }
+
+  .cf-note {
+    background: var(--green-l); border: 1px solid rgba(45,122,91,0.22); border-radius: 10px;
+    padding: 14px 18px; font-size: 13.5px; color: var(--green); margin-top: 4px;
+  }
+  .cf-note strong { color: var(--green); }
+  .cf-warn {
+    background: var(--o-glow); border: 1px solid var(--ambre-m); border-radius: 10px;
+    padding: 14px 18px; font-size: 13.5px; color: var(--gris-f); margin-top: 4px;
+  }
+
+  .cf-fill { background: #FFF6E9; padding: 1px 5px; border-radius: 4px; color: var(--orange-hover); font-weight: 600; }
+
+  .cf-foot { text-align: center; margin-top: 40px; font-size: 12px; color: var(--ink-30); }
+  .cf-foot a { color: var(--gris); }
+
+  @media (max-width: 640px) {
+    .cf-h1 { font-size: 27px; }
+    .cf-card { padding: 20px 20px; }
+    .cf-wrap { padding: 32px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cf-top">
+  <a class="cf-brand" href="index.html">
+    <span class="cf-mark">C</span>
+    <span class="cf-brand-name">CGP Skool</span>
+  </a>
+  <a class="cf-back" href="outils.html">← Retour aux outils</a>
+</div>
+
+<div class="cf-wrap">
+
+  <div class="cf-tag">🔒 Confidentialité</div>
+  <h1 class="cf-h1">Confidentialité &amp; protection des données</h1>
+  <p class="cf-lead">Comment CGP Skool traite les données — et surtout, comment il évite d'en traiter.</p>
+  <p class="cf-lead">CGP Skool est une application <strong style="color:var(--ink)">100 % navigateur</strong> : elle s'exécute sur votre poste, sans serveur d'application. Cette page décrit précisément ce qui se passe avec les données, sans raccourci marketing.</p>
+  <div class="cf-updated">Dernière mise à jour : juillet 2026</div>
+
+  <!-- 1 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">01</span> Une application sans serveur de données</h2>
+    <p>Contrairement à un outil SaaS classique, CGP Skool n'héberge <strong>aucune base de données</strong>. Le code (pages, calculs) est publié sur GitHub Pages, mais les calculs s'exécutent entièrement dans votre navigateur.</p>
+    <p><strong>Les données que vous saisissez sur vos clients ne sont transmises à aucun serveur</strong> et ne quittent pas votre poste pour être stockées ailleurs.</p>
+  </div>
+
+  <!-- 2 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">02</span> Les données de vos clients</h2>
+    <p>Lorsque vous réalisez une étude, les informations du client (situation, patrimoine, revenus…) restent <strong>en mémoire le temps de la session</strong>.</p>
+    <ul>
+      <li><strong>Fermer l'onglet efface tout.</strong> Rien de ces données n'est conservé sur l'appareil d'une session à l'autre.</li>
+      <li><strong>La seule conservation possible est le fichier que vous exportez vous-même</strong> (JSON ou PDF). C'est vous qui l'enregistrez et l'archivez dans votre propre système.</li>
+    </ul>
+    <div class="cf-warn">
+      Ce fichier exporté peut contenir des données sensibles. Rangez-le dans un espace sécurisé (idéalement chiffré),
+      et non dans un dossier « Téléchargements » ouvert. Sa sécurité relève de vous.
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">03</span> Ce qui est mémorisé sur votre appareil</h2>
+    <p>Seuls des éléments <strong>vous concernant, vous</strong> (le conseiller), sont mémorisés localement dans votre navigateur, sur ce poste uniquement :</p>
+    <ul>
+      <li>votre <strong>profil conseiller</strong> (nom, cabinet, ORIAS, coordonnées, logo, mentions légales), pour personnaliser vos documents ;</li>
+      <li>quelques préférences d'affichage et, pour certains outils internes d'équipe, leur état de travail.</li>
+    </ul>
+    <p>Aucune donnée client n'est mémorisée de façon persistante, et <strong>aucun cookie de suivi publicitaire</strong> n'est déposé. Sur un poste partagé, pensez à effacer votre profil depuis la page « Mon profil ».</p>
+  </div>
+
+  <!-- 4 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">04</span> Composants techniques</h2>
+    <p>Pour l'affichage (graphiques, mise en forme), certaines pages peuvent charger des <strong>bibliothèques techniques</strong> depuis des services d'hébergement de fichiers.</p>
+    <p><strong>Aucune donnée de vos clients ne leur est transmise</strong> : ces composants servent uniquement à afficher l'interface. Nous travaillons à héberger ces composants localement afin de supprimer toute dépendance externe sur les pages d'étude.</p>
+  </div>
+
+  <!-- 5 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">05</span> Vos obligations de conseiller</h2>
+    <p>L'architecture de CGP Skool <strong>minimise</strong> la conservation des données — mais elle ne se substitue pas à vos obligations. En tant que responsable de traitement, il vous appartient notamment de :</p>
+    <ul>
+      <li><strong>conserver</strong> les documents de conseil selon vos obligations professionnelles (lutte anti-blanchiment, devoir de conseil), généralement plusieurs années ;</li>
+      <li><strong>archiver</strong> les études exportées de façon sécurisée ;</li>
+      <li><strong>informer</strong> vos clients du traitement de leurs données et respecter leurs droits (accès, rectification, effacement).</li>
+    </ul>
+    <div class="cf-note">
+      Autrement dit : « fermer l'onglet efface tout » ne vous dispense pas d'archiver.
+      La loi vous <strong>oblige</strong> à conserver vos dossiers — de façon sécurisée, dans votre propre système.
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">06</span> Suivi d'équipe (outil interne)</h2>
+    <p>Un outil interne de suivi de parcours d'équipe enregistre, sur un service dédié, un <strong>prénom suivi d'une initiale</strong> et l'étape en cours — jamais de nom complet ni de donnée client. Cet outil est réservé aux membres du réseau et ne concerne pas les études patrimoniales.</p>
+  </div>
+
+  <!-- 7 -->
+  <div class="cf-card">
+    <h2 class="cf-h2"><span class="num">07</span> Éditeur, hébergeur &amp; contact</h2>
+    <p><strong>Éditeur :</strong> Peak Patrimoine — ORIAS n° 22002240.</p>
+    <p><strong>Hébergeur :</strong> GitHub Pages — GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA.</p>
+    <p><strong>Contact / exercice de vos droits :</strong> <a href="mailto:contact@peakpatrimoine.fr" style="color:var(--orange)">contact@peakpatrimoine.fr</a></p>
+    <p>Pour toute réclamation relative à vos données, vous pouvez également saisir la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener" style="color:var(--orange)">cnil.fr</a>).</p>
+  </div>
+
+  <div class="cf-foot">
+    CGP Skool — <a href="outils.html">Retour aux outils</a> · <a href="index.html">Accueil</a>
+  </div>
+
+</div>
+
+</body>
+</html>
