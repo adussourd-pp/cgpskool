@@ -654,3 +654,103 @@ window.addEventListener('afterprint', function() {
     CGP.pdf._restoreCanvases();
   }
 });
+
+/* ── MODE D'EMPLOI (volet lateral standard, partage) ─────────────
+ * Composant uniforme pour tous les modules : bouton pill + volet
+ * lateral section par section (meme forme que etude-dossier).
+ *
+ * Usage :
+ *   CGP.manual.init({
+ *     title:    "📖 Mode d'emploi",   // optionnel
+ *     subtitle: "Le detail du module, etape par etape",
+ *     sections: [ { id:'x', t:'Titre', b:'HTML corps', opt:false }, ... ],
+ *     video:    'https://www.youtube.com/embed/XXXX', // optionnel
+ *     buttonInto: 'idElement',   // conteneur ou injecter le bouton pill
+ *     moduleId: 'mon-module',    // pour l'auto-ouverture premiere visite
+ *     autoFirstVisit: true       // ouvre le volet a la 1re visite (optionnel)
+ *   });
+ *   CGP.manual.open(secId?)  /  CGP.manual.close()
+ */
+CGP.manual = {};
+CGP.manual._cfg = null;
+CGP.manual._built = false;
+CGP.manual.init = function(cfg) {
+  CGP.manual._cfg = cfg || {};
+  CGP.manual._built = false;
+  // 1. backdrop + panel (une seule fois dans le body)
+  if (!document.getElementById('cgpMePanel')) {
+    var bd = document.createElement('div');
+    bd.id = 'cgpMeBackdrop';
+    bd.className = 'me-backdrop';
+    bd.onclick = CGP.manual.close;
+    document.body.appendChild(bd);
+    var panel = document.createElement('div');
+    panel.id = 'cgpMePanel';
+    panel.className = 'me-panel';
+    document.body.appendChild(panel);
+  }
+  var p = document.getElementById('cgpMePanel');
+  p.innerHTML =
+    '<div class="me-head"><div>' +
+    '<div class="me-title">' + (CGP.manual._cfg.title || '📖 Mode d\'emploi') + '</div>' +
+    (CGP.manual._cfg.subtitle ? '<div class="me-sub">' + CGP.manual._cfg.subtitle + '</div>' : '') +
+    '</div><button class="me-close" onclick="CGP.manual.close()">✕</button></div>' +
+    '<div class="me-body" id="cgpMeBody"></div>';
+  // 2. bouton pill (optionnel)
+  if (CGP.manual._cfg.buttonInto) {
+    var host = document.getElementById(CGP.manual._cfg.buttonInto);
+    if (host && !host.querySelector('.me-pill')) {
+      var wrap = document.createElement('div');
+      wrap.className = 'no-print';
+      wrap.style.cssText = 'text-align:center;margin-top:12px';
+      wrap.innerHTML = '<button class="me-pill" onclick="CGP.manual.open()">📖 Mode d\'emploi</button>';
+      host.appendChild(wrap);
+    }
+  }
+  // 3. auto-ouverture : ?modeEmploi=1 ou premiere visite
+  try {
+    var q = new URLSearchParams(window.location.search).get('modeEmploi');
+    var seenKey = CGP.manual._cfg.moduleId ? ('cgpskool_me_seen_' + CGP.manual._cfg.moduleId) : null;
+    var firstVisit = CGP.manual._cfg.autoFirstVisit && seenKey && !localStorage.getItem(seenKey);
+    if (q || firstVisit) { setTimeout(function() { CGP.manual.open(); }, 350); }
+  } catch (e) {}
+};
+CGP.manual._build = function() {
+  var body = document.getElementById('cgpMeBody');
+  if (!body || CGP.manual._built) return;
+  var cfg = CGP.manual._cfg || {};
+  var h = '';
+  if (cfg.video) {
+    h += '<div class="me-video"><iframe src="' + cfg.video + '" allowfullscreen loading="lazy"></iframe></div>';
+  }
+  var secs = cfg.sections || [];
+  for (var i = 0; i < secs.length; i++) {
+    var s = secs[i];
+    h += '<div class="me-item" id="cgpMe-' + s.id + '">' +
+      '<div class="me-item-head" onclick="this.parentNode.classList.toggle(\'open\')">' +
+      '<div class="me-num">' + (i + 1) + '</div>' +
+      '<div class="me-item-title">' + s.t + '</div>' +
+      (s.opt ? '<span class="me-badge opt">Optionnelle</span>' : '') +
+      '<span class="me-chev">▶</span></div>' +
+      '<div class="me-item-body">' + s.b + '</div></div>';
+  }
+  body.innerHTML = h;
+  CGP.manual._built = true;
+};
+CGP.manual.open = function(secId) {
+  CGP.manual._build();
+  var cfg = CGP.manual._cfg || {};
+  if (cfg.moduleId) { try { localStorage.setItem('cgpskool_me_seen_' + cfg.moduleId, '1'); } catch (e) {} }
+  var items = document.querySelectorAll('#cgpMePanel .me-item');
+  for (var i = 0; i < items.length; i++) { items[i].classList.remove('open', 'current'); }
+  var target = (typeof secId === 'string') ? document.getElementById('cgpMe-' + secId) : null;
+  if (target) { target.classList.add('open', 'current'); }
+  else if (items.length) { items[0].classList.add('open'); }
+  var bd = document.getElementById('cgpMeBackdrop'); if (bd) bd.classList.add('open');
+  var p = document.getElementById('cgpMePanel'); if (p) p.classList.add('open');
+  if (target) { setTimeout(function() { target.scrollIntoView({ block: 'nearest' }); }, 260); }
+};
+CGP.manual.close = function() {
+  var bd = document.getElementById('cgpMeBackdrop'); if (bd) bd.classList.remove('open');
+  var p = document.getElementById('cgpMePanel'); if (p) p.classList.remove('open');
+};
