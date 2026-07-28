@@ -100,15 +100,14 @@
 .final-tbl tfoot .ok{color:#2da064}
 .final-tbl tfoot .err{color:#dc2626}
 
-/* Camemberts avant / apres */
-.pie-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+/* Camemberts avant / apres (empiles, taille identique) */
+.pie-2{display:flex;flex-direction:column;gap:22px}
 .pie-box{display:flex;flex-direction:column;gap:8px}
 .pie-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center}
-.pie-canvas-wrap{position:relative;height:250px}
-@media(max-width:640px){.pie-2{grid-template-columns:1fr}}
+.pie-canvas-wrap{position:relative;height:300px}
 
-/* Print : preserver couleurs des camemberts convertis en image (R23/R24) */
-@media print{.pie-canvas-wrap{height:220px}}
+/* Print : camemberts convertis en image (R23/R24) */
+@media print{.pie-canvas-wrap{height:270px}}
 </style>
 </head>
 <body>
@@ -145,10 +144,6 @@
       </div>
       <div class="fg"><label>Frais d'entr&#233;e</label>
         <div class="fi-row"><input type="number" id="fraisEntree" value="2.5" min="0" max="10" step="0.1" oninput="recalc()"><span class="fi-unit">%</span></div>
-      </div>
-      <div class="fg"><label>Minimum par arbitrage (contrat)</label>
-        <div class="fi-row"><input type="number" id="minArbitrage" value="50" min="0" step="10" oninput="recalc()"><span class="fi-unit">&euro;</span></div>
-        <div class="fld-hint">Contrainte du contrat &#8212; sert uniquement d'alerte si le montant/arbitrage calcul&#233; passe en dessous.</div>
       </div>
     </div>
 
@@ -207,10 +202,12 @@
     <!-- Bouton d'action -->
     <button class="sim-btn" onclick="recalc()">Lancer le calcul &#8594;</button>
 
+    <!-- Mode d'emploi (bouton pill injecte par CGP.manual) -->
+    <div id="meBtnSlot"></div>
+
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
     <div style="height:1px;background:var(--bord);margin:12px 0"></div>
-    <button class="btn-secondary" onclick="openManualAC()">&#128214; Mode d'emploi</button>
     <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
     <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
     <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
@@ -298,118 +295,6 @@
     </div>
   </div>
 </div>
-
-<!-- ── MODE D'EMPLOI (overlay onboarding) ──────────────────────── -->
-<div id="acOnboarding" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 12px 48px rgba(0,0,0,0.25)">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:32px;margin-bottom:8px">&#128200;</div>
-      <div style="font-family:var(--serif);font-size:24px;font-weight:600;color:var(--noir)">Mode d'emploi &#8212; Allocation Cible</div>
-      <div style="font-size:13px;color:var(--gris);margin-top:6px">Dynamiser une poche (fonds euros) vers des fonds actions, en 5 &#233;tapes</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
-
-      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
-        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</div>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Param&#232;tres g&#233;n&#233;raux</div><div style="font-size:11px;color:var(--gris)">Versement, frais, minimum du contrat</div></div>
-          <span style="color:var(--gris)">&#9660;</span>
-        </div>
-        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
-          &#8226; <strong>Versement initial brut</strong> et <strong>frais d'entr&#233;e</strong> : le net investi (brut &#8722; frais) sert de base &#224; toutes les r&#233;partitions.<br>
-          &#8226; <strong>Minimum par arbitrage (contrat)</strong> : c'est une simple <strong>contrainte de contr&#244;le</strong>. Il ne se saisit plus en face de chaque fonds : il sert uniquement &#224; d&#233;clencher une alerte si le montant/arbitrage calcul&#233; passe en dessous.
-        </div>
-      </div>
-
-      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
-        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</div>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Allocation de d&#233;part</div><div style="font-size:11px;color:var(--gris)">O&#249; l'argent est plac&#233; au d&#233;but</div></div>
-          <span style="color:var(--gris)">&#9660;</span>
-        </div>
-        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
-          Saisissez chaque fonds du contrat avec son <strong>pourcentage initial</strong> (le total doit faire 100 %). C'est ici que se trouve la <strong>poche &#224; dynamiser</strong>, en g&#233;n&#233;ral le <strong>fonds euros</strong>.<br>
-          Le montant en euros de chaque fonds se calcule automatiquement &#224; partir du net investi.
-        </div>
-      </div>
-
-      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
-        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</div>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Programme de dynamisation</div><div style="font-size:11px;color:var(--gris)">Source, montant, dur&#233;e</div></div>
-          <span style="color:var(--gris)">&#9660;</span>
-        </div>
-        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
-          &#8226; <strong>Fonds &#224; dynamiser (source)</strong> : la poche que l'on vide progressivement (ex. le fonds euros).<br>
-          &#8226; <strong>Montant total &#224; dynamiser</strong> : la somme &#224; basculer (plafonn&#233;e au montant disponible dans la poche source).<br>
-          &#8226; <strong>P&#233;riodicit&#233;</strong> : fr&#233;quence des arbitrages (mensuelle, trimestrielle...).<br>
-          &#8226; Deux modes :<br>
-          &nbsp;&nbsp;&#8211; <strong>Dur&#233;e fixe</strong> : vous fixez la dur&#233;e, le <strong>montant par arbitrage se calcule tout seul</strong> (montant &#247; nombre d'arbitrages).<br>
-          &nbsp;&nbsp;&#8211; <strong>Jusqu'&#224; &#233;puisement</strong> : vous fixez le montant par arbitrage, la <strong>dur&#233;e se d&#233;duit</strong> automatiquement.
-        </div>
-      </div>
-
-      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
-        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</div>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Fonds de destination</div><div style="font-size:11px;color:var(--gris)">Vers quels fonds on dynamise</div></div>
-          <span style="color:var(--gris)">&#9660;</span>
-        </div>
-        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
-          Ce sont les <strong>fonds actions</strong> (ou UC) vers lesquels le montant est progressivement bascul&#233;. Saisissez chacun avec son <strong>pourcentage de ventilation</strong> (le total doit faire 100 %).<br>
-          Le montant r&#233;investi sur chaque fonds se calcule automatiquement au prorata du montant &#224; dynamiser.
-        </div>
-      </div>
-
-      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
-        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</div>
-          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Lire le r&#233;sultat &amp; exporter</div><div style="font-size:11px;color:var(--gris)">Camemberts, allocation finale, PDF</div></div>
-          <span style="color:var(--gris)">&#9660;</span>
-        </div>
-        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
-          &#8226; Les <strong>hypoth&#232;ses</strong> r&#233;capitulent le programme, dont le <strong>montant par arbitrage calcul&#233;</strong> (en orange) et le nombre d'arbitrages.<br>
-          &#8226; L'<strong>allocation finale</strong> montre la r&#233;partition apr&#232;s ex&#233;cution du programme.<br>
-          &#8226; Les <strong>camemberts avant / apr&#232;s</strong> visualisent l'effet de la dynamisation.<br>
-          &#8226; Des <strong>alertes</strong> signalent toute incoh&#233;rence (total &#8800; 100 %, montant/arbitrage sous le minimum, d&#233;passement de la poche source).<br>
-          &#8226; <strong>Exporter PDF</strong> pour le client, <strong>Sauvegarder</strong> en JSON pour reprendre l'&#233;tude plus tard.
-        </div>
-      </div>
-
-    </div>
-
-    <div style="padding:14px 16px;background:rgba(45,122,91,0.06);border:1.5px solid rgba(45,122,91,0.3);border-radius:10px;margin-bottom:12px;font-size:12px;color:var(--gris-f);line-height:1.7">
-      <strong style="color:#2D7A5B">&#128274; Confidentialit&eacute; &amp; RGPD &mdash; o&ugrave; vont les donn&eacute;es ?</strong><br>
-      &#8226; L'outil fonctionne <strong>100 % dans votre navigateur</strong> : aucune donn&eacute;e client n'est envoy&eacute;e ni stock&eacute;e sur un serveur.<br>
-      &#8226; Les donn&eacute;es restent <strong>en m&eacute;moire le temps de la session</strong> : fermer l'onglet efface tout.<br>
-      &#8226; La seule conservation est le <strong>fichier JSON que vous t&eacute;l&eacute;chargez vous-m&ecirc;me</strong> &mdash; &agrave; archiver dans votre propre syst&egrave;me.
-    </div>
-
-    <div style="padding:14px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f);line-height:1.7">
-      <strong>Astuces :</strong><br>
-      &#8226; Le <strong>montant par arbitrage est calcul&#233; automatiquement</strong> &#8212; plus besoin de le saisir en face de chaque fonds.<br>
-      &#8226; Le <strong>minimum par arbitrage</strong> ne sert qu'&#224; vous alerter, jamais &#224; bloquer le calcul.<br>
-      &#8226; Vous pouvez rouvrir ce guide via le bouton <strong>&#128214; Mode d'emploi</strong> en bas de la sidebar.
-    </div>
-
-    <div style="text-align:center">
-      <button onclick="closeManualAC()" style="padding:12px 32px;font-size:14px;font-family:var(--sans);font-weight:600;background:var(--orange);color:#fff;border:none;border-radius:8px;cursor:pointer">C'est compris !</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── Mode d'emploi (overlay) ──────────────────────────────────────
-function openManualAC(){ var o=document.getElementById('acOnboarding'); if(o) o.style.display='flex'; }
-function closeManualAC(){
-  try{localStorage.setItem('cgpskool_ac_onboarding_done','1');}catch(e){}
-  var o=document.getElementById('acOnboarding'); if(o) o.style.display='none';
-}
-(function(){
-  try{ if(!localStorage.getItem('cgpskool_ac_onboarding_done')) setTimeout(openManualAC, 300); }catch(e){}
-})();
-</script>
 
 <script>
 // ── État ─────────────────────────────────────────────────────────
@@ -575,7 +460,6 @@ function recalc(){
   populateSourceSelect();
   var brut = num('versementBrut');
   var frais = num('fraisEntree');
-  var minArb = num('minArbitrage');
   var periodMois = parseInt(V('periodicite').value)||1;
   var net = brut * (1 - frais/100);
 
@@ -635,12 +519,6 @@ function recalc(){
   var alertesHyp = [];
   if(capDepasse){
     alertesHyp.push({type:'err', msg:'Le montant a dynamiser ('+fmt(montantSaisi)+' &euro;) depasse la poche &laquo; '+escHtml(srcFonds?srcFonds.label:'')+' &raquo; ('+fmt(srcDispo)+' &euro;). Il est plafonne a '+fmt(montantADyn)+' &euro;.'});
-  }
-  if(minArb > 0 && montParArb > 0 && montParArb < minArb - 0.5){
-    var conseil = ALLOC.driver==='duree'
-      ? 'Raccourcissez la duree ou augmentez le montant a dynamiser.'
-      : 'Augmentez le montant par arbitrage.';
-    alertesHyp.push({type:'err', msg:'Le montant par arbitrage calcule ('+fmt(montParArb)+' &euro;) est inferieur au minimum du contrat ('+fmt(minArb)+' &euro;). '+conseil});
   }
 
   // ── Rendu Hypotheses ─────────────────────────────────────────
@@ -741,26 +619,17 @@ function recalc(){
     '<td class="'+(finalOk?'ok':'err')+'">'+Math.round(pctTotalFinal)+' %</td></tr>';
   V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
 
-  // ── Camemberts avant / apres ─────────────────────────────────
-  var colorMap = {}, colIdx = 0;
-  var colorFor = function(k){
-    if(colorMap[k] === undefined){ colorMap[k] = PIE_COLORS[colIdx % PIE_COLORS.length]; colIdx++; }
-    return colorMap[k];
-  };
-  // Avant = allocation de depart (montInitial agrege par label)
-  var avantMap = {}, avantOrder = [];
-  ALLOC.depart.forEach(function(f){
-    if(f.montInitial > 0.5){
-      var k = (f.label||'').trim() || '(sans nom)';
-      if(avantMap[k] === undefined){avantMap[k]=0;avantOrder.push(k);}
-      avantMap[k] += f.montInitial;
-    }
-  });
-  // Couleurs partagees : meme fonds = meme couleur avant/apres
-  avantOrder.forEach(colorFor);
-  order.forEach(colorFor);
-  drawPie('pieAvant', avantOrder, avantOrder.map(function(k){return avantMap[k];}), avantOrder.map(colorFor));
-  drawPie('pieApres', order, order.map(function(k){return merged[k];}), order.map(colorFor));
+  // ── Camemberts avant / apres (regroupes par famille d'actif) ─
+  // Avant = allocation de depart ; Apres = allocation finale
+  var avant = groupByFamille(ALLOC.depart.map(function(f){return {label:f.label, montant:f.montInitial};}));
+  var apres = groupByFamille(order.map(function(k){return {label:k, montant:merged[k]};}));
+  // Ordre de familles unifie (avant puis nouvelles familles de l'apres)
+  var famOrder = [];
+  avant.order.concat(apres.order).forEach(function(fam){ if(famOrder.indexOf(fam)<0) famOrder.push(fam); });
+  var colFor = function(fam){ return FAM_COLORS[fam] || PIE_COLORS[famOrder.indexOf(fam) % PIE_COLORS.length]; };
+  var colors = famOrder.map(colFor);
+  drawPie('pieAvant', famOrder, famOrder.map(function(fam){return avant.map[fam]||0;}), colors);
+  drawPie('pieApres', famOrder, famOrder.map(function(fam){return apres.map[fam]||0;}), colors);
 
   CGP.project.autoSave('allocation-cible');
   updateProgress();
@@ -768,6 +637,40 @@ function recalc(){
 
 function hypItem(label, val, hi){
   return '<div class="hyp-item"><div class="hyp-label">'+label+'</div><div class="hyp-val"'+(hi?' style="color:var(--orange)"':'')+'>'+val+'</div></div>';
+}
+
+// ── Familles d'actif (classification auto par mots-cles) ─────────
+var FAM_COLORS = {
+  'Fonds euros':'#2D7A5B',
+  'Actions':'#D4622A',
+  'Obligations':'#5B8DEF',
+  'Immobilier':'#9B59B6',
+  'Private equity / Infra':'#E0A458',
+  'Produits structures':'#3FA7A0',
+  'Monetaire':'#8AA34B',
+  'Autre / diversifie':'#6B6B6B'
+};
+function familleActif(label){
+  var s = (label||'').toLowerCase();
+  if(/euro|actif g[eé]n[eé]ral|s[eé]curit[eé]|fonds g[eé]n[eé]ral/.test(s)) return 'Fonds euros';
+  if(/scpi|\bsci\b|opci|immobil|pierre|foncier/.test(s)) return 'Immobilier';
+  if(/fcpr|fpci|private equity|capital invest|infrastructure|\binfra\b/.test(s)) return 'Private equity / Infra';
+  if(/oblig|\bbond\b|obligataire|high yield|cr[eé]dit|\btaux\b/.test(s)) return 'Obligations';
+  if(/mon[eé]taire|\bcash\b|liquidit/.test(s)) return 'Monetaire';
+  if(/structur|autocall|phoenix|athena|rendement.*20\d\d/.test(s)) return 'Produits structures';
+  if(/action|equity|\bmonde\b|world|europe|japan|japon|india|inde|usa|am[eé]rique|asie|emerg|small|\bmid\b|caps?|d[eé]couvert|s[eé]lection|opportunit|croissance|growth|value|dividend|premium|focus|multi/.test(s)) return 'Actions';
+  return 'Autre / diversifie';
+}
+// Agrege une liste [{label, montant}] par famille d'actif
+function groupByFamille(items){
+  var map = {}, order = [];
+  items.forEach(function(it){
+    if(!(it.montant > 0.5)) return;
+    var fam = familleActif(it.label);
+    if(map[fam] === undefined){ map[fam] = 0; order.push(fam); }
+    map[fam] += it.montant;
+  });
+  return { map: map, order: order };
 }
 
 // ── Camemberts (doughnut Chart.js) ───────────────────────────────
@@ -803,7 +706,6 @@ CGP.project.registerModule('allocation-cible', {
       clientNom: V('clientNom').value,
       versementBrut: num('versementBrut'),
       fraisEntree: num('fraisEntree'),
-      minArbitrage: num('minArbitrage'),
       epuise: ALLOC.epuise,
       driver: ALLOC.driver,
       source: ALLOC.source,
@@ -820,7 +722,6 @@ CGP.project.registerModule('allocation-cible', {
     if(d.clientNom !== undefined) V('clientNom').value = d.clientNom;
     if(d.versementBrut !== undefined) V('versementBrut').value = d.versementBrut;
     if(d.fraisEntree !== undefined) V('fraisEntree').value = d.fraisEntree;
-    if(d.minArbitrage !== undefined) V('minArbitrage').value = d.minArbitrage;
     if(d.duree !== undefined){V('duree').value = d.duree;V('vDuree').textContent = d.duree+' mois';}
     if(d.periodicite !== undefined) V('periodicite').value = d.periodicite;
     // Fonds : on ne conserve que label + pct dans le nouveau modele
@@ -866,6 +767,36 @@ function resetModule(){
   try{localStorage.removeItem('cgpskool_state_allocation-cible');}catch(e){}
   location.reload();
 }
+
+// ── Mode d'emploi (volet standard partage CGP.manual) ────────────
+CGP.manual.init({
+  title: '📖 Mode d\'emploi',
+  subtitle: 'Dynamiser une poche vers des fonds actions, etape par etape',
+  buttonInto: 'meBtnSlot',
+  moduleId: 'allocation-cible',
+  autoFirstVisit: true,
+  sections: [
+    { id:'params', t:'Parametres generaux', b:
+      '<ul><li><b>Versement initial brut</b> et <b>frais d\'entree</b> : le net investi (brut moins frais) sert de base a toutes les repartitions.</li></ul>' },
+    { id:'depart', t:'Allocation de depart', b:
+      'Saisissez chaque fonds du contrat avec son <b>pourcentage initial</b> (le total doit faire 100 %). C\'est ici que se trouve la <b>poche a dynamiser</b>, en general le <b>fonds euros</b>. Le montant en euros de chaque fonds se calcule automatiquement.' },
+    { id:'programme', t:'Programme de dynamisation', b:
+      '<ul>'+
+      '<li><b>Fonds a dynamiser (source)</b> : la poche que l\'on vide progressivement.</li>'+
+      '<li><b>Vider entierement la poche source</b> (case a cocher) : si cochee, on dynamise 100 % de la poche (le fonds tombe a zero) ; sinon vous saisissez un <b>montant total a dynamiser</b>.</li>'+
+      '<li><b>Rythme defini par</b> : soit <b>la duree</b> (le montant par arbitrage se calcule), soit <b>le montant par arbitrage</b> (la duree se calcule).</li>'+
+      '<li><b>Periodicite</b> : frequence des arbitrages (mensuelle, trimestrielle...).</li></ul>' },
+    { id:'destination', t:'Fonds de destination', b:
+      'Les <b>fonds actions</b> (ou UC) vers lesquels le montant est progressivement bascule. Saisissez chacun avec son <b>pourcentage de ventilation</b> (total 100 %). Le montant reinvesti se calcule au prorata.' },
+    { id:'resultat', t:'Lire le resultat & exporter', b:
+      '<ul>'+
+      '<li>Les <b>hypotheses</b> recapitulent le programme, dont le <b>montant par arbitrage calcule</b> et le nombre d\'arbitrages.</li>'+
+      '<li>L\'<b>allocation finale</b> montre la repartition apres execution du programme.</li>'+
+      '<li>Les <b>camemberts avant / apres</b>, regroupes par famille d\'actif, visualisent l\'effet de la dynamisation.</li>'+
+      '<li><b>Exporter PDF</b> pour le client, <b>Sauvegarder</b> en JSON pour reprendre l\'etude plus tard.</li></ul>'+
+      '<div class="me-tip">Vos donnees restent 100 % dans votre navigateur : rien n\'est envoye sur un serveur. Seul le JSON que vous telechargez conserve l\'etude.</div>' }
+  ]
+});
 
 // ── Init ─────────────────────────────────────────────────────────
 (function(){var c=V('epuiseChk'); if(c) c.checked=ALLOC.epuise; var d=V('driverSel'); if(d) d.value=ALLOC.driver;})();
