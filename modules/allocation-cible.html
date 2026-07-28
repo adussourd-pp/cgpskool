@@ -7,6 +7,7 @@
 <title>CGP Skool &#8212; Allocation Cible</title>
 <link rel="stylesheet" href="../assets/cgp-skool-theme.css">
 <link rel="stylesheet" href="../assets/cgp-skool-layout.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="../assets/cgp-skool-core.js"></script>
 <script src="../assets/cgp-skool-nav.js" defer></script>
 <script src="../assets/cgp-skool-feedback.js" defer></script>
@@ -102,6 +103,16 @@
 .final-tbl tfoot td:first-child{text-align:left}
 .final-tbl tfoot .ok{color:#2da064}
 .final-tbl tfoot .err{color:#dc2626}
+
+/* Camemberts avant / apres */
+.pie-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.pie-box{display:flex;flex-direction:column;gap:8px}
+.pie-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center}
+.pie-canvas-wrap{position:relative;height:250px}
+@media(max-width:640px){.pie-2{grid-template-columns:1fr}}
+
+/* Print : preserver couleurs des camemberts convertis en image (R23/R24) */
+@media print{.pie-canvas-wrap{height:220px}}
 </style>
 </head>
 <body>
@@ -191,19 +202,19 @@
       </div>
     </div>
 
-    <div class="cs-sidebar-lbl" data-step="cible" onclick="openStep('cible',this)"><span class="acc">&#9654;</span>Fonds actions (allocation cible)</div>
+    <div class="cs-sidebar-lbl" data-step="cible" onclick="openStep('cible',this)"><span class="acc">&#9654;</span>Fonds de destination</div>
     <div class="sb-body" id="body_cible">
       <div id="sbCibleBody"></div>
       <button class="btn-add" onclick="addCible()" style="width:100%">+ Ajouter un fonds</button>
     </div>
 
-    <!-- Bouton d'action + compteur etapes -->
+    <!-- Bouton d'action -->
     <button class="sim-btn" onclick="recalc()">Lancer le calcul &#8594;</button>
-    <div class="prog-count" id="progCount"><strong>0</strong> / 5 &#233;tapes valid&#233;es</div>
 
     <!-- Spacer + boutons bas -->
     <div style="flex:1;min-height:16px"></div>
     <div style="height:1px;background:var(--bord);margin:12px 0"></div>
+    <button class="btn-secondary" onclick="openManualAC()">&#128214; Mode d'emploi</button>
     <button class="btn-pdf" onclick="CGP.pdf.print()">&#11015; Exporter PDF</button>
     <button class="btn-secondary" onclick="CGP.project.exportAll()">&#128190; Sauvegarder</button>
     <label class="btn-secondary" style="cursor:pointer">&#128194; Charger
@@ -247,7 +258,7 @@
       <!-- ALLOCATION CIBLE -->
       <div class="card">
         <div class="card-title">
-          <div class="card-title-l"><span class="dot"></span>Allocation cible des nouveaux fonds</div>
+          <div class="card-title-l"><span class="dot"></span>Fonds de destination (vers lesquels on dynamise)</div>
         </div>
         <table class="alloc-tbl">
           <thead><tr>
@@ -276,12 +287,133 @@
         <div id="finalAlerts"></div>
       </div>
 
+      <!-- CAMEMBERTS AVANT / APRES -->
+      <div class="card">
+        <div class="card-title"><div class="card-title-l"><span class="dot"></span>R&#233;partition avant / apr&#232;s</div></div>
+        <div class="pie-2">
+          <div class="pie-box"><div class="pie-lbl">Avant &#8212; allocation de d&#233;part</div><div class="pie-canvas-wrap"><canvas id="pieAvant"></canvas></div></div>
+          <div class="pie-box"><div class="pie-lbl">Apr&#232;s &#8212; allocation finale</div><div class="pie-canvas-wrap"><canvas id="pieApres"></canvas></div></div>
+        </div>
+      </div>
+
       <!-- Footer conseiller -->
       <div id="conseillerFooter"></div>
 
     </div>
   </div>
 </div>
+
+<!-- ── MODE D'EMPLOI (overlay onboarding) ──────────────────────── -->
+<div id="acOnboarding" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 12px 48px rgba(0,0,0,0.25)">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:32px;margin-bottom:8px">&#128200;</div>
+      <div style="font-family:var(--serif);font-size:24px;font-weight:600;color:var(--noir)">Mode d'emploi &#8212; Allocation Cible</div>
+      <div style="font-size:13px;color:var(--gris);margin-top:6px">Dynamiser une poche (fonds euros) vers des fonds actions, en 5 &#233;tapes</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Param&#232;tres g&#233;n&#233;raux</div><div style="font-size:11px;color:var(--gris)">Versement, frais, minimum du contrat</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          &#8226; <strong>Versement initial brut</strong> et <strong>frais d'entr&#233;e</strong> : le net investi (brut &#8722; frais) sert de base &#224; toutes les r&#233;partitions.<br>
+          &#8226; <strong>Minimum par arbitrage (contrat)</strong> : c'est une simple <strong>contrainte de contr&#244;le</strong>. Il ne se saisit plus en face de chaque fonds : il sert uniquement &#224; d&#233;clencher une alerte si le montant/arbitrage calcul&#233; passe en dessous.
+        </div>
+      </div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Allocation de d&#233;part</div><div style="font-size:11px;color:var(--gris)">O&#249; l'argent est plac&#233; au d&#233;but</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          Saisissez chaque fonds du contrat avec son <strong>pourcentage initial</strong> (le total doit faire 100 %). C'est ici que se trouve la <strong>poche &#224; dynamiser</strong>, en g&#233;n&#233;ral le <strong>fonds euros</strong>.<br>
+          Le montant en euros de chaque fonds se calcule automatiquement &#224; partir du net investi.
+        </div>
+      </div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Programme de dynamisation</div><div style="font-size:11px;color:var(--gris)">Source, montant, dur&#233;e</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          &#8226; <strong>Fonds &#224; dynamiser (source)</strong> : la poche que l'on vide progressivement (ex. le fonds euros).<br>
+          &#8226; <strong>Montant total &#224; dynamiser</strong> : la somme &#224; basculer (plafonn&#233;e au montant disponible dans la poche source).<br>
+          &#8226; <strong>P&#233;riodicit&#233;</strong> : fr&#233;quence des arbitrages (mensuelle, trimestrielle...).<br>
+          &#8226; Deux modes :<br>
+          &nbsp;&nbsp;&#8211; <strong>Dur&#233;e fixe</strong> : vous fixez la dur&#233;e, le <strong>montant par arbitrage se calcule tout seul</strong> (montant &#247; nombre d'arbitrages).<br>
+          &nbsp;&nbsp;&#8211; <strong>Jusqu'&#224; &#233;puisement</strong> : vous fixez le montant par arbitrage, la <strong>dur&#233;e se d&#233;duit</strong> automatiquement.
+        </div>
+      </div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Fonds de destination</div><div style="font-size:11px;color:var(--gris)">Vers quels fonds on dynamise</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          Ce sont les <strong>fonds actions</strong> (ou UC) vers lesquels le montant est progressivement bascul&#233;. Saisissez chacun avec son <strong>pourcentage de ventilation</strong> (le total doit faire 100 %).<br>
+          Le montant r&#233;investi sur chaque fonds se calcule automatiquement au prorata du montant &#224; dynamiser.
+        </div>
+      </div>
+
+      <div style="border:1.5px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;gap:14px;align-items:center;padding:14px 16px;cursor:pointer">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--noir)">Lire le r&#233;sultat &amp; exporter</div><div style="font-size:11px;color:var(--gris)">Camemberts, allocation finale, PDF</div></div>
+          <span style="color:var(--gris)">&#9660;</span>
+        </div>
+        <div style="display:none;padding:0 16px 14px;font-size:12px;color:var(--gris-f);line-height:1.7">
+          &#8226; Les <strong>hypoth&#232;ses</strong> r&#233;capitulent le programme, dont le <strong>montant par arbitrage calcul&#233;</strong> (en orange) et le nombre d'arbitrages.<br>
+          &#8226; L'<strong>allocation finale</strong> montre la r&#233;partition apr&#232;s ex&#233;cution du programme.<br>
+          &#8226; Les <strong>camemberts avant / apr&#232;s</strong> visualisent l'effet de la dynamisation.<br>
+          &#8226; Des <strong>alertes</strong> signalent toute incoh&#233;rence (total &#8800; 100 %, montant/arbitrage sous le minimum, d&#233;passement de la poche source).<br>
+          &#8226; <strong>Exporter PDF</strong> pour le client, <strong>Sauvegarder</strong> en JSON pour reprendre l'&#233;tude plus tard.
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:14px 16px;background:rgba(45,122,91,0.06);border:1.5px solid rgba(45,122,91,0.3);border-radius:10px;margin-bottom:12px;font-size:12px;color:var(--gris-f);line-height:1.7">
+      <strong style="color:#2D7A5B">&#128274; Confidentialit&eacute; &amp; RGPD &mdash; o&ugrave; vont les donn&eacute;es ?</strong><br>
+      &#8226; L'outil fonctionne <strong>100 % dans votre navigateur</strong> : aucune donn&eacute;e client n'est envoy&eacute;e ni stock&eacute;e sur un serveur.<br>
+      &#8226; Les donn&eacute;es restent <strong>en m&eacute;moire le temps de la session</strong> : fermer l'onglet efface tout.<br>
+      &#8226; La seule conservation est le <strong>fichier JSON que vous t&eacute;l&eacute;chargez vous-m&ecirc;me</strong> &mdash; &agrave; archiver dans votre propre syst&egrave;me.
+    </div>
+
+    <div style="padding:14px 16px;background:var(--gris-l);border-radius:10px;margin-bottom:24px;font-size:12px;color:var(--gris-f);line-height:1.7">
+      <strong>Astuces :</strong><br>
+      &#8226; Le <strong>montant par arbitrage est calcul&#233; automatiquement</strong> &#8212; plus besoin de le saisir en face de chaque fonds.<br>
+      &#8226; Le <strong>minimum par arbitrage</strong> ne sert qu'&#224; vous alerter, jamais &#224; bloquer le calcul.<br>
+      &#8226; Vous pouvez rouvrir ce guide via le bouton <strong>&#128214; Mode d'emploi</strong> en bas de la sidebar.
+    </div>
+
+    <div style="text-align:center">
+      <button onclick="closeManualAC()" style="padding:12px 32px;font-size:14px;font-family:var(--sans);font-weight:600;background:var(--orange);color:#fff;border:none;border-radius:8px;cursor:pointer">C'est compris !</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Mode d'emploi (overlay) ──────────────────────────────────────
+function openManualAC(){ var o=document.getElementById('acOnboarding'); if(o) o.style.display='flex'; }
+function closeManualAC(){
+  try{localStorage.setItem('cgpskool_ac_onboarding_done','1');}catch(e){}
+  var o=document.getElementById('acOnboarding'); if(o) o.style.display='none';
+}
+(function(){
+  try{ if(!localStorage.getItem('cgpskool_ac_onboarding_done')) setTimeout(openManualAC, 300); }catch(e){}
+})();
+</script>
 
 <script>
 // ── État ─────────────────────────────────────────────────────────
@@ -396,18 +528,7 @@ function renderDepart(){
       '</div>';
     sb.appendChild(d);
   });
-  // A4 (read-only)
-  var tb = V('departBody');
-  tb.innerHTML = '';
-  ALLOC.depart.forEach(function(f, i){
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>'+escHtml(f.label)+'</td>'+
-      '<td>'+Math.round(f.pct)+' %</td>'+
-      '<td id="departMnt'+i+'">&mdash;</td>'+
-      '<td id="departDyn'+i+'">&mdash;</td>';
-    tb.appendChild(tr);
-  });
+  // A4 (read-only) : reconstruit dans recalc() pour rester a jour
   populateSourceSelect();
 }
 function renderCible(){
@@ -425,17 +546,7 @@ function renderCible(){
       '</div>';
     sb.appendChild(d);
   });
-  // A4 (read-only)
-  var tb = V('cibleBody');
-  tb.innerHTML = '';
-  ALLOC.cible.forEach(function(f, i){
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>'+escHtml(f.label)+'</td>'+
-      '<td>'+Math.round(f.pct)+' %</td>'+
-      '<td id="cibleMnt'+i+'">&mdash;</td>';
-    tb.appendChild(tr);
-  });
+  // A4 (read-only) : reconstruit dans recalc() pour rester a jour
 }
 function escAttr(s){return String(s||'').replace(/"/g,'&quot;');}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -559,16 +670,19 @@ function recalc(){
   var hEpuise = V('autoDuree');
   if(hEpuise) hEpuise.textContent = '→ ' + nbArb + ' arbitrages, soit ' + dureeMois + ' mois';
 
-  // ── Rendu Allocation depart ──────────────────────────────────
-  var totPctD = 0, totMntD = 0;
+  // ── Rendu Allocation depart (A4, reconstruit a chaque calcul) ─
+  var totPctD = 0, totMntD = 0, departHtml = '';
   ALLOC.depart.forEach(function(f, i){
-    var el = V('departMnt'+i);
-    if(el) el.textContent = fmt(f.montInitial)+' €';
-    var elD = V('departDyn'+i);
-    if(elD) elD.textContent = (i===srcIdx && montantADyn>0) ? ('- '+fmt(montantADyn)+' €') : '—';
     totPctD += f.pct;
     totMntD += f.montInitial;
+    var dyn = (i===srcIdx && montantADyn>0) ? ('- '+fmt(montantADyn)+' &euro;') : '&mdash;';
+    departHtml +=
+      '<tr><td>'+escHtml(f.label)+'</td>'+
+      '<td>'+Math.round(f.pct)+' %</td>'+
+      '<td>'+fmt(f.montInitial)+' &euro;</td>'+
+      '<td>'+dyn+'</td></tr>';
   });
+  V('departBody').innerHTML = departHtml;
   var pctOkD = Math.abs(totPctD - 100) < 0.01;
   V('departFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
@@ -577,14 +691,17 @@ function recalc(){
     '<td>- '+fmt(montantADyn)+' &euro;</td></tr>';
   V('departAlerts').innerHTML = pctOkD?'':'<div class="alert err">Le total doit faire 100 %.</div>';
 
-  // ── Rendu Allocation cible ───────────────────────────────────
-  var totPctC = 0, totReinvC = 0;
+  // ── Rendu Fonds de destination (A4, reconstruit a chaque calcul) ─
+  var totPctC = 0, totReinvC = 0, cibleHtml = '';
   ALLOC.cible.forEach(function(f, i){
-    var el = V('cibleMnt'+i);
-    if(el) el.textContent = fmt(f.reinvesti)+' €';
     totPctC += f.pct;
     totReinvC += f.reinvesti;
+    cibleHtml +=
+      '<tr><td>'+escHtml(f.label)+'</td>'+
+      '<td>'+Math.round(f.pct)+' %</td>'+
+      '<td>'+fmt(f.reinvesti)+' &euro;</td></tr>';
   });
+  V('cibleBody').innerHTML = cibleHtml;
   var pctOkC = Math.abs(totPctC - 100) < 0.01;
   V('cibleFoot').innerHTML =
     '<tr><td>TOTAL</td>'+
@@ -592,7 +709,7 @@ function recalc(){
     '<td>'+fmt(totReinvC)+' &euro;</td></tr>';
   var cibleAlert = '';
   if(!pctOkC) cibleAlert = '<div class="alert err">Le total doit faire 100 %.</div>';
-  else if(ALLOC.cible.length===0 || totReinvC<0.5) cibleAlert = '<div class="alert warn">Ajoutez les fonds actions cible pour ventiler le montant dynamise.</div>';
+  else if(ALLOC.cible.length===0 || totReinvC<0.5) cibleAlert = '<div class="alert warn">Ajoutez les fonds de destination (fonds actions) pour ventiler le montant a dynamiser.</div>';
   V('cibleAlerts').innerHTML = cibleAlert;
 
   // ── Allocation finale (merge par label) ──────────────────────
@@ -629,12 +746,59 @@ function recalc(){
     '<td class="'+(finalOk?'ok':'err')+'">'+Math.round(pctTotalFinal)+' %</td></tr>';
   V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
 
+  // ── Camemberts avant / apres ─────────────────────────────────
+  var colorMap = {}, colIdx = 0;
+  var colorFor = function(k){
+    if(colorMap[k] === undefined){ colorMap[k] = PIE_COLORS[colIdx % PIE_COLORS.length]; colIdx++; }
+    return colorMap[k];
+  };
+  // Avant = allocation de depart (montInitial agrege par label)
+  var avantMap = {}, avantOrder = [];
+  ALLOC.depart.forEach(function(f){
+    if(f.montInitial > 0.5){
+      var k = (f.label||'').trim() || '(sans nom)';
+      if(avantMap[k] === undefined){avantMap[k]=0;avantOrder.push(k);}
+      avantMap[k] += f.montInitial;
+    }
+  });
+  // Couleurs partagees : meme fonds = meme couleur avant/apres
+  avantOrder.forEach(colorFor);
+  order.forEach(colorFor);
+  drawPie('pieAvant', avantOrder, avantOrder.map(function(k){return avantMap[k];}), avantOrder.map(colorFor));
+  drawPie('pieApres', order, order.map(function(k){return merged[k];}), order.map(colorFor));
+
   CGP.project.autoSave('allocation-cible');
   updateProgress();
 }
 
-function hypItem(label, val){
-  return '<div class="hyp-item"><div class="hyp-label">'+label+'</div><div class="hyp-val">'+val+'</div></div>';
+function hypItem(label, val, hi){
+  return '<div class="hyp-item"><div class="hyp-label">'+label+'</div><div class="hyp-val"'+(hi?' style="color:var(--orange)"':'')+'>'+val+'</div></div>';
+}
+
+// ── Camemberts (doughnut Chart.js) ───────────────────────────────
+var PIE_COLORS = ['#D4622A','#2D7A5B','#E0A458','#5B8DEF','#9B59B6','#C0455E','#3FA7A0','#8AA34B','#B07A3F','#6B6B6B'];
+var _pies = {};
+function drawPie(canvasId, labels, data, colors){
+  if(typeof Chart === 'undefined') return;
+  var cv = V(canvasId);
+  if(!cv) return;
+  if(_pies[canvasId]){ _pies[canvasId].destroy(); _pies[canvasId] = null; }
+  if(!labels || !labels.length) return;
+  _pies[canvasId] = new Chart(cv, {
+    type: 'doughnut',
+    data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderColor: '#fff', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '55%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, color: '#3A3A3A', boxWidth: 10, padding: 7 } },
+        tooltip: { callbacks: { label: function(c){
+          var tot = c.dataset.data.reduce(function(a,b){return a+(b||0);}, 0);
+          var p = tot>0 ? Math.round(c.parsed/tot*100) : 0;
+          return ' ' + c.label + ' : ' + fmt(c.parsed) + ' € (' + p + ' %)';
+        } } }
+      }
+    }
+  });
 }
 
 // ── Sauvegarde / chargement projet ───────────────────────────────
