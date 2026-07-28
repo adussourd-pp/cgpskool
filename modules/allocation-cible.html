@@ -106,8 +106,15 @@
 .pie-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);text-align:center}
 .pie-canvas-wrap{position:relative;height:300px}
 
+/* Bandeau de dynamisation entre les 2 camemberts */
+.dyn-band{display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0}
+.dyn-arrow{font-size:24px;line-height:1;color:var(--orange)}
+.dyn-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.dyn-chip{background:rgba(212,98,42,0.08);border:1px solid rgba(212,98,42,0.28);border-radius:999px;padding:6px 13px;font-size:11px;font-weight:600;color:var(--noir)}
+.dyn-chip b{color:var(--orange)}
+
 /* Print : camemberts convertis en image (R23/R24) */
-@media print{.pie-canvas-wrap{height:270px}}
+@media print{.pie-canvas-wrap{height:270px}.dyn-chip{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
 </style>
 </head>
 <body>
@@ -285,6 +292,7 @@
         <div class="card-title"><div class="card-title-l"><span class="dot"></span>R&#233;partition avant / apr&#232;s</div></div>
         <div class="pie-2">
           <div class="pie-box"><div class="pie-lbl">Avant &#8212; allocation de d&#233;part</div><div class="pie-canvas-wrap"><canvas id="pieAvant"></canvas></div></div>
+          <div class="dyn-band" id="dynBand"></div>
           <div class="pie-box"><div class="pie-lbl">Apr&#232;s &#8212; allocation finale</div><div class="pie-canvas-wrap"><canvas id="pieApres"></canvas></div></div>
         </div>
       </div>
@@ -619,6 +627,19 @@ function recalc(){
     '<td class="'+(finalOk?'ok':'err')+'">'+Math.round(pctTotalFinal)+' %</td></tr>';
   V('finalAlerts').innerHTML = finalOk?'':'<div class="alert err">Total ≠ 100 % — vérifiez les allocations.</div>';
 
+  // ── Bandeau de dynamisation (entre les 2 camemberts) ─────────
+  var uniteLbl = {1:'mois',3:'trimestre',6:'semestre',12:'an'}[periodMois] || 'arbitrage';
+  var db = V('dynBand');
+  if(db){
+    db.innerHTML =
+      '<div class="dyn-arrow">&#8595;</div>'+
+      '<div class="dyn-chips">'+
+        '<span class="dyn-chip">Total dynamis&eacute; <b>'+fmt(montantADyn)+' &euro;</b></span>'+
+        '<span class="dyn-chip">Dur&eacute;e <b>'+dureeMois+' mois</b></span>'+
+        '<span class="dyn-chip"><b>'+fmt(montParArb)+' &euro;</b> / '+uniteLbl+'</span>'+
+      '</div>';
+  }
+
   // ── Camemberts avant / apres (regroupes par famille d'actif) ─
   // Avant = allocation de depart ; Apres = allocation finale
   var avant = groupByFamille(ALLOC.depart.map(function(f){return {label:f.label, montant:f.montInitial};}));
@@ -771,30 +792,30 @@ function resetModule(){
 // ── Mode d'emploi (volet standard partage CGP.manual) ────────────
 CGP.manual.init({
   title: '📖 Mode d\'emploi',
-  subtitle: 'Dynamiser une poche vers des fonds actions, etape par etape',
+  subtitle: 'Dynamiser une poche vers des fonds actions, étape par étape',
   buttonInto: 'meBtnSlot',
   moduleId: 'allocation-cible',
   autoFirstVisit: true,
   sections: [
-    { id:'params', t:'Parametres generaux', b:
-      '<ul><li><b>Versement initial brut</b> et <b>frais d\'entree</b> : le net investi (brut moins frais) sert de base a toutes les repartitions.</li></ul>' },
-    { id:'depart', t:'Allocation de depart', b:
-      'Saisissez chaque fonds du contrat avec son <b>pourcentage initial</b> (le total doit faire 100 %). C\'est ici que se trouve la <b>poche a dynamiser</b>, en general le <b>fonds euros</b>. Le montant en euros de chaque fonds se calcule automatiquement.' },
+    { id:'params', t:'Paramètres généraux', b:
+      '<ul><li><b>Versement initial brut</b> et <b>frais d\'entrée</b> : le net investi (brut moins frais) sert de base à toutes les répartitions.</li></ul>' },
+    { id:'depart', t:'Allocation de départ', b:
+      'Saisissez chaque fonds du contrat avec son <b>pourcentage initial</b> (le total doit faire 100 %). C\'est ici que se trouve la <b>poche à dynamiser</b>, en général le <b>fonds euros</b>. Le montant en euros de chaque fonds se calcule automatiquement.' },
     { id:'programme', t:'Programme de dynamisation', b:
       '<ul>'+
-      '<li><b>Fonds a dynamiser (source)</b> : la poche que l\'on vide progressivement.</li>'+
-      '<li><b>Vider entierement la poche source</b> (case a cocher) : si cochee, on dynamise 100 % de la poche (le fonds tombe a zero) ; sinon vous saisissez un <b>montant total a dynamiser</b>.</li>'+
-      '<li><b>Rythme defini par</b> : soit <b>la duree</b> (le montant par arbitrage se calcule), soit <b>le montant par arbitrage</b> (la duree se calcule).</li>'+
-      '<li><b>Periodicite</b> : frequence des arbitrages (mensuelle, trimestrielle...).</li></ul>' },
+      '<li><b>Fonds à dynamiser (source)</b> : la poche que l\'on vide progressivement.</li>'+
+      '<li><b>Vider entièrement la poche source</b> (case à cocher) : si cochée, on dynamise 100 % de la poche (le fonds tombe à zéro) ; sinon vous saisissez un <b>montant total à dynamiser</b>.</li>'+
+      '<li><b>Rythme défini par</b> : soit <b>la durée</b> (le montant par arbitrage se calcule), soit <b>le montant par arbitrage</b> (la durée se calcule).</li>'+
+      '<li><b>Périodicité</b> : fréquence des arbitrages (mensuelle, trimestrielle...).</li></ul>' },
     { id:'destination', t:'Fonds de destination', b:
-      'Les <b>fonds actions</b> (ou UC) vers lesquels le montant est progressivement bascule. Saisissez chacun avec son <b>pourcentage de ventilation</b> (total 100 %). Le montant reinvesti se calcule au prorata.' },
-    { id:'resultat', t:'Lire le resultat & exporter', b:
+      'Les <b>fonds actions</b> (ou UC) vers lesquels le montant est progressivement basculé. Saisissez chacun avec son <b>pourcentage de ventilation</b> (total 100 %). Le montant réinvesti se calcule au prorata.' },
+    { id:'resultat', t:'Lire le résultat & exporter', b:
       '<ul>'+
-      '<li>Les <b>hypotheses</b> recapitulent le programme, dont le <b>montant par arbitrage calcule</b> et le nombre d\'arbitrages.</li>'+
-      '<li>L\'<b>allocation finale</b> montre la repartition apres execution du programme.</li>'+
-      '<li>Les <b>camemberts avant / apres</b>, regroupes par famille d\'actif, visualisent l\'effet de la dynamisation.</li>'+
-      '<li><b>Exporter PDF</b> pour le client, <b>Sauvegarder</b> en JSON pour reprendre l\'etude plus tard.</li></ul>'+
-      '<div class="me-tip">Vos donnees restent 100 % dans votre navigateur : rien n\'est envoye sur un serveur. Seul le JSON que vous telechargez conserve l\'etude.</div>' }
+      '<li>Les <b>hypothèses</b> récapitulent le programme, dont le <b>montant par arbitrage calculé</b> et le nombre d\'arbitrages.</li>'+
+      '<li>L\'<b>allocation finale</b> montre la répartition après exécution du programme.</li>'+
+      '<li>Les <b>camemberts avant / après</b>, regroupés par famille d\'actif, visualisent l\'effet de la dynamisation.</li>'+
+      '<li><b>Exporter PDF</b> pour le client, <b>Sauvegarder</b> en JSON pour reprendre l\'étude plus tard.</li></ul>'+
+      '<div class="me-tip">Vos données restent 100 % dans votre navigateur : rien n\'est envoyé sur un serveur. Seul le JSON que vous téléchargez conserve l\'étude.</div>' }
   ]
 });
 
