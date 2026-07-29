@@ -954,9 +954,11 @@ function habLines() {
 // Section "Formation" = Habilitations en cours + Ateliers Forman (formations continues)
 function emitFormation(o) {
   var hab = habLines(), at = ateliersLines();
-  if (!hab && !at) return;
+  var fc = (state.profil.formCont || []).map(function(x){ return String(x || '').trim(); }).filter(Boolean);
+  if (!hab && !at && !fc.length) return;
   secTitle(o, 'Formation');
   if (hab) { o.push(bold('Habilitations') + ' :'); o.push(hab); }
+  if (fc.length) { o.push(bold('Formations continues') + ' :'); o.push(fc.join('\n')); }
   if (at) { o.push(bold('Ateliers Forman') + ' :'); o.push(at); }
 }
 function renderHabs() {
@@ -974,8 +976,22 @@ function renderHabs() {
       '<input class="hab-note" value="' + esc(d.note) + '" placeholder="' + (d.done ? 'validé le ...' : 'échéance / en cours') + '" onchange="setHabNote(\'' + h[0] + '\',this.value)">' +
       '</div>';
   });
+  // Formations continues (optionnel, plusieurs par an)
+  var fc = fcList();
+  html += '<div style="margin-top:12px;border-top:1px solid var(--bord);padding-top:10px">' +
+    '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gris);margin-bottom:6px">Formations continues <span style="font-size:9px;color:var(--ink-30)">optionnel &middot; plusieurs possibles</span></div>';
+  fc.forEach(function(f, i) {
+    html += '<div style="display:flex;gap:6px;margin-bottom:6px">' +
+      '<input class="hab-note" style="flex:1" value="' + esc(f) + '" placeholder="Fiscalité niveau 2 — 12/03/2026" onchange="fcSet(' + i + ',this.value)">' +
+      '<button onclick="fcRemove(' + i + ')" title="Retirer" style="border:none;background:transparent;color:var(--gris);cursor:pointer;font-size:14px;padding:0 4px">✕</button></div>';
+  });
+  html += '<button onclick="fcAdd()" style="border:none;background:transparent;color:var(--orange);font-size:11px;font-weight:600;cursor:pointer;padding:0">+ formation continue</button></div>';
   box.innerHTML = html;
 }
+function fcList() { if (!state.profil.formCont) state.profil.formCont = []; return state.profil.formCont; }
+function fcAdd() { fcList().push(''); saveState(); renderHabs(); }
+function fcSet(i, v) { var l = fcList(); if (i < l.length) { l[i] = v; saveState(); updatePreview(); } }
+function fcRemove(i) { var l = fcList(); l.splice(i, 1); saveState(); renderHabs(); updatePreview(true); }
 function toggleHab(key, val) { var hs = habState(); if (!hs[key]) hs[key] = { done:false, note:'' }; hs[key].done = val; saveState(); renderHabs(); updatePreview(true); }
 function setHabNote(key, val) { var hs = habState(); if (!hs[key]) hs[key] = { done:false, note:'' }; hs[key].note = val; saveState(); updatePreview(); }
 
