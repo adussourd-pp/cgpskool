@@ -1146,21 +1146,21 @@ select.span2{grid-column:span 2}
   <div class="card no-print-when-disabled" id="retEduToggleCard" style="margin:22px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:4px solid var(--orange)">
     <div>
       <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">🅰 Comprendre votre retraite</div>
-      <div style="font-size:11px;color:var(--gris)">Encart pédagogique adapté au statut du client (régime, dividendes, fin de carrière). <span id="retEduPDFLabel">Masqué du PDF</span>.</div>
+      <div style="font-size:11px;color:var(--gris)">Encart pédagogique adapté au statut du client (régime, fin de carrière). Affiché à l'écran et dans le PDF si activé. <span id="retEduPDFLabel" style="font-weight:600">Désactivé</span>.</div>
     </div>
     <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retEduPrint" onchange="toggleRetEduPrint(this)"><span class="cz-slider"></span></label>
   </div>
-  <div id="retEduBlock"><div id="retEduBody"></div></div>
+  <div id="retEduBlock" style="display:none"><div id="retEduBody"></div></div>
 
   <!-- 🅱 Option — Fiabiliser la pension par les trimestres -->
   <div class="card no-print-when-disabled" id="retFibToggleCard" style="margin:22px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:4px solid var(--blue)">
     <div>
       <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">🅱 Fiabiliser la pension estimée</div>
-      <div style="font-size:11px;color:var(--gris)">Applique le coefficient trimestres validés/requis et une estimation de décote. Indicatif — n'altère pas la simulation d'effort. <span id="retFibPDFLabel">Masqué du PDF</span>.</div>
+      <div style="font-size:11px;color:var(--gris)">Ajuste la pension selon les trimestres validés/requis et l'intègre à la simulation d'effort (plus juste). <span id="retFibPDFLabel" style="font-weight:600">Non pris en compte</span>.</div>
     </div>
     <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retFibPrint" onchange="toggleRetFibPrint(this)"><span class="cz-slider"></span></label>
   </div>
-  <div id="retFibBlock"><div id="retFibBody"></div></div>
+  <div id="retFibBlock" style="display:none"><div id="retFibBody"></div></div>
 
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
@@ -5377,7 +5377,7 @@ function rRetraite(){
   // R8 : pension KPI = salaires seuls (fonciers SCI exclus pour couple, nominatifs seuls si seul)
 var isCouple=ED.type!=='seul';
 var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1||ED.revenus.c1||0)+(ED.revenus._foncNomC1||0))/12;
-  var pensionEst=Math.round(pensionBrute*tauxClient/100);
+  var pensionEst=Math.round(pensionBrute*tauxClient/100*_retFibCoef(1));
   var kpiEl=document.getElementById('retKpis');
   if(kpiEl)kpiEl.innerHTML='<div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Âge actuel '+nomCFull(1)+'</div><div class="kpi-val">'+age1+' ans</div></div><div class="kpi" style="--kc:var(--ambre)"><div class="kpi-label">Taux remplacement</div><div class="kpi-val">'+tauxClient+' %</div></div><div class="kpi" style="--kc:var(--green)"><div class="kpi-label">Pension estimee</div><div class="kpi-val">'+fmt(pensionEst)+' €/mois</div></div><div class="kpi featured"><div class="kpi-label">Categorie</div><div class="kpi-val" style="font-size:14px">'+cspKey+'</div></div>';
   if(!ED.retraite)ED.retraite={age1:64,age2:64,pension1:2500,pension2:2000};
@@ -5396,7 +5396,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
   if(ED.type!=='seul'&&ED.c2&&ED.c2.prenom){var rawCSP2=ED.c2.sitpro||ED.c2.profession||'';var cspKey2=CSP_MAP[rawCSP2]||'Sal. cadre';if(!TAUX[cspKey2])cspKey2=CSP_MAP[cspKey2]||'Sal. cadre';clients.push({c:ED.c2,retAge:ED.retraite.age2||64,pension:ED.retraite.pension2||2000,rev:(ED.revenus.sal2||ED.revenus.c2||0)+foncC2,csp:cspKey2});}
   var cardsHtml='';
   var impactFoyer=0;
-  clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,i){return a>=age?i:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100);var gap=Math.max(0,cl.pension-pensM);
+  clients.forEach(function(cl,i){var c=cl.c;var name=(c.civ||'')+' '+(c.prenom||'')+' '+(c.nom||'');name=name.trim()||'Client '+(i+1);var age=ageFrom(c.dob)||40;var horizon=Math.max(1,(cl.retAge||64)-age);var ageI=AGES.reduce(function(bi,a,i){return a>=age?i:bi;},0);var tx=(TAUX[cl.csp]||TAUX['Sal. cadre'])[ageI];var pensM=Math.floor(cl.rev/12*tx/100*_retFibCoef(i+1));var gap=Math.max(0,cl.pension-pensM);
         var espVie=getEspVie(c.civ,cl.retAge||64);
         var impactTotal=Math.round((cl.pension-pensM)*espVie);
         impactFoyer+=impactTotal;
@@ -5438,7 +5438,7 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
 // ── RETRAITE : blocs optionnels (pédago adaptatif + fiabilisation trimestres) ──
 // Ajoutés AUTOUR de rRetraite (appelés sous try/catch), sans en modifier le coeur.
 var RET_REGIMES={
-  salarie:{who:'Salarié / Assimilé salarié',ex:"Salarié cadre ou non-cadre du privé, ou dirigeant assimilé salarié (président de SAS/SASU, DG de SA, gérant minoritaire de SARL).",base:'Régime général — CNAV',baseC:"Salaire annuel moyen (25 meilleures années) x taux 50 % max.",compl:'AGIRC-ARRCO',complC:"Retraite par points — valeur du point 1,4386 € (nov. 2025).",rev:"Base 54 % - complémentaire 60 %, dès 55 ans, sous condition de ressources.",div:'danger',divT:"Dividendes → aucun droit à la retraite",divX:"Les dividendes ne sont pas soumis à cotisations sociales : ils ne valident ni trimestres ni points. Pour un dirigeant assimilé salarié (SAS, SASU, SA), privilégier les dividendes au détriment de la rémunération réduit fortement les droits futurs à la retraite."},
+  salarie:{who:'Salarié / Assimilé salarié',ex:"Salarié cadre ou non-cadre du privé, ou dirigeant assimilé salarié (président de SAS/SASU, DG de SA, gérant minoritaire de SARL).",base:'Régime général — CNAV',baseC:"Salaire annuel moyen (25 meilleures années) x taux 50 % max.",compl:'AGIRC-ARRCO',complC:"Retraite par points — valeur du point 1,4386 € (nov. 2025).",rev:"Base 54 % - complémentaire 60 %, dès 55 ans, sous condition de ressources.",div:'none',divT:'',divX:''},
   fonction:{who:'Fonctionnaire',ex:"Agent titulaire de la fonction publique.",base:"Service des retraites de l'État / CNRACL",baseC:"75 % du traitement indiciaire des 6 derniers mois (hors primes).",compl:'RAFP',complC:"Retraite additionnelle par points, assise sur les primes.",rev:"50 % de la pension, sous conditions.",div:'none',divT:'',divX:''},
   tnscom:{who:'TNS — Artisan / Commerçant',ex:"Gérant majoritaire de SARL, entrepreneur individuel (régime BIC).",base:'Sécurité sociale des indépendants (SSI)',baseC:"Revenu annuel moyen (25 meilleures années) x taux 50 % max.",compl:'Complémentaire SSI',complC:"Retraite par points, gérée par la SSI.",rev:"Base 54 % - complémentaire 60 %, dès 55 ans, sous condition de ressources.",div:'warn',divT:"Dividendes partiellement cotisés",divX:"Pour le gérant majoritaire de SARL, la part des dividendes supérieure à 10 % du capital social est soumise à cotisations : cette fraction seulement génère des droits à la retraite."},
   tnslib:{who:'TNS — Profession libérale',ex:"Médecin (CARMF), architecte / consultant (CIPAV), notaire (CPRN), avocat (CNBF)…",base:'CNAVPL — base par points',baseC:"Points x valeur du point x taux de pension.",compl:'Section professionnelle',complC:"CARMF, CIPAV, CARPIMKO, CAVEC… selon la profession exercée.",rev:"Règles propres à chaque section (âge et taux variables).",div:'warn',divT:"Arbitrage rémunération / dividendes",divX:"En société d'exercice libéral (SEL), une partie des dividendes peut être soumise à cotisations. À arbitrer avec la constitution des droits retraite et le maintien de la protection sociale."}
@@ -5456,20 +5456,35 @@ function _retClients(){
   if(isCouple&&ED.c2&&ED.c2.prenom){var csp2=cspOf(ED.c2);var foncC2=Math.round((fnc2||0)*0.70);list.push({key:'2',c:ED.c2,name:nomCFull(2),csp:csp2,fam:_retFamille(csp2),rev:(rev.sal2||rev.c2||0)+foncC2,tx:txOf(ED.c2,csp2),req:_retTrimRequis(ED.c2&&ED.c2.dob)});}
   return list;
 }
+// Données de fiabilisation par client : trimestres validés estimés d'après l'âge de départ souhaité
+function _retFibData(k){
+  k=String(k);var cl=null;_retClients().forEach(function(c){if(c.key===k)cl=c;});
+  if(!cl)return null;
+  var r=ED.retraite||{};
+  var ageDep=+(r['age'+k])||64;
+  var debut=+(r['debut'+k]);if(!debut)debut=22;
+  var req=Math.max(1,+(r['treq'+k]||cl.req));
+  var val=Math.max(0,Math.round((ageDep-debut)*4));
+  var coef=Math.min(1,val/req);var manq=Math.max(0,req-val);
+  var dec=Math.min(12.5,Math.min(20,manq)*0.625);var pleinM=cl.rev/12*cl.tx/100;
+  return {name:cl.name,ageDep:ageDep,debut:debut,req:req,val:val,coef:coef,manq:manq,dec:dec,pleinM:pleinM,finM:pleinM*coef};
+}
+// Coefficient appliqué à la simulation : 1 (neutre) tant que le switch "prise en compte" est OFF
+function _retFibCoef(k){if(!(ED.retraite&&ED.retraite.fibOn))return 1;var d=_retFibData(k);return d?d.coef:1;}
 function _retFibInput(label,key,val){
-  return '<div><label style="display:block;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">'+label+'</label><input type="number" class="fi" min="0" max="200" value="'+(val||0)+'" oninput="onRetFibInput(\''+key+'\',this.value)" style="font-size:13px"></div>';
+  return '<div><label style="display:block;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">'+label+'</label><input type="number" class="fi" min="0" max="200" value="'+(val||0)+'" onchange="onRetFibInput(\''+key+'\',this.value)" style="font-size:13px"></div>';
 }
 function enrichRetraite(){
   if(!ED.retraite)ED.retraite={};
   var clients=_retClients();var disabled=!!ED.retraite.disabled;
-  // Restaurer l'état des cases "inclure dans le PDF"
-  var eOn=!!ED.retraite.eduPrint,fOn=!!ED.retraite.fibPrint;
+  // Restaurer l'état des switches (affichage écran + PDF ; bloc B pilote aussi la simulation)
+  var eOn=!!ED.retraite.eduOn,fOn=!!ED.retraite.fibOn;
   var eSw=document.getElementById('retEduPrint');if(eSw)eSw.checked=eOn;
-  var eB=document.getElementById('retEduBlock');if(eB)eB.classList.toggle('retedu-print-visible',eOn);
-  var eL=document.getElementById('retEduPDFLabel');if(eL)eL.textContent=eOn?'Visible dans le PDF':'Masqué du PDF';
+  var eB=document.getElementById('retEduBlock');if(eB){eB.style.display=eOn?'':'none';eB.classList.toggle('retedu-print-visible',eOn);}
+  var eL=document.getElementById('retEduPDFLabel');if(eL)eL.textContent=eOn?'Affiché (écran et PDF)':'Désactivé';
   var fSw=document.getElementById('retFibPrint');if(fSw)fSw.checked=fOn;
-  var fBl=document.getElementById('retFibBlock');if(fBl)fBl.classList.toggle('retfib-print-visible',fOn);
-  var fL=document.getElementById('retFibPDFLabel');if(fL)fL.textContent=fOn?'Visible dans le PDF':'Masqué du PDF';
+  var fBl=document.getElementById('retFibBlock');if(fBl){fBl.style.display=fOn?'':'none';fBl.classList.toggle('retfib-print-visible',fOn);}
+  var fL=document.getElementById('retFibPDFLabel');if(fL)fL.textContent=fOn?'Pris en compte (simulation + PDF)':'Non pris en compte';
   // BLOC A — pédagogique adaptatif (statut du client principal)
   var body=document.getElementById('retEduBody');
   if(body){
@@ -5503,49 +5518,50 @@ function enrichRetraite(){
   if(fbody){
     if(disabled){fbody.innerHTML='<div class="card" style="margin-bottom:0;color:var(--gris);font-size:12px">Fiabilisation indisponible : les calculs retraite sont désactivés (personne déjà retraitée).</div>';}
     else{
-      var hh='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Ajustement par la durée d\'assurance<span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);background:rgba(43,94,167,0.10);padding:4px 9px;border-radius:20px">Chiffré</span></div>';
+      var hh='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Ajustement par la durée d\'assurance<span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);background:rgba(43,94,167,0.10);padding:4px 9px;border-radius:20px">Intégré à la simulation</span></div>';
+      hh+='<div style="display:flex;gap:10px;align-items:center;background:rgba(45,122,91,0.10);border:1px solid rgba(45,122,91,0.30);border-radius:8px;padding:9px 13px;margin-bottom:14px"><span style="font-size:15px">✓</span><span style="font-size:11.5px;color:var(--green);font-weight:600">Pris en compte dans la simulation d\'effort : le manque mensuel et le capital cible sont recalculés avec la minoration.</span></div>';
       clients.forEach(function(cl){
         var k=cl.key;
+        if(ED.retraite['debut'+k]==null)ED.retraite['debut'+k]=22;
         if(ED.retraite['treq'+k]==null)ED.retraite['treq'+k]=cl.req;
-        if(ED.retraite['tval'+k]==null)ED.retraite['tval'+k]=cl.req;
         hh+='<div style="margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:var(--noir);margin-bottom:10px">'+cl.name+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
         hh+='<div style="background:var(--gris-l);border-radius:11px;padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">';
-        hh+=_retFibInput('Trimestres validés','tval'+k,ED.retraite['tval'+k]);
+        hh+=_retFibInput('Âge début d\'activité','debut'+k,ED.retraite['debut'+k]);
         hh+=_retFibInput('Trimestres requis','treq'+k,ED.retraite['treq'+k]);
-        hh+='</div><div style="font-size:10.5px;color:var(--gris);line-height:1.5;margin-top:8px">Requis pré-rempli selon l\'année de naissance (169 à 172). Modifiable.</div></div>';
-        hh+='<div><div class="fiscal-row"><span class="fr-l">Pension pleine estimée</span><span class="fr-v" id="rPlein'+k+'">—</span></div>';
+        hh+='</div><div style="font-size:10.5px;color:var(--gris);line-height:1.5;margin-top:8px">Trimestres validés estimés automatiquement : (âge de départ souhaité − âge de début d\'activité) × 4. Requis pré-rempli selon l\'année de naissance.</div></div>';
+        hh+='<div><div class="fiscal-row"><span class="fr-l">Âge de départ souhaité</span><span class="fr-v" id="rDep'+k+'">—</span></div>';
+        hh+='<div class="fiscal-row"><span class="fr-l">Trimestres validés (estimés)</span><span class="fr-v" id="rVal'+k+'" style="color:var(--blue)">—</span></div>';
         hh+='<div class="fiscal-row"><span class="fr-l">Trimestres manquants</span><span class="fr-v" id="rManq'+k+'">—</span></div>';
+        hh+='<div class="fiscal-row"><span class="fr-l">Pension pleine estimée</span><span class="fr-v" id="rPlein'+k+'">—</span></div>';
         hh+='<div class="fiscal-row"><span class="fr-l">Coefficient (validés / requis)</span><span class="fr-v" id="rCoef'+k+'" style="color:var(--orange-hover)">—</span></div>';
         hh+='<div class="fiscal-row"><span class="fr-l">Décote estimée (0,625 %/trim, max 12,5 %)</span><span class="fr-v" id="rDec'+k+'" style="color:var(--red)">—</span></div>';
         hh+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Pension fiabilisée</span><span class="fr-v" id="rFin'+k+'" style="color:var(--orange-hover);font-weight:700">—</span></div>';
         hh+='<div style="font-size:10.5px;color:var(--gris);line-height:1.5;margin-top:9px" id="rMsg'+k+'"></div></div></div></div>';
       });
-      hh+='<div style="font-size:10.5px;color:var(--gris);line-height:1.55;margin-top:6px;padding-top:10px;border-top:1px solid var(--bord)">Indicatif — n\'altère pas la simulation d\'effort ci-dessus. Le coefficient de minoration est cohérent avec l\'hypothèse affichée sous le graphe.</div></div>';
+      hh+='<div style="font-size:10.5px;color:var(--gris);line-height:1.55;margin-top:6px;padding-top:10px;border-top:1px solid var(--bord)">Estimation : trimestres validés déduits de l\'âge de départ souhaité (section Paramètres) et de l\'âge de début d\'activité, à raison de 4 trimestres/an. La simulation applique le coefficient validés/requis ; la décote est affichée à titre indicatif.</div></div>';
       fbody.innerHTML=hh;
       computeRetFib();
     }
   }
 }
-function onRetFibInput(key,val){if(!ED.retraite)ED.retraite={};ED.retraite[key]=+val||0;computeRetFib();}
+function onRetFibInput(key,val){if(!ED.retraite)ED.retraite={};ED.retraite[key]=+val||0;try{updateRetraiteCalc();}catch(e){computeRetFib();}}
 function computeRetFib(){
-  var clients=_retClients();
-  clients.forEach(function(cl){
-    var k=cl.key;var req=Math.max(1,+(ED.retraite['treq'+k]||cl.req));
-    var val=+(ED.retraite['tval'+k]);if(isNaN(val))val=req;
-    var pleinM=cl.rev/12*cl.tx/100;var manq=Math.max(0,req-val);
-    var coef=Math.min(1,val/req);var dec=Math.min(12.5,Math.min(20,manq)*0.625);var finM=pleinM*coef;
+  _retClients().forEach(function(cl){
+    var k=cl.key;var d=_retFibData(k);if(!d)return;
     var set=function(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;};
-    set('rPlein'+k,fmt(Math.round(pleinM))+' €/mois');
-    set('rManq'+k,manq+' trim.');
-    set('rCoef'+k,(coef*100).toFixed(1).replace('.',',')+' %');
-    set('rDec'+k,'− '+dec.toFixed(2).replace('.',',')+' %');
-    set('rFin'+k,fmt(Math.round(finM))+' €/mois');
+    set('rDep'+k,d.ageDep+' ans');
+    set('rVal'+k,d.val+' trim.');
+    set('rManq'+k,d.manq+' trim.');
+    set('rPlein'+k,fmt(Math.round(d.pleinM))+' €/mois');
+    set('rCoef'+k,(d.coef*100).toFixed(1).replace('.',',')+' %');
+    set('rDec'+k,'− '+d.dec.toFixed(2).replace('.',',')+' %');
+    set('rFin'+k,fmt(Math.round(d.finM))+' €/mois');
     var msg=document.getElementById('rMsg'+k);
-    if(msg){if(manq<=0){msg.innerHTML='<span style="color:var(--green);font-weight:700">Carrière complète</span> — taux plein, pas de minoration.';}else{msg.innerHTML='Écart vs pension pleine : <strong style="color:var(--red)">− '+fmt(Math.round(pleinM-finM))+' €/mois</strong> ('+manq+' trimestres manquants).';}}
+    if(msg){if(d.manq<=0){msg.innerHTML='<span style="color:var(--green);font-weight:700">Carrière complète</span> — taux plein, pas de minoration.';}else{msg.innerHTML='Écart vs pension pleine : <strong style="color:var(--red)">− '+fmt(Math.round(d.pleinM-d.finM))+' €/mois</strong> ('+d.manq+' trimestres manquants).';}}
   });
 }
-function toggleRetEduPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.eduPrint=on;var b=document.getElementById('retEduBlock');if(b)b.classList.toggle('retedu-print-visible',on);var l=document.getElementById('retEduPDFLabel');if(l)l.textContent=on?'Visible dans le PDF':'Masqué du PDF';}
-function toggleRetFibPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.fibPrint=on;var b=document.getElementById('retFibBlock');if(b)b.classList.toggle('retfib-print-visible',on);var l=document.getElementById('retFibPDFLabel');if(l)l.textContent=on?'Visible dans le PDF':'Masqué du PDF';}
+function toggleRetEduPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.eduOn=on;var b=document.getElementById('retEduBlock');if(b){b.style.display=on?'':'none';b.classList.toggle('retedu-print-visible',on);}var l=document.getElementById('retEduPDFLabel');if(l)l.textContent=on?'Affiché (écran et PDF)':'Désactivé';}
+function toggleRetFibPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.fibOn=on;var b=document.getElementById('retFibBlock');if(b){b.style.display=on?'':'none';b.classList.toggle('retfib-print-visible',on);}var l=document.getElementById('retFibPDFLabel');if(l)l.textContent=on?'Pris en compte (simulation + PDF)':'Non pris en compte';try{updateRetraiteCalc();}catch(e){}}
 
 
 // ╔══════════════════════════════════════════════════════════════════╗
