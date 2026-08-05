@@ -425,8 +425,14 @@ select.span2{grid-column:span 2}
   #projFiscCard.proj-print-visible{display:block!important}
   #projFinCard{display:none!important}
   #projFinCard.proj-print-visible{display:block!important}
+  /* ── RETRAITE : blocs optionnels masqués par défaut, visibles si case cochée ── */
+  #retEduBlock{display:none!important}
+  #retEduBlock.retedu-print-visible{display:block!important}
+  #retFibBlock{display:none!important}
+  #retFibBlock.retfib-print-visible{display:block!important}
   /* ── Contrôles écran jamais imprimés : libellés "Visible PDF/Masqué du PDF" + carte switch retraite ── */
-  #projFiscPDFLabel,#projFinPDFLabel,#retraiteToggleCard{display:none!important}
+  #projFiscPDFLabel,#projFinPDFLabel,#retraiteToggleCard,
+  #retEduPDFLabel,#retFibPDFLabel,#retEduToggleCard,#retFibToggleCard{display:none!important}
   /* ── FORMAT A4 ── */
   @page{size:A4 portrait;margin:10mm 10mm 15mm 10mm}
 }
@@ -1135,6 +1141,26 @@ select.span2{grid-column:span 2}
       <div style="overflow-x:auto"><table class="tbl" id="retSimuTbl"></table></div>
     </div>
   </div>
+
+  <!-- 🅰 Option — Comprendre votre retraite (bloc pédagogique adaptatif) -->
+  <div class="card no-print-when-disabled" id="retEduToggleCard" style="margin:22px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:4px solid var(--orange)">
+    <div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">🅰 Comprendre votre retraite</div>
+      <div style="font-size:11px;color:var(--gris)">Encart pédagogique adapté au statut du client (régime, dividendes, fin de carrière). <span id="retEduPDFLabel">Masqué du PDF</span>.</div>
+    </div>
+    <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retEduPrint" onchange="toggleRetEduPrint(this)"><span class="cz-slider"></span></label>
+  </div>
+  <div id="retEduBlock"><div id="retEduBody"></div></div>
+
+  <!-- 🅱 Option — Fiabiliser la pension par les trimestres -->
+  <div class="card no-print-when-disabled" id="retFibToggleCard" style="margin:22px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:4px solid var(--blue)">
+    <div>
+      <div style="font-family:var(--sans);font-weight:700;font-size:13px;color:var(--noir);margin-bottom:2px">🅱 Fiabiliser la pension estimée</div>
+      <div style="font-size:11px;color:var(--gris)">Applique le coefficient trimestres validés/requis et une estimation de décote. Indicatif — n'altère pas la simulation d'effort. <span id="retFibPDFLabel">Masqué du PDF</span>.</div>
+    </div>
+    <label class="cz-switch" style="flex:0 0 auto"><input type="checkbox" id="retFibPrint" onchange="toggleRetFibPrint(this)"><span class="cz-slider"></span></label>
+  </div>
+  <div id="retFibBlock"><div id="retFibBody"></div></div>
 
   <div class="note-print" id="notePrint-retraite" style="display:none"></div>
 
@@ -5201,6 +5227,7 @@ function rRetraite(){
   // Applique l'état (afficher/masquer les blocs de calcul)
   applyRetraiteDisabledState();
   var calcsDisabled=!!ED.retraite.disabled;
+  try{enrichRetraite();}catch(e){console.warn('enrichRetraite',e);}
 
   // ── Panneau paramètres manuels ──────────────────────────────
   var retParamsEl=document.getElementById('retParams');
@@ -5407,6 +5434,118 @@ var pensionBrute=(isCouple?(ED.revenus.sal1||ED.revenus.c1||0):(ED.revenus.sal1|
     if(rst)rst.style.display='';
   }
 }
+
+// ── RETRAITE : blocs optionnels (pédago adaptatif + fiabilisation trimestres) ──
+// Ajoutés AUTOUR de rRetraite (appelés sous try/catch), sans en modifier le coeur.
+var RET_REGIMES={
+  salarie:{who:'Salarié / Assimilé salarié',ex:"Salarié cadre ou non-cadre du privé, ou dirigeant assimilé salarié (président de SAS/SASU, DG de SA, gérant minoritaire de SARL).",base:'Régime général — CNAV',baseC:"Salaire annuel moyen (25 meilleures années) x taux 50 % max.",compl:'AGIRC-ARRCO',complC:"Retraite par points — valeur du point 1,4386 € (nov. 2025).",rev:"Base 54 % - complémentaire 60 %, dès 55 ans, sous condition de ressources.",div:'danger',divT:"Dividendes → aucun droit à la retraite",divX:"Les dividendes ne sont pas soumis à cotisations sociales : ils ne valident ni trimestres ni points. Pour un dirigeant assimilé salarié (SAS, SASU, SA), privilégier les dividendes au détriment de la rémunération réduit fortement les droits futurs à la retraite."},
+  fonction:{who:'Fonctionnaire',ex:"Agent titulaire de la fonction publique.",base:"Service des retraites de l'État / CNRACL",baseC:"75 % du traitement indiciaire des 6 derniers mois (hors primes).",compl:'RAFP',complC:"Retraite additionnelle par points, assise sur les primes.",rev:"50 % de la pension, sous conditions.",div:'none',divT:'',divX:''},
+  tnscom:{who:'TNS — Artisan / Commerçant',ex:"Gérant majoritaire de SARL, entrepreneur individuel (régime BIC).",base:'Sécurité sociale des indépendants (SSI)',baseC:"Revenu annuel moyen (25 meilleures années) x taux 50 % max.",compl:'Complémentaire SSI',complC:"Retraite par points, gérée par la SSI.",rev:"Base 54 % - complémentaire 60 %, dès 55 ans, sous condition de ressources.",div:'warn',divT:"Dividendes partiellement cotisés",divX:"Pour le gérant majoritaire de SARL, la part des dividendes supérieure à 10 % du capital social est soumise à cotisations : cette fraction seulement génère des droits à la retraite."},
+  tnslib:{who:'TNS — Profession libérale',ex:"Médecin (CARMF), architecte / consultant (CIPAV), notaire (CPRN), avocat (CNBF)…",base:'CNAVPL — base par points',baseC:"Points x valeur du point x taux de pension.",compl:'Section professionnelle',complC:"CARMF, CIPAV, CARPIMKO, CAVEC… selon la profession exercée.",rev:"Règles propres à chaque section (âge et taux variables).",div:'warn',divT:"Arbitrage rémunération / dividendes",divX:"En société d'exercice libéral (SEL), une partie des dividendes peut être soumise à cotisations. À arbitrer avec la constitution des droits retraite et le maintien de la protection sociale."}
+};
+function _retBirthYear(dob){if(!dob)return 0;var m=String(dob).match(/\d{4}/g);return m?+m[m.length-1]:0;}
+function _retTrimRequis(dob){var y=_retBirthYear(dob);if(!y)return 172;if(y<=1962)return 169;if(y===1963)return 170;if(y===1964)return 171;return 172;}
+function _retFamille(cspKey){if(cspKey==='Fonctionnaire')return 'fonction';if(cspKey==='TNS comer.')return 'tnscom';if(cspKey==='TNS lib.')return 'tnslib';return 'salarie';}
+function _retClients(){
+  var rev=ED.revenus||{};var isCouple=ED.type!=='seul';var AGES=[65,60,55,50,45,40,35,30,0];
+  function cspOf(c){var raw=(c&&(c.sitpro||c.profession))||'';var k=CSP_MAP[raw]||'Sal. cadre';if(!RET_TAUX[k])k=CSP_MAP[k]||'Sal. cadre';return k;}
+  function txOf(c,csp){var age=ageFrom(c&&c.dob)||40;var i=AGES.reduce(function(bi,a,ix){return a>=age?ix:bi;},0);return (RET_TAUX[csp]||RET_TAUX['Sal. cadre'])[i];}
+  var fonc=rev.fonc||0,fnc1=rev._foncNomC1||0,fnc2=rev._foncNomC2||0;
+  var csp1=cspOf(ED.c1);var foncC1=Math.round((isCouple?fnc1:fonc)*0.70);
+  var list=[{key:'1',c:ED.c1,name:nomCFull(1),csp:csp1,fam:_retFamille(csp1),rev:(rev.sal1||rev.c1||0)+foncC1,tx:txOf(ED.c1,csp1),req:_retTrimRequis(ED.c1&&ED.c1.dob)}];
+  if(isCouple&&ED.c2&&ED.c2.prenom){var csp2=cspOf(ED.c2);var foncC2=Math.round((fnc2||0)*0.70);list.push({key:'2',c:ED.c2,name:nomCFull(2),csp:csp2,fam:_retFamille(csp2),rev:(rev.sal2||rev.c2||0)+foncC2,tx:txOf(ED.c2,csp2),req:_retTrimRequis(ED.c2&&ED.c2.dob)});}
+  return list;
+}
+function _retFibInput(label,key,val){
+  return '<div><label style="display:block;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);margin-bottom:4px">'+label+'</label><input type="number" class="fi" min="0" max="200" value="'+(val||0)+'" oninput="onRetFibInput(\''+key+'\',this.value)" style="font-size:13px"></div>';
+}
+function enrichRetraite(){
+  if(!ED.retraite)ED.retraite={};
+  var clients=_retClients();var disabled=!!ED.retraite.disabled;
+  // Restaurer l'état des cases "inclure dans le PDF"
+  var eOn=!!ED.retraite.eduPrint,fOn=!!ED.retraite.fibPrint;
+  var eSw=document.getElementById('retEduPrint');if(eSw)eSw.checked=eOn;
+  var eB=document.getElementById('retEduBlock');if(eB)eB.classList.toggle('retedu-print-visible',eOn);
+  var eL=document.getElementById('retEduPDFLabel');if(eL)eL.textContent=eOn?'Visible dans le PDF':'Masqué du PDF';
+  var fSw=document.getElementById('retFibPrint');if(fSw)fSw.checked=fOn;
+  var fBl=document.getElementById('retFibBlock');if(fBl)fBl.classList.toggle('retfib-print-visible',fOn);
+  var fL=document.getElementById('retFibPDFLabel');if(fL)fL.textContent=fOn?'Visible dans le PDF':'Masqué du PDF';
+  // BLOC A — pédagogique adaptatif (statut du client principal)
+  var body=document.getElementById('retEduBody');
+  if(body){
+    var R=RET_REGIMES[clients[0]?clients[0].fam:'salarie']||RET_REGIMES.salarie;
+    var h='';
+    h+='<div class="card" style="margin-bottom:16px"><div class="card-title"><span class="dot"></span>Votre régime de retraite<span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);background:rgba(212,98,42,0.10);padding:4px 9px;border-radius:20px">Adapté au statut</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:11px 14px;background:rgba(212,98,42,0.10);border-radius:9px"><span style="font-weight:700;font-size:13px;color:var(--orange-hover)">'+R.who+'</span><span style="font-size:11.5px;color:var(--gris);line-height:1.45">'+R.ex+'</span></div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    h+='<div style="background:var(--gris-l);border-radius:10px;padding:13px 15px"><div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:5px">1 · Retraite de base obligatoire</div><div style="font-size:13px;font-weight:700;color:var(--noir);line-height:1.35">'+R.base+'</div><div style="font-size:11px;color:var(--gris);margin-top:4px;line-height:1.45">'+R.baseC+'</div></div>';
+    h+='<div style="background:var(--gris-l);border-radius:10px;padding:13px 15px"><div style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gris);margin-bottom:5px">2 · Complémentaire obligatoire</div><div style="font-size:13px;font-weight:700;color:var(--noir);line-height:1.35">'+R.compl+'</div><div style="font-size:11px;color:var(--gris);margin-top:4px;line-height:1.45">'+R.complC+'</div></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:12px;margin-top:12px;padding-top:13px;border-top:1px solid var(--bord)"><div style="width:26px;height:26px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff;background:#C98A1E">3</div><div><div style="font-weight:700;font-size:12.5px;color:var(--noir)">Retraite supplémentaire facultative</div><div style="font-size:11.5px;color:var(--gris);line-height:1.5;margin-top:2px">Le seul étage sur lequel le client garde la main : PER individuel, PER d\'entreprise, assurance-vie. C\'est le levier de la préconisation.</div></div></div>';
+    h+='</div>';
+    if(R.div!=='none'){
+      var isDanger=(R.div==='danger');
+      var bg=isDanger?'rgba(192,57,43,0.08)':'rgba(201,138,30,0.10)';
+      var bd=isDanger?'rgba(192,57,43,0.35)':'rgba(201,138,30,0.38)';
+      var col=isDanger?'var(--red)':'#C98A1E';
+      var ic=isDanger?'⚠️':'⚖️';
+      h+='<div class="card" style="margin-bottom:16px"><div class="card-title"><span class="dot"></span>Le point clé pour un dirigeant</div><div style="border-radius:11px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;background:'+bg+';border:1.5px solid '+bd+'"><div style="font-size:19px;line-height:1;flex:0 0 auto;margin-top:1px">'+ic+'</div><div><div style="font-weight:800;font-size:13px;margin-bottom:3px;color:'+col+'">'+R.divT+'</div><div style="font-size:12px;line-height:1.55;color:var(--gris-f)">'+R.divX+'</div></div></div></div>';
+    }
+    h+='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Leviers de fin de carrière</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">';
+    h+='<div style="border:1.5px solid var(--bord);border-radius:10px;padding:13px 14px"><div style="font-weight:700;font-size:12.5px;color:var(--noir);margin-bottom:5px">Retraite progressive</div><div style="font-size:11px;color:var(--gris);line-height:1.5">Dès 60 ans (souvent 150 trimestres). Temps partiel : une part de pension + un revenu, et le client continue d\'acquérir des droits.</div></div>';
+    h+='<div style="border:1.5px solid var(--bord);border-radius:10px;padding:13px 14px"><div style="font-weight:700;font-size:12.5px;color:var(--noir);margin-bottom:5px">Cumul emploi-retraite</div><div style="font-size:11px;color:var(--gris);line-height:1.5">Retraite liquidée + reprise ou poursuite d\'activité. Cumul intégral ou plafonné, en général sans nouveaux droits.</div></div>';
+    h+='<div style="border:1.5px solid var(--bord);border-radius:10px;padding:13px 14px"><div style="font-weight:700;font-size:12.5px;color:var(--noir);margin-bottom:5px">Pension de réversion</div><div style="font-size:11px;color:var(--gris);line-height:1.5">'+R.rev+'</div></div>';
+    h+='</div><div style="display:flex;gap:12px;align-items:center;background:var(--gris-l);border-radius:10px;padding:12px 15px;margin-top:14px"><div style="font-size:20px">📄</div><div style="font-size:12px;color:var(--gris-f);line-height:1.5"><strong>Réflexe diagnostic :</strong> vérifier les droits déjà acquis via le Relevé de Situation Individuelle (RIS), envoyé tous les 5 ans dès 35 ans et consultable sur <strong style="color:var(--orange-hover)">info-retraite.fr</strong>.</div></div></div>';
+    body.innerHTML=h;
+  }
+  // BLOC B — fiabilisation par les trimestres
+  var fbody=document.getElementById('retFibBody');
+  if(fbody){
+    if(disabled){fbody.innerHTML='<div class="card" style="margin-bottom:0;color:var(--gris);font-size:12px">Fiabilisation indisponible : les calculs retraite sont désactivés (personne déjà retraitée).</div>';}
+    else{
+      var hh='<div class="card" style="margin-bottom:0"><div class="card-title"><span class="dot"></span>Ajustement par la durée d\'assurance<span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);background:rgba(43,94,167,0.10);padding:4px 9px;border-radius:20px">Chiffré</span></div>';
+      clients.forEach(function(cl){
+        var k=cl.key;
+        if(ED.retraite['treq'+k]==null)ED.retraite['treq'+k]=cl.req;
+        if(ED.retraite['tval'+k]==null)ED.retraite['tval'+k]=cl.req;
+        hh+='<div style="margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:var(--noir);margin-bottom:10px">'+cl.name+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+        hh+='<div style="background:var(--gris-l);border-radius:11px;padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">';
+        hh+=_retFibInput('Trimestres validés','tval'+k,ED.retraite['tval'+k]);
+        hh+=_retFibInput('Trimestres requis','treq'+k,ED.retraite['treq'+k]);
+        hh+='</div><div style="font-size:10.5px;color:var(--gris);line-height:1.5;margin-top:8px">Requis pré-rempli selon l\'année de naissance (169 à 172). Modifiable.</div></div>';
+        hh+='<div><div class="fiscal-row"><span class="fr-l">Pension pleine estimée</span><span class="fr-v" id="rPlein'+k+'">—</span></div>';
+        hh+='<div class="fiscal-row"><span class="fr-l">Trimestres manquants</span><span class="fr-v" id="rManq'+k+'">—</span></div>';
+        hh+='<div class="fiscal-row"><span class="fr-l">Coefficient (validés / requis)</span><span class="fr-v" id="rCoef'+k+'" style="color:var(--orange-hover)">—</span></div>';
+        hh+='<div class="fiscal-row"><span class="fr-l">Décote estimée (0,625 %/trim, max 12,5 %)</span><span class="fr-v" id="rDec'+k+'" style="color:var(--red)">—</span></div>';
+        hh+='<div class="fiscal-row" style="border-top:2px solid var(--bord);padding-top:10px;margin-top:4px"><span class="fr-l" style="font-weight:600">Pension fiabilisée</span><span class="fr-v" id="rFin'+k+'" style="color:var(--orange-hover);font-weight:700">—</span></div>';
+        hh+='<div style="font-size:10.5px;color:var(--gris);line-height:1.5;margin-top:9px" id="rMsg'+k+'"></div></div></div></div>';
+      });
+      hh+='<div style="font-size:10.5px;color:var(--gris);line-height:1.55;margin-top:6px;padding-top:10px;border-top:1px solid var(--bord)">Indicatif — n\'altère pas la simulation d\'effort ci-dessus. Le coefficient de minoration est cohérent avec l\'hypothèse affichée sous le graphe.</div></div>';
+      fbody.innerHTML=hh;
+      computeRetFib();
+    }
+  }
+}
+function onRetFibInput(key,val){if(!ED.retraite)ED.retraite={};ED.retraite[key]=+val||0;computeRetFib();}
+function computeRetFib(){
+  var clients=_retClients();
+  clients.forEach(function(cl){
+    var k=cl.key;var req=Math.max(1,+(ED.retraite['treq'+k]||cl.req));
+    var val=+(ED.retraite['tval'+k]);if(isNaN(val))val=req;
+    var pleinM=cl.rev/12*cl.tx/100;var manq=Math.max(0,req-val);
+    var coef=Math.min(1,val/req);var dec=Math.min(12.5,Math.min(20,manq)*0.625);var finM=pleinM*coef;
+    var set=function(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;};
+    set('rPlein'+k,fmt(Math.round(pleinM))+' €/mois');
+    set('rManq'+k,manq+' trim.');
+    set('rCoef'+k,(coef*100).toFixed(1).replace('.',',')+' %');
+    set('rDec'+k,'− '+dec.toFixed(2).replace('.',',')+' %');
+    set('rFin'+k,fmt(Math.round(finM))+' €/mois');
+    var msg=document.getElementById('rMsg'+k);
+    if(msg){if(manq<=0){msg.innerHTML='<span style="color:var(--green);font-weight:700">Carrière complète</span> — taux plein, pas de minoration.';}else{msg.innerHTML='Écart vs pension pleine : <strong style="color:var(--red)">− '+fmt(Math.round(pleinM-finM))+' €/mois</strong> ('+manq+' trimestres manquants).';}}
+  });
+}
+function toggleRetEduPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.eduPrint=on;var b=document.getElementById('retEduBlock');if(b)b.classList.toggle('retedu-print-visible',on);var l=document.getElementById('retEduPDFLabel');if(l)l.textContent=on?'Visible dans le PDF':'Masqué du PDF';}
+function toggleRetFibPrint(cb){var on=!!(cb&&cb.checked);if(!ED.retraite)ED.retraite={};ED.retraite.fibPrint=on;var b=document.getElementById('retFibBlock');if(b)b.classList.toggle('retfib-print-visible',on);var l=document.getElementById('retFibPDFLabel');if(l)l.textContent=on?'Visible dans le PDF':'Masqué du PDF';}
 
 
 // ╔══════════════════════════════════════════════════════════════════╗
